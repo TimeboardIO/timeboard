@@ -75,9 +75,9 @@ export default class ProjectDetails extends React.Component<Props, State> {
     printMembers(s: any): any {
         if (s.project.members) {
             var acc: any[] = [];
-            s.project.members.map((m: any) => {
-                acc.push(<div key={m} className="list-group-item">{m}</div>);
-            })
+            s.project.members.map((m: any) => 
+                acc.push(<div key={m} className="list-group-item">{m}</div>)
+            )
             return acc;
         }
         return (<div></div>);
