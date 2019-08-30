@@ -1,8 +1,7 @@
-import React, { MouseEvent } from "react"; 
+import React from "react";
 import { NavLink } from "react-router-dom";
-import ProjectDetails from "./project-details";
 import { Project, RPCProjectServiceBP } from "../api";
-import { bool } from "prop-types";
+import ProjectDetails from "./project-details";
 
  
 

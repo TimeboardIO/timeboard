@@ -1,7 +1,5 @@
-import React, { ChangeEvent, ReactNode } from "react";
+import React, { ChangeEvent } from "react";
 import { Project, RPCProjectServiceBP } from "../api";
-import Toast from "../common/toast";
-import ReactDOM from "react-dom";
 import ToastFactory from "../common/toast";
 
 class State {
@@ -82,6 +80,7 @@ export default class ProjectDetails extends React.Component<Props, State> {
             })
             return acc;
         }
+        return (<div></div>);
     }
 
     render() {

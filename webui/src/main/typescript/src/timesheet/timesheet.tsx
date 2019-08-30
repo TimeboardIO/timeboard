@@ -10,9 +10,7 @@ class ProjectTimesheetLineProps {
 
 export class ProjectTimesheetLine extends React.Component<ProjectTimesheetLineProps, any>{
 
-    constructor(props: ProjectTimesheetLineProps) {
-        super(props);
-    }
+   
 
     getClassName(load: number) {
         if (load < 0.2) {
