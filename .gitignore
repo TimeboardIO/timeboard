@@ -1,0 +1,5 @@
+node_modules/
+target/
+.idea
+*.iml
+.DS_Store

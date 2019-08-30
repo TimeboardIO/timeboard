@@ -1,0 +1,172 @@
+ .layout {
+
+     display: grid;
+     grid-template-columns: 15em 1fr;
+     position: fixed;
+     top: 0px;
+     left: 0px;
+     right: 0px;
+     bottom: 0px;
+
+
+     .main-nav {
+         overflow: hidden;
+         background-color: #4e73df;
+         background-image: -webkit-gradient(linear, left top, left bottom, color-stop(10%, #4e73df), to(#224abe));
+         background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+         background-size: cover;
+         color: white;
+
+         .logo {
+             background-image: url('images/logo.png');
+             background-size: contain;
+             background-repeat: no-repeat;
+             background-position: 1em;
+             padding-left: 3.7em;
+             line-height: 2em;
+             font-size: 2em;
+             text-align: left;
+         }
+
+         .user-details {
+             position: absolute;
+             bottom: 5px;
+             left: 1em;
+             text-transform: capitalize;
+
+             * {
+                 display: inline-block;
+                 margin-right: 10px;
+             }
+         }
+
+         .nav-bar {
+             color: white;
+             list-style: none;
+             padding: 0px;
+
+             a {
+                 color: white;
+
+             }
+
+             .active {
+                 background-color: #28a745 !important;
+             }
+         }
+     }
+
+     .main-placeholder {
+         background-color: #f8f9fc;
+         overflow-y: auto;
+         padding-bottom: 1em;
+         padding-top: 14px;
+     }
+
+ }
+
+ h1,
+ h2,
+ h3,
+ h4 {
+     color: darkorange;
+     text-transform: capitalize;
+ }
+
+ h3 {
+     color: #224abe;
+     font-size: 1.5em !important;
+ }
+
+
+ .cell {
+     margin: 5px;
+     width: 100px;
+ }
+
+ .timesheet {
+     .days {
+         * {
+             @extend .cell;
+             display: inline-block;
+             width: 100px;
+             text-align: center;
+             font-weight: bold;
+         }
+     }
+
+     .projects {
+         .project {
+
+             .projectName {
+                 @extend .cell;
+                 line-height: 3em;
+                 display: inline-block;
+                 font-weight: bold;
+                 text-transform: capitalize;
+             }
+
+             .projectDays {
+                 display: inline-block;
+
+                 * {
+                     line-height: 3em;
+                 }
+
+                 .load {
+                     @extend .cell;
+                     text-align: center;
+                     line-height: 2em;
+                     border-radius: 30px;
+                     border: none; 
+                     background-color: #28a745;
+                     font-size: 1.2em;
+                     color: white; 
+
+                     &.empty {
+                         color: crimson;
+                         border: 1px solid crimson;
+                         background-color: white;
+                     }
+
+                     &.good {
+                         color: royalblue;
+                         border: 1px solid royalblue;
+                         background-color: white;
+                     }
+
+                     &.todo {
+                         color: orange;
+                         border: 1px solid orange;
+                         background-color: white;
+                     }
+                 }
+             }
+
+             ;
+         }
+
+     }
+ }
+
+ #toast{
+    position: fixed;
+    max-width: 20%;
+    bottom: 0px; 
+    max-height: 5em;
+    background-color: #28a745;
+    color: white;
+    box-shadow: 0px 5px 20px 3px #111;
+    overflow-y: auto;
+    overflow-x: hidden;
+    text-align: center;
+    left: 0px;
+    right: 0px;
+    min-width: 10em;
+    word-wrap: break-word;
+    margin: 0 auto;
+
+    >* {
+        padding: 1em;
+    }
+ }

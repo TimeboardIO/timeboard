@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<features name="kronops-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
+
+    <feature name="kronops-datasource" version="${project.version}">
+        <config name="org.ops4j.datasource-kronops-core-ds">
+            dataSourceName=kronops-core-ds
+            osgi.jdbc.driver.class=com.mysql.cj.jdbc.Driver
+            url=jdbc:mysql://localhost:3306/epo?createDatabaseIfNotExist=true
+            user=root
+            password=epo
+            dialect=org.hibernate.dialect.MySQL8Dialect
+        </config>
+        <capability>
+            osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=kronops-core-ds
+        </capability>
+        <bundle start-level="70">mvn:mysql/mysql-connector-java/8.0.17</bundle>
+    </feature>
+
+    <feature name="kronops-core" version="${project.version}">
+        <feature>scr</feature>
+        <feature>transaction</feature>
+        <feature>jndi</feature>
+        <feature>pax-jdbc-config</feature>
+        <feature>pax-jdbc-pool-dbcp2</feature>
+        <feature>jdbc</feature>
+        <feature dependency="true">aries-blueprint</feature>
+        <feature version="[2,3)">jpa</feature>
+        <feature version="[5,6)">hibernate</feature>
+        <bundle start-level="70"> mvn:org.ops4j.pax.jdbc/pax-jdbc-mysql/1.4.0</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/core/${project.version}</bundle>
+    </feature>
+
+    <feature name="kronops-rpc-bride" version="${project.version}">
+        <feature>kronops-core</feature>
+        <bundle start-level="80">mvn:${project.groupId}/rpcbridge/${project.version}</bundle>
+    </feature>
+
+
+</features>

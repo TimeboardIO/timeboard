@@ -1,0 +1,16 @@
+@startuml
+
+
+
+package "kronops" {
+    KronopsProject - [core]
+    [ui] ..> core : use
+}
+
+package "Plugins" {
+    [Task List Project] ..> KronopsProject : use
+}
+
+
+
+@enduml
