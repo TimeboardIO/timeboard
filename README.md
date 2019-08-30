@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/pierremellet/kronops.svg?branch=develop)](https://travis-ci.com/pierremellet/kronops)
+
 Download Karaf & uncompress archive
    
    
