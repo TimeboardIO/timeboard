@@ -2,7 +2,8 @@
   "name": "epo",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8080",
+  "proxy": "http://localhost:8181",
+  "homepage": "/ui/",
   "dependencies": {
     "@types/jest": "24.0.15",
     "@types/node": "12.6.2",
@@ -19,7 +20,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "rm -rf ../../../target/classes/public/ && react-scripts build && mv build/ ../../../target/classes/public/",
+    "build": "rm -rf ../../../src/main/resources/www/ && react-scripts build && mv build/ ../../../src/main/resources/www/",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

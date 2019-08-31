@@ -3,3 +3,4 @@ target/
 .idea
 *.iml
 .DS_Store
+webui/src/main/resources/www/

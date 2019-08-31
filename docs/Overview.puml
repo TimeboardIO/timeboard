@@ -3,12 +3,9 @@
 
 
 package "kronops" {
-    KronopsProject - [core]
-    [ui] ..> core : use
-}
-
-package "Plugins" {
-    [Task List Project] ..> KronopsProject : use
+    [core]
+    [webui] ..> rpcbridge : use
+    [core] --> rpcbridge : implement
 }
 
 

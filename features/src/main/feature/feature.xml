@@ -31,10 +31,16 @@
         <bundle start-level="80">mvn:${project.groupId}/core/${project.version}</bundle>
     </feature>
 
-    <feature name="kronops-rpc-bride" version="${project.version}">
-        <feature>kronops-core</feature>
+    <feature name="kronops-rpc-bridge" version="${project.version}">
+        <feature>http</feature>
+        <feature>http-whiteboard</feature>
         <bundle start-level="80">mvn:${project.groupId}/rpcbridge/${project.version}</bundle>
     </feature>
 
-
+    <feature name="kronops-webui" version="${project.version}">
+        <feature>scr</feature>
+        <feature>http-whiteboard</feature>
+        <feature>kronops-rpc-bridge</feature>
+        <bundle start-level="80">mvn:${project.groupId}/webui/${project.version}</bundle>
+    </feature>
 </features>
