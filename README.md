@@ -32,3 +32,7 @@ Install Kronops
     feature:install kronops-core 
     feature:install kronops-rpcbridge 
     feature:install kronops-webui
+    
+Open webrowser 
+
+    http://localhost:8181/kronops/home.html
