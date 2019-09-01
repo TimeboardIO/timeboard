@@ -10,11 +10,11 @@ import javax.servlet.Servlet;
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/",
+                "osgi.http.whiteboard.servlet.pattern=/projects",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=kronops)"
         }
 )
-public class HomeServlet extends TemplateServlet {
+public class ProjectsServlet extends TemplateServlet {
 
 
 }
