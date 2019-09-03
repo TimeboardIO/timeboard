@@ -6,11 +6,12 @@ package kronops.core.model;
 import kronops.apigenerator.annotation.RPCEntity;
 
 import javax.persistence.*;
-//import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+//import javax.validation.constraints.NotNull;
 
 
 @Entity
@@ -21,8 +22,7 @@ public class Project implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(length = 50)
-    //@NotNull
+    @Column(length = 50, unique = true)
     private String name;
 
     @Temporal(TemporalType.DATE)

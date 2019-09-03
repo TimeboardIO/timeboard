@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <link href="/static/style.css" rel="stylesheet">
     <title>Kronops</title>
 </head>
@@ -10,6 +10,19 @@
 <h1>Projects</h1>
 
 <a th:href="@{/}">Home</a>
+
+
+<table>
+    <tr>
+        <th>id</th>
+        <th>Name</th>
+    </tr>
+    <tr th:each="project : ${projects}">
+        <td th:text="${project.id}">id</td>
+        <td th:text="${project.name}">name</td>
+    </tr>
+</table>
+
 
 
 </body>

@@ -2,6 +2,7 @@ package kronops.core.service;
 
 import kronops.apigenerator.annotation.RPCEndpoint;
 import kronops.apigenerator.annotation.RPCMethod;
+import kronops.core.api.UserServiceBP;
 import kronops.core.model.User;
 import org.osgi.service.component.annotations.Component;
 
@@ -10,11 +11,14 @@ import org.osgi.service.component.annotations.Component;
         service = UserServiceBP.class,
         immediate = true
 )
-public class UserServiceBP implements kronops.core.api.UserServiceBP {
+public class UserServiceBPImpl implements UserServiceBP {
 
     @Override
     @RPCMethod
     public User getCurrentUser(){
-        return null;
+        User u = new User();
+        u.setName("Hello");
+        u.setFirstName("World");
+        return u;
     }
 }

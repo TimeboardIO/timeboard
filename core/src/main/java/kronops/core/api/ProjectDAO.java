@@ -1,4 +1,6 @@
 package kronops.core.api;
 
-public interface ProjectDAO {
+import kronops.core.model.Project;
+
+public interface ProjectDAO extends BaseDAO<Long, Project>{
 }

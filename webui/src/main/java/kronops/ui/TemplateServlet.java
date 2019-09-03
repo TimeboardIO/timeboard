@@ -12,10 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 
-
-public class TemplateServlet extends HttpServlet {
+public abstract class TemplateServlet extends HttpServlet {
 
 
     private ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver(TemplateServlet.class.getClassLoader());
@@ -42,15 +43,23 @@ public class TemplateServlet extends HttpServlet {
         doService(request, response);
     }
 
+    protected Map<String, Object> getTemplateData() {
+        return new HashMap<>();
+    }
+
     protected void doService(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setCharacterEncoding(resolver.getCharacterEncoding());
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
 
-        WebContext ctx = new WebContext(request, response, request.getServletContext());
+        final WebContext ctx = new WebContext(request, response, request.getServletContext());
+        this.getTemplateData().forEach((s, o) -> {
+            ctx.setVariable(s, o);
+        });
         String templateName = getTemplateName(request);
         String result = engine.process(templateName, ctx);
+
 
         PrintWriter out = null;
         try {
@@ -67,7 +76,6 @@ public class TemplateServlet extends HttpServlet {
         if (contextPath == null) {
             contextPath = "";
         }
-
 
         return TemplateResolver.getTemplateName(requestPath.substring(contextPath.length()));
     }

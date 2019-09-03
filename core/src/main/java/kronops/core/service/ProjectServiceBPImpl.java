@@ -3,29 +3,34 @@ package kronops.core.service;
 import kronops.apigenerator.annotation.RPCEndpoint;
 import kronops.apigenerator.annotation.RPCMethod;
 import kronops.apigenerator.annotation.RPCParam;
+import kronops.core.api.ProjectDAO;
+import kronops.core.api.ProjectServiceBP;
 import kronops.core.model.Project;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RPCEndpoint
 @Component(
-        service = ProjectServiceBPImpl.class,
+        service = ProjectServiceBP.class,
         immediate = true
 )
-public class ProjectServiceBPImpl implements kronops.core.api.ProjectServiceBP {
+public class ProjectServiceBPImpl implements ProjectServiceBP {
+
+    @Reference
+    public ProjectDAO projectDAO;
 
     @Override
     @RPCMethod()
     public Project saveProject(@RPCParam("project") Project project){
-        return project;
+        return this.projectDAO.save(project);
     }
 
     @Override
     @RPCMethod(returnListOf = Project.class)
     public List<Project> getProjects(){
-        return new ArrayList<>();
+        return this.projectDAO.findAll();
     }
 
     @Override
