@@ -1,5 +1,12 @@
 [![Build Status](https://travis-ci.com/pierremellet/kronops.svg?branch=develop)](https://travis-ci.com/pierremellet/kronops)
 
+Prerequisites
+
+    * Java JDK 11
+    * OSX or Ubuntu (not tested on other OS)
+    * Internet connection with an access to maven central  
+
+
 Download Karaf & uncompress archive
    
    

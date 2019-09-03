@@ -2,10 +2,47 @@
 
 
 
-package "kronops" {
+node "kronops" {
+
     [core]
-    [webui] ..> rpcbridge : use
-    [core] --> rpcbridge : implement
+    [webui]
+
+
+    package "API" {
+        package "Services"{
+            [core] ---|> () "ProjectService"
+            [core] ---|> () "UserService"
+            [core] ---|> () "MembershipService"
+        }
+        package "DAO"{
+        [core] ---|> () "ProjectDAO"
+        [core] ---|> () "ProjectClusterDAO"
+        [core] ---|> () "UserDAO"
+        [core] ---|> () "ProjectMembershipDAO"
+        }
+    }
+
+    package "ExtensionPoints" {
+        [core] --|> () "ProjectExtPoint"
+        [core] --|> () "AuthenticationExtPoint"
+        [core] --|> () "ReportExtPoint"
+        [core] --|> () "IOConnectorExtPoint"
+    }
+
+
+
+    ProjectService <... [webui]
+    MembershipService <... [webui]
+    UserService <... [webui]
+
+}
+
+node "plugins"{
+    [JDBCAuthenticationPlugin]
+    [LDAPAuthenticationPlugin]
+
+    [JDBCAuthenticationPlugin] ..> AuthenticationExtPoint
+    [LDAPAuthenticationPlugin] ...> AuthenticationExtPoint
 }
 
 

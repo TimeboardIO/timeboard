@@ -1,0 +1,40 @@
+@startuml
+
+
+
+
+package "api"{
+
+
+    interface BaseDAO {
+      void update()
+      void delete()
+      void deleteByID()
+      void save()
+      void findByID()
+    }
+    interface ProjectService
+    interface ProjectDAO
+    interface ProjectClusterDAO
+    interface UserDAO
+    interface ProjectMembershipDAO
+
+
+    ProjectDAO --|> BaseDAO
+    ProjectClusterDAO --|> BaseDAO
+    UserDAO --|> BaseDAO
+    ProjectMembershipDAO --|> BaseDAO
+}
+
+package "dao"{
+    ProjectDAOIMPL --|> ProjectDAO
+}
+
+package "service"{
+    ProjectServiceIMPL --|> ProjectService
+}
+
+
+
+
+@enduml
