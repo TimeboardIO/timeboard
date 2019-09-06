@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html th:replace="~{layouts/general.html :: main-fragment(
+                                                '/timesheet',
+                                                ~{::title},
+                                                ~{:: #home-main-content}
+                                               )}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Timesheet</title>
+</head>
+<body>
+
+<div id="home-main-content">
+
+    <h1>Timesheet</h1>
+
+</div>
+
+</body>
+</html>

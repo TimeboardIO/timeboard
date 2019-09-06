@@ -14,11 +14,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <modules>
-        <module>maven/kronops-apigenerator</module>
-        <module>maven/kronops-apigenerator-sdk</module>
         <module>core</module>
-        <module>rpcbridge</module>
+        <module>security</module>
         <module>webui</module>
+        <module>projects</module>
+        <module>timesheet</module>
         <module>features</module>
     </modules>
 

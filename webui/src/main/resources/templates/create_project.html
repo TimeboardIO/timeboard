@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html th:replace="~{layouts/general.html :: main-fragment(
+                                                '/projects',
+                                                ~{::title},
+                                                ~{:: #home-main-content}
+                                               )}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+
+<div id="home-main-content">
+
+    <form class="ui form" action="" method="post" enctype="application/x-www-form-urlencoded">
+        <div class="field">
+            <label>Project Name</label>
+            <input type="text" name="projectName" required placeholder="Project Name">
+        </div>
+
+        <div class="field">
+            <label>Project type</label>
+            <select name="projectType" required>
+                <option class="ui card"
+                        th:text="${project.getProjectName}"
+                        th:value="${project.getClass().getName()}"
+                        th:each="project : ${projects}" >
+                </option>
+            </select>
+        </div>
+        <button class="ui button" type="submit">Submit</button>
+    </form>
+
+</div>
+
+</body>
+</html>

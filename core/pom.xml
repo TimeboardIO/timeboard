@@ -17,6 +17,16 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.9.9</version>
+        </dependency>
+        <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>javax.persistence</artifactId>
             <version>2.1.0</version>
@@ -53,10 +63,28 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>kronops</groupId>
-            <artifactId>kronops-apigenerator-sdk</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.http</artifactId>
+            <version>1.2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>3.0.11.RELEASE</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.http.whiteboard</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>
@@ -71,13 +99,19 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            kronops.core.api.*,
-                            kronops.core.model.*,
-                            kronops.apigenerator.annotation.*
+                            kronops.core.api,
+                            kronops.core.model,
+                            kronops.apigenerator.annotation,
+                            org.thymeleaf.*,
                         </Export-Package>
                         <Import-Package>
                             javax.persistence;version="[2,3)",
-                            *
+                            javax.servlet,
+                            javax.servlet.http,
+                            org.apache.aries.jpa.template,
+                            org.osgi.*,
+                            kronops.core.api,
+                            !com.fasterxml
                         </Import-Package>
                         <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
                         <Embed-Transitive>true</Embed-Transitive>

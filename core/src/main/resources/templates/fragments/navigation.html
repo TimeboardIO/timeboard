@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="nav(title)">
+    <div class="ui secondary pointing menu">
+        <a class="item" th:classappend="${title} == '/'  ? 'active':''" th:href="@{/}">Home</a>
+        <a class="item" th:each="nav : ${navs}" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:href="${nav.getNavigationPath()}" th:text="${nav.getNavigationLabel()}"></a>
+
+        <div class="right menu">
+            <a class="item" th:href="@{/logout}">
+                <i class="sign out alternate icon">
+
+                </i></a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

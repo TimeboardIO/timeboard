@@ -2,6 +2,23 @@
 
 <features name="kronops-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
+    <feature  name="kronops-base" version="${project.version}">
+        <feature>scr</feature>
+        <feature>http</feature>
+        <feature>http-whiteboard</feature>
+        <feature>transaction</feature>
+        <feature>jndi</feature>
+        <feature>pax-jdbc-config</feature>
+        <feature>pax-jdbc-pool-dbcp2</feature>
+        <feature>jdbc</feature>
+        <feature>jaas</feature>
+        <feature dependency="true">aries-blueprint</feature>
+        <feature version="[2,3)">jpa</feature>
+        <feature version="[5,6)">hibernate</feature>
+        <bundle start-level="70">mvn:mysql/mysql-connector-java/8.0.17</bundle>
+        <bundle start-level="70"> mvn:org.ops4j.pax.jdbc/pax-jdbc-mysql/1.4.0</bundle>
+    </feature>
+
     <feature name="kronops-datasource" version="${project.version}">
         <config name="org.ops4j.datasource-kronops-core-ds">
             dataSourceName=kronops-core-ds
@@ -14,33 +31,36 @@
         <capability>
             osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=kronops-core-ds
         </capability>
-        <bundle start-level="70">mvn:mysql/mysql-connector-java/8.0.17</bundle>
     </feature>
 
     <feature name="kronops-core" version="${project.version}">
-        <feature>scr</feature>
-        <feature>transaction</feature>
-        <feature>jndi</feature>
-        <feature>pax-jdbc-config</feature>
-        <feature>pax-jdbc-pool-dbcp2</feature>
-        <feature>jdbc</feature>
-        <feature dependency="true">aries-blueprint</feature>
-        <feature version="[2,3)">jpa</feature>
-        <feature version="[5,6)">hibernate</feature>
-        <bundle start-level="70"> mvn:org.ops4j.pax.jdbc/pax-jdbc-mysql/1.4.0</bundle>
-        <bundle start-level="80">mvn:${project.groupId}/core/${project.version}</bundle>
+        <feature>kronops-base</feature>
+        <feature>kronops-datasource</feature>
+        <bundle start-level="85">mvn:${project.groupId}/core/${project.version}</bundle>
     </feature>
 
-    <feature name="kronops-rpc-bridge" version="${project.version}">
-        <feature>http</feature>
-        <feature>http-whiteboard</feature>
-        <bundle start-level="80">mvn:${project.groupId}/rpcbridge/${project.version}</bundle>
+
+
+    <feature name="kronops-security" version="${project.version}">
+        <feature>kronops-core</feature>
+        <bundle start-level="90">mvn:${project.groupId}/security/${project.version}</bundle>
     </feature>
 
     <feature name="kronops-webui" version="${project.version}">
-        <feature>scr</feature>
-        <feature>http-whiteboard</feature>
-        <feature>kronops-rpc-bridge</feature>
-        <bundle start-level="80">mvn:${project.groupId}/webui/${project.version}</bundle>
+        <feature>war</feature>
+        <feature>kronops-core</feature>
+        <feature>kronops-security</feature>
+        <bundle start-level="90">mvn:${project.groupId}/webui/${project.version}</bundle>
     </feature>
+
+    <feature name="kronops-projects" version="${project.version}">
+        <feature>kronops-core</feature>
+        <bundle start-level="90">mvn:${project.groupId}/projects/${project.version}</bundle>
+    </feature>
+
+    <feature name="kronops-timesheet" version="${project.version}">
+        <feature>kronops-core</feature>
+        <bundle start-level="90">mvn:${project.groupId}/timesheet/${project.version}</bundle>
+    </feature>
+
 </features>

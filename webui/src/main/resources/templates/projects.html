@@ -1,29 +1,45 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html th:replace="~{layouts/general.html :: main-fragment(
+                                                '/projects',
+                                                ~{::title},
+                                                ~{:: #home-main-content}
+                                               )}"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="utf-8"/>
-    <link href="/static/style.css" rel="stylesheet">
-    <title>Kronops</title>
+    <title>Home Page</title>
 </head>
 <body>
 
-<h1>Projects</h1>
+<div id="home-main-content">
 
-<a th:href="@{/}">Home</a>
+    <a th:href="@{/projects/create}" class="ui button">Create Project</a>
 
+    <table class="ui celled table">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>type</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="project : ${projects}">
+            <td th:text="${project.id}">id</td>
+            <td th:text="${project.name}">name</td>
+            <td th:text="${project.type}">type</td>
+            <td>
+                <a th:href="@{/kanban?id={id}(id=${project.id})}" class="ui button">Open</a>
+                <a th:href="@{/projects/delete?id={id}(id=${project.id})}" class="ui button">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-<table>
-    <tr>
-        <th>id</th>
-        <th>Name</th>
-    </tr>
-    <tr th:each="project : ${projects}">
-        <td th:text="${project.id}">id</td>
-        <td th:text="${project.name}">name</td>
-    </tr>
-</table>
-
-
+</div>
 
 </body>
 </html>

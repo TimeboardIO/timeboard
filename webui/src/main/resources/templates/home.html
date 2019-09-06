@@ -1,17 +1,33 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html th:replace="~{layouts/general.html :: main-fragment(
+                                                '/',
+                                                ~{::title},
+                                                ~{:: #home-main-content}
+                                               )}"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="utf-8"/>
-    <link href="/static/style.css" rel="stylesheet">
-    <title>Kronops</title>
+    <title>Home Page</title>
 </head>
 <body>
 
-<h1>Kronops -</h1>
+<div id="home-main-content">
 
-<a th:href="@{/projects}">Projects</a>
+         <div class="ui card" th:each="plugin : ${plugins}">
+            <div class="content">
+                <div class="header" th:text="${plugin.getProjectName()}">Project Type Name</div>
+            </div>
+            <div class="content">
+                <div th:text="${plugin.getProjectDescription()}"></div>
+            </div>
+            <div class="extra content">
+                <a th:href="${plugin.getServletPath()}" class="ui button">Create Project</a>
+            </div>
+        </div>
 
-
+</div>
 
 </body>
 </html>
