@@ -8,9 +8,15 @@ node "JVM 11" {
 
          node "FeatureApp"{
              [core] -- mysql
+             [core-ui] -- mysql
+             [security] -- core
+             [security] -- [core-ui]
              [projects] -- core
              [timesheet] -- core
              [home] -- core
+             [projects] -- [core-ui]
+             [timesheet] -- [core-ui]
+             [home] -- [core-ui]
 
 
          }

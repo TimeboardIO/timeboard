@@ -43,4 +43,4 @@ Install Kronops
     
 Open webrowser 
 
-    http://localhost:8181/kronops/home.html
+    http://localhost:8181
