@@ -1,0 +1,17 @@
+<!DOCTYPE HTML>
+<html th:fragment="main-fragment (route, title, mainContent)"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:replace="${title}">Page 1 Title</title>
+    <link href="/static/semantic/semantic.min.css" rel="stylesheet">
+    <script src="/static/jquery/jquery-3.4.1.min.js" type="text/javascript"></script>
+    <script src="/static/semantic/semantic.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div th:replace="fragments/navigation.html :: nav(${route})"></div>
+<div style="padding:1em" th:insert="${mainContent} ?: ~{}">
+    Main content
+</div>
+</body>
+</html>

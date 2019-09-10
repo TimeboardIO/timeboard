@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html th:replace="~{layouts/general.html :: main-fragment(
+                                                '/',
+                                                ~{::title},
+                                                ~{:: #home-main-content}
+                                               )}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+
+<div id="home-main-content">
+
+    <div class="ui card" th:each="plugin : ${plugins}">
+        <div class="content">
+            <div class="header" th:text="${plugin.getProjectName()}">Project Type Name</div>
+        </div>
+        <div class="content">
+            <div th:text="${plugin.getProjectDescription()}"></div>
+        </div>
+        <div class="extra content">
+            <a class="ui button" th:href="${plugin.getServletPath()}">Create Project</a>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

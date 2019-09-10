@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html th:replace="~{layouts/general.html :: main-fragment(
+                                                '/projects',
+                                                ~{::title},
+                                                ~{:: #home-main-content}
+                                               )}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+
+<div id="home-main-content">
+    <div class="ui negative message" th:if="${error}">
+        <i class="close icon"></i>
+        <div class="header">
+            Failed to create project
+        </div>
+        <p th:text="${error}">:(</p>
+    </div>
+    <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+        <div class="field">
+            <label>Project Name</label>
+            <input name="projectName" placeholder="Project Name" required type="text">
+        </div>
+        <button class="ui button" type="submit">Submit</button>
+    </form>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html th:replace="~{layouts/general.html :: main-fragment(
+                                                '/projects',
+                                                ~{::title},
+                                                ~{:: #home-main-content}
+                                               )}"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Home Page</title>
+</head>
+<body>
+
+<div id="home-main-content">
+
+    <a class="ui button" th:href="@{/projects/create}">Create Project</a>
+
+    <table class="ui celled table">
+        <thead>
+        <tr>
+            <th>id</th>
+            <th>Name</th>
+            <th>Members</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="project : ${projects}">
+            <td th:text="${project.id}">id</td>
+            <td th:text="${project.name}">name</td>
+            <td><span th:text="${project.members.size()}"></span> members</td>
+            <td>
+                <a class="ui button" th:href="@{/projects/details?id={id}(id=${project.id})}">Open</a>
+                <a class="ui button" th:href="@{/projects/delete?id={id}(id=${project.id})}">Delete</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+
+</body>
+</html>

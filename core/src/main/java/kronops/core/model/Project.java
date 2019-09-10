@@ -12,10 +12,10 @@ package kronops.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -48,8 +48,6 @@ public class Project implements Serializable {
     @Column(length = 50, unique = true)
     private String name;
 
-    @Column(length = 150)
-    private String type;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -57,7 +55,12 @@ public class Project implements Serializable {
     @Column(length = 500)
     private String comments;
 
-    @OneToMany(targetEntity = ProjectMembership.class, mappedBy = "project")
+    @OneToMany(targetEntity = ProjectMembership.class,
+            mappedBy = "project",
+            orphanRemoval = true,
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.EAGER
+    )
     private List<ProjectMembership> members;
 
     public Project() {
@@ -104,11 +107,4 @@ public class Project implements Serializable {
         this.members = members;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 }

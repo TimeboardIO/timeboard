@@ -12,10 +12,10 @@ package kronops.security.service;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,41 +26,32 @@ package kronops.security.service;
  * #L%
  */
 
+import kronops.core.api.dao.UserDAO;
+import kronops.core.api.exceptions.BusinessException;
+import kronops.core.model.User;
 import kronops.security.api.LoginService;
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.PasswordCallback;
-import javax.security.auth.login.LoginContext;
-import javax.security.auth.login.LoginException;
-import java.util.Map;
+import org.osgi.service.component.annotations.Reference;
 
 @Component(
         service = LoginService.class,
-        immediate = true,
-        property = {
-                "kronops.security.realm=kronops"
-        }
+        immediate = true
 )
 public class LoginServiceImpl implements LoginService {
 
-    private String realm;
 
-    @Activate
-    private void init(Map<String, String> props){
-        this.realm = props.get("kronops.security.realm");
-    }
-    
+    @Reference
+    private UserDAO userDAO;
+
     @Override
-    public void logUser(String username, String password) throws LoginException {
+    public void logUser(String username, String password) throws BusinessException {
 
-        LoginContext lc = new LoginContext(this.realm, callbacks -> {
-            ((NameCallback) callbacks[0]).setName(username);
-            ((PasswordCallback) callbacks[1]).setPassword(password.toCharArray());
-        });
+        try {
+            User user = this.userDAO.autenticateUser(username, password);
 
-        lc.login();
+        }catch (Exception e){
+            throw new BusinessException("Wrong credentials");
+        }
 
     }
 }

@@ -4,6 +4,7 @@ Prerequisites
 
     * Java JDK 11
     * OSX or Ubuntu (not tested on other OS)
+    * Maven 3
     * Internet connection with an access to maven central  
 
 

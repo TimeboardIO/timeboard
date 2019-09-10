@@ -78,12 +78,12 @@ public class AuthSecurityFilter implements Filter {
 
         boolean isLogged = req.getSession(false) != null;
         if (isLogged) {
-            isLogged = req.getSession(false).getAttribute("username") != null;
+            isLogged = req.getSession(false).getAttribute("user") != null;
         }
 
 
         if (!isLogged && !isStatic && !isLogin) {
-            res.sendRedirect(this.loginURL);
+            res.sendRedirect(this.loginURL + "?origin=" + ((HttpServletRequest) request).getRequestURI());
         } else {
             chain.doFilter(request, response);
         }

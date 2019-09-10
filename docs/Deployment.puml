@@ -1,0 +1,35 @@
+@startuml
+
+database mysql
+
+node "JVM 11" {
+    node "Apache Karaf"{
+
+
+         node "FeatureApp"{
+             [core] -- mysql
+             [projects] -- core
+             [timesheet] -- core
+             [home] -- core
+
+
+         }
+
+
+
+         [JPA (hibernate-osgi)] ---- core
+         [JAAS (Karaf)] --- core
+         [JTA (Apache Geronimo)] --- core
+         [JNDI (Karaf)] --- core
+         ["Log (log4j)"] ---- core
+
+         ["Http Service (Jetty)"] -- projects
+         ["Http Service (Jetty)"] -- timesheet
+         ["Http Service (Jetty)"] -- home
+    }
+}
+
+
+
+
+@enduml
