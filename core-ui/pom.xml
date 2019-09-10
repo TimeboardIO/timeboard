@@ -86,6 +86,7 @@
                             kronops.core.ui,
                             com.fasterxml.jackson.databind,
                             com.fasterxml.jackson.core,
+                            com.fasterxml.jackson.*,
                         </Export-Package>
                         <Import-Package>
                             javax.servlet,

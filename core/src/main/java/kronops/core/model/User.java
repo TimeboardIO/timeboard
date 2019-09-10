@@ -74,29 +74,10 @@ public class User implements Serializable {
     private boolean imputationFutur = false;
 
     @Column(nullable = false)
-    private boolean projectManager = false;
-
-    @Column(nullable = false)
     private boolean validateOwnImputation = false;
-
 
     @Column(nullable = true)
     private String matriculeID;
-
-    @Column(nullable = true)
-    private String mantisUserName;
-
-    @Column(nullable = true)
-    private String jiraUserName;
-
-    @Column(nullable = true)
-    private String mailToken;
-
-    @Column(nullable = true)
-    private Date mailTokenEndDate;
-
-    @Column(nullable = true)
-    private String apiToken;
 
 
     public User() {
@@ -186,13 +167,6 @@ public class User implements Serializable {
         this.imputationFutur = imputationFutur;
     }
 
-    public boolean isProjectManager() {
-        return projectManager;
-    }
-
-    public void setProjectManager(boolean projectManager) {
-        this.projectManager = projectManager;
-    }
 
     public boolean isValidateOwnImputation() {
         return validateOwnImputation;
@@ -210,43 +184,5 @@ public class User implements Serializable {
         this.matriculeID = matriculeID;
     }
 
-    public String getMantisUserName() {
-        return mantisUserName;
-    }
 
-    public void setMantisUserName(String mantisUserName) {
-        this.mantisUserName = mantisUserName;
-    }
-
-    public String getJiraUserName() {
-        return jiraUserName;
-    }
-
-    public void setJiraUserName(String jiraUserName) {
-        this.jiraUserName = jiraUserName;
-    }
-
-    public String getMailToken() {
-        return mailToken;
-    }
-
-    public void setMailToken(String mailToken) {
-        this.mailToken = mailToken;
-    }
-
-    public Date getMailTokenEndDate() {
-        return mailTokenEndDate;
-    }
-
-    public void setMailTokenEndDate(Date mailTokenEndDate) {
-        this.mailTokenEndDate = mailTokenEndDate;
-    }
-
-    public String getApiToken() {
-        return apiToken;
-    }
-
-    public void setApiToken(String apiToken) {
-        this.apiToken = apiToken;
-    }
 }

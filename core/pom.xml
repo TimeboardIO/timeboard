@@ -48,6 +48,12 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.transaction.control</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.component.annotations</artifactId>
             <version>1.4.0</version>
             <scope>provided</scope>
@@ -83,6 +89,7 @@
                         <Import-Package>
                             javax.persistence;version="[2,3)",
                             org.apache.aries.jpa.template,
+                            javax.transaction,
                             org.osgi.*,
                             org.w3c.dom
                         </Import-Package>

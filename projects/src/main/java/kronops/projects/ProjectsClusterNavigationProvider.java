@@ -1,8 +1,8 @@
-package kronops.security.service;
+package kronops.projects;
 
 /*-
  * #%L
- * security
+ * KanbanProjectPlugin
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -26,32 +26,22 @@ package kronops.security.service;
  * #L%
  */
 
-import kronops.core.api.dao.UserDAO;
-import kronops.core.api.exceptions.BusinessException;
-import kronops.core.model.User;
-import kronops.security.api.LoginService;
+import kronops.core.ui.NavigationExtPoint;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 @Component(
-        service = LoginService.class,
+        service = NavigationExtPoint.class,
         immediate = true
 )
-public class LoginServiceImpl implements LoginService {
-
-
-    @Reference
-    private UserDAO userDAO;
+public class ProjectsClusterNavigationProvider implements NavigationExtPoint {
 
     @Override
-    public void logUser(String username, String password) throws BusinessException {
+    public String getNavigationLabel() {
+        return "Cluster";
+    }
 
-        try {
-            User user = this.userDAO.autenticateUser(username, password);
-
-        }catch (Exception e){
-            throw new BusinessException("Wrong credentials");
-        }
-
+    @Override
+    public String getNavigationPath() {
+        return "/clusters";
     }
 }

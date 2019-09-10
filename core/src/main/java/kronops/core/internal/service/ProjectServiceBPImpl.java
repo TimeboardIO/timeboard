@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LogService;
 
+import javax.transaction.TransactionManager;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,9 +52,12 @@ import java.util.stream.Collectors;
 )
 public class ProjectServiceBPImpl implements ProjectServiceBP {
 
+
+    @Reference
+    public TransactionManager transactionManager;
+
     @Reference
     public ProjectDAO projectDAO;
-
 
     @Reference
     public ProjectMembershipDAO projectMembershipDAO;
@@ -109,6 +113,7 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
         this.projectDAO.update(project);
         return project;
     }
+
 
     @Override
     public Project updateProject(Project project, Map<Long, ProjectRole> memberships) throws BusinessException {

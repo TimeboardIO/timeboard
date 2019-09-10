@@ -23,6 +23,7 @@
             <th>id</th>
             <th>Name</th>
             <th>Members</th>
+            <th>Clusters</th>
             <th></th>
         </tr>
         </thead>
@@ -31,6 +32,7 @@
             <td th:text="${project.id}">id</td>
             <td th:text="${project.name}">name</td>
             <td><span th:text="${project.members.size()}"></span> members</td>
+            <td><span th:text="${project.cluster.name}"></span></td>
             <td>
                 <a class="ui button" th:href="@{/projects/details?id={id}(id=${project.id})}">Open</a>
                 <a class="ui button" th:href="@{/projects/delete?id={id}(id=${project.id})}">Delete</a>

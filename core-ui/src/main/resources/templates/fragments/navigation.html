@@ -11,7 +11,9 @@
             <a class="item" th:href="@{/logout}">
                 <i class="sign out alternate icon">
 
-                </i><span th:text="${user.name}"></span></a>
+                </i>
+                <span th:if=${user} th:text="${user.name}"></span>
+            </a>
         </div>
     </div>
 </div>

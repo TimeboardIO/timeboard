@@ -46,7 +46,6 @@ import java.util.List;
 @Transactional
 public class UserDAOImpl implements UserDAO {
 
-
     @Reference(target = "(osgi.unit.name=kronops-pu)")
     JpaTemplate jpa;
 

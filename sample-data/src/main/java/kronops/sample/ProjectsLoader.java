@@ -26,43 +26,57 @@ package kronops.sample;
  * #L%
  */
 
+import kronops.core.api.bp.ProjectServiceBP;
+import kronops.core.api.dao.ProjectMembershipDAO;
+import kronops.core.api.dao.ProjectsClusterDAO;
 import kronops.core.api.dao.UserDAO;
 import kronops.core.api.exceptions.BusinessException;
-import kronops.core.model.User;
+import kronops.core.model.*;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.Date;
-
 @Component(
-        service = UserLoader.class,
+        service = ProjectsLoader.class,
         immediate = true
 )
-public class UserLoader {
+public class ProjectsLoader {
+
+    @Reference
+    ProjectsClusterDAO projectsClusterDAO;
+
+    @Reference
+    UserLoader userLoader;
+
 
     @Reference
     UserDAO userDAO;
 
 
+    @Reference
+    ProjectServiceBP projectServiceBP;
+
+    @Reference
+    ProjectMembershipDAO projectMembershipDAO;
+
     @Activate
     public void load() throws BusinessException {
-        for (int i = 0; i < 10; i++) {
-            User u = new User();
-            u.setName("kronops" + i);
-            u.setPassword("kronops" + i);
-            u.setEmail("user" + i + "@kronops.com");
-            u.setImputationFutur(true);
-            u.setBeginWorkDate(new Date());
-            u.setFirstName("User" + i);
-            u.setLogin("kronops" + i);
-            u.setAccountCreationTime(new Date());
-            try {
-                this.userDAO.createUser(u);
-            } catch (BusinessException e) {
-                e.printStackTrace();
-            }
-        }
+        User u1 = this.userDAO.findUserByLogin("kronops1");
+        User u2 = this.userDAO.findUserByLogin("kronops2");
+
+        Project newProject = this.projectServiceBP.createProject(u1, "Test Project");
+
+        ProjectMembership projectMembership = new ProjectMembership(newProject, u2, ProjectRole.CONTRIBUTOR);
+
+        this.projectMembershipDAO.save(projectMembership);
+
+
+        ProjectCluster projectCluster = new ProjectCluster();
+        projectCluster.setName("Root Cluster");
+
+        this.projectsClusterDAO.save(projectCluster);
+
+        this.projectsClusterDAO.addProjectToCluster(projectCluster, newProject);
 
     }
 

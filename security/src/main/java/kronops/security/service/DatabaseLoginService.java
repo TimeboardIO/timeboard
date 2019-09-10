@@ -1,8 +1,8 @@
-package kronops.sample;
+package kronops.security.service;
 
 /*-
  * #%L
- * sample-data
+ * security
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -29,42 +29,29 @@ package kronops.sample;
 import kronops.core.api.dao.UserDAO;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
-import org.osgi.service.component.annotations.Activate;
+import kronops.security.api.LoginService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.Date;
-
 @Component(
-        service = UserLoader.class,
+        service = LoginService.class,
         immediate = true
 )
-public class UserLoader {
+public class DatabaseLoginService implements LoginService {
+
 
     @Reference
-    UserDAO userDAO;
+    private UserDAO userDAO;
 
+    @Override
+    public void logUser(String username, String password) throws BusinessException {
 
-    @Activate
-    public void load() throws BusinessException {
-        for (int i = 0; i < 10; i++) {
-            User u = new User();
-            u.setName("kronops" + i);
-            u.setPassword("kronops" + i);
-            u.setEmail("user" + i + "@kronops.com");
-            u.setImputationFutur(true);
-            u.setBeginWorkDate(new Date());
-            u.setFirstName("User" + i);
-            u.setLogin("kronops" + i);
-            u.setAccountCreationTime(new Date());
-            try {
-                this.userDAO.createUser(u);
-            } catch (BusinessException e) {
-                e.printStackTrace();
-            }
+        try {
+            User user = this.userDAO.autenticateUser(username, password);
+
+        } catch (Exception e) {
+            throw new BusinessException("Wrong credentials");
         }
 
     }
-
-
 }

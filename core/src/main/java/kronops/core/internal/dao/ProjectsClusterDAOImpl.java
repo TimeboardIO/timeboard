@@ -26,9 +26,10 @@ package kronops.core.internal.dao;
  * #L%
  */
 
-import kronops.core.api.dao.ProjectDAO;
+import kronops.core.api.dao.ProjectsClusterDAO;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.Project;
+import kronops.core.model.ProjectCluster;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,68 +40,55 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Component(
-        service = ProjectDAO.class,
+        service = ProjectsClusterDAO.class,
         immediate = true,
         scope = ServiceScope.SINGLETON
 )
 @Transactional
-public class ProjectDAOImpl implements ProjectDAO {
+public class ProjectsClusterDAOImpl implements ProjectsClusterDAO {
 
     @Reference(target = "(osgi.unit.name=kronops-pu)", scope = ReferenceScope.BUNDLE)
     JpaTemplate jpa;
 
-    @Override
-    public Project save(Project object) throws BusinessException {
-        try {
-            jpa.tx(em -> {
-                em.persist(object);
-                em.flush();
-            });
-        } catch (Exception e) {
-            throw new BusinessException(e);
-        }
-
-        return object;
-    }
 
     @Override
-    public Project update(Project object) throws BusinessException {
-        return jpa.txExpr(em -> {
-            em.merge(object);
-            em.flush();
+    public ProjectCluster save(ProjectCluster object) throws BusinessException {
+        return this.jpa.txExpr(entityManager -> {
+            entityManager.persist(object);
+            entityManager.flush();
             return object;
         });
     }
 
-
     @Override
-    public Project delete(Project object) {
-        jpa.tx(em -> {
-            Project p = em.find(Project.class, object.getId());
-            em.remove(p);
-            em.flush();
-        });
-        return object;
+    public ProjectCluster update(ProjectCluster object) throws BusinessException {
+        return null;
     }
 
     @Override
-    public Project findById(Long objectPkey) {
-        return jpa.txExpr(em -> {
-            Project data = em.createQuery("select p from Project p where p.id = :id", Project.class)
-                    .setParameter("id", objectPkey)
-                    .getSingleResult();
-            return data;
-        });
+    public ProjectCluster delete(ProjectCluster object) {
+        return null;
     }
 
     @Override
-    public List<Project> findAll() {
-        return jpa.txExpr(em -> {
-            List<Project> data = em.createQuery("select p from Project p", Project.class)
-                    .getResultList();
-            return data;
-        });
+    public ProjectCluster findById(Long objectPkey) {
+        return null;
     }
 
+    @Override
+    public List<ProjectCluster> findAll() {
+        return null;
+    }
 
+    @Override
+    public void addProjectToCluster(ProjectCluster projectCluster, Project newProject) {
+        this.jpa.tx(entityManager -> {
+            ProjectCluster c = entityManager.find(ProjectCluster.class, projectCluster.getId());
+            Project p = entityManager.find(Project.class, newProject.getId());
+
+            p.setCluster(c);
+
+            entityManager.flush();
+        });
+    }
 }

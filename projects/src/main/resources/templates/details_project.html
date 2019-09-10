@@ -20,6 +20,7 @@
             $("#"+userID).remove();
         }
 
+
     </script>
     <form action="" class="ui form" enctype="application/x-www-form-urlencoded" id="projects" method="post">
         <input name="projectId" required th:value="${project.id}" type="hidden">
@@ -67,6 +68,10 @@
                 </tbody>
             </table>
         </div>
+
+        <h4 class="ui dividing header">Clusters</h4>
+
+
         <button class="ui button" type="submit">Submit</button>
     </form>
     <script>
@@ -87,6 +92,7 @@
                     },
                 minCharacters : 3
             });
+
 
     </script>
 </div>

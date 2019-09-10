@@ -28,14 +28,14 @@ package kronops.projects;
 
 import kronops.core.api.bp.ProjectServiceBP;
 import kronops.core.ui.KronopsServlet;
-import kronops.core.ui.NavigationExtPoint;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -48,7 +48,6 @@ import java.util.Map;
         }
 )
 public class ProjectsServlet extends KronopsServlet {
-
 
 
     @Reference

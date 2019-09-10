@@ -29,13 +29,12 @@ package kronops.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 
 @Entity
-public class Project implements Serializable {
+public class ProjectCluster implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,27 +43,19 @@ public class Project implements Serializable {
     @Column(length = 50, unique = true)
     private String name;
 
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
-
-    @Column(length = 500)
-    private String comments;
-
-    @OneToMany(targetEntity = ProjectMembership.class,
-            mappedBy = "project",
-            orphanRemoval = true,
+    @OneToMany(targetEntity = Project.class,
+            mappedBy = "cluster",
             cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER
     )
-    private Set<ProjectMembership> members;
+    private Set<Project> projects;
 
-    @ManyToOne(targetEntity = ProjectCluster.class)
-    private ProjectCluster cluster;
+    @OneToOne(targetEntity = ProjectCluster.class, optional = true, fetch = FetchType.EAGER)
+    private ProjectCluster parent;
 
-    public Project() {
-
-        members = new HashSet<>();
-
+    public ProjectCluster() {
+        this.projects = new HashSet<>();
+        this.parent = null;
     }
 
     public long getId() {
@@ -83,35 +74,19 @@ public class Project implements Serializable {
         this.name = name;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Set<Project> getProjects() {
+        return projects;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setProjects(Set<Project> projects) {
+        this.projects = projects;
     }
 
-    public String getComments() {
-        return comments;
+    public ProjectCluster getParent() {
+        return parent;
     }
 
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
-
-    public Set<ProjectMembership> getMembers() {
-        return members;
-    }
-
-    public void setMembers(Set<ProjectMembership> members) {
-        this.members = members;
-    }
-
-    public ProjectCluster getCluster() {
-        return cluster;
-    }
-
-    public void setCluster(ProjectCluster cluster) {
-        this.cluster = cluster;
+    public void setParent(ProjectCluster parent) {
+        this.parent = parent;
     }
 }
