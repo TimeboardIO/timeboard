@@ -26,9 +26,9 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.bp.ProjectServiceBP;
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.ProjectServiceBP;
 import kronops.core.api.exceptions.BusinessException;
+import kronops.core.api.TreeNode;
 import kronops.core.model.Project;
 import kronops.core.model.ProjectRole;
 import kronops.core.ui.KronopsServlet;
@@ -61,14 +61,8 @@ import java.util.Map;
 )
 public class DetailsProjectServlet extends KronopsServlet {
 
-
     @Reference
     public ProjectServiceBP projectServiceBP;
-
-
-    @Reference
-    public UserDAO userDAO;
-
 
     @Override
     protected String getTemplate(String path) {
@@ -87,6 +81,7 @@ public class DetailsProjectServlet extends KronopsServlet {
 
         Project project = this.projectServiceBP.getProject(id);
 
+
         Map<String, Object> map = new HashMap<>();
         prepareTemplateData(project, map);
 
@@ -94,6 +89,9 @@ public class DetailsProjectServlet extends KronopsServlet {
     }
 
     private void prepareTemplateData(Project project, Map<String, Object> map) {
+        TreeNode node = this.projectServiceBP.listProjectCluster();
+
+        map.put("clusters", node.getPaths());
         map.put("project", project);
         map.put("members", project.getMembers());
         map.put("roles", ProjectRole.values());

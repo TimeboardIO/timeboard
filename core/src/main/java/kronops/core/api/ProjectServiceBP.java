@@ -1,4 +1,4 @@
-package kronops.core.api.dao;
+package kronops.core.api;
 
 /*-
  * #%L
@@ -27,19 +27,36 @@ package kronops.core.api.dao;
  */
 
 import kronops.core.api.exceptions.BusinessException;
-import kronops.core.model.User;
+import kronops.core.model.*;
 
 import java.util.List;
+import java.util.Map;
 
-public interface UserDAO {
+public interface ProjectServiceBP {
 
-    User createUser(User user) throws BusinessException;
+    void addProjectToProjectCluster(ProjectCluster projectCluster, Project newProject);
 
-    List<User> searchUserByName(String prefix);
+    void saveProjectCluster(ProjectCluster root);
 
-    User autenticateUser(String username, String password);
+    TreeNode listProjectCluster();
 
-    User findUserByLogin(String username);
+    Project createProject(User owner, String projectName) throws BusinessException;
 
-    User findUserByID(Long aLong);
+    List<Project> listProjects();
+
+    Project getProject(Long projectId);
+
+    Project deleteProjectByID(Long projectID);
+
+    Project updateProject(Project project) throws BusinessException;
+
+
+    /**
+     * @param project
+     * @param memberships Key : userID, Value : user role for project param
+     */
+    Project updateProject(Project project, Map<Long, ProjectRole> memberships) throws BusinessException;
+
+    void save(ProjectMembership projectMembership);
+
 }

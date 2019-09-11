@@ -1,4 +1,4 @@
-package kronops.core.internal.dao;
+package kronops.core.internal;
 
 /*-
  * #%L
@@ -26,29 +26,33 @@ package kronops.core.internal.dao;
  * #L%
  */
 
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.component.annotations.ReferenceScope;
 
 import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Component(
-        service = UserDAO.class,
-        immediate = true,
-        scope = ServiceScope.SINGLETON
+        service = UserServiceBP.class,
+        immediate = true
 )
-@Transactional
-public class UserDAOImpl implements UserDAO {
+public class UserServiceBPImpl implements UserServiceBP {
 
-    @Reference(target = "(osgi.unit.name=kronops-pu)")
-    JpaTemplate jpa;
+    @Reference(target = "(osgi.unit.name=kronops-pu)", scope = ReferenceScope.BUNDLE)
+    private JpaTemplate jpa;
 
+    @Override
+    public User getCurrentUser() {
+        User u = new User();
+        u.setName("Hello");
+        u.setFirstName("World");
+        return u;
+    }
 
     @Override
     public User createUser(User user) throws BusinessException {

@@ -26,7 +26,7 @@ package kronops.sample;
  * #L%
  */
 
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
 import org.osgi.service.component.annotations.Activate;
@@ -42,7 +42,7 @@ import java.util.Date;
 public class UserLoader {
 
     @Reference
-    UserDAO userDAO;
+    UserServiceBP userServiceBP;
 
 
     @Activate
@@ -58,7 +58,7 @@ public class UserLoader {
             u.setLogin("kronops" + i);
             u.setAccountCreationTime(new Date());
             try {
-                this.userDAO.createUser(u);
+                this.userServiceBP.createUser(u);
             } catch (BusinessException e) {
                 e.printStackTrace();
             }

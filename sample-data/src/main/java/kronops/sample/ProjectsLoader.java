@@ -26,10 +26,8 @@ package kronops.sample;
  * #L%
  */
 
-import kronops.core.api.bp.ProjectServiceBP;
-import kronops.core.api.dao.ProjectMembershipDAO;
-import kronops.core.api.dao.ProjectsClusterDAO;
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.*;
 import org.osgi.service.component.annotations.Activate;
@@ -43,40 +41,39 @@ import org.osgi.service.component.annotations.Reference;
 public class ProjectsLoader {
 
     @Reference
-    ProjectsClusterDAO projectsClusterDAO;
+    ProjectServiceBP projectServiceBP;
 
     @Reference
     UserLoader userLoader;
 
 
     @Reference
-    UserDAO userDAO;
+    UserServiceBP userServiceBP;
 
-
-    @Reference
-    ProjectServiceBP projectServiceBP;
-
-    @Reference
-    ProjectMembershipDAO projectMembershipDAO;
 
     @Activate
     public void load() throws BusinessException {
-        User u1 = this.userDAO.findUserByLogin("kronops1");
-        User u2 = this.userDAO.findUserByLogin("kronops2");
+        User u1 = this.userServiceBP.findUserByLogin("kronops1");
+        User u2 = this.userServiceBP.findUserByLogin("kronops2");
 
         Project newProject = this.projectServiceBP.createProject(u1, "Test Project");
 
         ProjectMembership projectMembership = new ProjectMembership(newProject, u2, ProjectRole.CONTRIBUTOR);
 
-        this.projectMembershipDAO.save(projectMembership);
+        this.projectServiceBP.save(projectMembership);
 
 
-        ProjectCluster projectCluster = new ProjectCluster();
-        projectCluster.setName("Root Cluster");
+        ProjectCluster root = new ProjectCluster();
+        root.setName("Root Cluster");
 
-        this.projectsClusterDAO.save(projectCluster);
+        ProjectCluster customer = new ProjectCluster();
+        customer.setName("Customer XYZ Cluster");
 
-        this.projectsClusterDAO.addProjectToCluster(projectCluster, newProject);
+        this.projectServiceBP.saveProjectCluster(root);
+        customer.setParent(root);
+        this.projectServiceBP.saveProjectCluster(customer);
+
+        this.projectServiceBP.addProjectToProjectCluster(customer, newProject);
 
     }
 

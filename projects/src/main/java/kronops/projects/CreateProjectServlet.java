@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.bp.ProjectServiceBP;
+import kronops.core.api.ProjectServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.ui.KronopsServlet;
 import kronops.security.SecurityContext;

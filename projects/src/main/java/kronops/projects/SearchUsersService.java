@@ -27,7 +27,7 @@ package kronops.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.UserServiceBP;
 import kronops.core.model.User;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,12 +54,12 @@ public class SearchUsersService extends HttpServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     @Reference
-    private UserDAO userDAO;
+    private UserServiceBP userServiceBP;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String query = req.getParameter("q");
-        List<User> users = this.userDAO.searchUserByName(query);
+        List<User> users = this.userServiceBP.searchUserByName(query);
 
         SearchResult searchResult = new SearchResult(users.size(), users);
 

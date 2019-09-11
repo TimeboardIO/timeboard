@@ -26,7 +26,7 @@ package kronops.security.service;
  * #L%
  */
 
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
 import kronops.security.api.LoginService;
@@ -41,13 +41,13 @@ public class DatabaseLoginService implements LoginService {
 
 
     @Reference
-    private UserDAO userDAO;
+    private UserServiceBP userServiceBP;
 
     @Override
     public void logUser(String username, String password) throws BusinessException {
 
         try {
-            User user = this.userDAO.autenticateUser(username, password);
+            User user = this.userServiceBP.autenticateUser(username, password);
 
         } catch (Exception e) {
             throw new BusinessException("Wrong credentials");

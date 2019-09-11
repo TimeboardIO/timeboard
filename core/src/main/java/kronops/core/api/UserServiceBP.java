@@ -1,4 +1,4 @@
-package kronops.core.api.dao;
+package kronops.core.api;
 
 /*-
  * #%L
@@ -26,9 +26,21 @@ package kronops.core.api.dao;
  * #L%
  */
 
-import kronops.core.model.Project;
+import kronops.core.api.exceptions.BusinessException;
+import kronops.core.model.User;
 
-public interface ProjectDAO extends BaseDAO<Long, Project> {
+import java.util.List;
 
+public interface UserServiceBP {
+    User getCurrentUser();
 
+    User createUser(User user) throws BusinessException;
+
+    List<User> searchUserByName(String prefix);
+
+    User autenticateUser(String username, String password);
+
+    User findUserByLogin(String username);
+
+    User findUserByID(Long aLong);
 }

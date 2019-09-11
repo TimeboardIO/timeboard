@@ -71,10 +71,21 @@
 
         <h4 class="ui dividing header">Clusters</h4>
 
-
+        <div class="grouped fields">
+            <div class="field" th:each="cluster : ${clusters}">
+                <div class="ui radio checkbox"   >
+                    <input type="radio" name="cluster" th:value="${cluster}" class="hidden"></input>
+                    <label th:text="${cluster}"></label>
+                </div>
+            </div>
+        </div>
         <button class="ui button" type="submit">Submit</button>
     </form>
     <script>
+
+        $('.ui.radio.checkbox')
+          .checkbox()
+        ;
 
         $('.ui.search')
             .search({

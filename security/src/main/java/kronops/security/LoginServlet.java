@@ -26,7 +26,7 @@ package kronops.security;
  * #L%
  */
 
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
 import kronops.core.ui.KronopsServlet;
@@ -61,7 +61,7 @@ public class LoginServlet extends KronopsServlet {
     LoginService loginService;
 
     @Reference
-    UserDAO userDAO;
+    UserServiceBP userServiceBP;
 
 
     @Override
@@ -79,7 +79,7 @@ public class LoginServlet extends KronopsServlet {
         try {
 
             this.loginService.logUser(username, password);
-            User user = this.userDAO.findUserByLogin(username);
+            User user = this.userServiceBP.findUserByLogin(username);
             HttpSession session = request.getSession(true);
             session.setAttribute("user", user);
 

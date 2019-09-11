@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.bp.ProjectServiceBP;
+import kronops.core.api.ProjectServiceBP;
 import kronops.core.ui.KronopsServlet;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -66,7 +66,7 @@ public class ProjectsServlet extends KronopsServlet {
     @Override
     protected Map<String, Object> handleGet(HttpServletRequest request, HttpServletResponse response) {
         Map<String, Object> data = new HashMap<>();
-        data.put("projects", this.projectServiceBP.getProjects());
+        data.put("projects", this.projectServiceBP.listProjects());
         return data;
     }
 

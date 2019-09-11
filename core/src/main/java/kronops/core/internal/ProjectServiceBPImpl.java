@@ -1,4 +1,4 @@
-package kronops.core.internal.service;
+package kronops.core.internal;
 
 /*-
  * #%L
@@ -26,17 +26,15 @@ package kronops.core.internal.service;
  * #L%
  */
 
-import kronops.core.api.bp.ProjectServiceBP;
-import kronops.core.api.dao.ProjectDAO;
-import kronops.core.api.dao.ProjectMembershipDAO;
-import kronops.core.api.dao.UserDAO;
+import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.TreeNode;
+import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
-import kronops.core.model.Project;
-import kronops.core.model.ProjectMembership;
-import kronops.core.model.ProjectRole;
-import kronops.core.model.User;
+import kronops.core.model.*;
+import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
 import javax.transaction.TransactionManager;
@@ -52,66 +50,91 @@ import java.util.stream.Collectors;
 )
 public class ProjectServiceBPImpl implements ProjectServiceBP {
 
+    @Reference
+    private TransactionManager transactionManager;
 
     @Reference
-    public TransactionManager transactionManager;
+    private LogService logService;
 
     @Reference
-    public ProjectDAO projectDAO;
+    private UserServiceBP userServiceBP;
 
-    @Reference
-    public ProjectMembershipDAO projectMembershipDAO;
+    @Reference(target = "(osgi.unit.name=kronops-pu)", scope = ReferenceScope.BUNDLE)
+    private JpaTemplate jpa;
 
-    @Reference
-    public LogService logService;
 
-    @Reference
-    public UserDAO userDAO;
+    @Override
+    public void addProjectToProjectCluster(ProjectCluster projectCluster, Project newProject) {
+        this.jpa.tx(entityManager -> {
+            ProjectCluster c = entityManager.find(ProjectCluster.class, projectCluster.getId());
+            Project p = entityManager.find(Project.class, newProject.getId());
 
+            p.setCluster(c);
+
+            entityManager.flush();
+        });
+    }
 
     @Override
     public Project createProject(User owner, String projectName) throws BusinessException {
 
-        Project newProject = new Project();
-        newProject.setName(projectName);
-        newProject.setStartDate(new Date());
-        this.projectDAO.save(newProject);
+        return this.jpa.txExpr(entityManager -> {
 
-        ProjectMembership ownerMembership = new ProjectMembership(newProject, owner, ProjectRole.OWNER);
-        this.projectMembershipDAO.save(ownerMembership);
+            Project newProject = new Project();
+            newProject.setName(projectName);
+            newProject.setStartDate(new Date());
+            entityManager.persist(newProject);
 
+            ProjectMembership ownerMembership = new ProjectMembership(newProject, owner, ProjectRole.OWNER);
+            entityManager.persist(ownerMembership);
 
-        this.logService.log(LogService.LOG_INFO, "Project " + projectName + " created by user " + owner.getId());
+            this.logService.log(LogService.LOG_INFO, "Project " + projectName + " created by user " + owner.getId());
 
-        return newProject;
+            return newProject;
+
+        });
+
     }
 
-    @Override
-    public Project saveProject(Project project) throws BusinessException {
-        return this.projectDAO.save(project);
-    }
 
     @Override
-    public List<Project> getProjects() {
-        return this.projectDAO.findAll();
+    public List<Project> listProjects() {
+        return jpa.txExpr(em -> {
+            List<Project> data = em.createQuery("select p from Project p", Project.class)
+                    .getResultList();
+            return data;
+        });
     }
 
     @Override
     public Project getProject(Long projectId) {
-        return this.projectDAO.findById(projectId);
+
+        return jpa.txExpr(em -> {
+            Project data = em.createQuery("select p from Project p where p.id = :id", Project.class)
+                    .setParameter("id", projectId)
+                    .getSingleResult();
+            return data;
+        });
+
     }
 
     @Override
     public Project deleteProjectByID(Long projectID) {
-        final Project project = this.getProject(projectID);
-        this.projectDAO.delete(project);
-        return project;
+        return jpa.txExpr(em -> {
+            Project p = em.find(Project.class, projectID);
+            em.remove(p);
+            em.flush();
+            return p;
+        });
     }
 
     @Override
     public Project updateProject(Project project) throws BusinessException {
-        this.projectDAO.update(project);
-        return project;
+        return jpa.txExpr(em -> {
+            em.merge(project);
+            em.flush();
+            return project;
+        });
     }
 
 
@@ -142,12 +165,38 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
             ProjectMembership projectMembership = new ProjectMembership();
             projectMembership.setProject(project);
             projectMembership.setRole(memberships.get(aLong));
-            projectMembership.setMember(this.userDAO.findUserByID(aLong));
+            projectMembership.setMember(this.userServiceBP.findUserByID(aLong));
             project.getMembers().add(projectMembership);
         });
 
         return project;
 
+    }
+
+    @Override
+    public void save(ProjectMembership projectMembership) {
+        this.jpa.tx(entityManager -> {
+            entityManager.persist(projectMembership);
+        });
+    }
+
+    @Override
+    public void saveProjectCluster(ProjectCluster projectCluster) {
+        this.jpa.tx(entityManager -> {
+            entityManager.persist(projectCluster);
+        });
+    }
+
+    @Override
+    public TreeNode listProjectCluster() {
+        return this.jpa.txExpr(entityManager -> {
+            TreeNode root = new TreeNode(null);
+            List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc", ProjectCluster.class).getResultList();
+             projectClusters.forEach(projectCluster -> {
+                 root.insert(projectCluster);
+             });
+            return root;
+        });
     }
 
 }
