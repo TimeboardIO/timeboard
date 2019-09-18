@@ -41,9 +41,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -89,9 +87,13 @@ public class DetailsProjectServlet extends KronopsServlet {
     }
 
     private void prepareTemplateData(Project project, Map<String, Object> map) {
-        TreeNode node = this.projectServiceBP.listProjectCluster();
+        List<TreeNode> node = this.projectServiceBP.listProjectClusters();
 
-        map.put("clusters", node.getPaths());
+        final Map<Long, String> paths = new HashMap<>();
+        node.forEach(treeNode -> {
+            paths.putAll(treeNode.getPaths());
+        });
+        map.put("clusters", paths);
         map.put("project", project);
         map.put("members", project.getMembers());
         map.put("roles", ProjectRole.values());
@@ -101,12 +103,11 @@ public class DetailsProjectServlet extends KronopsServlet {
     protected Map<String, Object> handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Map<String, Object> map = new HashMap<>();
 
+        //Extract project id
         long id = Long.parseLong(request.getParameter("id"));
-
-
-        Map<Long, ProjectRole> memberships = new HashMap<>();
-
+        
         //Extract memberships from request
+        Map<Long, ProjectRole> memberships = new HashMap<>();
         Enumeration<String> params = request.getParameterNames();
         while (params.hasMoreElements()) {
             String param = params.nextElement();
@@ -120,8 +121,11 @@ public class DetailsProjectServlet extends KronopsServlet {
                 }
             }
         }
+        
+        //Extract cluster
         Project project = this.projectServiceBP.getProject(id);
         project.setName(request.getParameter("projectName"));
+        project.setCluster(this.projectServiceBP.findProjectsCluserByID(Long.parseLong(request.getParameter("cluster"))));
 
         try {
             this.projectServiceBP.updateProject(project, memberships);

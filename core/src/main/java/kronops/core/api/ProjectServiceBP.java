@@ -38,7 +38,7 @@ public interface ProjectServiceBP {
 
     void saveProjectCluster(ProjectCluster root);
 
-    TreeNode listProjectCluster();
+    List<TreeNode> listProjectClusters();
 
     Project createProject(User owner, String projectName) throws BusinessException;
 
@@ -59,4 +59,5 @@ public interface ProjectServiceBP {
 
     void save(ProjectMembership projectMembership);
 
+    ProjectCluster findProjectsCluserByID(long cluster);
 }

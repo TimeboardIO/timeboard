@@ -58,7 +58,7 @@ public class Project implements Serializable {
     )
     private Set<ProjectMembership> members;
 
-    @ManyToOne(targetEntity = ProjectCluster.class)
+    @ManyToOne(targetEntity = ProjectCluster.class, cascade = CascadeType.PERSIST)
     private ProjectCluster cluster;
 
     public Project() {

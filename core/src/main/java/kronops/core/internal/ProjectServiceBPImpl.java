@@ -141,35 +141,40 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     @Override
     public Project updateProject(Project project, Map<Long, ProjectRole> memberships) throws BusinessException {
 
+        return this.jpa.txExpr(entityManager -> {
 
-        //Update existing membership
-        List<Long> membershipToRemove = new ArrayList<>();
+            entityManager.merge(project);
 
-        List<Long> currentMembers = project.getMembers().stream().map(pm -> pm.getMember().getId()).collect(Collectors.toList());
-        List<Long> membershipToAdd = memberships.keySet().stream().filter(mID -> currentMembers.contains(mID) == false).collect(Collectors.toList());
+            //Update existing membership
+            List<Long> membershipToRemove = new ArrayList<>();
+
+            List<Long> currentMembers = project.getMembers().stream().map(pm -> pm.getMember().getId()).collect(Collectors.toList());
+            List<Long> membershipToAdd = memberships.keySet().stream().filter(mID -> currentMembers.contains(mID) == false).collect(Collectors.toList());
 
 
-        project.getMembers().forEach(projectMembership -> {
-            if (memberships.containsKey(projectMembership.getMember().getId())) {
-                projectMembership.setRole(memberships.get(projectMembership.getMember().getId()));
-            } else {
-                membershipToRemove.add(projectMembership.getMember().getId());
-            }
+            project.getMembers().forEach(projectMembership -> {
+                if (memberships.containsKey(projectMembership.getMember().getId())) {
+                    projectMembership.setRole(memberships.get(projectMembership.getMember().getId()));
+                } else {
+                    membershipToRemove.add(projectMembership.getMember().getId());
+                }
+            });
+
+            //Remove membership
+            project.getMembers().removeIf(projectMembership -> membershipToRemove.contains(projectMembership.getMember().getId()));
+
+            //Add new membership
+            membershipToAdd.forEach((aLong) -> {
+                ProjectMembership projectMembership = new ProjectMembership();
+                projectMembership.setProject(project);
+                projectMembership.setRole(memberships.get(aLong));
+                projectMembership.setMember(this.userServiceBP.findUserByID(aLong));
+                project.getMembers().add(projectMembership);
+            });
+
+
+            return project;
         });
-
-        //Remove membership
-        project.getMembers().removeIf(projectMembership -> membershipToRemove.contains(projectMembership.getMember().getId()));
-
-        //Add new membership
-        membershipToAdd.forEach((aLong) -> {
-            ProjectMembership projectMembership = new ProjectMembership();
-            projectMembership.setProject(project);
-            projectMembership.setRole(memberships.get(aLong));
-            projectMembership.setMember(this.userServiceBP.findUserByID(aLong));
-            project.getMembers().add(projectMembership);
-        });
-
-        return project;
 
     }
 
@@ -181,6 +186,11 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     }
 
     @Override
+    public ProjectCluster findProjectsCluserByID(long cluster) {
+        return this.jpa.txExpr(entityManager -> entityManager.find(ProjectCluster.class, cluster));
+    }
+
+    @Override
     public void saveProjectCluster(ProjectCluster projectCluster) {
         this.jpa.tx(entityManager -> {
             entityManager.persist(projectCluster);
@@ -188,14 +198,14 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     }
 
     @Override
-    public TreeNode listProjectCluster() {
+    public List<TreeNode> listProjectClusters() {
         return this.jpa.txExpr(entityManager -> {
             TreeNode root = new TreeNode(null);
             List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc", ProjectCluster.class).getResultList();
-             projectClusters.forEach(projectCluster -> {
-                 root.insert(projectCluster);
-             });
-            return root;
+            projectClusters.forEach(projectCluster -> {
+                root.insert(projectCluster);
+            });
+            return root.getChildren();
         });
     }
 

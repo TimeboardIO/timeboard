@@ -50,19 +50,17 @@ public class TreeNodeTest {
         p13.setName("P1.3");
 
 
-        TreeNode root = new TreeNode(null);
-        TreeNode cluster1 = new TreeNode(p1);
+         TreeNode cluster1 = new TreeNode(p1);
         TreeNode cluster2 = new TreeNode(p2);
         TreeNode cluster12 = new TreeNode(p12);
         TreeNode cluster13 = new TreeNode(p13);
 
-        root.getChildren().add(cluster1);
-        root.getChildren().add(cluster2);
-        cluster1.getChildren().add(cluster12);
-        cluster1.getChildren().add(cluster13);
+        cluster1.getChildren().add(cluster2);
+        cluster2.getChildren().add(cluster12);
+        cluster2.getChildren().add(cluster13);
 
 
-        System.out.println(root.getPaths());
+        System.out.println(cluster1.getPaths());
 
     }
 

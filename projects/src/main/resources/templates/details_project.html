@@ -74,8 +74,8 @@
         <div class="grouped fields">
             <div class="field" th:each="cluster : ${clusters}">
                 <div class="ui radio checkbox"   >
-                    <input type="radio" name="cluster" th:value="${cluster}" class="hidden"></input>
-                    <label th:text="${cluster}"></label>
+                    <input type="radio" name="cluster" th:checked="${cluster.key == project.cluster.id}" th:value="${cluster.key}" class="hidden"></input>
+                    <label th:text="${cluster.value}"></label>
                 </div>
             </div>
         </div>

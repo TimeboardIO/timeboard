@@ -6,7 +6,7 @@ node "JVM 11" {
     node "Apache Karaf"{
 
 
-         node "FeatureApp"{
+         node "Kronops"{
              [core] -- mysql
              [core-ui] -- mysql
              [security] -- core

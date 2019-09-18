@@ -29,7 +29,9 @@ package kronops.core.api;
 import kronops.core.model.ProjectCluster;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TreeNode {
@@ -42,39 +44,36 @@ public class TreeNode {
     }
 
 
-    public List<String> getPaths(){
-        List<String> paths = new ArrayList<>();
-        List<Long> nodes = new ArrayList<>();
+    public  Map<Long, String> getPaths(){
+        Map<Long, String> cPath = new HashMap<>();
         if(this.projectCluster == null){
             this.projectCluster = new ProjectCluster();
             this.projectCluster.setName("Root");
         }
-        paths.add(this.projectCluster.getName() + " > ");
-        nodes.add(this.projectCluster.getId());
+        cPath.put(this.projectCluster.getId(), this.projectCluster.getName() + " > ");
         StringBuilder buff = new StringBuilder();
         buff.append(this.projectCluster.getName());
-        buff.append(" > ");
 
 
         this.getChildren().forEach(treeNode -> {
-            getPathRec(nodes, paths, buff, treeNode);
+            buff.append(" > ");
+
+            getPathRec( cPath, buff, treeNode);
         });
 
 
-        System.out.println(nodes);
-        return paths.stream().map(s -> s.substring(0, s.lastIndexOf(">"))).collect(Collectors.toList());
+        return cPath;
+
     }
 
-    private void getPathRec( List<Long> nodes, List<String> paths, StringBuilder buff, TreeNode treeNode) {
+    private void getPathRec( Map<Long, String> cPath, StringBuilder buff, TreeNode treeNode) {
         StringBuilder localBuffer = new StringBuilder();
         localBuffer.append(treeNode.getProjectCluster().getName());
         localBuffer.append(" > ");
-        nodes.add(treeNode.getProjectCluster().getId());
-
-        paths.add(buff.toString() + localBuffer.toString());
+        cPath.put(treeNode.getProjectCluster().getId(), buff.toString() + localBuffer.toString());
         if(!treeNode.getChildren().isEmpty()){
             treeNode.getChildren().forEach(treeNode1 -> {
-                getPathRec(nodes, paths, new StringBuilder(buff.toString() + localBuffer.toString()), treeNode1);
+                getPathRec(cPath, new StringBuilder(buff.toString() + localBuffer.toString()), treeNode1);
             });
         }
     }
