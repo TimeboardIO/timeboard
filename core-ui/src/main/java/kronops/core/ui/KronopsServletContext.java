@@ -26,6 +26,7 @@ package kronops.core.ui;
  * #L%
  */
 
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.context.ServletContextHelper;
@@ -34,6 +35,8 @@ import org.osgi.service.http.context.ServletContextHelper;
         service = ServletContextHelper.class,
         scope = ServiceScope.BUNDLE,
         property = {
+
+                Constants.SERVICE_RANKING + ":Integer=900",
                 "osgi.http.whiteboard.context.name=kronops",
                 "osgi.http.whiteboard.context.path=/"})
 public class KronopsServletContext extends ServletContextHelper {
