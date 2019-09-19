@@ -29,6 +29,7 @@ package kronops.projects;
 import kronops.core.api.ProjectServiceBP;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.NavigationExtPoint;
+import kronops.core.ui.ViewModel;
 import org.osgi.service.component.annotations.*;
 
 import javax.servlet.Servlet;
@@ -49,11 +50,7 @@ import java.util.List;
 )
 public class DeleteProjectServlet extends KronopsServlet {
 
-    @Reference(
-            cardinality = ReferenceCardinality.MULTIPLE,
-            policy = ReferencePolicy.DYNAMIC,
-            policyOption = ReferencePolicyOption.GREEDY)
-    public volatile List<NavigationExtPoint> navs;
+
 
     @Reference
     public ProjectServiceBP projectServiceBP;
@@ -72,6 +69,7 @@ public class DeleteProjectServlet extends KronopsServlet {
 
         response.sendRedirect("/projects");
     }
+
 
 
 }

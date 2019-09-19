@@ -34,8 +34,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "user")
-
+@Table
 public class User implements Serializable {
 
     @Id
@@ -49,10 +48,6 @@ public class User implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date accountCreationTime;
 
-    /**
-     * Represent the time the user started working as an employee. This date is equal to accountCreationTime, or can be
-     * set BEFORE it
-     */
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private Date beginWorkDate;

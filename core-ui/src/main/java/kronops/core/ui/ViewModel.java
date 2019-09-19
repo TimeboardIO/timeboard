@@ -1,8 +1,8 @@
-package kronops.core;
+package kronops.core.ui;
 
 /*-
  * #%L
- * core
+ * core-ui
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -12,10 +12,10 @@ package kronops.core;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,42 +26,41 @@ package kronops.core;
  * #L%
  */
 
-import kronops.core.api.TreeNode;
-import kronops.core.model.ProjectCluster;
-import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class TreeNodeTest {
+public class ViewModel {
 
-    @Test
-    public void toStringTest() {
+    private final List<Exception> errors;
+    private final Map<String, Object> viewDatas;
+    private String template;
 
-
-        ProjectCluster p1 = new ProjectCluster();
-        p1.setId(10);
-        p1.setName("P1");
-        ProjectCluster p2 = new ProjectCluster();
-        p2.setId(12);
-        p2.setName("P2");
-        ProjectCluster p12 = new ProjectCluster();
-        p12.setId(14);
-        p12.setName("P1.2");
-        ProjectCluster p13 = new ProjectCluster();
-        p13.setId(15);
-        p13.setName("P1.3");
-
-
-        TreeNode cluster1 = new TreeNode(p1);
-        TreeNode cluster2 = new TreeNode(p2);
-        TreeNode cluster12 = new TreeNode(p12);
-        TreeNode cluster13 = new TreeNode(p13);
-
-        cluster1.getChildren().add(cluster2);
-        cluster2.getChildren().add(cluster12);
-        cluster2.getChildren().add(cluster13);
-
-
-        System.out.println(cluster1.getPaths());
-
+    public ViewModel(){
+        this.errors = new ArrayList<>();
+        this.viewDatas = new HashMap<>();
     }
 
+    public ViewModel(String template) {
+        this.errors =  new ArrayList<>();
+        this.viewDatas = new HashMap<>();
+        this.template = template;
+    }
+
+    public List<Exception> getErrors() {
+        return errors;
+    }
+
+    public Map<String, Object> getViewDatas() {
+        return viewDatas;
+    }
+
+    public String getTemplate() {
+        return template;
+    }
+
+    public void setTemplate(String template) {
+        this.template = template;
+    }
 }

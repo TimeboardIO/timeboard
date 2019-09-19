@@ -1,4 +1,4 @@
-package kronops.core;
+package kronops.core.model;
 
 /*-
  * #%L
@@ -26,42 +26,32 @@ package kronops.core;
  * #L%
  */
 
-import kronops.core.api.TreeNode;
-import kronops.core.model.ProjectCluster;
-import org.junit.jupiter.api.Test;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
 
-public class TreeNodeTest {
+@Entity
+public class Imputation implements Serializable {
 
-    @Test
-    public void toStringTest() {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
+    @Column
+    private Double value;
 
-        ProjectCluster p1 = new ProjectCluster();
-        p1.setId(10);
-        p1.setName("P1");
-        ProjectCluster p2 = new ProjectCluster();
-        p2.setId(12);
-        p2.setName("P2");
-        ProjectCluster p12 = new ProjectCluster();
-        p12.setId(14);
-        p12.setName("P1.2");
-        ProjectCluster p13 = new ProjectCluster();
-        p13.setId(15);
-        p13.setName("P1.3");
+    @Column
+    @Temporal(TemporalType.DATE)
+    private Date day;
 
+    @ManyToOne(targetEntity = Task.class)
+    private Task task;
 
-        TreeNode cluster1 = new TreeNode(p1);
-        TreeNode cluster2 = new TreeNode(p2);
-        TreeNode cluster12 = new TreeNode(p12);
-        TreeNode cluster13 = new TreeNode(p13);
-
-        cluster1.getChildren().add(cluster2);
-        cluster2.getChildren().add(cluster12);
-        cluster2.getChildren().add(cluster13);
-
-
-        System.out.println(cluster1.getPaths());
-
+    public long getId() {
+        return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
 }

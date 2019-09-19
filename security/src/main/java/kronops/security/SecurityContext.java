@@ -28,11 +28,17 @@ package kronops.security;
 
 import kronops.core.model.User;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.net.http.HttpRequest;
 
 public class SecurityContext {
 
     public static User getCurrentUser(HttpSession sess) {
         return (User) sess.getAttribute("user");
+    }
+
+    public static User getCurrentUser(HttpServletRequest req) {
+        return getCurrentUser(req.getSession());
     }
 }

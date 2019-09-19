@@ -30,45 +30,46 @@ package kronops.core.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 
 @Entity
-public class Project implements Serializable {
+public class Task implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(length = 50, unique = true)
+    @Column(length = 50, unique = true, nullable = false)
     private String name;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
+    @Temporal(TemporalType.DATE)
+    private Date endDate;
+
     @Column(length = 500)
     private String comments;
 
-    @OneToMany(targetEntity = ProjectMembership.class,
-            mappedBy = "project",
-            orphanRemoval = true,
-            cascade = {CascadeType.ALL},
-            fetch = FetchType.EAGER
-    )
-    private Set<ProjectMembership> members;
+    @Column(nullable = false)
+    private double estimateWork;
 
-    @ManyToMany(targetEntity = ProjectCluster.class, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    private Set<ProjectCluster> clusters;
+    @OneToOne
+    private User assigned;
 
-    @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.PERSIST)
-    private Set<Task> tasks;
+    @ManyToOne(targetEntity = Project.class)
+    private Project project;
 
-    public Project() {
+    @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
+    private Set<Imputation> imputations;
 
-        members = new HashSet<>();
-        clusters = new HashSet<>();
-        tasks = new HashSet<>();
+    public double getEstimateWork() {
+        return estimateWork;
+    }
+
+    public void setEstimateWork(double estimateWork) {
+        this.estimateWork = estimateWork;
     }
 
     public long getId() {
@@ -95,6 +96,14 @@ public class Project implements Serializable {
         this.startDate = startDate;
     }
 
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
     public String getComments() {
         return comments;
     }
@@ -103,27 +112,27 @@ public class Project implements Serializable {
         this.comments = comments;
     }
 
-    public Set<ProjectMembership> getMembers() {
-        return members;
+    public Project getProject() {
+        return project;
     }
 
-    public void setMembers(Set<ProjectMembership> members) {
-        this.members = members;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
-    public Set<ProjectCluster> getClusters() {
-        return clusters;
+    public Set<Imputation> getImputations() {
+        return imputations;
     }
 
-    public void setClusters(Set<ProjectCluster> cluster) {
-        this.clusters = cluster;
+    public void setImputations(Set<Imputation> imputations) {
+        this.imputations = imputations;
     }
 
-    public Set<Task> getTasks() {
-        return tasks;
+    public User getAssigned() {
+        return assigned;
     }
 
-    public void setTasks(Set<Task> tasks) {
-        this.tasks = tasks;
+    public void setAssigned(User assigned) {
+        this.assigned = assigned;
     }
 }

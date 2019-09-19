@@ -37,7 +37,7 @@ public class ProjectsClusterNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Cluster";
+        return "Clusters";
     }
 
     @Override

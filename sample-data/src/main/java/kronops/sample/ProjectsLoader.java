@@ -34,6 +34,8 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.util.Date;
+
 @Component(
         service = ProjectsLoader.class,
         immediate = true
@@ -57,6 +59,22 @@ public class ProjectsLoader {
         User u2 = this.userServiceBP.findUserByLogin("kronops2");
 
         Project newProject = this.projectServiceBP.createProject(u1, "Test Project");
+
+        Task t = new Task();
+        t.setName("Hello Task");
+        t.setStartDate(new Date());
+        t.setEndDate(new Date());
+        t.setComments("This is a sample task");
+        t.setEstimateWork(5);
+        this.projectServiceBP.createTask(newProject, t);
+
+        Task t2 = new Task();
+        t2.setEstimateWork(1);
+        t2.setName("Do stuff");
+        t2.setStartDate(new Date());
+        t2.setEndDate(new Date());
+        t2.setComments("This is another sample task");
+        this.projectServiceBP.createTask(newProject, t2);
 
         ProjectMembership projectMembership = new ProjectMembership(newProject, u2, ProjectRole.CONTRIBUTOR);
 

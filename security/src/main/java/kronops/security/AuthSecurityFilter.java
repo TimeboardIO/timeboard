@@ -26,6 +26,7 @@ package kronops.security;
  * #L%
  */
 
+import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,6 +41,7 @@ import java.util.Map;
 @Component(
         service = Filter.class,
         property = {
+                Constants.SERVICE_RANKING + ":Integer=1000",
                 "osgi.http.whiteboard.filter.regex=/*",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=kronops)",
                 "kronops.security.login-url=/login",
@@ -83,7 +85,7 @@ public class AuthSecurityFilter implements Filter {
 
 
         if (!isLogged && !isStatic && !isLogin) {
-            res.sendRedirect(this.loginURL + "?origin=" + ((HttpServletRequest) request).getRequestURI());
+            res.sendRedirect(this.loginURL + "?origin=" + ((HttpServletRequest) request).getRequestURI()+((HttpServletRequest) request).getQueryString());
         } else {
             chain.doFilter(request, response);
         }

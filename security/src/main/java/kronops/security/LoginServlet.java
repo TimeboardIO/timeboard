@@ -30,6 +30,7 @@ import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
 import kronops.core.ui.KronopsServlet;
+import kronops.core.ui.ViewModel;
 import kronops.security.api.LoginService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,6 +43,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Component(
@@ -69,12 +72,16 @@ public class LoginServlet extends KronopsServlet {
         return LoginServlet.class.getClassLoader();
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+
+
+
+    @Override
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("login.html");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-
+        String origin = request.getParameter("origin");
 
         try {
 
@@ -89,13 +96,20 @@ public class LoginServlet extends KronopsServlet {
         }
 
 
-        response.sendRedirect("/");
-
+        response.sendRedirect(origin);
     }
-
 
     @Override
-    protected String getTemplate(String path) {
-        return "login.html";
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("login.html");
+        Map<String, Object> templateDatas = new HashMap<>();
+        String origin = "/";
+        if (request.getParameter("origin") != null) {
+            origin = request.getParameter("origin");
+        }
+        templateDatas.put("origin", origin);
+        viewModel.getViewDatas().putAll(templateDatas);
     }
+
+
 }

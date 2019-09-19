@@ -43,8 +43,8 @@ public class ProjectCluster implements Serializable {
     @Column(length = 50, unique = true)
     private String name;
 
-    @OneToMany(targetEntity = Project.class,
-            mappedBy = "cluster",
+    @ManyToMany(targetEntity = Project.class,
+            mappedBy = "clusters",
             cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER
     )

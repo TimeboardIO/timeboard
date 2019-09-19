@@ -38,6 +38,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.View;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -66,25 +67,21 @@ public abstract class KronopsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Map<String, Object> data = this.handleGet(request, response);
-        data.put("user", request.getSession().getAttribute("user"));
-        doService(request, response, data);
+        final ViewModel viewModel = new ViewModel();
+        this.handleGet(request, response, viewModel);
+        doService(request, response, viewModel);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        Map<String, Object> data = this.handlePost(request, response);
-        data.put("user", request.getSession().getAttribute("user"));
-        doService(request, response, data);
+        final ViewModel viewModel = new ViewModel();
+        this.handlePost(request, response, viewModel);
+        doService(request, response, viewModel);
     }
 
-    protected Map<String, Object> handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        return new HashMap<>();
-    }
+    protected  void handlePost(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException{};
 
-    protected Map<String, Object> handleGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        return new HashMap<>();
-    }
+    protected  void handleGet(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException{};
 
 
     protected List<NavigationExtPoint> getNavs() {
@@ -92,14 +89,15 @@ public abstract class KronopsServlet extends HttpServlet {
     }
 
 
-    protected void doService(HttpServletRequest request, HttpServletResponse response, Map<String, Object> datas) throws ServletException, IOException {
+    protected void doService(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException {
         response.setCharacterEncoding(resolver.getCharacterEncoding());
+        viewModel.getViewDatas().put("user", request.getSession().getAttribute("user"));
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
 
         final WebContext ctx = new WebContext(request, response, request.getServletContext());
-        datas.forEach((s, o) -> {
+        viewModel.getViewDatas().forEach((s, o) -> {
             ctx.setVariable(s, o);
         });
 
@@ -108,7 +106,7 @@ public abstract class KronopsServlet extends HttpServlet {
             navigationEntries.addAll(this.getNavs());
         }
         ctx.setVariable("navs", navigationEntries);
-        String templateName = getTemplateName(request);
+        String templateName = viewModel.getTemplate();
         String result = engine.process(templateName, ctx);
 
 
@@ -121,18 +119,6 @@ public abstract class KronopsServlet extends HttpServlet {
         }
     }
 
-    private String getTemplateName(HttpServletRequest request) {
-        String requestPath = request.getRequestURI();
-        String contextPath = request.getContextPath();
-        if (contextPath == null) {
-            contextPath = "";
-        }
 
-        return this.getTemplate(requestPath.substring(contextPath.length()));
-    }
-
-    protected String getTemplate(String path) {
-        return path;
-    }
 
 }

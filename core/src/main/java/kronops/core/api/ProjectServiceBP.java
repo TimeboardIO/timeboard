@@ -34,15 +34,26 @@ import java.util.Map;
 
 public interface ProjectServiceBP {
 
+    /*
+    === Clusters ===
+     */
     void addProjectToProjectCluster(ProjectCluster projectCluster, Project newProject);
 
     void saveProjectCluster(ProjectCluster root);
 
-    List<TreeNode> listProjectClusters();
+    List<TreeNode> computeClustersTree();
 
+    List<ProjectCluster> listProjectClusters();
+
+    ProjectCluster findProjectsClusterByID(long cluster);
+
+
+    /*
+    === Projects ===
+     */
     Project createProject(User owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects();
+    List<Project> listProjects(User user);
 
     Project getProject(Long projectId);
 
@@ -59,5 +70,20 @@ public interface ProjectServiceBP {
 
     void save(ProjectMembership projectMembership);
 
-    ProjectCluster findProjectsCluserByID(long cluster);
+    void deleteProjectClusterByID(Long clusterID);
+
+    void updateProjectClusters(List<ProjectCluster> updatedProjectCluster, Map<Long, Long> clusterParent);
+
+
+    /*
+     == Tasks ==
+     */
+
+    List<Task> listProjectTasks(Project project);
+
+    Task createTask(Project project, Task task);
+
+    Task updateTask(Task task);
+
+    Task getTask(long id);
 }

@@ -4,6 +4,8 @@
           xmlns="http://karaf.apache.org/xmlns/features/v1.4.0"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
+
+
     <feature name="kronops-base" version="${project.version}">
         <feature>scr</feature>
         <feature>http</feature>

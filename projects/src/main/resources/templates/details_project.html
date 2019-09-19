@@ -20,71 +20,119 @@
             $("#"+userID).remove();
         }
 
+        var showTaskDetails = function(taskID){
+         
+        }
 
     </script>
+
+
     <form action="" class="ui form" enctype="application/x-www-form-urlencoded" id="projects" method="post">
         <input name="projectId" required th:value="${project.id}" type="hidden">
 
-        <h4 class="ui dividing header">Project Informations</h4>
-        <div class="field">
-            <label>Project Name</label>
-            <input name="projectName" placeholder="Project Name" required th:value="${project.name}" type="text">
+        <div class="ui top attached tabular menu">
+            <a class="item active" data-tab="first">Summary</a>
+            <a class="item" data-tab="second">Tasks</a>
+            <a class="item" data-tab="third">Clusters</a>
         </div>
+        <div class="ui bottom attached tab segment active" data-tab="first">
+            <div class="ui stackable two column grid">
+                <div class="column">
+                    <h4 class="ui dividing header">Project Informations</h4>
+                    <div class="field">
+                        <label>Project Name</label>
+                        <input name="projectName" placeholder="Project Name" required th:value="${project.name}"
+                               type="text">
 
-        <h4 class="ui dividing header">Members</h4>
-        <div class="field">
-            <div class="ui category search">
-                <div class="ui icon input">
-                    <input class="prompt" placeholder="Search user..." type="text">
-                    <i class="search icon"></i>
+                    </div>
+                    <div class="field">
+                        <label>Project Description</label>
+                        <textarea name="projectDescription" placeholder="Project Description" required
+                                  th:text="${project.comments}">
+                    </textarea>
+                    </div>
                 </div>
-                <div class="results"></div>
+                <div class="column">
+                    <h4 class="ui dividing header">Members</h4>
+                    <div class="field">
+                        <div class="ui category search">
+                            <div class="ui icon input">
+                                <input class="prompt" placeholder="Search user..." type="text">
+                                <i class="search icon"></i>
+                            </div>
+                            <div class="results"></div>
+                        </div>
+                        <table class="ui tablet unstackable table" id="members" th:if="${members.size()>0}">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="membership : ${members}" th:id="${membership.member.id}">
+                                <td th:text="${membership.member.name}">
+                                </td>
+                                <td>
+                                    <select th:name="'members['+${membership.member.id}+']'">
+                                        <option th:each="role : ${roles}" th:selected="${role == membership.role}"
+                                                th:text="${role}"
+                                                th:value="${role}"></option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <button class="ui negative basic button"
+                                            th:onclick="'removeUser('+${membership.member.id}+')'">
+                                        <i class="remove alternate icon"></i>
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
             </div>
-            <table class="ui tablet unstackable table" id="members" th:if="${members.size()>0}">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Role</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="membership : ${members}" th:id="${membership.member.id}">
-                    <td th:text="${membership.member.name}">
-                    </td>
-                    <td>
-                        <select th:name="'members['+${membership.member.id}+']'">
-                            <option th:each="role : ${roles}" th:selected="${role == membership.role}" th:text="${role}"
-                                    th:value="${role}"></option>
-                        </select>
-                    </td>
-                    <td>
-                        <button class="ui button" th:onclick="'removeUser('+${membership.member.id}+')'">
-                            <i class="remove alternate icon"></i>
-                            Remove
-                        </button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
         </div>
+        <div class="ui bottom attached tab segment" data-tab="second">
+            <div class="ui relaxed divided selection list">
+                <div class="item" th:each="task : ${tasks}">
+                    <div class="content" th:onclick="'showTaskDetails('+${task.id}+')'">
+                        <div class="header" th:text="${task.name}"></div>
+                        <div class="description" th:text="${task.comments}"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="task-details">
 
-        <h4 class="ui dividing header">Clusters</h4>
-
-        <div class="grouped fields">
-            <div class="field" th:each="cluster : ${clusters}">
-                <div class="ui radio checkbox"   >
-                    <input type="radio" name="cluster" th:checked="${cluster.key == project.cluster.id}" th:value="${cluster.key}" class="hidden"></input>
-                    <label th:text="${cluster.value}"></label>
+            </div>
+        </div>
+        <div class="ui bottom attached tab segment" data-tab="third">
+            <div class="grouped fields">
+                <div class="field" th:each="cluster : ${clusters}">
+                    <div class="ui toggle checkbox">
+                        <input class="hidden" name="cluster"
+                               th:checked="${selected_clusters.contains(cluster.key)}" th:value="${cluster.key}"
+                               type="checkbox"></input>
+                        <label th:text="${cluster.value}"></label>
+                    </div>
                 </div>
             </div>
         </div>
-        <button class="ui button" type="submit">Submit</button>
+
+        <button class="ui positive button" type="submit">Save</button>
     </form>
     <script>
 
-        $('.ui.radio.checkbox')
+        $('.ui.checkbox')
           .checkbox()
+        ;
+
+        $('.menu .item')
+          .tab()
         ;
 
         $('.ui.search')
@@ -103,6 +151,13 @@
                     },
                 minCharacters : 3
             });
+
+
+
+
+
+
+
 
 
     </script>

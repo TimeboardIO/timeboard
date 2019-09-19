@@ -27,11 +27,12 @@ package kronops.projects;
  */
 
 import kronops.core.api.ProjectServiceBP;
-import kronops.core.api.exceptions.BusinessException;
 import kronops.core.api.TreeNode;
+import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.Project;
 import kronops.core.model.ProjectRole;
 import kronops.core.ui.KronopsServlet;
+import kronops.core.ui.ViewModel;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -42,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -63,18 +65,32 @@ public class DetailsProjectServlet extends KronopsServlet {
     public ProjectServiceBP projectServiceBP;
 
     @Override
-    protected String getTemplate(String path) {
-        return "details_project.html";
-    }
-
-    @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
         return DetailsProjectServlet.class.getClassLoader();
     }
 
-    @Override
-    protected Map<String, Object> handleGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+
+    private void prepareTemplateData(Project project, Map<String, Object> map) {
+        List<TreeNode> node = this.projectServiceBP.computeClustersTree();
+
+        final Map<Long, String> paths = new HashMap<>();
+        node.forEach(treeNode -> {
+            paths.putAll(treeNode.getPaths());
+        });
+
+        map.put("selected_clusters", project.getClusters().stream().map(projectCluster -> projectCluster.getId()).collect(Collectors.toList()));
+        map.put("clusters", paths);
+        map.put("project", project);
+        map.put("members", project.getMembers());
+        map.put("roles", ProjectRole.values());
+        map.put("tasks", this.projectServiceBP.listProjectTasks(project));
+    }
+
+
+    @Override
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("details_project.html");
         long id = Long.parseLong(request.getParameter("id"));
 
         Project project = this.projectServiceBP.getProject(id);
@@ -82,30 +98,20 @@ public class DetailsProjectServlet extends KronopsServlet {
 
         Map<String, Object> map = new HashMap<>();
         prepareTemplateData(project, map);
-
-        return map;
-    }
-
-    private void prepareTemplateData(Project project, Map<String, Object> map) {
-        List<TreeNode> node = this.projectServiceBP.listProjectClusters();
-
-        final Map<Long, String> paths = new HashMap<>();
-        node.forEach(treeNode -> {
-            paths.putAll(treeNode.getPaths());
-        });
-        map.put("clusters", paths);
-        map.put("project", project);
-        map.put("members", project.getMembers());
-        map.put("roles", ProjectRole.values());
+        viewModel.getViewDatas().putAll(map);
     }
 
     @Override
-    protected Map<String, Object> handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("details_project.html");
         Map<String, Object> map = new HashMap<>();
 
-        //Extract project id
+        //Extract project
         long id = Long.parseLong(request.getParameter("id"));
-        
+        Project project = this.projectServiceBP.getProject(id);
+        project.setName(request.getParameter("projectName"));
+        project.setComments(request.getParameter("projectDescription"));
+
         //Extract memberships from request
         Map<Long, ProjectRole> memberships = new HashMap<>();
         Enumeration<String> params = request.getParameterNames();
@@ -121,11 +127,15 @@ public class DetailsProjectServlet extends KronopsServlet {
                 }
             }
         }
-        
+
         //Extract cluster
-        Project project = this.projectServiceBP.getProject(id);
-        project.setName(request.getParameter("projectName"));
-        project.setCluster(this.projectServiceBP.findProjectsCluserByID(Long.parseLong(request.getParameter("cluster"))));
+        String[] clusterID = request.getParameterValues("cluster");
+        project.getClusters().clear();
+        if (clusterID != null) {
+            Arrays.asList(clusterID).stream().forEach(s -> {
+                project.getClusters().add(this.projectServiceBP.findProjectsClusterByID(Long.parseLong(s)));
+            });
+        }
 
         try {
             this.projectServiceBP.updateProject(project, memberships);
@@ -135,7 +145,6 @@ public class DetailsProjectServlet extends KronopsServlet {
 
         prepareTemplateData(project, map);
 
-
-        return map;
+        viewModel.getViewDatas().putAll(map);
     }
 }

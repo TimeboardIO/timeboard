@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
+import javax.persistence.TypedQuery;
 import javax.transaction.TransactionManager;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,7 +70,7 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
             ProjectCluster c = entityManager.find(ProjectCluster.class, projectCluster.getId());
             Project p = entityManager.find(Project.class, newProject.getId());
 
-            p.setCluster(c);
+            p.getClusters().add(c);
 
             entityManager.flush();
         });
@@ -98,11 +99,11 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
 
 
     @Override
-    public List<Project> listProjects() {
+    public List<Project> listProjects(User user) {
         return jpa.txExpr(em -> {
-            List<Project> data = em.createQuery("select p from Project p", Project.class)
-                    .getResultList();
-            return data;
+            TypedQuery<Project> query = em.createQuery("select p from Project p join fetch p.members m where m.member = :user", Project.class);
+            query.setParameter("user", user);
+            return query.getResultList();
         });
     }
 
@@ -186,7 +187,70 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     }
 
     @Override
-    public ProjectCluster findProjectsCluserByID(long cluster) {
+    public void deleteProjectClusterByID(Long clusterID) {
+        this.jpa.tx(entityManager -> {
+            ProjectCluster pc = entityManager.find(ProjectCluster.class, clusterID);
+            entityManager.remove(pc);
+            entityManager.flush();
+        });
+    }
+
+    @Override
+    public void updateProjectClusters(List<ProjectCluster> updatedProjectCluster, Map<Long, Long> clusterParent) {
+
+        this.jpa.tx(entityManager -> {
+            updatedProjectCluster.forEach(projectCluster -> {
+                if (clusterParent.containsKey(projectCluster.getId())) {
+                    ProjectCluster parentCluster = entityManager.find(ProjectCluster.class, clusterParent.get(projectCluster.getId()));
+                    if (parentCluster != null) {
+                        projectCluster.setParent(parentCluster);
+                    }
+                }
+                entityManager.merge(projectCluster);
+            });
+            entityManager.flush();
+        });
+
+    }
+
+    @Override
+    public List<Task> listProjectTasks(Project project) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project", Task.class);
+            q.setParameter("project", project);
+            return q.getResultList();
+        });
+    }
+
+    @Override
+    public Task createTask(Project project, Task task) {
+        return this.jpa.txExpr(entityManager -> {
+            entityManager.persist(task);
+            entityManager.merge(project);
+            task.setProject(project);
+            entityManager.flush();
+            return task;
+        });
+    }
+
+    @Override
+    public Task updateTask(Task task) {
+        return this.jpa.txExpr(entityManager -> {
+            entityManager.merge(task);
+            entityManager.flush();
+            return task;
+        });
+    }
+
+    @Override
+    public Task getTask(long id) {
+        return this.jpa.txExpr(entityManager -> {
+            return entityManager.find(Task.class, id);
+        });
+    }
+
+    @Override
+    public ProjectCluster findProjectsClusterByID(long cluster) {
         return this.jpa.txExpr(entityManager -> entityManager.find(ProjectCluster.class, cluster));
     }
 
@@ -198,7 +262,7 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     }
 
     @Override
-    public List<TreeNode> listProjectClusters() {
+    public List<TreeNode> computeClustersTree() {
         return this.jpa.txExpr(entityManager -> {
             TreeNode root = new TreeNode(null);
             List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc", ProjectCluster.class).getResultList();
@@ -206,6 +270,15 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
                 root.insert(projectCluster);
             });
             return root.getChildren();
+        });
+    }
+
+    @Override
+    public List<ProjectCluster> listProjectClusters() {
+        return this.jpa.txExpr(entityManager -> {
+            List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc", ProjectCluster.class).getResultList();
+
+            return projectClusters;
         });
     }
 

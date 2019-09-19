@@ -27,10 +27,15 @@ package kronops.ui;
  */
 
 import kronops.core.ui.KronopsServlet;
+import kronops.core.ui.ViewModel;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
 import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 @Component(
@@ -50,8 +55,13 @@ public class HomeServlet extends KronopsServlet {
     }
 
     @Override
-    protected String getTemplate(String path) {
-        return "home.html";
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("home.html");
+    }
+
+    @Override
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("home.html");
     }
 
 

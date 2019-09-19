@@ -38,8 +38,10 @@ Install Kronops
     
     feature:install kronops-datasource
     feature:install kronops-core 
-    feature:install kronops-rpcbridge 
-    feature:install kronops-webui
+    feature:install kronops-core-ui 
+    feature:install kronops-security 
+    feature:install kronops-home 
+    feature:install kronops-projects 
     
 Open webrowser 
 

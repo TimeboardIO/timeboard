@@ -26,11 +26,11 @@ package kronops.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kronops.core.api.ProjectServiceBP;
-import kronops.core.model.User;
+import kronops.core.model.Task;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
-import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -39,34 +39,32 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 
+/**
+ * Display project details form
+ * <p>
+ * ex : /projects/details?id=
+ */
 @Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=kronops)"
-        }
+        service = DetailsTaskRest.class,
+        immediate = true
 )
-public class ProjectsServlet extends KronopsServlet {
-
+public class DetailsTaskRest {
 
     @Reference
-    private ProjectServiceBP projectServiceBP;
+    public ProjectServiceBP projectServiceBP;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectsServlet.class.getClassLoader();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+
+    public String handleGet(@PathParam("param") Long id) throws ServletException, IOException {
+        final Task task = this.projectServiceBP.getTask(id);
+        return MAPPER.writeValueAsString(task);
     }
 
-    @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects.html");
-        User user = SecurityContext.getCurrentUser(request);
-        viewModel.getViewDatas().put("projects", this.projectServiceBP.listProjects(user));
-    }
 }

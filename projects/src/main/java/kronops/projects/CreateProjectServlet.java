@@ -29,6 +29,7 @@ package kronops.projects;
 import kronops.core.api.ProjectServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.ui.KronopsServlet;
+import kronops.core.ui.ViewModel;
 import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -57,20 +58,14 @@ public class CreateProjectServlet extends KronopsServlet {
     @Reference
     public ProjectServiceBP projectServiceBP;
 
-
-    @Override
-    protected String getTemplate(String path) {
-        return "create_project.html";
-    }
-
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
         return CreateProjectServlet.class.getClassLoader();
     }
 
     @Override
-    protected Map<String, Object> handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("create_project.html");
         Map<String, Object> result = new HashMap<>();
         result.put("projectName", request.getParameter("projectName"));
 
@@ -82,8 +77,13 @@ public class CreateProjectServlet extends KronopsServlet {
             result.put("error", "Project " + result.get("projectName").toString() + " already exist");
         }
 
-        return result;
+        viewModel.getViewDatas().putAll(result);
     }
 
+    @Override
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        viewModel.setTemplate("create_project.html");
+
+    }
 
 }
