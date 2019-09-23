@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 
-<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
-<html th:replace="~{layouts/general.html :: main-fragment(
-                                                '/projects',
-                                                ~{::title},
-                                                ~{:: #home-main-content}
-                                               )}"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/general.html(path='/projects')}">
 
 <head>
-    <title>Home Page</title>
+    <title layout:fragment="title">Home Page</title>
 </head>
 <body>
 
-<div id="home-main-content">
+<div layout:fragment="content">
     <div class="ui negative message" th:if="${error}">
         <i class="close icon"></i>
         <div class="header">

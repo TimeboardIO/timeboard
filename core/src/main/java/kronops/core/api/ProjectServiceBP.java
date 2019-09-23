@@ -86,4 +86,6 @@ public interface ProjectServiceBP {
     Task updateTask(Task task);
 
     Task getTask(long id);
+
+    void deleteTaskByID(long taskID) throws BusinessException;
 }

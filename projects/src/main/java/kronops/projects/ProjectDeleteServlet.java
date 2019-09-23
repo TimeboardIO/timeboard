@@ -28,16 +28,15 @@ package kronops.projects;
 
 import kronops.core.api.ProjectServiceBP;
 import kronops.core.ui.KronopsServlet;
-import kronops.core.ui.NavigationExtPoint;
-import kronops.core.ui.ViewModel;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 
 @Component(
@@ -48,8 +47,7 @@ import java.util.List;
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=kronops)"
         }
 )
-public class DeleteProjectServlet extends KronopsServlet {
-
+public class ProjectDeleteServlet extends KronopsServlet {
 
 
     @Reference
@@ -58,18 +56,17 @@ public class DeleteProjectServlet extends KronopsServlet {
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return DeleteProjectServlet.class.getClassLoader();
+        return ProjectDeleteServlet.class.getClassLoader();
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        long projectID = Long.parseLong(request.getParameter("id"));
+        long projectID = Long.parseLong(request.getParameter("projectID"));
         this.projectServiceBP.deleteProjectByID(projectID);
 
         response.sendRedirect("/projects");
     }
-
 
 
 }

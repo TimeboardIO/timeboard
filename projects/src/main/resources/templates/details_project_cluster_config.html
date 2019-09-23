@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{details_project_layout.html(tab='third')}">
+
+<head>
+    <title>Project Tasks details</title>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+
+    <form class="ui form segment" style="margin-left:1em;" enctype="application/x-www-form-urlencoded" method="post" action="">
+        <input name="projectID"  th:value="${project.id}" required type="hidden">
+
+        <div class="grouped fields">
+            <div class="field" th:each="cluster : ${clusters}">
+                <div class="ui toggle checkbox">
+                    <input class="hidden" name="cluster"
+                           th:checked="${selected_clusters.contains(cluster.key)}" th:value="${cluster.key}"
+                           type="checkbox"></input>
+                    <label th:text="${cluster.value}"></label>
+                </div>
+            </div>
+        </div>
+
+        <button class="ui positive button" type="submit">Save</button>
+
+        <script>
+                $('.ui.checkbox')
+                  .checkbox()
+                ;
+        </script>
+
+    </form>
+
+</div>
+
+</body>
+</html>

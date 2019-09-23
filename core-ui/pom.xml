@@ -53,6 +53,11 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>nz.net.ultraq.thymeleaf</groupId>
+            <artifactId>thymeleaf-layout-dialect</artifactId>
+            <version>2.4.1</version>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.1.0</version>
@@ -84,6 +89,7 @@
                     <instructions>
                         <Export-Package>
                             kronops.core.ui,
+                            nz.net.ultraq.thymeleaf,
                             com.fasterxml.jackson.databind,
                             com.fasterxml.jackson.core,
                             com.fasterxml.jackson.*,

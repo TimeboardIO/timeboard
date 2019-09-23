@@ -115,17 +115,15 @@ public class ClustersServlet extends KronopsServlet {
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("clusters.html");
         if (request.getRequestURI().equals("/clusters/delete")) {
-            deleteCluster(Long.parseLong(request.getParameter("id")));
+            deleteCluster(Long.parseLong(request.getParameter("projectID")));
         }
         viewModel.getViewDatas().putAll(prepareData());
     }
 
 
-
     private void deleteCluster(Long clusterID) {
         this.projectServiceBP.deleteProjectClusterByID(clusterID);
     }
-
 
 
     private Long getID(String k) {

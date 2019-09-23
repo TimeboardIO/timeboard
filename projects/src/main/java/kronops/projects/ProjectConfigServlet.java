@@ -42,7 +42,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -55,20 +58,19 @@ import java.util.stream.Collectors;
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/details",
+                "osgi.http.whiteboard.servlet.pattern=/projects/config",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=kronops)"
         }
 )
-public class DetailsProjectServlet extends KronopsServlet {
+public class ProjectConfigServlet extends KronopsServlet {
 
     @Reference
     public ProjectServiceBP projectServiceBP;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return DetailsProjectServlet.class.getClassLoader();
+        return ProjectConfigServlet.class.getClassLoader();
     }
-
 
 
     private void prepareTemplateData(Project project, Map<String, Object> map) {
@@ -90,8 +92,8 @@ public class DetailsProjectServlet extends KronopsServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("details_project.html");
-        long id = Long.parseLong(request.getParameter("id"));
+        viewModel.setTemplate("details_project_config.html");
+        long id = Long.parseLong(request.getParameter("projectID"));
 
         Project project = this.projectServiceBP.getProject(id);
 
@@ -103,11 +105,11 @@ public class DetailsProjectServlet extends KronopsServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("details_project.html");
+        viewModel.setTemplate("details_project_config.html");
         Map<String, Object> map = new HashMap<>();
 
         //Extract project
-        long id = Long.parseLong(request.getParameter("id"));
+        long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectServiceBP.getProject(id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
@@ -126,15 +128,6 @@ public class DetailsProjectServlet extends KronopsServlet {
                     memberships.put(Long.parseLong(key), ProjectRole.CONTRIBUTOR);
                 }
             }
-        }
-
-        //Extract cluster
-        String[] clusterID = request.getParameterValues("cluster");
-        project.getClusters().clear();
-        if (clusterID != null) {
-            Arrays.asList(clusterID).stream().forEach(s -> {
-                project.getClusters().add(this.projectServiceBP.findProjectsClusterByID(Long.parseLong(s)));
-            });
         }
 
         try {

@@ -2,7 +2,7 @@ package kronops.projects;
 
 /*-
  * #%L
- * webui
+ * projects
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -27,10 +27,9 @@ package kronops.projects;
  */
 
 import kronops.core.api.ProjectServiceBP;
-import kronops.core.api.exceptions.BusinessException;
+import kronops.core.model.Project;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
-import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -40,50 +39,44 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/create",
+                "osgi.http.whiteboard.servlet.pattern=/projects/tasks",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=kronops)"
         }
 )
-public class CreateProjectServlet extends KronopsServlet {
-
+public class ProjectTaskListServlet extends KronopsServlet {
 
     @Reference
     public ProjectServiceBP projectServiceBP;
 
+
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return CreateProjectServlet.class.getClassLoader();
-    }
-
-    @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("create_project.html");
-        Map<String, Object> result = new HashMap<>();
-        result.put("projectName", request.getParameter("projectName"));
-
-
-        try {
-            this.projectServiceBP.createProject(SecurityContext.getCurrentUser(request.getSession()), result.get("projectName").toString());
-            response.sendRedirect("/projects");
-        } catch (BusinessException e) {
-            result.put("error", "Project " + result.get("projectName").toString() + " already exist");
-        }
-
-        viewModel.getViewDatas().putAll(result);
+        return ProjectTaskListServlet.class.getClassLoader();
     }
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("create_project.html");
+        long id = Long.parseLong(request.getParameter("projectID"));
+        Project project = this.projectServiceBP.getProject(id);
+
+        viewModel.setTemplate("details_project_tasks.html");
+        viewModel.getViewDatas().put("tasks", this.projectServiceBP.listProjectTasks(project));
+        viewModel.getViewDatas().put("project", project);
 
     }
 
+    @Override
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        long id = Long.parseLong(request.getParameter("projectID"));
+        Project project = this.projectServiceBP.getProject(id);
+
+        viewModel.setTemplate("details_project_tasks.html");
+        viewModel.getViewDatas().put("tasks", this.projectServiceBP.listProjectTasks(project));
+        viewModel.getViewDatas().put("project", project);
+    }
 }

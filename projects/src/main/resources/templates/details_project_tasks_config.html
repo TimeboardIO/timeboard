@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{details_project_tasks.html}">
+
+<head>
+    <title>Project Tasks details</title>
+</head>
+<body>
+
+<div layout:fragment="task-config">
+
+    <form class="ui form segment" style="margin-left:1em;" enctype="application/x-www-form-urlencoded" method="post" action="">
+        <input name="taskID"  th:value="${task.id}" required type="hidden">
+
+        <div class="field">
+            <label>Task Name</label>
+            <input name="taskName" placeholder="Task Name" th:value="${task.name}" required type="text">
+        </div>
+        <div class="field">
+            <label>Task Description</label>
+            <input name="taskComments" placeholder="Task Description" th:value="${task.comments}" type="text">
+        </div>
+        <div class="field">
+            <label>Task Start Date</label>
+            <input name="taskStartDate" placeholder="Task Name" th:value="${#dates.format(task.startDate, 'yyyy-MM-dd')}" required type="date">
+        </div>
+        <div class="field">
+            <label>Task End Date</label>
+            <input name="taskEndDate" placeholder="Task Name" th:value="${#dates.format(task.endDate, 'yyyy-MM-dd')}" required type="date">
+        </div>
+        <div class="field">
+            <label>Task Original Estimate</label>
+            <input name="taskEstimateWork" placeholder="Task OE" th:value="${task.estimateWork}" required type="number">
+        </div>
+        <div class="field">
+            <label>User assigned</label>
+            <input name="taskAssigned" placeholder="No user assigned" th:value="${task.assigned}" type="text">
+        </div>
+
+        <button class="ui positive button" type="submit">Save</button>
+
+        <a class="ui negative basic button"
+           th:href="@{/projects/tasks/delete(taskID=${task.id}, projectID=${project.id})}">
+            <i class="remove alternate icon"></i>
+            Delete Task
+        </a>
+
+    </form>
+
+</div>
+
+</body>
+</html>

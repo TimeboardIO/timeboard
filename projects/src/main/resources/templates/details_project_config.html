@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{details_project_layout.html(tab='first')}">
+
+<head>
+    <title layout:fragment="title">Project</title>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+
+    <script type="text/javascript">
+        var removeUser = function(userID){
+            $("#"+userID).remove();
+        }
+
+        var showTaskDetails = function(taskID){
+         
+        }
+
+
+    </script>
+
+
+    <form action="" class="ui form" enctype="application/x-www-form-urlencoded" id="projects" method="post">
+        <input name="projectID" required th:value="${project.id}" type="hidden">
+
+        <div class="ui stackable two column grid">
+            <div class="column">
+                <h4 class="ui dividing header">Project Informations</h4>
+                <div class="field">
+                    <label>Project Name</label>
+                    <input name="projectName" placeholder="Project Name" required th:value="${project.name}"
+                           type="text">
+
+                </div>
+                <div class="field">
+                    <label>Project Description</label>
+                    <textarea name="projectDescription" placeholder="Project Description" required
+                              th:text="${project.comments}">
+                    </textarea>
+                </div>
+            </div>
+            <div class="column">
+                <h4 class="ui dividing header">Members</h4>
+                <div class="field">
+                    <div class="ui category search">
+                        <div class="ui icon input">
+                            <input class="prompt" placeholder="Search user..." type="text">
+                            <i class="search icon"></i>
+                        </div>
+                        <div class="results"></div>
+                    </div>
+                    <table class="ui tablet unstackable table" id="members" th:if="${members.size()>0}">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="membership : ${members}" th:id="${membership.member.id}">
+                            <td th:text="${membership.member.name}">
+                            </td>
+                            <td>
+                                <select th:name="'members['+${membership.member.id}+']'">
+                                    <option th:each="role : ${roles}" th:selected="${role == membership.role}"
+                                            th:text="${role}"
+                                            th:value="${role}"></option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="ui negative basic button"
+                                        th:onclick="'removeUser('+${membership.member.id}+')'">
+                                    <i class="remove alternate icon"></i>
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <button class="ui positive button" type="submit">Save</button>
+    </form>
+    <script>
+
+        $('.ui.checkbox')
+          .checkbox()
+        ;
+
+
+
+        $('.ui.search')
+            .search({
+                apiSettings: {
+                        url: '/search?q={query}'
+                    },
+                    fields: {
+                        results : 'items',
+                        title   : 'name',
+                        description : 'email'
+                    },
+                    onSelect: function(result, response) {
+                        $('#projects').append("<input type='text' name='members["+result.id+"]' />");
+                        $('#projects').submit();
+                    },
+                minCharacters : 3
+            });
+
+
+
+
+
+
+
+
+
+
+    </script>
+</div>
+
+</body>
+</html>

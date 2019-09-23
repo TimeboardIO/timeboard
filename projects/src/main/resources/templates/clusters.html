@@ -1,19 +1,16 @@
 <!DOCTYPE html>
 
 <!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
-<html th:replace="~{layouts/general.html :: main-fragment(
-                                                '/clusters',
-                                                ~{::title},
-                                                ~{:: #home-main-content}
-                                               )}"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/general.html}">
 
 <head>
-    <title>Clusters</title>
+    <title layout:fragment="title">Clusters</title>
 </head>
 <body>
 
-<div id="home-main-content">
+<div layout:fragment="content">
 
     <h4 class="ui dividing header">Create cluster</h4>
 

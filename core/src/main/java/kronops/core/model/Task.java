@@ -38,7 +38,7 @@ public class Task implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column(length = 50, unique = true, nullable = false)
     private String name;
@@ -58,7 +58,7 @@ public class Task implements Serializable {
     @OneToOne
     private User assigned;
 
-    @ManyToOne(targetEntity = Project.class)
+    @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
     @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
@@ -72,11 +72,11 @@ public class Task implements Serializable {
         this.estimateWork = estimateWork;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

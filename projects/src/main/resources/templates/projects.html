@@ -1,19 +1,15 @@
 <!DOCTYPE html>
 
-<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
-<html th:replace="~{layouts/general.html :: main-fragment(
-                                                '/projects',
-                                                ~{::title},
-                                                ~{:: #home-main-content}
-                                               )}"
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layouts/general.html(path='/projects')}">
 
 <head>
-    <title>Home Page</title>
+    <title layout:fragment="title">Home Page</title>
 </head>
 <body>
 
-<div id="home-main-content">
+<div layout:fragment="content">
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
@@ -49,9 +45,9 @@
                 <td><span th:text="${project.members.size()}"></span> members</td>
                 <td><span th:text="${project.clusters.size()}"></span> clusters</td>
                 <td>
-                    <a class="ui positive button" th:href="@{/projects/details?id={id}(id=${project.id})}">Edit</a>
+                    <a class="ui positive button" th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
                     <a class="ui negative basic button"
-                       th:href="@{/projects/delete?id={id}(id=${project.id})}">Delete</a>
+                       th:href="@{/projects/delete(projectID=${project.id})}">Delete</a>
                 </td>
             </tr>
             </tbody>

@@ -26,6 +26,7 @@ package kronops.core.ui;
  * #L%
  */
 
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.thymeleaf.TemplateEngine;
@@ -68,20 +69,28 @@ public abstract class KronopsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final ViewModel viewModel = new ViewModel();
-        this.handleGet(request, response, viewModel);
+        try {
+            this.handleGet(request, response, viewModel);
+        }catch (Exception e){
+            viewModel.getErrors().add(e);
+        }
         doService(request, response, viewModel);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final ViewModel viewModel = new ViewModel();
-        this.handlePost(request, response, viewModel);
+        try {
+            this.handlePost(request, response, viewModel);
+        }catch (Exception e){
+            viewModel.getErrors().add(e);
+        }
         doService(request, response, viewModel);
     }
 
-    protected  void handlePost(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException{};
+    protected  void handlePost(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception{};
 
-    protected  void handleGet(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException{};
+    protected  void handleGet(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception{};
 
 
     protected List<NavigationExtPoint> getNavs() {
@@ -95,11 +104,15 @@ public abstract class KronopsServlet extends HttpServlet {
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
+        engine.addDialect(new LayoutDialect());
 
         final WebContext ctx = new WebContext(request, response, request.getServletContext());
         viewModel.getViewDatas().forEach((s, o) -> {
             ctx.setVariable(s, o);
         });
+
+        ctx.setVariable("errors", viewModel.getErrors());
+
 
         ArrayList<NavigationExtPoint> navigationEntries = new ArrayList<>();
         if (this.getNavs() != null) {

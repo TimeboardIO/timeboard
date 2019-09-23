@@ -37,6 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.TransactionManager;
 import java.util.ArrayList;
@@ -111,8 +112,8 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     public Project getProject(Long projectId) {
 
         return jpa.txExpr(em -> {
-            Project data = em.createQuery("select p from Project p where p.id = :id", Project.class)
-                    .setParameter("id", projectId)
+            Project data = em.createQuery("select p from Project p where p.id = :projectID", Project.class)
+                    .setParameter("projectID", projectId)
                     .getSingleResult();
             return data;
         });
@@ -248,6 +249,28 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
             return entityManager.find(Task.class, id);
         });
     }
+
+
+
+    @Override
+    public void deleteTaskByID(long taskID) throws BusinessException {
+        BusinessException exp = this.jpa.txExpr(entityManager -> {
+            Task task = entityManager.find(Task.class, taskID);
+
+            if (!task.getImputations().isEmpty()) {
+                return new BusinessException("Unable to delete task " + taskID + ", imputations are not empty");
+            }
+
+            entityManager.remove(task);
+            entityManager.flush();
+            return null;
+        });
+
+        if(exp != null){
+            throw exp;
+        }
+    }
+
 
     @Override
     public ProjectCluster findProjectsClusterByID(long cluster) {

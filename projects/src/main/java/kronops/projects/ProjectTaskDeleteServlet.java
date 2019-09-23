@@ -27,10 +27,9 @@ package kronops.projects;
  */
 
 import kronops.core.api.ProjectServiceBP;
-import kronops.core.model.User;
+import kronops.core.api.exceptions.BusinessException;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
-import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -40,33 +39,41 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects",
+                "osgi.http.whiteboard.servlet.pattern=/projects/tasks/delete",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=kronops)"
         }
 )
-public class ProjectsServlet extends KronopsServlet {
+public class ProjectTaskDeleteServlet extends KronopsServlet {
 
 
     @Reference
-    private ProjectServiceBP projectServiceBP;
+    public ProjectServiceBP projectServiceBP;
+
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectsServlet.class.getClassLoader();
+        return ProjectTaskDeleteServlet.class.getClassLoader();
     }
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects.html");
-        User user = SecurityContext.getCurrentUser(request);
-        viewModel.getViewDatas().put("projects", this.projectServiceBP.listProjects(user));
+        long taskID = Long.parseLong(request.getParameter("taskID"));
+        try {
+            this.projectServiceBP.deleteTaskByID(taskID);
+        } catch (BusinessException e) {
+            viewModel.getErrors().add(e);
+        }
+
+        viewModel.setTemplate("details_project_tasks.html");
     }
+
+
+
+
 }
