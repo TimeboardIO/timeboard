@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{details_project_layout.html(tab='first')}">
+<html layout:decorate="~{details_project_layout.html(tab='first')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title layout:fragment="title">Project</title>
@@ -19,6 +19,7 @@
         var showTaskDetails = function(taskID){
          
         }
+
 
 
     </script>
@@ -115,15 +116,6 @@
                     },
                 minCharacters : 3
             });
-
-
-
-
-
-
-
-
-
 
     </script>
 </div>

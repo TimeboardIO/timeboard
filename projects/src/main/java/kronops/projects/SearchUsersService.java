@@ -40,6 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component(
@@ -59,8 +60,19 @@ public class SearchUsersService extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String query = req.getParameter("q");
-        List<User> users = this.userServiceBP.searchUserByName(query);
 
+        Long projectID = null;
+        if (req.getParameter("projectID") != null) {
+            projectID = Long.parseLong(req.getParameter("projectID"));
+        }
+
+        List<User> users = new ArrayList<>();
+
+        if (projectID != null) {
+            users.addAll(this.userServiceBP.searchUserByName(query, projectID));
+        } else {
+            users.addAll(this.userServiceBP.searchUserByName(query));
+        }
         SearchResult searchResult = new SearchResult(users.size(), users);
 
         MAPPER.writeValue(resp.getWriter(), searchResult);

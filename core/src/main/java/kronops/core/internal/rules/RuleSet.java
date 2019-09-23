@@ -1,8 +1,8 @@
-package kronops.core.ui;
+package kronops.core.internal.rules;
 
 /*-
  * #%L
- * core-ui
+ * core
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -26,41 +26,27 @@ package kronops.core.ui;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import kronops.core.model.User;
 
-public class ViewModel {
+import java.util.HashSet;
+import java.util.Set;
 
-    private final List<Exception> errors;
-    private final Map<String, Object> viewDatas;
-    private String template;
+public class RuleSet<T> {
 
-    public ViewModel() {
-        this.errors = new ArrayList<>();
-        this.viewDatas = new HashMap<>();
+    private final Set<Rule> rules = new HashSet<>();
+
+    public void addRule(Rule r) {
+        this.rules.add(r);
     }
 
-    public ViewModel(String template) {
-        this.errors = new ArrayList<>();
-        this.viewDatas = new HashMap<>();
-        this.template = template;
+    public Set<Rule> evaluate(User actor, T o) {
+        Set<Rule> noSatisfiedRules = new HashSet<>();
+        for (Rule r : this.rules) {
+            if (!r.isSatisfied(actor, o)) {
+                noSatisfiedRules.add(r);
+            }
+        }
+        return noSatisfiedRules;
     }
 
-    public List<Exception> getErrors() {
-        return errors;
-    }
-
-    public Map<String, Object> getViewDatas() {
-        return viewDatas;
-    }
-
-    public String getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(String template) {
-        this.template = template;
-    }
 }

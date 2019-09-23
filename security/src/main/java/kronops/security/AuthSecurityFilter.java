@@ -26,7 +26,6 @@ package kronops.security;
  * #L%
  */
 
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -84,7 +83,7 @@ public class AuthSecurityFilter implements Filter {
 
 
         if (!isLogged && !isStatic && !isLogin) {
-            res.sendRedirect(this.loginURL + "?origin=" + ((HttpServletRequest) request).getRequestURI()+"?"+((HttpServletRequest) request).getQueryString());
+            res.sendRedirect(this.loginURL + "?origin=" + ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString());
         } else {
             chain.doFilter(request, response);
         }

@@ -76,7 +76,7 @@ public class ProjectClustersServlet extends KronopsServlet {
         }
 
         viewModel.setTemplate("details_project_cluster_config.html");
-     }
+    }
 
     private void prepareDatas(ViewModel viewModel, Project project) {
         viewModel.getViewDatas().put("project", project);

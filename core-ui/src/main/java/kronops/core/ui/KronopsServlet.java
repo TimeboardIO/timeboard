@@ -34,12 +34,12 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.View;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
@@ -71,7 +71,7 @@ public abstract class KronopsServlet extends HttpServlet {
         final ViewModel viewModel = new ViewModel();
         try {
             this.handleGet(request, response, viewModel);
-        }catch (Exception e){
+        } catch (Exception e) {
             viewModel.getErrors().add(e);
         }
         doService(request, response, viewModel);
@@ -82,19 +82,32 @@ public abstract class KronopsServlet extends HttpServlet {
         final ViewModel viewModel = new ViewModel();
         try {
             this.handlePost(request, response, viewModel);
-        }catch (Exception e){
+        } catch (Exception e) {
             viewModel.getErrors().add(e);
         }
         doService(request, response, viewModel);
     }
 
-    protected  void handlePost(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception{};
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
+    }
 
-    protected  void handleGet(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception{};
+    ;
+
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
+    }
+
+    ;
 
 
     protected List<NavigationExtPoint> getNavs() {
         return this.navRegistry.getEntries();
+    }
+
+    protected void forward(HttpServletRequest request, HttpServletResponse response, String url, ViewModel viewModel) throws ServletException, IOException {
+        RequestDispatcher requestDispatcher = request.getRequestDispatcher(url);
+        request.setAttribute("errors", viewModel.getErrors());
+        requestDispatcher.forward(request, response);
+        ;
     }
 
 
@@ -111,6 +124,10 @@ public abstract class KronopsServlet extends HttpServlet {
             ctx.setVariable(s, o);
         });
 
+        //Used to forward errors between servlets
+        if (request.getAttribute("errors") != null) {
+            viewModel.getErrors().addAll((Collection<? extends Exception>) request.getAttribute("errors"));
+        }
         ctx.setVariable("errors", viewModel.getErrors());
 
 
@@ -131,7 +148,6 @@ public abstract class KronopsServlet extends HttpServlet {
             out.close();
         }
     }
-
 
 
 }

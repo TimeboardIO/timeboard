@@ -27,16 +27,14 @@ package kronops.timesheet;
  */
 
 import kronops.core.ui.KronopsServlet;
-import kronops.core.ui.NavigationExtPoint;
 import kronops.core.ui.ViewModel;
-import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Component;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
 @Component(
         service = Servlet.class,
@@ -63,8 +61,6 @@ public class TimesheetServlet extends KronopsServlet {
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("timesheet.html");
     }
-
-
 
 
 }

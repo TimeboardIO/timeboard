@@ -28,6 +28,7 @@ package kronops.core.internal;
 
 import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
+import kronops.core.model.Project;
 import kronops.core.model.User;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
@@ -36,6 +37,7 @@ import org.osgi.service.component.annotations.ReferenceScope;
 
 import javax.persistence.TypedQuery;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component(
         service = UserServiceBP.class,
@@ -68,6 +70,17 @@ public class UserServiceBPImpl implements UserServiceBP {
             TypedQuery<User> q = entityManager.createQuery("select u from User u where u.name LIKE CONCAT('%',:prefix,'%')", User.class);
             q.setParameter("prefix", prefix);
             return q.getResultList();
+        });
+    }
+
+    @Override
+    public List<User> searchUserByName(String prefix, Long projectID) {
+        return this.jpa.txExpr(entityManager -> {
+            Project project = entityManager.find(Project.class, projectID);
+            List<User> matchedUser = project.getMembers().stream()
+                    .filter(projectMembership -> projectMembership.getMember().getName().startsWith(prefix))
+                    .map(projectMembership -> projectMembership.getMember()).collect(Collectors.toList());
+            return matchedUser;
         });
     }
 

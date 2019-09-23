@@ -1,8 +1,8 @@
-package kronops.core.ui;
+package kronops.core.internal.rules;
 
 /*-
  * #%L
- * core-ui
+ * core
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -26,41 +26,28 @@ package kronops.core.ui;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import kronops.core.model.ProjectMembership;
+import kronops.core.model.ProjectRole;
+import kronops.core.model.Task;
+import kronops.core.model.User;
 
-public class ViewModel {
+import java.util.Optional;
 
-    private final List<Exception> errors;
-    private final Map<String, Object> viewDatas;
-    private String template;
+public class ActorIsProjectMember implements Rule<Task> {
 
-    public ViewModel() {
-        this.errors = new ArrayList<>();
-        this.viewDatas = new HashMap<>();
+    @Override
+    public String ruleDescription() {
+        return "User is not project Owner";
     }
 
-    public ViewModel(String template) {
-        this.errors = new ArrayList<>();
-        this.viewDatas = new HashMap<>();
-        this.template = template;
-    }
-
-    public List<Exception> getErrors() {
-        return errors;
-    }
-
-    public Map<String, Object> getViewDatas() {
-        return viewDatas;
-    }
-
-    public String getTemplate() {
-        return template;
-    }
-
-    public void setTemplate(String template) {
-        this.template = template;
+    @Override
+    public boolean isSatisfied(User u, Task thing) {
+        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+                .filter(projectMembership ->
+                        (projectMembership.getMember().getId() == u.getId())
+                                && (projectMembership.getRole().equals(ProjectRole.OWNER))
+                )
+                .findFirst();
+        return userOptional.isPresent();
     }
 }

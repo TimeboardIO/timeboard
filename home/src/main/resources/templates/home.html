@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-       xmlns:th="http://www.thymeleaf.org"
-       layout:decorate="~{layouts/general.html}">
+<html layout:decorate="~{layouts/general.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title layout:fragment="title">Home Page</title>
@@ -11,15 +11,23 @@
 
 <div layout:fragment="content">
 
-    <div class="ui card" th:each="plugin : ${plugins}">
-        <div class="content">
-            <div class="header" th:text="${plugin.getProjectName()}">Project Type Name</div>
+    <div class="ui statistic">
+        <div class="label">
+            You are member of
         </div>
-        <div class="content">
-            <div th:text="${plugin.getProjectDescription()}"></div>
+        <div class="value" th:text="${nb_projects}"></div>
+        <div class="label">
+            Projects
         </div>
-        <div class="extra content">
-            <a class="ui button" th:href="${plugin.getServletPath()}">Create Project</a>
+    </div>
+
+    <div class="ui statistic">
+        <div class="label">
+            You are assigned to
+        </div>
+        <div class="value" th:text="${nb_tasks}"></div>
+        <div class="label">
+            Tasks
         </div>
     </div>
 

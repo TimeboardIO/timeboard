@@ -104,7 +104,7 @@ public class ProjectConfigServlet extends KronopsServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws BusinessException {
         viewModel.setTemplate("details_project_config.html");
         Map<String, Object> map = new HashMap<>();
 
@@ -130,11 +130,7 @@ public class ProjectConfigServlet extends KronopsServlet {
             }
         }
 
-        try {
-            this.projectServiceBP.updateProject(project, memberships);
-        } catch (BusinessException e) {
-            map.put("error", e.getLocalizedMessage());
-        }
+        this.projectServiceBP.updateProject(project, memberships);
 
         prepareTemplateData(project, map);
 

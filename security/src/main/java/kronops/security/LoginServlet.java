@@ -73,9 +73,6 @@ public class LoginServlet extends KronopsServlet {
     }
 
 
-
-
-
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("login.html");

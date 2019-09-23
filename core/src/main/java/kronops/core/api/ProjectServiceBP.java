@@ -81,11 +81,14 @@ public interface ProjectServiceBP {
 
     List<Task> listProjectTasks(Project project);
 
+    List<Task> listUserTasks(User user);
+
     Task createTask(Project project, Task task);
 
     Task updateTask(Task task);
 
     Task getTask(long id);
 
-    void deleteTaskByID(long taskID) throws BusinessException;
+
+    void deleteTaskByID(User actor, long taskID) throws BusinessException;
 }

@@ -30,7 +30,6 @@ import kronops.core.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.net.http.HttpRequest;
 
 public class SecurityContext {
 

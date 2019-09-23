@@ -38,9 +38,12 @@ public interface UserServiceBP {
 
     List<User> searchUserByName(String prefix);
 
+    List<User> searchUserByName(String query, Long projectID);
+
     User autenticateUser(String username, String password);
 
     User findUserByLogin(String username);
 
     User findUserByID(Long aLong);
+
 }

@@ -26,12 +26,38 @@ package kronops.core.api.exceptions;
  * #L%
  */
 
+import kronops.core.internal.rules.Rule;
+
+import java.util.HashSet;
+import java.util.Set;
+
 public class BusinessException extends Exception {
+
+    private final Set<Rule> triggeredRules = new HashSet<>();
+
     public BusinessException(Exception e) {
         super(e);
     }
 
     public BusinessException(String err) {
         super(err);
+    }
+
+    public BusinessException(Set<Rule> wrongRules) {
+        this.triggeredRules.addAll(wrongRules);
+    }
+
+    @Override
+    public String getMessage() {
+        if (this.triggeredRules.isEmpty()) {
+            return super.getMessage();
+        } else {
+            StringBuilder builder = new StringBuilder();
+            this.triggeredRules.forEach(rule -> {
+                builder.append(rule.ruleDescription());
+                builder.append("\n");
+            });
+            return builder.toString();
+        }
     }
 }

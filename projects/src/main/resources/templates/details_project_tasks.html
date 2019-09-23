@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{details_project_layout.html(tab='second')}">
+<html layout:decorate="~{details_project_layout.html(tab='second')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>Project Tasks details</title>
@@ -13,7 +13,7 @@
     <input name="projectID" required th:value="${project.id}" type="hidden">
     <div class="ui grid form">
 
-        <div id="masters" class="six wide column">
+        <div class="six wide column" id="masters">
             <table class="ui unstackable table">
                 <thead>
                 <tr>
@@ -30,14 +30,14 @@
                 </tr>
                 <tr th:each="task : ${tasks}">
                     <td>
-                        <a th:text="${task.name}"
-                           th:href="@{/projects/tasks/config(projectID=${project.id}, taskID=${task.id})}"></a>
+                        <a th:href="@{/projects/tasks/config(projectID=${project.id}, taskID=${task.id})}"
+                           th:text="${task.name}"></a>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-        <div id="details" class="ten wide column" layout:fragment="task-config">
+        <div class="ten wide column" id="details" layout:fragment="task-config">
 
         </div>
     </div>

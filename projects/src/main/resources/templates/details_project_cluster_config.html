@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 
-<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{details_project_layout.html(tab='third')}">
+<html layout:decorate="~{details_project_layout.html(tab='third')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title>Project Tasks details</title>
@@ -11,8 +11,9 @@
 
 <div layout:fragment="placeholder">
 
-    <form class="ui form segment" style="margin-left:1em;" enctype="application/x-www-form-urlencoded" method="post" action="">
-        <input name="projectID"  th:value="${project.id}" required type="hidden">
+    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" method="post"
+          style="margin-left:1em;">
+        <input name="projectID" required th:value="${project.id}" type="hidden">
 
         <div class="grouped fields">
             <div class="field" th:each="cluster : ${clusters}">
@@ -31,6 +32,7 @@
                 $('.ui.checkbox')
                   .checkbox()
                 ;
+
         </script>
 
     </form>

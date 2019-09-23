@@ -30,6 +30,10 @@ import kronops.core.api.ProjectServiceBP;
 import kronops.core.api.TreeNode;
 import kronops.core.api.UserServiceBP;
 import kronops.core.api.exceptions.BusinessException;
+import kronops.core.internal.rules.ActorIsProjectMember;
+import kronops.core.internal.rules.Rule;
+import kronops.core.internal.rules.RuleSet;
+import kronops.core.internal.rules.TaskHasNoImputation;
 import kronops.core.model.*;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
@@ -37,13 +41,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
-import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.TransactionManager;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component(
@@ -156,8 +156,10 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
 
             project.getMembers().forEach(projectMembership -> {
                 if (memberships.containsKey(projectMembership.getMember().getId())) {
+                    // Update existing user membership role
                     projectMembership.setRole(memberships.get(projectMembership.getMember().getId()));
                 } else {
+                    // Store user to removed
                     membershipToRemove.add(projectMembership.getMember().getId());
                 }
             });
@@ -171,8 +173,11 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
                 projectMembership.setProject(project);
                 projectMembership.setRole(memberships.get(aLong));
                 projectMembership.setMember(this.userServiceBP.findUserByID(aLong));
+                entityManager.persist(projectMembership);
                 project.getMembers().add(projectMembership);
             });
+
+            entityManager.flush();
 
 
             return project;
@@ -224,6 +229,16 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     }
 
     @Override
+    public List<Task> listUserTasks(User user){
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.assigned = :user", Task.class);
+            q.setParameter("user", user);
+            return q.getResultList();
+        });
+    }
+
+
+    @Override
     public Task createTask(Project project, Task task) {
         return this.jpa.txExpr(entityManager -> {
             entityManager.persist(task);
@@ -251,14 +266,19 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     }
 
 
-
     @Override
-    public void deleteTaskByID(long taskID) throws BusinessException {
+    public void deleteTaskByID(User actor, long taskID) throws BusinessException {
+
+        RuleSet<Task> ruleSet = new RuleSet();
+        ruleSet.addRule(new TaskHasNoImputation());
+        ruleSet.addRule(new ActorIsProjectMember());
+
         BusinessException exp = this.jpa.txExpr(entityManager -> {
             Task task = entityManager.find(Task.class, taskID);
 
-            if (!task.getImputations().isEmpty()) {
-                return new BusinessException("Unable to delete task " + taskID + ", imputations are not empty");
+            Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
+            if (!wrongRules.isEmpty()) {
+                return new BusinessException(wrongRules);
             }
 
             entityManager.remove(task);
@@ -266,7 +286,7 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
             return null;
         });
 
-        if(exp != null){
+        if (exp != null) {
             throw exp;
         }
     }

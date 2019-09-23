@@ -30,6 +30,7 @@ import kronops.core.api.ProjectServiceBP;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
+import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -64,16 +65,17 @@ public class ProjectTaskDeleteServlet extends KronopsServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         long taskID = Long.parseLong(request.getParameter("taskID"));
+        long projectID = Long.parseLong(request.getParameter("projectID"));
+
         try {
-            this.projectServiceBP.deleteTaskByID(taskID);
+            this.projectServiceBP.deleteTaskByID(SecurityContext.getCurrentUser(request), taskID);
         } catch (BusinessException e) {
             viewModel.getErrors().add(e);
         }
 
-        viewModel.setTemplate("details_project_tasks.html");
+
+        this.forward(request, response, String.format("/projects/tasks?projectID=%s", projectID), viewModel);
     }
-
-
 
 
 }

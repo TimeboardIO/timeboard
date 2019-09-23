@@ -91,6 +91,8 @@
                             org.osgi.service.log,
                             kronops.core.model,
                             kronops.core.ui,
+                            kronops.core.api,
+                            kronops.security,
                             kronops.security.api,
                             org.xml.sax
                         </Import-Package>
