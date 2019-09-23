@@ -104,7 +104,7 @@ public class ProjectConfigServlet extends KronopsServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws BusinessException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
         viewModel.setTemplate("details_project_config.html");
         Map<String, Object> map = new HashMap<>();
 

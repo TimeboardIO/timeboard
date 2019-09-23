@@ -15,6 +15,8 @@
            th:href="@{/projects/config(projectID=${project.id})}">Summary</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
            th:href="@{/projects/tasks(projectID=${project.id})}">Tasks</a>
+        <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
+           th:href="@{/projects/blueprint(projectID=${project.id})}">Blueprint</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
            th:href="@{/projects/clusters(projectID=${project.id})}">Clusters</a>
     </div>

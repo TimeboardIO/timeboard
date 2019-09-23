@@ -27,9 +27,10 @@ package kronops.security.service;
  */
 
 import kronops.core.api.UserServiceBP;
-import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
+import kronops.security.api.Credential;
 import kronops.security.api.LoginService;
+import kronops.security.api.UsernamePasswordCredential;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -37,21 +38,29 @@ import org.osgi.service.component.annotations.Reference;
         service = LoginService.class,
         immediate = true
 )
-public class DatabaseLoginService implements LoginService {
+public class DatabaseAuthService implements LoginService {
 
 
     @Reference
     private UserServiceBP userServiceBP;
 
-    @Override
-    public void logUser(String username, String password) throws BusinessException {
 
+    @Override
+    public boolean isServiceValidFor(Credential credential) {
+        return credential instanceof UsernamePasswordCredential;
+    }
+
+    @Override
+    public boolean validateCredential(Credential credential) {
+        UsernamePasswordCredential upc = (UsernamePasswordCredential) credential;
+        User user = null;
         try {
-            User user = this.userServiceBP.autenticateUser(username, password);
+            user = this.userServiceBP.autenticateUser(upc.getUsername(), upc.getPassword());
 
         } catch (Exception e) {
-            throw new BusinessException("Wrong credentials");
+
         }
 
+        return user != null;
     }
 }

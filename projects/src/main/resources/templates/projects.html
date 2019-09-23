@@ -11,6 +11,22 @@
 
 <div layout:fragment="content">
 
+    <style type="text/css">
+        .badge{
+           text-align: center;
+            width: 3em;
+            margin: 0 auto;
+            background-color: #957DAD;
+            line-height: 3em;
+            border-radius: 5em;
+            margin-top: 0.5em;
+            font-size: 3em;
+            color: white;
+            margin-bottom: 0.5em;
+        }
+
+    </style>
+
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
         <div class="content">
@@ -26,32 +42,35 @@
 
         <a class="ui button" th:href="@{/projects/create}">Create Project</a>
 
-        <table class="ui celled table">
-            <thead>
-            <tr>
-                <th>id</th>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Members</th>
-                <th>Clusters</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="project : ${projects}">
-                <td th:text="${project.id}">id</td>
-                <td th:text="${project.name}">name</td>
-                <td th:text="${project.comments}">name</td>
-                <td><span th:text="${project.members.size()}"></span> members</td>
-                <td><span th:text="${project.clusters.size()}"></span> clusters</td>
-                <td>
+        <div class="ui grid segment">
+            <div class="four wide column" th:each="project : ${projects}">
+                <div class="ui card" >
+                <div class="image">
+                    <div class="badge" th:text="${project.name.charAt(0)}" style="text-transform: capitalize;">P</div>
+                </div>
+                <div class="content">
+                    <a class="header" th:text="${project.name}"></a>
+                    <div class="meta">
+                    <span class="date">
+                        <i class="archive icon"></i>
+                        [[${project.clusters.size()}]] Clusters
+                    </span>
+                        <div>
+                            <i class="user icon"></i>
+                            [[${project.members.size()}]] Members
+                        </div>
+                    </div>
+                    <div class="description" th:text="${project.comments}">
+                    </div>
+                </div>
+                <div class="extra content">
                     <a class="ui positive button" th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
-                    <a class="ui negative basic button"
+                    <a class="negative ui basic button"
                        th:href="@{/projects/delete(projectID=${project.id})}">Delete</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                </div>
+            </div>
+            </div>
+        </div>
     </div>
 
 </div>

@@ -27,14 +27,12 @@ package kronops.security;
  */
 
 import kronops.core.api.UserServiceBP;
-import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
 import kronops.security.api.LoginService;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import kronops.security.api.UsernamePasswordCredential;
+import org.osgi.service.component.annotations.*;
 import org.osgi.service.log.LogService;
 
 import javax.servlet.Servlet;
@@ -44,7 +42,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Component(
@@ -60,8 +60,8 @@ public class LoginServlet extends KronopsServlet {
     @Reference
     LogService logService;
 
-    @Reference
-    LoginService loginService;
+    @Reference(cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
+    List<LoginService> loginServices;
 
     @Reference
     UserServiceBP userServiceBP;
@@ -80,20 +80,26 @@ public class LoginServlet extends KronopsServlet {
         String password = request.getParameter("password");
         String origin = request.getParameter("origin");
 
-        try {
+        final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredential(username, password);
 
-            this.loginService.logUser(username, password);
+
+        boolean logged = this.loginServices.stream()
+                .filter(loginService -> loginService.isServiceValidFor(usernamePasswordCredential))
+                .map(loginService -> loginService.validateCredential(usernamePasswordCredential))
+                .collect(Collectors.toList())
+                .contains(true);
+
+        if (logged) {
             User user = this.userServiceBP.findUserByLogin(username);
             HttpSession session = request.getSession(true);
             session.setAttribute("user", user);
 
-        } catch (BusinessException e) {
-            logService.log(LogService.LOG_WARNING, e.getLocalizedMessage());
+            response.sendRedirect(origin);
+        } else {
             response.setStatus(403);
+            viewModel.setTemplate("login.html");
         }
 
-
-        response.sendRedirect(origin);
     }
 
     @Override

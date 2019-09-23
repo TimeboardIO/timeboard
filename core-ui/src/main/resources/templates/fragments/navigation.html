@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="nav(title)">
-    <div class="ui secondary pointing menu">
+    <div class="ui secondary pointing menu nav">
         <a class="item" th:classappend="${title} == '/'  ? 'active':''" th:href="@{/}">Home</a>
         <a class="item" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}"
            th:href="${nav.getNavigationPath()}" th:text="${nav.getNavigationLabel()}"></a>

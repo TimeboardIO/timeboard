@@ -51,6 +51,7 @@ public class AuthSecurityFilter implements Filter {
     private String loginURL;
     private String logoutURL;
 
+
     @Reference
     private LogService logService;
 
