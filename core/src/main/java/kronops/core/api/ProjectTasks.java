@@ -1,4 +1,4 @@
-package kronops.core.ui;
+package kronops.core.api;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package kronops.core.ui;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,14 +26,26 @@ package kronops.core.ui;
  * #L%
  */
 
-public interface NavigationExtPoint {
+import kronops.core.model.Project;
+import kronops.core.model.Task;
 
-    public String getNavigationLabel();
+import java.util.Set;
 
-    public String getNavigationPath();
+public class ProjectTasks {
 
-    public default String getNavigationParams(){
-        return "";
+    private final Project project;
+    private final Set<Task> tasks;
+
+    public ProjectTasks(Project project, Set<Task> tasks) {
+        this.project = project;
+        this.tasks = tasks;
     }
 
+    public Project getProject() {
+        return project;
+    }
+
+    public Set<Task> getTasks() {
+        return tasks;
+    }
 }

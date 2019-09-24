@@ -29,13 +29,27 @@ package kronops.timesheet;
 import kronops.core.ui.NavigationExtPoint;
 import org.osgi.service.component.annotations.Component;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 @Component(
         service = NavigationExtPoint.class
 )
 public class TimesheetNavigationProvier implements NavigationExtPoint {
+
     @Override
     public String getNavigationLabel() {
         return "Timesheet";
+    }
+
+    @Override
+    public String getNavigationParams() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+
+        return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));
     }
 
     @Override

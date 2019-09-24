@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
@@ -56,7 +56,7 @@ public class ProjectCreateServlet extends KronopsServlet {
 
 
     @Reference
-    public ProjectServiceBP projectServiceBP;
+    public ProjectService projectService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -71,7 +71,7 @@ public class ProjectCreateServlet extends KronopsServlet {
 
 
         try {
-            this.projectServiceBP.createProject(SecurityContext.getCurrentUser(request.getSession()), result.get("projectName").toString());
+            this.projectService.createProject(SecurityContext.getCurrentUser(request.getSession()), result.get("projectName").toString());
             response.sendRedirect("/projects");
         } catch (BusinessException e) {
             result.put("error", "Project " + result.get("projectName").toString() + " already exist");

@@ -1,4 +1,4 @@
-package kronops.core.ui;
+package kronops.core.api;
 
 /*-
  * #%L
@@ -26,14 +26,24 @@ package kronops.core.ui;
  * #L%
  */
 
-public interface NavigationExtPoint {
+import kronops.core.api.exceptions.BusinessException;
+import kronops.core.model.User;
 
-    public String getNavigationLabel();
+import java.util.List;
 
-    public String getNavigationPath();
+public interface UserService {
+    User getCurrentUser();
 
-    public default String getNavigationParams(){
-        return "";
-    }
+    User createUser(User user) throws BusinessException;
+
+    List<User> searchUserByName(String prefix);
+
+    List<User> searchUserByName(String query, Long projectID);
+
+    User autenticateUser(String username, String password);
+
+    User findUserByLogin(String username);
+
+    User findUserByID(Long aLong);
 
 }

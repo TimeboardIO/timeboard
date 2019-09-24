@@ -26,7 +26,7 @@ package kronops.security.service;
  * #L%
  */
 
-import kronops.core.api.UserServiceBP;
+import kronops.core.api.UserService;
 import kronops.core.model.User;
 import kronops.security.api.Credential;
 import kronops.security.api.LoginService;
@@ -42,7 +42,7 @@ public class DatabaseAuthService implements LoginService {
 
 
     @Reference
-    private UserServiceBP userServiceBP;
+    private UserService userService;
 
 
     @Override
@@ -55,7 +55,7 @@ public class DatabaseAuthService implements LoginService {
         UsernamePasswordCredential upc = (UsernamePasswordCredential) credential;
         User user = null;
         try {
-            user = this.userServiceBP.autenticateUser(upc.getUsername(), upc.getPassword());
+            user = this.userService.autenticateUser(upc.getUsername(), upc.getPassword());
 
         } catch (Exception e) {
 

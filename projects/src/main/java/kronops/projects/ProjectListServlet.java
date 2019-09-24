@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.model.User;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
@@ -54,7 +54,7 @@ public class ProjectListServlet extends KronopsServlet {
 
 
     @Reference
-    private ProjectServiceBP projectServiceBP;
+    private ProjectService projectService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -65,6 +65,6 @@ public class ProjectListServlet extends KronopsServlet {
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("projects.html");
         User user = SecurityContext.getCurrentUser(request);
-        viewModel.getViewDatas().put("projects", this.projectServiceBP.listProjects(user));
+        viewModel.getViewDatas().put("projects", this.projectService.listProjects(user));
     }
 }

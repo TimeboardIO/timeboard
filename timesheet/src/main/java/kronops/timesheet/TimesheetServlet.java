@@ -26,15 +26,23 @@ package kronops.timesheet;
  * #L%
  */
 
+import kronops.core.api.ProjectService;
+import kronops.core.api.ProjectTasks;
+import kronops.core.model.User;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
+import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component(
         service = Servlet.class,
@@ -46,21 +54,78 @@ import java.io.IOException;
 )
 public class TimesheetServlet extends KronopsServlet {
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    private ProjectService projectService;
+
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
         return TimesheetServlet.class.getClassLoader();
     }
 
+
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+        Set<ProjectTasks> tasksByProject = new HashSet<>();
+        int week = Integer.parseInt(request.getParameter("week"));
+        int year = Integer.parseInt(request.getParameter("year"));
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.YEAR, year);
+
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        Date ds = c.getTime();
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        Date de = c.getTime();
+
+
+        if (this.projectService != null) {
+            User actor = SecurityContext.getCurrentUser(request);
+            tasksByProject.addAll(this.projectService.listTasksByProject(actor, ds, de));
+        }
+
+        List<DateWrapper> days = new ArrayList<>();
+        c.setTime(ds);
+        for(int i=0; i<7; i++){
+            DateWrapper dw = new DateWrapper();
+            dw.setDay(c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
+            dw.setDate(c.getTime());
+            days.add(dw);
+            c.add(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        viewModel.getViewDatas().put("days", days);
+        viewModel.getViewDatas().put("week", week);
+        viewModel.getViewDatas().put("year", year);
+        viewModel.getViewDatas().put("projectTasks", tasksByProject);
         viewModel.setTemplate("timesheet.html");
     }
 
-    @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("timesheet.html");
+
+    private class DateWrapper {
+
+        private String day;
+        private Date date;
+
+        public String getDay() {
+            return day;
+        }
+
+        public void setDay(String day) {
+            this.day = day;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
     }
-
-
 }

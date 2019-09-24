@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
@@ -54,7 +54,7 @@ public class ProjectTaskDeleteServlet extends KronopsServlet {
 
 
     @Reference
-    public ProjectServiceBP projectServiceBP;
+    public ProjectService projectService;
 
 
     @Override
@@ -68,7 +68,7 @@ public class ProjectTaskDeleteServlet extends KronopsServlet {
         long projectID = Long.parseLong(request.getParameter("projectID"));
 
         try {
-            this.projectServiceBP.deleteTaskByID(SecurityContext.getCurrentUser(request), taskID);
+            this.projectService.deleteTaskByID(SecurityContext.getCurrentUser(request), taskID);
         } catch (BusinessException e) {
             viewModel.getErrors().add(e);
         }

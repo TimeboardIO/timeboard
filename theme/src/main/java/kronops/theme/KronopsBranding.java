@@ -1,8 +1,8 @@
-package kronops.core.ui;
+package kronops.theme;
 
 /*-
  * #%L
- * core
+ * theme
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -12,10 +12,10 @@ package kronops.core.ui;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,14 +26,16 @@ package kronops.core.ui;
  * #L%
  */
 
-public interface NavigationExtPoint {
+import kronops.core.ui.BrandingService;
+import org.osgi.service.component.annotations.Component;
 
-    public String getNavigationLabel();
-
-    public String getNavigationPath();
-
-    public default String getNavigationParams(){
-        return "";
+@Component(
+        service = BrandingService.class,
+        immediate = true
+)
+public class KronopsBranding implements BrandingService {
+    @Override
+    public String appName() {
+        return "Kronops 😎";
     }
-
 }

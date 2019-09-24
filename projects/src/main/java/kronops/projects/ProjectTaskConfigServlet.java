@@ -26,8 +26,8 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
-import kronops.core.api.UserServiceBP;
+import kronops.core.api.ProjectService;
+import kronops.core.api.UserService;
 import kronops.core.model.Project;
 import kronops.core.model.Task;
 import kronops.core.ui.KronopsServlet;
@@ -57,10 +57,10 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     @Reference
-    public ProjectServiceBP projectServiceBP;
+    public ProjectService projectService;
 
     @Reference
-    public UserServiceBP userServiceBP;
+    public UserService userService;
 
 
     @Override
@@ -72,18 +72,18 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         if (request.getParameter("taskID") != null) {
             long taskID = Long.parseLong(request.getParameter("taskID"));
-            Task task = this.projectServiceBP.getTask(taskID);
+            Task task = this.projectService.getTask(taskID);
             viewModel.getViewDatas().put("task", task);
         } else {
             viewModel.getViewDatas().put("task", new Task());
         }
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectServiceBP.getProject(projectID);
+        Project project = this.projectService.getProject(projectID);
 
         viewModel.setTemplate("details_project_tasks_config.html");
         viewModel.getViewDatas().put("project", project);
-        viewModel.getViewDatas().put("tasks", this.projectServiceBP.listProjectTasks(project));
+        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
 
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectServiceBP.getProject(projectID);
+        Project project = this.projectService.getProject(projectID);
         viewModel.getViewDatas().put("project", project);
         final Task t = new Task();
         viewModel.getViewDatas().put("task", t);
@@ -120,19 +120,19 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
             t.setEstimateWork(Double.parseDouble(request.getParameter("taskEstimateWork")));
 
             if (taskAssigned != null) {
-                t.setAssigned(this.userServiceBP.findUserByID(taskAssigned));
+                t.setAssigned(this.userService.findUserByID(taskAssigned));
             }
 
             if (!request.getParameter("taskID").isEmpty()) {
-                viewModel.getViewDatas().put("task", this.projectServiceBP.updateTask(t));
+                viewModel.getViewDatas().put("task", this.projectService.updateTask(t));
             } else {
-                viewModel.getViewDatas().put("task", this.projectServiceBP.createTask(project, t));
+                viewModel.getViewDatas().put("task", this.projectService.createTask(project, t));
             }
 
         } catch (Exception e) {
             viewModel.getErrors().add(e);
         } finally {
-            viewModel.getViewDatas().put("tasks", this.projectServiceBP.listProjectTasks(project));
+            viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
             viewModel.setTemplate("details_project_tasks_config.html");
         }
     }

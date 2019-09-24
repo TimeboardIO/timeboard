@@ -16,6 +16,7 @@
     <modules>
         <module>core</module>
         <module>security</module>
+        <module>theme</module>
         <module>core-ui</module>
         <module>home</module>
         <module>projects</module>

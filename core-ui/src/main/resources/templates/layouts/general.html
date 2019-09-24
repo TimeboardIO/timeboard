@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title layout:fragment="title">Page Title</title>
+    <title>[[${appName}]]</title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <link href="/static/semantic/semantic.min.css" rel="stylesheet">
@@ -11,6 +11,7 @@
     <script src="/static/semantic/semantic.min.js" type="text/javascript"></script>
     <script src="/static/frappe/frappe-gantt.min.js"  type="text/javascript"></script>
     <link href="/static/frappe/frappe-gantt.css" rel="stylesheet">
+    <link href="/theme/style.css" rel="stylesheet">
 </head>
 <body>
 <div th:replace="fragments/navigation.html :: nav(${path})"></div>

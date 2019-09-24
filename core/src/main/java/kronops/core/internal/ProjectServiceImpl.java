@@ -26,9 +26,10 @@ package kronops.core.internal;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
+import kronops.core.api.ProjectTasks;
 import kronops.core.api.TreeNode;
-import kronops.core.api.UserServiceBP;
+import kronops.core.api.UserService;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.internal.rules.ActorIsProjectMember;
 import kronops.core.internal.rules.Rule;
@@ -47,10 +48,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component(
-        service = ProjectServiceBP.class,
+        service = ProjectService.class,
         immediate = true
 )
-public class ProjectServiceBPImpl implements ProjectServiceBP {
+public class ProjectServiceImpl implements ProjectService {
 
     @Reference
     private TransactionManager transactionManager;
@@ -59,7 +60,7 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
     private LogService logService;
 
     @Reference
-    private UserServiceBP userServiceBP;
+    private UserService userService;
 
     @Reference(target = "(osgi.unit.name=kronops-pu)", scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
@@ -172,7 +173,7 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
                 ProjectMembership projectMembership = new ProjectMembership();
                 projectMembership.setProject(project);
                 projectMembership.setRole(memberships.get(aLong));
-                projectMembership.setMember(this.userServiceBP.findUserByID(aLong));
+                projectMembership.setMember(this.userService.findUserByID(aLong));
                 entityManager.persist(projectMembership);
                 project.getMembers().add(projectMembership);
             });
@@ -264,6 +265,42 @@ public class ProjectServiceBPImpl implements ProjectServiceBP {
             return entityManager.find(Task.class, id);
         });
     }
+
+
+    @Override
+    public Set<ProjectTasks> listTasksByProject(User actor, Date ds, Date de){
+        final Set<ProjectTasks> projectTasks = new HashSet<>();
+
+        this.jpa.tx(entityManager -> {
+
+            TypedQuery<Task> q = entityManager
+                    .createQuery("select t from Task t where " +
+                            "t.endDate >= :ds "+
+                            "and t.startDate <= :de " +
+                            "and t.assigned = :actor"
+                            , Task.class);
+            q.setParameter("ds", ds);
+            q.setParameter("de", de);
+            q.setParameter("actor", actor);
+            List<Task> tasks = q.getResultList();
+
+            //rebalance task by project
+            final Map<Project, Set<Task>> rebalanced = new HashMap<>();
+            tasks.forEach(task -> {
+                if(!rebalanced.containsKey(task.getProject())){
+                    rebalanced.put(task.getProject(), new HashSet<>());
+                }
+                rebalanced.get(task.getProject()).add(task);
+            });
+
+            rebalanced.forEach((project, ts) -> {
+                projectTasks.add(new ProjectTasks(project, ts));
+            });
+
+        });
+        return projectTasks;
+    }
+
 
 
     @Override

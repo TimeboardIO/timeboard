@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.api.TreeNode;
 import kronops.core.model.Project;
 import kronops.core.ui.KronopsServlet;
@@ -58,7 +58,7 @@ public class ProjectClustersServlet extends KronopsServlet {
 
 
     @Reference
-    public ProjectServiceBP projectServiceBP;
+    public ProjectService projectService;
 
 
     @Override
@@ -69,7 +69,7 @@ public class ProjectClustersServlet extends KronopsServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         if (request.getParameter("projectID") != null) {
-            final Project project = this.projectServiceBP.getProject(Long.parseLong(request.getParameter("projectID")));
+            final Project project = this.projectService.getProject(Long.parseLong(request.getParameter("projectID")));
 
             prepareDatas(viewModel, project);
 
@@ -81,7 +81,7 @@ public class ProjectClustersServlet extends KronopsServlet {
     private void prepareDatas(ViewModel viewModel, Project project) {
         viewModel.getViewDatas().put("project", project);
 
-        final List<TreeNode> node = this.projectServiceBP.computeClustersTree();
+        final List<TreeNode> node = this.projectService.computeClustersTree();
         final Map<Long, String> paths = new HashMap<>();
         node.forEach(treeNode -> {
             paths.putAll(treeNode.getPaths());
@@ -94,18 +94,18 @@ public class ProjectClustersServlet extends KronopsServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
-        final Project project = this.projectServiceBP.getProject(Long.parseLong(request.getParameter("projectID")));
+        final Project project = this.projectService.getProject(Long.parseLong(request.getParameter("projectID")));
 
         //Extract cluster
         String[] clusterID = request.getParameterValues("cluster");
         project.getClusters().clear();
         if (clusterID != null) {
             Arrays.asList(clusterID).stream().forEach(s -> {
-                project.getClusters().add(this.projectServiceBP.findProjectsClusterByID(Long.parseLong(s)));
+                project.getClusters().add(this.projectService.findProjectsClusterByID(Long.parseLong(s)));
             });
         }
 
-        this.projectServiceBP.updateProject(project);
+        this.projectService.updateProject(project);
 
         prepareDatas(viewModel, project);
 

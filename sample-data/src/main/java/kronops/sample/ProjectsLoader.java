@@ -26,8 +26,8 @@ package kronops.sample;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
-import kronops.core.api.UserServiceBP;
+import kronops.core.api.ProjectService;
+import kronops.core.api.UserService;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.*;
 import org.osgi.service.component.annotations.Activate;
@@ -43,22 +43,22 @@ import java.util.Date;
 public class ProjectsLoader {
 
     @Reference
-    ProjectServiceBP projectServiceBP;
+    ProjectService projectService;
 
     @Reference
     UserLoader userLoader;
 
 
     @Reference
-    UserServiceBP userServiceBP;
+    UserService userService;
 
 
     @Activate
     public void load() throws BusinessException {
-        User u1 = this.userServiceBP.findUserByLogin("kronops1");
-        User u2 = this.userServiceBP.findUserByLogin("kronops2");
+        User u1 = this.userService.findUserByLogin("kronops1");
+        User u2 = this.userService.findUserByLogin("kronops2");
 
-        Project newProject = this.projectServiceBP.createProject(u1, "Test Project");
+        Project newProject = this.projectService.createProject(u1, "Test Project");
 
         Task t = new Task();
         t.setName("Hello Task");
@@ -66,7 +66,7 @@ public class ProjectsLoader {
         t.setEndDate(new Date());
         t.setComments("This is a sample task");
         t.setEstimateWork(5);
-        this.projectServiceBP.createTask(newProject, t);
+        this.projectService.createTask(newProject, t);
 
         Task t2 = new Task();
         t2.setEstimateWork(1);
@@ -74,11 +74,11 @@ public class ProjectsLoader {
         t2.setStartDate(new Date());
         t2.setEndDate(new Date());
         t2.setComments("This is another sample task");
-        this.projectServiceBP.createTask(newProject, t2);
+        this.projectService.createTask(newProject, t2);
 
         ProjectMembership projectMembership = new ProjectMembership(newProject, u2, ProjectRole.CONTRIBUTOR);
 
-        this.projectServiceBP.save(projectMembership);
+        this.projectService.save(projectMembership);
 
 
         ProjectCluster root = new ProjectCluster();
@@ -87,11 +87,11 @@ public class ProjectsLoader {
         ProjectCluster customer = new ProjectCluster();
         customer.setName("Customer XYZ Cluster");
 
-        this.projectServiceBP.saveProjectCluster(root);
+        this.projectService.saveProjectCluster(root);
         customer.setParent(root);
-        this.projectServiceBP.saveProjectCluster(customer);
+        this.projectService.saveProjectCluster(customer);
 
-        this.projectServiceBP.addProjectToProjectCluster(customer, newProject);
+        this.projectService.addProjectToProjectCluster(customer, newProject);
 
     }
 

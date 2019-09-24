@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.ui.KronopsServlet;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -51,7 +51,7 @@ public class ProjectDeleteServlet extends KronopsServlet {
 
 
     @Reference
-    public ProjectServiceBP projectServiceBP;
+    public ProjectService projectService;
 
 
     @Override
@@ -63,7 +63,7 @@ public class ProjectDeleteServlet extends KronopsServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        this.projectServiceBP.deleteProjectByID(projectID);
+        this.projectService.deleteProjectByID(projectID);
 
         response.sendRedirect("/projects");
     }

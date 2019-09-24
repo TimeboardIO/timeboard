@@ -46,7 +46,6 @@ import java.util.*;
 
 public abstract class KronopsServlet extends HttpServlet {
 
-    private final Set<NavigationExtPoint> navigationItems = new HashSet<>();
     private ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver(new JoinClassLoader(KronopsServlet.class.getClassLoader(), this.getTemplateResolutionClassLoader()));
     private NavigationEntryRegistryService navRegistry;
 
@@ -63,8 +62,20 @@ public abstract class KronopsServlet extends HttpServlet {
         resolver.setCacheable(true);
         resolver.setCacheTTLMs(50000L);
         resolver.setCharacterEncoding("utf-8");
+
+
     }
 
+
+    private String getAppName(){
+        String appName = "Missing Theme Plugin";
+        ServiceReference<BrandingService> brandingServiceRef = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getServiceReference(BrandingService.class);
+        if(brandingServiceRef != null) {
+            BrandingService brandingService = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getService(brandingServiceRef);
+            appName = brandingService.appName();
+        }
+        return appName;
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -107,8 +118,9 @@ public abstract class KronopsServlet extends HttpServlet {
         RequestDispatcher requestDispatcher = request.getRequestDispatcher(url);
         request.setAttribute("errors", viewModel.getErrors());
         requestDispatcher.forward(request, response);
-        ;
     }
+
+
 
 
     protected void doService(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException {
@@ -136,6 +148,9 @@ public abstract class KronopsServlet extends HttpServlet {
             navigationEntries.addAll(this.getNavs());
         }
         ctx.setVariable("navs", navigationEntries);
+
+        ctx.setVariable("appName", this.getAppName());
+
         String templateName = viewModel.getTemplate();
         String result = engine.process(templateName, ctx);
 

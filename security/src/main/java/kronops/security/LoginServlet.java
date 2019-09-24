@@ -26,7 +26,7 @@ package kronops.security;
  * #L%
  */
 
-import kronops.core.api.UserServiceBP;
+import kronops.core.api.UserService;
 import kronops.core.model.User;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
@@ -57,14 +57,12 @@ import java.util.stream.Collectors;
 )
 public class LoginServlet extends KronopsServlet {
 
-    @Reference
-    LogService logService;
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
     List<LoginService> loginServices;
 
     @Reference
-    UserServiceBP userServiceBP;
+    UserService userService;
 
 
     @Override
@@ -90,7 +88,7 @@ public class LoginServlet extends KronopsServlet {
                 .contains(true);
 
         if (logged) {
-            User user = this.userServiceBP.findUserByLogin(username);
+            User user = this.userService.findUserByLogin(username);
             HttpSession session = request.getSession(true);
             session.setAttribute("user", user);
 

@@ -28,7 +28,7 @@ package kronops.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.model.Project;
 import kronops.core.model.Task;
 import kronops.core.ui.KronopsServlet;
@@ -43,7 +43,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,7 +60,7 @@ public class ProjectBlueprintServlet extends KronopsServlet {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Reference
-    private ProjectServiceBP projectServiceBP;
+    private ProjectService projectService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -73,9 +72,9 @@ public class ProjectBlueprintServlet extends KronopsServlet {
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         long id = Long.parseLong(request.getParameter("projectID"));
 
-        Project project = this.projectServiceBP.getProject(id);
+        Project project = this.projectService.getProject(id);
 
-        List<Task> tasks = this.projectServiceBP.listProjectTasks(project);
+        List<Task> tasks = this.projectService.listProjectTasks(project);
 
         List<String> data = tasks.stream().map(task -> {
             GantTaskStruct struct = new GantTaskStruct();

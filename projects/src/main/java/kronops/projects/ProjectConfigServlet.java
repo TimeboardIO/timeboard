@@ -26,9 +26,8 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.api.TreeNode;
-import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.Project;
 import kronops.core.model.ProjectRole;
 import kronops.core.ui.KronopsServlet;
@@ -65,7 +64,7 @@ import java.util.stream.Collectors;
 public class ProjectConfigServlet extends KronopsServlet {
 
     @Reference
-    public ProjectServiceBP projectServiceBP;
+    public ProjectService projectService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -74,7 +73,7 @@ public class ProjectConfigServlet extends KronopsServlet {
 
 
     private void prepareTemplateData(Project project, Map<String, Object> map) {
-        List<TreeNode> node = this.projectServiceBP.computeClustersTree();
+        List<TreeNode> node = this.projectService.computeClustersTree();
 
         final Map<Long, String> paths = new HashMap<>();
         node.forEach(treeNode -> {
@@ -86,7 +85,7 @@ public class ProjectConfigServlet extends KronopsServlet {
         map.put("project", project);
         map.put("members", project.getMembers());
         map.put("roles", ProjectRole.values());
-        map.put("tasks", this.projectServiceBP.listProjectTasks(project));
+        map.put("tasks", this.projectService.listProjectTasks(project));
     }
 
 
@@ -95,7 +94,7 @@ public class ProjectConfigServlet extends KronopsServlet {
         viewModel.setTemplate("details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
-        Project project = this.projectServiceBP.getProject(id);
+        Project project = this.projectService.getProject(id);
 
 
         Map<String, Object> map = new HashMap<>();
@@ -110,7 +109,7 @@ public class ProjectConfigServlet extends KronopsServlet {
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectServiceBP.getProject(id);
+        Project project = this.projectService.getProject(id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
 
@@ -130,7 +129,7 @@ public class ProjectConfigServlet extends KronopsServlet {
             }
         }
 
-        this.projectServiceBP.updateProject(project, memberships);
+        this.projectService.updateProject(project, memberships);
 
         prepareTemplateData(project, map);
 

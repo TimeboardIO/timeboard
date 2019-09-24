@@ -26,7 +26,7 @@ package kronops.projects;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.model.ProjectCluster;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
@@ -55,7 +55,7 @@ import java.util.Map;
 public class ClustersServlet extends KronopsServlet {
 
     @Reference
-    private ProjectServiceBP projectServiceBP;
+    private ProjectService projectService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -73,7 +73,7 @@ public class ClustersServlet extends KronopsServlet {
             String clusterName = request.getParameter("clusterName");
             ProjectCluster pc = new ProjectCluster();
             pc.setName(clusterName);
-            this.projectServiceBP.saveProjectCluster(pc);
+            this.projectService.saveProjectCluster(pc);
         }
 
         if (action.equals("update")) {
@@ -103,7 +103,7 @@ public class ClustersServlet extends KronopsServlet {
                 updatedProjectCluster.add(pc);
             });
 
-            this.projectServiceBP.updateProjectClusters(updatedProjectCluster, clusterParent);
+            this.projectService.updateProjectClusters(updatedProjectCluster, clusterParent);
 
         }
 
@@ -122,7 +122,7 @@ public class ClustersServlet extends KronopsServlet {
 
 
     private void deleteCluster(Long clusterID) {
-        this.projectServiceBP.deleteProjectClusterByID(clusterID);
+        this.projectService.deleteProjectClusterByID(clusterID);
     }
 
 
@@ -132,7 +132,7 @@ public class ClustersServlet extends KronopsServlet {
 
     private Map<String, Object> prepareData() {
         final Map<String, Object> templateDatas = new HashMap<>();
-        List<ProjectCluster> clusters = this.projectServiceBP.listProjectClusters();
+        List<ProjectCluster> clusters = this.projectService.listProjectClusters();
         templateDatas.put("clusters", clusters);
         return templateDatas;
     }

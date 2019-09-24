@@ -29,10 +29,12 @@ package kronops.core.api;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-public interface ProjectServiceBP {
+public interface ProjectService {
 
     /*
     === Clusters ===
@@ -91,4 +93,6 @@ public interface ProjectServiceBP {
 
 
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
+
+    Set<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
 }

@@ -1,8 +1,8 @@
-package kronops.core.api;
+package kronops.core.ui;
 
 /*-
  * #%L
- * core
+ * webui
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -26,24 +26,19 @@ package kronops.core.api;
  * #L%
  */
 
-import kronops.core.api.exceptions.BusinessException;
-import kronops.core.model.User;
+import org.osgi.service.component.annotations.Component;
 
-import java.util.List;
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
 
-public interface UserServiceBP {
-    User getCurrentUser();
 
-    User createUser(User user) throws BusinessException;
+@Component(
+        service = Servlet.class,
+        property = {
+                "osgi.http.whiteboard.resource.pattern=/theme/*",
+                "osgi.http.whiteboard.resource.prefix=/static"}
+)
+public class StaticRessourcesServlet extends HttpServlet {
 
-    List<User> searchUserByName(String prefix);
-
-    List<User> searchUserByName(String query, Long projectID);
-
-    User autenticateUser(String username, String password);
-
-    User findUserByLogin(String username);
-
-    User findUserByID(Long aLong);
 
 }

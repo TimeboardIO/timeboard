@@ -48,7 +48,8 @@
     <feature name="kronops-core-ui" version="${project.version}">
         <feature>war</feature>
         <feature>kronops-base</feature>
-        <bundle start-level="85">mvn:${project.groupId}/core-ui/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/core-ui/${project.version}</bundle>
+        <bundle start-level="85">mvn:${project.groupId}/theme/${project.version}</bundle>
     </feature>
 
 

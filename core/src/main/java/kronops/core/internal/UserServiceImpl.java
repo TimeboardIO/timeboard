@@ -26,7 +26,7 @@ package kronops.core.internal;
  * #L%
  */
 
-import kronops.core.api.UserServiceBP;
+import kronops.core.api.UserService;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.Project;
 import kronops.core.model.User;
@@ -40,10 +40,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component(
-        service = UserServiceBP.class,
+        service = UserService.class,
         immediate = true
 )
-public class UserServiceBPImpl implements UserServiceBP {
+public class UserServiceImpl implements UserService {
 
     @Reference(target = "(osgi.unit.name=kronops-pu)", scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;

@@ -26,7 +26,7 @@ package kronops.ui;
  * #L%
  */
 
-import kronops.core.api.ProjectServiceBP;
+import kronops.core.api.ProjectService;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
 import kronops.security.SecurityContext;
@@ -52,7 +52,7 @@ import java.io.IOException;
 public class HomeServlet extends KronopsServlet {
 
     @Reference
-    private ProjectServiceBP projectServiceBP;
+    private ProjectService projectService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -66,8 +66,8 @@ public class HomeServlet extends KronopsServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.getViewDatas().put("nb_projects", this.projectServiceBP.listProjects(SecurityContext.getCurrentUser(request)).size());
-        viewModel.getViewDatas().put("nb_tasks", this.projectServiceBP.listUserTasks(SecurityContext.getCurrentUser(request)).size());
+        viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(SecurityContext.getCurrentUser(request)).size());
+        viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(SecurityContext.getCurrentUser(request)).size());
 
         viewModel.setTemplate("home.html");
     }

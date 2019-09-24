@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <link href="/static/semantic/semantic.min.css" rel="stylesheet">
-    <title>Kronops</title>
+    <title th:text="${appName}"></title>
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
 
 </head>
@@ -58,8 +58,8 @@
 
             <div class="ui segment">
                 <h2 class="ui teal image header">
-                    <div class="content">
-                        Kronops
+                    <div class="content" th:text="${appName}">
+
                     </div>
                 </h2>
 
