@@ -35,6 +35,8 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Component(
@@ -84,7 +86,9 @@ public class AuthSecurityFilter implements Filter {
 
 
         if (!isLogged && !isStatic && !isLogin) {
-            res.sendRedirect(this.loginURL + "?origin=" + ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString());
+            String origin = ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString();
+            origin = URLEncoder.encode(origin, StandardCharsets.UTF_8.toString());
+            res.sendRedirect(this.loginURL + "?origin=" + origin);
         } else {
             chain.doFilter(request, response);
         }

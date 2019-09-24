@@ -30,6 +30,7 @@ package kronops.core.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -134,5 +135,22 @@ public class Task implements Serializable {
 
     public void setAssigned(User assigned) {
         this.assigned = assigned;
+    }
+
+    @Transient
+    public boolean isOpen(Date date){
+        return (date.before(this.endDate) || date.equals(this.endDate)) && (date.after(this.startDate) || date.equals(this.startDate));
+    }
+
+    @Transient
+    public double findTaskImputationValueByDate(Date date){
+        Optional<Imputation> iOpt = this.getImputations().stream()
+                .filter(imputation -> imputation.getDay().equals(date))
+                .findFirst();
+        if(iOpt.isPresent()){
+            return iOpt.get().getValue();
+        }else{
+            return 0;
+        }
     }
 }

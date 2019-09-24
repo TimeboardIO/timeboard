@@ -50,10 +50,10 @@
             <tr>
                 <th class="two wide">Project</th>
                 <th class="two wide">Task</th>
-                <th class="wide one" th:each="day : ${days}" style="text-align:center">
-                    <div>[[${day.day}]]</div>
-                    <div class="grey header">[[${#dates.format(day.date, 'dd/MM/yyyy')}]]</div>
-                    <div style="margin-top: 5px;" th:day-badge="${#dates.format(day.date, 'yyyy-MM-dd')}" class="ui circular label large">1</div>
+                <th class="wide one" th:each="dw : ${dateWrappers}" style="text-align:center">
+                    <div>[[${dw.day}]]</div>
+                    <div class="grey header">[[${#dates.format(dw.date, 'dd/MM/yyyy')}]]</div>
+                    <div style="margin-top: 5px;" th:day-badge="${#dates.format(dw.date, 'yyyy-MM-dd')}" class="ui circular label large">1</div>
                 </th>
                 <th class="wide one">ES</th>
                 <th class="wide one">EL</th>
@@ -62,31 +62,26 @@
             </tr>
             </thead>
             <tbody>
-            <th:block th:each="wrapper : ${projectTasks}">
-                <tr  th:each="t : ${wrapper.tasks}">
-                    <td th:text="${wrapper.project.name}"></td>
-                    <td th:text="${t.name}"></td>
-                    <td th:each="day: ${days}">
+            <th:block th:each="ptask : ${projectTasks}">
+                <tr  th:each="task : ${ptask.tasks}">
+                    <td th:text="${ptask.project.name}"></td>
+                    <td th:text="${task.name}"></td>
+                    <td th:each="dw: ${dateWrappers}">
                         <input
                                type="number"
                                min="0" max="1" step="0.1"
-                               value="0"
-                               th:data-task="${t.id}"
-                               th:data-day="${#dates.format(day.date, 'yyyy-MM-dd')}"
-                               th:name="'task['+${t.id}+']day['+${#dates.format(day.date, 'dd/MM/yyyy')}+']'" />
+                               th:if="${task.isOpen(dw.date)}"
+                               th:value="${task.findTaskImputationValueByDate(dw.date)}"
+                               th:data-task="${task.id}"
+                               th:data-day="${#dates.format(dw.date, 'yyyy-MM-dd')}"
+                               th:name="'task['+${task.id}+']day['+${#dates.format(dw.date, 'dd/MM/yyyy')}+']'" />
                     </td>
                     <td>
-
-                        <div>4</div>
-                        <div class="ui indicating progress" data-value="65" data-total="100">
-                            <div class="bar">
-                                <div class="progress"></div>
-                            </div>
-                        </div>
+                        4
                     </td>
                     <td><input value="0" type="number"/></td>
                     <td><input value="0" type="number"/></td>
-                    <td th:text="${t.estimateWork}"></td>
+                    <td th:text="${task.estimateWork}"></td>
                 </tr>
             </th:block>
             </tbody>
@@ -112,14 +107,6 @@
                 update($(this).attr('data-day'));
             });
 
-            $('.ui.progress')
-              .progress({
-                duration : 200,
-                total    : 200,
-                text     : {
-                  active: '{value} of {total} done'
-                }
-              })
 
         </script>
 

@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
+import javax.persistence.EntityGraph;
 import javax.persistence.TypedQuery;
 import javax.transaction.TransactionManager;
 import java.util.*;
@@ -273,8 +274,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         this.jpa.tx(entityManager -> {
 
+
             TypedQuery<Task> q = entityManager
-                    .createQuery("select t from Task t where " +
+                    .createQuery("select t from Task t left join fetch t.imputations where " +
                             "t.endDate >= :ds "+
                             "and t.startDate <= :de " +
                             "and t.assigned = :actor"

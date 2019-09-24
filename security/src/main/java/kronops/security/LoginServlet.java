@@ -41,6 +41,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +95,7 @@ public class LoginServlet extends KronopsServlet {
             HttpSession session = request.getSession(true);
             session.setAttribute("user", user);
 
+            origin = URLDecoder.decode(origin, StandardCharsets.UTF_8.toString());
             response.sendRedirect(origin);
         } else {
             response.setStatus(403);

@@ -66,31 +66,43 @@ public class TimesheetServlet extends KronopsServlet {
     }
 
 
+    private Date findStartDate(Calendar c, int week, int year){
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        return c.getTime();
+    }
+
+    private Date findEndDate(Calendar c, int week, int year){
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        return c.getTime();
+    }
+
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        Set<ProjectTasks> tasksByProject = new HashSet<>();
-        int week = Integer.parseInt(request.getParameter("week"));
-        int year = Integer.parseInt(request.getParameter("year"));
+        final Set<ProjectTasks> tasksByProject = new HashSet<>();
+        final int week = Integer.parseInt(request.getParameter("week"));
+        final int year = Integer.parseInt(request.getParameter("year"));
 
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
-
         c.setFirstDayOfWeek(Calendar.MONDAY);
-        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        c.set(Calendar.HOUR_OF_DAY, 2);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
 
-        Date ds = c.getTime();
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        Date de = c.getTime();
+        final Date ds = findStartDate(c, week, year);
+        final Date de = findEndDate(c, week, year);
 
-
+        //Get tasks for current week
         if (this.projectService != null) {
             User actor = SecurityContext.getCurrentUser(request);
             tasksByProject.addAll(this.projectService.listTasksByProject(actor, ds, de));
         }
 
-        List<DateWrapper> days = new ArrayList<>();
-        c.setTime(ds);
+        final List<DateWrapper> days = new ArrayList<>();
+
+        c.setTime(ds); //reset calendar to start date
         for(int i=0; i<7; i++){
             DateWrapper dw = new DateWrapper();
             dw.setDay(c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
@@ -99,7 +111,7 @@ public class TimesheetServlet extends KronopsServlet {
             c.add(Calendar.DAY_OF_YEAR, 1);
         }
 
-        viewModel.getViewDatas().put("days", days);
+        viewModel.getViewDatas().put("dateWrappers", days);
         viewModel.getViewDatas().put("week", week);
         viewModel.getViewDatas().put("year", year);
         viewModel.getViewDatas().put("projectTasks", tasksByProject);
