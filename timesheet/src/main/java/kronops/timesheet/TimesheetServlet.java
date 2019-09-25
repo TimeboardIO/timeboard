@@ -99,7 +99,7 @@ public class TimesheetServlet extends KronopsServlet {
             User actor = SecurityContext.getCurrentUser(request);
             tasksByProject.addAll(this.projectService.listTasksByProject(actor, ds, de));
             tasksByProject.sort((o1, o2) -> {
-                return o1.getProject().getName().compareTo(o1.getProject().getName());
+                return o1.getProject().getName().compareTo(o2.getProject().getName());
             });
         }
 

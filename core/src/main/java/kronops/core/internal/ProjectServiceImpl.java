@@ -300,8 +300,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Set<ProjectTasks> listTasksByProject(User actor, Date ds, Date de) {
-        final Set<ProjectTasks> projectTasks = new HashSet<>();
+    public List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de) {
+        final List<ProjectTasks> projectTasks = new ArrayList<>();
 
         this.jpa.tx(entityManager -> {
 
@@ -319,10 +319,10 @@ public class ProjectServiceImpl implements ProjectService {
             List<Task> tasks = q.getResultList();
 
             //rebalance task by project
-            final Map<Project, Set<Task>> rebalanced = new HashMap<>();
+            final Map<Project, List<Task>> rebalanced = new HashMap<>();
             tasks.forEach(task -> {
                 if (!rebalanced.containsKey(task.getProject())) {
-                    rebalanced.put(task.getProject(), new HashSet<>());
+                    rebalanced.put(task.getProject(), new ArrayList<>());
                 }
                 rebalanced.get(task.getProject()).add(task);
             });

@@ -94,7 +94,7 @@ public interface ProjectService {
 
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
 
-    Set<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
+    List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
 
     void updateTaskImputation(Long taskID, Date day, double imputation);
 }

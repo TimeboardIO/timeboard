@@ -78,4 +78,9 @@
         <feature>kronops-core</feature>
         <bundle start-level="90">mvn:${project.groupId}/sample-data/${project.version}</bundle>
     </feature>
+
+    <feature name="kronops-shell" version="${project.version}">
+        <feature>kronops-core</feature>
+        <bundle start-level="90">mvn:${project.groupId}/shell/${project.version}</bundle>
+    </feature>
 </features>

@@ -29,14 +29,15 @@ package kronops.core.api;
 import kronops.core.model.Project;
 import kronops.core.model.Task;
 
+import java.util.List;
 import java.util.Set;
 
 public class ProjectTasks {
 
     private final Project project;
-    private final Set<Task> tasks;
+    private final List<Task> tasks;
 
-    public ProjectTasks(Project project, Set<Task> tasks) {
+    public ProjectTasks(Project project, List<Task> tasks) {
         this.project = project;
         this.tasks = tasks;
     }
@@ -45,7 +46,7 @@ public class ProjectTasks {
         return project;
     }
 
-    public Set<Task> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 }

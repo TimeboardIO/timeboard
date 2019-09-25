@@ -23,6 +23,7 @@
         <module>timesheet</module>
         <module>features</module>
         <module>sample-data</module>
+        <module>shell</module>
     </modules>
 
 
