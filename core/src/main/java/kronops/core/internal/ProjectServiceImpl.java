@@ -42,9 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
-import javax.persistence.EntityGraph;
 import javax.persistence.TypedQuery;
-import javax.transaction.TransactionManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,9 +51,6 @@ import java.util.stream.Collectors;
         immediate = true
 )
 public class ProjectServiceImpl implements ProjectService {
-
-    @Reference
-    private TransactionManager transactionManager;
 
     @Reference
     private LogService logService;
@@ -231,7 +226,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Task> listUserTasks(User user){
+    public List<Task> listUserTasks(User user) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.assigned = :user", Task.class);
             q.setParameter("user", user);
@@ -267,9 +262,45 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
+    @Override
+    public void updateTaskImputation(Long taskID, Date day, double val) {
+        this.jpa.tx(entityManager -> {
+
+            Calendar c = Calendar.getInstance();
+            c.setTime(day);
+            c.set(Calendar.HOUR_OF_DAY, 2);
+
+            final Task task = entityManager.find(Task.class, taskID);
+
+            TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
+            q.setParameter("taskID", taskID);
+            q.setParameter("day", c.getTime());
+
+            List<Imputation> res = q.getResultList();
+            if (res.isEmpty() && val > 0.0 && val <= 1.0) {
+                //No imputation for current task and day
+                Imputation i = new Imputation();
+                i.setDay(c.getTime());
+                i.setTask(task);
+                i.setValue(val);
+                entityManager.persist(i);
+            }
+
+            if (!res.isEmpty()) {
+                Imputation i = res.get(0);
+                if (val == 0) {
+                    entityManager.remove(i);
+                } else {
+                    i.setValue(val);
+                }
+            }
+
+            entityManager.flush();
+        });
+    }
 
     @Override
-    public Set<ProjectTasks> listTasksByProject(User actor, Date ds, Date de){
+    public Set<ProjectTasks> listTasksByProject(User actor, Date ds, Date de) {
         final Set<ProjectTasks> projectTasks = new HashSet<>();
 
         this.jpa.tx(entityManager -> {
@@ -277,9 +308,10 @@ public class ProjectServiceImpl implements ProjectService {
 
             TypedQuery<Task> q = entityManager
                     .createQuery("select t from Task t left join fetch t.imputations where " +
-                            "t.endDate >= :ds "+
-                            "and t.startDate <= :de " +
-                            "and t.assigned = :actor"
+                                    "t.endDate >= :ds " +
+                                    "and t.startDate <= :de " +
+                                    "and t.assigned = :actor " +
+                                    "order by t.name"
                             , Task.class);
             q.setParameter("ds", ds);
             q.setParameter("de", de);
@@ -289,7 +321,7 @@ public class ProjectServiceImpl implements ProjectService {
             //rebalance task by project
             final Map<Project, Set<Task>> rebalanced = new HashMap<>();
             tasks.forEach(task -> {
-                if(!rebalanced.containsKey(task.getProject())){
+                if (!rebalanced.containsKey(task.getProject())) {
                     rebalanced.put(task.getProject(), new HashSet<>());
                 }
                 rebalanced.get(task.getProject()).add(task);
@@ -304,11 +336,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-
     @Override
     public void deleteTaskByID(User actor, long taskID) throws BusinessException {
 
-        RuleSet<Task> ruleSet = new RuleSet();
+        RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new TaskHasNoImputation());
         ruleSet.addRule(new ActorIsProjectMember());
 

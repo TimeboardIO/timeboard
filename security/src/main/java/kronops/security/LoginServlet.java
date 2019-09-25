@@ -33,7 +33,6 @@ import kronops.core.ui.ViewModel;
 import kronops.security.api.LoginService;
 import kronops.security.api.UsernamePasswordCredential;
 import org.osgi.service.component.annotations.*;
-import org.osgi.service.log.LogService;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -42,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;

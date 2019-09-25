@@ -25,6 +25,7 @@
             margin-bottom: 0.5em;
         }
 
+
     </style>
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
@@ -44,31 +45,33 @@
 
         <div class="ui grid segment">
             <div class="four wide column" th:each="project : ${projects}">
-                <div class="ui card" >
-                <div class="image">
-                    <div class="badge" th:text="${project.name.charAt(0)+''+project.name.charAt(1)}" style="text-transform: capitalize;">P</div>
-                </div>
-                <div class="content">
-                    <a class="header" th:text="${project.name}"></a>
-                    <div class="meta">
+                <div class="ui card">
+                    <div class="image">
+                        <div class="badge" style="text-transform: capitalize;"
+                             th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">P
+                        </div>
+                    </div>
+                    <div class="content">
+                        <a class="header" th:text="${project.name}"></a>
+                        <div class="meta">
                     <span class="date">
                         <i class="archive icon"></i>
                         [[${project.clusters.size()}]] Clusters
                     </span>
-                        <div>
-                            <i class="user icon"></i>
-                            [[${project.members.size()}]] Members
+                            <div>
+                                <i class="user icon"></i>
+                                [[${project.members.size()}]] Members
+                            </div>
+                        </div>
+                        <div class="description" th:text="${project.comments}">
                         </div>
                     </div>
-                    <div class="description" th:text="${project.comments}">
+                    <div class="extra content">
+                        <a class="ui positive button" th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
+                        <a class="negative ui basic button"
+                           th:href="@{/projects/delete(projectID=${project.id})}">Delete</a>
                     </div>
                 </div>
-                <div class="extra content">
-                    <a class="ui positive button" th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
-                    <a class="negative ui basic button"
-                       th:href="@{/projects/delete(projectID=${project.id})}">Delete</a>
-                </div>
-            </div>
             </div>
         </div>
     </div>

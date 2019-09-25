@@ -66,19 +66,19 @@ public class TimesheetServlet extends KronopsServlet {
     }
 
 
-    private Date findStartDate(Calendar c, int week, int year){
+    private Date findStartDate(Calendar c, int week, int year) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return c.getTime();
     }
 
-    private Date findEndDate(Calendar c, int week, int year){
+    private Date findEndDate(Calendar c, int week, int year) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         return c.getTime();
     }
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        final Set<ProjectTasks> tasksByProject = new HashSet<>();
+        final List<ProjectTasks> tasksByProject = new ArrayList<>();
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
 
@@ -98,12 +98,15 @@ public class TimesheetServlet extends KronopsServlet {
         if (this.projectService != null) {
             User actor = SecurityContext.getCurrentUser(request);
             tasksByProject.addAll(this.projectService.listTasksByProject(actor, ds, de));
+            tasksByProject.sort((o1, o2) -> {
+                return o1.getProject().getName().compareTo(o1.getProject().getName());
+            });
         }
 
         final List<DateWrapper> days = new ArrayList<>();
 
         c.setTime(ds); //reset calendar to start date
-        for(int i=0; i<7; i++){
+        for (int i = 0; i < 7; i++) {
             DateWrapper dw = new DateWrapper();
             dw.setDay(c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
             dw.setDate(c.getTime());
@@ -118,6 +121,20 @@ public class TimesheetServlet extends KronopsServlet {
         viewModel.setTemplate("timesheet.html");
     }
 
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+
+        try {
+            Long taskID = Long.parseLong(request.getParameter("task"));
+            Date day = DATE_FORMAT.parse(request.getParameter("day"));
+            double imputation = Double.parseDouble(request.getParameter("imputation"));
+
+            this.projectService.updateTaskImputation(taskID, day, imputation);
+        } catch (Exception e) {
+            response.setStatus(500);
+        }
+    }
 
     private class DateWrapper {
 

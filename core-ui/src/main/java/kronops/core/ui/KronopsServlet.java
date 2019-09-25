@@ -42,7 +42,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public abstract class KronopsServlet extends HttpServlet {
 
@@ -67,10 +69,10 @@ public abstract class KronopsServlet extends HttpServlet {
     }
 
 
-    private String getAppName(){
+    private String getAppName() {
         String appName = "Missing Theme Plugin";
         ServiceReference<BrandingService> brandingServiceRef = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getServiceReference(BrandingService.class);
-        if(brandingServiceRef != null) {
+        if (brandingServiceRef != null) {
             BrandingService brandingService = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getService(brandingServiceRef);
             appName = brandingService.appName();
         }
@@ -119,8 +121,6 @@ public abstract class KronopsServlet extends HttpServlet {
         request.setAttribute("errors", viewModel.getErrors());
         requestDispatcher.forward(request, response);
     }
-
-
 
 
     protected void doService(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException {

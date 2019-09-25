@@ -29,8 +29,6 @@ package kronops.timesheet;
 import kronops.core.ui.NavigationExtPoint;
 import org.osgi.service.component.annotations.Component;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 

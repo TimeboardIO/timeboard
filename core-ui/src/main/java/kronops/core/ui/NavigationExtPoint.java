@@ -32,7 +32,7 @@ public interface NavigationExtPoint {
 
     public String getNavigationPath();
 
-    public default String getNavigationParams(){
+    public default String getNavigationParams() {
         return "";
     }
 

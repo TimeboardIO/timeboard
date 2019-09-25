@@ -138,18 +138,23 @@ public class Task implements Serializable {
     }
 
     @Transient
-    public boolean isOpen(Date date){
+    public boolean isOpen(Date date) {
         return (date.before(this.endDate) || date.equals(this.endDate)) && (date.after(this.startDate) || date.equals(this.startDate));
     }
 
     @Transient
-    public double findTaskImputationValueByDate(Date date){
+    public double getEffortSpent() {
+        return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
+    }
+
+    @Transient
+    public double findTaskImputationValueByDate(Date date) {
         Optional<Imputation> iOpt = this.getImputations().stream()
                 .filter(imputation -> imputation.getDay().equals(date))
                 .findFirst();
-        if(iOpt.isPresent()){
+        if (iOpt.isPresent()) {
             return iOpt.get().getValue();
-        }else{
+        } else {
             return 0;
         }
     }

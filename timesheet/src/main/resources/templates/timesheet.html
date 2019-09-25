@@ -10,36 +10,49 @@
 
     <script>
 
-        const update = function(date){
+        const updateBadge = function(date){
             const reducer = (accumulator, currentValue) => accumulator + currentValue;
             var data = $('[data-day="'+date+'"]').map(function(){return parseFloat($(this).val())}).get();
-            var sum = data.reduce(reducer).toFixed(2);
+            var sum = data.reduce(reducer);
 
-            if(sum === '1.00'){
+
+            if(sum === 1.00){
                 $('[day-badge="'+date+'"]').addClass('green');
             }else{
                 $('[day-badge="'+date+'"]').removeClass('green');
             }
 
-            if(sum === '0.00'){
+            if(sum === 0.00){
                 $('[day-badge="'+date+'"]').addClass('red');
             }else{
                 $('[day-badge="'+date+'"]').removeClass('red');
             }
 
-            $('[day-badge="'+date+'"]').text(sum);
+            $('[day-badge="'+date+'"]').text(sum.toFixed(2));
         }
+
+        const update = function(date, task, val){
+
+            $.post("/timesheet", {
+                'day':date,
+                'task':task,
+                'imputation':val
+            }).then(function(){
+                updateBadge(date);
+            });
+        }
+
 
     </script>
 
     <div class="timesheet-navigation-controls">
-        <a th:href="@{/timesheet(week=${week-1}, year=${year})}" class="ui labeled icon button">
+        <a class="ui labeled icon button" th:href="@{/timesheet(week=${week-1}, year=${year})}">
             <i class="left arrow icon"></i>Previous week</a>
 
         <span class="ui blue circular label bug">Week [[${week}]]</span>
 
 
-        <a th:href="@{/timesheet(week=${week+1}, year=${year})}" class="ui right labeled icon button">
+        <a class="ui right labeled icon button" th:href="@{/timesheet(week=${week+1}, year=${year})}">
             <i class="right arrow icon"></i>Next week</a>
     </div>
 
@@ -48,12 +61,13 @@
         <table class="ui celled table" style="text-align:center">
             <thead>
             <tr>
-                <th class="two wide">Project</th>
                 <th class="two wide">Task</th>
-                <th class="wide one" th:each="dw : ${dateWrappers}" style="text-align:center">
+                <th class="wide one" style="text-align:center" th:each="dw : ${dateWrappers}">
                     <div>[[${dw.day}]]</div>
                     <div class="grey header">[[${#dates.format(dw.date, 'dd/MM/yyyy')}]]</div>
-                    <div style="margin-top: 5px;" th:day-badge="${#dates.format(dw.date, 'yyyy-MM-dd')}" class="ui circular label large">1</div>
+                    <div class="ui circular label large" style="margin-top: 5px;"
+                         th:day-badge="${#dates.format(dw.date, 'yyyy-MM-dd')}">-
+                    </div>
                 </th>
                 <th class="wide one">ES</th>
                 <th class="wide one">EL</th>
@@ -63,24 +77,24 @@
             </thead>
             <tbody>
             <th:block th:each="ptask : ${projectTasks}">
-                <tr  th:each="task : ${ptask.tasks}">
-                    <td th:text="${ptask.project.name}"></td>
+                <tr>
+                    <td class="ui header left aligned green small" colspan="12" th:text="${ptask.project.name}"></td>
+                </tr>
+                <tr th:each="task : ${ptask.tasks}">
                     <td th:text="${task.name}"></td>
                     <td th:each="dw: ${dateWrappers}">
                         <input
-                               type="number"
-                               min="0" max="1" step="0.1"
-                               th:if="${task.isOpen(dw.date)}"
-                               th:value="${task.findTaskImputationValueByDate(dw.date)}"
-                               th:data-task="${task.id}"
-                               th:data-day="${#dates.format(dw.date, 'yyyy-MM-dd')}"
-                               th:name="'task['+${task.id}+']day['+${#dates.format(dw.date, 'dd/MM/yyyy')}+']'" />
+                                max="1"
+                                min="0" step="0.1" th:data-day="${#dates.format(dw.date, 'yyyy-MM-dd')}"
+                                th:data-task="${task.id}"
+                                th:if="${task.isOpen(dw.date)}"
+                                th:name="'task['+${task.id}+']day['+${#dates.format(dw.date, 'dd/MM/yyyy')}+']'"
+                                th:value="${task.findTaskImputationValueByDate(dw.date)}"
+                                type="number"/>
                     </td>
-                    <td>
-                        4
-                    </td>
-                    <td><input value="0" type="number"/></td>
-                    <td><input value="0" type="number"/></td>
+                    <td th:text="${#numbers.formatDecimal(task.getEffortSpent(),0, 'COMMA', 2, 'POINT')}"></td>
+                    <td><input type="number" value="0"/></td>
+                    <td><input type="number" value="0"/></td>
                     <td th:text="${task.estimateWork}"></td>
                 </tr>
             </th:block>
@@ -88,37 +102,30 @@
         </table>
 
         <div class="timesheet-validation-controls">
-            <input type="submit" th:href="@{/timesheet(week=${week-1}, year=${year})}" class="ui  positive basic  button" value="Save My Week">
+            <input class="ui  positive basic  button" th:href="@{/timesheet(week=${week-1}, year=${year})}"
+                   type="submit" value="Save My Week">
         </div>
 
-     </form>
+    </form>
 
+    <script>
+
+
+            $("input[data-task]").on('input',function(){
+                update($(this).attr('data-day'), $(this).attr('data-task'), $(this).val());
+            });
+
+
+
+    </script>
+
+
+    <th:block th:each="dw : ${dateWrappers}">
         <script>
-
-            $("input[data-task]").keyup(function(){
-                update($(this).attr('data-day'));
-            });
-
-            $("input[data-task]").keypress(function(){
-                update($(this).attr('data-day'));
-            });
-
-            $("input[data-task]").focusout(function(){
-                update($(this).attr('data-day'));
-            });
-
+            updateBadge('[(${#dates.format(dw.date, 'yyyy-MM-dd')})]');
 
         </script>
-
-
-        <th:block th:each="day: ${days}">
-            <script>
-            update('[(${#dates.format(day.date, 'yyyy-MM-dd')})]');
-            </script>
-        </th:block>
-
-
-
+    </th:block>
 
 
 </div>

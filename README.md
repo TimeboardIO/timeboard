@@ -6,6 +6,7 @@ Prerequisites
     * OSX or Ubuntu (not tested on other OS)
     * Maven 3
     * Internet connection with an access to maven central  
+    * Docker for mysql container
 
 
 Download Karaf & uncompress archive
@@ -27,6 +28,12 @@ Compile Kronops source code
 
 
     mvn clean install
+    
+
+Init Database
+
+    start mysql container and create database named "kronops"
+    use SQL script sql/mysql8.sql to load db schema
 
 Add Kronops features repo to Karaf
 
@@ -44,7 +51,7 @@ Install Kronops
     feature:install kronops-projects 
     
     
-Configure SSL
+Configure SSL (optional)
 
     into karaf install dir /etc
 
@@ -69,4 +76,4 @@ Open webrowser
     
     or
     
-    https://localhost:8443
+    https://localhost:8443 (if http sercure enabled)
