@@ -4,6 +4,10 @@
 
 TODO
 
+ 
+![alt text](docs/images/login.png "Login form UI")
+
+
 # Setup
 
 - [See setup dev env manual](docs/setup.md)
