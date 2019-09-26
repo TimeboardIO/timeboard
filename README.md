@@ -2,9 +2,6 @@
 
 # Decription
 
-TODO
-
- 
 ![alt text](docs/images/login.png "Login form UI")
 
 

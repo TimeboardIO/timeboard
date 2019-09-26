@@ -1,1 +1,5 @@
 theme: jekyll-theme-cayman
+show_downloads: true
+github:
+  zip_url: https://github.com/pierremellet/kronops/releases/latest
+  tar_url: https://github.com/pierremellet/kronops/releases/latest
