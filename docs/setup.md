@@ -101,6 +101,14 @@ Now, you can login into Kronops with
     username : kronops
     password : pwd      
         
+
 ## For production
 
-Not ready yet :(
+Not realy ready yet :(
+
+Releases for production use Apache Karaf KAR format.
+
+A Release installation must follow classical KAR process : 
+
+    https://karaf.apache.org/manual/latest/kar
+
