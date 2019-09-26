@@ -68,11 +68,13 @@ Command is assumed to be run from source code root folder :
 
     mvn install    
     
+
+### Deploy Kronops
+
+
 Command is assumed to be run in Apache Karaf Shell :
 
     feature:repo-add mvn:kronops/features/LATEST/xml
-
-### Deploy Kronops
 
 
 Command is assumed to be run in Apache Karaf Shell :
