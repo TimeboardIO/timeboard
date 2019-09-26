@@ -155,7 +155,7 @@ public class Task implements Serializable {
 
     @Transient
     public double getReEstimateWork(){
-        return this.getEstimateWork() + this.getRemainsToBeDone();
+        return this.getEffortSpent() + this.getRemainsToBeDone();
     }
 
     @Transient
