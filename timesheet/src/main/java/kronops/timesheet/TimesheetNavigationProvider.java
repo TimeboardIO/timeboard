@@ -35,7 +35,7 @@ import java.util.Date;
 @Component(
         service = NavigationExtPoint.class
 )
-public class TimesheetNavigationProvier implements NavigationExtPoint {
+public class TimesheetNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
