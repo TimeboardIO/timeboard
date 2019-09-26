@@ -90,7 +90,7 @@ public class TreeNode {
     }
 
     private void insertRec(TreeNode node, ProjectCluster projectCluster) {
-        this.children.forEach(treeNode -> {
+        node.children.forEach(treeNode -> {
             if (treeNode.getProjectCluster().getId() == projectCluster.getParent().getId()) {
                 treeNode.getChildren().add(new TreeNode(projectCluster));
             } else {
