@@ -1,6 +1,6 @@
-#Installation
+# Installation
 
-##For development
+## For development
 
 ### Prerequisites
 
@@ -72,7 +72,6 @@ Command is assumed to be run in Apache Karaf Shell :
 
     feature:repo-add mvn:kronops/features/LATEST/xml
 
-
 ### Deploy Kronops
 
 
@@ -88,7 +87,6 @@ Open your web browser and got to
     
 Congratulation, you have access to Kronops login page !
 
-
 ### Last job : create user account
 
 Kronops database is empty at first startup
@@ -100,3 +98,7 @@ Now, you can login into Kronops with
 
     username : kronops
     password : pwd      
+        
+## For production
+
+Not ready yet :(
