@@ -3,8 +3,6 @@ sudo: false
 script:
   - mvn clean install
   - cd features && mvn karaf:kar
-  - ls
-  - pwd
 
 deploy:
   provider: releases
