@@ -5,7 +5,7 @@
 
     jdbc:ds-list 
 
-## Where is my database configuration
+## Where is my database configuration ?
 
     [KRONOPS_HOME]/etc/org.ops4j.datasource-kronops-core-ds.cfg
 
