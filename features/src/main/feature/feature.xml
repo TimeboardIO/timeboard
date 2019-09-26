@@ -24,63 +24,63 @@
         <bundle start-level="70">mvn:org.ops4j.pax.jdbc/pax-jdbc-mysql/1.4.0</bundle>
     </feature>
 
-    <feature name="kronops-datasource" version="${project.version}">
-        <config name="org.ops4j.datasource-kronops-core-ds">
-            dataSourceName=kronops-core-ds
-            osgi.jdbc.driver.class=com.mysql.cj.jdbc.Driver
-            url=jdbc:mysql://localhost:3306/epo?createDatabaseIfNotExist=true
-            user=root
-            password=epo
-            dialect=org.hibernate.dialect.MySQL8Dialect
-        </config>
-        <capability>
-            osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=kronops-core-ds
-        </capability>
-    </feature>
+        <feature name="kronops-datasource" version="${project.version}">
+            <config name="org.ops4j.datasource-kronops-core-ds">
+                dataSourceName=kronops-core-ds
+                osgi.jdbc.driver.class=com.mysql.cj.jdbc.Driver
+                url=jdbc:mysql://localhost:3306/epo?createDatabaseIfNotExist=true
+                user=root
+                password=epo
+                dialect=org.hibernate.dialect.MySQL8Dialect
+            </config>
+            <capability>
+                osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=kronops-core-ds
+            </capability>
+        </feature>
 
-    <feature name="kronops-core" version="${project.version}">
-        <feature>kronops-base</feature>
-        <feature>kronops-datasource</feature>
-        <bundle start-level="85">mvn:${project.groupId}/core/${project.version}</bundle>
-    </feature>
-
-
-    <feature name="kronops-core-ui" version="${project.version}">
-        <feature>war</feature>
-        <feature>kronops-base</feature>
-        <bundle start-level="80">mvn:${project.groupId}/core-ui/${project.version}</bundle>
-        <bundle start-level="85">mvn:${project.groupId}/theme/${project.version}</bundle>
-    </feature>
+         <feature name="kronops-core" version="${project.version}">
+             <feature>kronops-base</feature>
+             <feature>kronops-datasource</feature>
+             <bundle start-level="85">mvn:${project.groupId}/core/${project.version}</bundle>
+         </feature>
 
 
-    <feature name="kronops-security" version="${project.version}">
-        <feature>kronops-core</feature>
-        <feature>kronops-core-ui</feature>
-        <bundle start-level="90">mvn:${project.groupId}/security/${project.version}</bundle>
-    </feature>
+         <feature name="kronops-core-ui" version="${project.version}">
+             <feature>war</feature>
+             <feature>kronops-base</feature>
+             <bundle start-level="80">mvn:${project.groupId}/core-ui/${project.version}</bundle>
+             <bundle start-level="85">mvn:${project.groupId}/theme/${project.version}</bundle>
+         </feature>
 
-    <feature name="kronops-home" version="${project.version}">
-        <feature>kronops-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/home/${project.version}</bundle>
-    </feature>
 
-    <feature name="kronops-projects" version="${project.version}">
-        <feature>kronops-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/projects/${project.version}</bundle>
-    </feature>
+         <feature name="kronops-security" version="${project.version}">
+             <feature>kronops-core</feature>
+             <feature>kronops-core-ui</feature>
+             <bundle start-level="90">mvn:${project.groupId}/security/${project.version}</bundle>
+         </feature>
 
-    <feature name="kronops-timesheet" version="${project.version}">
-        <feature>kronops-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/timesheet/${project.version}</bundle>
-    </feature>
+         <feature name="kronops-home" version="${project.version}">
+             <feature>kronops-core</feature>
+             <bundle start-level="90">mvn:${project.groupId}/home/${project.version}</bundle>
+         </feature>
 
-    <feature name="kronops-sampledata" version="${project.version}">
-        <feature>kronops-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/sample-data/${project.version}</bundle>
-    </feature>
+         <feature name="kronops-projects" version="${project.version}">
+             <feature>kronops-core</feature>
+             <bundle start-level="90">mvn:${project.groupId}/projects/${project.version}</bundle>
+         </feature>
 
-    <feature name="kronops-shell" version="${project.version}">
-        <feature>kronops-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/shell/${project.version}</bundle>
-    </feature>
+         <feature name="kronops-timesheet" version="${project.version}">
+             <feature>kronops-core</feature>
+             <bundle start-level="90">mvn:${project.groupId}/timesheet/${project.version}</bundle>
+         </feature>
+
+         <feature name="kronops-sampledata" version="${project.version}">
+             <feature>kronops-core</feature>
+             <bundle start-level="90">mvn:${project.groupId}/sample-data/${project.version}</bundle>
+         </feature>
+
+         <feature name="kronops-shell" version="${project.version}">
+             <feature>kronops-core</feature>
+             <bundle start-level="90">mvn:${project.groupId}/shell/${project.version}</bundle>
+         </feature>
 </features>
