@@ -1,0 +1,14 @@
+language: java
+sudo: false
+script:
+  - mvn clean install
+  -  cd features && mvn karaf:kar
+
+deploy:
+  provider: releases
+  api_key: "$GITHUB_TOKEN"
+  file: "features/target/features-1.0-SNAPSHOT.kar"
+  skip_cleanup: true
+  draft: true
+  on:
+    tags: true

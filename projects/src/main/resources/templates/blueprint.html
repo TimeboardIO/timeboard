@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{details_project_layout.html(tab='fourth')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+>
+
+<head>
+    <title layout:fragment="title">Kronops - Blueprint</title>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+    <svg id="gantt"></svg>
+
+    <script>
+        var tasks = [(${tasks})];
+        var gantt = new Gantt("#gantt", tasks);
+
+    </script>
+</div>
+
+</body>
+</html>

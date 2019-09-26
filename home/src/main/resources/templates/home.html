@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+
+<div layout:fragment="content">
+
+
+    <div class="ui middle aligned center aligned grid" style="margin-top:3em">
+
+        <div class="column">
+
+            <div class="ui statistic">
+                <div class="label">
+                    You are member of
+                </div>
+                <div class="value" th:text="${nb_projects}"></div>
+                <div class="label">
+                    Projects
+                </div>
+            </div>
+
+            <div class="ui statistic">
+                <div class="label">
+                    You are assigned to
+                </div>
+                <div class="value" th:text="${nb_tasks}"></div>
+                <div class="label">
+                    Tasks
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

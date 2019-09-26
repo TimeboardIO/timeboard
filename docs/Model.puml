@@ -1,0 +1,18 @@
+@startuml
+
+class Imputation{
+    es : % of day
+    day : Date
+}
+
+class Task{
+    validated : boolean
+}
+
+
+ProjectCluster "1" --> "0..*" ProjectCluster : parent
+ProjectCluster "0..*" -- "0..*" Project
+Project "1" -- "0..*" Task
+Task "1" -- "0..*" Imputation
+Imputation "0..*" - "1" User
+@enduml

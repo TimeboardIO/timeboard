@@ -1,0 +1,25 @@
+@startuml
+
+UserAgent -> AuthSecurityFilter : https://.../
+activate AuthSecurityFilter
+AuthSecurityFilter -> AuthSecurityFilter : Check if user has session
+
+alt no user session exist
+
+    AuthSecurityFilter -> LoginServlet : redirect
+    LoginServlet -> LoginService
+    LoginService --> LoginServlet
+    LoginServlet --> LoginServlet : create user session
+    LoginServlet --> HomeServlet : forward request
+end
+
+alt  user session exist
+
+    AuthSecurityFilter -> HomeServlet : forward request
+
+end
+
+    HomeServlet --> UserAgent : return UI
+
+
+@enduml

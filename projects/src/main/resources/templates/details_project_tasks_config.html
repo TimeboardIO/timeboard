@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{details_project_tasks.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Project Tasks details</title>
+</head>
+<body>
+
+<div layout:fragment="task-config">
+
+    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="task"
+          method="post" style="margin-left:1em;">
+        <input name="taskID" required th:value="${task.id}" type="hidden">
+
+        <div class="field">
+            <label>Task Name</label>
+            <input name="taskName" placeholder="Task Name" required th:value="${task.name}" type="text">
+        </div>
+        <div class="field">
+            <label>Task Description</label>
+            <input name="taskComments" placeholder="Task Description" th:value="${task.comments}" type="text">
+        </div>
+        <div class="field">
+            <label>Task Start Date</label>
+            <input name="taskStartDate" placeholder="Task Name"
+                   required th:value="${#dates.format(task.startDate, 'yyyy-MM-dd')}" type="date">
+        </div>
+        <div class="field">
+            <label>Task End Date</label>
+            <input name="taskEndDate" placeholder="Task Name" required
+                   th:value="${#dates.format(task.endDate, 'yyyy-MM-dd')}" type="date">
+        </div>
+        <div class="field">
+            <label>Task Original Estimate</label>
+            <input name="taskEstimateWork" placeholder="Task OE" required th:value="${task.estimateWork}" type="number">
+        </div>
+        <div class="field">
+            <label>User assigned</label>
+            <div class="ui category search">
+                <div class="ui icon input">
+
+                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assigned != null}"
+                           th:value="${task.assigned.name}" type="text"/>
+                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assigned == null}"
+                           type="text"/>
+
+                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assigned != null}"
+                           th:value="${task.assigned.id}" type="hidden"/>
+                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assigned == null}" type="hidden"
+                           value=""/>
+
+
+                    <i class="search icon"></i>
+                </div>
+                <div class="results"></div>
+            </div>
+        </div>
+
+
+        <button class="ui positive button" type="submit">Save</button>
+
+        <a class="ui negative basic button"
+           th:href="@{/projects/tasks/delete(taskID=${task.id}, projectID=${project.id})}">
+            <i class="remove alternate icon"></i>
+            Delete Task
+        </a>
+
+    </form>
+
+    <script>
+         $('.ui.search')
+            .search({
+                apiSettings: {
+                        url: '/search?q={query}&projectID=[[${project.id}]]'
+                    },
+                    fields: {
+                        results : 'items',
+                        title   : 'name',
+                        description : 'email'
+                    },
+                    onSelect: function(result, response) {
+                        $('.assigned').val(result.name);
+                        $('.taskAssigned').val(result.id);
+                     },
+                minCharacters : 3
+            });
+
+
+    </script>
+
+</div>
+
+</body>
+</html>

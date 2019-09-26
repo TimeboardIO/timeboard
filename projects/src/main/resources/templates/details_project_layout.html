@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/projects')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+
+<body>
+
+<div layout:fragment="content">
+
+
+    <div class="ui top attached tabular menu">
+        <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
+           th:href="@{/projects/config(projectID=${project.id})}">Summary</a>
+        <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
+           th:href="@{/projects/tasks(projectID=${project.id})}">Tasks</a>
+        <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
+           th:href="@{/projects/blueprint(projectID=${project.id})}">Blueprint</a>
+        <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
+           th:href="@{/projects/clusters(projectID=${project.id})}">Clusters</a>
+    </div>
+    <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

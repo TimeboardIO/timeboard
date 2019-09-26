@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<!--  main-fragment (title, otherStaticResources, header, nav, mainContent, footer)  -->
+<html layout:decorate="~{layouts/general.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">Clusters</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <h4 class="ui dividing header">Create cluster</h4>
+
+    <form action="/clusters?action=create" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+        <div class="ui negative message" th:if="${error}">
+            <i class="close icon"></i>
+            <div class="header">
+                Failed to create project cluster
+            </div>
+            <p th:text="${error}">:(</p>
+        </div>
+        <div class="field">
+            <label>Cluster Name</label>
+            <input name="clusterName" placeholder="Cluster Name" required type="text">
+        </div>
+        <button class="ui button" type="submit">Save</button>
+    </form>
+
+    <h4 class="ui dividing header">Clusters Tree</h4>
+
+    <form action="/clusters?action=update" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+        <table class="ui celled table">
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>Name</th>
+                <th>Parent</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cluster : ${clusters}">
+                <td th:text="${cluster.id}">id</td>
+                <td>
+                    <input required th:name="'clustername['+${cluster.id}+']'" th:value="${cluster.name}" type="text"/>
+                </td>
+                <td>
+                    <select th:name="'clusterparent['+${cluster.id}+']'">
+                        <option value="">---</option>
+                        <option th:each="parent : ${clusters}"
+                                th:if="${parent.id != cluster.id}"
+                                th:selected="${cluster.parent != null && (parent.id == cluster.parent.id)}"
+                                th:text="${parent.name}"
+                                th:value="${parent.id}"></option>
+                    </select>
+                </td>
+                <td>
+                    <a class="ui button" th:href="@{/clusters/delete?id={id}(id=${cluster.id})}">Delete</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <button class="ui button" type="submit">Save</button>
+
+    </form>
+</div>
+
+</body>
+</html>

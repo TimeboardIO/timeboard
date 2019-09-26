@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/projects')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">Home Page</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <style type="text/css">
+        .badge{
+           text-align: center;
+            width: 3em;
+            margin: 0 auto;
+            background-color: #957DAD;
+            line-height: 3em;
+            border-radius: 5em;
+            margin-top: 0.5em;
+            font-size: 3em;
+            color: white;
+            margin-bottom: 0.5em;
+        }
+
+
+    </style>
+
+    <div class="ui icon message" th:if="${projects.isEmpty()}">
+        <i class="inbox icon"></i>
+        <div class="content">
+            <div class="header">
+                No Projects ?
+            </div>
+            <p>You are not member of any project, click <a th:href="@{/projects/create}">here</a> to create your first
+                project !</p>
+        </div>
+    </div>
+
+    <div th:if="${!projects.isEmpty()}">
+
+        <a class="ui button basic positive" th:href="@{/projects/create}">Create Project</a>
+
+        <div class="ui grid segment">
+            <div class="four wide column" th:each="project : ${projects}">
+                <div class="ui card">
+                    <div class="image">
+                        <div class="badge" style="text-transform: capitalize;"
+                             th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">P
+                        </div>
+                    </div>
+                    <div class="content">
+                        <a class="header" th:text="${project.name}"></a>
+                        <div class="meta">
+                    <span class="date">
+                        <i class="archive icon"></i>
+                        [[${project.clusters.size()}]] Clusters
+                    </span>
+                            <div>
+                                <i class="user icon"></i>
+                                [[${project.members.size()}]] Members
+                            </div>
+                        </div>
+                        <div class="description" th:text="${project.comments}">
+                        </div>
+                    </div>
+                    <div class="extra content">
+                        <a class="ui positive button" th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
+                        <a class="negative ui basic button"
+                           th:href="@{/projects/delete(projectID=${project.id})}">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
