@@ -121,7 +121,7 @@
                     <packages>
                         <param>kronops.core.model</param>
                     </packages>
-                    <outputDirectory>${project.basedir}/../sql</outputDirectory>
+                    <outputDirectory>${project.basedir}/../scripts/sql</outputDirectory>
                 </configuration>
                 <executions>
                     <execution>
