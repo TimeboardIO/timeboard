@@ -9,6 +9,6 @@
 
 - [See setup dev env manual](docs/setup.md)
 
-- [Dev cheatsheet](docs/setup.md)
+- [Dev cheatsheet](docs/cheatsheet.md)
 
 
