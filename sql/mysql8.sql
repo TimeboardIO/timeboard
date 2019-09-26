@@ -57,6 +57,7 @@
         comments varchar(500),
         endDate date,
         estimateWork double precision not null,
+        remainsToBeDone double precision,
         name varchar(50) not null,
         startDate date,
         assigned_id bigint,

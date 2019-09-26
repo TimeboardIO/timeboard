@@ -56,6 +56,9 @@ public class Task implements Serializable {
     @Column(nullable = false)
     private double estimateWork;
 
+    @Column(nullable = true)
+    private double remainsToBeDone = 0;
+
     @OneToOne
     private User assigned;
 
@@ -137,9 +140,22 @@ public class Task implements Serializable {
         this.assigned = assigned;
     }
 
+    public double getRemainsToBeDone() {
+        return remainsToBeDone;
+    }
+
+    public void setRemainsToBeDone(double remainsToBeDone) {
+        this.remainsToBeDone = remainsToBeDone;
+    }
+
     @Transient
     public boolean isOpen(Date date) {
         return (date.before(this.endDate) || date.equals(this.endDate)) && (date.after(this.startDate) || date.equals(this.startDate));
+    }
+
+    @Transient
+    public double getReEstimateWork(){
+        return this.getEstimateWork() + this.getRemainsToBeDone();
     }
 
     @Transient
@@ -158,4 +174,6 @@ public class Task implements Serializable {
             return 0;
         }
     }
+
+
 }
