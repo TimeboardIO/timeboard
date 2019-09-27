@@ -8,6 +8,8 @@
 
 # Setup
 
+- [Software design](docs/design.md)
+
 - [See setup dev env manual](docs/setup.md)
 
 - [Dev cheatsheet](docs/cheatsheet.md)

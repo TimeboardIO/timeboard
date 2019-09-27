@@ -8,12 +8,12 @@ node "JVM 11" {
 
          node "Kronops"{
              [core] -- mysql
-             [core-ui] -- mysql
              [security] -- core
              [security] -- [core-ui]
              [projects] -- core
              [timesheet] -- core
              [home] -- core
+             [shell] -- core
              [projects] -- [core-ui]
              [timesheet] -- [core-ui]
              [home] -- [core-ui]
@@ -23,15 +23,11 @@ node "JVM 11" {
 
 
 
-         [JPA (hibernate-osgi)] ---- core
-         [JAAS (Karaf)] --- core
-         [JTA (Apache Geronimo)] --- core
-         [JNDI (Karaf)] --- core
-         ["Log (log4j)"] ---- core
+         [JPA] ---- core
+         [JTA] --- core
+         [JNDI] --- core
 
-         ["Http Service (Jetty)"] -- projects
-         ["Http Service (Jetty)"] -- timesheet
-         ["Http Service (Jetty)"] -- home
+         ["Http Whiteboard"] --- [core-ui]
     }
 }
 
