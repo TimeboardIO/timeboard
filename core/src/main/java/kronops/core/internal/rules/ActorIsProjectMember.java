@@ -44,8 +44,8 @@ public class ActorIsProjectMember implements Rule<Task> {
     public boolean isSatisfied(User u, Task thing) {
         Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
                 .filter(projectMembership ->
-                        (projectMembership.getMember().getId() == u.getId())
-                                && (projectMembership.getRole().equals(ProjectRole.OWNER))
+                        projectMembership.getMember().getId() == u.getId()
+                                && projectMembership.getRole().equals(ProjectRole.OWNER)
                 )
                 .findFirst();
         return userOptional.isPresent();
