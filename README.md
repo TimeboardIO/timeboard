@@ -10,7 +10,7 @@
 
 - [Software design](docs/design.md)
 
-- [Roadmap](docs/design.md)
+- [Roadmap](docs/roadmap.md)
 
 - [See setup dev env manual](docs/setup.md)
 
