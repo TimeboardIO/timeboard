@@ -33,23 +33,42 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TreeNode {
+/**
+ * Represent a tree of ProjectClusters.
+ */
+public final class TreeNode {
 
+    /**
+     * Node payload : current project cluster.
+     */
     private ProjectCluster projectCluster;
-    private List<TreeNode> children = new ArrayList<>();
 
-    public TreeNode(ProjectCluster projectCluster) {
-        this.projectCluster = projectCluster;
+    /**
+     * Childre of current node.
+     */
+    private final List<TreeNode> children = new ArrayList<>();
+
+    /**
+     * TreeNode constructor.
+     * @param pc payload of current TreeNode
+     */
+    public TreeNode(final ProjectCluster pc) {
+        this.projectCluster = pc;
     }
 
-
+    /**
+     * Flat representation of tree.
+     *
+     * @return key : projectCluster ID, value : path to node
+     */
     public Map<Long, String> getPaths() {
         Map<Long, String> cPath = new HashMap<>();
         if (this.projectCluster == null) {
             this.projectCluster = new ProjectCluster();
             this.projectCluster.setName("Root");
         }
-        cPath.put(this.projectCluster.getId(), this.projectCluster.getName() + " > ");
+        cPath.put(this.projectCluster.getId(),
+                this.projectCluster.getName() + " > ");
         StringBuilder buff = new StringBuilder();
         buff.append(this.projectCluster.getName());
 
@@ -68,50 +87,75 @@ public class TreeNode {
         return cPath;
     }
 
-    private void getPathRec(Map<Long, String> cPath, StringBuilder buff, TreeNode treeNode) {
+    private void getPathRec(final Map<Long, String> cPath,
+                            final StringBuilder buff,
+                            final TreeNode treeNode) {
         StringBuilder localBuffer = new StringBuilder();
         localBuffer.append(treeNode.getProjectCluster().getName());
         localBuffer.append(" > ");
-        cPath.put(treeNode.getProjectCluster().getId(), buff.toString() + localBuffer.toString());
+        cPath.put(treeNode.getProjectCluster().getId(),
+                buff.toString() + localBuffer.toString());
         if (!treeNode.getChildren().isEmpty()) {
             treeNode.getChildren().forEach(treeNode1 -> {
-                getPathRec(cPath, new StringBuilder(buff.toString() + localBuffer.toString()), treeNode1);
+                getPathRec(cPath, new StringBuilder(buff.toString()
+                        + localBuffer.toString()), treeNode1);
             });
         }
     }
 
 
-    public void insert(ProjectCluster projectCluster) {
-        if (projectCluster.getParent() == null) {
-            this.children.add(new TreeNode(projectCluster));
+    /**
+     * Insert children to current node.
+     * @param pc payload to insert as a child of current node
+     */
+    public void insert(final ProjectCluster pc) {
+        if (pc.getParent() == null) {
+            this.children.add(new TreeNode(pc));
         } else {
-            this.insertRec(this, projectCluster);
+            this.insertRec(this, pc);
         }
     }
 
-    private void insertRec(TreeNode node, ProjectCluster projectCluster) {
+    /**
+     * used to find and insert ProjectCluster at the right position in tree.
+     *
+     * @param node current node
+     * @param pc ProjectCluster to insert
+     */
+    private void insertRec(final TreeNode node, final ProjectCluster pc) {
         node.children.forEach(treeNode -> {
-            if (treeNode.getProjectCluster().getId() == projectCluster.getParent().getId()) {
-                treeNode.getChildren().add(new TreeNode(projectCluster));
+            if (treeNode.getProjectCluster().getId()
+                    == pc.getParent().getId()) {
+                treeNode.getChildren().add(new TreeNode(pc));
             } else {
-                insertRec(treeNode, projectCluster);
+                insertRec(treeNode, pc);
             }
         });
     }
 
+    /**
+     *
+     * @return node payload
+     */
     public ProjectCluster getProjectCluster() {
         return projectCluster;
     }
 
-    public void setProjectCluster(ProjectCluster projectCluster) {
-        this.projectCluster = projectCluster;
+    /**
+     * set payload.
+     * @param pc payload
+     */
+    public void setProjectCluster(final ProjectCluster pc) {
+        this.projectCluster = pc;
     }
 
+    /**
+     *
+     * @return Current node children. May be empty list.
+     */
     public List<TreeNode> getChildren() {
         return children;
     }
 
-    public void setChildren(List<TreeNode> children) {
-        this.children = children;
-    }
+
 }

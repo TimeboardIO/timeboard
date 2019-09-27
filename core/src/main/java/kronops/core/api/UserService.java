@@ -26,24 +26,63 @@ package kronops.core.api;
  * #L%
  */
 
+
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.User;
 
 import java.util.List;
 
-public interface UserService {
-    User getCurrentUser();
 
+/**
+ * Service for users and accounts management.
+ */
+public interface UserService {
+
+    /**
+     * Create new user.
+     * @param user to create
+     * @return user will with primary key
+     * @throws BusinessException user already exist
+     */
     User createUser(User user) throws BusinessException;
 
+    /**
+     * Search user where name start with prefix.
+     * @param prefix prefix used to search user
+     * @return list of users
+     */
     List<User> searchUserByName(String prefix);
 
-    List<User> searchUserByName(String query, Long projectID);
+    /**
+     * Search user where name start with prefix, limit to project with
+     * primary Key projectID.
+     * @param prefix prefix used to search user
+     * @param projectID project primary key
+     * @return list of users
+     */
+    List<User> searchUserByName(String prefix, Long projectID);
 
+    /**
+     * Method used to check if a user with username exist and if password match.
+     * @param username username to check
+     * @param password password to chekc
+     * @return user if username and password match with database entry,
+     * else return null.
+     */
     User autenticateUser(String username, String password);
 
-    User findUserByLogin(String username);
+    /**
+     * Find user by login field.
+     * @param login login value
+     * @return user instance or null if not exist
+     */
+    User findUserByLogin(String login);
 
-    User findUserByID(Long aLong);
+    /**
+     * Find user by primary key.
+     * @param userID user primary key
+     * @return user instance or null if not exist
+     */
+    User findUserByID(Long userID);
 
 }

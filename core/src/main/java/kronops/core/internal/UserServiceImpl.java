@@ -43,21 +43,19 @@ import java.util.stream.Collectors;
         service = UserService.class,
         immediate = true
 )
-public class UserServiceImpl implements UserService {
+public final class UserServiceImpl implements UserService {
 
-    @Reference(target = "(osgi.unit.name=kronops-pu)", scope = ReferenceScope.BUNDLE)
+    /**
+     * Injected instance of kronops persistence unit.
+     */
+    @Reference(
+            target = "(osgi.unit.name=kronops-pu)",
+            scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
 
-    @Override
-    public User getCurrentUser() {
-        User u = new User();
-        u.setName("Hello");
-        u.setFirstName("World");
-        return u;
-    }
 
     @Override
-    public User createUser(User user) throws BusinessException {
+    public User createUser(final User user) throws BusinessException {
         return this.jpa.txExpr(entityManager -> {
             entityManager.persist(user);
             return user;
@@ -65,29 +63,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchUserByName(String prefix) {
+    public List<User> searchUserByName(final String prefix) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager.createQuery("select u from User u where u.name LIKE CONCAT('%',:prefix,'%')", User.class);
+            TypedQuery<User> q = entityManager
+                    .createQuery(
+                            "select u from User u "
+                            + "where u.name LIKE CONCAT('%',:prefix,'%')",
+                            User.class);
             q.setParameter("prefix", prefix);
             return q.getResultList();
         });
     }
 
     @Override
-    public List<User> searchUserByName(String prefix, Long projectID) {
+    public List<User> searchUserByName(final String prefix, final Long pID) {
         return this.jpa.txExpr(entityManager -> {
-            Project project = entityManager.find(Project.class, projectID);
+            Project project = entityManager.find(Project.class, pID);
             List<User> matchedUser = project.getMembers().stream()
-                    .filter(projectMembership -> projectMembership.getMember().getName().startsWith(prefix))
-                    .map(projectMembership -> projectMembership.getMember()).collect(Collectors.toList());
+                    .filter(projectMembership -> projectMembership
+                            .getMember()
+                            .getName().startsWith(prefix))
+                    .map(projectMembership -> projectMembership.getMember())
+                    .collect(Collectors.toList());
             return matchedUser;
         });
     }
 
     @Override
-    public User autenticateUser(String login, String password) {
+    public User autenticateUser(final String login, final String password) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager.createQuery("select u from User u where u.login = :login and u.password = :password", User.class);
+            TypedQuery<User> q = entityManager
+                    .createQuery("select u from User u "
+                            + "where u.login = :login "
+                            + "and u.password = :password", User.class);
             q.setParameter("login", login);
             q.setParameter("password", password);
             return q.getSingleResult();
@@ -95,16 +103,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserByLogin(String login) {
+    public User findUserByLogin(final String login) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager.createQuery("select u from User u where u.login = :login", User.class);
+            TypedQuery<User> q = entityManager
+                    .createQuery("select u from User u "
+                            + "where u.login = :login", User.class);
             q.setParameter("login", login);
             return q.getSingleResult();
         });
     }
 
     @Override
-    public User findUserByID(Long aLong) {
-        return jpa.txExpr(entityManager -> entityManager.find(User.class, aLong));
+    public User findUserByID(final Long userID) {
+        return jpa.txExpr(entityManager -> entityManager
+                .find(User.class, userID));
     }
 }
