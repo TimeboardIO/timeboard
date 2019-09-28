@@ -57,7 +57,7 @@ public class Task implements Serializable {
     private double estimateWork;
 
     @Column(nullable = true)
-    private double remainsToBeDone = 0;
+    private Double remainsToBeDone;
 
     @OneToOne
     private User assigned;
@@ -68,6 +68,10 @@ public class Task implements Serializable {
     @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
     private Set<Imputation> imputations;
 
+    /**
+     * OE.
+     * @return OE
+     */
     public double getEstimateWork() {
         return estimateWork;
     }
@@ -140,12 +144,17 @@ public class Task implements Serializable {
         this.assigned = assigned;
     }
 
+
+    /**
+     * EL.
+     * @return EL
+     */
     public double getRemainsToBeDone() {
-        return remainsToBeDone;
+        return this.remainsToBeDone;
     }
 
-    public void setRemainsToBeDone(double remainsToBeDone) {
-        this.remainsToBeDone = remainsToBeDone;
+    public void setRemainsToBeDone(double rtbd) {
+        this.remainsToBeDone = rtbd;
     }
 
     @Transient
@@ -153,11 +162,20 @@ public class Task implements Serializable {
         return (date.before(this.endDate) || date.equals(this.endDate)) && (date.after(this.startDate) || date.equals(this.startDate));
     }
 
+
+    /**
+     * RE.
+     * @return RE
+     */
     @Transient
     public double getReEstimateWork(){
         return this.getEffortSpent() + this.getRemainsToBeDone();
     }
 
+    /**
+     * ES.
+     * @return ES
+     */
     @Transient
     public double getEffortSpent() {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();

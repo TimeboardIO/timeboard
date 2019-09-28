@@ -80,6 +80,9 @@
         primary key (id)
     ) engine=InnoDB;
 
+    alter table Imputation 
+       add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
+
     alter table Project 
        add constraint UK_iflk2yk9ma95q0q9ovhftpi63 unique (name);
 

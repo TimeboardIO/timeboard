@@ -26,10 +26,7 @@ package kronops.core.internal;
  * #L%
  */
 
-import kronops.core.api.ProjectService;
-import kronops.core.api.ProjectTasks;
-import kronops.core.api.TreeNode;
-import kronops.core.api.UserService;
+import kronops.core.api.*;
 import kronops.core.api.exceptions.BusinessException;
 import kronops.core.internal.rules.ActorIsProjectMember;
 import kronops.core.internal.rules.Rule;
@@ -263,8 +260,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void updateTaskImputation(Long taskID, Date day, double val) {
-        this.jpa.tx(entityManager -> {
+    public UpdatedTaskResult updateTaskImputation(Long taskID, Date day, double val) {
+        return this.jpa.txExpr(entityManager -> {
 
             Calendar c = Calendar.getInstance();
             c.setTime(day);
@@ -276,18 +273,26 @@ public class ProjectServiceImpl implements ProjectService {
             q.setParameter("taskID", taskID);
             q.setParameter("day", c.getTime());
 
-            List<Imputation> res = q.getResultList();
-            if (res.isEmpty() && val > 0.0 && val <= 1.0) {
+            List<Imputation> existingImputations = q.getResultList();
+            if (existingImputations.isEmpty() && val > 0.0 && val <= 1.0) {
                 //No imputation for current task and day
                 Imputation i = new Imputation();
                 i.setDay(c.getTime());
                 i.setTask(task);
                 i.setValue(val);
+                task.setRemainsToBeDone(task.getRemainsToBeDone() - val);
                 entityManager.persist(i);
             }
 
-            if (!res.isEmpty()) {
-                Imputation i = res.get(0);
+            if (!existingImputations.isEmpty()) {
+                Imputation i = existingImputations.get(0);
+
+                if (i.getValue() < val) {
+                    task.setRemainsToBeDone(task.getRemainsToBeDone() - Math.abs(val - i.getValue()));
+                }
+                if (i.getValue() > val) {
+                    task.setRemainsToBeDone(task.getRemainsToBeDone() + Math.abs(i.getValue() - val));
+                }
                 if (val == 0) {
                     entityManager.remove(i);
                 } else {
@@ -296,8 +301,21 @@ public class ProjectServiceImpl implements ProjectService {
             }
 
             entityManager.flush();
+
+            return new UpdatedTaskResult(task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
     }
+
+    @Override
+    public UpdatedTaskResult updateTaskRTBD(Long taskID, double rtbd) {
+        return this.jpa.txExpr(entityManager -> {
+            Task task = entityManager.find(Task.class, taskID);
+            task.setRemainsToBeDone(rtbd);
+            entityManager.flush();
+            return new UpdatedTaskResult(task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
+        });
+    }
+
 
     @Override
     public List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de) {
@@ -307,7 +325,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
             TypedQuery<Task> q = entityManager
-                    .createQuery("select t from Task t left join fetch t.imputations where " +
+                    .createQuery("select distinct t from Task t left join fetch t.imputations where " +
                                     "t.endDate >= :ds " +
                                     "and t.startDate <= :de " +
                                     "and t.assigned = :actor " +

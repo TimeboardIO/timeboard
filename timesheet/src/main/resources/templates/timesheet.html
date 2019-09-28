@@ -13,8 +13,12 @@
         const updateBadge = function(date){
             const reducer = (accumulator, currentValue) => accumulator + currentValue;
             var data = $('[data-day="'+date+'"]').map(function(){return parseFloat($(this).val())}).get();
-            var sum = data.reduce(reducer);
 
+            var sum = 0;
+
+            if(data.length > 0){
+                sum = data.reduce(reducer);
+            }
 
             if(sum === 1.00){
                 $('[day-badge="'+date+'"]').addClass('green');
@@ -31,14 +35,22 @@
             $('[day-badge="'+date+'"]').text(sum.toFixed(2));
         }
 
-        const update = function(date, task, val){
+        const update = function(date, task, type, val){
+
+            $(".ui.dimmer").addClass("active");
 
             $.post("/timesheet", {
+                'type':type,
                 'day':date,
                 'task':task,
                 'imputation':val
-            }).then(function(){
+            }).then(function(updateTask){
+                $('[data-task-rew='+updateTask.taskID+']').text(updateTask.reEstimateWork);
+                $('[data-task-es='+updateTask.taskID+']').text(updateTask.effortSpent);
+                $('[data-task-ew='+updateTask.taskID+']').text(updateTask.estimateWork);
+                $('[data-task-rtbd='+updateTask.taskID+']').val(parseFloat(updateTask.remainToBeDone.replace(',','.')));
                 updateBadge(date);
+                $(".ui.dimmer").removeClass("active");
             });
         }
 
@@ -56,6 +68,10 @@
             <i class="right arrow icon"></i>Next week</a>
     </div>
 
+    <div class="ui inverted dimmer">
+        <div class="ui loader"></div>
+    </div>
+
     <form class="ui form" enctype="application/x-www-form-urlencoded" method="post">
 
         <table class="ui celled table" style="text-align:center">
@@ -69,10 +85,10 @@
                          th:day-badge="${#dates.format(dw.date, 'yyyy-MM-dd')}">-
                     </div>
                 </th>
-                <th class="wide one">ES</th>
-                <th class="wide one">EL</th>
-                <th class="wide one">RE</th>
-                <th class="wide one">OE</th>
+                <th class="wide one">Effort spent</th>
+                <th class="wide one">Remain To Be Done</th>
+                <th class="wide one">Original estimate</th>
+                <th class="wide one">Restimate</th>
             </tr>
             </thead>
             <tbody>
@@ -85,17 +101,30 @@
                     <td th:each="dw: ${dateWrappers}">
                         <input
                                 max="1"
-                                min="0" step="0.1" th:data-day="${#dates.format(dw.date, 'yyyy-MM-dd')}"
+                                min="0"
+                                step="0.1"
+                                th:data-day="${#dates.format(dw.date, 'yyyy-MM-dd')}"
                                 th:data-task="${task.id}"
                                 th:if="${task.isOpen(dw.date)}"
                                 th:name="'task['+${task.id}+']day['+${#dates.format(dw.date, 'dd/MM/yyyy')}+']'"
                                 th:value="${task.findTaskImputationValueByDate(dw.date)}"
                                 type="number"/>
                     </td>
-                    <td th:text="${#numbers.formatDecimal(task.getEffortSpent(),0, 'COMMA', 2, 'POINT')}"></td>
-                    <td><input type="number" value="0"/></td>
-                    <td><input type="number" value="0"/></td>
-                    <td th:text="${task.estimateWork}"></td>
+                    <td th:data-task-es="${task.id}" th:text="${#numbers.formatDecimal(task.getEffortSpent(), 1, 'COMMA', 2, 'POINT')}"></td>
+                    <td><input
+                            min="0"
+                            step="0.1"
+                            name="remainsToBeDone"
+                            th:value="${task.getRemainsToBeDone()}"
+                            th:data-task-rtbd="${task.id}"
+                            type="number"
+                    /></td>
+                    <td th:data-task-ew="${task.id}" th:text="${task.estimateWork}"></td>
+                    <td
+                            th:data-task-rew="${task.id}"
+                            th:text="${#numbers.formatDecimal(task.getReEstimateWork(), 1, 'COMMA', 2, 'POINT')}"
+                            th:classappend="${task.getReEstimateWork() > task.estimateWork}   ? 'negative':''"
+                    ></td>
                 </tr>
             </th:block>
             </tbody>
@@ -103,19 +132,20 @@
 
         <div class="timesheet-validation-controls">
             <input class="ui  positive basic  button" th:href="@{/timesheet(week=${week-1}, year=${year})}"
-                   type="submit" value="Save My Week">
+                   type="submit" value="Validate My Week">
         </div>
 
     </form>
 
     <script>
 
-
             $("input[data-task]").on('input',function(){
-                update($(this).attr('data-day'), $(this).attr('data-task'), $(this).val());
+                update($(this).attr('data-day'), $(this).attr('data-task'), 'imputation',$(this).val());
             });
 
-
+            $("input[data-task-rtbd]").on('input',function(){
+                update(null, $(this).attr('data-task-rtbd'), 'rtbd', $(this).val());
+            });
 
     </script>
 
@@ -123,7 +153,6 @@
     <th:block th:each="dw : ${dateWrappers}">
         <script>
             updateBadge('[(${#dates.format(dw.date, 'yyyy-MM-dd')})]');
-
         </script>
     </th:block>
 

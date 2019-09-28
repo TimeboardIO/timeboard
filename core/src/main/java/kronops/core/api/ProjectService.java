@@ -95,5 +95,7 @@ public interface ProjectService {
 
     List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
 
-    void updateTaskImputation(Long taskID, Date day, double imputation);
+    UpdatedTaskResult updateTaskImputation(Long taskID, Date day, double imputation);
+
+    UpdatedTaskResult updateTaskRTBD(Long taskID, double rtbd);
 }

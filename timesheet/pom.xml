@@ -85,6 +85,7 @@
                             kronops.core.ui,
                             kronops.core.api,
                             kronops.security,
+                            com.fasterxml.*,
                             org.xml.sax
                         </Import-Package>
                         <Export-Package>

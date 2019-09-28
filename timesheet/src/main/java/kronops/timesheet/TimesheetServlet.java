@@ -26,8 +26,11 @@ package kronops.timesheet;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kronops.core.api.ProjectService;
 import kronops.core.api.ProjectTasks;
+import kronops.core.api.UpdatedTaskResult;
+import kronops.core.model.Task;
 import kronops.core.model.User;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
@@ -55,6 +58,7 @@ import java.util.*;
 public class TimesheetServlet extends KronopsServlet {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
     private ProjectService projectService;
@@ -126,15 +130,33 @@ public class TimesheetServlet extends KronopsServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         try {
+            String type = request.getParameter("type");
             Long taskID = Long.parseLong(request.getParameter("task"));
-            Date day = DATE_FORMAT.parse(request.getParameter("day"));
-            double imputation = Double.parseDouble(request.getParameter("imputation"));
 
-            this.projectService.updateTaskImputation(taskID, day, imputation);
+            UpdatedTaskResult updatedTask = null;
+
+            if(type.equals("imputation")) {
+                Date day = DATE_FORMAT.parse(request.getParameter("day"));
+                double imputation = Double.parseDouble(request.getParameter("imputation"));
+                updatedTask = this.projectService.updateTaskImputation(taskID, day, imputation);
+            }
+
+            if(type.equals("rtbd")) {
+                double rtbd = Double.parseDouble(request.getParameter("imputation"));
+                updatedTask = this.projectService.updateTaskRTBD(taskID, rtbd);
+            }
+
+
+            response.setContentType("application/json");
+            MAPPER.writeValue(response.getWriter(), updatedTask);
+
         } catch (Exception e) {
             response.setStatus(500);
         }
+
+
     }
+
 
     private class DateWrapper {
 

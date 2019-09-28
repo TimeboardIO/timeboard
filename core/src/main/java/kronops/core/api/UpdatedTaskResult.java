@@ -1,4 +1,4 @@
-package kronops.core.model;
+package kronops.core.api;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package kronops.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,59 +26,41 @@ package kronops.core.model;
  * #L%
  */
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
+import java.text.DecimalFormat;
 
-@Entity
-@Table(
-        uniqueConstraints={@UniqueConstraint(columnNames={"day", "task_id"})}
-)
-public class Imputation implements Serializable {
+public class UpdatedTaskResult {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private final long taskID;
+    private final double effortSpent;
+    private final double remainToBeDone;
+    private final double estimateWork;
+    private final double reEstimateWork;
 
-    @Column
-    private Double value;
-
-    @Column
-    @Temporal(TemporalType.DATE)
-    private Date day;
-
-    @ManyToOne(targetEntity = Task.class)
-    private Task task;
-
-    public long getId() {
-        return id;
+    public UpdatedTaskResult(long taskID, double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork) {
+        this.taskID = taskID;
+        this.effortSpent = effortSpent;
+        this.remainToBeDone = remainToBeDone;
+        this.estimateWork = estimateWork;
+        this.reEstimateWork = reEstimateWork;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public long getTaskID() {
+        return taskID;
     }
 
-    public Double getValue() {
-        return value;
+    public String getEffortSpent() {
+        return  new DecimalFormat("#.##").format(this.effortSpent);
     }
 
-    public void setValue(Double value) {
-        this.value = value;
+    public String getRemainToBeDone() {
+        return  new DecimalFormat("#.##").format(this.remainToBeDone);
     }
 
-    public Date getDay() {
-        return day;
+    public String getEstimateWork() {
+        return  new DecimalFormat("#.##").format(this.estimateWork);
     }
 
-    public void setDay(Date day) {
-        this.day = day;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
+    public String getReEstimateWork() {
+        return  new DecimalFormat("#.##").format(this.reEstimateWork);
     }
 }
