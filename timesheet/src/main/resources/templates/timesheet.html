@@ -48,7 +48,7 @@
                             <div class="grey header">{{new Date(day.date).toLocaleDateString()}}</div>
                             <div class="ui circular label large" style="margin-top: 5px;"
                                  v-bind:day-badge="day.date">
-                                -
+                                {{ getImputationSum(day.date).toFixed(1) }}
                             </div>
                         </th>
                         <th class="wide one">Effort spent</th>

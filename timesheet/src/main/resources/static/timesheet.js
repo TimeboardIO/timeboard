@@ -1,29 +1,3 @@
-const updateBadge = function(date){
-    const reducer = (accumulator, currentValue) => accumulator + currentValue;
-    var data = $('[data-date="'+date+'"]').map(function(){return parseFloat($(this).val())}).get();
-
-
-    var sum = 0;
-
-    if(data.length > 0){
-        sum = data.reduce(reducer);
-    }
-
-    if(sum === 1.00){
-        $('[day-badge="'+date+'"]').addClass('green');
-    }else{
-        $('[day-badge="'+date+'"]').removeClass('green');
-    }
-
-    if(sum === 0.00){
-        $('[day-badge="'+date+'"]').addClass('red');
-    }else{
-        $('[day-badge="'+date+'"]').removeClass('red');
-    }
-
-    $('[day-badge="'+date+'"]').text(sum.toFixed(2));
-}
-
 /**
 * type = imputation | rtbd
 */
@@ -31,20 +5,14 @@ const updateTask = function(date, task, type, val){
 
     $(".ui.dimmer").addClass("active");
 
-    $.post("/timesheet", {
+    return $.post("/timesheet", {
         'type':type,
         'day':date,
         'task':task,
         'imputation':val
-    }).then(function(updateTask){
-        $('[data-task-rew='+updateTask.taskID+']').text(updateTask.reEstimateWork);
-        $('[data-task-es='+updateTask.taskID+']').text(updateTask.effortSpent);
-        $('[data-task-ew='+updateTask.taskID+']').text(updateTask.estimateWork);
-        $('[data-task-rtbd='+updateTask.taskID+']').val(parseFloat(updateTask.remainToBeDone.replace(',','.')));
-        updateBadge(date);
-        $(".ui.dimmer").removeClass("active");
     });
 }
+
 
 
 const timesheetModel = {
@@ -54,6 +22,14 @@ const timesheetModel = {
     days:[],
     projects: {},
     imputations: {},
+    getImputationSum: function(date){
+        var sum = 0;
+        Object.keys(this.imputations[date])
+        .forEach(function(i){
+            sum += this.imputations[date][i];
+        }.bind(this));
+        return sum;
+    },
     getImputation: function(date, taskID){
         return this.imputations[date][taskID];
     }
@@ -73,17 +49,43 @@ $(document).ready(function(){
         triggerUpdateRTBD: function(event){
             const taskID = $(event.target).attr('data-task-rtbd');
             const val = $(event.target).val();
-            updateTask(null, taskID, 'rtbd', val);
+            updateTask(null, taskID, 'rtbd', val)
+            .then(function(updateTask){
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].reEstimateWork = updateTask.reEstimateWork;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].estimateWork = updateTask.estimateWork;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].remainToBeDone = updateTask.remainToBeDone;
+                    $(".ui.dimmer").removeClass("active");
+                });
         },
         triggerUpdateTask: function (event) {
             const date = $(event.target).attr('data-date');
             const taskID = $(event.target).attr('data-task');
-            var val = $(event.target).val();
-            if(val > 1){
-                val = 1;
-                $(event.target).val(val);
+
+            const currentSum = app.getImputationSum(date);
+            var newval = parseFloat($(event.target).val());
+            var oldVal = app.imputations[date][taskID];
+
+            if(newval > 1){
+                newval = 1;
             }
-            updateTask(date, taskID, 'imputation', val);
+            if(newval < 0){
+                newval = 0;
+            }
+            if(currentSum + (newval - oldVal) <= 1.0){
+                $(event.target).val(newval);
+                updateTask(date, taskID, 'imputation', newval)
+                .then(function(updateTask){
+                        app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
+                        app.projects[updateTask.projectID].tasks[updateTask.taskID].reEstimateWork = updateTask.reEstimateWork;
+                        app.projects[updateTask.projectID].tasks[updateTask.taskID].estimateWork = updateTask.estimateWork;
+                        app.projects[updateTask.projectID].tasks[updateTask.taskID].remainToBeDone = updateTask.remainToBeDone;
+                        app.imputations[date][taskID] = newval;
+                        $(".ui.dimmer").removeClass("active");
+                    });
+            }else{
+                $(event.target).val(oldVal);
+            }
         }
       }
     })
@@ -97,7 +99,8 @@ $(document).ready(function(){
         app.days = data.days;
         app.imputations = data.imputations;
         app.projects = data.projects;
-    }).then(function(){
+    })
+    .then(function(){
         $('.ui.dimmer').removeClass('active');
     });
 });

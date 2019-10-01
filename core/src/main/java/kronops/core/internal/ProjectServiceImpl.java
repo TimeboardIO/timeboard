@@ -303,7 +303,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             entityManager.flush();
 
-            return new UpdatedTaskResult(task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
+            return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
     }
 
@@ -313,7 +313,7 @@ public class ProjectServiceImpl implements ProjectService {
             Task task = entityManager.find(Task.class, taskID);
             task.setRemainsToBeDone(rtbd);
             entityManager.flush();
-            return new UpdatedTaskResult(task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
+            return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
     }
 
