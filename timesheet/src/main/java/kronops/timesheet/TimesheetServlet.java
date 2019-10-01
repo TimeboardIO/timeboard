@@ -29,6 +29,7 @@ package kronops.timesheet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kronops.core.api.ProjectService;
 import kronops.core.api.ProjectTasks;
+import kronops.core.api.TimesheetService;
 import kronops.core.api.UpdatedTaskResult;
 import kronops.core.model.Task;
 import kronops.core.model.User;
@@ -63,6 +64,8 @@ public class TimesheetServlet extends KronopsServlet {
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
     private ProjectService projectService;
 
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    private TimesheetService timesheetService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -98,30 +101,9 @@ public class TimesheetServlet extends KronopsServlet {
         final Date ds = findStartDate(c, week, year);
         final Date de = findEndDate(c, week, year);
 
-        //Get tasks for current week
-        if (this.projectService != null) {
-            User actor = SecurityContext.getCurrentUser(request);
-            tasksByProject.addAll(this.projectService.listTasksByProject(actor, ds, de));
-            tasksByProject.sort((o1, o2) -> {
-                return o1.getProject().getName().compareTo(o2.getProject().getName());
-            });
-        }
-
-        final List<DateWrapper> days = new ArrayList<>();
-
-        c.setTime(ds); //reset calendar to start date
-        for (int i = 0; i < 7; i++) {
-            DateWrapper dw = new DateWrapper();
-            dw.setDay(c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH));
-            dw.setDate(c.getTime());
-            days.add(dw);
-            c.add(Calendar.DAY_OF_YEAR, 1);
-        }
-
-        viewModel.getViewDatas().put("dateWrappers", days);
         viewModel.getViewDatas().put("week", week);
         viewModel.getViewDatas().put("year", year);
-        viewModel.getViewDatas().put("projectTasks", tasksByProject);
+
         viewModel.setTemplate("timesheet.html");
     }
 

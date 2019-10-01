@@ -12,10 +12,10 @@ package kronops.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,27 +26,27 @@ package kronops.core.api;
  * #L%
  */
 
-import kronops.core.model.Project;
-import kronops.core.model.Task;
+import kronops.core.model.User;
 
-import java.util.List;
-import java.util.stream.Collectors;
+public interface TimesheetService {
 
-public class ProjectTasks {
+    /**
+     * Validate user timesheet.
+     *
+     * @param actorID user PK who trigger this function.
+     * @param userTimesheetID user PK which be used to build timehseet to validate
+     * @param year timesheet year
+     * @param week timesheet week
+     * @return true if timesheet is validate else, false.
+     */
+    boolean validateTimesheet(long actorID, long userTimesheetID, int year, int week);
 
-    private final Project project;
-    private final List<Task> tasks;
-
-    public ProjectTasks(Project project, List<Task> tasks) {
-        this.project = project;
-        this.tasks = tasks;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
+    /**
+     *
+     * @param userTimesheet user used to check timesheet validation state.
+     * @param week timesheet week
+     * @param year timesheet year
+     * @return true if timesheet is already validated
+     */
+    boolean isTimesheetValidated(User userTimesheet, int year, int week);
 }

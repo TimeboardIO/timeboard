@@ -1,4 +1,4 @@
-package kronops.core.api;
+package kronops.core.model;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package kronops.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,27 +26,64 @@ package kronops.core.api;
  * #L%
  */
 
-import kronops.core.model.Project;
-import kronops.core.model.Task;
+import javax.persistence.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
+@Entity
+public class ValidatedTimesheet {
 
-public class ProjectTasks {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-    private final Project project;
-    private final List<Task> tasks;
+    @OneToOne(targetEntity = User.class)
+    private User validatedBy;
 
-    public ProjectTasks(Project project, List<Task> tasks) {
-        this.project = project;
-        this.tasks = tasks;
+    @OneToOne(targetEntity = User.class)
+    private User user;
+
+    @Column
+    private int year;
+
+    @Column
+    private int week;
+
+    public long getId() {
+        return id;
     }
 
-    public Project getProject() {
-        return project;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public List<Task> getTasks() {
-        return tasks;
+    public User getValidatedBy() {
+        return validatedBy;
+    }
+
+    public void setValidatedBy(User validatedBy) {
+        this.validatedBy = validatedBy;
+    }
+
+    public long getYear() {
+        return year;
+    }
+
+    public void setYear(int y) {
+        this.year = y;
+    }
+
+    public long getWeek() {
+        return week;
+    }
+
+    public void setWeek(int w) {
+        this.week = w;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

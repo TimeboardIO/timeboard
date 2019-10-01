@@ -235,6 +235,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Task createTask(Project project, Task task) {
         return this.jpa.txExpr(entityManager -> {
+            task.setRemainsToBeDone(task.getEstimateWork());
             entityManager.persist(task);
             entityManager.merge(project);
             task.setProject(project);

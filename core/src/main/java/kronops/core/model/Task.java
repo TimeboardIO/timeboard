@@ -56,7 +56,7 @@ public class Task implements Serializable {
     @Column(nullable = false)
     private double estimateWork;
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private Double remainsToBeDone;
 
     @OneToOne

@@ -15,6 +15,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         day date,
@@ -58,7 +60,7 @@
         endDate date,
         estimateWork double precision not null,
         name varchar(50) not null,
-        remainsToBeDone double precision,
+        remainsToBeDone double precision not null,
         startDate date,
         assigned_id bigint,
         project_id bigint,
@@ -77,6 +79,15 @@
         name varchar(255) not null,
         password varchar(255) not null,
         validateOwnImputation bit not null,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table ValidatedTimesheet (
+       id bigint not null,
+        week integer,
+        year integer,
+        user_id bigint,
+        validatedBy_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -134,3 +145,13 @@
        add constraint FKkkcat6aybe3nbvhc54unstxm6 
        foreign key (project_id) 
        references Project (id);
+
+    alter table ValidatedTimesheet 
+       add constraint FKf4lmab2846nt5smlforv45yj3 
+       foreign key (user_id) 
+       references User (id);
+
+    alter table ValidatedTimesheet 
+       add constraint FK7ffrinnv0q59rfi7a1dkjvh26 
+       foreign key (validatedBy_id) 
+       references User (id);

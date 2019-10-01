@@ -1,8 +1,8 @@
-package kronops.core.api;
+package kronops.timesheet;
 
 /*-
  * #%L
- * core
+ * webui
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -26,27 +26,19 @@ package kronops.core.api;
  * #L%
  */
 
-import kronops.core.model.Project;
-import kronops.core.model.Task;
+import org.osgi.service.component.annotations.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
 
-public class ProjectTasks {
 
-    private final Project project;
-    private final List<Task> tasks;
+@Component(
+        service = Servlet.class,
+        property = {
+                "osgi.http.whiteboard.resource.pattern=/timesheet/static/*",
+                "osgi.http.whiteboard.resource.prefix=/static"}
+)
+public class StaticRessourcesServlet extends HttpServlet {
 
-    public ProjectTasks(Project project, List<Task> tasks) {
-        this.project = project;
-        this.tasks = tasks;
-    }
 
-    public Project getProject() {
-        return project;
-    }
-
-    public List<Task> getTasks() {
-        return tasks;
-    }
 }

@@ -41,7 +41,9 @@
 
     <div th:if="${!projects.isEmpty()}">
 
-        <a class="ui button basic positive" th:href="@{/projects/create}">Create Project</a>
+        <div class="ui segment">
+            <a class="ui button basic positive" th:href="@{/projects/create}">Create Project</a>
+        </div>
 
         <div class="ui grid segment">
             <div class="four wide column" th:each="project : ${projects}">
