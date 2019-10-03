@@ -33,7 +33,9 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Component(
         service = UserLoader.class,
@@ -47,7 +49,8 @@ public class UserLoader {
 
     @Activate
     public void load() throws BusinessException {
-        for (int i = 0; i < 20; i++) {
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
             User u = new User();
             u.setName("kronops" + i);
             u.setPassword("kronops" + i);
@@ -57,11 +60,15 @@ public class UserLoader {
             u.setFirstName("User" + i);
             u.setLogin("kronops" + i);
             u.setAccountCreationTime(new Date());
-            try {
-                this.userService.createUser(u);
-            } catch (BusinessException e) {
-                e.printStackTrace();
-            }
+            users.add(u);
+            System.out.println("Stage user : "+u.getName());
+        }
+
+        try {
+            this.userService.createUsers(users);
+            System.out.println("Save "+users.size()+" users");
+        } catch (BusinessException e) {
+            e.printStackTrace();
         }
 
     }

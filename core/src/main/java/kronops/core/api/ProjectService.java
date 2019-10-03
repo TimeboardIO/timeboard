@@ -54,7 +54,7 @@ public interface ProjectService {
      */
     Project createProject(User owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(User user);
+    List<Project> listProjects(User owner);
 
     Project getProjectByID(User owner, Long projectID);
 
