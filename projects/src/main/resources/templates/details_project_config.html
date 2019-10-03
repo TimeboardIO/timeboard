@@ -85,8 +85,13 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
 
+                <h4 class="ui dividing header">Exports</h4>
+                <div>
+                    <a target="_blank" class="ui orange basic button" th:each="export: ${exports}" th:href="@{/projects/export(projectID=${project.id}, type=${export.getMimeType()})}" th:text="${export.getName()}" ></a>
+                </div>
+
+            </div>
 
         </div>
 

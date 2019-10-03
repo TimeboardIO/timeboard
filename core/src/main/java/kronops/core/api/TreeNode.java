@@ -39,17 +39,17 @@ import java.util.Map;
 public final class TreeNode {
 
     /**
+     * Childre of current node.
+     */
+    private final List<TreeNode> children = new ArrayList<>();
+    /**
      * Node payload : current project cluster.
      */
     private ProjectCluster projectCluster;
 
     /**
-     * Childre of current node.
-     */
-    private final List<TreeNode> children = new ArrayList<>();
-
-    /**
      * TreeNode constructor.
+     *
      * @param pc payload of current TreeNode
      */
     public TreeNode(final ProjectCluster pc) {
@@ -106,6 +106,7 @@ public final class TreeNode {
 
     /**
      * Insert children to current node.
+     *
      * @param pc payload to insert as a child of current node
      */
     public void insert(final ProjectCluster pc) {
@@ -120,7 +121,7 @@ public final class TreeNode {
      * used to find and insert ProjectCluster at the right position in tree.
      *
      * @param node current node
-     * @param pc ProjectCluster to insert
+     * @param pc   ProjectCluster to insert
      */
     private void insertRec(final TreeNode node, final ProjectCluster pc) {
         node.children.forEach(treeNode -> {
@@ -134,7 +135,6 @@ public final class TreeNode {
     }
 
     /**
-     *
      * @return node payload
      */
     public ProjectCluster getProjectCluster() {
@@ -143,6 +143,7 @@ public final class TreeNode {
 
     /**
      * set payload.
+     *
      * @param pc payload
      */
     public void setProjectCluster(final ProjectCluster pc) {
@@ -150,7 +151,6 @@ public final class TreeNode {
     }
 
     /**
-     *
      * @return Current node children. May be empty list.
      */
     public List<TreeNode> getChildren() {

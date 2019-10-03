@@ -40,6 +40,7 @@ public interface UserService {
 
     /**
      * Create new user.
+     *
      * @param user to create
      * @return user will with primary key
      * @throws BusinessException user already exist
@@ -47,7 +48,17 @@ public interface UserService {
     User createUser(User user) throws BusinessException;
 
     /**
+     * Same as createUser but for a batch of users.
+     *
+     * @param users user list to create
+     * @return user will with primary key
+     * @throws BusinessException user already exist
+     */
+    List<User> createUsers(List<User> users) throws BusinessException;
+
+    /**
      * Search user where name start with prefix.
+     *
      * @param prefix prefix used to search user
      * @return list of users
      */
@@ -56,7 +67,8 @@ public interface UserService {
     /**
      * Search user where name start with prefix, limit to project with
      * primary Key projectID.
-     * @param prefix prefix used to search user
+     *
+     * @param prefix    prefix used to search user
      * @param projectID project primary key
      * @return list of users
      */
@@ -64,6 +76,7 @@ public interface UserService {
 
     /**
      * Method used to check if a user with username exist and if password match.
+     *
      * @param username username to check
      * @param password password to chekc
      * @return user if username and password match with database entry,
@@ -73,6 +86,7 @@ public interface UserService {
 
     /**
      * Find user by login field.
+     *
      * @param login login value
      * @return user instance or null if not exist
      */
@@ -80,9 +94,11 @@ public interface UserService {
 
     /**
      * Find user by primary key.
+     *
      * @param userID user primary key
      * @return user instance or null if not exist
      */
     User findUserByID(Long userID);
+
 
 }

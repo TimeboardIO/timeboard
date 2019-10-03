@@ -30,6 +30,7 @@ import kronops.core.api.ProjectService;
 import kronops.core.model.Project;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
+import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -62,7 +63,7 @@ public class ProjectTaskListServlet extends KronopsServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(id);
+        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
 
         viewModel.setTemplate("details_project_tasks.html");
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
@@ -73,7 +74,7 @@ public class ProjectTaskListServlet extends KronopsServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(id);
+        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
 
         viewModel.setTemplate("details_project_tasks.html");
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));

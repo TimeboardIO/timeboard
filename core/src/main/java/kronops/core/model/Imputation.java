@@ -32,7 +32,7 @@ import java.util.Date;
 
 @Entity
 @Table(
-        uniqueConstraints={@UniqueConstraint(columnNames={"day", "task_id"})}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
 )
 public class Imputation implements Serializable {
 

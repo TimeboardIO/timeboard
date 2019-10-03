@@ -32,6 +32,8 @@
         <module>features</module>
         <module>sample-data</module>
         <module>shell</module>
+        <module>plugins/project-xls-export-plugin</module>
+        <module>plugins/project-msp-export-plugin</module>
     </modules>
 
     <dependencyManagement>

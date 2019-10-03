@@ -28,24 +28,20 @@ package kronops.core.api;
 
 import kronops.core.model.User;
 
-public interface TimesheetService {
+import java.io.IOException;
+import java.io.OutputStream;
 
-    /**
-     * Validate user timesheet.
-     *
-     * @param actorID         user PK who trigger this function.
-     * @param userTimesheetID user PK which be used to build timehseet to validate
-     * @param year            timesheet year
-     * @param week            timesheet week
-     * @return true if timesheet is validate else, false.
-     */
-    boolean validateTimesheet(long actorID, long userTimesheetID, int year, int week);
+public interface ProjectExportService {
 
-    /**
-     * @param userTimesheet user used to check timesheet validation state.
-     * @param week          timesheet week
-     * @param year          timesheet year
-     * @return true if timesheet is already validated
-     */
-    boolean isTimesheetValidated(User userTimesheet, int year, int week);
+    default boolean isCandidate(String mimetype) {
+        return mimetype.equals(this.getMimeType());
+    }
+
+    String getMimeType();
+
+    String getName();
+
+    void export(User actor, long projectID, OutputStream output) throws IOException;
+
+    String getExtension();
 }

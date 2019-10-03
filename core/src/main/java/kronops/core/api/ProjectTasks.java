@@ -30,7 +30,6 @@ import kronops.core.model.Project;
 import kronops.core.model.Task;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ProjectTasks {
 

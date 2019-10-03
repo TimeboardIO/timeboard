@@ -56,7 +56,7 @@ public interface ProjectService {
 
     List<Project> listProjects(User user);
 
-    Project getProjectByID(Long projectID);
+    Project getProjectByID(User owner, Long projectID);
 
     Project deleteProjectByID(Long projectID);
 

@@ -63,12 +63,22 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> createUsers(List<User> users) throws BusinessException {
+        return this.jpa.txExpr(entityManager -> {
+            users.forEach(user -> {
+                entityManager.persist(user);
+            });
+            return users;
+        });
+    }
+
+    @Override
     public List<User> searchUserByName(final String prefix) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<User> q = entityManager
                     .createQuery(
                             "select u from User u "
-                            + "where u.name LIKE CONCAT('%',:prefix,'%')",
+                                    + "where u.name LIKE CONCAT('%',:prefix,'%')",
                             User.class);
             q.setParameter("prefix", prefix);
             return q.getResultList();

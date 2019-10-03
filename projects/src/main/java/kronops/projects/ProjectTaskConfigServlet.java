@@ -32,6 +32,7 @@ import kronops.core.model.Project;
 import kronops.core.model.Task;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
+import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -79,7 +80,7 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
         }
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(projectID);
+        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
 
         viewModel.setTemplate("details_project_tasks_config.html");
         viewModel.getViewDatas().put("project", project);
@@ -91,7 +92,7 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
 
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(projectID);
+        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
         viewModel.getViewDatas().put("project", project);
         final Task t = new Task();
         viewModel.getViewDatas().put("task", t);

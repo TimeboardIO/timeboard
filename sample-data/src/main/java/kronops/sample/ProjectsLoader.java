@@ -37,10 +37,7 @@ import org.osgi.service.component.annotations.Reference;
 import java.util.Date;
 import java.util.Random;
 
-@Component(
-        service = ProjectsLoader.class,
-        immediate = true
-)
+
 public class ProjectsLoader {
 
     @Reference

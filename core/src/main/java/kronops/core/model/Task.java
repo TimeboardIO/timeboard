@@ -70,6 +70,7 @@ public class Task implements Serializable {
 
     /**
      * OE.
+     *
      * @return OE
      */
     public double getEstimateWork() {
@@ -147,6 +148,7 @@ public class Task implements Serializable {
 
     /**
      * EL.
+     *
      * @return EL
      */
     public double getRemainsToBeDone() {
@@ -165,15 +167,17 @@ public class Task implements Serializable {
 
     /**
      * RE.
+     *
      * @return RE
      */
     @Transient
-    public double getReEstimateWork(){
+    public double getReEstimateWork() {
         return this.getEffortSpent() + this.getRemainsToBeDone();
     }
 
     /**
      * ES.
+     *
      * @return ES
      */
     @Transient

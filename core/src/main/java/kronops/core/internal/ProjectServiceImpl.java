@@ -103,9 +103,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectByID(Long projectId) {
+    public Project getProjectByID(User actor, Long projectId) {
         return jpa.txExpr(em -> {
-            Project data = em.createQuery("select p from Project p where p.id = :projectID", Project.class)
+            Project data = em.createQuery("select p from Project p join fetch p.members m where p.id = :projectID and  m.member = :user", Project.class)
+                    .setParameter("user", actor)
                     .setParameter("projectID", projectId)
                     .getSingleResult();
             return data;
@@ -154,7 +155,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             final Double effortSpent = effortSpentQuery.getSingleResult();
 
-            return new ProjectDashboard((Double) EWandRTBD[0], (Double) EWandRTBD[1],effortSpent);
+            return new ProjectDashboard((Double) EWandRTBD[0], (Double) EWandRTBD[1], effortSpent);
 
         });
     }

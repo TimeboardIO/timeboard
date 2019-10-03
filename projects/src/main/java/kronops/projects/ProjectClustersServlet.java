@@ -31,6 +31,7 @@ import kronops.core.api.TreeNode;
 import kronops.core.model.Project;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
+import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -69,7 +70,7 @@ public class ProjectClustersServlet extends KronopsServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         if (request.getParameter("projectID") != null) {
-            final Project project = this.projectService.getProjectByID(Long.parseLong(request.getParameter("projectID")));
+            final Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), Long.parseLong(request.getParameter("projectID")));
 
             prepareDatas(viewModel, project);
 
@@ -94,7 +95,7 @@ public class ProjectClustersServlet extends KronopsServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
-        final Project project = this.projectService.getProjectByID(Long.parseLong(request.getParameter("projectID")));
+        final Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), Long.parseLong(request.getParameter("projectID")));
 
         //Extract cluster
         String[] clusterID = request.getParameterValues("cluster");

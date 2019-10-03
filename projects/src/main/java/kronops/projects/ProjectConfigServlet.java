@@ -26,15 +26,15 @@ package kronops.projects;
  * #L%
  */
 
+import kronops.core.api.ProjectExportService;
 import kronops.core.api.ProjectService;
 import kronops.core.api.TreeNode;
 import kronops.core.model.Project;
 import kronops.core.model.ProjectRole;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import kronops.security.SecurityContext;
+import org.osgi.service.component.annotations.*;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -63,6 +63,13 @@ import java.util.stream.Collectors;
 )
 public class ProjectConfigServlet extends KronopsServlet {
 
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            collectionType = CollectionType.SERVICE
+    )
+    private List<ProjectExportService> projectExportServices;
+
     @Reference
     public ProjectService projectService;
 
@@ -85,6 +92,7 @@ public class ProjectConfigServlet extends KronopsServlet {
         map.put("project", project);
         map.put("members", project.getMembers());
         map.put("roles", ProjectRole.values());
+        map.put("exports", this.projectExportServices);
         map.put("tasks", this.projectService.listProjectTasks(project));
     }
 
@@ -94,7 +102,7 @@ public class ProjectConfigServlet extends KronopsServlet {
         viewModel.setTemplate("details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
-        Project project = this.projectService.getProjectByID(id);
+        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
 
 
         Map<String, Object> map = new HashMap<>();
@@ -109,7 +117,7 @@ public class ProjectConfigServlet extends KronopsServlet {
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(id);
+        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
 
