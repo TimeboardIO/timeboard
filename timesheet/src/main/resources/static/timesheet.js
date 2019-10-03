@@ -46,6 +46,14 @@ $(document).ready(function(){
       el: '#timesheet',
       data: timesheetModel,
       methods: {
+        validateMyWeek: function(event){
+            $.post('/timesheet/validate', {
+                'week': app.week,
+                'year': app.year
+            }).then(function(){
+                app.validated=true;
+            });
+        },
         triggerUpdateRTBD: function(event){
             const taskID = $(event.target).attr('data-task-rtbd');
             const val = $(event.target).val();

@@ -18,9 +18,13 @@
         <div class="timesheet-navigation-controls">
 
             <input class="ui positive basic button"
-                   v-bind:if="validated"
+                   v-if="validated === false"
+                   v-bind:data-week="week"
+                   v-bind:data-year="year"
+                   v-on:click="validateMyWeek"
                    style="left: 1em; position: absolute;"
                    type="submit" value="Validate My Week">
+
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+(week-1)+'&year='+year">
                 <i class="left arrow icon"></i>Previous week</a>

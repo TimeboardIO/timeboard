@@ -41,7 +41,7 @@ public class Task implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 50, unique = true, nullable = false)
+    @Column(length = 50, unique = false, nullable = false)
     private String name;
 
     @Temporal(TemporalType.DATE)

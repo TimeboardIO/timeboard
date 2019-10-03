@@ -47,7 +47,7 @@ public class UserLoader {
 
     @Activate
     public void load() throws BusinessException {
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             User u = new User();
             u.setName("kronops" + i);
             u.setPassword("kronops" + i);

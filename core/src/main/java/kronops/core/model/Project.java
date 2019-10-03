@@ -41,7 +41,7 @@ public class Project implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(length = 50, unique = true)
+    @Column(length = 50, unique = false)
     private String name;
 
     @Temporal(TemporalType.DATE)

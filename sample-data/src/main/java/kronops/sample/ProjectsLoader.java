@@ -35,6 +35,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.util.Date;
+import java.util.Random;
 
 @Component(
         service = ProjectsLoader.class,
@@ -55,43 +56,30 @@ public class ProjectsLoader {
 
     @Activate
     public void load() throws BusinessException {
-        User u1 = this.userService.findUserByLogin("kronops1");
-        User u2 = this.userService.findUserByLogin("kronops2");
 
-        Project newProject = this.projectService.createProject(u1, "Test Project");
+        for(int i =0; i<10; i++) {
+            Random r = new Random();
+            int low = 0;
+            int high = 10;
+            int result = r.nextInt(high-low) + low;
 
-        Task t = new Task();
-        t.setName("Hello Task");
-        t.setStartDate(new Date());
-        t.setEndDate(new Date());
-        t.setComments("This is a sample task");
-        t.setEstimateWork(5);
-        this.projectService.createTask(newProject, t);
+            User u1 = this.userService.findUserByLogin("kronops"+result);
+            Project newProject = this.projectService.createProject(u1, "Sample Project "+i);
 
-        Task t2 = new Task();
-        t2.setEstimateWork(1);
-        t2.setName("Do stuff");
-        t2.setStartDate(new Date());
-        t2.setEndDate(new Date());
-        t2.setComments("This is another sample task");
-        this.projectService.createTask(newProject, t2);
-
-        ProjectMembership projectMembership = new ProjectMembership(newProject, u2, ProjectRole.CONTRIBUTOR);
-
-        this.projectService.save(projectMembership);
+            for(int k=0; k<100; k++){
+                Task t = new Task();
+                t.setName("Hello Task "+k);
+                t.setStartDate(new Date());
+                t.setEndDate(new Date());
+                t.setComments("This is a sample task "+k);
+                t.setEstimateWork(5);
+                this.projectService.createTask(newProject, t);
+            }
 
 
-        ProjectCluster root = new ProjectCluster();
-        root.setName("Root Cluster");
+        }
 
-        ProjectCluster customer = new ProjectCluster();
-        customer.setName("Customer XYZ Cluster");
 
-        this.projectService.saveProjectCluster(root);
-        customer.setParent(root);
-        this.projectService.saveProjectCluster(customer);
-
-        this.projectService.addProjectToProjectCluster(customer, newProject);
 
     }
 
