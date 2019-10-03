@@ -62,7 +62,7 @@ public class ProjectTaskListServlet extends KronopsServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProject(id);
+        Project project = this.projectService.getProjectByID(id);
 
         viewModel.setTemplate("details_project_tasks.html");
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
@@ -73,7 +73,7 @@ public class ProjectTaskListServlet extends KronopsServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProject(id);
+        Project project = this.projectService.getProjectByID(id);
 
         viewModel.setTemplate("details_project_tasks.html");
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));

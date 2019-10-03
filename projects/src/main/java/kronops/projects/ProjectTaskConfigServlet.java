@@ -79,7 +79,7 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
         }
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProject(projectID);
+        Project project = this.projectService.getProjectByID(projectID);
 
         viewModel.setTemplate("details_project_tasks_config.html");
         viewModel.getViewDatas().put("project", project);
@@ -91,7 +91,7 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
 
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProject(projectID);
+        Project project = this.projectService.getProjectByID(projectID);
         viewModel.getViewDatas().put("project", project);
         final Task t = new Task();
         viewModel.getViewDatas().put("task", t);

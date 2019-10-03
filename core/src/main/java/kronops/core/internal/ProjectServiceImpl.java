@@ -103,15 +103,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProject(Long projectId) {
-
+    public Project getProjectByID(Long projectId) {
         return jpa.txExpr(em -> {
             Project data = em.createQuery("select p from Project p where p.id = :projectID", Project.class)
                     .setParameter("projectID", projectId)
                     .getSingleResult();
             return data;
         });
-
     }
 
     @Override
@@ -130,6 +128,34 @@ public class ProjectServiceImpl implements ProjectService {
             em.merge(project);
             em.flush();
             return project;
+        });
+    }
+
+    @Override
+    public ProjectDashboard projectDashboard(Project project) {
+
+        return jpa.txExpr(em -> {
+
+            TypedQuery<Object[]> q = em.createQuery("select " +
+                    "sum(t.estimateWork) as estimateWork, " +
+                    "sum(t.remainsToBeDone) as remainsToBeDone " +
+                    "from Task t " +
+                    "where t.project = :project ", Object[].class);
+
+            q.setParameter("project", project);
+
+            Object[] EWandRTBD = q.getSingleResult();
+
+            TypedQuery<Double> effortSpentQuery = em.createQuery("select sum(i.value) " +
+                    "from Task t left outer join t.imputations i " +
+                    "where t.project = :project ", Double.class);
+
+            effortSpentQuery.setParameter("project", project);
+
+            final Double effortSpent = effortSpentQuery.getSingleResult();
+
+            return new ProjectDashboard((Double) EWandRTBD[0], (Double) EWandRTBD[1],effortSpent);
+
         });
     }
 

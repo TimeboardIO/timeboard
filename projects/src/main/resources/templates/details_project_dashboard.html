@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{details_project_layout.html(tab='fourth')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Project Dashboard</title>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+
+    <div class="ui statistic">
+        <div class="value" th:text="${#numbers.formatDecimal(dashboard.effortSpent,1,1,'COMMA')}"></div>
+        <div class="label">
+            Effort Spent
+        </div>
+    </div>
+
+    <div class="ui statistic">
+        <div class="value" th:text="${#numbers.formatDecimal(dashboard.remainToBeDone,1,1,'COMMA')}"></div>
+        <div class="label">
+            Remain To Be Done
+        </div>
+    </div>
+
+    <div class="ui statistic">
+        <div class="value" th:text="${#numbers.formatDecimal(dashboard.estimateWork,1,1,'COMMA')}"></div>
+        <div class="label">
+            Estimate Work
+        </div>
+    </div>
+
+
+    <div class="ui statistic">
+        <div class="value" th:text="${#numbers.formatDecimal(dashboard.reEstimateWork,1,1,'COMMA')}"></div>
+        <div class="label">
+            ReEstimate Work
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

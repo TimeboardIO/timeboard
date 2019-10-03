@@ -94,7 +94,7 @@ public class ProjectConfigServlet extends KronopsServlet {
         viewModel.setTemplate("details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
-        Project project = this.projectService.getProject(id);
+        Project project = this.projectService.getProjectByID(id);
 
 
         Map<String, Object> map = new HashMap<>();
@@ -109,7 +109,7 @@ public class ProjectConfigServlet extends KronopsServlet {
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProject(id);
+        Project project = this.projectService.getProjectByID(id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
 

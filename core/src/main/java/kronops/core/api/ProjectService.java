@@ -56,12 +56,13 @@ public interface ProjectService {
 
     List<Project> listProjects(User user);
 
-    Project getProject(Long projectId);
+    Project getProjectByID(Long projectID);
 
     Project deleteProjectByID(Long projectID);
 
     Project updateProject(Project project) throws BusinessException;
 
+    ProjectDashboard projectDashboard(Project project);
 
     /**
      * @param project
