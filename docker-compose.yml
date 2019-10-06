@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  kronops:
+    image: kronopsio/kronops
+    ports:
+      - 8181:8181
+    links:
+      - mysql
+  mysql:
+    image: mysql:8.0
+    volumes:
+      - ${PWD}/scripts/sql:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=kronops
+      - MYSQL_DATABASE=kronops
+
+

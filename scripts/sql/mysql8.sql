@@ -28,6 +28,7 @@
     create table Project (
        id bigint not null,
         comments varchar(500),
+        kv varchar(500),
         name varchar(50),
         startDate date,
         primary key (id)

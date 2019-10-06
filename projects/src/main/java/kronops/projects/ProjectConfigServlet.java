@@ -27,6 +27,7 @@ package kronops.projects;
  */
 
 import kronops.core.api.ProjectExportService;
+import kronops.core.api.ProjectImportService;
 import kronops.core.api.ProjectService;
 import kronops.core.api.TreeNode;
 import kronops.core.model.Project;
@@ -70,6 +71,13 @@ public class ProjectConfigServlet extends KronopsServlet {
     )
     private List<ProjectExportService> projectExportServices;
 
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            collectionType = CollectionType.SERVICE
+    )
+    private List<ProjectImportService> projectImportServices;
+
     @Reference
     public ProjectService projectService;
 
@@ -93,6 +101,7 @@ public class ProjectConfigServlet extends KronopsServlet {
         map.put("members", project.getMembers());
         map.put("roles", ProjectRole.values());
         map.put("exports", this.projectExportServices);
+        map.put("imports", this.projectImportServices);
         map.put("tasks", this.projectService.listProjectTasks(project));
     }
 
@@ -120,6 +129,24 @@ public class ProjectConfigServlet extends KronopsServlet {
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
+
+        //Extract project configuration
+        project.clearArguments();
+
+        String newAttrKey = request.getParameter("newAttrKey");
+        String newAttrValue = request.getParameter("newAttrValue");
+        if(!newAttrKey.isEmpty()){
+            project.setArgument(newAttrKey, newAttrValue);
+        }
+        Enumeration<String> params1 = request.getParameterNames();
+        while (params1.hasMoreElements()) {
+            String param = params1.nextElement();
+            if (param.startsWith("attr-")) {
+                String key = param.substring(5, param.length());
+                String value = request.getParameter(param);
+                project.setArgument(key, value);
+            }
+        }
 
         //Extract memberships from request
         Map<Long, ProjectRole> memberships = new HashMap<>();

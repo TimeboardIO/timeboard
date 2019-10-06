@@ -1,8 +1,8 @@
-package kronops.theme;
+package kronops.core.api;
 
 /*-
  * #%L
- * theme
+ * core
  * %%
  * Copyright (C) 2019 Kronops
  * %%
@@ -26,16 +26,16 @@ package kronops.theme;
  * #L%
  */
 
-import kronops.core.ui.BrandingService;
-import org.osgi.service.component.annotations.Component;
+import kronops.core.api.exceptions.BusinessException;
+import kronops.core.model.User;
 
-@Component(
-        service = BrandingService.class,
-        immediate = true
-)
-public class KronopsBranding implements BrandingService {
-    @Override
-    public String appName() {
-        return "Kronops";
-    }
+import java.io.IOException;
+import java.io.OutputStream;
+
+public interface ProjectImportService {
+
+    String getServiceName();
+
+    void importTasksToProject(User actor, long projectID) throws BusinessException;
+
 }
