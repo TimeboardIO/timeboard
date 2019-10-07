@@ -43,6 +43,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ *
+ * search user  : /search?q={search query}
+ * search user in project : /search?projectID={project id}&q={search query}
+ */
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,

@@ -85,6 +85,12 @@ public interface ProjectService {
 
     List<Task> listUserTasks(User user);
 
+    /**
+     *
+     * @return List all task types.
+     */
+    List<TaskType> listTaskType();
+
     Task createTask(Project project, Task task);
 
     Task updateTask(Task task);
@@ -99,4 +105,6 @@ public interface ProjectService {
     UpdatedTaskResult updateTaskImputation(Long taskID, Date day, double imputation);
 
     UpdatedTaskResult updateTaskRTBD(Long taskID, double rtbd);
+
+    TaskType findTaskTypeByID(Long taskTypeID);
 }

@@ -258,6 +258,13 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
+    @Override
+    public List<TaskType> listTaskType() {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<TaskType> q = entityManager.createQuery("select tt from TaskType tt", TaskType.class);
+            return q.getResultList();
+        });
+    }
 
     @Override
     public Task createTask(Project project, Task task) {
@@ -342,6 +349,11 @@ public class ProjectServiceImpl implements ProjectService {
             entityManager.flush();
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
+    }
+
+    @Override
+    public TaskType findTaskTypeByID(Long taskTypeID) {
+        return this.jpa.txExpr(entityManager -> entityManager.find(TaskType.class, taskTypeID));
     }
 
 

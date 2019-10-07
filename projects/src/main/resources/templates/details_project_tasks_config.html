@@ -38,6 +38,15 @@
             <input name="taskEstimateWork" placeholder="Task OE" required th:value="${task.estimateWork}" type="number">
         </div>
         <div class="field">
+            <label>Task type</label>
+            <select  name="taskTypeID" >
+                <option th:each="type: ${taskTypes}"
+                        th:text="${type.typeName}"
+                        th:selected="${task.taskType != null && (task.taskType.id == type.id)}"
+                        th:value="${type.id}"></option>
+            </select>
+        </div>
+        <div class="field">
             <label>User assigned</label>
             <div class="ui category search">
                 <div class="ui icon input">
