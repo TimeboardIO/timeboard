@@ -1,49 +1,47 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="utf-8"/>
-    <link href="/static/semantic/semantic.min.css" rel="stylesheet">
-    <title th:text="${appName}"></title>
-    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
-    <link href="/theme/style.css" rel="stylesheet">
-</head>
-<body class="login">
+<html layout:decorate="~{layouts/general.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
 
-<div class="ui middle aligned center aligned grid">
-    <div class="column">
+<body>
 
-        <form action="" class="ui large form" enctype="application/x-www-form-urlencoded" method="post">
-            <input name="origin" placeholder="Username" th:value="${origin}" type="hidden">
+<div layout:fragment="content">
 
-            <div class="ui segment">
-                <h2 class="ui teal image header">
-                    <div class="content" th:text="${appName}">
+    <div class="login ui middle aligned center aligned grid">
+        <div class="column">
 
+            <form action="" class="ui large form" enctype="application/x-www-form-urlencoded" method="post">
+                <input name="origin" placeholder="Username" th:value="${origin}" type="hidden">
+
+                <div class="ui segment">
+                    <h2 class="ui teal image header">
+                        <div class="content" th:text="${appName}">
+
+                        </div>
+                    </h2>
+
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input name="username" placeholder="Username" type="text">
+                        </div>
                     </div>
-                </h2>
-
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="user icon"></i>
-                        <input name="username" placeholder="Username" type="text">
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input name="password" placeholder="Password" type="password">
+                        </div>
                     </div>
+                    <input class="ui fluid large teal submit button" type="submit" value="Login"></input>
                 </div>
-                <div class="field">
-                    <div class="ui left icon input">
-                        <i class="lock icon"></i>
-                        <input name="password" placeholder="Password" type="password">
-                    </div>
-                </div>
-                <input class="ui fluid large teal submit button" type="submit" value="Login"></input>
-            </div>
 
-            <div class="ui error message"></div>
+                <div class="ui error message"></div>
 
-        </form>
+            </form>
 
 
+        </div>
     </div>
 </div>
-
 </body>
 </html>

@@ -102,9 +102,34 @@ Now, you can login into Kronops with
     password : pwd      
         
 
+## For test with Docker
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+- Java
+- Maven
+
+First build source code with 
+
+    mvn install
+    
+Build karaf Kar bundle
+
+    cd features && mvn karaf:kar && cd ..
+    
+Build docker container
+
+    docker build -t kronopsio/kronops .
+        
+Run docker compose
+
+    docker-compose up
+
 ## For production
 
-Not realy ready yet :(
+Not ready yet, missing documentation :(
 
 Releases for production use Apache Karaf KAR format.
 

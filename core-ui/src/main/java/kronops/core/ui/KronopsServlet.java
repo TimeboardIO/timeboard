@@ -64,8 +64,6 @@ public abstract class KronopsServlet extends HttpServlet {
         resolver.setCacheable(true);
         resolver.setCacheTTLMs(50000L);
         resolver.setCharacterEncoding("utf-8");
-
-
     }
 
 
@@ -77,6 +75,26 @@ public abstract class KronopsServlet extends HttpServlet {
             appName = brandingService.appName();
         }
         return appName;
+    }
+
+    private List<String> getCssLinkURLs() {
+        List<String> cssURLs = new ArrayList<>();
+        ServiceReference<CssService> cssServiceRef = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getServiceReference(CssService.class);
+        if (cssServiceRef != null) {
+            CssService cssService = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getService(cssServiceRef);
+            cssURLs.addAll(cssService.listCSSUrls());
+        }
+        return cssURLs;
+    }
+
+    private List<String> getJavascriptURLs() {
+        List<String> jsURLs = new ArrayList<>();
+        ServiceReference<JavascriptService> jsServiceRef = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getServiceReference(JavascriptService.class);
+        if (jsServiceRef != null) {
+            JavascriptService jsService = FrameworkUtil.getBundle(KronopsServlet.class).getBundleContext().getService(jsServiceRef);
+            jsURLs.addAll(jsService.listJavascriptUrls());
+        }
+        return jsURLs;
     }
 
     @Override
@@ -104,12 +122,8 @@ public abstract class KronopsServlet extends HttpServlet {
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
     }
 
-    ;
-
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
     }
-
-    ;
 
 
     protected List<NavigationExtPoint> getNavs() {
@@ -150,6 +164,10 @@ public abstract class KronopsServlet extends HttpServlet {
         ctx.setVariable("navs", navigationEntries);
 
         ctx.setVariable("appName", this.getAppName());
+
+        ctx.setVariable("javascripts", this.getJavascriptURLs());
+
+        ctx.setVariable("CSSs", this.getCssLinkURLs());
 
         String templateName = viewModel.getTemplate();
         String result = engine.process(templateName, ctx);

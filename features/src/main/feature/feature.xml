@@ -80,10 +80,14 @@
         <bundle start-level="90">mvn:${project.groupId}/timesheet/${project.version}</bundle>
     </feature>
 
-    <feature name="kronops-sampledata" version="${project.version}">
+    <feature name="kronops-plugins" version="${project.version}">
         <feature>kronops-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/sample-data/${project.version}</bundle>
+        <bundle start-level="90">mvn:${project.groupId}/project-github-import-plugin/${project.version}</bundle>
+        <bundle start-level="90">mvn:${project.groupId}/project-jira-import-plugin/${project.version}</bundle>
+        <bundle start-level="90">mvn:${project.groupId}/project-msp-export-plugin/${project.version}</bundle>
+        <bundle start-level="90">mvn:${project.groupId}/project-xls-export-plugin/${project.version}</bundle>
     </feature>
+
 
     <feature name="kronops-shell" version="${project.version}">
         <feature>kronops-core</feature>

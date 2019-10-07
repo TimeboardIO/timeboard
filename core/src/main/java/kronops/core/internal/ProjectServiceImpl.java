@@ -424,7 +424,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<TreeNode> computeClustersTree() {
         return this.jpa.txExpr(entityManager -> {
             TreeNode root = new TreeNode(null);
-            List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc", ProjectCluster.class).getResultList();
+            List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc order by pc.parent", ProjectCluster.class).getResultList();
             projectClusters.forEach(projectCluster -> {
                 root.insert(projectCluster);
             });

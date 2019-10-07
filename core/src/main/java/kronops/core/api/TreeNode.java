@@ -120,16 +120,15 @@ public final class TreeNode {
     /**
      * used to find and insert ProjectCluster at the right position in tree.
      *
-     * @param node current node
-     * @param pc   ProjectCluster to insert
+     * @param currentNode current node
+     * @param clusterToInsert   ProjectCluster to insert
      */
-    private void insertRec(final TreeNode node, final ProjectCluster pc) {
-        node.children.forEach(treeNode -> {
-            if (treeNode.getProjectCluster().getId()
-                    == pc.getParent().getId()) {
-                treeNode.getChildren().add(new TreeNode(pc));
+    private void insertRec(final TreeNode currentNode, final ProjectCluster clusterToInsert) {
+        currentNode.children.forEach(treeNode -> {
+            if (treeNode.getProjectCluster().getId() == clusterToInsert.getParent().getId()) {
+                treeNode.getChildren().add(new TreeNode(clusterToInsert));
             } else {
-                insertRec(treeNode, pc);
+                insertRec(treeNode, clusterToInsert);
             }
         });
     }

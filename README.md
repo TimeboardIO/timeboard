@@ -10,6 +10,26 @@
 
 - [Dev cheatsheet](docs/cheatsheet.md)
 
+# Features
+
+- Projects
+    - Tasks management
+        - Tasks import from 
+            - Jira, 
+            - Github, 
+            - Gitlab, 
+            - Excel, 
+            - CSV
+    - Timesheet management
+
+- Reporting
+    - Online dashboard,
+    - Microsoft Project,
+    - Excel    
+- User management
+    - local accounts
+    - remote accounts extensible with plugins        
+
 # Screenshots
 
 ![alt text](docs/images/login.png "Login form UI")

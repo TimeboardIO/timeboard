@@ -1,7 +1,13 @@
 language: java
 sudo: false
+env:
+  - NODE_VERSION=10.16.3 CC=clang CXX=clang++
+
+before_install:
+  - nvm install $NODE_VERSION
+
 script:
-  - mvn clean install
+  - mvn clean install -P full
   - cd features && mvn karaf:kar && cd ..
   - ls
 

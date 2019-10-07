@@ -91,7 +91,6 @@
                             com.fasterxml.jackson.databind,
                             com.fasterxml.jackson.core,
                             org.thymeleaf.*,
-                            ongl.*,
                             !org.slf4j
                             com.fasterxml.jackson.*,
                         </Export-Package>
