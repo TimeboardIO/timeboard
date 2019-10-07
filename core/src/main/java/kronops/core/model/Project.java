@@ -34,17 +34,11 @@ import jdk.nashorn.internal.parser.JSONParser;
 import javax.persistence.*;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 @Entity
 public class Project implements Serializable {
-
-    @Transient
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -59,8 +53,9 @@ public class Project implements Serializable {
     @Column(length = 500)
     private String comments;
 
-    @Column(length = 500)
-    private String kv;
+    @Column(columnDefinition = "json")
+    @Convert(converter = JSONToProjectAttributsConverter.class)
+    private Map<String, ProjectAttributValue> attributes;
 
     @OneToMany(targetEntity = ProjectMembership.class,
             mappedBy = "project",
@@ -77,11 +72,10 @@ public class Project implements Serializable {
     private Set<Task> tasks;
 
     public Project() {
-
         members = new HashSet<>();
         clusters = new HashSet<>();
         tasks = new HashSet<>();
-        this.kv = "{}";
+        this.attributes = new HashMap<>();
     }
 
     public long getId() {
@@ -140,32 +134,11 @@ public class Project implements Serializable {
         this.tasks = tasks;
     }
 
-    public String getKv() {
-        if(this.kv == null || this.kv.isEmpty()){
-            return "{}";
-        }
-        return kv;
+    public Map<String, ProjectAttributValue> getAttributes() {
+        return attributes;
     }
 
-    public void setKv(String kv) {
-        this.kv = kv;
+    public void setAttributes(Map<String, ProjectAttributValue> attributes) {
+        this.attributes = attributes;
     }
-
-    @Transient
-    public void clearArguments() {
-        this.setKv("{}");
-    }
-
-    @Transient
-    public Map<String, String> getArguments() throws IOException {
-        return MAPPER.readValue(this.getKv(), Map.class);
-    }
-
-    @Transient
-    public void setArgument(String key, String value) throws IOException {
-        Map<String, String> args = this.getArguments();
-        args.put(key, value);
-        this.setKv(MAPPER.writeValueAsString(args));
-    }
-
 }

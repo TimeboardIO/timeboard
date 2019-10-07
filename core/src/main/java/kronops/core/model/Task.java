@@ -62,6 +62,9 @@ public class Task implements Serializable {
     @OneToOne
     private User assigned;
 
+    @OneToOne(targetEntity = TaskType.class)
+    private TaskType taskType;
+
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
@@ -157,6 +160,14 @@ public class Task implements Serializable {
 
     public void setRemainsToBeDone(double rtbd) {
         this.remainsToBeDone = rtbd;
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(TaskType taskType) {
+        this.taskType = taskType;
     }
 
     @Transient

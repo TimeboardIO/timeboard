@@ -17,6 +17,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         day date,
@@ -27,8 +29,8 @@
 
     create table Project (
        id bigint not null,
+        attributes json,
         comments varchar(500),
-        kv varchar(500),
         name varchar(50),
         startDate date,
         primary key (id)
@@ -65,6 +67,13 @@
         startDate date,
         assigned_id bigint,
         project_id bigint,
+        taskType_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table TaskType (
+       id bigint not null,
+        typeName varchar(255),
         primary key (id)
     ) engine=InnoDB;
 
@@ -140,6 +149,11 @@
        add constraint FKkkcat6aybe3nbvhc54unstxm6 
        foreign key (project_id) 
        references Project (id);
+
+    alter table Task 
+       add constraint FKigksw4egslpbdevlab7ucu8lb 
+       foreign key (taskType_id) 
+       references TaskType (id);
 
     alter table ValidatedTimesheet 
        add constraint FKf4lmab2846nt5smlforv45yj3 

@@ -51,15 +51,20 @@
                         <tr>
                             <th>Key</th>
                             <th>Value</th>
+                            <th>Encrypt</th>
                             <th></th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="attr : ${project.getArguments()}" th:attr="data-key=${attr.key}">
+                        <tr th:each="attr : ${project.getAttributes()}" th:attr="data-key=${attr.key}">
                             <td th:text="${attr.key}">
                             </td>
                             <td>
-                                <input th:name="'attr-'+${attr.key}" th:value="${attr.value}"/>
+                                <input th:if="${attr.value.encrypted == false}" type="text" th:name="'attr-'+${attr.key}" th:value="${attr.value.value}"/>
+                                <input th:if="${attr.value.encrypted == true}" type="text" readonly th:name="'attr-'+${attr.key}" th:value="${attr.value.value}"/>
+                            </td>
+                            <td th:text="${attr.value.encrypted}">
+                                <input  type="hidden"  th:name="'attrenc-'+${attr.key}" th:value="${attr.value.encrypted}"/>
                             </td>
                             <td>
                                 <div class="ui negative basic button delete" th:attr="data-key=${attr.key}">
@@ -74,6 +79,9 @@
                             </td>
                             <td>
                                 <input type="text" name="newAttrValue" placeholder="new conf value"/>
+                            </td>
+                            <td>
+                                <input type="checkbox" name="newAttrEncrypted"/>
                             </td>
                             <td></td>
                         </tr>

@@ -31,6 +31,7 @@ import kronops.core.api.ProjectImportService;
 import kronops.core.api.ProjectService;
 import kronops.core.api.TreeNode;
 import kronops.core.model.Project;
+import kronops.core.model.ProjectAttributValue;
 import kronops.core.model.ProjectRole;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
@@ -131,12 +132,17 @@ public class ProjectConfigServlet extends KronopsServlet {
         project.setComments(request.getParameter("projectDescription"));
 
         //Extract project configuration
-        project.clearArguments();
+        project.getAttributes().clear();
 
         String newAttrKey = request.getParameter("newAttrKey");
         String newAttrValue = request.getParameter("newAttrValue");
-        if(!newAttrKey.isEmpty()){
-            project.setArgument(newAttrKey, newAttrValue);
+        Boolean newAttrEncrypted = false;
+        if (request.getParameter("newAttrEncrypted") != null && request.getParameter("newAttrEncrypted").equals("on")) {
+            newAttrEncrypted = true;
+        }
+
+        if (!newAttrKey.isEmpty()) {
+            project.getAttributes().put(newAttrKey, new ProjectAttributValue(newAttrValue, newAttrEncrypted));
         }
         Enumeration<String> params1 = request.getParameterNames();
         while (params1.hasMoreElements()) {
@@ -144,7 +150,12 @@ public class ProjectConfigServlet extends KronopsServlet {
             if (param.startsWith("attr-")) {
                 String key = param.substring(5, param.length());
                 String value = request.getParameter(param);
-                project.setArgument(key, value);
+                project.getAttributes().put(key, new ProjectAttributValue(value));
+            }
+            if (param.startsWith("attrenc-")) {
+                String key = param.substring(8, param.length());
+                String encrypted = request.getParameter(param);
+                project.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
             }
         }
 
