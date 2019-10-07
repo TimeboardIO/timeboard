@@ -85,7 +85,9 @@
                             kronops.core.model,
                             kronops.core.ui,
                             kronops.security,
-                            org.xml.sax
+                            org.xml.sax,
+                            javax.crypto.spec,
+                            javax.crypto
                         </Import-Package>
                         <Export-Package>
                             kronops.projects

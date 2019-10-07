@@ -38,16 +38,23 @@ import kronops.core.ui.ViewModel;
 import kronops.security.SecurityContext;
 import org.osgi.service.component.annotations.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static javax.crypto.Cipher.ENCRYPT_MODE;
 
 
 /**
@@ -82,11 +89,20 @@ public class ProjectConfigServlet extends KronopsServlet {
     @Reference
     public ProjectService projectService;
 
+    private SecretKeySpec secretKey;
+    private Cipher cipher;
+
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
         return ProjectConfigServlet.class.getClassLoader();
     }
 
+    @Activate
+    private void initCypher() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException {
+        this.secretKey = new SecretKeySpec("738F26A3C1971235".getBytes(), "AES");
+        this.cipher = Cipher.getInstance("AES");
+        this.cipher.init(Cipher.ENCRYPT_MODE, this.secretKey);
+    }
 
     private void prepareTemplateData(Project project, Map<String, Object> map) {
         List<TreeNode> node = this.projectService.computeClustersTree();
@@ -142,6 +158,9 @@ public class ProjectConfigServlet extends KronopsServlet {
         }
 
         if (!newAttrKey.isEmpty()) {
+            if(newAttrEncrypted){
+                newAttrValue = new String(cipher.doFinal(newAttrValue.getBytes()));
+            }
             project.getAttributes().put(newAttrKey, new ProjectAttributValue(newAttrValue, newAttrEncrypted));
         }
         Enumeration<String> params1 = request.getParameterNames();
