@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/pierremellet/kronops.svg?branch=develop)](https://travis-ci.com/pierremellet/kronops)
+[![Build Status](https://travis-ci.com/kronopsio/kronops.svg?branch=develop)](https://travis-ci.com/kronopsio/kronops)
 
 # Documentations
 
