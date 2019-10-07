@@ -138,8 +138,8 @@ public class ProjectServiceImpl implements ProjectService {
         return jpa.txExpr(em -> {
 
             TypedQuery<Object[]> q = em.createQuery("select " +
-                    "sum(t.estimateWork) as estimateWork, " +
-                    "sum(t.remainsToBeDone) as remainsToBeDone " +
+                    "COALESCE(sum(t.estimateWork),0) as estimateWork, " +
+                    "COALESCE(sum(t.remainsToBeDone),0) as remainsToBeDone " +
                     "from Task t " +
                     "where t.project = :project ", Object[].class);
 
@@ -147,7 +147,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             Object[] EWandRTBD = q.getSingleResult();
 
-            TypedQuery<Double> effortSpentQuery = em.createQuery("select sum(i.value) " +
+            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) " +
                     "from Task t left outer join t.imputations i " +
                     "where t.project = :project ", Double.class);
 

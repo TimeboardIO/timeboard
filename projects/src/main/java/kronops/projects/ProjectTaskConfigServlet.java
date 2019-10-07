@@ -94,15 +94,18 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
         viewModel.getViewDatas().put("project", project);
-        final Task t = new Task();
+        final Task t;
+        Long taskID = null;
+
+        if(!request.getParameter("taskID").isEmpty()){
+            taskID = Long.parseLong(request.getParameter("taskID"));
+            t =  this.projectService.getTask(taskID);
+        }else{
+            t = new Task();
+        }
         viewModel.getViewDatas().put("task", t);
 
         try {
-
-            Long taskID = null;
-            if (!request.getParameter("taskID").isEmpty()) {
-                taskID = Long.parseLong(request.getParameter("taskID"));
-            }
 
             Long taskAssigned = null;
             if (!request.getParameter("taskAssigned").isEmpty()) {
