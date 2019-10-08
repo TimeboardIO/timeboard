@@ -28,6 +28,7 @@ package kronops.projects;
 
 import kronops.core.api.ProjectService;
 import kronops.core.api.UserService;
+import kronops.core.api.exceptions.BusinessException;
 import kronops.core.model.Project;
 import kronops.core.model.Task;
 import kronops.core.ui.KronopsServlet;
@@ -44,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 
 @Component(
         service = Servlet.class,
@@ -93,65 +95,65 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
-
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
-        viewModel.getViewDatas().put("project", project);
-        final Task t;
-        Long taskID = null;
+        final Task currentTask;
 
-        if(!request.getParameter("taskID").isEmpty()){
-            taskID = Long.parseLong(request.getParameter("taskID"));
-            t =  this.projectService.getTask(taskID);
-        }else{
-            t = new Task();
+        if (!getParameter(request, "taskID").get().isEmpty()) {
+            Long taskID = Long.parseLong(request.getParameter("taskID"));
+            currentTask = this.projectService.getTask(taskID);
+        } else {
+            currentTask = new Task();
         }
-        viewModel.getViewDatas().put("task", t);
 
         try {
 
-            Long taskAssigned = null;
-            Long taskTypeID = null;
-
             if (!request.getParameter("taskAssigned").isEmpty()) {
-                taskAssigned = Long.parseLong(request.getParameter("taskAssigned"));
+                Long taskAssigned = Long.parseLong(request.getParameter("taskAssigned"));
+                currentTask.setAssigned(this.userService.findUserByID(taskAssigned));
             }
 
             if (!request.getParameter("taskTypeID").isEmpty()) {
-                taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
+                Long taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
+                currentTask.setTaskType(this.projectService.findTaskTypeByID(taskTypeID));
             }
 
             Date taskStartDate = DATE_FORMAT.parse(request.getParameter("taskStartDate"));
             Date taskEndDate = DATE_FORMAT.parse(request.getParameter("taskEndDate"));
 
-            t.setName(request.getParameter("taskName"));
-            t.setStartDate(taskStartDate);
-            t.setEndDate(taskEndDate);
-            t.setId(taskID);
-            t.setProject(project);
-            t.setComments(request.getParameter("taskComments"));
-            t.setEstimateWork(Double.parseDouble(request.getParameter("taskEstimateWork")));
-
-            if (taskAssigned != null) {
-                t.setAssigned(this.userService.findUserByID(taskAssigned));
+            if(taskEndDate.before(taskStartDate)){
+                viewModel.getErrors().add(new BusinessException("The end date must be after the start date"));
             }
 
-            if (taskTypeID != null) {
-                t.setTaskType(this.projectService.findTaskTypeByID(taskTypeID));
-            }
+            currentTask.setName(request.getParameter("taskName"));
+            currentTask.setStartDate(taskStartDate);
+            currentTask.setEndDate(taskEndDate);
+            currentTask.setProject(project);
+            currentTask.setComments(request.getParameter("taskComments"));
+            currentTask.setEstimateWork(Double.parseDouble(request.getParameter("taskEstimateWork")));
 
-            if (!request.getParameter("taskID").isEmpty()) {
-                viewModel.getViewDatas().put("task", this.projectService.updateTask(t));
-            } else {
-                viewModel.getViewDatas().put("task", this.projectService.createTask(project, t));
+
+            if(viewModel.getErrors().isEmpty()) {
+                saveOrUpdateTask(getParameter(request, "taskID"), viewModel, project, currentTask);
             }
 
         } catch (Exception e) {
             viewModel.getErrors().add(e);
         } finally {
-            viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
             viewModel.setTemplate("details_project_tasks_config.html");
+
+            viewModel.getViewDatas().put("task", currentTask);
+            viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
+            viewModel.getViewDatas().put("project", project);
+        }
+    }
+
+    private void saveOrUpdateTask(Optional<String> taskID, ViewModel viewModel, Project project, Task currentTask) {
+        if (!taskID.get().isEmpty()) {
+            viewModel.getViewDatas().put("task", this.projectService.updateTask(currentTask));
+        } else {
+            viewModel.getViewDatas().put("task", this.projectService.createTask(project, currentTask));
         }
     }
 }

@@ -45,6 +45,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class KronopsServlet extends HttpServlet {
 
@@ -180,6 +181,10 @@ public abstract class KronopsServlet extends HttpServlet {
         } finally {
             out.close();
         }
+    }
+
+    protected Optional<String> getParameter(final HttpServletRequest req, final String paramName){
+        return Optional.of(req.getParameter(paramName));
     }
 
 

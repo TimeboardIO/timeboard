@@ -12,7 +12,7 @@
 
     <div class="ui top attached tabular menu">
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
-           th:href="@{/projects/config(projectID=${project.id})}">Summary</a>
+           th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
            th:href="@{/projects/tasks(projectID=${project.id})}">Tasks</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
