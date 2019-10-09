@@ -28,9 +28,7 @@ package kronops.projects;
 
 import kronops.core.api.ProjectService;
 import kronops.core.api.UserService;
-import kronops.core.api.exceptions.BusinessException;
-import kronops.core.model.Project;
-import kronops.core.model.Task;
+import kronops.core.model.*;
 import kronops.core.ui.KronopsServlet;
 import kronops.core.ui.ViewModel;
 import kronops.security.SecurityContext;
@@ -43,9 +41,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
 
 @Component(
         service = Servlet.class,
@@ -77,10 +75,10 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
             // Update case
             long taskID = Long.parseLong(request.getParameter("taskID"));
             Task task = this.projectService.getTask(taskID);
-            viewModel.getViewDatas().put("task", task);
+            viewModel.getViewDatas().put("task", new TaskForm(task));
         } else {
             // New task case
-            viewModel.getViewDatas().put("task", new Task());
+            viewModel.getViewDatas().put("task", new TaskForm(new Task()));
         }
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
@@ -95,65 +93,171 @@ public class ProjectTaskConfigServlet extends KronopsServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
+        final User actor = SecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
-        final Task currentTask;
-
-        if (!getParameter(request, "taskID").get().isEmpty()) {
-            Long taskID = Long.parseLong(request.getParameter("taskID"));
-            currentTask = this.projectService.getTask(taskID);
-        } else {
-            currentTask = new Task();
-        }
+          Task currentTask;
 
         try {
 
-            if (!request.getParameter("taskAssigned").isEmpty()) {
-                Long taskAssigned = Long.parseLong(request.getParameter("taskAssigned"));
-                currentTask.setAssigned(this.userService.findUserByID(taskAssigned));
+            if (!getParameter(request, "taskID").get().isEmpty()) {
+                Long taskID = Long.parseLong(request.getParameter("taskID"));
+                currentTask = this.projectService.getTask(taskID);
+                currentTask = updateTask(actor, project, currentTask, request);
+            } else {
+                currentTask = createTask(actor, project, request);
             }
 
-            if (!request.getParameter("taskTypeID").isEmpty()) {
-                Long taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
-                currentTask.setTaskType(this.projectService.findTaskTypeByID(taskTypeID));
-            }
+            viewModel.getViewDatas().put("task", new TaskForm(currentTask));
 
-            Date taskStartDate = DATE_FORMAT.parse(request.getParameter("taskStartDate"));
-            Date taskEndDate = DATE_FORMAT.parse(request.getParameter("taskEndDate"));
-
-            if(taskEndDate.before(taskStartDate)){
-                viewModel.getErrors().add(new BusinessException("The end date must be after the start date"));
-            }
-
-            currentTask.setName(request.getParameter("taskName"));
-            currentTask.setStartDate(taskStartDate);
-            currentTask.setEndDate(taskEndDate);
-            currentTask.setProject(project);
-            currentTask.setComments(request.getParameter("taskComments"));
-            currentTask.setEstimateWork(Double.parseDouble(request.getParameter("taskEstimateWork")));
-
-
-            if(viewModel.getErrors().isEmpty()) {
-                saveOrUpdateTask(getParameter(request, "taskID"), viewModel, project, currentTask);
-            }
 
         } catch (Exception e) {
             viewModel.getErrors().add(e);
         } finally {
             viewModel.setTemplate("details_project_tasks_config.html");
 
-            viewModel.getViewDatas().put("task", currentTask);
             viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
             viewModel.getViewDatas().put("project", project);
         }
     }
 
-    private void saveOrUpdateTask(Optional<String> taskID, ViewModel viewModel, Project project, Task currentTask) {
-        if (!taskID.get().isEmpty()) {
-            viewModel.getViewDatas().put("task", this.projectService.updateTask(currentTask));
-        } else {
-            viewModel.getViewDatas().put("task", this.projectService.createTask(project, currentTask));
+    private Task createTask(User actor, Project project, HttpServletRequest request) throws ParseException {
+
+        TaskForm taskForm = new TaskForm(request);
+
+        return this.projectService.createTask(actor,
+                project,
+                taskForm.getTaskName(),
+                taskForm.getTaskComment(),
+                taskForm.getStartDate(),
+                taskForm.getEndDate(),
+                taskForm.getEstimateWork(),
+                taskForm.getTaskTypeID(),
+                this.userService.findUserByID(taskForm.getAssignedUserID()));
+    }
+
+    private Task updateTask(User actor, Project project, Task currentTask, HttpServletRequest request) throws ParseException {
+        TaskForm taskForm = new TaskForm(request);
+
+        final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());
+        if(taskType != null) {
+            currentTask.setTaskType(taskType);
+        }
+        final TaskRevision rev = new TaskRevision(actor,
+                currentTask,
+                taskForm.getTaskName(),
+                taskForm.getTaskComment(),
+                taskForm.getStartDate(),
+                taskForm.getEndDate(),
+                taskForm.getEstimateWork(),
+                currentTask.getRemainsToBeDone(),
+                this.userService.findUserByID(taskForm.getAssignedUserID()));
+
+
+        return this.projectService.updateTask(actor, currentTask, rev);
+    }
+
+
+
+
+
+    public static class TaskForm {
+        private Long taskID;
+        private String taskName;
+        private String taskComment;
+        private Date startDate;
+        private Date endDate;
+        private Double estimateWork;
+        private Long assignedUserID;
+        private Long taskTypeID;
+        private User assignedUser;
+        private TaskType taskType;
+
+        public TaskForm(Task task){
+            taskID = task.getId();
+            taskType = task.getTaskType();
+            if(task.getLatestRevision() != null) {
+                estimateWork = task.getLatestRevision().getEstimateWork();
+                startDate = task.getLatestRevision().getStartDate();
+                endDate = task.getLatestRevision().getEndDate();
+                assignedUser = task.getLatestRevision().getAssigned();
+                taskName = task.getLatestRevision().getName();
+                taskComment = task.getLatestRevision().getComments();
+            }else{
+                startDate = new Date();
+                endDate = new Date();
+                assignedUser = null;
+            }
+        }
+
+        public TaskForm(HttpServletRequest request) throws ParseException {
+            if(!request.getParameter("taskID").isEmpty()) {
+                taskID = Long.parseLong(request.getParameter("taskID"));
+            }
+            taskName = request.getParameter("taskName");
+            taskComment = request.getParameter("taskComments");
+            startDate = DATE_FORMAT.parse(request.getParameter("taskStartDate"));
+            endDate = DATE_FORMAT.parse(request.getParameter("taskEndDate"));
+            estimateWork = Double.parseDouble(request.getParameter("taskEstimateWork"));
+
+            if(request.getParameter("taskTypeID") != null &&  !request.getParameter("taskTypeID").isEmpty()) {
+                taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
+            }
+
+            assignedUserID = Long.parseLong(request.getParameter("taskAssigned"));
+        }
+
+        public Long getTaskID() {
+            return taskID;
+        }
+
+        public void setTaskID(Long taskID) {
+            this.taskID = taskID;
+        }
+
+        public String getTaskName() {
+            return taskName;
+        }
+
+        public String getTaskComment() {
+            return taskComment;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public Double getEstimateWork() {
+            return estimateWork;
+        }
+
+        public Long getAssignedUserID() {
+            return assignedUserID;
+        }
+
+        public void setAssignedUserID(Long assignedUserID) {
+            this.assignedUserID = assignedUserID;
+        }
+
+        public Long getTaskTypeID() {
+            return taskTypeID;
+        }
+
+        public void setTaskTypeID(Long taskTypeID) {
+            this.taskTypeID = taskTypeID;
+        }
+
+        public User getAssignedUser() {
+            return assignedUser;
+        }
+
+        public void setAssignedUser(User assignedUser) {
+            this.assignedUser = assignedUser;
         }
     }
 }

@@ -19,6 +19,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         day date,
@@ -59,15 +61,25 @@
 
     create table Task (
        id bigint not null,
+        origin varchar(255),
+        latestRevision_id bigint,
+        project_id bigint,
+        taskType_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table TaskRevision (
+       id bigint not null,
         comments varchar(500),
         endDate date,
         estimateWork double precision not null,
         name varchar(50) not null,
         remainsToBeDone double precision not null,
+        revisionDate datetime(6),
         startDate date,
         assigned_id bigint,
-        project_id bigint,
-        taskType_id bigint,
+        revisionActor_id bigint,
+        task_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -141,9 +153,9 @@
        references Project (id);
 
     alter table Task 
-       add constraint FKc44lafqphn0ecv9phdfate2kb 
-       foreign key (assigned_id) 
-       references User (id);
+       add constraint FKjwuo5mqkfx9k23jd3g8vr4a2p 
+       foreign key (latestRevision_id) 
+       references TaskRevision (id);
 
     alter table Task 
        add constraint FKkkcat6aybe3nbvhc54unstxm6 
@@ -154,6 +166,21 @@
        add constraint FKigksw4egslpbdevlab7ucu8lb 
        foreign key (taskType_id) 
        references TaskType (id);
+
+    alter table TaskRevision 
+       add constraint FKp9ssbxu7c3w7fr3jukkget1ne 
+       foreign key (assigned_id) 
+       references User (id);
+
+    alter table TaskRevision 
+       add constraint FK16welq7uyu2n2xmycgw23ebgq 
+       foreign key (revisionActor_id) 
+       references User (id);
+
+    alter table TaskRevision 
+       add constraint FKpsj9t1js8flo735q3nx3o0c6d 
+       foreign key (task_id) 
+       references Task (id);
 
     alter table ValidatedTimesheet 
        add constraint FKf4lmab2846nt5smlforv45yj3 

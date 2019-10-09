@@ -114,18 +114,19 @@ public class TimesheetServlet extends KronopsServlet {
         try {
             String type = request.getParameter("type");
             Long taskID = Long.parseLong(request.getParameter("task"));
+            final User actor = SecurityContext.getCurrentUser(request);
 
             UpdatedTaskResult updatedTask = null;
 
             if(type.equals("imputation")) {
                 Date day = DATE_FORMAT.parse(request.getParameter("day"));
                 double imputation = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskImputation(taskID, day, imputation);
+                updatedTask = this.projectService.updateTaskImputation(actor,taskID, day, imputation);
             }
 
             if(type.equals("rtbd")) {
                 double rtbd = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskRTBD(taskID, rtbd);
+                updatedTask = this.projectService.updateTaskRTBD(actor,taskID, rtbd);
             }
 
 

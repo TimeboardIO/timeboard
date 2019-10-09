@@ -28,6 +28,7 @@ package kronops.core.api;
 
 import kronops.core.model.Project;
 import kronops.core.model.Task;
+import kronops.core.model.TaskRevision;
 
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class ProjectTasks {
         return project;
     }
 
-    public List<Task> getTasks() {
+    public List<Task> getTaskRevisions() {
         return tasks;
     }
 }

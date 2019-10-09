@@ -13,15 +13,15 @@
 
     <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="task"
           method="post" style="margin-left:1em;">
-        <input name="taskID" required th:value="${task.id}" type="hidden">
+        <input name="taskID" required th:value="${task.taskID}" type="hidden">
 
         <div class="field">
             <label>Task Name</label>
-            <input name="taskName" placeholder="Task Name" required th:value="${task.name}" type="text">
+            <input name="taskName" placeholder="Task Name" required th:value="${task.taskName}" type="text">
         </div>
         <div class="field">
             <label>Task Description</label>
-            <input name="taskComments" placeholder="Task Description" th:value="${task.comments}" type="text">
+            <input name="taskComments" placeholder="Task Description" th:value="${task.taskComment}" type="text">
         </div>
         <div class="field">
             <label>Task Start Date</label>
@@ -51,14 +51,14 @@
             <div class="ui category search">
                 <div class="ui icon input">
 
-                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assigned != null}"
-                           th:value="${task.assigned.name}" type="text"/>
-                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assigned == null}"
+                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser != null}"
+                           th:value="${task.assignedUser.name}" type="text"/>
+                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser == null}"
                            type="text"/>
 
-                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assigned != null}"
-                           th:value="${task.assigned.id}" type="hidden"/>
-                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assigned == null}" type="hidden"
+                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assignedUser != null}"
+                           th:value="${task.assignedUser.id}" type="hidden"/>
+                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assignedUser == null}" type="hidden"
                            value=""/>
 
 
@@ -72,7 +72,7 @@
         <button class="ui positive button" type="submit">Save</button>
 
         <a class="ui negative basic button"
-           th:href="@{/projects/tasks/delete(taskID=${task.id}, projectID=${project.id})}">
+           th:href="@{/projects/tasks/delete(taskID=${task.taskID}, projectID=${project.id})}">
             <i class="remove alternate icon"></i>
             Delete Task
         </a>

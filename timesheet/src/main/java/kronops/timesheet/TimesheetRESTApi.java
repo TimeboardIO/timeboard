@@ -119,16 +119,16 @@ public class TimesheetRESTApi extends KronopsServlet {
             this.projectService.listTasksByProject(actor, ds, de).stream().forEach(projectTasks -> {
                 List<TaskWrapper> tasks = new ArrayList<>();
 
-                projectTasks.getTasks().stream().forEach(task -> {
+                projectTasks.getTaskRevisions().stream().forEach(task -> {
                     tasks.add(new TaskWrapper(
                             task.getId(),
-                            task.getName(),
+                            task.getLatestRevision().getName(),
                             task.getEffortSpent(),
                             task.getRemainsToBeDone(),
                             task.getEstimateWork(),
                             task.getReEstimateWork(),
-                            task.getStartDate(),
-                            task.getEndDate()));
+                            task.getLatestRevision().getStartDate(),
+                            task.getLatestRevision().getEndDate()));
 
                     days.forEach(dateWrapper -> {
                         double i = task.findTaskImputationValueByDate(dateWrapper.date);

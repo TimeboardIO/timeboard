@@ -86,25 +86,25 @@ public interface ProjectService {
     List<Task> listUserTasks(User user);
 
     /**
-     *
      * @return List all task types.
      */
     List<TaskType> listTaskType();
 
-    Task createTask(Project project, Task task);
+    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID);
 
-    Task updateTask(Task task);
+    Task updateTask(User actove, Task task, TaskRevision rev);
 
     Task getTask(long id);
-
 
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
 
     List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
 
-    UpdatedTaskResult updateTaskImputation(Long taskID, Date day, double imputation);
+    UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
 
-    UpdatedTaskResult updateTaskRTBD(Long taskID, double rtbd);
+    UpdatedTaskResult updateTaskRTBD(User actor, Long taskID, double rtbd);
 
     TaskType findTaskTypeByID(Long taskTypeID);
+
+    List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID);
 }

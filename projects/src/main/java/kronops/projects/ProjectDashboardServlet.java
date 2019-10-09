@@ -72,7 +72,7 @@ public class ProjectDashboardServlet extends KronopsServlet {
         final long id = Long.parseLong(request.getParameter("projectID"));
         final Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
 
-        ProjectDashboard dashboard = this.projectService.projectDashboard(project);
+        final ProjectDashboard dashboard = this.projectService.projectDashboard(project);
 
 
         viewModel.getViewDatas().put("project", project);

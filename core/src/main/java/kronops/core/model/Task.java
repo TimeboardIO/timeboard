@@ -29,9 +29,7 @@ package kronops.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 
 @Entity
@@ -41,26 +39,18 @@ public class Task implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(length = 50, unique = false, nullable = false)
-    private String name;
+    @OneToOne(targetEntity = TaskRevision.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private TaskRevision latestRevision;
 
-    @Temporal(TemporalType.DATE)
-    private Date startDate;
+    @OneToMany(targetEntity = TaskRevision.class, mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("revisionDate desc")
+    private List<TaskRevision> revisions;
 
-    @Temporal(TemporalType.DATE)
-    private Date endDate;
-
-    @Column(length = 500)
-    private String comments;
-
-    @Column(nullable = false)
-    private double estimateWork;
-
-    @Column(nullable = false)
-    private Double remainsToBeDone;
-
-    @OneToOne
-    private User assigned;
+    /**
+     * Task creation origin
+     */
+    @Column
+    private String origin;
 
     @OneToOne(targetEntity = TaskType.class)
     private TaskType taskType;
@@ -71,17 +61,18 @@ public class Task implements Serializable {
     @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
     private Set<Imputation> imputations;
 
-    /**
-     * OE.
-     *
-     * @return OE
-     */
-    public double getEstimateWork() {
-        return estimateWork;
+    public Task() {
+        this.revisions = new ArrayList<>();
+        this.imputations = new HashSet<>();
     }
 
-    public void setEstimateWork(double estimateWork) {
-        this.estimateWork = estimateWork;
+
+    public TaskRevision getLatestRevision() {
+        return latestRevision;
+    }
+
+    public void setLatestRevision(TaskRevision latestRevision) {
+        this.latestRevision = latestRevision;
     }
 
     public Long getId() {
@@ -92,36 +83,12 @@ public class Task implements Serializable {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getOrigin() {
+        return origin;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Date getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getComments() {
-        return comments;
-    }
-
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setOrigin(String origin) {
+        this.origin = origin;
     }
 
     public Project getProject() {
@@ -140,26 +107,36 @@ public class Task implements Serializable {
         this.imputations = imputations;
     }
 
-    public User getAssigned() {
-        return assigned;
+    public double getEstimateWork(){
+        if(this.getLatestRevision() != null) {
+            return this.getLatestRevision().getEstimateWork();
+        }else{
+            return 0;
+        }
     }
-
-    public void setAssigned(User assigned) {
-        this.assigned = assigned;
-    }
-
 
     /**
      * EL.
      *
      * @return EL
      */
+    @Transient
     public double getRemainsToBeDone() {
-        return this.remainsToBeDone;
+        if(this.getLatestRevision() != null) {
+            return this.getLatestRevision().getRemainsToBeDone();
+        }else{
+            return 0;
+        }
     }
 
-    public void setRemainsToBeDone(double rtbd) {
-        this.remainsToBeDone = rtbd;
+    @Transient
+    public void setRemainsToBeDone(final User actor, double rtbd) {
+        TaskRevision taskRevision = this.getLatestRevision().clone();
+        taskRevision.setRemainsToBeDone(rtbd);
+        taskRevision.setRevisionDate(new Date());
+        taskRevision.setRevisionActor(actor);
+        this.setLatestRevision(taskRevision);
+        this.revisions.add(taskRevision);
     }
 
     public TaskType getTaskType() {
@@ -168,11 +145,6 @@ public class Task implements Serializable {
 
     public void setTaskType(TaskType taskType) {
         this.taskType = taskType;
-    }
-
-    @Transient
-    public boolean isOpen(Date date) {
-        return (date.before(this.endDate) || date.equals(this.endDate)) && (date.after(this.startDate) || date.equals(this.startDate));
     }
 
 
@@ -208,5 +180,11 @@ public class Task implements Serializable {
         }
     }
 
+    public List<TaskRevision> getRevisions() {
+        return revisions;
+    }
 
+    public void setRevisions(List<TaskRevision> revisions) {
+        this.revisions = revisions;
+    }
 }
