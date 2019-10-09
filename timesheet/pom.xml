@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>parent</artifactId>
-        <groupId>kronops</groupId>
+        <groupId>timeboard</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -56,7 +56,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>kronops</groupId>
+            <groupId>timeboard</groupId>
             <artifactId>security</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
@@ -81,15 +81,15 @@
                             org.apache.commons.logging,
                             !org.springframework,
                             org.osgi.service.log,
-                            kronops.core.model,
-                            kronops.core.ui,
-                            kronops.core.api,
-                            kronops.security,
+                            timeboard.core.model,
+                            timeboard.core.ui,
+                            timeboard.core.api,
+                            timeboard.security,
                             com.fasterxml.*,
                             org.xml.sax
                         </Import-Package>
                         <Export-Package>
-                            kronops.timesheet
+                            timeboard.timesheet
                         </Export-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

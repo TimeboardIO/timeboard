@@ -1,4 +1,4 @@
-# Kronops Cheats
+# Timeboard Cheats
 
 
 ## How to control database connexion ?
@@ -7,11 +7,11 @@
 
 ## Where is my database configuration ?
 
-    [KRONOPS_HOME]/etc/org.ops4j.datasource-kronops-core-ds.cfg
+    [KRONOPS_HOME]/etc/org.ops4j.datasource-timeboard-core-ds.cfg
 
 ## How to create new users ?
 
-    kronops:add-user
+    timeboard:add-user
 
 ## How to display active http endpoints ?
 

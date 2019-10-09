@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>parent</artifactId>
-        <groupId>kronops</groupId>
+        <groupId>timeboard</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <packaging>bundle</packaging>
@@ -37,11 +37,11 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            kronops.sample
+                            timeboard.sample
                         </Export-Package>
                         <Import-Package>
-                            kronops.core.api.*,
-                            kronops.core.model
+                            timeboard.core.api.*,
+                            timeboard.core.model
                         </Import-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

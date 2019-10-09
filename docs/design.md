@@ -3,11 +3,11 @@
 
 ## Big picture
 
-Kronops is based on Apache Karaf Runtime.
+Timeboard is based on Apache Karaf Runtime.
 
 ![alt text](images/deployment.png "Login form UI")
 
-All Kronops runtime dependencies can be found in Karaf [feature.xml](../features/src/main/feature/feature.xml) file
+All Timeboard runtime dependencies can be found in Karaf [feature.xml](../features/src/main/feature/feature.xml) file
 
 
 ## Technical stack
@@ -25,7 +25,7 @@ All Kronops runtime dependencies can be found in Karaf [feature.xml](../features
 - Semantic-UI
 
 
-## Kronops components
+## Timeboard components
 
 - Core : business logic
 - Core-ui : runtime framework for web ui
@@ -33,13 +33,13 @@ All Kronops runtime dependencies can be found in Karaf [feature.xml](../features
 - Projects : projects, tasks and clusters setup pages
 - Timesheet : page used to note effort spent on projects
 - Security : brind software security (filters, login form)
-- Shell : custom karaf shell commands for Kronops
+- Shell : custom karaf shell commands for Timeboard
 
 ## Functionnal basics
 
 ### Actor
 
-Any logged user to Kronops is an actor
+Any logged user to Timeboard is an actor
 
 ### Project
 

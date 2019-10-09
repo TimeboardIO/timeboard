@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>parent</artifactId>
-        <groupId>kronops</groupId>
+        <groupId>timeboard</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -67,15 +67,15 @@
                     <instructions>
                         <Import-Package>
                             org.apache.karaf.jaas.config,
-                            kronops.core.ui,
-                            kronops.core.api.*,
-                            kronops.core.model,
+                            timeboard.core.ui,
+                            timeboard.core.api.*,
+                            timeboard.core.model,
                             !com.sun.jdi,
                             *
                         </Import-Package>
                         <Export-Package>
-                            kronops.security,
-                            kronops.security.api
+                            timeboard.security,
+                            timeboard.security.api
                         </Export-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

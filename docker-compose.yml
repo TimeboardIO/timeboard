@@ -1,7 +1,7 @@
 version: "3.7"
 services:
-  kronops:
-    image: kronopsio/kronops
+  timeboard:
+    image: timeboardio/timeboard
     ports:
       - 8181:8181
     links:
@@ -11,7 +11,7 @@ services:
     volumes:
       - ${PWD}/scripts/sql:/docker-entrypoint-initdb.d
     environment:
-      - MYSQL_ROOT_PASSWORD=kronops
-      - MYSQL_DATABASE=kronops
+      - MYSQL_ROOT_PASSWORD=timeboard
+      - MYSQL_DATABASE=timeboard
 
 

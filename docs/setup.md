@@ -12,7 +12,7 @@
 
 ### Download source code
 
-    git clone https://github.com/pierremellet/kronops.git
+    git clone https://github.com/pierremellet/timeboard.git
 
 ### Setup Apache Karaf
 
@@ -43,17 +43,17 @@ Open your web browser and got to
     username : karaf
     password : karaf
 
-If you can access to Karaf webconsole, your installation is ready to deploy Kronops !
+If you can access to Karaf webconsole, your installation is ready to deploy Timeboard !
 
 ### Setup database
 
 Run this docker command to provide database container and deploy database configurations. 
 Commands are assumed to be run from source code root folder. 
 
-    docker run -d --name kronops-mysql \
+    docker run -d --name timeboard-mysql \
         -v ${PWD}/scripts/sql:/docker-entrypoint-initdb.d \
-        -e MYSQL_ROOT_PASSWORD=kronops \
-        -e MYSQL_DATABASE=kronops \
+        -e MYSQL_ROOT_PASSWORD=timeboard \
+        -e MYSQL_DATABASE=timeboard \
         -p 3306:3306 \
         mysql:8.0
         
@@ -62,43 +62,43 @@ A shortcut is available
     ./scripts/docker/mysql.sh
     
 
-### Build Kronops source code
+### Build Timeboard source code
 
 Command is assumed to be run from source code root folder :
 
     mvn install    
     
 
-### Deploy Kronops
+### Deploy Timeboard
 
 
 Command is assumed to be run in Apache Karaf Shell :
 
-    feature:repo-add mvn:kronops/features/LATEST/xml
+    feature:repo-add mvn:timeboard/features/LATEST/xml
 
 
 Command is assumed to be run in Apache Karaf Shell :
 
-    feature:install kronops-core 
-    feature:install kronops-home kronops-projects kronops-timesheet  
-    feature:install kronops-shell  
+    feature:install timeboard-core 
+    feature:install timeboard-home timeboard-projects timeboard-timesheet  
+    feature:install timeboard-shell  
 
 Open your web browser and got to 
 
     http://localhost:8181
     
-Congratulation, you have access to Kronops login page !
+Congratulation, you have access to Timeboard login page !
 
 ### Last job : create user account
 
-Kronops database is empty at first startup
+Timeboard database is empty at first startup
 In order to create your first user, you must use Apache Karaf Shell 
 
-    kronops:add-user -u kronops -p pwd -e kronops@localhost.com
+    timeboard:add-user -u timeboard -p pwd -e timeboard@localhost.com
         
-Now, you can login into Kronops with 
+Now, you can login into Timeboard with 
 
-    username : kronops
+    username : timeboard
     password : pwd      
         
 
@@ -121,7 +121,7 @@ Build karaf Kar bundle
     
 Build docker container
 
-    docker build -t kronopsio/kronops .
+    docker build -t timeboardio/timeboard .
         
 Run docker compose
 

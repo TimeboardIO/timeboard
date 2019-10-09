@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>parent</artifactId>
-        <groupId>kronops</groupId>
+        <groupId>timeboard</groupId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
@@ -82,7 +82,7 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            kronops.*,
+                            timeboard.*,
                             javax.naming,
                             javax.security.auth.x500,
                             javax.naming.ldap,
@@ -92,7 +92,7 @@
                             javax.net.ssl
                         </Import-Package>
                         <Export-Package>
-                            kronops.plugin.project.imp.jira
+                            timeboard.plugin.project.imp.jira
                         </Export-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

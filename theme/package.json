@@ -1,5 +1,5 @@
 {
-  "name": "kronops-theme",
+  "name": "timeboard-theme",
   "scripts": {
     "build": "rm -rf src/main/resources/* && cd semantic && gulp build && cp -r ./dist/ ../src/main/resources/static"
   },

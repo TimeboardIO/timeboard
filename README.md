@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kronopsio/kronops.svg?branch=develop)](https://travis-ci.com/kronopsio/kronops)
+[![Build Status](https://travis-ci.com/timeboardio/timeboard.svg?branch=develop)](https://travis-ci.com/timeboardio/timeboard)
 
 # Documentations
 
