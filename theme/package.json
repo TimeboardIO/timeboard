@@ -4,6 +4,9 @@
     "build": "rm -rf src/main/resources/* && cd semantic && gulp build && cp -r ./dist/ ../src/main/resources/static"
   },
   "dependencies": {
-    "semantic-ui": "^2.4.2"
+    "semantic-ui": "^2.4.2",
+    "diff": ">=3.5.0",
+    "lodash.template": ">=4.5.0",
+    "lodash": ">=4.17.13"
   }
 }
