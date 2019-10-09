@@ -94,7 +94,8 @@
                         </Export-Package>
                         <Import-Package>
                             timeboard.core.ui,
-                            javax.servlet
+                            javax.servlet,
+                            javax.servlet.http
                         </Import-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
