@@ -93,7 +93,8 @@
                             timeboard.theme
                         </Export-Package>
                         <Import-Package>
-                            timeboard.core.ui
+                            timeboard.core.ui,
+                            javax.servlet
                         </Import-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

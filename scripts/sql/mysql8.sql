@@ -34,6 +34,7 @@
         attributes json,
         comments varchar(500),
         name varchar(50),
+        quotation double precision,
         startDate date,
         primary key (id)
     ) engine=InnoDB;

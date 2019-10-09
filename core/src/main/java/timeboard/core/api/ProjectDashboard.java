@@ -33,11 +33,17 @@ public final class ProjectDashboard implements Serializable {
     private final double estimateWork;
     private final double remainToBeDone;
     private final double effortSpent;
+    private final double quotation;
 
-    public ProjectDashboard(double estimateWork, double remainToBeDone, double effortSpent) {
+    public ProjectDashboard(double quotation, double estimateWork, double remainToBeDone, double effortSpent) {
+        this.quotation = quotation;
         this.estimateWork = estimateWork;
         this.remainToBeDone = remainToBeDone;
         this.effortSpent = effortSpent;
+    }
+
+    public double getQuotation() {
+        return quotation;
     }
 
     public final double getEstimateWork() {

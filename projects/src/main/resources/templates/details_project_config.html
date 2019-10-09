@@ -38,6 +38,11 @@
 
                 </div>
                 <div class="field">
+                    <label>Project Quotation</label>
+                    <input name="projectQuotation" required th:value="${project.quotation}"
+                           type="number">
+                </div>
+                <div class="field">
                     <label>Project Description</label>
                     <textarea name="projectDescription" placeholder="Project Description" required
                               th:text="${project.comments}">

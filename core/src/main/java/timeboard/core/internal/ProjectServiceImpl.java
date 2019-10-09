@@ -155,7 +155,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             final Double effortSpent = effortSpentQuery.getSingleResult();
 
-            return new ProjectDashboard((Double) EWandRTBD[0], (Double) EWandRTBD[1], effortSpent);
+            return new ProjectDashboard(project.getQuotation(), (Double) EWandRTBD[0], (Double) EWandRTBD[1], effortSpent);
 
         });
     }
