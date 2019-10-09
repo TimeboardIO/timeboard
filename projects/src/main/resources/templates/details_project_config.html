@@ -16,10 +16,9 @@
             $("#"+userID).remove();
         }
 
-        var showTaskDetails = function(taskID){
-         
+        var removeConfig = function(configKey){
+            $("[data-key="+configKey+"]").remove();
         }
-
 
 
 
@@ -43,6 +42,53 @@
                     <textarea name="projectDescription" placeholder="Project Description" required
                               th:text="${project.comments}">
                     </textarea>
+                </div>
+                <h4 class="ui dividing header">Project Configuration</h4>
+                <div class="field">
+
+                    <table class="ui celled table">
+                        <thead>
+                        <tr>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th>Encrypt</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="attr : ${project.getAttributes()}" th:attr="data-key=${attr.key}">
+                            <td th:text="${attr.key}">
+                            </td>
+                            <td>
+                                <input th:if="${attr.value.encrypted == false}" type="text" th:name="'attr-'+${attr.key}" th:value="${attr.value.value}"/>
+                                <input th:if="${attr.value.encrypted == true}" type="text" readonly th:name="'attr-'+${attr.key}" th:value="${attr.value.value}"/>
+                            </td>
+                            <td th:text="${attr.value.encrypted}">
+                                <input  type="hidden"  th:name="'attrenc-'+${attr.key}" th:value="${attr.value.encrypted}"/>
+                            </td>
+                            <td>
+                                <div class="ui negative basic button delete" th:attr="data-key=${attr.key}">
+                                    <i class="remove alternate icon"></i>
+                                    Remove
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="text" name="newAttrKey" placeholder="new conf key"/>
+                            </td>
+                            <td>
+                                <input type="text" name="newAttrValue" placeholder="new conf value"/>
+                            </td>
+                            <td>
+                                <input type="checkbox" name="newAttrEncrypted"/>
+                            </td>
+                            <td></td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+
                 </div>
             </div>
             <div class="column">
@@ -85,19 +131,34 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
 
+                <h4 class="ui dividing header">Exports</h4>
+                <div>
+                    <a target="_blank" class="ui orange basic button" th:each="export: ${exports}" th:href="@{/projects/export(projectID=${project.id}, type=${export.getMimeType()})}" th:text="${export.getName()}" ></a>
+                </div>
+
+                <h4 class="ui dividing header">Imports</h4>
+                <div>
+                    <a class="ui green basic button" th:each="import: ${imports}" th:href="@{/projects/import(projectID=${project.id}, type=${import.getServiceName()})}" th:text="${import.getServiceName()}" ></a>
+                </div>
+
+            </div>
 
         </div>
 
 
-        <button class="ui positive button" type="submit">Save</button>
+        <button class="ui positive button" type="submit" style="margin-top:1em">Save</button>
     </form>
     <script>
 
         $('.ui.checkbox')
           .checkbox()
         ;
+
+        $('.delete[data-key]').click(function(){
+        console.log("delete");
+            $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
+        });
 
 
 

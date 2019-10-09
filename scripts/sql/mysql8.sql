@@ -15,6 +15,12 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
+    insert into hibernate_sequence values ( 1 );
+
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         day date,
@@ -25,6 +31,7 @@
 
     create table Project (
        id bigint not null,
+        attributes json,
         comments varchar(500),
         name varchar(50),
         startDate date,
@@ -54,14 +61,31 @@
 
     create table Task (
        id bigint not null,
+        origin varchar(255),
+        latestRevision_id bigint,
+        project_id bigint,
+        taskType_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table TaskRevision (
+       id bigint not null,
         comments varchar(500),
         endDate date,
         estimateWork double precision not null,
         name varchar(50) not null,
-        remainsToBeDone double precision,
+        remainsToBeDone double precision not null,
+        revisionDate datetime(6),
         startDate date,
         assigned_id bigint,
-        project_id bigint,
+        revisionActor_id bigint,
+        task_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table TaskType (
+       id bigint not null,
+        typeName varchar(255),
         primary key (id)
     ) engine=InnoDB;
 
@@ -80,14 +104,20 @@
         primary key (id)
     ) engine=InnoDB;
 
-    alter table Project 
-       add constraint UK_iflk2yk9ma95q0q9ovhftpi63 unique (name);
+    create table ValidatedTimesheet (
+       id bigint not null,
+        week integer,
+        year integer,
+        user_id bigint,
+        validatedBy_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
+    alter table Imputation 
+       add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
     alter table ProjectCluster 
        add constraint UK_3k2bn97rxcj148mqb4wo03cob unique (name);
-
-    alter table Task 
-       add constraint UK_awswgpgqdgcos1g5t6wehc24m unique (name);
 
     alter table User 
        add constraint UK_587tdsv8u5cvheyo9i261xhry unique (login);
@@ -123,11 +153,41 @@
        references Project (id);
 
     alter table Task 
-       add constraint FKc44lafqphn0ecv9phdfate2kb 
-       foreign key (assigned_id) 
-       references User (id);
+       add constraint FKjwuo5mqkfx9k23jd3g8vr4a2p 
+       foreign key (latestRevision_id) 
+       references TaskRevision (id);
 
     alter table Task 
        add constraint FKkkcat6aybe3nbvhc54unstxm6 
        foreign key (project_id) 
        references Project (id);
+
+    alter table Task 
+       add constraint FKigksw4egslpbdevlab7ucu8lb 
+       foreign key (taskType_id) 
+       references TaskType (id);
+
+    alter table TaskRevision 
+       add constraint FKp9ssbxu7c3w7fr3jukkget1ne 
+       foreign key (assigned_id) 
+       references User (id);
+
+    alter table TaskRevision 
+       add constraint FK16welq7uyu2n2xmycgw23ebgq 
+       foreign key (revisionActor_id) 
+       references User (id);
+
+    alter table TaskRevision 
+       add constraint FKpsj9t1js8flo735q3nx3o0c6d 
+       foreign key (task_id) 
+       references Task (id);
+
+    alter table ValidatedTimesheet 
+       add constraint FKf4lmab2846nt5smlforv45yj3 
+       foreign key (user_id) 
+       references User (id);
+
+    alter table ValidatedTimesheet 
+       add constraint FK7ffrinnv0q59rfi7a1dkjvh26 
+       foreign key (validatedBy_id) 
+       references User (id);

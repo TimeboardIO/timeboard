@@ -1,10 +1,10 @@
-package kronops.core;
+package timeboard.core;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Kronops
+ * Copyright (C) 2019 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@ package kronops.core;
  * #L%
  */
 
-import kronops.core.api.TreeNode;
-import kronops.core.model.ProjectCluster;
+import timeboard.core.api.TreeNode;
+import timeboard.core.model.ProjectCluster;
 import org.junit.jupiter.api.Test;
 
 public class TreeNodeTest {

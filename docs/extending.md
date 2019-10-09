@@ -1,8 +1,8 @@
-# Extended Kronops
+# Extended Timeboard
 
 ## Branding
 
-Kronops base deployment prodived a bundle named "theme". 
+Timeboard base deployment prodived a bundle named "theme". 
 This bundle implements some "core" services to customize application look and fell.
 
 To customize branding you have to provide your own theme bundle.
@@ -15,5 +15,5 @@ To customize branding you have to provide your own theme bundle.
 
 ## Tabs
 
-Kronops UI Layout provide a primary nav menu (home, projects, timesheet).
+Timeboard UI Layout provide a primary nav menu (home, projects, timesheet).
 To add a new tab, you have to provide **NavigationExtPoint** service implementation.

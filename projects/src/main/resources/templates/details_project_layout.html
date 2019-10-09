@@ -12,13 +12,13 @@
 
     <div class="ui top attached tabular menu">
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
-           th:href="@{/projects/config(projectID=${project.id})}">Summary</a>
+           th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
            th:href="@{/projects/tasks(projectID=${project.id})}">Tasks</a>
-        <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
-           th:href="@{/projects/blueprint(projectID=${project.id})}">Blueprint</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
            th:href="@{/projects/clusters(projectID=${project.id})}">Clusters</a>
+        <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
+           th:href="@{/projects/dashboard(projectID=${project.id})}">Dashboard</a>
     </div>
     <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
 

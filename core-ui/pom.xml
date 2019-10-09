@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>kronops</groupId>
+    <groupId>timeboard</groupId>
     <artifactId>core-ui</artifactId>
     <packaging>bundle</packaging>
 
     <parent>
-        <groupId>kronops</groupId>
+        <groupId>timeboard</groupId>
         <artifactId>parent</artifactId>
         <version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
@@ -86,12 +86,11 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            kronops.core.ui,
+                            timeboard.core.ui,
                             nz.net.ultraq.thymeleaf,
                             com.fasterxml.jackson.databind,
                             com.fasterxml.jackson.core,
                             org.thymeleaf.*,
-                            ongl.*,
                             !org.slf4j
                             com.fasterxml.jackson.*,
                         </Export-Package>
