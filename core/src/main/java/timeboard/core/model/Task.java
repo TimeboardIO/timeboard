@@ -139,6 +139,11 @@ public class Task implements Serializable {
         this.revisions.add(taskRevision);
     }
 
+    @Transient
+    public void updateCurrentRemainsToBeDone(final User actor, double rtbd) {
+        this.getLatestRevision().setRemainsToBeDone(rtbd);
+    }
+
     public TaskType getTaskType() {
         return taskType;
     }

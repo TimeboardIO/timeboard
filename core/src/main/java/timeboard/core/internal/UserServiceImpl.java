@@ -125,6 +125,9 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByID(final Long userID) {
+        if(userID == null){
+            return null;
+        }
         return jpa.txExpr(entityManager -> entityManager
                 .find(User.class, userID));
     }

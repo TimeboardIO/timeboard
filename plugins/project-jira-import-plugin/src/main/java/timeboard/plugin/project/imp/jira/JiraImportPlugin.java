@@ -65,8 +65,8 @@ public class JiraImportPlugin implements ProjectImportService {
 
             final Project project = this.projectService.getProjectByID(actor, projectID);
 
-            String jiraUsername = project.getArguments().get(JIRA_USERNAME_KEY);
-            String jiraPassword = project.getArguments().get(JIRA_PASSWORD_KEY);
+            String jiraUsername = project.getAttributes().get(JIRA_USERNAME_KEY).getValue();
+            String jiraPassword = project.getAttributes().get(JIRA_PASSWORD_KEY).getValue();
 
             final JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
             final URI uri = new URI("https://tsl-extranet.fr/jira");

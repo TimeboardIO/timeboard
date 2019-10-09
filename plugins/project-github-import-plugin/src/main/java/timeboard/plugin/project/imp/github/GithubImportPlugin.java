@@ -68,17 +68,17 @@ public class GithubImportPlugin implements ProjectImportService {
         try {
             final Project targetProject = this.projectService.getProjectByID(actor, projectID);
 
-            final String githubOAuthToken = targetProject.getArguments().get(GITHUB_TOKEN_KEY);
+            final String githubOAuthToken = targetProject.getAttributes().get(GITHUB_TOKEN_KEY).getValue();
             if(githubOAuthToken == null){
                 throw new BusinessException("Missing "+GITHUB_TOKEN_KEY+" in project configuration");
             }
 
-            final String githubRepoOwner = targetProject.getArguments().get(GITHUB_REPO_OWNER_KEY);
+            final String githubRepoOwner = targetProject.getAttributes().get(GITHUB_REPO_OWNER_KEY).getValue();
             if(githubRepoOwner == null){
                 throw new BusinessException("Missing "+GITHUB_REPO_OWNER_KEY+" in project configuration");
             }
 
-            final String githubRepoName = targetProject.getArguments().get(GITHUB_REPO_NAME_KEY);
+            final String githubRepoName = targetProject.getAttributes().get(GITHUB_REPO_NAME_KEY).getValue();
             if(githubRepoName == null){
                 throw new BusinessException("Missing "+GITHUB_REPO_NAME_KEY+" in project configuration");
             }
@@ -90,13 +90,7 @@ public class GithubImportPlugin implements ProjectImportService {
             List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
             issues.stream().forEach(issue -> {
-
-                Task taskFromGithub = new Task();
-                taskFromGithub.setName(issue.getTitle());
-                taskFromGithub.setComments(issue.getUrl());
-                taskFromGithub.setStartDate(issue.getCreatedAt());
-
-                this.projectService.createTask(targetProject, taskFromGithub);
+                this.projectService.createTask(actor, targetProject, issue.getTitle(), issue.getUrl(), issue.getCreatedAt(), issue.getClosedAt(), 0, null, null);
             });
 
 

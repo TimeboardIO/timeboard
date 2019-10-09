@@ -185,6 +185,7 @@ public class TaskRevision implements Serializable, Cloneable {
         taskRevision.setRemainsToBeDone(this.getRemainsToBeDone());
         taskRevision.setStartDate(this.getStartDate());
         taskRevision.setEndDate(this.getEndDate());
+        taskRevision.setEstimateWork(this.getEstimateWork());
         taskRevision.setRevisionDate(this.getRevisionDate());
 
         return taskRevision;

@@ -332,7 +332,7 @@ public class ProjectServiceImpl implements ProjectService {
                 i.setDay(c.getTime());
                 i.setTask(task);
                 i.setValue(val);
-                task.setRemainsToBeDone(actor,task.getRemainsToBeDone() - val);
+                task.updateCurrentRemainsToBeDone(actor,task.getRemainsToBeDone() - val);
                 entityManager.persist(i);
             }
 
@@ -340,10 +340,10 @@ public class ProjectServiceImpl implements ProjectService {
                 Imputation i = existingImputations.get(0);
 
                 if (i.getValue() < val) {
-                    task.setRemainsToBeDone(actor,task.getRemainsToBeDone() - Math.abs(val - i.getValue()));
+                    task.updateCurrentRemainsToBeDone(actor,task.getRemainsToBeDone() - Math.abs(val - i.getValue()));
                 }
                 if (i.getValue() > val) {
-                    task.setRemainsToBeDone(actor,task.getRemainsToBeDone() + Math.abs(i.getValue() - val));
+                    task.updateCurrentRemainsToBeDone(actor,task.getRemainsToBeDone() + Math.abs(i.getValue() - val));
                 }
                 if (val == 0) {
                     entityManager.remove(i);

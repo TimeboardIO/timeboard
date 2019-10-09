@@ -126,6 +126,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         TaskForm taskForm = new TaskForm(request);
 
+
+
         return this.projectService.createTask(actor,
                 project,
                 taskForm.getTaskName(),
@@ -134,7 +136,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskForm.getEndDate(),
                 taskForm.getEstimateWork(),
                 taskForm.getTaskTypeID(),
-                this.userService.findUserByID(taskForm.getAssignedUserID()));
+                this.userService.findUserByID(taskForm.getAssignedUserID())
+                );
     }
 
     private Task updateTask(User actor, Project project, Task currentTask, HttpServletRequest request) throws ParseException {
@@ -205,7 +208,9 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
             }
 
-            assignedUserID = Long.parseLong(request.getParameter("taskAssigned"));
+            if(request.getParameter("taskAssigned") != null && !request.getParameter("taskAssigned").isEmpty()) {
+                assignedUserID = Long.parseLong(request.getParameter("taskAssigned"));
+            }
         }
 
         public Long getTaskID() {
