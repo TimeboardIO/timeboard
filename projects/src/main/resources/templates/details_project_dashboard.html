@@ -63,6 +63,7 @@
 
       /*<![CDATA[*/
 
+         var qt = /*[[${dashboard.quotation}]]*/ 'QT';
          var oe = /*[[${dashboard.estimateWork}]]*/ 'EW';
          var re = /*[[${dashboard.reEstimateWork}]]*/ 'RE';
          var es = /*[[${dashboard.effortSpent}]]*/ 'ES';
@@ -70,29 +71,35 @@
 
 
         const data = {
-        labels: ['OE', 'RE', 'Efforts'],
+        labels: ['QT', 'OE', 'RE', 'ES'],
         datasets: [
             {
+                label: 'Quotation',
+                data: [qt,0,0,0],
+                backgroundColor: 'royalblue',
+                borderWidth: 3
+            },
+            {
                 label: 'Estimated Work',
-                data: [oe,0,0],
+                data: [0, oe,0,0],
                 backgroundColor: '#ff6384',
                 borderWidth: 3
             },
              {
                 label: 'REestimated Work',
-                data: [0,re,0],
+                data: [0, 0,re,0],
                 backgroundColor: '#36a2eb',
                 borderWidth: 3
             },
              {
                 label: 'ES',
-                data: [0,0,es],
+                data: [0, 0, 0,es],
                 backgroundColor: '#cc65fe',
                 borderWidth: 3
             },
              {
                 label: 'EL',
-                data: [0,0,el],
+                data: [0, 0, 0, el],
                 backgroundColor: '#ffce56',
                 borderWidth: 3
             }

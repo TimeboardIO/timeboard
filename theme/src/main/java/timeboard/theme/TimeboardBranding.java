@@ -26,16 +26,32 @@ package timeboard.theme;
  * #L%
  */
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.ui.BrandingService;
 import org.osgi.service.component.annotations.Component;
 
+import java.util.Map;
+
 @Component(
         service = BrandingService.class,
-        immediate = true
+        scope = ServiceScope.SINGLETON,
+        property = {
+                "timeboard.name=Timeboards"
+        },
+        configurationPid = "timeboard.theme.TimeboardBranding"
 )
 public class TimeboardBranding implements BrandingService {
+
+    private String name;
+
+    @Activate
+    private void init(Map<String, String> conf){
+        this.name = conf.get("timeboard.name");
+    }
     @Override
     public String appName() {
-        return "Timeboard";
+        return name;
     }
 }

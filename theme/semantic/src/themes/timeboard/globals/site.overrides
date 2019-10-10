@@ -1,0 +1,57 @@
+/*******************************
+        Global Overrides
+*******************************/
+
+.timesheet-navigation-controls{
+    margin-bottom: 1em;
+    text-align: right;
+}
+
+.timesheet-validation-controls{
+    margin-top: 1em;
+}
+
+.navigation{
+    background-color : white ! important;
+}
+
+.login{
+        position: fixed;
+        bottom: 0px;
+        right: 0px;
+        left: 0px;
+        top: 0px;
+
+       background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
+       background-size: 600% 600%;
+
+       -webkit-animation: AnimationName 12s ease infinite;
+       -moz-animation: AnimationName 12s ease infinite;
+       animation: AnimationName 12s ease infinite;
+
+       @-webkit-keyframes AnimationName {
+           0%{background-position:0% 68%}
+           50%{background-position:100% 33%}
+           100%{background-position:0% 68%}
+       }
+       @-moz-keyframes AnimationName {
+           0%{background-position:0% 68%}
+           50%{background-position:100% 33%}
+           100%{background-position:0% 68%}
+       }
+       @keyframes AnimationName {
+           0%{background-position:0% 68%}
+           50%{background-position:100% 33%}
+           100%{background-position:0% 68%}
+       }
+   }
+
+div.login > .grid {
+  height: 100%;
+}
+.login .image {
+  margin-top: -100px;
+}
+.login .column {
+  max-width: 450px;
+}

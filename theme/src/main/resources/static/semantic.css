@@ -775,38 +775,38 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
   right: 0px;
   left: 0px;
   top: 0px;
-  background: -webkit-linear-gradient(222deg, #0a368e, #5eb959, #3c5ad2);
-  background: linear-gradient(228deg, #0a368e, #5eb959, #3c5ad2);
+  background: -webkit-linear-gradient(50deg, #44b79a, #33b6dd, #b37dff);
+  background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
   background-size: 600% 600%;
-  -webkit-animation: AnimationName 14s ease infinite;
-  animation: AnimationName 14s ease infinite;
+  -webkit-animation: AnimationName 12s ease infinite;
+  animation: AnimationName 12s ease infinite;
 }
 
 @-webkit-keyframes AnimationName {
   0% {
-    background-position: 19% 0%;
+    background-position: 0% 68%;
   }
 
   50% {
-    background-position: 82% 100%;
+    background-position: 100% 33%;
   }
 
   100% {
-    background-position: 19% 0%;
+    background-position: 0% 68%;
   }
 }
 
 @keyframes AnimationName {
   0% {
-    background-position: 19% 0%;
+    background-position: 0% 68%;
   }
 
   50% {
-    background-position: 82% 100%;
+    background-position: 100% 33%;
   }
 
   100% {
-    background-position: 19% 0%;
+    background-position: 0% 68%;
   }
 }
 
@@ -5178,6 +5178,10 @@ div.login > .grid {
 .ui.vertical.buttons .button:only-child {
   border-radius: 0.28571429rem;
 }
+
+/*******************************
+         Theme Overrides
+*******************************/
 
 /*******************************
          Site Overrides

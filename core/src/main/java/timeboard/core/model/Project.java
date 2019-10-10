@@ -42,6 +42,9 @@ public class Project implements Serializable {
     @Column(length = 50, unique = false)
     private String name;
 
+    @Column
+    private Double quotation;
+
     @Temporal(TemporalType.DATE)
     private Date startDate;
 
@@ -79,6 +82,14 @@ public class Project implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public Double getQuotation() {
+        return quotation;
+    }
+
+    public void setQuotation(Double quotation) {
+        this.quotation = quotation;
     }
 
     public String getName() {

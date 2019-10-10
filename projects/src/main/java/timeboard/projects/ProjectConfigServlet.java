@@ -144,6 +144,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
+        project.setQuotation(Double.parseDouble(request.getParameter("projectQuotation")));
 
         //Extract project configuration
         project.getAttributes().clear();

@@ -10,13 +10,18 @@ before_install:
 
 script:
   - mvn clean install -P full
-  - cd features && mvn karaf:kar && cd ..
-  - ls
+  - mvn -f features/pom.xml install karaf:kar
+
+after_success:
+  - docker build -t timeboardio/timeboard .
+
 
 deploy:
-  provider: releases
-  api_key: "$GITHUB_TOKEN"
-  file: "features/target/features-1.0-SNAPSHOT.kar"
-  skip_cleanup: true
-  on:
-    tags: true
+  - provider: releases
+    api_key: "$GITHUB_TOKEN"
+    file: "features/target/features-1.0-SNAPSHOT.kar"
+    skip_cleanup: true
+    on:
+      tags: true
+  - provider: script
+    script: bash docker_push
