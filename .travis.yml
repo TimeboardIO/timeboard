@@ -13,10 +13,20 @@ script:
   - cd features && mvn karaf:kar && cd ..
   - ls
 
+after_success:
+  - docker build -t timeboardio/timeboard .
+
+
 deploy:
-  provider: releases
-  api_key: "$GITHUB_TOKEN"
-  file: "features/target/features-1.0-SNAPSHOT.kar"
-  skip_cleanup: true
-  on:
-    tags: true
+  - provider: releases
+    api_key: "$GITHUB_TOKEN"
+    file: "features/target/features-1.0-SNAPSHOT.kar"
+    skip_cleanup: true
+    on:
+      tags: true
+  - provider: script
+    script:
+      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      - docker push timeboardio/timeboard
+    on:
+      branch: master
