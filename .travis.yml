@@ -10,7 +10,7 @@ before_install:
 
 script:
   - mvn clean install -P full
-  - mvn -f features/pom.xml install karaf:kar.
+  - mvn -f features/pom.xml install karaf:kar
 
 after_success:
   - docker build -t timeboardio/timeboard .
