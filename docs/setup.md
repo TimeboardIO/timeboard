@@ -6,13 +6,14 @@
 
 - Open JDK 11
 - Docker engine
+- Maven
 - Internet connexion
 - MySQL Workbench
-- Intellij
+- Intellij or maven compatible IDE
 
 ### Download source code
 
-    git clone https://github.com/pierremellet/timeboard.git
+    git clone https://github.com/timeboardio/timeboard.git
 
 ### Setup Apache Karaf
 
@@ -66,7 +67,7 @@ A shortcut is available
 
 Command is assumed to be run from source code root folder :
 
-    mvn install    
+    mvn install -p full   
     
 
 ### Deploy Timeboard
