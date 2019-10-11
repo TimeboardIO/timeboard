@@ -215,6 +215,7 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
   background: -webkit-linear-gradient(50deg, #44b79a, #33b6dd, #b37dff);
   background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
   background-size: 600% 600%;
+  background-color: pink;
   -webkit-animation: AnimationName 12s ease infinite;
   animation: AnimationName 12s ease infinite;
 }
