@@ -67,7 +67,7 @@ A shortcut is available
 
 Command is assumed to be run from source code root folder :
 
-    mvn install -p full   
+    mvn install -P full   
     
 
 ### Deploy Timeboard
