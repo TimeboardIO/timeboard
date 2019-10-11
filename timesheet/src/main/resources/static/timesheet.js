@@ -24,10 +24,12 @@ const timesheetModel = {
     imputations: {},
     getImputationSum: function(date){
         var sum = 0;
-        Object.keys(this.imputations[date])
-        .forEach(function(i){
-            sum += this.imputations[date][i];
-        }.bind(this));
+        if(this.imputations[date]){
+            Object.keys(this.imputations[date])
+            .forEach(function(i){
+                sum += this.imputations[date][i];
+            }.bind(this));
+        }
         return sum;
     },
     getImputation: function(date, taskID){
