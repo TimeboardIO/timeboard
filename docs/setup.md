@@ -5,6 +5,7 @@
 ### Prerequisites
 
 - Open JDK 11
+- Nodejs
 - Docker engine
 - Maven
 - Internet connexion
