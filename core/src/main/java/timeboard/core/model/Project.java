@@ -85,6 +85,9 @@ public class Project implements Serializable {
     }
 
     public Double getQuotation() {
+        if(this.quotation == null){
+            return 0.0;
+        }
         return quotation;
     }
 
