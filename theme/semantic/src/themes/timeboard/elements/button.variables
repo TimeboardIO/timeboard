@@ -89,8 +89,8 @@
 @secondaryBoxShadow       : @borderBoxShadow;
 
 /* Emotive */
-@positiveColor: #3D9400;
-@negativeColor: #D34836;
+@positiveColor: @green;
+@negativeColor: @red;
 
 /* Inverted */
 @invertedBorderSize: 1px;

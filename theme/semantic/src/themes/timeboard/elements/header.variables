@@ -10,6 +10,7 @@
 @iconAlignment: top;
 
 @subHeaderFontSize: 1rem;
+@headerFontSize: 1.25rem;
 
 
 /* HTML Headings */

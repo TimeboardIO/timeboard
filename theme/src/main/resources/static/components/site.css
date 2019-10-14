@@ -13,7 +13,7 @@
              Page
 *******************************/
 
-@import url('https://fonts.googleapis.com/css?family=Verdana:400,700,400italic,700italic&subset=latin');
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin');
 html,
 body {
   height: 100%;
@@ -27,7 +27,7 @@ body {
   overflow-x: hidden;
   min-width: 320px;
   background: #FFFFFF;
-  font-family: 'Verdana', 'Verdana', Geneva, sans-serif;
+  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
   font-size: 14px;
   line-height: 1.4285em;
   color: rgba(0, 0, 0, 0.87);
@@ -44,7 +44,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: 'Verdana', 'Verdana', Geneva, sans-serif;
+  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
   line-height: 1.28571429em;
   margin: calc(2rem -  0.14285714em ) 0em 1rem;
   font-weight: bold;
@@ -207,9 +207,10 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
   background-color: white ! important;
 }
 body {
-  background: -webkit-gradient(linear, left top, left bottom, from(#668aa0), color-stop(99%, #fbfcfd)) !important;
-  background: -webkit-linear-gradient(top, #668aa0 0%, #fbfcfd 99%) !important;
-  background: linear-gradient(to bottom, #668aa0 0%, #fbfcfd 99%) !important;
+  background: #668aa0;
+  
+/* background: linear-gradient(180deg, rgba(102,138,160,1) 0%, rgba(251,252,253,1) 100%); */
+  background-repeat: repeat-y;
 }
 .login {
   position: fixed;

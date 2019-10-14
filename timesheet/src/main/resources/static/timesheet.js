@@ -34,7 +34,12 @@ const timesheetModel = {
     },
     getImputation: function(date, taskID){
         return this.imputations[date][taskID];
-    }
+    },
+    getImputationColor: function(date){
+        var num = getImputationSum(date);
+           if(num == 1) return 'green';
+           else return 'red';
+     }
 }
 
 $(document).ready(function(){

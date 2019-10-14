@@ -8,3 +8,25 @@
 
 @itemVerticalPadding: @relativeLarge;
 @itemHorizontalPadding: @relativeLarge;
+
+
+/* Pointing */
+@secondaryPointingBorderWidth: 2px;
+@secondaryPointingBorderColor: @borderColor;
+@secondaryPointingItemVerticalPadding: @relativeTiny;
+@secondaryPointingItemHorizontalPadding: @relativeLarge;
+
+@secondaryPointingHoverTextColor: @textColor;
+
+@secondaryPointingActiveBorderColor: @primaryColor;
+/*@secondaryPointingActiveTextColor: @selectedTextColor;*/
+@secondaryPointingActiveTextColor: @primaryColor;
+@secondaryPointingActiveFontWeight: @bold;
+
+@secondaryPointingActiveDropdownBorderColor: transparent;
+
+@secondaryPointingActiveHoverBorderColor: @secondaryPointingActiveBorderColor;
+@secondaryPointingActiveHoverTextColor: @secondaryPointingActiveTextColor;
+
+@secondaryPointingHeaderColor: @darkTextColor;
+@secondaryVerticalPointingItemMargin: 0em -@secondaryPointingBorderWidth 0em 0em;

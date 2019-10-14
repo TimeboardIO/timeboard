@@ -1,7 +1,7 @@
 {
   "name": "timeboard-theme",
   "scripts": {
-    "build": "rm -rf src/main/resources/* && cd semantic && cp -r ./dist/ ../src/main/resources/static"
+    "build": "rm -rf src/main/resources/* && cd semantic && gulp build && cp -r ./dist/ ../src/main/resources/static"
   },
   "dependencies": {
     "semantic-ui": "^2.4.2",
