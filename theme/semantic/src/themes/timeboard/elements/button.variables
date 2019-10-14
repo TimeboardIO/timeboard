@@ -14,14 +14,14 @@
 @verticalPadding   : 0.8em;
 @horizontalPadding : 0.8em;
 @borderRadius      : @relative3px;
-@color             : #ff00e5;
+@color             : @primaryColor;
 @fontWeight        : normal;
 @textTransform     : none;
 
 @backgroundColor      : @white;
 @backgroundImage      : linear-gradient(transparent, rgba(0, 0, 0, 0.02));
 
-@solidBorderColor: #ff00e5;
+@solidBorderColor: #DDDDDD;
 
 @borderBoxShadowColor: @solidBorderColor;
 @borderBoxShadow: 0px 0px 0px 1px @solidBorderColor inset;
@@ -38,7 +38,7 @@
         State
 --------------------*/
 
-@hoverBackgroundColor: #ff00e5;
+@hoverBackgroundColor: @white;
 @hoverBoxShadow:
   @borderBoxShadow,
   0px 2px 3px 0px rgba(0, 0, 0, 0.2) !important
@@ -46,7 +46,7 @@
 
 @downBackgroundColor: @white;
 @downBackgroundImage: linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04));
-@downTextColor: #ff00e5;
+@downTextColor: #222222;
 @downBoxShadow: @borderBoxShadow;
 
 @activeBackgroundColor: #F0F0F0;
@@ -79,11 +79,11 @@
 @coloredBoxShadow       : 0px 0px 0px 1px rgba(0, 0, 0, 0.1) inset;
 
 /* Primary */
-@primaryColor       : #ff00e5;
+@primaryColor       : #4184F3;
 @primaryBoxShadow   : 0px 0px 0px 1px #0157E4 inset;
 
 /* Secondary */
-@secondaryColor           : #ff00e5;
+@secondaryColor           : #EEEEEE;
 @secondaryBackgroundImage : @backgroundImage;
 @secondaryTextColor       : @textColor;
 @secondaryBoxShadow       : @borderBoxShadow;

@@ -6,11 +6,11 @@
        Fonts
 --------------------*/
 
-@fontName          : 'Lato';
+@fontName          : 'Verdana';
 @fontSmoothing     : antialiased;
 
-@headerFont        : @fontName, 'Helvetica Neue', Arial, Helvetica, sans-serif;
-@pageFont          : @fontName, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+@headerFont        : @fontName, 'Verdana', Geneva, sans-serif;
+@pageFont          : @fontName, 'Verdana', Geneva, sans-serif;
 
 @googleFontName    : @fontName;
 @importGoogleFonts : true;
@@ -51,10 +51,10 @@
     Brand Colors
 --------------------*/
 
-@primaryColor        : @pink;
-@secondaryColor      : @pink;
+@primaryColor        : #75a7d5;
+@secondaryColor      : @black;
 
-@lightPrimaryColor   : @lightBlue;
+@lightPrimaryColor   : #75a7d5;
 @lightSecondaryColor : @lightBlack;
 
 /*--------------

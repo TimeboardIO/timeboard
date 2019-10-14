@@ -13,7 +13,7 @@
              Page
 *******************************/
 
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin');
+@import url('https://fonts.googleapis.com/css?family=Verdana:400,700,400italic,700italic&subset=latin');
 html,
 body {
   height: 100%;
@@ -27,7 +27,7 @@ body {
   overflow-x: hidden;
   min-width: 320px;
   background: #FFFFFF;
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Verdana', 'Verdana', Geneva, sans-serif;
   font-size: 14px;
   line-height: 1.4285em;
   color: rgba(0, 0, 0, 0.87);
@@ -44,7 +44,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Verdana', 'Verdana', Geneva, sans-serif;
   line-height: 1.28571429em;
   margin: calc(2rem -  0.14285714em ) 0em 1rem;
   font-weight: bold;
@@ -206,16 +206,24 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 .navigation {
   background-color: white ! important;
 }
+body {
+  background: -webkit-gradient(linear, left top, left bottom, from(#668aa0), color-stop(99%, #fbfcfd)) !important;
+  background: -webkit-linear-gradient(top, #668aa0 0%, #fbfcfd 99%) !important;
+  background: linear-gradient(to bottom, #668aa0 0%, #fbfcfd 99%) !important;
+}
 .login {
   position: fixed;
   bottom: 0px;
   right: 0px;
   left: 0px;
   top: 0px;
-  background: -webkit-linear-gradient(50deg, #44b79a, #33b6dd, #b37dff);
-  background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
-  background-size: 600% 600%;
-  background-color: pink;
+  
+/* background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
+       background-size: 600% 600%;
+       background-color: pink; */
+  background: -webkit-gradient(linear, left top, left bottom, from(#668aa0), color-stop(99%, #fbfcfd)) !important;
+  background: -webkit-linear-gradient(top, #668aa0 0%, #fbfcfd 99%) !important;
+  background: linear-gradient(to bottom, #668aa0 0%, #fbfcfd 99%) !important;
   -webkit-animation: AnimationName 12s ease infinite;
   animation: AnimationName 12s ease infinite;
 }

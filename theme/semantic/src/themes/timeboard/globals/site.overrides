@@ -15,6 +15,10 @@
     background-color : white ! important;
 }
 
+body{
+       background: linear-gradient(to bottom, #668aa0 0%,#fbfcfd 99%) !important;
+}
+
 .login{
 
         position: fixed;
@@ -23,9 +27,11 @@
         left: 0px;
         top: 0px;
 
-       background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
+      /* background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
        background-size: 600% 600%;
-       background-color: pink;
+       background-color: pink; */
+
+       background: linear-gradient(to bottom, #668aa0 0%,#fbfcfd 99%) !important;
 
        -webkit-animation: AnimationName 12s ease infinite;
        -moz-animation: AnimationName 12s ease infinite;
