@@ -64,7 +64,19 @@
                     <tbody>
                     <template v-for="(project, projectID) in projects">
                         <tr>
-                            <td class="ui header left aligned green small" colspan="12">{{ project.projectName }}</td>
+                            <th class="two wide">Total</th>
+                            <th class="wide one" style="text-align:center" v-for="day in days">
+
+                                <div v-bind:id="day.date" class="ui circular label red large day-badge" style="margin-top: 5px;"
+                                     v-bind:day-badge="day.date">
+                                    {{ getImputationSum(day.date).toFixed(1) }}
+                                </div>
+                            </th>
+                            <th class="wide one" data-content="Effort spent" rowspan="2" >ES</th>
+                            <th class="wide one" data-content="Remain To Be Done" rowspan="2" >EL</th>
+                            <th class="wide one" data-content="Restimate" rowspan="2" >RE</th>
+                            <th class="wide one" data-content="Original estimate" rowspan="2" >OE</th>
+
                         </tr>
                         <tr v-for="(task, taskID) in project.tasks">
                             <td>{{ task.taskName }}</td>
