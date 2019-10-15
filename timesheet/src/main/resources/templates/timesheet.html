@@ -57,7 +57,8 @@
                         <tr>
                             <th class="two wide">Total</th>
                             <th class="wide one" style="text-align:center" v-for="day in days">
-                                <div class="ui circular label large day-badge {{ getImputationColor(day.date) }} " style="margin-top: 5px;"
+
+                                <div v-bind:id="day.date" class="ui circular label red large day-badge" style="margin-top: 5px;"
                                      v-bind:day-badge="day.date">
                                     {{ getImputationSum(day.date).toFixed(1) }}
                                 </div>
