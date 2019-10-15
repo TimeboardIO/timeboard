@@ -55,9 +55,9 @@
 }
 .ui.table thead th {
   cursor: auto;
-  background: #F9FAFB;
+  background: #3d6488;
   text-align: inherit;
-  color: rgba(0, 0, 0, 0.87);
+  color: #FFFFFF;
   padding: 0.78571429em 0.78571429em;
   vertical-align: inherit;
   font-style: none;
@@ -643,10 +643,10 @@
 
 /* Red */
 .ui.red.table {
-  border-top: 0.2em solid #DB2828;
+  border-top: 0.2em solid #C53E43;
 }
 .ui.inverted.red.table {
-  background-color: #DB2828 !important;
+  background-color: #C53E43 !important;
   color: #FFFFFF !important;
 }
 
@@ -679,10 +679,10 @@
 
 /* Green */
 .ui.green.table {
-  border-top: 0.2em solid #21BA45;
+  border-top: 0.2em solid #4dc98d;
 }
 .ui.inverted.green.table {
-  background-color: #21BA45 !important;
+  background-color: #4dc98d !important;
   color: #FFFFFF !important;
 }
 
@@ -697,10 +697,10 @@
 
 /* Blue */
 .ui.blue.table {
-  border-top: 0.2em solid #2185D0;
+  border-top: 0.2em solid #3d6488;
 }
 .ui.inverted.blue.table {
-  background-color: #2185D0 !important;
+  background-color: #3d6488 !important;
   color: #FFFFFF !important;
 }
 
@@ -1129,6 +1129,12 @@
 /* Large */
 .ui.large.table {
   font-size: 1.1em;
+}
+.project {
+  padding: 0.38571429em 0.78571429em !important;
+  background-color: #d1dceb !important;
+  color: #375d8f !important;
+  font-size: 1.25em !important;
 }
 
 

@@ -554,10 +554,12 @@ template {
              Page
 *******************************/
 
+/*
 html,
 body {
   height: 100%;
 }
+*/
 
 html {
   font-size: 14px;
@@ -771,8 +773,14 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 
 body {
   background: #668aa0;
-  /* background: linear-gradient(180deg, rgba(102,138,160,1) 0%, rgba(251,252,253,1) 100%); */
+  background: -webkit-gradient(linear, left top, left bottom, from(#668aa0), to(#fbfcfd));
+  background: -webkit-linear-gradient(top, #668aa0 0%, #fbfcfd 100%);
+  background: linear-gradient(180deg, #668aa0 0%, #fbfcfd 100%);
   background-repeat: repeat-y;
+}
+
+html {
+  height: 100%;
 }
 
 .login {
@@ -7788,7 +7796,7 @@ a.ui.inverted.grey.header:hover {
 }
 
 /*******************************
-           Overrides
+           Header Overrides
 *******************************/
 
 @font-face {
@@ -26707,9 +26715,9 @@ Floated Menu / Item
 
 .ui.table thead th {
   cursor: auto;
-  background: #F9FAFB;
+  background: #3d6488;
   text-align: inherit;
-  color: rgba(0, 0, 0, 0.87);
+  color: #FFFFFF;
   padding: 0.78571429em 0.78571429em;
   vertical-align: inherit;
   font-style: none;
@@ -27359,11 +27367,11 @@ Floated Menu / Item
 /* Red */
 
 .ui.red.table {
-  border-top: 0.2em solid #DB2828;
+  border-top: 0.2em solid #C53E43;
 }
 
 .ui.inverted.red.table {
-  background-color: #DB2828 !important;
+  background-color: #C53E43 !important;
   color: #FFFFFF !important;
 }
 
@@ -27403,11 +27411,11 @@ Floated Menu / Item
 /* Green */
 
 .ui.green.table {
-  border-top: 0.2em solid #21BA45;
+  border-top: 0.2em solid #4dc98d;
 }
 
 .ui.inverted.green.table {
-  background-color: #21BA45 !important;
+  background-color: #4dc98d !important;
   color: #FFFFFF !important;
 }
 
@@ -27425,11 +27433,11 @@ Floated Menu / Item
 /* Blue */
 
 .ui.blue.table {
-  border-top: 0.2em solid #2185D0;
+  border-top: 0.2em solid #3d6488;
 }
 
 .ui.inverted.blue.table {
-  background-color: #2185D0 !important;
+  background-color: #3d6488 !important;
   color: #FFFFFF !important;
 }
 
@@ -27938,6 +27946,13 @@ Floated Menu / Item
 
 .ui.large.table {
   font-size: 1.1em;
+}
+
+.project {
+  padding: 0.38571429em 0.78571429em !important;
+  background-color: #d1dceb !important;
+  color: #375d8f !important;
+  font-size: 1.25em !important;
 }
 
 /*******************************
