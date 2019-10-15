@@ -14,12 +14,10 @@
 *******************************/
 
 @import url('https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin');
-/*
 html,
 body {
   height: 100%;
 }
-*/
 html {
   font-size: 14px;
 }
@@ -210,13 +208,9 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 }
 body {
   background: #668aa0;
-  background: -webkit-gradient(linear, left top, left bottom, from(#668aa0), to(#fbfcfd));
-  background: -webkit-linear-gradient(top, #668aa0 0%, #fbfcfd 100%);
-  background: linear-gradient(180deg, #668aa0 0%, #fbfcfd 100%);
+  
+/* background: linear-gradient(180deg, rgba(102,138,160,1) 0%, rgba(251,252,253,1) 100%); */
   background-repeat: repeat-y;
-}
-html {
-  height: 100%;
 }
 .login {
   position: fixed;

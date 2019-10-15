@@ -44,29 +44,20 @@
 
                     <table class="ui celled table" style="text-align:center">
                         <thead>
-                        <tr >
-                            <th class="two wide timesheet-day" ></th>
-                            <th class="wide one timesheet-day" style="text-align:center" v-for="day in days">
-                                <div>{{day.day}} {{new Date(day.date).getDate()}}</div>
-                            </th>
-                            <th class="wide one timesheet-day" data-content="Effort spent" colspan="4" ></th>
-
-                        </tr>
-
-
                         <tr>
-                            <th class="two wide">Total</th>
+                            <th class="two wide">Task</th>
                             <th class="wide one" style="text-align:center" v-for="day in days">
+                                <div>{{day.day}}</div>
+                                <div class="grey header">{{new Date(day.date).toLocaleDateString()}}</div>
                                 <div class="ui circular label large day-badge {{ getImputationColor(day.date) }} " style="margin-top: 5px;"
                                      v-bind:day-badge="day.date">
                                     {{ getImputationSum(day.date).toFixed(1) }}
                                 </div>
                             </th>
-                            <th class="wide one" data-content="Effort spent" rowspan="2" >ES</th>
-                            <th class="wide one" data-content="Remain To Be Done" rowspan="2" >EL</th>
-                            <th class="wide one" data-content="Restimate" rowspan="2" >RE</th>
-                            <th class="wide one" data-content="Original estimate" rowspan="2" >OE</th>
-
+                            <th class="wide one">Effort spent</th>
+                            <th class="wide one">Remain To Be Done</th>
+                            <th class="wide one">Original estimate</th>
+                            <th class="wide one">Restimate</th>
                         </tr>
                         </thead>
                         <tbody>
