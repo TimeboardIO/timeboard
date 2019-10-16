@@ -68,8 +68,3 @@ div.login > .grid {
 .login .column {
   max-width: 450px;
 }
-
-.timesheet-day{
-    background-color: #d1dceb !important;
-    color: @primaryColor !important;
-}

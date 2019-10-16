@@ -44,18 +44,8 @@
 
                     <table class="ui celled table" style="text-align:center">
                         <thead>
-                        <tr >
-                            <th class="two wide timesheet-day" ></th>
-                            <th class="wide one timesheet-day" style="text-align:center" v-for="day in days">
-                                <div>{{day.day}} {{new Date(day.date).getDate()}}</div>
-                            </th>
-                            <th class="wide one timesheet-day" data-content="Effort spent" colspan="4" ></th>
-
-                        </tr>
-
-
                         <tr>
-                            <th class="two wide">Total</th>
+                            <th class="two wide">Task</th>
                             <th class="wide one" style="text-align:center" v-for="day in days">
 
                                 <div v-bind:id="day.date" class="ui circular label red large day-badge" style="margin-top: 5px;"
