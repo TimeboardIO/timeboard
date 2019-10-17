@@ -9,8 +9,8 @@
 @fontName          : 'Lato';
 @fontSmoothing     : antialiased;
 
-@headerFont        : @fontName, 'Helvetica Neue', Arial, Helvetica, sans-serif;
-@pageFont          : @fontName, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+@headerFont        : @fontName, 'Verdana', Geneva, sans-serif;
+@pageFont          : @fontName, 'Verdana', Geneva, sans-serif;
 
 @googleFontName    : @fontName;
 @importGoogleFonts : true;
@@ -51,10 +51,10 @@
     Brand Colors
 --------------------*/
 
-@primaryColor        : @blue;
+@primaryColor        : #3d6488;
 @secondaryColor      : @black;
 
-@lightPrimaryColor   : @lightBlue;
+@lightPrimaryColor   : #75a7d5;
 @lightSecondaryColor : @lightBlack;
 
 /*--------------
@@ -220,13 +220,16 @@
 --------------------*/
 
 /*---  Colors  ---*/
-@red              : #DB2828;
+/*@red              : #DB2828;*/
+@red              : #C53E43;
 @orange           : #F2711C;
 @yellow           : #FBBD08;
 @olive            : #B5CC18;
-@green            : #21BA45;
+/*@green            : #21BA45;*/
+@green            : #4dc98d;
 @teal             : #00B5AD;
-@blue             : #2185D0;
+@blue             : @primaryColor;
+/*@blue             : #2185D0;*/
 @violet           : #6435C9;
 @purple           : #A333C8;
 @pink             : #E03997;

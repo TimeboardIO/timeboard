@@ -40,10 +40,12 @@
 /* Table Header */
 @headerBorder: 1px solid @internalBorderColor;
 @headerDivider: none;
-@headerBackground: @offWhite;
+/*@headerBackground: @offWhite;*/
+@headerBackground: #3d6488;
 @headerAlign: inherit;
 @headerVerticalAlign: inherit;
-@headerColor: @textColor;
+/*@headerColor: @textColor;*/
+@headerColor: @white;
 @headerVerticalPadding: @relativeMini;
 @headerHorizontalPadding: @cellHorizontalPadding;
 @headerFontStyle: none;

@@ -1,0 +1,6 @@
+.project{
+    padding: 0.38571429em 0.78571429em !important;
+    background-color: #d1dceb !important;
+    color: #375d8f !important;
+    font-size: 1.25em !important;
+}

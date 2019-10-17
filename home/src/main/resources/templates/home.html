@@ -9,34 +9,34 @@
 
 <div layout:fragment="content">
 
+    <div class="ui segment">
+        <div class="ui middle aligned center aligned grid" style="margin-top:3em; margin-bottom: 3em;">
 
-    <div class="ui middle aligned center aligned grid" style="margin-top:3em">
+            <div class="column">
 
-        <div class="column">
-
-            <div class="ui statistic">
-                <div class="label">
-                    You are member of
+                <div class="ui statistic">
+                    <div class="label">
+                        You are member of
+                    </div>
+                    <div class="value" th:text="${nb_projects}"></div>
+                    <div class="label">
+                        Projects
+                    </div>
                 </div>
-                <div class="value" th:text="${nb_projects}"></div>
-                <div class="label">
-                    Projects
+
+                <div class="ui statistic">
+                    <div class="label">
+                        You are assigned to
+                    </div>
+                    <div class="value" th:text="${nb_tasks}"></div>
+                    <div class="label">
+                        Tasks
+                    </div>
                 </div>
             </div>
 
-            <div class="ui statistic">
-                <div class="label">
-                    You are assigned to
-                </div>
-                <div class="value" th:text="${nb_tasks}"></div>
-                <div class="label">
-                    Tasks
-                </div>
-            </div>
         </div>
-
     </div>
-
 </div>
 
 </body>
