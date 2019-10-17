@@ -14,10 +14,9 @@
 <div layout:fragment="content">
 
     <div id="timesheet">
+        <div class="ui segment timesheet-navigation-controls">
 
-        <div class="timesheet-navigation-controls">
-
-            <input class="ui positive basic button"
+            <input class="ui positive button"
                    v-if="validated === false"
                    v-bind:data-week="week"
                    v-bind:data-year="year"
@@ -36,73 +35,78 @@
                 <i class="right arrow icon"></i>Next week</a>
         </div>
 
-         <div class="ui inverted dimmer">
+        <div class="ui inverted dimmer">
             <div class="ui text loader">Loading</div>
         </div>
+        <div class="ui segment">
+            <fieldset v-bind:disabled="validated === true" style="padding: 0px; margin: 0px; border: none;">
+                <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
 
-        <fieldset v-bind:disabled="validated === true" style="padding: 0px; margin: 0px; border: none;">
-            <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
-
-                <table class="ui celled table" style="text-align:center">
-                    <thead>
-                    <tr>
-                        <th class="two wide">Task</th>
-                        <th class="wide one" style="text-align:center" v-for="day in days">
-                            <div>{{day.day}}</div>
-                            <div class="grey header">{{new Date(day.date).toLocaleDateString()}}</div>
-                            <div class="ui circular label large" style="margin-top: 5px;"
-                                 v-bind:day-badge="day.date">
-                                {{ getImputationSum(day.date).toFixed(1) }}
-                            </div>
-                        </th>
-                        <th class="wide one">Effort spent</th>
-                        <th class="wide one">Remain To Be Done</th>
-                        <th class="wide one">Original estimate</th>
-                        <th class="wide one">Restimate</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <template v-for="(project, projectID) in projects">
+                    <table class="ui celled table" style="text-align:center">
+                        <thead>
                         <tr>
-                            <td class="ui header left aligned green small" colspan="12">{{ project.projectName }}</td>
+                            <th class="two wide">Task</th>
+                            <th class="wide one" style="text-align:center" v-for="day in days">
+
+                                <div v-bind:id="day.date"
+                                     v-bind:class="{'ui circular label large day-badge':true,
+                                      'green':(getImputationSum(day.date).toFixed(1) >= 1),
+                                      'red':(getImputationSum(day.date).toFixed(1) < 1)}"
+                                     style="margin-top: 5px;"
+                                     v-bind:day-badge="day.date">
+                                    {{ getImputationSum(day.date).toFixed(1) }}
+                                </div>
+                            </th>
+                            <th class="wide one" data-tooltip="Effort spent" rowspan="2" >ES</th>
+                            <th class="wide one" data-tooltip="Remain To Be Done" rowspan="2" >EL</th>
+                            <th class="wide one" data-tooltip="Restimate" rowspan="2" >RE</th>
+                            <th class="wide one" data-tooltip="Original estimate" rowspan="2" >OE</th>
+
                         </tr>
-                        <tr v-for="(task, taskID) in project.tasks">
-                            <td>{{ task.taskName }}</td>
-                           <td v-for="day in days">
-                                <input
-                                        max="1"
+                        </thead>
+                        <tbody>
+                        <template v-for="(project, projectID) in projects">
+                            <tr>
+                                <td class="ui header left aligned project" colspan="12">{{ project.projectName }}</td>
+                            </tr>
+                            <tr v-for="(task, taskID) in project.tasks">
+                                <td>{{ task.taskName }}</td>
+                                <td v-for="day in days">
+                                    <input
+                                            max="1"
+                                            min="0"
+                                            step="0.1"
+                                            v-if="(day.date >= task.startDate) && (day.date <= task.endDate)"
+                                            v-on:focusout="triggerUpdateTask"
+                                            v-bind:data-date="day.date"
+                                            v-bind:data-task="taskID"
+                                            v-bind:name="'task['+taskID+']day['+day.date+']'"
+                                            v-bind:value="getImputation(day.date, taskID).toFixed(1)"
+                                            type="number"/>
+                                </td>
+                                <td v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
+                                <td><input
                                         min="0"
                                         step="0.1"
-                                        v-if="(day.date >= task.startDate) && (day.date <= task.endDate)"
-                                        v-on:focusout="triggerUpdateTask"
-                                        v-bind:data-date="day.date"
-                                        v-bind:data-task="taskID"
-                                        v-bind:name="'task['+taskID+']day['+day.date+']'"
-                                        v-bind:value="getImputation(day.date, taskID).toFixed(1)"
-                                        type="number"/>
-                            </td>
-                            <td v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
-                            <td><input
-                                    min="0"
-                                    step="0.1"
-                                    name="remainsToBeDone"
-                                    v-on:focusout="triggerUpdateRTBD"
-                                    v-bind:value="task.remainToBeDone.toFixed(1)"
-                                    v-bind:data-task-rtbd="taskID"
-                                    type="number"
-                            /></td>
-                            <td v-bind:data-task-ew="taskID">{{task.estimateWork.toFixed(1)}}</td>
-                            <td
-                                    v-bind:data-task-rew="taskID">{{task.reEstimateWork.toFixed(1)}}
-                            </td>
-                        </tr>
-                    </template>
-                    </tbody>
-                </table>
+                                        name="remainsToBeDone"
+                                        v-on:focusout="triggerUpdateRTBD"
+                                        v-bind:value="task.remainToBeDone.toFixed(1)"
+                                        v-bind:data-task-rtbd="taskID"
+                                        type="number"
+                                /></td>
+                                <td v-bind:data-task-ew="taskID">{{task.estimateWork.toFixed(1)}}</td>
+                                <td
+                                        v-bind:data-task-rew="taskID">{{task.reEstimateWork.toFixed(1)}}
+                                </td>
+                            </tr>
+                        </template>
+                        </tbody>
+                    </table>
 
 
-            </form>
-        </fieldset>
+                </form>
+            </fieldset>
+        </div>
         <script src="/timesheet/static/timesheet.js"></script>
 
     </div>

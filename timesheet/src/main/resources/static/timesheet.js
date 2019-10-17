@@ -4,7 +4,6 @@
 const updateTask = function(date, task, type, val){
 
     $(".ui.dimmer").addClass("active");
-
     return $.post("/timesheet", {
         'type':type,
         'day':date,
@@ -18,6 +17,7 @@ const updateTask = function(date, task, type, val){
 const timesheetModel = {
     week:0,
     year:0,
+    sum:0,
     validated:false,
     days:[],
     projects: {},
@@ -30,6 +30,7 @@ const timesheetModel = {
                 sum += this.imputations[date][i];
             }.bind(this));
         }
+         this.sum = sum;
         return sum;
     },
     getImputation: function(date, taskID){
@@ -112,7 +113,21 @@ $(document).ready(function(){
     })
     .then(function(){
         $('.ui.dimmer').removeClass('active');
+    }).then(function(){
+         var list = document.getElementsByClassName("day-badge");
+         for (var i = 0; i < list.length; i++ ){
+            var badge = list[i];
+             if(badge.innerText == "1.0"){
+                  badge.classList.add("green");
+                  badge.classList.remove("red");
+             }
+        }
     });
+
+
+
+
+
 });
 
 
