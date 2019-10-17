@@ -17,6 +17,7 @@ const updateTask = function(date, task, type, val){
 const timesheetModel = {
     week:0,
     year:0,
+    sum:0,
     validated:false,
     days:[],
     projects: {},
@@ -29,17 +30,7 @@ const timesheetModel = {
                 sum += this.imputations[date][i];
             }.bind(this));
         }
-        //color update
-        var elem = document.getElementById(date);
-        if(elem){
-            if(sum ==1){
-                elem.classList.add("green");
-                elem.classList.remove("red");
-             }else{
-                elem.classList.add("red");
-                elem.classList.remove("green");
-             }
-         }
+         this.sum = sum;
         return sum;
     },
     getImputation: function(date, taskID){
