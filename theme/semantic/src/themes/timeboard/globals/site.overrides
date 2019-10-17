@@ -15,15 +15,28 @@
     background-color : white ! important;
 }
 
+body{
+       background: rgb(102,138,160);
+       background: linear-gradient(180deg, rgba(102,138,160,1) 0%, rgba(251,252,253,1) 100%);
+       background-repeat: repeat-y;
+}
+html{
+       height: 100%;
+}
+
 .login{
+
         position: fixed;
         bottom: 0px;
         right: 0px;
         left: 0px;
         top: 0px;
 
-       background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
+      /* background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
        background-size: 600% 600%;
+       background-color: pink; */
+
+       background: linear-gradient(to bottom, #668aa0 0%,#fbfcfd 99%) !important;
 
        -webkit-animation: AnimationName 12s ease infinite;
        -moz-animation: AnimationName 12s ease infinite;

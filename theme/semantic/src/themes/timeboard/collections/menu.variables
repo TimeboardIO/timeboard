@@ -1,0 +1,32 @@
+/*******************************
+             Menu
+*******************************/
+
+@fontFamily: 'Roboto', Arial, sans-serif;
+@boxShadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
+@dividerSize: 0px;
+
+@itemVerticalPadding: @relativeLarge;
+@itemHorizontalPadding: @relativeLarge;
+
+
+/* Pointing */
+@secondaryPointingBorderWidth: 2px;
+@secondaryPointingBorderColor: @borderColor;
+@secondaryPointingItemVerticalPadding: @relativeTiny;
+@secondaryPointingItemHorizontalPadding: @relativeLarge;
+
+@secondaryPointingHoverTextColor: @textColor;
+
+@secondaryPointingActiveBorderColor: @primaryColor;
+/*@secondaryPointingActiveTextColor: @selectedTextColor;*/
+@secondaryPointingActiveTextColor: @primaryColor;
+@secondaryPointingActiveFontWeight: @bold;
+
+@secondaryPointingActiveDropdownBorderColor: transparent;
+
+@secondaryPointingActiveHoverBorderColor: @secondaryPointingActiveBorderColor;
+@secondaryPointingActiveHoverTextColor: @secondaryPointingActiveTextColor;
+
+@secondaryPointingHeaderColor: @darkTextColor;
+@secondaryVerticalPointingItemMargin: 0em -@secondaryPointingBorderWidth 0em 0em;

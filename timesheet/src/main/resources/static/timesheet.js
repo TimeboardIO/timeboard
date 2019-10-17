@@ -35,7 +35,8 @@ const timesheetModel = {
     },
     getImputation: function(date, taskID){
         return this.imputations[date][taskID];
-    }
+    },
+
 }
 
 $(document).ready(function(){
