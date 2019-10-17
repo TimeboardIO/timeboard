@@ -12,8 +12,6 @@ const updateTask = function(date, task, type, val){
     });
 }
 
-
-
 const timesheetModel = {
     week:0,
     year:0,
@@ -36,6 +34,19 @@ const timesheetModel = {
     getImputation: function(date, taskID){
         return this.imputations[date][taskID];
     },
+    enableValidateButton: function(week){
+        var result = true;
+        //check last week
+        const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
+        result = result && lastWeekValidated;
+        //check all days imputations == 1
+        this.days.forEach(function(day) {
+        var sum = timesheetModel.getImputationSum(day.date);
+           result = result && (sum == 1);
+        });
+        console.log(result);
+        return result;
+    }
 
 }
 
@@ -45,6 +56,8 @@ $(document).ready(function(){
 
     const week = $("meta[property='timesheet']").attr('week');
     const year = $("meta[property='timesheet']").attr('year');
+    const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
+
 
     var app = new Vue({
       el: '#timesheet',

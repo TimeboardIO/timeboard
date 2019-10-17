@@ -72,6 +72,20 @@ public class TimesheetServlet extends TimeboardServlet {
     }
 
 
+    private int findLastWeekYear(Calendar c, int week, int year) {
+        c.set(Calendar.YEAR , year);
+        c.set(Calendar.WEEK_OF_YEAR , week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        return c.get(Calendar.YEAR);
+    }
+
+    private int findLastWeek(Calendar c, int week, int year) {
+        c.set(Calendar.YEAR , year);
+        c.set(Calendar.WEEK_OF_YEAR , week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        return c.get(Calendar.WEEK_OF_YEAR);
+    }
+
     private Date findStartDate(Calendar c, int week, int year) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return c.getTime();
@@ -100,8 +114,14 @@ public class TimesheetServlet extends TimeboardServlet {
         final Date ds = findStartDate(c, week, year);
         final Date de = findEndDate(c, week, year);
 
+
+        final int lastWeek = findLastWeek(c, week, year);
+        final int lastWeekYear = findLastWeekYear(c, week, year);
+        final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(SecurityContext.getCurrentUser(request), lastWeekYear, lastWeek);
+
         viewModel.getViewDatas().put("week", week);
         viewModel.getViewDatas().put("year", year);
+        viewModel.getViewDatas().put("lastWeekValidated", lastWeekValidated);
 
         viewModel.setTemplate("timesheet.html");
     }
