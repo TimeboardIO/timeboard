@@ -36,8 +36,11 @@ const timesheetModel = {
     },
     enableValidateButton: function(week){
         var result = true;
+
         //check last week
         const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
+        result = result && (lastWeekValidated == 'true');
+
         //check all days imputations == 1
         this.days.forEach(function(day) {
             if(day.day != 'Sunday' && day.day != 'Saturday'){
@@ -46,10 +49,9 @@ const timesheetModel = {
                 console.log(day.day);
              }
         });
-        result = result && (lastWeekValidated == 'true');
+
         return result;
     }
-
 }
 
 $(document).ready(function(){

@@ -6,7 +6,7 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekValidated="${lastWeekValidated}" />
+    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekValidated="${lastWeekValidated}"/>
 </head>
 
 <body>
@@ -18,12 +18,12 @@
             <div style="left: 1em; position: absolute;"
                  v-bind:data-tooltip="!enableValidateButton()?'Please validate last week and check you have all imputation day total = 1' : false"
                  data-position="right center">
-              <input v-if="validated === false"
-                   v-bind:data-week="week"
-                   v-bind:data-year="year"
-                   v-on:click="validateMyWeek"
-                   v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
-                   type="submit" value="Validate My Week">
+                <input v-if="validated === false"
+                       v-bind:data-week="week"
+                       v-bind:data-year="year"
+                       v-on:click="validateMyWeek"
+                       v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
+                       type="submit" value="Validate My Week">
             </div>
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+(week-1)+'&year='+year">
@@ -49,7 +49,7 @@
                             <th class="wide one project" style="text-align:center" v-for="day in days">
                                 {{ day.day }} {{ new Date(day.date).getDate() }}
                             </th>
-                            <th class="wide one project" data-tooltip="Effort spent" colspan="4" ></th>
+                            <th class="wide one project" data-tooltip="Effort spent" colspan="4"></th>
 
 
                         </tr>
@@ -76,10 +76,10 @@
                                     {{ getImputationSum(day.date).toFixed(1) }}
                                 </div>
                             </th>
-                            <th class="wide one" data-tooltip="Effort spent" rowspan="1" >ES</th>
-                            <th class="wide one" data-tooltip="Remain To Be Done" rowspan="1" >EL</th>
-                            <th class="wide one" data-tooltip="Restimate" rowspan="1" >RE</th>
-                            <th class="wide one" data-tooltip="Original estimate" rowspan="1" >OE</th>
+                            <th class="wide one" data-tooltip="Effort spent" rowspan="1">ES</th>
+                            <th class="wide one" data-tooltip="Remain To Be Done" rowspan="1">EL</th>
+                            <th class="wide one" data-tooltip="Restimate" rowspan="1">RE</th>
+                            <th class="wide one" data-tooltip="Original estimate" rowspan="1">OE</th>
 
                         </tr>
 

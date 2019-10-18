@@ -73,15 +73,15 @@ public class TimesheetServlet extends TimeboardServlet {
 
 
     private int findLastWeekYear(Calendar c, int week, int year) {
-        c.set(Calendar.YEAR , year);
-        c.set(Calendar.WEEK_OF_YEAR , week);
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.YEAR);
     }
 
     private int findLastWeek(Calendar c, int week, int year) {
-        c.set(Calendar.YEAR , year);
-        c.set(Calendar.WEEK_OF_YEAR , week);
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.WEEK_OF_YEAR);
     }
@@ -137,15 +137,15 @@ public class TimesheetServlet extends TimeboardServlet {
 
             UpdatedTaskResult updatedTask = null;
 
-            if(type.equals("imputation")) {
+            if (type.equals("imputation")) {
                 Date day = DATE_FORMAT.parse(request.getParameter("day"));
                 double imputation = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskImputation(actor,taskID, day, imputation);
+                updatedTask = this.projectService.updateTaskImputation(actor, taskID, day, imputation);
             }
 
-            if(type.equals("rtbd")) {
+            if (type.equals("rtbd")) {
                 double rtbd = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskRTBD(actor,taskID, rtbd);
+                updatedTask = this.projectService.updateTaskRTBD(actor, taskID, rtbd);
             }
 
 
