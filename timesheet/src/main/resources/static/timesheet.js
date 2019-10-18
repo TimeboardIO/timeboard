@@ -40,11 +40,13 @@ const timesheetModel = {
         const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
         //check all days imputations == 1
         this.days.forEach(function(day) {
-            var sum = timesheetModel.getImputationSum(day.date);
-            result = result && (sum == 1);
+            if(day.day != 'Sunday' && day.day != 'Saturday'){
+                var sum = timesheetModel.getImputationSum(day.date);
+                result = result && (sum == 1);
+                console.log(day.day);
+             }
         });
         result = result && (lastWeekValidated == 'true');
-
         return result;
     }
 

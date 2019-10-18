@@ -15,15 +15,16 @@
 
     <div id="timesheet">
         <div class="ui segment timesheet-navigation-controls">
-
-            <input v-if="validated === false"
+            <div style="left: 1em; position: absolute;"
+                 v-bind:data-tooltip="!enableValidateButton()?'Please validate last week and check you have all imputation day total = 1' : false"
+                 data-position="right center">
+              <input v-if="validated === false"
                    v-bind:data-week="week"
                    v-bind:data-year="year"
                    v-on:click="validateMyWeek"
                    v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
-                   v-bind:data-tooltip="!enableValidateButton()?'Please validate last week and check you have all imputation day total = 1' : false"
-                   style="left: 1em; position: absolute;"
                    type="submit" value="Validate My Week">
+            </div>
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+(week-1)+'&year='+year">
                 <i class="left arrow icon"></i>Previous week</a>
@@ -43,11 +44,21 @@
 
                     <table class="ui celled table" style="text-align:center">
                         <thead>
+                        <tr class="">
+                            <th class="two wide project"></th>
+                            <th class="wide one project" style="text-align:center" v-for="day in days">
+                                {{ day.day }} {{ new Date(day.date).getDate() }}
+                            </th>
+                            <th class="wide one project" data-tooltip="Effort spent" colspan="4" ></th>
+
+
+                        </tr>
                         <tr>
                             <th class="two wide">Task</th>
                             <th class="wide one" style="text-align:center" v-for="day in days">
 
-                                <div v-bind:id="day.date"
+                                <div v-if="(day.day != 'Saturday') && (day.day != 'Sunday')"
+                                     v-bind:id="day.date"
                                      v-bind:class="{'ui circular label large day-badge':true,
                                       'green':(getImputationSum(day.date).toFixed(1) >= 1),
                                       'red':(getImputationSum(day.date).toFixed(1) < 1)}"
@@ -55,13 +66,23 @@
                                      v-bind:day-badge="day.date">
                                     {{ getImputationSum(day.date).toFixed(1) }}
                                 </div>
+
+                                <div v-if="(day.day == 'Saturday') || (day.day == 'Sunday')"
+                                     v-bind:id="day.date"
+                                     v-bind:class="{'ui circular label large day-badge':true,
+                                      'green':(getImputationSum(day.date).toFixed(1) >= 1)}"
+                                     style="margin-top: 5px;"
+                                     v-bind:day-badge="day.date">
+                                    {{ getImputationSum(day.date).toFixed(1) }}
+                                </div>
                             </th>
-                            <th class="wide one" data-tooltip="Effort spent" rowspan="2" >ES</th>
-                            <th class="wide one" data-tooltip="Remain To Be Done" rowspan="2" >EL</th>
-                            <th class="wide one" data-tooltip="Restimate" rowspan="2" >RE</th>
-                            <th class="wide one" data-tooltip="Original estimate" rowspan="2" >OE</th>
+                            <th class="wide one" data-tooltip="Effort spent" rowspan="1" >ES</th>
+                            <th class="wide one" data-tooltip="Remain To Be Done" rowspan="1" >EL</th>
+                            <th class="wide one" data-tooltip="Restimate" rowspan="1" >RE</th>
+                            <th class="wide one" data-tooltip="Original estimate" rowspan="1" >OE</th>
 
                         </tr>
+
                         </thead>
                         <tbody>
                         <template v-for="(project, projectID) in projects">
