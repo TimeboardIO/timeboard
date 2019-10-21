@@ -46,7 +46,6 @@ const timesheetModel = {
             if(day.day != 'Sunday' && day.day != 'Saturday'){
                 var sum = timesheetModel.getImputationSum(day.date);
                 result = result && (sum == 1);
-                console.log(day.day);
              }
         });
 

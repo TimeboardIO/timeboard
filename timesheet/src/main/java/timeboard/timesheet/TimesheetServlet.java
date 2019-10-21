@@ -113,8 +113,6 @@ public class TimesheetServlet extends TimeboardServlet {
 
         final Date ds = findStartDate(c, week, year);
         final Date de = findEndDate(c, week, year);
-
-
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
         final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(SecurityContext.getCurrentUser(request), lastWeekYear, lastWeek);

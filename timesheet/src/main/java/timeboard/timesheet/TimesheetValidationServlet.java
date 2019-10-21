@@ -27,7 +27,10 @@ package timeboard.timesheet;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import groovy.util.logging.Log4j;
+import org.osgi.service.log.LogService;
 import timeboard.core.api.TimesheetService;
+import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.security.SecurityContext;
@@ -39,6 +42,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.logging.Logger;
 
 @Component(
         service = Servlet.class,
@@ -52,6 +56,10 @@ public class TimesheetValidationServlet extends TimeboardServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    @Reference
+    private LogService logService;
+
+
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
     private TimesheetService timesheetService;
 
@@ -63,19 +71,19 @@ public class TimesheetValidationServlet extends TimeboardServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+        this.logService.log(LogService.LOG_INFO, "TEST");
 
         int week = Integer.parseInt(request.getParameter("week"));
         int year = Integer.parseInt(request.getParameter("year"));
         User actor = SecurityContext.getCurrentUser(request);
-
-        if(this.timesheetService.validateTimesheet(actor.getId(), actor.getId(), year, week)){
+        try{
+            this.timesheetService.validateTimesheet(actor.getId(), actor.getId(), year, week);
             response.setStatus(201);
-        }else{
+        }catch (Exception e){ // TimesheetException
             response.setStatus(412);
+            e.printStackTrace();
         }
-
-
     }
 
- 
+
 }

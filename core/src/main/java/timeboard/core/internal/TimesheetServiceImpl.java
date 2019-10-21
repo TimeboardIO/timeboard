@@ -26,7 +26,11 @@ package timeboard.core.internal;
  * #L%
  */
 
+import org.osgi.service.log.LogService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.TimesheetException;
+import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 import timeboard.core.api.TimesheetService;
@@ -37,6 +41,8 @@ import org.osgi.service.component.annotations.ReferenceScope;
 
 import javax.persistence.TypedQuery;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 @Component(
         service = TimesheetService.class
@@ -54,16 +60,65 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Reference
     private UserService userService;
 
+    @Reference
+    private ProjectService projectService;
+
+    @Reference
+    private LogService logService;
+
     @Override
-    public boolean validateTimesheet(long actorID, long userTimesheetID, int year, int week) {
+    public void validateTimesheet(long actorID, long userTimesheetID, int year, int week) throws TimesheetException {
 
         User actor = this.userService.findUserByID(actorID);
         User userTimesheet = this.userService.findUserByID(userTimesheetID);
 
-        Calendar c = Calendar.getInstance();
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.WEEK_OF_YEAR, week);
+        //check if validation is possible
 
+
+
+        //1 - last week is validated
+
+        final Calendar c = Calendar.getInstance();
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.YEAR, year);
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.set(Calendar.HOUR_OF_DAY, 2);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+
+        boolean lastWeekValidated = this.isTimesheetValidated(userTimesheet, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+        if(!lastWeekValidated) throw new TimesheetException("Can not validate this week, previous week is not validated");
+
+
+
+        //2 - all imputation day sum == 1
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.YEAR, year);
+
+        boolean allDailyImputationTotalsAreOne = this.jpa.txExpr(entityManager -> {
+
+            Boolean result = true;
+            c.set(Calendar.WEEK_OF_YEAR, week);
+            c.set(Calendar.YEAR, year);
+            c.setFirstDayOfWeek(Calendar.MONDAY);
+            c.set(Calendar.DAY_OF_WEEK, 2);
+
+            for(int i=1; i<=5; i++) {
+
+                TypedQuery<Double> q = entityManager.createQuery("select sum(value) from Imputation i where i.task.latestRevision.assigned = :user and i.day = :day ", Double.class);
+                q.setParameter("user", userTimesheet);
+                q.setParameter("day", c.getTime());
+                final List<Double> resultList = q.getResultList();
+                result &= (resultList.get(0) == 1.0);
+                c.roll(Calendar.DAY_OF_WEEK,1);
+            }
+            return result;
+
+        });
+        if(!allDailyImputationTotalsAreOne) throw new TimesheetException("Can not validate this week, all daily imputations totals are not equals to 1");
 
         ValidatedTimesheet validatedTimesheet = new ValidatedTimesheet();
         validatedTimesheet.setValidatedBy(actor);
@@ -74,8 +129,6 @@ public class TimesheetServiceImpl implements TimesheetService {
         this.jpa.tx(entityManager -> {
             entityManager.persist(validatedTimesheet);
         });
-
-        return true;
     }
 
     @Override
