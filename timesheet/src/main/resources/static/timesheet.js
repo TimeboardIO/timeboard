@@ -50,6 +50,39 @@ const timesheetModel = {
         });
 
         return result;
+    },
+    rollWeek: function(year, week, x){
+        var day = (1 + (week - 1) * 7); // 1st of January + 7 days for each week
+        var date = new Date(year, 0, day);
+        date.setDate(date.getDate() + 7 * x); //Add x week(s)
+        return date;
+    },
+    getWeekNumber: function(date){
+        var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        var dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+    },
+    nextWeek: function(year, week){
+        var date = timesheetModel.rollWeek(year, week, 1);
+        return timesheetModel.getWeekNumber(date);
+    },
+    lastWeek: function(year, week){
+        var date = timesheetModel.rollWeek(year, week, -1);
+        return timesheetModel.getWeekNumber(date);
+    },
+    nextWeekYear: function(year, week){
+        var date = timesheetModel.rollWeek(year, week, 1);
+        var weekNum = timesheetModel.getWeekNumber(date);
+        if(week > weekNum){ year ++; }
+        return year;
+    },
+    lastWeekYear: function(year, week){
+        var date = timesheetModel.rollWeek(year, week, -1);
+        var weekNum = timesheetModel.getWeekNumber(date);
+        if(week < weekNum) { year --; }
+        return year;
     }
 }
 

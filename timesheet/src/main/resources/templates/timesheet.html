@@ -26,12 +26,12 @@
                        type="submit" value="Validate My Week">
             </div>
 
-            <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+(week-1)+'&year='+year">
+            <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+lastWeek(year,week)+'&year='+lastWeekYear(year,week)">
                 <i class="left arrow icon"></i>Previous week</a>
 
             <span class="ui blue circular label bug">Week {{ week }}</span>
 
-            <a class="ui right labeled icon button" v-bind:href="'/timesheet?week='+(week+1)+'&year='+year">
+            <a class="ui right labeled icon button" v-bind:href="'/timesheet?week='+nextWeek(year,week)+'&year='+nextWeekYear(year,week)">
                 <i class="right arrow icon"></i>Next week</a>
         </div>
 
