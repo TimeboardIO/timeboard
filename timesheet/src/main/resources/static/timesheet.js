@@ -55,7 +55,6 @@ const timesheetModel = {
         var day = (1 + (week - 1) * 7); // 1st of January + 7 days for each week
         var date = new Date(year, 0, day);
         date.setDate(date.getDate() + 7 * x); //Add x week(s)
-
         return date;
     },
     getWeekNumber: function(date){
@@ -69,17 +68,17 @@ const timesheetModel = {
         var date = timesheetModel.rollWeek(year, week, 1);
         return timesheetModel.getWeekNumber(date);
     },
-    previousWeek: function(year, week){
+    lastWeek: function(year, week){
         var date = timesheetModel.rollWeek(year, week, -1);
         return timesheetModel.getWeekNumber(date);
     },
-    nextYear: function(year, week){
+    nextWeekYear: function(year, week){
         var date = timesheetModel.rollWeek(year, week, 1);
         var weekNum = timesheetModel.getWeekNumber(date);
         if(week > weekNum){ year ++; }
         return year;
     },
-    previousYear: function(year, week){
+    lastWeekYear: function(year, week){
         var date = timesheetModel.rollWeek(year, week, -1);
         var weekNum = timesheetModel.getWeekNumber(date);
         if(week < weekNum) { year --; }
