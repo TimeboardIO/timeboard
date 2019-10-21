@@ -78,7 +78,7 @@ public class ProjectDashboardServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("dashboard", dashboard);
 
-        viewModel.setTemplate("details_project_dashboard.html");
+        viewModel.setTemplate("projects:details_project_dashboard.html");
 
     }
 

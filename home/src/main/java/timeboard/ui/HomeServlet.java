@@ -71,7 +71,7 @@ public class HomeServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("home.html");
+        viewModel.setTemplate("home:home.html");
     }
 
     @Override
@@ -97,7 +97,7 @@ public class HomeServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(user).size());
         viewModel.getViewDatas().put("weeks", weeks);
 
-        viewModel.setTemplate("home.html");
+        viewModel.setTemplate("home:home.html");
     }
 
 
