@@ -1,4 +1,4 @@
-package timeboard.core.api;
+package timeboard.core.api.exceptions;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,27 +26,36 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.api.exceptions.TimesheetException;
-import timeboard.core.model.User;
+import timeboard.core.internal.rules.Rule;
 
-public interface TimesheetService {
+import java.util.HashSet;
+import java.util.Set;
 
-    /**
-     * Validate user timesheet.
-     *
-     * @param actorID         user PK who trigger this function.
-     * @param userTimesheetID user PK which be used to build timehseet to validate
-     * @param year            timesheet year
-     * @param week            timesheet week
-     * @return true if timesheet is validate else, false.
-     */
-    void validateTimesheet(long actorID, long userTimesheetID, int year, int week) throws TimesheetException;
+public class TimesheetException extends BusinessException {
 
-    /**
-     * @param userTimesheet user used to check timesheet validation state.
-     * @param week          timesheet week
-     * @param year          timesheet year
-     * @return true if timesheet is already validated
-     */
-    boolean isTimesheetValidated(User userTimesheet, int year, int week);
+    private final Set<Rule> triggeredRules = new HashSet<>();
+
+    public TimesheetException(Exception e) {
+        super(e);
+    }
+
+    public TimesheetException(String err) {
+        super(err);
+    }
+
+
+
+    @Override
+    public String getMessage() {
+        if (this.triggeredRules.isEmpty()) {
+            return super.getMessage();
+        } else {
+            StringBuilder builder = new StringBuilder();
+            this.triggeredRules.forEach(rule -> {
+                builder.append(rule.ruleDescription());
+                builder.append("\n");
+            });
+            return builder.toString();
+        }
+    }
 }
