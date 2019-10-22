@@ -8,5 +8,8 @@
 th.project{
     font-size: 1em !important;
     font-weight: normal;
+}
 
+th, td {
+    text-align: center !important;
 }

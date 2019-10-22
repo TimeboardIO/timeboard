@@ -33,34 +33,36 @@
                         Tasks
                     </div>
                 </div>
-            </div>
 
+            </div>
         </div>
-        <div class="ui segment">
-            <table class="ui celled table">
+
+        <div class="ui segment imputation-table">
+            <table class="ui table">
                 <thead>
                 <tr>
-                    <th style="text-align: center;">Week</th>
-                    <th style="text-align: center;">Days</th>
-                    <th style="text-align: center;">Validated</th>
+                    <th class="six wide">Week</th>
+                    <th class="four wide">Days</th>
+                    <th class="two wide">Validated</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td style="text-align: center;" data-label="Week">Week 41</td>
-                    <td style="text-align: center;" data-label="Days"><div class="ui circular label large day-badge green">5.0</div></td>
-                    <td style="text-align: center;" data-label="Validated"><i class="check icon"></i></td>
-                </tr>
-                <tr>
-                    <td style="text-align: center;" data-label="Week">Week 42</td>
-                    <td style="text-align: center;" data-label="Days"><div class="ui circular label large day-badge green">5.0</div></td>
-                    <td style="text-align: center;" data-label="Validated"><i class="check icon"></i></td>
-                </tr>
-                <tr>
-                    <td style="text-align: center;" data-label="Week">Week 43</td>
-                    <td style="text-align: center;" data-label="Days"><div class="ui circular label large day-badge red">3.8</div></td>
-                    <td style="text-align: center;" data-label="Validated"></td>
-                </tr>
+                <tbody th:each="week : ${weeks}">
+                    <tr>
+                        <td data-label="Week" >
+                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} " th:text="${'Week '+week.number}"></a>
+                        </td>
+                        <td data-label="Days">
+                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
+                                <div th:if="${week.imputationSum >= 5}" class="ui circular label large day-badge green" th:text="${week.imputationSum}"></div>
+                                <div th:if="${week.imputationSum < 5}" class="ui circular label large day-badge red" th:text="${week.imputationSum}"></div>
+                            </a>
+                        </td>
+                        <td data-label="Validated">
+                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
+                                <i class="check icon green" th:if="${week.isValidated}"></i>
+                            </a>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
