@@ -9,9 +9,9 @@
 
 <div layout:fragment="content">
 
-    <div class="ui segment">
-        <div class="ui middle aligned center aligned grid" style="margin-top:3em; margin-bottom: 3em;">
+    <div class="ui horizontal segments" style="margin-top:3em; margin-bottom: 3em;">
 
+        <div class="ui segment middle aligned center aligned grid" >
             <div class="column">
 
                 <div class="ui statistic">
@@ -35,6 +35,34 @@
                 </div>
             </div>
 
+        </div>
+        <div class="ui segment">
+            <table class="ui celled table">
+                <thead>
+                <tr>
+                    <th style="text-align: center;">Week</th>
+                    <th style="text-align: center;">Days</th>
+                    <th style="text-align: center;">Validated</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="text-align: center;" data-label="Week">Week 41</td>
+                    <td style="text-align: center;" data-label="Days"><div class="ui circular label large day-badge green">5.0</div></td>
+                    <td style="text-align: center;" data-label="Validated"><i class="check icon"></i></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;" data-label="Week">Week 42</td>
+                    <td style="text-align: center;" data-label="Days"><div class="ui circular label large day-badge green">5.0</div></td>
+                    <td style="text-align: center;" data-label="Validated"><i class="check icon"></i></td>
+                </tr>
+                <tr>
+                    <td style="text-align: center;" data-label="Week">Week 43</td>
+                    <td style="text-align: center;" data-label="Days"><div class="ui circular label large day-badge red">3.8</div></td>
+                    <td style="text-align: center;" data-label="Validated"></td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
