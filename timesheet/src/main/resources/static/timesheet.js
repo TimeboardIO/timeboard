@@ -3,7 +3,6 @@
 */
 const updateTask = function(date, task, type, val){
 
-    //$(".ui.dimmer").addClass("active");
     return $.post("/timesheet", {
         'type':type,
         'day':date,
@@ -108,6 +107,7 @@ $(document).ready(function(){
             });
         },
         triggerUpdateRTBD: function(event){
+
             $(event.target).parent().addClass('left icon loading').removeClass('error');
             const taskID = $(event.target).attr('data-task-rtbd');
             const val = $(event.target).val();
@@ -121,8 +121,7 @@ $(document).ready(function(){
                 });
         },
         triggerUpdateTask: function (event) {
-            //$('#timesheet-error').removeClass('hidden').addClass('visible');
-           // $('#timesheet-error').transition('fade');
+
            $(event.target).parent().addClass('left icon loading').removeClass('error');
             const date = $(event.target).attr('data-date');
             const taskID = $(event.target).attr('data-task');
@@ -187,8 +186,6 @@ $(document).ready(function(){
         ;
       })
     ;
-
-
 
 });
 
