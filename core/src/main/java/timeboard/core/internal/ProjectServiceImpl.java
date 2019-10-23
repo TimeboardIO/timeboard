@@ -68,6 +68,8 @@ public class ProjectServiceImpl implements ProjectService {
             p.getClusters().add(c);
 
             entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Project " + newProject.getName() + " added to  cluster " + projectCluster.getName());
         });
     }
 
@@ -119,6 +121,8 @@ public class ProjectServiceImpl implements ProjectService {
             Project p = em.find(Project.class, projectID);
             em.remove(p);
             em.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Project " + p.getName() + " deleted");
             return p;
         });
     }
@@ -128,6 +132,8 @@ public class ProjectServiceImpl implements ProjectService {
         return jpa.txExpr(em -> {
             em.merge(project);
             em.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Project " + project.getName() + " updated");
             return project;
         });
     }
@@ -200,7 +206,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             entityManager.flush();
 
-
+            this.logService.log(LogService.LOG_INFO, "Project " + project.getName() + " updated");
             return project;
         });
 
@@ -211,6 +217,8 @@ public class ProjectServiceImpl implements ProjectService {
         this.jpa.tx(entityManager -> {
             entityManager.persist(projectMembership);
         });
+        this.logService.log(LogService.LOG_INFO, "User " + projectMembership.getMember().getName() + " add to project "+projectMembership.getProject().getName());
+
     }
 
     @Override
@@ -219,6 +227,7 @@ public class ProjectServiceImpl implements ProjectService {
             ProjectCluster pc = entityManager.find(ProjectCluster.class, clusterID);
             entityManager.remove(pc);
             entityManager.flush();
+            this.logService.log(LogService.LOG_INFO, "Project cluster " + pc.getName() + " deleted");
         });
     }
 
@@ -233,6 +242,7 @@ public class ProjectServiceImpl implements ProjectService {
                         projectCluster.setParent(parentCluster);
                     }
                 }
+                this.logService.log(LogService.LOG_INFO, "Project cluster " + projectCluster.getName() + " updated");
                 entityManager.merge(projectCluster);
             });
             entityManager.flush();
@@ -288,6 +298,9 @@ public class ProjectServiceImpl implements ProjectService {
             entityManager.merge(project);
             newTask.setProject(project);
             entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
+
             return newTask;
         });
     }
@@ -300,6 +313,9 @@ public class ProjectServiceImpl implements ProjectService {
             rev.setTask(taskFromDB);
             entityManager.persist(rev);
             entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
+
             return taskFromDB;
         });
     }
@@ -354,6 +370,8 @@ public class ProjectServiceImpl implements ProjectService {
 
             entityManager.flush();
 
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+task.getProject().getName()+" with value "+ val);
+
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
     }
@@ -364,6 +382,9 @@ public class ProjectServiceImpl implements ProjectService {
             Task task = entityManager.find(Task.class, taskID);
             task.setRemainsToBeDone(actor, rtbd);
             entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated reamin to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ rtbd);
+
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
     }
@@ -452,6 +473,8 @@ public class ProjectServiceImpl implements ProjectService {
         if (exp != null) {
             throw exp;
         }
+        this.logService.log(LogService.LOG_INFO, "Task " + taskID + " deleted by "+actor.getName());
+
     }
 
 
@@ -465,6 +488,8 @@ public class ProjectServiceImpl implements ProjectService {
         this.jpa.tx(entityManager -> {
             entityManager.persist(projectCluster);
         });
+        this.logService.log(LogService.LOG_INFO, "Project cluster " + projectCluster.getName() + " saved");
+
     }
 
     @Override
