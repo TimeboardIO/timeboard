@@ -17,31 +17,33 @@
         <div class="ui segment">
             <br/>
             <br/>
-            <div class="ui top large primary attached label"><i class="icon user blue"></i> John Doe</div>
+            <div class="ui top large primary attached label">
+                <i class="icon user blue"></i>
+                <i th:text="${user.firstName} + ' ' + ${user.name}"></i>
+            </div>
 
             <div class="ui list">
                 <div class="item">
                     <i class="users icon"></i>
-                    <div class="content">
-                        jdoe
-                    </div>
+                    <div class="content" th:text="${user.login}" ></div>
                 </div>
 
                 <div class="item">
                     <i class="clock outline icon"></i>
                     <div class="content">
-                        Member since 1st oct 2019
+                        Member since  <i th:text="${user.accountCreationTime}"></i>
                     </div>
                 </div>
                 <div class="item">
                     <i class="mail icon"></i>
                     <div class="content">
-                        <a href="mailto:jack@semantic-ui.com">john@mygroup.io</a>
+                        <a th:href="'mailto:' + ${user.email}" th:text="${user.email}" ></a>
                     </div>
                 </div>
 
             </div>
         </div>
+
         <div class="ui segment">
 
         <h4 class="ui dividing header">Edit your account</h4>
@@ -51,20 +53,20 @@
                 <label>Name</label>
                 <div class="two fields">
                     <div class="field">
-                        <input type="text" name="first-name" placeholder="First Name" value="John">
+                        <input type="text" name="first-name" placeholder="First Name" th:value="${user.firstName}">
                     </div>
                     <div class="field">
-                        <input type="text" name="last-name" placeholder="Last Name" value="Doe">
+                        <input type="text" name="last-name" placeholder="Last Name" th:value="${user.name}">
                     </div>
                 </div>
                 <div class="two fields">
                     <div class="field">
                         <label>Nickname</label>
-                        <input type="text" name="login" placeholder="Login" value="jdoe">
+                        <input type="text" name="login" placeholder="Login" th:value="${user.login}">
                     </div>
                     <div class="field">
                         <label>E-mail</label>
-                        <input type="email" name="email" placeholder="john@mygroup.io">
+                        <input type="email" name="email" placeholder="john@mygroup.io" th:value="${user.email}">
                     </div>
                 </div>
                 <div class="ui submit positive button right">Submit</div>
