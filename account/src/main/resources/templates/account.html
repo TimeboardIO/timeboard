@@ -48,15 +48,15 @@
 
         <h4 class="ui dividing header">Edit your account</h4>
 
-        <form action="/clusters?action=create" class="ui form account" enctype="application/x-www-form-urlencoded" method="post">
+        <form action="" class="ui form account" enctype="application/x-www-form-urlencoded" method="post">
             <div class="field">
                 <label>Name</label>
                 <div class="two fields">
                     <div class="field">
-                        <input type="text" name="first-name" placeholder="First Name" th:value="${user.firstName}">
+                        <input type="text" name="firstName" placeholder="First Name" th:value="${user.firstName}">
                     </div>
                     <div class="field">
-                        <input type="text" name="last-name" placeholder="Last Name" th:value="${user.name}">
+                        <input type="text" name="name" placeholder="Last Name" th:value="${user.name}">
                     </div>
                 </div>
                 <div class="two fields">
@@ -69,7 +69,9 @@
                         <input type="email" name="email" placeholder="john@mygroup.io" th:value="${user.email}">
                     </div>
                 </div>
-                <div class="ui submit positive button right">Submit</div>
+
+                <input name="formType" type="hidden" value="account">
+                <div name="submit" class="ui submit positive button right" value="account" >Submit</div>
                 <div class="ui error message"></div>
 
             </div>
@@ -99,7 +101,8 @@
                         <input type="password" name="password2" placeholder="Password verification">
                     </div>
                 </div>
-                <div class="ui submit positive button">Submit</div>
+                <input name="formType" type="hidden" value="password">
+                <div name="submitButton" class="ui submit positive button" value="password" >Submit</div>
                 <div class="ui error message"></div>
             </div>
 

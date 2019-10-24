@@ -101,4 +101,12 @@ public interface UserService {
     User findUserByID(Long userID);
 
 
+    /**
+     * Update user
+     *
+     * @param user to update
+     * @return user will with primary key
+     * @throws BusinessException user does not exist
+     */
+    User updateUser(User user);
 }

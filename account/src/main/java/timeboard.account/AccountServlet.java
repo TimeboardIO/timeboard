@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -53,7 +54,7 @@ import java.io.IOException;
 public class AccountServlet extends TimeboardServlet {
 
     @Reference
-    private ProjectService projectService;
+    private UserService userService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -62,6 +63,52 @@ public class AccountServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        User user = SecurityContext.getCurrentUser(request);
+
+        String submitButton = request.getParameter("formType");
+        if(submitButton.matches("password")){
+            //Password modification
+
+            String newPassword = request.getParameter("password1");
+            String oldPassword = request.getParameter("oldPassword");
+
+            if(oldPassword == user.getPassword()){
+
+                //TODO Security checking
+
+                user.setPassword(newPassword);
+                try{
+                    User u = userService.updateUser(user);
+                }catch  (Exception e){
+                    //TODO handle this
+                }
+            }else{
+                //TODO throw wrong pwd exception
+            }
+
+
+        }else if(submitButton .matches("account")){
+            //Account modification
+
+           String fistName = request.getParameter("firstName");
+           String name = request.getParameter("name");
+           String login = request.getParameter("login");
+           String email = request.getParameter("email");
+
+
+           user.setFirstName(fistName);
+           user.setName(name);
+           user.setLogin(login);
+           user.setEmail(email);
+
+           try{
+              User u = userService.updateUser(user);
+           }catch  (Exception e){
+               //TODO handle this
+           }
+        }
+        viewModel.getViewDatas().put("user", user);
+
         viewModel.setTemplate("account.html");
     }
 

@@ -73,6 +73,14 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User updateUser(User user) {
+        return this.jpa.txExpr(entityManager -> {
+            entityManager.persist(user);
+            return user;
+        });
+    }
+
+    @Override
     public List<User> searchUserByName(final String prefix) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<User> q = entityManager
@@ -131,4 +139,6 @@ public final class UserServiceImpl implements UserService {
         return jpa.txExpr(entityManager -> entityManager
                 .find(User.class, userID));
     }
+
+
 }
