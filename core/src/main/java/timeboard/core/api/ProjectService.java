@@ -113,7 +113,7 @@ public interface ProjectService {
      == Imputations ==
      */
     /**
-     * @return List all effort left for a task.
+     * @return List all effort spent for a task.
      */
     List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
 }

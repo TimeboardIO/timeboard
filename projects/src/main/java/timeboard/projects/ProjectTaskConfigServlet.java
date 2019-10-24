@@ -44,11 +44,9 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component(
         service = Servlet.class,
@@ -102,19 +100,19 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 .collect(Collectors.toList());
         viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
 
-        List<EffortSpent> effortSpentList = this.projectService.getESByTaskAndPeriod(task.getId(), task.getLatestRevision().getStartDate(), task.getLatestRevision().getEndDate());
-        List<Double> esList = listOfTaskDates
+        List<EffortSpent> effortSpentDB = this.projectService.getESByTaskAndPeriod(task.getId(), task.getLatestRevision().getStartDate(), task.getLatestRevision().getEndDate());
+        final Double[] lastSum = {0.0};
+        List<Double> effortSpent = listOfTaskDates
                 .stream()
-                .map(date -> {
-                    return effortSpentList
-                            .stream()
-                            .filter(effortSpent -> effortSpent.getDate().toString().equals(date))
-                            .map(effort -> effort.getSumPreviousValue())
-                            .findFirst()
-                            .orElse(0.0);
-                })
+                .map(date -> effortSpentDB.stream()
+                        .filter(es -> es.getDate().toString().equals(date))
+                        .map(effort -> {
+                            lastSum[0] = effort.getSumPreviousValue();
+                            return effort.getSumPreviousValue();
+                        })
+                        .findFirst().orElse(lastSum[0]))
                 .collect(Collectors.toList());
-        viewModel.getViewDatas().put("effortSpent", esList);
+        viewModel.getViewDatas().put("effortSpent", effortSpent);
 
     }
 

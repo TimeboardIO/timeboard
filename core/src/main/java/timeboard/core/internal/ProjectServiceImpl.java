@@ -488,36 +488,21 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
- /*   @Override
-    public List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
-
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery query = (TypedQuery) entityManager.createNativeQuery("select " +
-                    "i.day as date, SUM(i.value) OVER (ORDER BY i.day) as sumPreviousValue" +
-                    "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate", EffortSpent.class);
-            query.setParameter("taskId", taskId);
-            query.setParameter("startTaskDate", startTaskDate);
-            query.setParameter("endTaskDate", endTaskDate);
-
-            return query.getResultList();
-        });
-    }*/
     @Override
     public List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
 
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Object[]> query = entityManager.createQuery("select " +
-                    "i.day as date, i.value as sumPreviousValue " +
-                    "from Imputation i  where i.task.id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate", Object[].class);
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
+                    "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue " +
+                    "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
             query.setParameter("taskId", taskId);
             query.setParameter("startTaskDate", startTaskDate);
             query.setParameter("endTaskDate", endTaskDate);
 
-            List<Object[]> e = query.getResultList();
-
-            List<EffortSpent> es = e.stream().map(x -> new EffortSpent((Date) x[0], (Double) x[1])).collect(Collectors.toList());
-
-            return es;
+            return query.getResultList()
+                    .stream()
+                    .map(x -> new EffortSpent((Date) x[0], (Double) x[1]))
+                    .collect(Collectors.toList());
         });
     }
 }

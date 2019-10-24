@@ -95,7 +95,7 @@
                 labels: /*[[${listOfTaskDates}]]*/,
                 datasets: [{
                     data: /*[[${effortSpent}]]*/,
-                    label: "Effort spent fort task 1",
+                    label: "Effort spent for " + /*[[${task.taskName}]]*/,
                     borderColor: "#3e95cd",
                     fill: true,
                     steppedLine: true
@@ -105,7 +105,7 @@
               options: {
                 title: {
                   display: true,
-                  text: 'Task reestimate and effort spent graph'
+                  text: 'Task REestimate and Effort Spent graph'
                 }
               }
             });
