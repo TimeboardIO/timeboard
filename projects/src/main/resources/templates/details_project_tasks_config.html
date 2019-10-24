@@ -99,20 +99,37 @@
                     borderColor: "#3e95cd",
                     fill: true,
                     steppedLine: true
+                  },
+                  {
+                    data: /*[[${reEstimate}]]*/,
+                    label: "Effort Estimate for " + /*[[${task.taskName}]]*/,
+                    borderColor: "#ff6384",
+                    fill: true,
+                    steppedLine: true
                   }
                 ]
               },
               options: {
                 title: {
                   display: true,
-                  text: 'Task REestimate and Effort Spent graph'
+                  text: 'Task REestimate and Effort Estimate graph'
                 },
                 scales: {
                     yAxes: [{
                         ticks: {
                             min: 0
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Number of days'
                         }
-                    }]
+                    }],
+                    xAxes: [{
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Dates'
+                        }
+                    }],
                 }
               }
             });

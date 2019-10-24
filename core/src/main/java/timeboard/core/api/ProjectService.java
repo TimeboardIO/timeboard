@@ -116,4 +116,6 @@ public interface ProjectService {
      * @return List all effort spent for a task.
      */
     List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
+
+    List<EffortEstimate> getEstimateByTask(long taskId);
 }

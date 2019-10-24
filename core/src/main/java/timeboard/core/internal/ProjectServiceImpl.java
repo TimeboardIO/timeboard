@@ -505,4 +505,19 @@ public class ProjectServiceImpl implements ProjectService {
                     .collect(Collectors.toList());
         });
     }
+
+    @Override
+    public List<EffortEstimate> getEstimateByTask(long taskId) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Object[]> query = entityManager.createQuery("select " +
+                    "tr.revisionDate as date, tr.estimateWork as estimateValue " +
+                    "from TaskRevision tr where tr.task.id = :taskId order by tr.revisionDate", Object[].class);
+            query.setParameter("taskId", taskId);
+
+            return query.getResultList()
+                    .stream()
+                    .map(x -> new EffortEstimate((Date) x[0], (Double) x[1]))
+                    .collect(Collectors.toList());
+        });
+    }
 }

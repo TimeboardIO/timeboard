@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,6 +94,10 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
 
+
+        /* Get datas for line-chart*/
+
+        // Datas for dates (Axis X)
         LocalDate start = LocalDate.parse(task.getLatestRevision().getStartDate().toString());
         LocalDate end = LocalDate.parse(task.getLatestRevision().getEndDate().toString());
         List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
@@ -100,6 +105,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 .collect(Collectors.toList());
         viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
 
+        // Datas for effort spent (Axis Y)
         List<EffortSpent> effortSpentDB = this.projectService.getESByTaskAndPeriod(task.getId(), task.getLatestRevision().getStartDate(), task.getLatestRevision().getEndDate());
         final Double[] lastSum = {0.0};
         List<Double> effortSpent = listOfTaskDates
@@ -113,6 +119,21 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                         .findFirst().orElse(lastSum[0]))
                 .collect(Collectors.toList());
         viewModel.getViewDatas().put("effortSpent", effortSpent);
+
+        // Datas for effort estimate (Axis Y)
+        List<EffortEstimate> effortEstimateDB = this.projectService.getEstimateByTask(task.getId());
+        final Double[] lastEstimate = {0.0};
+        List<Double> effortEstimate = listOfTaskDates
+                .stream()
+                .map(date -> effortEstimateDB.stream()
+                        .filter(ee -> ee.getDate().toString().contains(date))
+                        .map(estimate -> {
+                            lastEstimate[0] = estimate.getEstimateValue();
+                            return estimate.getEstimateValue();
+                        })
+                        .findFirst().orElse(lastEstimate[0]))
+                .collect(Collectors.toList());
+        viewModel.getViewDatas().put("reEstimate", effortEstimate);
 
     }
 
