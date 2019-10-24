@@ -4,7 +4,6 @@
           xmlns="http://karaf.apache.org/xmlns/features/v1.4.0"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
-
     <repository>mvn:org.ops4j.pax.web/pax-web-features/7.3.4/xml/features</repository>
 
     <feature name="timeboard-base" version="${project.version}">
@@ -64,6 +63,13 @@
         <feature>timeboard-core-ui</feature>
         <feature>timeboard-security</feature>
         <bundle start-level="90">mvn:${project.groupId}/home/${project.version}</bundle>
+    </feature>
+
+    <feature name="timeboard-account" version="${project.version}">
+        <feature>timeboard-core</feature>
+        <feature>timeboard-core-ui</feature>
+        <feature>timeboard-security</feature>
+        <bundle start-level="90">mvn:${project.groupId}/account/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-projects" version="${project.version}">
