@@ -43,7 +43,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component(
         service = Servlet.class,
@@ -71,14 +76,15 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        Task task = new Task();
         if (request.getParameter("taskID") != null) {
             // Update case
             long taskID = Long.parseLong(request.getParameter("taskID"));
-            Task task = this.projectService.getTask(taskID);
+            task = this.projectService.getTask(taskID);
             viewModel.getViewDatas().put("task", new TaskForm(task));
         } else {
             // New task case
-            viewModel.getViewDatas().put("task", new TaskForm(new Task()));
+            viewModel.getViewDatas().put("task", new TaskForm(task));
         }
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
@@ -88,6 +94,28 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
+
+        LocalDate start = LocalDate.parse(task.getLatestRevision().getStartDate().toString());
+        LocalDate end = LocalDate.parse(task.getLatestRevision().getEndDate().toString());
+        List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
+                .map(localDate -> localDate.toString())
+                .collect(Collectors.toList());
+        viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
+
+        List<EffortSpent> effortSpentList = this.projectService.getESByTaskAndPeriod(task.getId(), task.getLatestRevision().getStartDate(), task.getLatestRevision().getEndDate());
+        List<Double> esList = listOfTaskDates
+                .stream()
+                .map(date -> {
+                    return effortSpentList
+                            .stream()
+                            .filter(effortSpent -> effortSpent.getDate().toString().equals(date))
+                            .map(effort -> effort.getSumPreviousValue())
+                            .findFirst()
+                            .orElse(0.0);
+                })
+                .collect(Collectors.toList());
+        viewModel.getViewDatas().put("effortSpent", esList);
+
     }
 
     @Override

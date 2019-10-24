@@ -79,6 +79,43 @@
 
     </form>
 
+    <div>
+
+        <div class="ui fluid card">
+            <canvas id="lineChart" width="800" height="450"></canvas>
+        </div>
+
+        <script th:inline="javascript">
+
+            /*<![CDATA[*/
+
+            const chart = new Chart(document.querySelector("#lineChart"), {
+              type: 'line',
+              data: {
+                labels: /*[[${listOfTaskDates}]]*/,
+                datasets: [{
+                    data: /*[[${effortSpent}]]*/,
+                    label: "Effort spent fort task 1",
+                    borderColor: "#3e95cd",
+                    fill: true,
+                    steppedLine: true
+                  }
+                ]
+              },
+              options: {
+                title: {
+                  display: true,
+                  text: 'Task reestimate and effort spent graph'
+                }
+              }
+            });
+
+            /*]]>*/
+
+
+            </script>
+    </div>
+
     <script>
          $('.ui.search')
             .search({
