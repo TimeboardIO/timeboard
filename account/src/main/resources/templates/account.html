@@ -13,15 +13,100 @@
 
 <div layout:fragment="content">
 
-    <div class="ui segment">
-        <div class="ui middle aligned center aligned grid" style="margin-top:3em; margin-bottom: 3em;">
+    <div class="ui horizontal segments">
+        <div class="ui segment">
+            <br/>
+            <br/>
+            <div class="ui top large primary attached label"><i class="icon user blue"></i> John Doe</div>
 
-            <div class="column">
-                <p>Account</p>
+            <div class="ui list">
+                <div class="item">
+                    <i class="users icon"></i>
+                    <div class="content">
+                        jdoe
+                    </div>
+                </div>
+
+                <div class="item">
+                    <i class="clock outline icon"></i>
+                    <div class="content">
+                        Member since 1st oct 2019
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="mail icon"></i>
+                    <div class="content">
+                        <a href="mailto:jack@semantic-ui.com">john@mygroup.io</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="ui segment">
+
+        <h4 class="ui dividing header">Edit your account</h4>
+
+        <form action="/clusters?action=create" class="ui form account" enctype="application/x-www-form-urlencoded" method="post">
+            <div class="field">
+                <label>Name</label>
+                <div class="two fields">
+                    <div class="field">
+                        <input type="text" name="first-name" placeholder="First Name" value="John">
+                    </div>
+                    <div class="field">
+                        <input type="text" name="last-name" placeholder="Last Name" value="Doe">
+                    </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Nickname</label>
+                        <input type="text" name="login" placeholder="Login" value="jdoe">
+                    </div>
+                    <div class="field">
+                        <label>E-mail</label>
+                        <input type="email" name="email" placeholder="john@mygroup.io">
+                    </div>
+                </div>
+                <div class="ui submit positive button right">Submit</div>
+                <div class="ui error message"></div>
+
             </div>
 
+        </form>
+
         </div>
+
+    <div class="ui segment">
+        <h4 class="ui dividing header">Edit your password</h4>
+
+        <form action="" class="ui form password" enctype="application/x-www-form-urlencoded" method="post">
+            <div class="field">
+                <label>Old password</label>
+                <div class="two fields">
+                    <div class="field">
+                        <input type="password" name="oldPassword" placeholder="Old password" >
+                    </div>
+
+                </div>
+                <label>New password</label>
+                <div class="two fields required">
+                    <div class="field required">
+                        <input type="password" name="password1" placeholder="New password" >
+                    </div>
+                    <div class="field required">
+                        <input type="password" name="password2" placeholder="Password verification">
+                    </div>
+                </div>
+                <div class="ui submit positive button">Submit</div>
+                <div class="ui error message"></div>
+            </div>
+
+        </form>
     </div>
+    </div>
+    <script src="/account/static/account.js"></script>
+
+</div>
 </div>
 
 </body>
