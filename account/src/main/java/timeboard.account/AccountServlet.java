@@ -87,8 +87,7 @@ public class AccountServlet extends TimeboardServlet {
                     viewModel.getViewDatas().put("error", "Error while updating user password.");
                 }*/
 
-
-                }catch(Exception e){
+                }catch(Exception e){ //TODO replace by multiple catch 
                     viewModel.getViewDatas().put("error", "Old password is incorrect.");
                 }
 
