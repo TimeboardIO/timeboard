@@ -74,6 +74,7 @@ public final class UserServiceImpl implements UserService {
     public List<User> createUsers(List<User> users) throws BusinessException {
         return this.jpa.txExpr(entityManager -> {
             users.forEach(user -> {
+                user.setPassword(this.hashPassword(user.getPassword()));
                 entityManager.persist(user);
                 this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
             });
@@ -110,17 +111,18 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public User autenticateUser(final String login, final String password) {
-
-        User u =  this.jpa.txExpr(entityManager -> {
+        User u = this.jpa.txExpr(entityManager -> {
             TypedQuery<User> q = entityManager
-                    .createQuery("select u.password from User u "
+                    .createQuery("select u from User u "
                             + "where u.login = :login ", User.class);
-                          //  + "and u.password = :password", User.class);
             q.setParameter("login", login);
-        //    q.setParameter("password", password);
             return q.getSingleResult();
         });
-        if(!this.checkPassword(password, u.getPassword()))  u = null;
+
+        if(!this.checkPassword(password, u.getPassword())) {
+            u = null;
+        }
+
         return u;
     }
 
@@ -143,8 +145,6 @@ public final class UserServiceImpl implements UserService {
         return jpa.txExpr(entityManager -> entityManager
                 .find(User.class, userID));
     }
-
-
 
     private String hashPassword(String password){
        return BCrypt.hashpw(password, BCrypt.gensalt(12));
