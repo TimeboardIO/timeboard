@@ -27,18 +27,25 @@ package timeboard.ui;
  */
 
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
+import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.ui.model.Week;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 
 @Component(
@@ -54,6 +61,9 @@ public class HomeServlet extends TimeboardServlet {
     @Reference
     private ProjectService projectService;
 
+    @Reference
+    private TimesheetService timesheetService;
+
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
         return HomeServlet.class.getClassLoader();
@@ -66,8 +76,26 @@ public class HomeServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(SecurityContext.getCurrentUser(request)).size());
-        viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(SecurityContext.getCurrentUser(request)).size());
+
+        //load previous weeks data
+        Date d = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(d);
+        List<Week> weeks = new ArrayList<>();
+        User user = SecurityContext.getCurrentUser(request);
+        int weeksToDisplay = 3; //TODO replace by a parameter ?
+        for(int i=0; i<weeksToDisplay; i++){
+            double weekSum = timesheetService.getWeekImputationSum(user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+            boolean weekIsValidated =timesheetService.isTimesheetValidated(user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+
+            Week week = new Week(c.get(Calendar.WEEK_OF_YEAR),c.get(Calendar.YEAR), weekSum, weekIsValidated);
+            weeks.add(week);
+            c.roll(Calendar.WEEK_OF_YEAR,-1);
+        }
+
+        viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(user).size());
+        viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(user).size());
+        viewModel.getViewDatas().put("weeks", weeks);
 
         viewModel.setTemplate("home.html");
     }
