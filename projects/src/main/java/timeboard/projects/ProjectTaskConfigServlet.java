@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -96,12 +97,20 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
 
         /* Get datas for line-chart*/
+        if(task.getId() != null) {
+            this.getDatasForCharts(viewModel, task);
+        }
 
+    }
+
+    private void getDatasForCharts(ViewModel viewModel, Task task) {
         // Datas for dates (Axis X)
-        LocalDate start = LocalDate.parse(task.getLatestRevision().getStartDate().toString());
-        LocalDate end = LocalDate.parse(task.getLatestRevision().getEndDate().toString());
+        String formatLocalDate = "yyyy-MM-dd";
+        String formatDateToDisplay = "dd-MM-yyyy";
+        LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getLatestRevision().getStartDate()));
+        LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getLatestRevision().getEndDate()));
         List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
-                .map(localDate -> localDate.toString())
+                .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
                 .collect(Collectors.toList());
         viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
 
@@ -111,7 +120,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         List<Double> effortSpent = listOfTaskDates
                 .stream()
                 .map(date -> effortSpentDB.stream()
-                        .filter(es -> es.getDate().toString().equals(date))
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(date))
                         .map(effort -> {
                             lastSum[0] = effort.getSumPreviousValue();
                             return effort.getSumPreviousValue();
@@ -126,7 +135,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         List<Double> effortEstimate = listOfTaskDates
                 .stream()
                 .map(date -> effortEstimateDB.stream()
-                        .filter(ee -> ee.getDate().toString().contains(date))
+                        .filter(ee -> new SimpleDateFormat(formatDateToDisplay).format(ee.getDate()).equals(date))
                         .map(estimate -> {
                             lastEstimate[0] = estimate.getEstimateValue();
                             return estimate.getEstimateValue();
@@ -134,7 +143,6 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                         .findFirst().orElse(lastEstimate[0]))
                 .collect(Collectors.toList());
         viewModel.getViewDatas().put("reEstimate", effortEstimate);
-
     }
 
     @Override
@@ -143,7 +151,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         final User actor = SecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
-          Task currentTask;
+          Task currentTask = null;
 
         try {
 
@@ -166,6 +174,11 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
             viewModel.getViewDatas().put("project", project);
+
+            /* Get datas for line-chart*/
+            if(currentTask.getId() != null) {
+                this.getDatasForCharts(viewModel, currentTask);
+            }
         }
     }
 

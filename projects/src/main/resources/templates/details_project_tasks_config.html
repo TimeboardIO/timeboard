@@ -81,7 +81,7 @@
 
     <div>
 
-        <div class="ui fluid card">
+        <div class="ui fluid card" th:if="${task.taskID != null}">
             <canvas id="lineChart" width="800" height="450"></canvas>
         </div>
 
@@ -112,7 +112,7 @@
               options: {
                 title: {
                   display: true,
-                  text: 'Task REestimate and Effort Estimate graph'
+                  text: 'Task - Effort Estimate and Effort Spent graph'
                 },
                 scales: {
                     yAxes: [{
