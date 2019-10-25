@@ -90,7 +90,7 @@ public final class UserServiceImpl implements UserService {
             u.setEmail(user.getEmail());
 
             entityManager.persist(u);
-            logservice.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
+            this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
             return user;
         });
     }
@@ -103,7 +103,7 @@ public final class UserServiceImpl implements UserService {
             this.jpa.txExpr(entityManager -> {
                 User u = entityManager.find(User.class, userID);
                 entityManager.persist(u);
-                logservice.log(LogService.LOG_INFO, "User " + u.getLogin() + " successfully change his password.");
+                this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + " successfully change his password.");
                 return u;
             });
         }else if(user != null){
