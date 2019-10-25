@@ -27,6 +27,8 @@ package timeboard.core.api;
  */
 
 
+import timeboard.core.api.exceptions.UserException;
+import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.User;
 import timeboard.core.api.exceptions.BusinessException;
 
@@ -109,4 +111,15 @@ public interface UserService {
      * @throws BusinessException user does not exist
      */
     User updateUser(User user);
+
+
+    /**
+     * Update user
+     *
+     * @param userID user primary key
+     * @param oldPassword old password
+     * @param newPassword new password
+     * @throws WrongPasswordException old password is incorrect
+     */
+    void updateUserPassword(Long userID, String oldPassword, String newPassword) throws WrongPasswordException, UserException;
 }

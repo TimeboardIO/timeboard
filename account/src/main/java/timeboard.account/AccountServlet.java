@@ -31,6 +31,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.UserException;
+import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -72,29 +74,31 @@ public class AccountServlet extends TimeboardServlet {
             String newPassword = request.getParameter("password1");
             String oldPassword = request.getParameter("oldPassword");
 
-            if(oldPassword == user.getPassword()){
-
                 //TODO Security checking
 
                 user.setPassword(newPassword);
-                try{
-                    User u = userService.updateUser(user);
-                }catch  (Exception e){
-                    //TODO handle this
+                try {
+                    userService.updateUserPassword(user.getId(), oldPassword, newPassword);
+                    viewModel.getViewDatas().put("message", "Password changed successfully !");
+               /* } catch (WrongPasswordException e) { //TODO custom exception make OSGI controller crash
+                    viewModel.getViewDatas().put("error", "Old password is incorrect.");
+                } catch (UserException e) {
+                    e.printStackTrace();
+                    viewModel.getViewDatas().put("error", "Error while updating user password.");
+                }*/
+
+
+                }catch(Exception e){
+                    viewModel.getViewDatas().put("error", "Old password is incorrect.");
                 }
-            }else{
-                //TODO throw wrong pwd exception
-            }
 
 
         }else if(submitButton .matches("account")){
             //Account modification
-
            String fistName = request.getParameter("firstName");
            String name = request.getParameter("name");
            String login = request.getParameter("login");
            String email = request.getParameter("email");
-
 
            user.setFirstName(fistName);
            user.setName(name);
@@ -103,8 +107,9 @@ public class AccountServlet extends TimeboardServlet {
 
            try{
               User u = userService.updateUser(user);
+               viewModel.getViewDatas().put("message", "User account changed successfully !");
            }catch  (Exception e){
-               //TODO handle this
+               viewModel.getViewDatas().put("error", "Error while updating user information.");
            }
         }
         viewModel.getViewDatas().put("user", user);

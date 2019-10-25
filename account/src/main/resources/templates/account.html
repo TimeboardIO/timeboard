@@ -13,6 +13,17 @@
 
 <div layout:fragment="content">
 
+    <div class="ui negative message" th:if="${error}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${error}">
+        </div>
+    </div>
+    <div class="ui positive message" th:if="${message}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${message}">
+        </div>
+    </div>
+
     <div class="ui horizontal segments">
         <div class="ui segment">
             <br/>
