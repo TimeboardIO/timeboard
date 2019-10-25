@@ -57,12 +57,13 @@ public final class UserServiceImpl implements UserService {
     private JpaTemplate jpa;
 
     @Reference
-    LogService logservice;
+    private LogService logService;
 
     @Override
     public User createUser(final User user) throws BusinessException {
         return this.jpa.txExpr(entityManager -> {
             entityManager.persist(user);
+            this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
             return user;
         });
     }
@@ -72,6 +73,7 @@ public final class UserServiceImpl implements UserService {
         return this.jpa.txExpr(entityManager -> {
             users.forEach(user -> {
                 entityManager.persist(user);
+                this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
             });
             return users;
         });

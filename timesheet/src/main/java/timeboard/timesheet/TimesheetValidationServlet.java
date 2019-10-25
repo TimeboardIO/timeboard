@@ -71,7 +71,6 @@ public class TimesheetValidationServlet extends TimeboardServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        this.logService.log(LogService.LOG_INFO, "TEST");
 
         int week = Integer.parseInt(request.getParameter("week"));
         int year = Integer.parseInt(request.getParameter("year"));

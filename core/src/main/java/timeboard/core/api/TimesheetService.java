@@ -49,4 +49,14 @@ public interface TimesheetService {
      * @return true if timesheet is already validated
      */
     boolean isTimesheetValidated(User userTimesheet, int year, int week);
+
+
+    /**
+     * @param userTimesheet user used to check timesheet validation state.
+     * @param week          timesheet week
+     * @param year          timesheet year
+     * @return the sum of all imputations of the week
+     */
+    double getWeekImputationSum(User userTimesheet, int year, int week);
+
 }

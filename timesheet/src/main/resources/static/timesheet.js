@@ -3,7 +3,6 @@
 */
 const updateTask = function(date, task, type, val){
 
-    $(".ui.dimmer").addClass("active");
     return $.post("/timesheet", {
         'type':type,
         'day':date,
@@ -108,6 +107,8 @@ $(document).ready(function(){
             });
         },
         triggerUpdateRTBD: function(event){
+
+            $(event.target).parent().addClass('left icon loading').removeClass('error');
             const taskID = $(event.target).attr('data-task-rtbd');
             const val = $(event.target).val();
             updateTask(null, taskID, 'rtbd', val)
@@ -116,10 +117,12 @@ $(document).ready(function(){
                     app.projects[updateTask.projectID].tasks[updateTask.taskID].reEstimateWork = updateTask.reEstimateWork;
                     app.projects[updateTask.projectID].tasks[updateTask.taskID].estimateWork = updateTask.estimateWork;
                     app.projects[updateTask.projectID].tasks[updateTask.taskID].remainToBeDone = updateTask.remainToBeDone;
-                    $(".ui.dimmer").removeClass("active");
+                    $(event.target).parent().removeClass('left icon loading');
                 });
         },
         triggerUpdateTask: function (event) {
+
+           $(event.target).parent().addClass('left icon loading').removeClass('error');
             const date = $(event.target).attr('data-date');
             const taskID = $(event.target).attr('data-task');
 
@@ -142,10 +145,11 @@ $(document).ready(function(){
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].estimateWork = updateTask.estimateWork;
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].remainToBeDone = updateTask.remainToBeDone;
                         app.imputations[date][taskID] = newval;
-                        $(".ui.dimmer").removeClass("active");
+                        $(event.target).parent().removeClass('left icon loading');
                     });
             }else{
                 $(event.target).val(oldVal);
+                $(event.target).parent().removeClass('left icon loading').addClass('error');
             }
         }
       }
@@ -173,10 +177,6 @@ $(document).ready(function(){
              }
         }
     });
-
-
-
-
 
 });
 

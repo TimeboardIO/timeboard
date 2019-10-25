@@ -9,9 +9,9 @@
 
 <div layout:fragment="content">
 
-    <div class="ui segment">
-        <div class="ui middle aligned center aligned grid" style="margin-top:3em; margin-bottom: 3em;">
+    <div class="ui horizontal segments" style="margin-top:3em; margin-bottom: 3em;">
 
+        <div class="ui segment middle aligned center aligned grid" >
             <div class="column">
 
                 <div class="ui statistic">
@@ -33,8 +33,38 @@
                         Tasks
                     </div>
                 </div>
-            </div>
 
+            </div>
+        </div>
+
+        <div class="ui segment imputation-table">
+            <table class="ui table">
+                <thead>
+                <tr>
+                    <th class="six wide">Week</th>
+                    <th class="four wide">Days</th>
+                    <th class="two wide">Validated</th>
+                </tr>
+                </thead>
+                <tbody th:each="week : ${weeks}">
+                    <tr>
+                        <td data-label="Week" >
+                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} " th:text="${'Week '+week.number}"></a>
+                        </td>
+                        <td data-label="Days">
+                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
+                                <div th:if="${week.imputationSum >= 5}" class="ui circular label large day-badge green" th:text="${week.imputationSum}"></div>
+                                <div th:if="${week.imputationSum < 5}" class="ui circular label large day-badge red" th:text="${week.imputationSum}"></div>
+                            </a>
+                        </td>
+                        <td data-label="Validated">
+                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
+                                <i class="check icon green" th:if="${week.isValidated}"></i>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
