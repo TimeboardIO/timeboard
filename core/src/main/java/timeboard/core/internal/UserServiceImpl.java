@@ -26,6 +26,7 @@ package timeboard.core.internal;
  * #L%
  */
 
+import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
@@ -53,11 +54,14 @@ public final class UserServiceImpl implements UserService {
             scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
 
+    @Reference
+    private LogService logService;
 
     @Override
     public User createUser(final User user) throws BusinessException {
         return this.jpa.txExpr(entityManager -> {
             entityManager.persist(user);
+            this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
             return user;
         });
     }
@@ -67,6 +71,7 @@ public final class UserServiceImpl implements UserService {
         return this.jpa.txExpr(entityManager -> {
             users.forEach(user -> {
                 entityManager.persist(user);
+                this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
             });
             return users;
         });

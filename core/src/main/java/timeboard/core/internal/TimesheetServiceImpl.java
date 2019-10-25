@@ -74,8 +74,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         //check if validation is possible
 
-
-
         //1 - last week is validated
 
         final Calendar c = Calendar.getInstance();
@@ -91,7 +89,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         boolean lastWeekValidated = this.isTimesheetValidated(userTimesheet, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
         if(!lastWeekValidated) throw new TimesheetException("Can not validate this week, previous week is not validated");
-
 
 
         //2 - all imputation day sum == 1
@@ -129,6 +126,9 @@ public class TimesheetServiceImpl implements TimesheetService {
         this.jpa.tx(entityManager -> {
             entityManager.persist(validatedTimesheet);
         });
+
+        this.logService.log(LogService.LOG_INFO, "Week " + week + " validated for user" + userTimesheet.getName()+" by user "+actor.getName());
+
     }
 
     @Override
