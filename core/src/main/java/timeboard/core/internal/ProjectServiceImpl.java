@@ -509,9 +509,15 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<EffortEstimate> getEstimateByTask(long taskId) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Object[]> query = entityManager.createQuery("select " +
-                    "tr.revisionDate as date, tr.estimateWork as estimateValue " +
-                    "from TaskRevision tr where tr.task.id = :taskId order by tr.revisionDate", Object[].class);
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
+            "tr.revisionDate as date, tr.estimateWork as estimateValue " +
+            "from TaskRevision tr " +
+            "where tr.task_id = :taskId and tr.id IN ( " +
+                    "SELECT MAX(trBis.id) " +
+                    "FROM TaskRevision trBis " +
+                    "GROUP BY DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")" +
+             ");");
+
             query.setParameter("taskId", taskId);
 
             return query.getResultList()

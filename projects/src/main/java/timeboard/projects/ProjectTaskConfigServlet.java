@@ -106,7 +106,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
     private void getDatasForCharts(ViewModel viewModel, Task task) {
         // Datas for dates (Axis X)
         String formatLocalDate = "yyyy-MM-dd";
-        String formatDateToDisplay = "dd-MM-yyyy";
+        String formatDateToDisplay = "dd/MM/yyyy";
         LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getLatestRevision().getStartDate()));
         LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getLatestRevision().getEndDate()));
         List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
