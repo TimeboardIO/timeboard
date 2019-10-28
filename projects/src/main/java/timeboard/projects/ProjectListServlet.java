@@ -63,7 +63,7 @@ public class ProjectListServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects.html");
+        viewModel.setTemplate("projects:projects.html");
         User user = SecurityContext.getCurrentUser(request);
         viewModel.getViewDatas().put("projects", this.projectService.listProjects(user));
     }

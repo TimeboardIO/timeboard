@@ -121,7 +121,7 @@ public class TimesheetServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("year", year);
         viewModel.getViewDatas().put("lastWeekValidated", lastWeekValidated);
 
-        viewModel.setTemplate("timesheet.html");
+        viewModel.setTemplate("timesheet:timesheet.html");
     }
 
 

@@ -84,7 +84,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
 
-        viewModel.setTemplate("details_project_tasks_config.html");
+        viewModel.setTemplate("projects:details_project_tasks_config.html");
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
@@ -114,7 +114,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         } catch (Exception e) {
             viewModel.getErrors().add(e);
         } finally {
-            viewModel.setTemplate("details_project_tasks_config.html");
+            viewModel.setTemplate("projects:details_project_tasks_config.html");
 
             viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());

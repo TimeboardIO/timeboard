@@ -65,7 +65,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
 
-        viewModel.setTemplate("details_project_tasks.html");
+        viewModel.setTemplate("projects:details_project_tasks.html");
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("project", project);
 
@@ -76,7 +76,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
 
-        viewModel.setTemplate("details_project_tasks.html");
+        viewModel.setTemplate("projects:details_project_tasks.html");
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("project", project);
     }
