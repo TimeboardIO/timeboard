@@ -97,6 +97,7 @@ public class LoginServlet extends TimeboardServlet {
             response.sendRedirect(origin);
         } else {
             response.setStatus(403);
+            viewModel.getViewDatas().put("message", "Username or password incorrect.");
             viewModel.setTemplate("login.html");
         }
 
