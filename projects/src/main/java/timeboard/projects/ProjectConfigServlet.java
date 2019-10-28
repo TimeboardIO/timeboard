@@ -29,7 +29,6 @@ package timeboard.projects;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.TreeNode;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.ProjectRole;
@@ -103,15 +102,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
     }
 
     private void prepareTemplateData(Project project, Map<String, Object> map) {
-        List<TreeNode> node = this.projectService.computeClustersTree();
 
-        final Map<Long, String> paths = new HashMap<>();
-        node.forEach(treeNode -> {
-            paths.putAll(treeNode.getPaths());
-        });
-
-        map.put("selected_clusters", project.getClusters().stream().map(projectCluster -> projectCluster.getId()).collect(Collectors.toList()));
-        map.put("clusters", paths);
         map.put("project", project);
         map.put("members", project.getMembers());
         map.put("roles", ProjectRole.values());

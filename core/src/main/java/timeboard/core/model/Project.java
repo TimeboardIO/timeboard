@@ -63,15 +63,12 @@ public class Project implements Serializable {
     )
     private Set<ProjectMembership> members;
 
-    @ManyToMany(targetEntity = ProjectCluster.class, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    private Set<ProjectCluster> clusters;
 
     @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.PERSIST)
     private Set<Task> tasks;
 
     public Project() {
         members = new HashSet<>();
-        clusters = new HashSet<>();
         tasks = new HashSet<>();
         this.attributes = new HashMap<>();
     }
@@ -125,14 +122,6 @@ public class Project implements Serializable {
 
     public void setMembers(Set<ProjectMembership> members) {
         this.members = members;
-    }
-
-    public Set<ProjectCluster> getClusters() {
-        return clusters;
-    }
-
-    public void setClusters(Set<ProjectCluster> cluster) {
-        this.clusters = cluster;
     }
 
     public Set<Task> getTasks() {
