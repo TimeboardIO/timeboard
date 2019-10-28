@@ -74,7 +74,7 @@ public class LoginServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("login.html");
+        viewModel.setTemplate("security:login.html");
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String origin = request.getParameter("origin");
@@ -97,14 +97,14 @@ public class LoginServlet extends TimeboardServlet {
             response.sendRedirect(origin);
         } else {
             response.setStatus(403);
-            viewModel.setTemplate("login.html");
+            viewModel.setTemplate("security:login.html");
         }
 
     }
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("login.html");
+        viewModel.setTemplate("security:login.html");
         Map<String, Object> templateDatas = new HashMap<>();
         String origin = "/";
         if (request.getParameter("origin") != null) {

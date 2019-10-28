@@ -14,7 +14,7 @@
     <link href="http://localhost:8000/semantic.css" rel="stylesheet"> <!-- TODO remove, currently use for development purpose. -->
 </head>
 <body>
-<div th:replace="fragments/navigation.html :: nav(${path})"></div>
+<div th:replace="core-ui:fragments/navigation.html :: nav(${path})"></div>
 <div class="ui container negative message" th:each="err : ${errors}">
     <i class="close icon"></i>
     <div class="header">
@@ -26,5 +26,8 @@
 <div layout:fragment="content" style="padding:1em">
     Main content
 </div>
+<footer>
+    Hello
+</footer>
 </body>
 </html>

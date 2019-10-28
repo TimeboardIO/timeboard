@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{layouts/general.html(path='/timesheet')}"
+<html layout:decorate="~{core-ui:layouts/general.html(path='/timesheet')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
       xmlns:v-on="http://www.w3.org/1999/xhtml">
@@ -24,6 +24,7 @@
                        v-on:click="validateMyWeek"
                        v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
                        type="submit" value="Validate My Week">
+                <div v-if="validated === true" class="ui positive horizontal label">Week validated</div>
             </div>
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+lastWeek(year,week)+'&year='+lastWeekYear(year,week)">
@@ -49,7 +50,7 @@
                             <th class="wide one project" style="text-align:center" v-for="day in days">
                                 {{ day.day }} {{ new Date(day.date).getDate() }}
                             </th>
-                            <th class="wide one project" data-tooltip="Effort spent" colspan="4"></th>
+                            <th class="wide one project" colspan="4"></th>
 
 
                         </tr>
@@ -92,20 +93,26 @@
                             <tr v-for="(task, taskID) in project.tasks">
                                 <td>{{ task.taskName }}</td>
                                 <td v-for="day in days">
+                                    <div class="ui input">
                                     <input
                                             max="1"
                                             min="0"
                                             step="0.1"
                                             v-if="(day.date >= task.startDate) && (day.date <= task.endDate)"
                                             v-on:focusout="triggerUpdateTask"
+                                            v-on:click="triggerUpdateTask"
                                             v-bind:data-date="day.date"
                                             v-bind:data-task="taskID"
                                             v-bind:name="'task['+taskID+']day['+day.date+']'"
                                             v-bind:value="getImputation(day.date, taskID).toFixed(1)"
                                             type="number"/>
+                                     <i class="search icon hidden" style="color: transparent;"></i>
+                                    </div>
                                 </td>
                                 <td v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
-                                <td><input
+                                <td>
+                                    <div class="ui input">
+                                    <input
                                         min="0"
                                         step="0.1"
                                         name="remainsToBeDone"
@@ -113,7 +120,11 @@
                                         v-bind:value="task.remainToBeDone.toFixed(1)"
                                         v-bind:data-task-rtbd="taskID"
                                         type="number"
-                                /></td>
+                                    />
+                                     <i class="search icon hidden" style="color: transparent;"></i>
+
+                                    </div>
+                                </td>
                                 <td v-bind:data-task-ew="taskID">{{task.estimateWork.toFixed(1)}}</td>
                                 <td
                                         v-bind:data-task-rew="taskID">{{task.reEstimateWork.toFixed(1)}}
