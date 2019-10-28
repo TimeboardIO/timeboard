@@ -123,7 +123,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("details_project_config.html");
+        viewModel.setTemplate("projects:details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
@@ -136,7 +136,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        viewModel.setTemplate("details_project_config.html");
+        viewModel.setTemplate("projects:details_project_config.html");
         Map<String, Object> map = new HashMap<>();
 
         //Extract project

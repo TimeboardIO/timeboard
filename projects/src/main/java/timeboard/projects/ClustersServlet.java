@@ -64,7 +64,7 @@ public class ClustersServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("clusters.html");
+        viewModel.setTemplate("projects:clusters.html");
         Map<String, Object> datas = this.prepareData();
 
         String action = request.getParameter("action");
@@ -113,7 +113,7 @@ public class ClustersServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("clusters.html");
+        viewModel.setTemplate("projects:clusters.html");
         if (request.getRequestURI().equals("/clusters/delete")) {
             deleteCluster(Long.parseLong(request.getParameter("projectID")));
         }

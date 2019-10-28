@@ -76,7 +76,7 @@ public class ProjectClustersServlet extends TimeboardServlet {
 
         }
 
-        viewModel.setTemplate("details_project_cluster_config.html");
+        viewModel.setTemplate("projects:details_project_cluster_config.html");
     }
 
     private void prepareDatas(ViewModel viewModel, Project project) {
@@ -110,7 +110,7 @@ public class ProjectClustersServlet extends TimeboardServlet {
 
         prepareDatas(viewModel, project);
 
-        viewModel.setTemplate("details_project_cluster_config.html");
+        viewModel.setTemplate("projects:details_project_cluster_config.html");
 
     }
 }

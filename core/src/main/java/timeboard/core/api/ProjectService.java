@@ -107,4 +107,15 @@ public interface ProjectService {
     TaskType findTaskTypeByID(Long taskTypeID);
 
     List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID);
+
+
+    /*
+     == Imputations ==
+     */
+    /**
+     * @return List all effort spent for a task.
+     */
+    List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
+
+    List<EffortEstimate> getEstimateByTask(long taskId);
 }

@@ -1,8 +1,8 @@
-package timeboard.security.service;
+package timeboard.core.model;
 
 /*-
  * #%L
- * security
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security.service;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,42 +26,31 @@ package timeboard.security.service;
  * #L%
  */
 
-import timeboard.core.api.UserService;
-import timeboard.core.model.User;
-import timeboard.security.api.Credential;
-import timeboard.security.api.LoginService;
-import timeboard.security.api.UsernamePasswordCredential;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import java.util.Date;
 
-@Component(
-        service = LoginService.class,
-        immediate = true
-)
-public class DatabaseAuthService implements LoginService {
+public class EffortEstimate {
 
+    private Date date;
+    private Double estimateValue;
 
-    @Reference
-    private UserService userService;
-
-
-    @Override
-    public boolean isServiceValidFor(Credential credential) {
-        return credential instanceof UsernamePasswordCredential;
+    public EffortEstimate(Date date, Double estimateValue){
+        this.date = date;
+        this.estimateValue = estimateValue;
     }
 
-    @Override
-    public boolean validateCredential(Credential credential) {
-        UsernamePasswordCredential upc = (UsernamePasswordCredential) credential;
-        User user = null;
-        try {
+    public Date getDate() {
+        return date;
+    }
 
-            user = this.userService.autenticateUser(upc.getUsername(), upc.getPassword());
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
-        } catch (Exception e) {
-                e.printStackTrace();
-        }
+    public Double getEstimateValue() {
+        return estimateValue;
+    }
 
-        return user != null;
+    public void setEstimateValue(Double estimateValue) {
+        this.estimateValue = estimateValue;
     }
 }
