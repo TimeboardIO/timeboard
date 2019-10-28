@@ -1,8 +1,8 @@
-package timeboard.projects;
+package timeboard.core.api.exceptions;
 
 /*-
  * #%L
- * KanbanProjectPlugin
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,22 +26,36 @@ package timeboard.projects;
  * #L%
  */
 
-import timeboard.core.ui.NavigationExtPoint;
-import org.osgi.service.component.annotations.Component;
+import timeboard.core.internal.rules.Rule;
 
-@Component(
-        service = NavigationExtPoint.class,
-        immediate = true
-)
-public class ProjectsClusterNavigationProvider implements NavigationExtPoint {
+import java.util.HashSet;
+import java.util.Set;
 
-    @Override
-    public String getNavigationLabel() {
-        return "Clusters";
+public class UserException extends BusinessException {
+
+    private final Set<Rule> triggeredRules = new HashSet<>();
+
+    public UserException(Exception e) {
+        super(e);
     }
 
+    public UserException(String err) {
+        super(err);
+    }
+
+
+
     @Override
-    public String getNavigationPath() {
-        return "/clusters";
+    public String getMessage() {
+        if (this.triggeredRules.isEmpty()) {
+            return super.getMessage();
+        } else {
+            StringBuilder builder = new StringBuilder();
+            this.triggeredRules.forEach(rule -> {
+                builder.append(rule.ruleDescription());
+                builder.append("\n");
+            });
+            return builder.toString();
+        }
     }
 }

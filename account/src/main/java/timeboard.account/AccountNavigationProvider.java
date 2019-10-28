@@ -1,8 +1,8 @@
-package timeboard.core;
+package timeboard.account;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,42 +26,30 @@ package timeboard.core;
  * #L%
  */
 
-import timeboard.core.api.TreeNode;
-import timeboard.core.model.ProjectCluster;
-import org.junit.jupiter.api.Test;
+import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-public class TreeNodeTest {
+import java.util.Calendar;
+import java.util.Date;
 
-    @Test
-    public void toStringTest() {
+@Component(
+        service = NavigationExtPoint.class
+)
+public class AccountNavigationProvider implements NavigationExtPoint {
 
-
-        ProjectCluster p1 = new ProjectCluster();
-        p1.setId(10);
-        p1.setName("P1");
-        ProjectCluster p2 = new ProjectCluster();
-        p2.setId(12);
-        p2.setName("P2");
-        ProjectCluster p12 = new ProjectCluster();
-        p12.setId(14);
-        p12.setName("P1.2");
-        ProjectCluster p13 = new ProjectCluster();
-        p13.setId(15);
-        p13.setName("P1.3");
-
-
-        TreeNode cluster1 = new TreeNode(p1);
-        TreeNode cluster2 = new TreeNode(p2);
-        TreeNode cluster12 = new TreeNode(p12);
-        TreeNode cluster13 = new TreeNode(p13);
-
-        cluster1.getChildren().add(cluster2);
-        cluster2.getChildren().add(cluster12);
-        cluster2.getChildren().add(cluster13);
-
-
-        System.out.println(cluster1.getPaths());
-
+    @Override
+    public String getNavigationLabel() {
+        return "Account";
     }
 
+    @Override
+    public String getNavigationParams() {
+
+        return "";
+    }
+
+    @Override
+    public String getNavigationPath() {
+        return "/account";
+    }
 }
