@@ -30,6 +30,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.exceptions.UserException;
+import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 import org.apache.aries.jpa.template.JpaTemplate;
@@ -80,6 +82,44 @@ public final class UserServiceImpl implements UserService {
             });
             return users;
         });
+    }
+
+    @Override
+    public User updateUser(User user) {
+        return this.jpa.txExpr(entityManager -> {
+
+            User u = entityManager.find(User.class, user.getId());
+            u.setFirstName(user.getFirstName());
+            u.setName(user.getName());
+            u.setLogin(user.getLogin());
+            u.setEmail(user.getEmail());
+
+            entityManager.persist(u);
+            this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
+            return user;
+        });
+    }
+
+    @Override
+    public void updateUserPassword(Long userID, String oldPassword, String newPassword) throws WrongPasswordException, UserException {
+
+        User user = this.findUserByID(userID);
+        if(user!=null && user.getPassword().matches(oldPassword)){
+            this.jpa.txExpr(entityManager -> {
+                User u = entityManager.find(User.class, userID);
+
+                u.setPassword(this.hashPassword(newPassword));
+
+                entityManager.persist(u);
+                this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + " successfully change his password.");
+                return u;
+            });
+        }else if(user != null){
+            throw new WrongPasswordException();
+        }else{
+            throw new UserException("User does not exist.");
+        }
+
     }
 
     @Override

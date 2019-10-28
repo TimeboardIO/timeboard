@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">Account</title>
+</head>
+
+<body>
+
+
+<div layout:fragment="content">
+
+    <div class="ui negative message" th:if="${error}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${error}">
+        </div>
+    </div>
+    <div class="ui positive message" th:if="${message}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${message}">
+        </div>
+    </div>
+
+    <div class="ui horizontal segments">
+        <div class="ui segment">
+            <br/>
+            <br/>
+            <div class="ui top large primary attached label">
+                <i class="icon user blue"></i>
+                <i th:text="${user.firstName} + ' ' + ${user.name}"></i>
+            </div>
+
+            <div class="ui list">
+                <div class="item">
+                    <i class="users icon"></i>
+                    <div class="content" th:text="${user.login}" ></div>
+                </div>
+
+                <div class="item">
+                    <i class="clock outline icon"></i>
+                    <div class="content">
+                        Member since  <i th:text="${user.accountCreationTime}"></i>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="mail icon"></i>
+                    <div class="content">
+                        <a th:href="'mailto:' + ${user.email}" th:text="${user.email}" ></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="ui segment">
+
+        <h4 class="ui dividing header">Edit your account</h4>
+
+        <form action="" class="ui form account" enctype="application/x-www-form-urlencoded" method="post">
+            <div class="field">
+                <label>Name</label>
+                <div class="two fields">
+                    <div class="field">
+                        <input type="text" name="firstName" placeholder="First Name" th:value="${user.firstName}">
+                    </div>
+                    <div class="field">
+                        <input type="text" name="name" placeholder="Last Name" th:value="${user.name}">
+                    </div>
+                </div>
+                <div class="two fields">
+                    <div class="field">
+                        <label>Nickname</label>
+                        <input type="text" name="login" placeholder="Login" th:value="${user.login}">
+                    </div>
+                    <div class="field">
+                        <label>E-mail</label>
+                        <input type="email" name="email" placeholder="john@mygroup.io" th:value="${user.email}">
+                    </div>
+                </div>
+
+                <input name="formType" type="hidden" value="account">
+                <div name="submit" class="ui submit positive button right" value="account" >Submit</div>
+                <div class="ui error message"></div>
+
+            </div>
+
+        </form>
+
+        </div>
+
+    <div class="ui segment">
+        <h4 class="ui dividing header">Edit your password</h4>
+
+        <form action="" class="ui form password" enctype="application/x-www-form-urlencoded" method="post">
+            <div class="field">
+                <label>Old password</label>
+                <div class="two fields">
+                    <div class="field">
+                        <input type="password" name="oldPassword" placeholder="Old password" >
+                    </div>
+
+                </div>
+                <label>New password</label>
+                <div class="two fields required">
+                    <div class="field required">
+                        <input type="password" name="password1" placeholder="New password" >
+                    </div>
+                    <div class="field required">
+                        <input type="password" name="password2" placeholder="Password verification">
+                    </div>
+                </div>
+                <input name="formType" type="hidden" value="password">
+                <div name="submitButton" class="ui submit positive button" value="password" >Submit</div>
+                <div class="ui error message"></div>
+            </div>
+
+        </form>
+    </div>
+    </div>
+    <script src="/account/static/account.js"></script>
+
+</div>
+</div>
+
+</body>
+</html>
