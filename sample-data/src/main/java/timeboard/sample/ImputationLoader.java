@@ -26,43 +26,43 @@ package timeboard.sample;
  * #L%
  */
 
+
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
-public class UserLoader {
+public class ImputationLoader {
 
     @Reference
     UserService userService;
 
+    @Reference
+    ProjectService projectService;
 
-    public void load() throws BusinessException {
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
-            User u = new User();
-            u.setName("timeboard" + i);
-            u.setPassword("timeboard" + i);
-            u.setEmail("user" + i + "@timeboard.com");
-            u.setImputationFutur(true);
-            u.setBeginWorkDate(new Date());
-            u.setFirstName("User" + i);
-            u.setLogin("timeboard" + i);
-            u.setAccountCreationTime(new Date());
-            users.add(u);
-            System.out.println("Stage user : "+u.getName());
-        }
+    public void load(){
+        for (int i = 0; i < 50; i++) {
 
-        try {
-            this.userService.createUsers(users);
-            System.out.println("Save "+users.size()+" users");
-        } catch (BusinessException e) {
-            e.printStackTrace();
+            User actor = this.userService.findUserByLogin("timeboard" + i);
+            Task task = this.projectService.getTask(Long.valueOf(1200 + (2*i) + 1));
+
+            if(actor != null) {
+                for (int j = 0; j < 8; j++) {
+                    Date day = new Date(new Date().getTime() + j * (1000 * 60 * 60 * 24));
+                    try {
+                        this.projectService.updateTaskImputation(actor, task.getId(), day, 0.7);
+                        System.out.println("Save imputations: task" + task.getId() + "imputation" + j);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         }
 
     }

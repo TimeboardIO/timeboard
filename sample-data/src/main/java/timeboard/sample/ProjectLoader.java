@@ -26,43 +26,36 @@ package timeboard.sample;
  * #L%
  */
 
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
+public class ProjectLoader {
 
-public class UserLoader {
+    @Reference
+    ProjectService projectService;
 
     @Reference
     UserService userService;
 
 
     public void load() throws BusinessException {
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
-            User u = new User();
-            u.setName("timeboard" + i);
-            u.setPassword("timeboard" + i);
-            u.setEmail("user" + i + "@timeboard.com");
-            u.setImputationFutur(true);
-            u.setBeginWorkDate(new Date());
-            u.setFirstName("User" + i);
-            u.setLogin("timeboard" + i);
-            u.setAccountCreationTime(new Date());
-            users.add(u);
-            System.out.println("Stage user : "+u.getName());
-        }
 
-        try {
-            this.userService.createUsers(users);
-            System.out.println("Save "+users.size()+" users");
-        } catch (BusinessException e) {
-            e.printStackTrace();
+        for (int i = 0; i < 100; i++) {
+            User owner = this.userService.findUserByLogin("timeboard" + i);
+
+            if(owner != null) {
+                try {
+                    this.projectService.createProject(owner, "project" + i);
+                    System.out.println("Save project: " + "project" + i);
+
+                } catch (BusinessException e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
     }

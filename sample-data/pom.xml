@@ -25,6 +25,12 @@
             <version>1.4.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.core</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -41,7 +47,8 @@
                         </Export-Package>
                         <Import-Package>
                             timeboard.core.api.*,
-                            timeboard.core.model
+                            timeboard.core.model,
+                            org.osgi.*
                         </Import-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

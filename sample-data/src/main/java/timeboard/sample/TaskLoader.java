@@ -26,43 +26,42 @@ package timeboard.sample;
  * #L%
  */
 
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
+import timeboard.core.model.Project;
 import org.osgi.service.component.annotations.Reference;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 
-public class UserLoader {
+public class TaskLoader {
 
     @Reference
     UserService userService;
 
+    @Reference
+    ProjectService projectService;
 
-    public void load() throws BusinessException {
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
-            User u = new User();
-            u.setName("timeboard" + i);
-            u.setPassword("timeboard" + i);
-            u.setEmail("user" + i + "@timeboard.com");
-            u.setImputationFutur(true);
-            u.setBeginWorkDate(new Date());
-            u.setFirstName("User" + i);
-            u.setLogin("timeboard" + i);
-            u.setAccountCreationTime(new Date());
-            users.add(u);
-            System.out.println("Stage user : "+u.getName());
-        }
+    public void load() {
+        for (int i = 0; i < 50; i++) {
 
-        try {
-            this.userService.createUsers(users);
-            System.out.println("Save "+users.size()+" users");
-        } catch (BusinessException e) {
-            e.printStackTrace();
+            User owner = this.userService.findUserByLogin("timeboard" + i);
+            Long projectId = Long.valueOf(1000 + (2*i) + 1);
+            Project project = this.projectService.getProjectByID(owner, projectId);
+
+            if(owner != null && project != null) {
+                for (int j = 0; j < 20; j++) {
+                    try {
+                        this.projectService.createTask(owner, project, "task-project" + i + "-task" + j, "comment task" + j, new Date(), new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)), 8, null, owner);
+                        System.out.println("Save task: " + "task" + j);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         }
 
     }

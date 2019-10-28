@@ -26,42 +26,37 @@ package timeboard.sample;
  * #L%
  */
 
-import timeboard.core.api.UserService;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.BundleException;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
-import org.osgi.service.component.annotations.Reference;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 
 
-public class UserLoader {
+@Component(
+        service = LauncherLoader.class,
+        immediate = true
+)
+public class LauncherLoader {
 
-    @Reference
-    UserService userService;
+    @Activate
+    public void load() throws BundleException, BusinessException {
 
-
-    public void load() throws BusinessException {
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
-            User u = new User();
-            u.setName("timeboard" + i);
-            u.setPassword("timeboard" + i);
-            u.setEmail("user" + i + "@timeboard.com");
-            u.setImputationFutur(true);
-            u.setBeginWorkDate(new Date());
-            u.setFirstName("User" + i);
-            u.setLogin("timeboard" + i);
-            u.setAccountCreationTime(new Date());
-            users.add(u);
-            System.out.println("Stage user : "+u.getName());
+        // Launch the creation of sample datas
+        try {
+            new UserLoader().load();
+            new ProjectLoader().load();
+            new TaskLoader().load();
+            new ImputationLoader().load();
+        } catch (BusinessException e){
+            e.printStackTrace();
         }
 
+        // Stop the sample-data bundle
         try {
-            this.userService.createUsers(users);
-            System.out.println("Save "+users.size()+" users");
-        } catch (BusinessException e) {
+            FrameworkUtil.getBundle(LauncherLoader.class).getBundleContext().getBundle().stop();
+            System.out.println("Datas saved !");
+        } catch (BundleException e) {
             e.printStackTrace();
         }
 
