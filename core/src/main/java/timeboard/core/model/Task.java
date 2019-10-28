@@ -52,6 +52,12 @@ public class Task implements Serializable {
     @Column
     private String origin;
 
+    @Column
+    private String remotePath;
+
+    @Column
+    private Long remoteId;
+
     @OneToOne(targetEntity = TaskType.class)
     private TaskType taskType;
 
@@ -90,6 +96,14 @@ public class Task implements Serializable {
     public void setOrigin(String origin) {
         this.origin = origin;
     }
+
+    public String getRemotePath() { return remotePath; }
+
+    public void setRemotePath(String remotePath) { this.remotePath = remotePath; }
+
+    public Long getRemoteId() { return remoteId; }
+
+    public void setRemoteId(Long remoteId) { this.remoteId = remoteId; }
 
     public Project getProject() {
         return project;

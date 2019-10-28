@@ -92,6 +92,8 @@ public interface ProjectService {
 
     Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID);
 
+    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
+
     Task updateTask(User actove, Task task, TaskRevision rev);
 
     Task getTask(long id);

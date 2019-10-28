@@ -56,6 +56,8 @@ public class GithubImportPlugin implements ProjectImportService {
     private static final String GITHUB_REPO_OWNER_KEY = "github.repo.owner";
     private static final String GITHUB_REPO_NAME_KEY = "github.repo.name";
 
+    private static final String GITHUB_ORIGIN_KEY = "github";
+
     @Reference
     private ProjectService projectService;
 
@@ -91,9 +93,11 @@ public class GithubImportPlugin implements ProjectImportService {
             List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
             issues.stream().forEach(issue -> {
-                this.projectService.createTask(actor, targetProject, issue.getTitle(), issue.getUrl(), issue.getCreatedAt(), issue.getClosedAt(), 0, null, null);
+                Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
+                        issue.getUrl(), issue.getCreatedAt(), issue.getClosedAt(),
+                        0, null, null,
+                        GITHUB_ORIGIN_KEY, githubRepoOwner+"/"+githubRepoName, issue.getId());
             });
-
 
         } catch (IOException e) {
             throw new BusinessException(e);

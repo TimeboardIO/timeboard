@@ -63,6 +63,8 @@
     create table Task (
        id bigint not null,
         origin varchar(255),
+        remoteId bigint,
+        remotePath varchar(255),
         latestRevision_id bigint,
         project_id bigint,
         taskType_id bigint,
