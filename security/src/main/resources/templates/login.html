@@ -35,7 +35,7 @@
                     <input class="ui fluid large submit button" type="submit" value="Login"></input>
                 </div>
 
-                <div class="ui error message"></div>
+                <div th:if='${message}' class="ui error message visible" th:text='${message}'></div>
 
             </form>
 
