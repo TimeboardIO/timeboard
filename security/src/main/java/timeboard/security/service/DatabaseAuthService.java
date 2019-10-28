@@ -55,10 +55,11 @@ public class DatabaseAuthService implements LoginService {
         UsernamePasswordCredential upc = (UsernamePasswordCredential) credential;
         User user = null;
         try {
+
             user = this.userService.autenticateUser(upc.getUsername(), upc.getPassword());
 
         } catch (Exception e) {
-
+                e.printStackTrace();
         }
 
         return user != null;
