@@ -113,7 +113,7 @@ public class AccountServlet extends TimeboardServlet {
         }
         viewModel.getViewDatas().put("user", user);
 
-        viewModel.setTemplate("account.html");
+        viewModel.setTemplate("account:account.html");
     }
 
     @Override
@@ -122,7 +122,7 @@ public class AccountServlet extends TimeboardServlet {
 
         viewModel.getViewDatas().put("user", user);
 
-        viewModel.setTemplate("account.html");
+        viewModel.setTemplate("account:account.html");
     }
 
 
