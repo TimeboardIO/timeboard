@@ -59,19 +59,6 @@ public class ProjectServiceImpl implements ProjectService {
     private JpaTemplate jpa;
 
 
-    @Override
-    public void addProjectToProjectCluster(ProjectCluster projectCluster, Project newProject) {
-        this.jpa.tx(entityManager -> {
-            ProjectCluster c = entityManager.find(ProjectCluster.class, projectCluster.getId());
-            Project p = entityManager.find(Project.class, newProject.getId());
-
-            p.getClusters().add(c);
-
-            entityManager.flush();
-
-            this.logService.log(LogService.LOG_INFO, "Project " + newProject.getName() + " added to  cluster " + projectCluster.getName());
-        });
-    }
 
     @Override
     public Project createProject(User owner, String projectName) throws BusinessException {
@@ -221,34 +208,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
-    public void deleteProjectClusterByID(Long clusterID) {
-        this.jpa.tx(entityManager -> {
-            ProjectCluster pc = entityManager.find(ProjectCluster.class, clusterID);
-            entityManager.remove(pc);
-            entityManager.flush();
-            this.logService.log(LogService.LOG_INFO, "Project cluster " + pc.getName() + " deleted");
-        });
-    }
 
-    @Override
-    public void updateProjectClusters(List<ProjectCluster> updatedProjectCluster, Map<Long, Long> clusterParent) {
 
-        this.jpa.tx(entityManager -> {
-            updatedProjectCluster.forEach(projectCluster -> {
-                if (clusterParent.containsKey(projectCluster.getId())) {
-                    ProjectCluster parentCluster = entityManager.find(ProjectCluster.class, clusterParent.get(projectCluster.getId()));
-                    if (parentCluster != null) {
-                        projectCluster.setParent(parentCluster);
-                    }
-                }
-                this.logService.log(LogService.LOG_INFO, "Project cluster " + projectCluster.getName() + " updated");
-                entityManager.merge(projectCluster);
-            });
-            entityManager.flush();
-        });
 
-    }
 
     @Override
     public List<Task> listProjectTasks(Project project) {
@@ -478,39 +440,44 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-    @Override
-    public ProjectCluster findProjectsClusterByID(long cluster) {
-        return this.jpa.txExpr(entityManager -> entityManager.find(ProjectCluster.class, cluster));
-    }
+
 
     @Override
-    public void saveProjectCluster(ProjectCluster projectCluster) {
-        this.jpa.tx(entityManager -> {
-            entityManager.persist(projectCluster);
-        });
-        this.logService.log(LogService.LOG_INFO, "Project cluster " + projectCluster.getName() + " saved");
+    public List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
 
-    }
-
-    @Override
-    public List<TreeNode> computeClustersTree() {
         return this.jpa.txExpr(entityManager -> {
-            TreeNode root = new TreeNode(null);
-            List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc order by pc.parent", ProjectCluster.class).getResultList();
-            projectClusters.forEach(projectCluster -> {
-                root.insert(projectCluster);
-            });
-            return root.getChildren();
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
+                    "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue " +
+                    "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
+            query.setParameter("taskId", taskId);
+            query.setParameter("startTaskDate", startTaskDate);
+            query.setParameter("endTaskDate", endTaskDate);
+
+            return query.getResultList()
+                    .stream()
+                    .map(x -> new EffortSpent((Date) x[0], (Double) x[1]))
+                    .collect(Collectors.toList());
         });
     }
 
     @Override
-    public List<ProjectCluster> listProjectClusters() {
+    public List<EffortEstimate> getEstimateByTask(long taskId) {
         return this.jpa.txExpr(entityManager -> {
-            List<ProjectCluster> projectClusters = entityManager.createQuery("select pc from ProjectCluster pc", ProjectCluster.class).getResultList();
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
+            "tr.revisionDate as date, tr.estimateWork as estimateValue " +
+            "from TaskRevision tr " +
+            "where tr.task_id = :taskId and tr.id IN ( " +
+                    "SELECT MAX(trBis.id) " +
+                    "FROM TaskRevision trBis " +
+                    "GROUP BY DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")" +
+             ");");
 
-            return projectClusters;
+            query.setParameter("taskId", taskId);
+
+            return query.getResultList()
+                    .stream()
+                    .map(x -> new EffortEstimate((Date) x[0], (Double) x[1]))
+                    .collect(Collectors.toList());
         });
     }
-
 }

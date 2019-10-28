@@ -26,6 +26,7 @@ package timeboard.core.internal;
  * #L%
  */
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -61,6 +62,9 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(final User user) throws BusinessException {
+
+        user.setPassword(this.hashPassword(user.getPassword()));
+
         return this.jpa.txExpr(entityManager -> {
             entityManager.persist(user);
             this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
@@ -72,6 +76,7 @@ public final class UserServiceImpl implements UserService {
     public List<User> createUsers(List<User> users) throws BusinessException {
         return this.jpa.txExpr(entityManager -> {
             users.forEach(user -> {
+                user.setPassword(this.hashPassword(user.getPassword()));
                 entityManager.persist(user);
                 this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
             });
@@ -146,15 +151,19 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public User autenticateUser(final String login, final String password) {
-        return this.jpa.txExpr(entityManager -> {
+        User u = this.jpa.txExpr(entityManager -> {
             TypedQuery<User> q = entityManager
                     .createQuery("select u from User u "
-                            + "where u.login = :login "
-                            + "and u.password = :password", User.class);
+                            + "where u.login = :login ", User.class);
             q.setParameter("login", login);
-            q.setParameter("password", password);
             return q.getSingleResult();
         });
+
+        if(!this.checkPassword(password, u.getPassword())) {
+            u = null;
+        }
+
+        return u;
     }
 
     @Override
@@ -178,7 +187,10 @@ public final class UserServiceImpl implements UserService {
     }
 
     private String hashPassword(String password){
-       // TODO remove this method when merged with issues #8 (database password encryption)
-        return password;
+       return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+
+    private boolean checkPassword(String password, String hash){
+       return BCrypt.checkpw(password, hash);
     }
 }

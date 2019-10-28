@@ -35,18 +35,6 @@ import java.util.Map;
 
 public interface ProjectService {
 
-    /*
-    === Clusters ===
-     */
-    void addProjectToProjectCluster(ProjectCluster projectCluster, Project newProject);
-
-    void saveProjectCluster(ProjectCluster root);
-
-    List<TreeNode> computeClustersTree();
-
-    List<ProjectCluster> listProjectClusters();
-
-    ProjectCluster findProjectsClusterByID(long cluster);
 
 
     /*
@@ -72,9 +60,7 @@ public interface ProjectService {
 
     void save(ProjectMembership projectMembership);
 
-    void deleteProjectClusterByID(Long clusterID);
 
-    void updateProjectClusters(List<ProjectCluster> updatedProjectCluster, Map<Long, Long> clusterParent);
 
 
     /*
@@ -107,4 +93,15 @@ public interface ProjectService {
     TaskType findTaskTypeByID(Long taskTypeID);
 
     List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID);
+
+
+    /*
+     == Imputations ==
+     */
+    /**
+     * @return List all effort spent for a task.
+     */
+    List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
+
+    List<EffortEstimate> getEstimateByTask(long taskId);
 }

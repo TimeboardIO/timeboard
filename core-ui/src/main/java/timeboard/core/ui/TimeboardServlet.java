@@ -49,7 +49,7 @@ import java.util.Optional;
 
 public abstract class TimeboardServlet extends HttpServlet {
 
-    private ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver(new JoinClassLoader(TimeboardServlet.class.getClassLoader(), this.getTemplateResolutionClassLoader()));
+    private OSGITemplateResolver resolver = new OSGITemplateResolver();
     private NavigationEntryRegistryService navRegistry;
 
     protected abstract ClassLoader getTemplateResolutionClassLoader();

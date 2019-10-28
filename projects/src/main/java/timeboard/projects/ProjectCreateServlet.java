@@ -65,7 +65,7 @@ public class ProjectCreateServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("create_project.html");
+        viewModel.setTemplate("projects:create_project.html");
         Map<String, Object> result = new HashMap<>();
         result.put("projectName", request.getParameter("projectName"));
 
@@ -82,7 +82,7 @@ public class ProjectCreateServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("create_project.html");
+        viewModel.setTemplate("projects:create_project.html");
 
     }
 
