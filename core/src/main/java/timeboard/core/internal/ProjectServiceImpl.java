@@ -513,4 +513,42 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
+    @Override
+    public List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
+
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
+                    "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue " +
+                    "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
+            query.setParameter("taskId", taskId);
+            query.setParameter("startTaskDate", startTaskDate);
+            query.setParameter("endTaskDate", endTaskDate);
+
+            return query.getResultList()
+                    .stream()
+                    .map(x -> new EffortSpent((Date) x[0], (Double) x[1]))
+                    .collect(Collectors.toList());
+        });
+    }
+
+    @Override
+    public List<EffortEstimate> getEstimateByTask(long taskId) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
+            "tr.revisionDate as date, tr.estimateWork as estimateValue " +
+            "from TaskRevision tr " +
+            "where tr.task_id = :taskId and tr.id IN ( " +
+                    "SELECT MAX(trBis.id) " +
+                    "FROM TaskRevision trBis " +
+                    "GROUP BY DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")" +
+             ");");
+
+            query.setParameter("taskId", taskId);
+
+            return query.getResultList()
+                    .stream()
+                    .map(x -> new EffortEstimate((Date) x[0], (Double) x[1]))
+                    .collect(Collectors.toList());
+        });
+    }
 }
