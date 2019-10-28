@@ -102,6 +102,9 @@ public final class UserServiceImpl implements UserService {
         if(user!=null && user.getPassword().matches(oldPassword)){
             this.jpa.txExpr(entityManager -> {
                 User u = entityManager.find(User.class, userID);
+
+                u.setPassword(this.hashPassword(newPassword));
+
                 entityManager.persist(u);
                 this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + " successfully change his password.");
                 return u;
@@ -174,5 +177,8 @@ public final class UserServiceImpl implements UserService {
                 .find(User.class, userID));
     }
 
-
+    private String hashPassword(String password){
+       // TODO remove this method when merged with issues #8 (database password encryption)
+        return password;
+    }
 }
