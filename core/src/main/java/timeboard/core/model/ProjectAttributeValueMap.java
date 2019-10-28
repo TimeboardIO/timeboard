@@ -26,39 +26,8 @@ package timeboard.core.model;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 
-@Converter
-public class JSONToProjectAttributsConverter implements AttributeConverter<Map<String, ProjectAttributValue>, String> {
+public class ProjectAttributeValueMap extends HashMap<String, ProjectAttributValue> {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-
-
-    @Override
-    public String convertToDatabaseColumn(Map<String, ProjectAttributValue> stringProjectAttributValueMap) {
-        String res = "{}";
-        try {
-            res = OBJECT_MAPPER.writeValueAsString(stringProjectAttributValueMap);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
-        return res;    }
-
-    @Override
-    public Map<String, ProjectAttributValue> convertToEntityAttribute(String s) {
-        final Map<String, ProjectAttributValue> attrs = new HashMap<>();
-        try {
-            attrs.putAll(OBJECT_MAPPER.readValue(s, ProjectAttributeValueMap.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return attrs;    }
 }
