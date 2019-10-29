@@ -72,7 +72,7 @@ public class ProjectImportServlet extends HttpServlet {
 
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
-        String message = "";
+        String message = null;
 
         ImportResponse importResponse = new ImportResponse();
 

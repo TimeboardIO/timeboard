@@ -99,7 +99,7 @@ public class GithubImportPlugin implements ProjectImportService {
                 issueService.getClient().setOAuth2Token(githubOAuthToken.getValue());
                 List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
-                Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName);
+                Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue());
 
                 issues.stream().forEach(issue -> {
                     if (!existingTasks.containsKey(issue.getId())) {
@@ -107,8 +107,7 @@ public class GithubImportPlugin implements ProjectImportService {
                         Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
                                 issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
                                 0, null, null,
-                                GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName, issue.getId());
-                        nbTaskRemoved.incrementAndGet();
+                                GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue(), issue.getId());
                         nbTaskCreated.incrementAndGet();
                     } else {
                         // task already exist, so update it
