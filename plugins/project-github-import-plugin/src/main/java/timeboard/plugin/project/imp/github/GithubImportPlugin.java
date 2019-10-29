@@ -30,10 +30,7 @@ import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
-import timeboard.core.model.ProjectAttributValue;
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
+import timeboard.core.model.*;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -45,6 +42,7 @@ import org.osgi.service.component.annotations.Reference;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component(
         service = ProjectImportService.class,
@@ -92,11 +90,36 @@ public class GithubImportPlugin implements ProjectImportService {
             issueService.getClient().setOAuth2Token(githubOAuthToken);
             List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
+            Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName);
+
             issues.stream().forEach(issue -> {
-                Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
-                        issue.getUrl(), issue.getCreatedAt(), issue.getClosedAt(),
-                        0, null, null,
-                        GITHUB_ORIGIN_KEY, githubRepoOwner+"/"+githubRepoName, issue.getId());
+                if(!existingTasks.containsKey(issue.getId()) ) {
+                    // task does not exist, so create it
+                    Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
+                            issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
+                            0, null, null,
+                            GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName, issue.getId());
+                }else{
+                    // task already exist, so update it
+                    Task task = existingTasks.get(issue.getId());
+                    final TaskRevision latestRevision = task.getLatestRevision();
+                    TaskRevision revision = new TaskRevision(actor,
+                            task,
+                            issue.getTitle(),
+                            issue.getBodyHtml(),
+                            issue.getCreatedAt(),
+                            issue.getClosedAt(),
+                            latestRevision.getEstimateWork(),
+                            latestRevision.getRemainsToBeDone(),
+                            latestRevision.getAssigned());
+                    this.projectService.updateTask(actor, task, revision);
+                    existingTasks.remove(task); //remove task in existing list to found the deleted at the end
+                }
+
+                // find deleted
+                existingTasks.values().forEach(task -> {
+                    //TODO DELETE TASK TO MATCH ORIGIN
+                });
             });
 
         } catch (IOException e) {

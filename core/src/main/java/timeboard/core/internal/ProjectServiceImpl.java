@@ -513,4 +513,24 @@ public class ProjectServiceImpl implements ProjectService {
                     .collect(Collectors.toList());
         });
     }
+
+    @Override
+    public Map<Long, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath) {
+
+        return this.jpa.txExpr(entityManager -> {
+            Map<Long, Task> map = new HashMap<>();
+            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project " +
+                    "and t.origin = :origin " +
+                    "and t.remotePath = :remotePath ", Task.class);
+            q.setParameter("project", project);
+            q.setParameter("origin", origin);
+            q.setParameter("remotePath", remotePath);
+            q.getResultList().forEach( task -> {
+                map.put(task.getRemoteId(), task);
+            });
+            return map;
+        });
+
+
+    }
 }

@@ -80,7 +80,7 @@ public interface ProjectService {
 
     Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
 
-    Task updateTask(User actove, Task task, TaskRevision rev);
+    Task updateTask(User actor, Task task, TaskRevision rev);
 
     Task getTask(long id);
 
@@ -94,6 +94,15 @@ public interface ProjectService {
 
     TaskType findTaskTypeByID(Long taskTypeID);
 
+    /**
+     * Search existing task from specific origin
+     * @param project target project
+     * @param origin source (Github, GitLab, Jira, ...)
+     * @param remotePath string key of source characteristics (owner, repository, ...)
+     * @return list of task corresponding to the origin
+     */
+    Map<Long, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath);
+
     List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID);
 
 
@@ -106,4 +115,6 @@ public interface ProjectService {
     List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
 
     List<EffortEstimate> getEstimateByTask(long taskId);
+
+
 }
