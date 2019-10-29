@@ -60,7 +60,7 @@ public class JiraImportPlugin implements ProjectImportService {
     }
 
     @Override
-    public void importTasksToProject(User actor, long projectID) throws BusinessException {
+    public String importTasksToProject(User actor, long projectID) throws BusinessException {
         try {
 
             final Project project = this.projectService.getProjectByID(actor, projectID);
@@ -80,6 +80,7 @@ public class JiraImportPlugin implements ProjectImportService {
             e.printStackTrace();
         }
 
+        return "";
     }
 
 
