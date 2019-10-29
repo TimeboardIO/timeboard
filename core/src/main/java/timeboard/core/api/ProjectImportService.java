@@ -39,6 +39,6 @@ public interface ProjectImportService {
      * @param projectID
      * @throws BusinessException
      */
-    void importTasksToProject(User actor, long projectID) throws BusinessException;
+    String importTasksToProject(User actor, long projectID) throws BusinessException;
 
 }

@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component(
         service = ProjectImportService.class,
@@ -65,7 +66,12 @@ public class GithubImportPlugin implements ProjectImportService {
     }
 
     @Override
-    public void importTasksToProject(User actor, long projectID) throws BusinessException {
+    public String importTasksToProject(User actor, long projectID) throws BusinessException {
+
+        final AtomicInteger nbTaskCreated = new AtomicInteger(0);
+        final AtomicInteger nbTaskUpdated = new AtomicInteger(0);
+        final AtomicInteger nbTaskRemoved = new AtomicInteger(0);
+
         try {
             final Project targetProject = this.projectService.getProjectByID(actor, projectID);
 
@@ -98,7 +104,8 @@ public class GithubImportPlugin implements ProjectImportService {
                     Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
                             issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
                             0, null, null,
-                            GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName, issue.getId());
+                            GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName, issue.getId());                nbTaskRemoved.incrementAndGet();
+                    nbTaskCreated.incrementAndGet();
                 }else{
                     // task already exist, so update it
                     Task task = existingTasks.get(issue.getId());
@@ -113,15 +120,22 @@ public class GithubImportPlugin implements ProjectImportService {
                             latestRevision.getRemainsToBeDone(),
                             latestRevision.getAssigned());
                     this.projectService.updateTask(actor, task, revision);
-                    existingTasks.remove(task); //remove task in existing list to found the deleted at the end
+                    existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
+                    nbTaskUpdated.incrementAndGet();
                 }
 
-                // find deleted
-                existingTasks.values().forEach(task -> {
-                    //TODO DELETE TASK TO MATCH ORIGIN
-                });
             });
 
+            // Deleted task
+            for (Task task : existingTasks.values()) { //remaining task have been delete from origin repository
+                this.projectService.deleteTaskByID(actor, task.getId()); //so delete it to be synchronized with origin
+                nbTaskRemoved.incrementAndGet();
+            }
+            return "<ul>" +
+                    "<li>"+nbTaskCreated+" tasks created</li>" +
+                    "<li>"+nbTaskUpdated+" tasks updated</li>" +
+                    "<li>"+nbTaskRemoved+" tasks removed</li>" +
+                    "</ul>";
         } catch (IOException e) {
             throw new BusinessException(e);
         }

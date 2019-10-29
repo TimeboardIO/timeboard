@@ -72,6 +72,7 @@ public class ProjectImportServlet extends HttpServlet {
 
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
+        String message = "";
 
         ImportResponse importResponse = new ImportResponse();
 
@@ -81,7 +82,8 @@ public class ProjectImportServlet extends HttpServlet {
 
         if(optionalService.isPresent()){
             try {
-                optionalService.get().importTasksToProject(SecurityContext.getCurrentUser(req), projectID);
+                message = optionalService.get().importTasksToProject(SecurityContext.getCurrentUser(req), projectID);
+
             } catch (BusinessException e) {
                 importResponse.getErrors().add(e);
             }
@@ -92,6 +94,7 @@ public class ProjectImportServlet extends HttpServlet {
 
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
         req.setAttribute("errors", importResponse.getErrors());
+        req.setAttribute("importSuccess", message);
         requestDispatcher.forward(req, resp);
     }
 
