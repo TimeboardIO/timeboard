@@ -30,34 +30,43 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
-import org.osgi.service.component.annotations.Reference;
+import timeboard.core.model.Project;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ProjectLoader {
 
-    @Reference
     ProjectService projectService;
-
-    @Reference
     UserService userService;
 
+    ProjectLoader(ProjectService projectService, UserService userService){
+        this.projectService = projectService;
+        this.userService = userService;
+    }
 
-    public void load() throws BusinessException {
 
-        for (int i = 0; i < 100; i++) {
-            User owner = this.userService.findUserByLogin("timeboard" + i);
+    public List<Project> load(List<User> usersSaved) throws BusinessException {
+        List<Project> projectsSaved = new ArrayList<>();
+        for (int i = 0; i < usersSaved.size(); i++) {
+            User owner = usersSaved.get(i);
 
             if(owner != null) {
-                try {
-                    this.projectService.createProject(owner, "project" + i);
-                    System.out.println("Save project: " + "project" + i);
+                for (int j = 0; j < 3; j++) {
+                    try {
+                        // On créé 3 projets pour chacun des utilisateurs
+                        projectsSaved.add(this.projectService.createProject(owner, "project owner " + i + " number " + j));
+                        System.out.println("Save project: " + "project owner " + i + " number " + j);
 
-                } catch (BusinessException e) {
-                    e.printStackTrace();
+                    } catch (BusinessException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
-
+        System.out.println("Projects saved ! ");
+        return projectsSaved;
     }
 
 

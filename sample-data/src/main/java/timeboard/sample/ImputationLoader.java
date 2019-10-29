@@ -31,31 +31,44 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
-import org.osgi.service.component.annotations.Reference;
+import timeboard.core.model.Imputation;
 
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ImputationLoader {
 
-    @Reference
     UserService userService;
-
-    @Reference
     ProjectService projectService;
 
-    public void load(){
-        for (int i = 0; i < 50; i++) {
+    ImputationLoader(ProjectService projectService, UserService userService){
+        this.projectService = projectService;
+        this.userService = userService;
+    }
 
-            User actor = this.userService.findUserByLogin("timeboard" + i);
-            Task task = this.projectService.getTask(Long.valueOf(1200 + (2*i) + 1));
+    public List<Imputation> load(List<User> usersSaved, List<Task> tasksSaved){
+        List<Imputation> imputationsSaved = new ArrayList<>();
+
+        for (int i = 0; i < tasksSaved.size(); i++) {
+
+            User actor = usersSaved.get(i/(3*10)); // car 1 user possède 3 projects possédant chacun 10 tâches
+            Task task = tasksSaved.get(i);
 
             if(actor != null) {
+                // Création de 8 imputations pour simuler 8 jours
                 for (int j = 0; j < 8; j++) {
                     Date day = new Date(new Date().getTime() + j * (1000 * 60 * 60 * 24));
+                    Double value = 0.7;
                     try {
-                        this.projectService.updateTaskImputation(actor, task.getId(), day, 0.7);
-                        System.out.println("Save imputations: task" + task.getId() + "imputation" + j);
+                        this.projectService.updateTaskImputation(actor, task.getId(), day, value);
+                        Imputation imputation = new Imputation();
+                        imputation.setDay(day);
+                        imputation.setTask(task);
+                        imputation.setValue(value);
+                        imputationsSaved.add(imputation);
+                        System.out.println("Save imputations: task" + task.getId() + " imputation" + j);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -64,6 +77,9 @@ public class ImputationLoader {
             }
 
         }
+
+        System.out.println("Imputations saved ! ");
+        return imputationsSaved;
 
     }
 

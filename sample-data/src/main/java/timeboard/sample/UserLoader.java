@@ -29,7 +29,6 @@ package timeboard.sample;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
-import org.osgi.service.component.annotations.Reference;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -38,13 +37,18 @@ import java.util.List;
 
 public class UserLoader {
 
-    @Reference
     UserService userService;
 
+    UserLoader(UserService userService){
+        this.userService = userService;
+    }
 
-    public void load() throws BusinessException {
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 500; i++) {
+    public List<User> load() throws BusinessException {
+        List<User> userSaved = new ArrayList<>();
+
+        List<User> usersToSave = new ArrayList<>();
+        // On créé 100 utilisateurs
+        for (int i = 0; i < 100; i++) {
             User u = new User();
             u.setName("timeboard" + i);
             u.setPassword("timeboard" + i);
@@ -54,16 +58,18 @@ public class UserLoader {
             u.setFirstName("User" + i);
             u.setLogin("timeboard" + i);
             u.setAccountCreationTime(new Date());
-            users.add(u);
+            usersToSave.add(u);
             System.out.println("Stage user : "+u.getName());
         }
 
         try {
-            this.userService.createUsers(users);
-            System.out.println("Save "+users.size()+" users");
+            userSaved = this.userService.createUsers(usersToSave);
+            System.out.println("Save "+usersToSave.size()+" users");
         } catch (BusinessException e) {
             e.printStackTrace();
         }
+
+        return userSaved;
 
     }
 

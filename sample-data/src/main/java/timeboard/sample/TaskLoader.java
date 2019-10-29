@@ -30,31 +30,36 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 import timeboard.core.model.Project;
-import org.osgi.service.component.annotations.Reference;
+import timeboard.core.model.Task;
 
 import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class TaskLoader {
 
-    @Reference
     UserService userService;
-
-    @Reference
     ProjectService projectService;
 
-    public void load() {
-        for (int i = 0; i < 50; i++) {
+    TaskLoader(ProjectService projectService, UserService userService){
+        this.projectService = projectService;
+        this.userService = userService;
+    }
 
-            User owner = this.userService.findUserByLogin("timeboard" + i);
-            Long projectId = Long.valueOf(1000 + (2*i) + 1);
-            Project project = this.projectService.getProjectByID(owner, projectId);
+    public List<Task> load(List<User> usersSaved, List<Project> projectsSaved) {
+        List<Task> tasksSaved = new ArrayList<>();
+        for (int i = 0; i < projectsSaved.size(); i++) {
+
+            User owner = usersSaved.get(i/3); // car 1 user possède 3 projects
+            Project project = projectsSaved.get(i);
 
             if(owner != null && project != null) {
-                for (int j = 0; j < 20; j++) {
+                // On créé 10 tâches par projet
+                for (int j = 0; j < 10; j++) {
                     try {
-                        this.projectService.createTask(owner, project, "task-project" + i + "-task" + j, "comment task" + j, new Date(), new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)), 8, null, owner);
-                        System.out.println("Save task: " + "task" + j);
+                        tasksSaved.add(this.projectService.createTask(owner, project, "task-project" + i + "-task" + j, "comment task" + j, new Date(), new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)), 8, null, owner));
+                        System.out.println("Save task: project" + i + " task" + j);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -63,6 +68,9 @@ public class TaskLoader {
             }
 
         }
+
+        System.out.println("Tasks saved ! ");
+        return tasksSaved;
 
     }
 

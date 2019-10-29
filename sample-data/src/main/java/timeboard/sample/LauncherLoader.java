@@ -28,10 +28,19 @@ package timeboard.sample;
 
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.BundleException;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
+import timeboard.core.model.Project;
+import timeboard.core.model.User;
+import timeboard.core.model.Task;
+import timeboard.core.model.Imputation;
 import timeboard.core.api.exceptions.BusinessException;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
+import java.util.ArrayList;
+import java.util.List;
 
 @Component(
         service = LauncherLoader.class,
@@ -39,15 +48,21 @@ import org.osgi.service.component.annotations.Component;
 )
 public class LauncherLoader {
 
+    @Reference
+    ProjectService projectService;
+
+    @Reference
+    UserService userService;
+
     @Activate
     public void load() throws BundleException, BusinessException {
 
         // Launch the creation of sample datas
         try {
-            new UserLoader().load();
-            new ProjectLoader().load();
-            new TaskLoader().load();
-            new ImputationLoader().load();
+            List<User> usersSaved = new UserLoader(this.userService).load();
+            List<Project> projectsSaved = new ProjectLoader(this.projectService, this.userService).load(usersSaved);
+            List<Task> tasksSaved = new TaskLoader(this.projectService, this.userService).load(usersSaved, projectsSaved);
+            List<Imputation> imputationsSaved = new ImputationLoader(this.projectService, this.userService).load(usersSaved, tasksSaved);
         } catch (BusinessException e){
             e.printStackTrace();
         }
