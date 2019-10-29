@@ -48,19 +48,19 @@ public class ImputationLoader {
         this.userService = userService;
     }
 
-    public List<Imputation> load(List<User> usersSaved, List<Task> tasksSaved){
+    public List<Imputation> load(List<User> usersSaved, List<Task> tasksSaved, int nbProjectsByUsers, int nbTasksByProjects, int nbImputationsByTasks){
         List<Imputation> imputationsSaved = new ArrayList<>();
 
         for (int i = 0; i < tasksSaved.size(); i++) {
 
-            User actor = usersSaved.get(i/(3*10)); // car 1 user possède 3 projects possédant chacun 10 tâches
+            User actor = usersSaved.get(i/(nbProjectsByUsers*nbTasksByProjects)); // car 1 user possède "nbProjectsByUsers" projects possédant chacun "nbTasksByProjects" tâches
             Task task = tasksSaved.get(i);
 
             if(actor != null) {
-                // Création de 8 imputations pour simuler 8 jours
-                for (int j = 0; j < 8; j++) {
+                // Création de "nbImputationsByTasks" imputations pour simuler un nombre de jours
+                for (int j = 0; j < nbImputationsByTasks; j++) {
                     Date day = new Date(new Date().getTime() + j * (1000 * 60 * 60 * 24));
-                    Double value = 0.7;
+                    Double value = Math.floor(Math.random() * 11)/10; // Value between 0 and 1 with 1 décimal max
                     try {
                         this.projectService.updateTaskImputation(actor, task.getId(), day, value);
                         Imputation imputation = new Imputation();

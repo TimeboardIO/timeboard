@@ -43,12 +43,12 @@ public class UserLoader {
         this.userService = userService;
     }
 
-    public List<User> load() throws BusinessException {
+    public List<User> load(int nbUsers) throws BusinessException {
         List<User> userSaved = new ArrayList<>();
 
         List<User> usersToSave = new ArrayList<>();
-        // On créé 100 utilisateurs
-        for (int i = 0; i < 100; i++) {
+        // On créé "nbUsers" utilisateurs
+        for (int i = 0; i < nbUsers; i++) {
             User u = new User();
             u.setName("timeboard" + i);
             u.setPassword("timeboard" + i);

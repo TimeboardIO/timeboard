@@ -54,15 +54,20 @@ public class LauncherLoader {
     @Reference
     UserService userService;
 
+    private final int nbUsers = 3;
+    private final int nbProjectsByUsers = 5;
+    private final int nbTasksByProjects = 10;
+    private final int nbImputationsByTasks = 8;
+
     @Activate
     public void load() throws BundleException, BusinessException {
 
         // Launch the creation of sample datas
         try {
-            List<User> usersSaved = new UserLoader(this.userService).load();
-            List<Project> projectsSaved = new ProjectLoader(this.projectService, this.userService).load(usersSaved);
-            List<Task> tasksSaved = new TaskLoader(this.projectService, this.userService).load(usersSaved, projectsSaved);
-            List<Imputation> imputationsSaved = new ImputationLoader(this.projectService, this.userService).load(usersSaved, tasksSaved);
+            List<User> usersSaved = new UserLoader(this.userService).load(nbUsers);
+            List<Project> projectsSaved = new ProjectLoader(this.projectService, this.userService).load(usersSaved, nbProjectsByUsers);
+            List<Task> tasksSaved = new TaskLoader(this.projectService, this.userService).load(usersSaved, projectsSaved, nbProjectsByUsers, nbTasksByProjects);
+            List<Imputation> imputationsSaved = new ImputationLoader(this.projectService, this.userService).load(usersSaved, tasksSaved, nbProjectsByUsers, nbTasksByProjects, nbImputationsByTasks);
         } catch (BusinessException e){
             e.printStackTrace();
         }

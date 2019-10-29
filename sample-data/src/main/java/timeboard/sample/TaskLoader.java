@@ -47,16 +47,16 @@ public class TaskLoader {
         this.userService = userService;
     }
 
-    public List<Task> load(List<User> usersSaved, List<Project> projectsSaved) {
+    public List<Task> load(List<User> usersSaved, List<Project> projectsSaved, int nbProjectsByUsers, int nbTasksByProjects) {
         List<Task> tasksSaved = new ArrayList<>();
         for (int i = 0; i < projectsSaved.size(); i++) {
 
-            User owner = usersSaved.get(i/3); // car 1 user possède 3 projects
+            User owner = usersSaved.get(i/nbProjectsByUsers); // car 1 user possède "nbProjectsByUsers" projects
             Project project = projectsSaved.get(i);
 
             if(owner != null && project != null) {
-                // On créé 10 tâches par projet
-                for (int j = 0; j < 10; j++) {
+                // On créé "nbTasksByProjects" tâches par projet
+                for (int j = 0; j < nbTasksByProjects; j++) {
                     try {
                         tasksSaved.add(this.projectService.createTask(owner, project, "task-project" + i + "-task" + j, "comment task" + j, new Date(), new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)), 8, null, owner));
                         System.out.println("Save task: project" + i + " task" + j);

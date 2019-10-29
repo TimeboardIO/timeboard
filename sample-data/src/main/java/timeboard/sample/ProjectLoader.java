@@ -47,15 +47,15 @@ public class ProjectLoader {
     }
 
 
-    public List<Project> load(List<User> usersSaved) throws BusinessException {
+    public List<Project> load(List<User> usersSaved, int nbProjectsByUsers) throws BusinessException {
         List<Project> projectsSaved = new ArrayList<>();
         for (int i = 0; i < usersSaved.size(); i++) {
             User owner = usersSaved.get(i);
 
             if(owner != null) {
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < nbProjectsByUsers; j++) {
                     try {
-                        // On créé 3 projets pour chacun des utilisateurs
+                        // On créé "nbProjectsByUsers" projets pour chacun des utilisateurs
                         projectsSaved.add(this.projectService.createProject(owner, "project owner " + i + " number " + j));
                         System.out.println("Save project: " + "project owner " + i + " number " + j);
 
