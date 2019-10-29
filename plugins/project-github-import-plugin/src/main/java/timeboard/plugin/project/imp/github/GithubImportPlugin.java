@@ -26,6 +26,7 @@ package timeboard.plugin.project.imp.github;
  * #L%
  */
 
+import org.eclipse.egit.github.core.client.RequestException;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
@@ -75,67 +76,74 @@ public class GithubImportPlugin implements ProjectImportService {
         try {
             final Project targetProject = this.projectService.getProjectByID(actor, projectID);
 
-            final String githubOAuthToken = targetProject.getAttributes().get(GITHUB_TOKEN_KEY).getValue();
-            if(githubOAuthToken == null){
+            final ProjectAttributValue githubOAuthToken = targetProject.getAttributes().get(GITHUB_TOKEN_KEY);
+            if(githubOAuthToken == null || githubOAuthToken.getValue()== null){
                 throw new BusinessException("Missing "+GITHUB_TOKEN_KEY+" in project configuration");
             }
 
-            final String githubRepoOwner = targetProject.getAttributes().get(GITHUB_REPO_OWNER_KEY).getValue();
-            if(githubRepoOwner == null){
+            final ProjectAttributValue githubRepoOwner = targetProject.getAttributes().get(GITHUB_REPO_OWNER_KEY);
+            if(githubRepoOwner == null || githubRepoOwner.getValue() == null){
                 throw new BusinessException("Missing "+GITHUB_REPO_OWNER_KEY+" in project configuration");
             }
 
-            final String githubRepoName = targetProject.getAttributes().get(GITHUB_REPO_NAME_KEY).getValue();
-            if(githubRepoName == null){
+            final ProjectAttributValue githubRepoName = targetProject.getAttributes().get(GITHUB_REPO_NAME_KEY);
+            if(githubRepoName == null || githubRepoName.getValue() == null){
                 throw new BusinessException("Missing "+GITHUB_REPO_NAME_KEY+" in project configuration");
             }
 
-            RepositoryId repositoryId = new RepositoryId(githubRepoOwner, githubRepoName);
+            try {
 
-            IssueService issueService = new IssueService();
-            issueService.getClient().setOAuth2Token(githubOAuthToken);
-            List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
+                RepositoryId repositoryId = new RepositoryId(githubRepoOwner.getValue(), githubRepoName.getValue());
 
-            Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName);
+                IssueService issueService = new IssueService();
+                issueService.getClient().setOAuth2Token(githubOAuthToken.getValue());
+                List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
-            issues.stream().forEach(issue -> {
-                if(!existingTasks.containsKey(issue.getId()) ) {
-                    // task does not exist, so create it
-                    Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
-                            issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
-                            0, null, null,
-                            GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName, issue.getId());                nbTaskRemoved.incrementAndGet();
-                    nbTaskCreated.incrementAndGet();
-                }else{
-                    // task already exist, so update it
-                    Task task = existingTasks.get(issue.getId());
-                    final TaskRevision latestRevision = task.getLatestRevision();
-                    TaskRevision revision = new TaskRevision(actor,
-                            task,
-                            issue.getTitle(),
-                            issue.getBodyHtml(),
-                            issue.getCreatedAt(),
-                            issue.getClosedAt(),
-                            latestRevision.getEstimateWork(),
-                            latestRevision.getRemainsToBeDone(),
-                            latestRevision.getAssigned());
-                    this.projectService.updateTask(actor, task, revision);
-                    existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
-                    nbTaskUpdated.incrementAndGet();
+                Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName);
+
+                issues.stream().forEach(issue -> {
+                    if (!existingTasks.containsKey(issue.getId())) {
+                        // task does not exist, so create it
+                        Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
+                                issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
+                                0, null, null,
+                                GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName, issue.getId());
+                        nbTaskRemoved.incrementAndGet();
+                        nbTaskCreated.incrementAndGet();
+                    } else {
+                        // task already exist, so update it
+                        Task task = existingTasks.get(issue.getId());
+                        final TaskRevision latestRevision = task.getLatestRevision();
+                        TaskRevision revision = new TaskRevision(actor,
+                                task,
+                                issue.getTitle(),
+                                issue.getBodyHtml(),
+                                issue.getCreatedAt(),
+                                issue.getClosedAt(),
+                                latestRevision.getEstimateWork(),
+                                latestRevision.getRemainsToBeDone(),
+                                latestRevision.getAssigned());
+                        this.projectService.updateTask(actor, task, revision);
+                        existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
+                        nbTaskUpdated.incrementAndGet();
+                    }
+
+                });
+
+                // Deleted task
+                for (Task task : existingTasks.values()) { //remaining task have been delete from origin repository
+                    this.projectService.deleteTaskByID(actor, task.getId()); //so delete it to be synchronized with origin
+                    nbTaskRemoved.incrementAndGet();
                 }
 
-            });
-
-            // Deleted task
-            for (Task task : existingTasks.values()) { //remaining task have been delete from origin repository
-                this.projectService.deleteTaskByID(actor, task.getId()); //so delete it to be synchronized with origin
-                nbTaskRemoved.incrementAndGet();
+                return "<ul>" +
+                        "<li>" + nbTaskCreated + " tasks created</li>" +
+                        "<li>" + nbTaskUpdated + " tasks updated</li>" +
+                        "<li>" + nbTaskRemoved + " tasks removed</li>" +
+                        "</ul>";
+            } catch (RequestException e) {
+                throw new BusinessException("Github configuration is incorrect.");
             }
-            return "<ul>" +
-                    "<li>"+nbTaskCreated+" tasks created</li>" +
-                    "<li>"+nbTaskUpdated+" tasks updated</li>" +
-                    "<li>"+nbTaskRemoved+" tasks removed</li>" +
-                    "</ul>";
         } catch (IOException e) {
             throw new BusinessException(e);
         }
