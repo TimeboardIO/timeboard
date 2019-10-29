@@ -73,7 +73,7 @@ public class GithubImportPlugin implements ProjectImportService {
         final AtomicInteger nbTaskUpdated = new AtomicInteger(0);
         final AtomicInteger nbTaskRemoved = new AtomicInteger(0);
 
-        try {
+        try { //handle configuration issues
             final Project targetProject = this.projectService.getProjectByID(actor, projectID);
 
             final ProjectAttributValue githubOAuthToken = targetProject.getAttributes().get(GITHUB_TOKEN_KEY);
@@ -91,7 +91,7 @@ public class GithubImportPlugin implements ProjectImportService {
                 throw new BusinessException("Missing "+GITHUB_REPO_NAME_KEY+" in project configuration");
             }
 
-            try {
+            try {//handle github connexion issues
 
                 RepositoryId repositoryId = new RepositoryId(githubRepoOwner.getValue(), githubRepoName.getValue());
 
@@ -126,7 +126,6 @@ public class GithubImportPlugin implements ProjectImportService {
                         existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
                         nbTaskUpdated.incrementAndGet();
                     }
-
                 });
 
                 // Deleted task
