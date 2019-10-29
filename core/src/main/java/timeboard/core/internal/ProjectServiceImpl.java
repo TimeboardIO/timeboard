@@ -469,7 +469,7 @@ public class ProjectServiceImpl implements ProjectService {
             "where tr.task_id = :taskId and tr.id IN ( " +
                     "SELECT MAX(trBis.id) " +
                     "FROM TaskRevision trBis " +
-                    "GROUP BY DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")" +
+                    "GROUP BY trBis.task_id, DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")" +
              ");");
 
             query.setParameter("taskId", taskId);
