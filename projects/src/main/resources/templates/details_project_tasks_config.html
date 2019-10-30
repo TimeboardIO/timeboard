@@ -48,7 +48,7 @@
         </div>
         <div class="field">
             <label>Task status</label>
-            <select  name="taskStatus">
+            <select  name="taskStatus" th:disabled="${task.taskID == null}">
                 <option th:each="status: ${allTaskStatus}"
                         th:text="${status.label}"
                         th:value="${status}"
