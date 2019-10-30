@@ -148,7 +148,7 @@
                             <tr th:each="element :  ${user.externalIDs}" th:attr="data-key=${element.key}" >
                                 <td th:text="${element.key}">  <i class="github icon"> </i> Github</td>
                                 <td>
-                                    <input type="text" th:value="${element.value}" />
+                                    <input type="text" th:value="${element.value}"  th:name="'attr-'+${element.key}"  />
                                 </td>
                                 <!--td>
                                     <div class="ui negative basic button remove"  th:attr="data-key=${element.key}">

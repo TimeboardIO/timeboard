@@ -33,6 +33,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.api.exceptions.WrongPasswordException;
+import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -43,6 +44,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 
 @Component(
@@ -92,7 +94,7 @@ public class AccountServlet extends TimeboardServlet {
                 }
 
 
-        }else if(submitButton .matches("account")){
+        }else if(submitButton.matches("account")){
             //Account modification
            String fistName = request.getParameter("firstName");
            String name = request.getParameter("name");
@@ -110,7 +112,24 @@ public class AccountServlet extends TimeboardServlet {
            }catch  (Exception e){
                viewModel.getViewDatas().put("error", "Error while updating user information.");
            }
+        }else if(submitButton.matches("external")){
+            Enumeration<String> params1 = request.getParameterNames();
+            while (params1.hasMoreElements()) {
+                String param = params1.nextElement();
+                if (param.startsWith("attr-")) {
+                    String key = param.substring(5, param.length());
+                    String value = request.getParameter(param);
+                    user.getExternalIDs().put(key, value);
+                }
+            }
+            try{
+                User u = userService.updateUser(user);
+                viewModel.getViewDatas().put("message", "External tools updated successfully !");
+            }catch  (Exception e){
+                viewModel.getViewDatas().put("error", "Error while external tools");
+            }
         }
+
         viewModel.getViewDatas().put("user", user);
 
         viewModel.setTemplate("account:account.html");

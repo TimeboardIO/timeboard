@@ -94,6 +94,7 @@ public final class UserServiceImpl implements UserService {
             u.setName(user.getName());
             u.setLogin(user.getLogin());
             u.setEmail(user.getEmail());
+            u.setExternalIDs(user.getExternalIDs());
 
             entityManager.persist(u);
             this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
