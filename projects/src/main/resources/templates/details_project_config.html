@@ -9,6 +9,8 @@
 </head>
 <body>
 
+
+
 <div layout:fragment="placeholder">
 
     <script type="text/javascript">
@@ -35,7 +37,6 @@
                     <label>Project Name</label>
                     <input name="projectName" placeholder="Project Name" required th:value="${project.name}"
                            type="text">
-
                 </div>
                 <div class="field">
                     <label>Project Quotation</label>
@@ -146,6 +147,13 @@
                 <div>
                     <a class="ui green basic button" th:each="import: ${imports}" th:href="@{/projects/import(projectID=${project.id}, type=${import.getServiceName()})}" th:text="${import.getServiceName()}" ></a>
                 </div>
+                <div th:if="${importSuccess}" class="ui container positive message">
+                    <i class="close icon"></i>
+                    <div class="header">
+                        Import successful !
+                    </div>
+                    <p th:utext="${importSuccess.toString()}"></p>
+                </div>
 
             </div>
 
@@ -157,15 +165,21 @@
     <script>
 
         $('.ui.checkbox')
-          .checkbox()
+          .checkbox();
+
+        $('.message .close')
+         .on('click', function() {
+        $(this)
+          .closest('.message')
+          .transition('fade')
+        ;
+        })
         ;
 
         $('.delete[data-key]').click(function(){
         console.log("delete");
             $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
         });
-
-
 
         $('.ui.search')
             .search({

@@ -266,6 +266,39 @@ public class ProjectServiceImpl implements ProjectService {
             return newTask;
         });
     }
+    @Override
+    public Task createTask(User actor,
+                           Project project,
+                           String taskName,
+                           String taskComment,
+                           Date startDate,
+                           Date endDate,
+                           double OE,
+                           Long taskTypeID,
+                           User assignedUser,
+                           String origin,
+                           String remotePath,
+                           Long remoteId
+                           ) {
+        return this.jpa.txExpr(entityManager -> {
+            Task newTask = new Task();
+            newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, taskName, taskComment, startDate, endDate, OE, OE, assignedUser);
+            newTask.getRevisions().add(taskRevision);
+            newTask.setLatestRevision(taskRevision);
+            newTask.setOrigin(origin);
+            newTask.setRemotePath(remotePath);
+            newTask.setRemoteId(remoteId);
+            entityManager.persist(newTask);
+            entityManager.merge(project);
+            newTask.setProject(project);
+            entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
+
+            return newTask;
+        });
+    }
 
     @Override
     public Task updateTask(User actor, final Task task, TaskRevision rev) {
@@ -479,5 +512,25 @@ public class ProjectServiceImpl implements ProjectService {
                     .map(x -> new EffortEstimate((Date) x[0], (Double) x[1]))
                     .collect(Collectors.toList());
         });
+    }
+
+    @Override
+    public Map<Long, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath) {
+
+        return this.jpa.txExpr(entityManager -> {
+            Map<Long, Task> map = new HashMap<>();
+            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project " +
+                    "and t.origin = :origin " +
+                    "and t.remotePath = :remotePath ", Task.class);
+            q.setParameter("project", project);
+            q.setParameter("origin", origin);
+            q.setParameter("remotePath", remotePath);
+            q.getResultList().forEach( task -> {
+                map.put(task.getRemoteId(), task);
+            });
+            return map;
+        });
+
+
     }
 }

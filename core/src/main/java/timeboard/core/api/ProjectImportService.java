@@ -33,6 +33,12 @@ public interface ProjectImportService {
 
     String getServiceName();
 
-    void importTasksToProject(User actor, long projectID) throws BusinessException;
+    /**
+     * Synchronize project tasks with remote source
+     * @param actor
+     * @param projectID
+     * @throws BusinessException
+     */
+    String importTasksToProject(User actor, long projectID) throws BusinessException;
 
 }
