@@ -9,6 +9,65 @@ $(document).ready(function(){
         ;
       })
     ;
+/*
+    $('.remove[data-key]').click(function(){
+        $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
+        $('.ui.dropdown select').append('<option value="'+$(this).attr('data-key')+'">'+$(this).attr('data-key')+'</option>');
+    });
+
+     $('tr[data-key]').each(function(){
+        $('option:contains(' + $(this).attr('data-key') + ')').remove();
+     });
+
+     $('.add').click(function(){
+
+        var type = $('.ui.dropdown').dropdown('get text');
+        var value = $('.newAttrValue').val();
+
+        $('.dropdown > select > option[value="' + $('.ui.dropdown').dropdown('get value') + '"]').remove();
+        $('.externalTools').prepend(''
+            +'<tr data-key="'+type+'" >'
+                +'<td>'
+                    +type
+                +'</td>'
+                +'<td>'
+                    +'<input type="text" value="'+value+'" />'
+                +'</td>'
+                +'<td>'
+                    +'<div class="ui negative basic button remove"  data-key="'+type+'">'
+                        +'<i class="remove alternate icon"></i>Remove'
+                    +'</div>'
+                +'<td>'
+            +'</tr>');
+
+        $('.remove[data-key]').click(function(){
+            $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
+            $('.ui.dropdown select').append('<option value="'+$(this).attr('data-key')+'">'+$(this).attr('data-key')+'</option>');
+        });
+
+        $('.ui.dropdown').dropdown('clear');
+     });
+
+
+
+    $('.field .dropdown')
+          .dropdown();
+
+    new Vue({
+      el: '#externalTools',
+      data: {
+        selected: '',
+        availableTypes: ['Jira' ,  'GitHub' , 'GitLab' ]
+      },
+      methods: {
+        addField : function(){
+
+
+        }
+      }
+    })
+*/
+
 
     $('.ui.form.password')
       .form({
