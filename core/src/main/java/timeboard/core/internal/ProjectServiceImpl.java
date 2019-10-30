@@ -247,12 +247,13 @@ public class ProjectServiceImpl implements ProjectService {
                            Date endDate,
                            double OE,
                            Long taskTypeID,
-                           User assignedUser
+                           User assignedUser,
+                           TaskStatus taskStatus
                            ) {
         return this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, taskName, taskComment, startDate, endDate, OE, OE, assignedUser);
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, taskName, taskComment, startDate, endDate, OE, OE, assignedUser, taskStatus);
             newTask.getRevisions().add(taskRevision);
             newTask.setLatestRevision(taskRevision);
             entityManager.persist(newTask);

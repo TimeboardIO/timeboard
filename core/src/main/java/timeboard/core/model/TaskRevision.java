@@ -70,7 +70,9 @@ public class TaskRevision implements Serializable, Cloneable {
     @OneToOne
     private User revisionActor;
 
-    public TaskRevision(User actor, Task t, String taskName, String taskComment, Date startDate, Date endDate, double oe, double rtbd, User assignedUser) {
+    private TaskStatus taskStatus;
+
+    public TaskRevision(User actor, Task t, String taskName, String taskComment, Date startDate, Date endDate, double oe, double rtbd, User assignedUser, TaskStatus taskStatus) {
         this.setRevisionDate(new Date());
         this.setName(taskName);
         this.setComments(taskComment);
@@ -81,9 +83,12 @@ public class TaskRevision implements Serializable, Cloneable {
         this.setRevisionActor(actor);
         this.setAssigned(assignedUser);
         this.setTask(t);
+        this.setTaskStatus(taskStatus);
     }
 
-    public TaskRevision(){}
+    public TaskRevision(){
+        this.taskStatus = TaskStatus.PENDING;
+    }
 
     public double getEstimateWork() {
         return estimateWork;
@@ -173,6 +178,14 @@ public class TaskRevision implements Serializable, Cloneable {
         this.endDate = endDate;
     }
 
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
     @Override
     protected TaskRevision clone()  {
 
@@ -187,6 +200,7 @@ public class TaskRevision implements Serializable, Cloneable {
         taskRevision.setEndDate(this.getEndDate());
         taskRevision.setEstimateWork(this.getEstimateWork());
         taskRevision.setRevisionDate(this.getRevisionDate());
+        taskRevision.setTaskStatus(this.getTaskStatus());
 
         return taskRevision;
     }

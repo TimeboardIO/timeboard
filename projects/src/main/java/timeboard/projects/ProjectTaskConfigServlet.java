@@ -94,6 +94,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
+        viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
 
 
         /* Get datas for line-chart*/
@@ -174,6 +175,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
             viewModel.getViewDatas().put("project", project);
+            viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
 
             /* Get datas for line-chart*/
             if(currentTask.getId() != null) {
@@ -196,7 +198,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskForm.getEndDate(),
                 taskForm.getEstimateWork(),
                 taskForm.getTaskTypeID(),
-                this.userService.findUserByID(taskForm.getAssignedUserID())
+                this.userService.findUserByID(taskForm.getAssignedUserID()),
+                taskForm.getTaskStatus()
                 );
     }
 
@@ -215,7 +218,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskForm.getEndDate(),
                 taskForm.getEstimateWork(),
                 currentTask.getRemainsToBeDone(),
-                this.userService.findUserByID(taskForm.getAssignedUserID()));
+                this.userService.findUserByID(taskForm.getAssignedUserID()),
+                taskForm.getTaskStatus());
 
 
         return this.projectService.updateTask(actor, currentTask, rev);
@@ -236,6 +240,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         private Long taskTypeID;
         private User assignedUser;
         private TaskType taskType;
+        private TaskStatus taskStatus;
 
         public TaskForm(Task task){
             taskID = task.getId();
@@ -247,10 +252,12 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 assignedUser = task.getLatestRevision().getAssigned();
                 taskName = task.getLatestRevision().getName();
                 taskComment = task.getLatestRevision().getComments();
+                taskStatus = task.getLatestRevision().getTaskStatus();
             }else{
                 startDate = new Date();
                 endDate = new Date();
                 assignedUser = null;
+                taskStatus = TaskStatus.PENDING;
             }
         }
 
@@ -263,6 +270,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             startDate = DATE_FORMAT.parse(request.getParameter("taskStartDate"));
             endDate = DATE_FORMAT.parse(request.getParameter("taskEndDate"));
             estimateWork = Double.parseDouble(request.getParameter("taskEstimateWork"));
+            taskStatus = TaskStatus.valueOf(request.getParameter("taskStatus"));
 
             if(request.getParameter("taskTypeID") != null &&  !request.getParameter("taskTypeID").isEmpty()) {
                 taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
@@ -323,6 +331,14 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         public void setAssignedUser(User assignedUser) {
             this.assignedUser = assignedUser;
+        }
+
+        public TaskStatus getTaskStatus() {
+            return taskStatus;
+        }
+
+        public void setTaskStatus(TaskStatus taskStatus) {
+            this.taskStatus = taskStatus;
         }
     }
 }
