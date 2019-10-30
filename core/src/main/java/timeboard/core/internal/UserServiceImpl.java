@@ -104,7 +104,7 @@ public final class UserServiceImpl implements UserService {
     public void updateUserPassword(Long userID, String oldPassword, String newPassword) throws WrongPasswordException, UserException {
 
         User user = this.findUserByID(userID);
-        if(user!=null && user.getPassword().matches(oldPassword)){
+        if(user!=null && this.checkPassword(oldPassword, user.getPassword())){
             this.jpa.txExpr(entityManager -> {
                 User u = entityManager.find(User.class, userID);
 
