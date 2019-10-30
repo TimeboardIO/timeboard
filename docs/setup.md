@@ -91,7 +91,17 @@ Open your web browser and got to
     
 Congratulation, you have access to Timeboard login page !
 
-### Last job : create user account
+### Last job : Load dataset OR create user account
+
+##### Load dataset (only once)
+
+    In Karaf shell, create a variable path to your sample-data.jar then resolve and start the bundle :
+    myPathDatasetJar = XXXXXX/timeboard/sample-data/target/sample-data-1.0-SNAPSHOT.jar
+    bundle:install file://$myPathDatasetJar
+    bundle:resolve sample-data
+    bundle:start sample-data
+
+##### Create a user account
 
 Timeboard database is empty at first startup
 In order to create your first user, you must use Apache Karaf Shell 

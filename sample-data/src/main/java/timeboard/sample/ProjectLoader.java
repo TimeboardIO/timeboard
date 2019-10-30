@@ -26,51 +26,47 @@ package timeboard.sample;
  * #L%
  */
 
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
+import timeboard.core.model.Project;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
-public class UserLoader {
+public class ProjectLoader {
 
+    ProjectService projectService;
     UserService userService;
 
-    UserLoader(UserService userService){
+    ProjectLoader(ProjectService projectService, UserService userService){
+        this.projectService = projectService;
         this.userService = userService;
     }
 
-    public List<User> load(int nbUsers) throws BusinessException {
-        List<User> userSaved = new ArrayList<>();
 
-        List<User> usersToSave = new ArrayList<>();
-        // On créé "nbUsers" utilisateurs
-        for (int i = 0; i < nbUsers; i++) {
-            User u = new User();
-            u.setName("timeboard" + i);
-            u.setPassword("timeboard" + i);
-            u.setEmail("user" + i + "@timeboard.com");
-            u.setImputationFutur(true);
-            u.setBeginWorkDate(new Date());
-            u.setFirstName("User" + i);
-            u.setLogin("timeboard" + i);
-            u.setAccountCreationTime(new Date());
-            usersToSave.add(u);
-            System.out.println("Stage user : "+u.getName());
+    public List<Project> load(List<User> usersSaved, int nbProjectsByUsers) throws BusinessException {
+        List<Project> projectsSaved = new ArrayList<>();
+        for (int i = 0; i < usersSaved.size(); i++) {
+            User owner = usersSaved.get(i);
+
+            if(owner != null) {
+                for (int j = 0; j < nbProjectsByUsers; j++) {
+                    try {
+                        // On créé "nbProjectsByUsers" projets pour chacun des utilisateurs
+                        projectsSaved.add(this.projectService.createProject(owner, "project owner " + i + " number " + j));
+                        System.out.println("Save project: " + "project owner " + i + " number " + j);
+
+                    } catch (BusinessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
-
-        try {
-            userSaved = this.userService.createUsers(usersToSave);
-            System.out.println("Save "+usersToSave.size()+" users");
-        } catch (BusinessException e) {
-            e.printStackTrace();
-        }
-
-        return userSaved;
-
+        System.out.println("Projects saved ! ");
+        return projectsSaved;
     }
 
 
