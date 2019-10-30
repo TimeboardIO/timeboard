@@ -198,8 +198,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskForm.getEndDate(),
                 taskForm.getEstimateWork(),
                 taskForm.getTaskTypeID(),
-                this.userService.findUserByID(taskForm.getAssignedUserID()),
-                taskForm.getTaskStatus()
+                this.userService.findUserByID(taskForm.getAssignedUserID())
                 );
     }
 

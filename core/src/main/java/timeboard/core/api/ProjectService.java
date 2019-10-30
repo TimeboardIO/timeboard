@@ -76,7 +76,7 @@ public interface ProjectService {
      */
     List<TaskType> listTaskType();
 
-    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, TaskStatus taskStatus);
+    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID);
 
     Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
 

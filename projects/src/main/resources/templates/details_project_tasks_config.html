@@ -47,12 +47,12 @@
             </select>
         </div>
         <div class="field">
-            <label>Task status:</label>
+            <label>Task status</label>
             <select  name="taskStatus">
                 <option th:each="status: ${allTaskStatus}"
-                        th:text="${status}"
+                        th:text="${status.label}"
                         th:value="${status}"
-                        th:selected="${task.taskStatus}"></option>
+                        th:selected="${status == task.taskStatus}"></option>
             </select>
         </div>
         <div class="field">

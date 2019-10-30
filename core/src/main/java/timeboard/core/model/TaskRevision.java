@@ -87,7 +87,6 @@ public class TaskRevision implements Serializable, Cloneable {
     }
 
     public TaskRevision(){
-        this.taskStatus = TaskStatus.PENDING;
     }
 
     public double getEstimateWork() {
