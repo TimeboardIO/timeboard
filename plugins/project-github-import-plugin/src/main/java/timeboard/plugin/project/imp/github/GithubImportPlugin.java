@@ -30,6 +30,7 @@ import org.eclipse.egit.github.core.client.RequestException;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import org.eclipse.egit.github.core.Issue;
@@ -60,6 +61,10 @@ public class GithubImportPlugin implements ProjectImportService {
 
     @Reference
     private ProjectService projectService;
+
+    @Reference
+    private UserService userService;
+
 
     @Override
     public String getServiceName() {
@@ -102,17 +107,25 @@ public class GithubImportPlugin implements ProjectImportService {
                 Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue());
 
                 issues.stream().forEach(issue -> {
+                    User existingUser = null;
+                    if(issue.getAssignee() != null){
+                        existingUser = this.userService.findUserByExternalID(GITHUB_ORIGIN_KEY, issue.getAssignee().getLogin());
+                    }
+
                     if (!existingTasks.containsKey(issue.getId())) {
                         // task does not exist, so create it
                         Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
                                 issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
-                                0, null, null,
+                                0, null, existingUser,
                                 GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue(), issue.getId());
                         nbTaskCreated.incrementAndGet();
                     } else {
+
                         // task already exist, so update it
                         Task task = existingTasks.get(issue.getId());
                         final TaskRevision latestRevision = task.getLatestRevision();
+                        if(existingUser == null) existingUser = latestRevision.getAssigned();
+
                         TaskRevision revision = new TaskRevision(actor,
                                 task,
                                 issue.getTitle(),
@@ -121,7 +134,7 @@ public class GithubImportPlugin implements ProjectImportService {
                                 issue.getClosedAt(),
                                 latestRevision.getEstimateWork(),
                                 latestRevision.getRemainsToBeDone(),
-                                latestRevision.getAssigned());
+                                existingUser);
                         this.projectService.updateTask(actor, task, revision);
                         existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
                         nbTaskUpdated.incrementAndGet();
@@ -139,6 +152,7 @@ public class GithubImportPlugin implements ProjectImportService {
                         "<li>" + nbTaskUpdated + " tasks updated</li>" +
                         "<li>" + nbTaskRemoved + " tasks removed</li>" +
                         "</ul>";
+
             } catch (RequestException e) {
                 throw new BusinessException("Github configuration is incorrect.");
             }
