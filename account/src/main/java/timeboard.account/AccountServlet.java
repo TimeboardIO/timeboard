@@ -137,24 +137,22 @@ public class AccountServlet extends TimeboardServlet {
         }
 
 
-        viewModel.getViewDatas().put("user", user);
-        List<String> fieldNames = new ArrayList<>();
-        projectImportServlets.forEach(service -> {
-            fieldNames.addAll(service.getRequiredUserFields());
-        });
+        loadPage(viewModel, user);
 
-
-        viewModel.getViewDatas().put("externalTools", fieldNames);
-        viewModel.setTemplate("account:account.html");
     }
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         User user = SecurityContext.getCurrentUser(request);
 
+        loadPage(viewModel, user);
+    }
+    
+    private void loadPage(ViewModel viewModel, User user){
         viewModel.getViewDatas().put("user", user);
 
         List<String> fieldNames = new ArrayList<>();
+        //import external ID field name from import plugins list
         projectImportServlets.forEach(service -> {
             fieldNames.addAll(service.getRequiredUserFields());
         });
@@ -163,6 +161,5 @@ public class AccountServlet extends TimeboardServlet {
 
         viewModel.setTemplate("account:account.html");
     }
-
 
 }

@@ -191,16 +191,12 @@ public final class UserServiceImpl implements UserService {
     @Override
     public User findUserByExternalID(String origin, String userExternalID) {
         return this.jpa.txExpr(entityManager -> {
-            Query q = entityManager
+            Query q = entityManager // MYSQL native for JSON queries
                     .createNativeQuery("select * from User "
                             + "where JSON_EXTRACT(externalIDs, '$."+origin+"')" +
                             " = ?", User.class);
-
             q.setParameter(1, userExternalID);
-
-            User user = (User) q.getSingleResult();
-
-            return user;
+            return (User) q.getSingleResult();
         });
     }
 
