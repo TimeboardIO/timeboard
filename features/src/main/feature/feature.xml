@@ -32,6 +32,13 @@
             password=timeboard
             dialect=org.hibernate.dialect.MySQL8Dialect
         </config>
+        <config name="org.ops4j.pax.web">
+            org.osgi.service.http.port=8181
+            javax.servlet.context.tempdir=${karaf.data}/pax-web-jsp
+            org.ops4j.pax.web.config.file=${karaf.etc}/jetty.xml
+            org.apache.karaf.features.configKey=org.ops4j.pax.web
+            org.ops4j.pax.web.session.timeout=30
+        </config>
         <capability>
             osgi.service;objectClass=javax.sql.DataSource;effective:=active;osgi.jndi.service.name=timeboard-core-ds
         </capability>
