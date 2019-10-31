@@ -1,0 +1,45 @@
+@startuml
+
+abstract class AbstractTask
+
+
+AbstractTask <|-- Task
+AbstractTask <|-- DefaultTask
+
+Imputation "1" -- "*" AbstractTask
+Task "1" -- "*" TaskRevision
+Task "1" -- "1" State
+Task "*" -- "1" Project
+TaskRevision -- "1" User :assignee
+Project "*" -- "*" User
+
+class AbstractTask {
+Long id
+String name
+String description
+}
+
+
+class Task {
+String origin
+String remotePath
+String remoteId
+Double OE
+Date startDate
+Date endDate
+}
+
+class TaskRevision {
+Long origin
+String remotePath
+String remoteId
+Double RE
+}
+
+enum State {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+
+@enduml
