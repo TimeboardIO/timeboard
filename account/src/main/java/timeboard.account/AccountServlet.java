@@ -26,9 +26,8 @@ package timeboard.account;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.component.annotations.*;
+import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.UserException;
@@ -44,7 +43,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 
 @Component(
@@ -59,6 +60,13 @@ public class AccountServlet extends TimeboardServlet {
 
     @Reference
     private UserService userService;
+
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            collectionType = CollectionType.SERVICE
+    )
+    private List<ProjectImportService> projectImportServlets;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -75,8 +83,6 @@ public class AccountServlet extends TimeboardServlet {
 
             String newPassword = request.getParameter("password1");
             String oldPassword = request.getParameter("oldPassword");
-
-                //TODO Security checking
 
                 user.setPassword(newPassword);
                 try {
@@ -130,8 +136,15 @@ public class AccountServlet extends TimeboardServlet {
             }
         }
 
-        viewModel.getViewDatas().put("user", user);
 
+        viewModel.getViewDatas().put("user", user);
+        List<String> fieldNames = new ArrayList<>();
+        projectImportServlets.forEach(service -> {
+            fieldNames.addAll(service.getRequiredUserFields());
+        });
+
+
+        viewModel.getViewDatas().put("externalTools", fieldNames);
         viewModel.setTemplate("account:account.html");
     }
 
@@ -140,6 +153,13 @@ public class AccountServlet extends TimeboardServlet {
         User user = SecurityContext.getCurrentUser(request);
 
         viewModel.getViewDatas().put("user", user);
+
+        List<String> fieldNames = new ArrayList<>();
+        projectImportServlets.forEach(service -> {
+            fieldNames.addAll(service.getRequiredUserFields());
+        });
+
+        viewModel.getViewDatas().put("externalTools", fieldNames);
 
         viewModel.setTemplate("account:account.html");
     }

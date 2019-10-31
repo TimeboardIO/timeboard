@@ -139,44 +139,17 @@
                         <table class="ui celled table">
                             <thead>
                             <tr>
-                                <th>Tool</th>
+                                <th>Key</th>
                                 <th>Value</th>
-                                <!--th></th-->
                             </tr>
                             </thead>
                             <tbody class="externalTools" >
-                            <tr th:each="element :  ${user.externalIDs}" th:attr="data-key=${element.key}" >
-                                <td th:text="${element.key}">  <i class="github icon"> </i> Github</td>
+                            <tr th:each="element :  ${externalTools}" th:attr="data-key=${element}" >
+                                <td th:text="${element}">  <i class="github icon"> </i> Github</td>
                                 <td>
-                                    <input type="text" th:value="${element.value}"  th:name="'attr-'+${element.key}"  />
+                                    <input type="text" th:value="${user.externalIDs.get(element)}"  th:name="'attr-'+${element}"  />
                                 </td>
-                                <!--td>
-                                    <div class="ui negative basic button remove"  th:attr="data-key=${element.key}">
-                                        <i class="remove alternate icon"></i>
-                                        Remove
-                                    </div>
-                                </td-->
                             </tr>
-                            <!-- tr>
-                                <td>
-                                    <div class="field" >
-                                        <select class="ui dropdown" >
-                                            <option disabled value="">Application</option>
-                                            <option></option>
-                                        </select>
-                                    </div>
-                                </td>
-                                <td>
-                                    <input class="newAttrValue" type="text" name="newAttrValue" placeholder="new conf value"/>
-                                </td>
-
-                                <td>
-                                    <div v-on:click="addField" class="ui positive basic button add">
-                                    <i class="add alternate icon"></i>
-                                    Add
-                                    </div>
-                                </td>
-                            </tr!-->
                             </tbody>
                         </table>
                         <input name="formType" type="hidden" value="external">

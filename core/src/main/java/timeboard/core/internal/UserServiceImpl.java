@@ -191,12 +191,10 @@ public final class UserServiceImpl implements UserService {
     @Override
     public User findUserByExternalID(String origin, String userExternalID) {
         return this.jpa.txExpr(entityManager -> {
-            //select * from timeboard.User
-            // where JSON_EXTRACT(externalIDS, "$.github") = 'nicolas-lefloch'
             Query q = entityManager
                     .createNativeQuery("select * from User "
-                            + "where JSON_EXTRACT(externalIDs, '$."+origin.toLowerCase()+"')" +
-                            "= ?", User.class);
+                            + "where JSON_EXTRACT(externalIDs, '$."+origin+"')" +
+                            " = ?", User.class);
 
             q.setParameter(1, userExternalID);
 

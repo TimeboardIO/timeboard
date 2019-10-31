@@ -42,6 +42,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +59,9 @@ public class GithubImportPlugin implements ProjectImportService {
     private static final String GITHUB_REPO_NAME_KEY = "github.repo.name";
 
     private static final String GITHUB_ORIGIN_KEY = "github";
+    private static final String GITHUB_USER_FIELD = GITHUB_ORIGIN_KEY;
+
+    private static final List<String> GITHUB_USER_FIELDS = new ArrayList<>();
 
     @Reference
     private ProjectService projectService;
@@ -68,7 +72,13 @@ public class GithubImportPlugin implements ProjectImportService {
 
     @Override
     public String getServiceName() {
-        return "Github issues";
+        return "Github Issues";
+    }
+
+    @Override
+    public List<String> getRequiredUserFields() {
+        if(GITHUB_USER_FIELDS.size() != 1) GITHUB_USER_FIELDS.add(GITHUB_USER_FIELD);
+        return GITHUB_USER_FIELDS;
     }
 
     @Override
@@ -109,7 +119,16 @@ public class GithubImportPlugin implements ProjectImportService {
                 issues.stream().forEach(issue -> {
                     User existingUser = null;
                     if(issue.getAssignee() != null){
-                        existingUser = this.userService.findUserByExternalID(GITHUB_ORIGIN_KEY, issue.getAssignee().getLogin());
+                        try{
+                            existingUser = this.userService.findUserByExternalID(GITHUB_USER_FIELD, issue.getAssignee().getLogin());
+                            //verify that found user is member of target project
+                            if(!projectService.listProjects(existingUser).contains(targetProject)){
+                                existingUser = null;
+                            }
+                        }catch(Exception e){
+                            // no existing user found
+                            existingUser = null;
+                        }
                     }
 
                     if (!existingTasks.containsKey(issue.getId())) {
@@ -124,8 +143,8 @@ public class GithubImportPlugin implements ProjectImportService {
                         // task already exist, so update it
                         Task task = existingTasks.get(issue.getId());
                         final TaskRevision latestRevision = task.getLatestRevision();
+                        //keep existing assignment if new user assignee is not found TODO CHECK IF IS FUNCTIONALLY CORRECT
                         if(existingUser == null) existingUser = latestRevision.getAssigned();
-
                         TaskRevision revision = new TaskRevision(actor,
                                 task,
                                 issue.getTitle(),
