@@ -5,6 +5,8 @@ Task "1" -- "1" State
 Task "*" -- "1" Project
 TaskRevision -- "1" User :assignee
 Project "*" -- "*" User
+Task  -- "1" TaskType
+Imputation "1" -- "*" Task
 
 
 
@@ -26,6 +28,7 @@ Double RE
 Double OE
 Date startDate
 Date endDate
+Date revisionDate
 
 }
 
@@ -34,5 +37,10 @@ enum State {
   IN_PROGRESS
   CLOSED
 }
+class TaskType {
+  String typeName
+}
+
+
 
 @enduml
