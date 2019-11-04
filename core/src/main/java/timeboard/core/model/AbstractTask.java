@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public abstract class AbstractTask implements Serializable {
 
     @Id

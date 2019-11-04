@@ -485,9 +485,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-
-
-
     @Override
     public List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
 
@@ -525,6 +522,20 @@ public class ProjectServiceImpl implements ProjectService {
                     .map(x -> new EffortEstimate((Date) x[0], (Double) x[1]))
                     .collect(Collectors.toList());
         });
+    }
+
+    @Override
+    public DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException {
+        try {
+            return this.jpa.txExpr(entityManager -> {
+                entityManager.persist(task);
+
+                this.logService.log(LogService.LOG_INFO, "Default task " + task.getName() + " is created.");
+                return task;
+            });
+        }catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override

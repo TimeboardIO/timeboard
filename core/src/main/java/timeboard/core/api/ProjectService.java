@@ -117,4 +117,5 @@ public interface ProjectService {
     List<EffortEstimate> getEstimateByTask(long taskId);
 
 
+    DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException;
 }

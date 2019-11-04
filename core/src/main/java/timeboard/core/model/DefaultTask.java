@@ -28,9 +28,16 @@ package timeboard.core.model;
 
 
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import java.io.Serializable;
 
+
 @Entity
+@PrimaryKeyJoinColumn(name = "id")
 public class DefaultTask extends AbstractTask implements Serializable {
+
+    public DefaultTask() {
+        super();
+    }
 
 }

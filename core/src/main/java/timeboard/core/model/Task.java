@@ -33,6 +33,7 @@ import java.util.*;
 
 
 @Entity
+@PrimaryKeyJoinColumn(name = "id")
 public class Task extends AbstractTask implements Serializable {
 
     @OneToOne(targetEntity = TaskRevision.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
