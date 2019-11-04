@@ -47,8 +47,8 @@ public class Imputation implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date day;
 
-    @ManyToOne(targetEntity = Task.class)
-    private Task task;
+    @ManyToOne(targetEntity = AbstractTask.class)
+    private AbstractTask task;
 
     public long getId() {
         return id;
@@ -74,11 +74,11 @@ public class Imputation implements Serializable {
         this.day = day;
     }
 
-    public Task getTask() {
+    public AbstractTask getTask() {
         return task;
     }
 
-    public void setTask(Task task) {
+    public void setTask(AbstractTask task) {
         this.task = task;
     }
 }

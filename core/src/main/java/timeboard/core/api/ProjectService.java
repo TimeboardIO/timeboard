@@ -29,6 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,7 @@ public interface ProjectService {
 
     List<Task> listProjectTasks(Project project);
 
+
     List<Task> listUserTasks(User user);
 
     /**
@@ -87,6 +89,8 @@ public interface ProjectService {
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
 
     List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
+
+    List<DefaultTask> listDefaultTasks(Date ds, Date de);
 
     UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
 
@@ -118,4 +122,5 @@ public interface ProjectService {
 
 
     DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException;
+
 }

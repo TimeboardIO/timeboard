@@ -123,9 +123,9 @@
        references AbstractTask (id);
 
     alter table Imputation 
-       add constraint FK77e4o89dpt066rpt2jpnbe0ba 
+       add constraint FKyirjrx86v2stxnnlwni8vfgr 
        foreign key (task_id) 
-       references Task (id);
+       references AbstractTask (id);
 
     alter table ProjectMembership 
        add constraint FKh59cv9s56u3sdi0ki6axsxf09 

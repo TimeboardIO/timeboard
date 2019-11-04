@@ -29,6 +29,9 @@ package timeboard.core.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -50,8 +53,11 @@ public abstract class AbstractTask implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    public AbstractTask(){
+    @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
+    private Set<Imputation> imputations;
 
+    public AbstractTask(){
+        this.imputations = new HashSet<>();
     }
 
     public AbstractTask(String taskName, String taskComment, Date startDate, Date endDate) {
@@ -95,6 +101,26 @@ public abstract class AbstractTask implements Serializable {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public Set<Imputation> getImputations() {
+        return imputations;
+    }
+
+    public void setImputations(Set<Imputation> imputations) {
+        this.imputations = imputations;
+    }
+
+    @Transient
+    public double findTaskImputationValueByDate(Date date) {
+        Optional<Imputation> iOpt = this.getImputations().stream()
+                .filter(imputation -> imputation.getDay().equals(date))
+                .findFirst();
+        if (iOpt.isPresent()) {
+            return iOpt.get().getValue();
+        } else {
+            return 0;
+        }
     }
 
 }

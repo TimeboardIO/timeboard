@@ -64,13 +64,10 @@ public class Task extends AbstractTask implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
-    private Set<Imputation> imputations;
 
     public Task() {
         super();
         this.revisions = new ArrayList<>();
-        this.imputations = new HashSet<>();
     }
 
 
@@ -114,13 +111,6 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
-    public Set<Imputation> getImputations() {
-        return imputations;
-    }
-
-    public void setImputations(Set<Imputation> imputations) {
-        this.imputations = imputations;
-    }
 
 
     /**
@@ -179,18 +169,6 @@ public class Task extends AbstractTask implements Serializable {
     @Transient
     public double getEffortSpent() {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
-    }
-
-    @Transient
-    public double findTaskImputationValueByDate(Date date) {
-        Optional<Imputation> iOpt = this.getImputations().stream()
-                .filter(imputation -> imputation.getDay().equals(date))
-                .findFirst();
-        if (iOpt.isPresent()) {
-            return iOpt.get().getValue();
-        } else {
-            return 0;
-        }
     }
 
     public List<TaskRevision> getRevisions() {

@@ -343,7 +343,11 @@ public class ProjectServiceImpl implements ProjectService {
             c.setTime(day);
             c.set(Calendar.HOUR_OF_DAY, 2);
 
-            final Task task = entityManager.find(Task.class, taskID);
+            AbstractTask task = entityManager.find(AbstractTask.class, taskID);
+            /*if(task == null){
+                task = entityManager.find(DefaultTask.class, taskID);
+            }*/
+            Task projectTask = (Task.class.isInstance(task)) ? (Task) task : null;
 
             TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
             q.setParameter("taskID", taskID);
@@ -356,18 +360,22 @@ public class ProjectServiceImpl implements ProjectService {
                 i.setDay(c.getTime());
                 i.setTask(task);
                 i.setValue(val);
-                task.updateCurrentRemainsToBeDone(actor,task.getRemainsToBeDone() - val);
+                if(projectTask != null){ //project task
+                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - val);
+                }
                 entityManager.persist(i);
             }
 
             if (!existingImputations.isEmpty()) {
                 Imputation i = existingImputations.get(0);
 
-                if (i.getValue() < val) {
-                    task.updateCurrentRemainsToBeDone(actor,task.getRemainsToBeDone() - Math.abs(val - i.getValue()));
-                }
-                if (i.getValue() > val) {
-                    task.updateCurrentRemainsToBeDone(actor,task.getRemainsToBeDone() + Math.abs(i.getValue() - val));
+                if(projectTask != null){ //project task
+                    if (i.getValue() < val) {
+                        projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - Math.abs(val - i.getValue()));
+                    }
+                    if (i.getValue() > val) {
+                        projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() + Math.abs(i.getValue() - val));
+                    }
                 }
                 if (val == 0) {
                     entityManager.remove(i);
@@ -378,9 +386,13 @@ public class ProjectServiceImpl implements ProjectService {
 
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+task.getProject().getName()+" with value "+ val);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
+            if(projectTask != null) { //project task
+                return new UpdatedTaskResult(projectTask.getProject().getId(), task.getId(), projectTask.getEffortSpent(), projectTask.getRemainsToBeDone(), projectTask.getEstimateWork(), projectTask.getReEstimateWork());
+            }else{
+                return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
+            }
 
-            return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
     }
 
@@ -455,6 +467,25 @@ public class ProjectServiceImpl implements ProjectService {
 
         });
         return projectTaskRevisions;
+    }
+
+    @Override
+    public List<DefaultTask> listDefaultTasks(Date ds, Date de) {
+
+       return this.jpa.txExpr(entityManager -> {
+
+            TypedQuery<DefaultTask> q = entityManager
+                    .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where " +
+                                    "t.endDate >= :ds " +
+                                    "and t.startDate <= :de "
+                            , DefaultTask.class);
+            q.setParameter("ds", ds);
+            q.setParameter("de", de);
+            List<DefaultTask> tasks = q.getResultList();
+
+           return q.getResultList();
+
+        });
     }
 
 
