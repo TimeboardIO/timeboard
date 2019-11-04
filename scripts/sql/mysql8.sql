@@ -1,4 +1,21 @@
 
+    create table AbstractTask (
+       DTYPE varchar(31) not null,
+        id bigint not null,
+        comments varchar(500),
+        endDate date,
+        name varchar(50) not null,
+        startDate date,
+        estimateWork double precision not null,
+        origin varchar(255),
+        remoteId bigint,
+        remotePath varchar(255),
+        latestRevision_id bigint,
+        project_id bigint,
+        taskType_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
@@ -45,26 +62,10 @@
         primary key (membershipID)
     ) engine=InnoDB;
 
-    create table Task (
-       id bigint not null,
-        origin varchar(255),
-        remoteId bigint,
-        remotePath varchar(255),
-        latestRevision_id bigint,
-        project_id bigint,
-        taskType_id bigint,
-        primary key (id)
-    ) engine=InnoDB;
-
     create table TaskRevision (
        id bigint not null,
-        comments varchar(500),
-        endDate date,
-        estimateWork double precision not null,
-        name varchar(50) not null,
         remainsToBeDone double precision not null,
         revisionDate datetime(6),
-        startDate date,
         assigned_id bigint,
         revisionActor_id bigint,
         task_id bigint,
@@ -107,10 +108,25 @@
     alter table User 
        add constraint UK_587tdsv8u5cvheyo9i261xhry unique (login);
 
+    alter table AbstractTask 
+       add constraint FKnvnfjuyh0k5yl9e80xkkjm7cq 
+       foreign key (latestRevision_id) 
+       references TaskRevision (id);
+
+    alter table AbstractTask 
+       add constraint FKlk8244tdnylamfi41c353evro 
+       foreign key (project_id) 
+       references Project (id);
+
+    alter table AbstractTask 
+       add constraint FKnk2i4sqlxfvc8ijr68j83ncbl 
+       foreign key (taskType_id) 
+       references TaskType (id);
+
     alter table Imputation 
-       add constraint FK77e4o89dpt066rpt2jpnbe0ba 
+       add constraint FKyirjrx86v2stxnnlwni8vfgr 
        foreign key (task_id) 
-       references Task (id);
+       references AbstractTask (id);
 
     alter table ProjectMembership 
        add constraint FKh59cv9s56u3sdi0ki6axsxf09 
@@ -121,21 +137,6 @@
        add constraint FKapg94jqua2lbkjdb0kofxtnln 
        foreign key (project_id) 
        references Project (id);
-
-    alter table Task 
-       add constraint FKjwuo5mqkfx9k23jd3g8vr4a2p 
-       foreign key (latestRevision_id) 
-       references TaskRevision (id);
-
-    alter table Task 
-       add constraint FKkkcat6aybe3nbvhc54unstxm6 
-       foreign key (project_id) 
-       references Project (id);
-
-    alter table Task 
-       add constraint FKigksw4egslpbdevlab7ucu8lb 
-       foreign key (taskType_id) 
-       references TaskType (id);
 
     alter table TaskRevision 
        add constraint FKp9ssbxu7c3w7fr3jukkget1ne 
@@ -148,9 +149,9 @@
        references User (id);
 
     alter table TaskRevision 
-       add constraint FKpsj9t1js8flo735q3nx3o0c6d 
+       add constraint FKmpdqpd2p4e41ye2ph7eb6wr5v 
        foreign key (task_id) 
-       references Task (id);
+       references AbstractTask (id);
 
     alter table ValidatedTimesheet 
        add constraint FKf4lmab2846nt5smlforv45yj3 

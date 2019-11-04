@@ -31,12 +31,8 @@ Double OE
 }
 
 class TaskRevision {
-Long origin
-String remotePath
-String remoteId
 Double RE
 Date revisionDate
-
 }
 
 enum State {

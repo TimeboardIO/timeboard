@@ -107,15 +107,15 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         // Datas for dates (Axis X)
         String formatLocalDate = "yyyy-MM-dd";
         String formatDateToDisplay = "dd/MM/yyyy";
-        LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getLatestRevision().getStartDate()));
-        LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getLatestRevision().getEndDate()));
+        LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getStartDate()));
+        LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getEndDate()));
         List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
                 .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
                 .collect(Collectors.toList());
         viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
-        List<EffortSpent> effortSpentDB = this.projectService.getESByTaskAndPeriod(task.getId(), task.getLatestRevision().getStartDate(), task.getLatestRevision().getEndDate());
+        List<EffortSpent> effortSpentDB = this.projectService.getESByTaskAndPeriod(task.getId(), task.getStartDate(), task.getEndDate());
         final Double[] lastSum = {0.0};
         List<Double> effortSpent = listOfTaskDates
                 .stream()
@@ -206,17 +206,16 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());
         if(taskType != null) {
             currentTask.setTaskType(taskType);
+            currentTask.setName(taskForm.getTaskName());
+            currentTask.setComments(taskForm.getTaskComment());
+            currentTask.setStartDate(taskForm.getStartDate());
+            currentTask.setEndDate(taskForm.getEndDate());
+            currentTask.setEstimateWork( taskForm.getEstimateWork());
         }
         final TaskRevision rev = new TaskRevision(actor,
                 currentTask,
-                taskForm.getTaskName(),
-                taskForm.getTaskComment(),
-                taskForm.getStartDate(),
-                taskForm.getEndDate(),
-                taskForm.getEstimateWork(),
                 currentTask.getRemainsToBeDone(),
                 this.userService.findUserByID(taskForm.getAssignedUserID()));
-
 
         return this.projectService.updateTask(actor, currentTask, rev);
     }
@@ -241,12 +240,12 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             taskID = task.getId();
             taskType = task.getTaskType();
             if(task.getLatestRevision() != null) {
-                estimateWork = task.getLatestRevision().getEstimateWork();
-                startDate = task.getLatestRevision().getStartDate();
-                endDate = task.getLatestRevision().getEndDate();
+                estimateWork = task.getEstimateWork();
+                startDate = task.getStartDate();
+                endDate = task.getEndDate();
                 assignedUser = task.getLatestRevision().getAssigned();
-                taskName = task.getLatestRevision().getName();
-                taskComment = task.getLatestRevision().getComments();
+                taskName = task.getName();
+                taskComment = task.getComments();
             }else{
                 startDate = new Date();
                 endDate = new Date();

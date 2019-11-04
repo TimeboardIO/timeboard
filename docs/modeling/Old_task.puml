@@ -21,9 +21,6 @@ String remoteId
 class TaskRevision {
 String name
 String description
-Long origin
-String remotePath
-String remoteId
 Double RE
 Double OE
 Date startDate

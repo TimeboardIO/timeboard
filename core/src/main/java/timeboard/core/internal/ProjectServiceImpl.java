@@ -131,7 +131,7 @@ public class ProjectServiceImpl implements ProjectService {
         return jpa.txExpr(em -> {
 
             TypedQuery<Object[]> q = em.createQuery("select " +
-                    "COALESCE(sum(t.latestRevision.estimateWork),0) as estimateWork, " +
+                    "COALESCE(sum(t.estimateWork),0) as estimateWork, " +
                     "COALESCE(sum(t.latestRevision.remainsToBeDone),0) as remainsToBeDone " +
                     "from Task t " +
                     "where t.project = :project ", Object[].class);
@@ -252,7 +252,13 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, taskName, taskComment, startDate, endDate, OE, OE, assignedUser);
+            newTask.setEstimateWork(OE);
+            newTask.setName(taskName);
+            newTask.setComments(taskComment);
+            newTask.setStartDate(startDate);
+            newTask.setEndDate(endDate);
+            newTask.setComments(taskComment);
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser);
             newTask.getRevisions().add(taskRevision);
             newTask.setLatestRevision(taskRevision);
             entityManager.persist(newTask);
@@ -283,12 +289,19 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, taskName, taskComment, startDate, endDate, OE, OE, assignedUser);
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser);
             newTask.getRevisions().add(taskRevision);
             newTask.setLatestRevision(taskRevision);
             newTask.setOrigin(origin);
             newTask.setRemotePath(remotePath);
             newTask.setRemoteId(remoteId);
+
+            newTask.setName(taskName);
+            newTask.setComments(taskComment);
+            newTask.setStartDate(startDate);
+            newTask.setEndDate(endDate);
+            newTask.setComments(taskComment);
+
             entityManager.persist(newTask);
             entityManager.merge(project);
             newTask.setProject(project);
@@ -418,8 +431,8 @@ public class ProjectServiceImpl implements ProjectService {
 
             TypedQuery<Task> q = entityManager
                     .createQuery("select distinct t from Task t left join fetch t.imputations where " +
-                                    "t.latestRevision.endDate >= :ds " +
-                                    "and t.latestRevision.startDate <= :de " +
+                                    "t.endDate >= :ds " +
+                                    "and t.startDate <= :de " +
                                     "and t.latestRevision.assigned = :actor "
                             , Task.class);
             q.setParameter("ds", ds);

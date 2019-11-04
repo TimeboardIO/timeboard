@@ -122,13 +122,13 @@ public class TimesheetRESTApi extends TimeboardServlet {
                 projectTasks.getTaskRevisions().stream().forEach(task -> {
                     tasks.add(new TaskWrapper(
                             task.getId(),
-                            task.getLatestRevision().getName(),
+                            task.getName(),
                             task.getEffortSpent(),
                             task.getRemainsToBeDone(),
                             task.getEstimateWork(),
                             task.getReEstimateWork(),
-                            task.getLatestRevision().getStartDate(),
-                            task.getLatestRevision().getEndDate()));
+                            task.getStartDate(),
+                            task.getEndDate()));
 
                     days.forEach(dateWrapper -> {
                         double i = task.findTaskImputationValueByDate(dateWrapper.date);
