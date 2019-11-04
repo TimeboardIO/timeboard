@@ -45,13 +45,15 @@ import java.util.Map;
                 "osgi.http.whiteboard.filter.regex=/*",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)",
                 "timeboard.security.login-url=/login",
-                "timeboard.security.logout-url=/logout"
+                "timeboard.security.logout-url=/logout",
+                "timeboard.security.newPassword-url=/newPassword"
         }
 )
 public class AuthSecurityFilter implements Filter {
 
     private String loginURL;
     private String logoutURL;
+    private String newPassword;
 
 
     @Reference
@@ -62,6 +64,7 @@ public class AuthSecurityFilter implements Filter {
         this.logService.log(LogService.LOG_INFO, "Security Filter is activated");
         this.loginURL = properties.get("timeboard.security.login-url");
         this.logoutURL = properties.get("timeboard.security.logout-url");
+        this.newPassword = properties.get("timeboard.security.newPassword-url");
     }
 
     @Override
@@ -75,6 +78,7 @@ public class AuthSecurityFilter implements Filter {
         HttpServletResponse res = (HttpServletResponse) response;
 
         boolean isLogin = req.getServletPath().equals(this.loginURL);
+        boolean isAskNewPassword = req.getServletPath().equals(this.newPassword);
         boolean isStatic =
                 req.getServletPath().startsWith("/static")
                         || req.getServletPath().equals("/favicon.ico");
@@ -85,7 +89,7 @@ public class AuthSecurityFilter implements Filter {
         }
 
 
-        if (!isLogged && !isStatic && !isLogin) {
+        if (!isLogged && !isStatic && !isLogin && !isAskNewPassword) {
             String origin = ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString();
             origin = URLEncoder.encode(origin, StandardCharsets.UTF_8.toString());
             res.sendRedirect(this.loginURL + "?origin=" + origin);

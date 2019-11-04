@@ -106,7 +106,7 @@ public class NewPasswordServlet extends TimeboardServlet {
             String from = "paasport@tsc-nantes.com"; // mail PAASPORT
             String to = user.getEmail();
             String subject = "Réinitisalisation du mot de passe";
-            String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n\" "
+            String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
                    + "Login: " + user.getLogin() + "\nMot de passe: " + newPassword;
 
             try {
@@ -139,6 +139,7 @@ public class NewPasswordServlet extends TimeboardServlet {
             } catch (Exception ex) {
                 System.out.println(ex);
             }
+
 
             response.sendRedirect(origin);
 
