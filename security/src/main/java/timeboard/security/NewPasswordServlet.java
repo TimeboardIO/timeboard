@@ -32,20 +32,19 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.api.LoginService;
-import timeboard.security.api.UsernamePasswordCredential;
 
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Properties;
 
 
 @Component(
@@ -82,7 +81,45 @@ public class NewPasswordServlet extends TimeboardServlet {
 
         if (user != null) {
 
-            // send email !!
+            /* send email */
+
+
+            String from = "paasport@tsc-nantes.com"; // mail PAASPORT
+            String to = "clarene.szymalka@mythalesgroup.io";
+            String subject = "subject";
+            String message = "message";
+            String login = "";
+            String password = "";
+
+            try {
+                Properties props = new Properties();
+                props.setProperty("mail.host", "10.10.0.48"); // host PAASPORT
+                props.setProperty("mail.smtp.port", "25"); // port PAASPORT
+                // props.setProperty("mail.smtp.auth", "true");
+                // props.setProperty("mail.smtp.starttls.enable", "true");
+
+                // Authenticator auth = new SMTPAuthenticator(login, password);
+
+                // Session session = Session.getInstance(props, auth);
+                Session session = Session.getInstance(props, null);
+
+                MimeMessage msg = new MimeMessage(session);
+                msg.setText(message);
+                msg.setSubject(subject);
+                msg.setFrom(new InternetAddress(from));
+                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
+                Transport.send(msg);
+
+            } catch (Exception ex) {
+                System.out.println(ex);
+            }
+
+
+            /* send email */
+
+
+
+
 
             response.sendRedirect(origin);
         } else {
@@ -92,6 +129,23 @@ public class NewPasswordServlet extends TimeboardServlet {
         }
 
     }
+
+
+    private class SMTPAuthenticator extends Authenticator {
+
+        private PasswordAuthentication authentication;
+
+        public SMTPAuthenticator(String login, String password) {
+            authentication = new PasswordAuthentication(login, password);
+        }
+
+        @Override
+        protected PasswordAuthentication getPasswordAuthentication() {
+            return authentication;
+        }
+    }
+
+
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
