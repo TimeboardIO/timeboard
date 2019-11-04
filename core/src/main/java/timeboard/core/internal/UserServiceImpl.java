@@ -123,6 +123,26 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void updateUserGeneratedPassword(Long userID, String newPassword) throws WrongPasswordException, UserException {
+
+        User user = this.findUserByID(userID);
+        if(user!=null){
+            this.jpa.txExpr(entityManager -> {
+                User u = entityManager.find(User.class, userID);
+
+                u.setPassword(this.hashPassword(newPassword));
+
+                entityManager.persist(u);
+                this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + "'s password has successfully been generated.");
+                return u;
+            });
+        }else {
+            throw new UserException("User does not exist.");
+        }
+
+    }
+
+    @Override
     public List<User> searchUserByName(final String prefix) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<User> q = entityManager

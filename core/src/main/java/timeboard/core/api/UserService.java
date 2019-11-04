@@ -114,7 +114,7 @@ public interface UserService {
 
 
     /**
-     * Update user
+     * Update user with new password
      *
      * @param userID user primary key
      * @param oldPassword old password
@@ -122,4 +122,14 @@ public interface UserService {
      * @throws WrongPasswordException old password is incorrect
      */
     void updateUserPassword(Long userID, String oldPassword, String newPassword) throws WrongPasswordException, UserException;
+
+
+    /**
+     * Update user with generate password
+     *
+     * @param userID user primary key
+     * @param newPassword new password
+     * @throws WrongPasswordException old password is incorrect
+     */
+    void updateUserGeneratedPassword(Long userID, String newPassword) throws WrongPasswordException, UserException;
 }
