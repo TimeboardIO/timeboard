@@ -120,6 +120,7 @@ public interface UserService {
      * @param oldPassword old password
      * @param newPassword new password
      * @throws WrongPasswordException old password is incorrect
+     * @throws UserException user does not exist
      */
     void updateUserPassword(Long userID, String oldPassword, String newPassword) throws WrongPasswordException, UserException;
 
@@ -129,7 +130,7 @@ public interface UserService {
      *
      * @param userID user primary key
      * @param newPassword new password
-     * @throws WrongPasswordException old password is incorrect
+     * @throws UserException user does not exist
      */
     void updateUserGeneratedPassword(Long userID, String newPassword) throws UserException;
 

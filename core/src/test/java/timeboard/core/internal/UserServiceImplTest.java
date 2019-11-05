@@ -38,6 +38,8 @@ import org.osgi.service.log.LogService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.exceptions.UserException;
+import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.internal.ProjectServiceImpl;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
@@ -45,14 +47,19 @@ import timeboard.core.model.User;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class UserServiceImplTest {
 
     private static JpaTemplate JPA;
 
+    private LogService mockLogService;
+    private UserService userService;
+
     @BeforeAll
-    public static void INIT(){
+    public void INIT(){
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("timeboard-pu-test", System.getProperties());
         EntityManager em = emf.createEntityManager();
         JpaTemplate jpaTemplate = new AbstractJpaTemplate(){
@@ -64,6 +71,10 @@ public class UserServiceImplTest {
         };
 
         JPA = jpaTemplate;
+
+
+        this.mockLogService = Mockito.mock(LogService.class);
+        this.userService = new UserServiceImpl(JPA, this.mockLogService);
     }
 
     /**
@@ -72,10 +83,6 @@ public class UserServiceImplTest {
      */
     @Test
     public void createUserTest() throws BusinessException {
-
-        LogService mockLogService = Mockito.mock(LogService.class);
-
-        UserService userService = new UserServiceImpl(JPA, mockLogService);
         User newUser = new User(
                 "login",
                 "password",
@@ -85,8 +92,198 @@ public class UserServiceImplTest {
                 new Date(),
                 new Date());
 
-        User createdUser = userService.createUser(newUser);
+        User createdUser = this.userService.createUser(newUser);
         Assertions.assertNotNull(createdUser);
+
+        User myUserInDB = this.userService.findUserByLogin(createdUser.getLogin());
+        Assertions.assertNotNull(myUserInDB);
+        Assertions.assertNotNull(myUserInDB.getId());
+        Assertions.assertEquals(myUserInDB.getFirstName(), createdUser.getFirstName());
+    }
+
+
+    /**
+     * Test of successful user list creation
+     * @throws BusinessException
+     */
+    @Test
+    public void createUsersTest() throws BusinessException {
+
+        List<User> usersList = new ArrayList<User>();
+        User newUser1 = new User(
+                "login1",
+                "password1",
+                "name1",
+                "firstName1",
+                "em1@il.com",
+                new Date(),
+                new Date());
+        usersList.add(newUser1);
+
+        User newUser2 = new User(
+                "login2",
+                "password2",
+                "name2",
+                "firstName2",
+                "em2@il.com",
+                new Date(),
+                new Date());
+        usersList.add(newUser2);
+
+        User newUser3 = new User(
+                "login3",
+                "password3",
+                "name3",
+                "firstName3",
+                "em3@il.com",
+                new Date(),
+                new Date());
+        usersList.add(newUser3);
+
+        List<User> createdUsers = this.userService.createUsers(usersList);
+        Assertions.assertNotNull(createdUsers);
+
+        Assertions.assertNotNull(userService.findUserByLogin(newUser1.getLogin()));
+        Assertions.assertNotNull(userService.findUserByLogin(newUser2.getLogin()));
+        Assertions.assertNotNull(userService.findUserByLogin(newUser3.getLogin()));
+    }
+
+
+    /**
+     * Test of successful user update
+     * @throws BusinessException
+     */
+    @Test
+    public void updateUserTest() throws BusinessException {
+        User newUser = new User(
+                "login",
+                "password",
+                "name",
+                "firstName",
+                "em@il.com",
+                new Date(),
+                new Date());
+        User createdUser = this.userService.createUser(newUser);
+
+        newUser.setLogin("newLogin");
+        newUser.setFirstName("newFirstname");
+        User updatedUser = this.userService.updateUser(newUser);
+        Assertions.assertNotNull(updatedUser);
+
+        User myUserInDB = this.userService.findUserByLogin(updatedUser.getLogin());
+        Assertions.assertNotNull(myUserInDB);
+        Assertions.assertNotEquals(myUserInDB.getFirstName(), createdUser.getFirstName());
+        Assertions.assertEquals(myUserInDB.getFirstName(), updatedUser.getFirstName());
+    }
+
+
+    /**
+     * Test of failure user update
+     * @throws BusinessException
+     */
+    @Test
+    public void updateUserKOTest() throws BusinessException {
+        User oldUser = new User(
+                "login",
+                "password",
+                "name",
+                "firstName",
+                "em@il.com",
+                new Date(),
+                new Date());
+        User createdUser = this.userService.createUser(oldUser);
+        Assertions.assertNotNull(createdUser);
+
+        User newUser = new User(
+                "Alogin",
+                "Apassword",
+                "Aname",
+                "AfirstName",
+                "Aem@il.com",
+                new Date(),
+                new Date());
+     /*   User updatedUser = this.userService.updateUser(newUser);
+        Assertions.assertNotNull(updatedUser);
+
+
+        User myOldUserInDB = this.userService.findUserByLogin(updatedUser.getLogin());
+        Assertions.assertNotNull(myOldUserInDB);
+        User myNewUserInDB = this.userService.findUserByLogin(updatedUser.getLogin());
+        Assertions.assertNotNull(myNewUserInDB);*/
+    }
+
+
+    /**
+     * Test of successful user password update
+     * @throws WrongPasswordException
+     * @throws BusinessException
+     * @throws UserException
+     */
+    @Test
+    public void updateUserPasswordTest() throws WrongPasswordException, UserException, BusinessException {
+        User newUser = new User(
+                "login",
+                "password",
+                "name",
+                "firstName",
+                "em@il.com",
+                new Date(),
+                new Date());
+
+        User createdUser = this.userService.createUser(newUser);
+        Assertions.assertNotNull(createdUser);
+
+        this.userService.updateUserPassword(createdUser.getId(), "password", "newPassword");
+
+
+    }
+
+
+    /**
+     * Test of failure user password update
+     * @throws WrongPasswordException
+     * @throws BusinessException
+     * @throws UserException
+     */
+    @Test
+    public void updateUserPasswordKOTest() throws WrongPasswordException, UserException, BusinessException {
+        User newUser = new User(
+                "login",
+                "password",
+                "name",
+                "firstName",
+                "em@il.com",
+                new Date(),
+                new Date());
+
+        User createdUser = this.userService.createUser(newUser);
+        Assertions.assertNotNull(createdUser);
+
+        this.userService.updateUserPassword(createdUser.getId(), "KOpasswordKO", "newPassword");
+
+
+    }
+
+
+    /**
+     * Test of successful user generated password update
+     * @throws BusinessException
+     * @throws UserException
+     */
+    @Test
+    public void updateUserGeneratedPassword() throws BusinessException, UserException {
+
+    }
+
+
+    /**
+     * Test of failure user generated password update
+     * @throws BusinessException
+     * @throws UserException
+     */
+    @Test
+    public void updateUserGeneratedKOPassword() throws BusinessException, UserException {
+
     }
 
 }
