@@ -344,9 +344,7 @@ public class ProjectServiceImpl implements ProjectService {
             c.set(Calendar.HOUR_OF_DAY, 2);
 
             AbstractTask task = entityManager.find(AbstractTask.class, taskID);
-            /*if(task == null){
-                task = entityManager.find(DefaultTask.class, taskID);
-            }*/
+            // special actions when task is a project task
             Task projectTask = (Task.class.isInstance(task)) ? (Task) task : null;
 
             TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
@@ -387,6 +385,7 @@ public class ProjectServiceImpl implements ProjectService {
             entityManager.flush();
 
             this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
+
             if(projectTask != null) { //project task
                 return new UpdatedTaskResult(projectTask.getProject().getId(), task.getId(), projectTask.getEffortSpent(), projectTask.getRemainsToBeDone(), projectTask.getEstimateWork(), projectTask.getReEstimateWork());
             }else{
