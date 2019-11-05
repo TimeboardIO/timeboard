@@ -51,7 +51,7 @@ public class Project implements Serializable {
     @Column(length = 500)
     private String comments;
 
-    @Column(columnDefinition = "CLOB NOT NULL")
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToProjectAttributsConverter.class)
     @Lob
     private Map<String, ProjectAttributValue> attributes;
