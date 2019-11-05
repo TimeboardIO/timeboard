@@ -1,4 +1,4 @@
-package timeboard.core.api;
+package timeboard.core.model;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,23 +26,21 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
 
-import java.util.List;
+public enum TaskStatus {
+    PENDING("En attente"),
+    IN_PROGESS("En cours"),
+    DONE("Réalisée");
 
-public interface ProjectImportService {
+    public final String label;
 
-    String getServiceName();
+    private TaskStatus(String label) {
+        this.label = label;
+    }
 
-    List<String> getRequiredUserFields();
-
-    /**
-     * Synchronize project tasks with remote source
-     * @param actor
-     * @param projectID
-     * @throws BusinessException
-     */
-    String importTasksToProject(User actor, long projectID) throws BusinessException;
-
+    String getLabel(){
+        return this.label;
+    }
 }
+
+

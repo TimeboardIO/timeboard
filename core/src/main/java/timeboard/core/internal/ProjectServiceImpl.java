@@ -258,7 +258,7 @@ public class ProjectServiceImpl implements ProjectService {
             newTask.setStartDate(startDate);
             newTask.setEndDate(endDate);
             newTask.setComments(taskComment);
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser);
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
             newTask.getRevisions().add(taskRevision);
             newTask.setLatestRevision(taskRevision);
             entityManager.persist(newTask);
@@ -289,7 +289,7 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser);
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
             newTask.getRevisions().add(taskRevision);
             newTask.setLatestRevision(taskRevision);
             newTask.setOrigin(origin);

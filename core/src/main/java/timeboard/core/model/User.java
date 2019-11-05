@@ -32,6 +32,8 @@ package timeboard.core.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table
@@ -51,7 +53,6 @@ public class User implements Serializable {
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private Date beginWorkDate;
-
 
     @Column(nullable = false)
     private String name;
@@ -74,6 +75,10 @@ public class User implements Serializable {
     @Column(nullable = true)
     private String matriculeID;
 
+    @Column(columnDefinition = "json")
+    @Convert(converter = JSONToMapStringConverter.class)
+    private Map<String, String> externalIDs;
+
 
     public User() {
     }
@@ -88,6 +93,7 @@ public class User implements Serializable {
         this.email = email;
         this.accountCreationTime = accountCreationTime;
         this.beginWorkDate = beginWorkDate;
+        this.externalIDs = new HashMap<>();
     }
 
     public long getId() {
@@ -177,6 +183,14 @@ public class User implements Serializable {
 
     public void setMatriculeID(String matriculeID) {
         this.matriculeID = matriculeID;
+    }
+
+    public Map<String, String> getExternalIDs() {
+        return externalIDs;
+    }
+
+    public void setExternalIDs(Map<String, String> externalIDs) {
+        this.externalIDs = externalIDs;
     }
 
 

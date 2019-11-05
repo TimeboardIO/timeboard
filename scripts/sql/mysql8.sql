@@ -92,6 +92,7 @@
         accountCreationTime date not null,
         beginWorkDate date not null,
         email varchar(255) not null,
+        externalIDs json,
         firstName varchar(255) not null,
         imputationFutur bit not null,
         login varchar(50) not null,
