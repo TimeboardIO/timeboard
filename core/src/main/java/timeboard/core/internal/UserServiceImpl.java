@@ -61,6 +61,14 @@ public final class UserServiceImpl implements UserService {
     @Reference
     private LogService logService;
 
+    public UserServiceImpl(){
+
+    }
+
+    public UserServiceImpl(JpaTemplate jpaTemplate) {
+        this.jpa = jpaTemplate;
+    }
+
     @Override
     public User createUser(final User user) throws BusinessException {
 
