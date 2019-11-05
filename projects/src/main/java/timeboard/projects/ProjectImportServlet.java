@@ -68,6 +68,13 @@ public class ProjectImportServlet extends HttpServlet {
     private List<ProjectImportService> projectImportServlets;
 
     @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        final long projectID = Long.parseLong(req.getParameter("projectID"));
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
+        requestDispatcher.forward(req, resp);
+    }
+
+    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         final String type = req.getParameter("type");
