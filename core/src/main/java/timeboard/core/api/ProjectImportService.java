@@ -29,9 +29,13 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
 
+import java.util.List;
+
 public interface ProjectImportService {
 
     String getServiceName();
+
+    List<String> getRequiredUserFields();
 
     /**
      * Synchronize project tasks with remote source

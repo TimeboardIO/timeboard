@@ -40,6 +40,8 @@ import org.osgi.service.component.annotations.Reference;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Component(
@@ -50,6 +52,8 @@ public class JiraImportPlugin implements ProjectImportService {
 
     private static final String JIRA_USERNAME_KEY = "jira.username";
     private static final String JIRA_PASSWORD_KEY = "jira.password";
+    private static final String JIRA_USER_FIELD = "jira";
+    private static final List<String> JIRA_USER_FIELDS = new ArrayList<>();
 
     @Reference
     private ProjectService projectService;
@@ -57,6 +61,13 @@ public class JiraImportPlugin implements ProjectImportService {
     @Override
     public String getServiceName() {
         return "Jira";
+    }
+
+
+    @Override
+    public List<String> getRequiredUserFields() {
+        if(JIRA_USER_FIELDS.size() != 1) JIRA_USER_FIELDS.add(JIRA_USER_FIELD);
+        return JIRA_USER_FIELDS;
     }
 
     @Override

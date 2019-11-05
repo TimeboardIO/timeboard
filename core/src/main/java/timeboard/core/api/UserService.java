@@ -132,4 +132,6 @@ public interface UserService {
      * @throws WrongPasswordException old password is incorrect
      */
     void updateUserGeneratedPassword(Long userID, String newPassword) throws UserException;
+
+    User findUserByExternalID(String origin, String userExternalID);
 }

@@ -30,6 +30,7 @@ import org.eclipse.egit.github.core.client.RequestException;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import org.eclipse.egit.github.core.Issue;
@@ -41,6 +42,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,13 +59,26 @@ public class GithubImportPlugin implements ProjectImportService {
     private static final String GITHUB_REPO_NAME_KEY = "github.repo.name";
 
     private static final String GITHUB_ORIGIN_KEY = "github";
+    private static final String GITHUB_USER_FIELD = GITHUB_ORIGIN_KEY;
+
+    private static final List<String> GITHUB_USER_FIELDS = new ArrayList<>();
 
     @Reference
     private ProjectService projectService;
 
+    @Reference
+    private UserService userService;
+
+
     @Override
     public String getServiceName() {
-        return "Github issues";
+        return "Github Issues";
+    }
+
+    @Override
+    public List<String> getRequiredUserFields() {
+        if(GITHUB_USER_FIELDS.size() != 1) GITHUB_USER_FIELDS.add(GITHUB_USER_FIELD);
+        return GITHUB_USER_FIELDS;
     }
 
     @Override
@@ -102,17 +117,34 @@ public class GithubImportPlugin implements ProjectImportService {
                 Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue());
 
                 issues.stream().forEach(issue -> {
+                    User existingUser = null;
+                    if(issue.getAssignee() != null){
+                        try{
+                            existingUser = this.userService.findUserByExternalID(GITHUB_USER_FIELD, issue.getAssignee().getLogin());
+                            //verify that found user is member of target project
+                            if(!projectService.listProjects(existingUser).contains(targetProject)){
+                                existingUser = null;
+                            }
+                        }catch(Exception e){
+                            // no existing user found
+                            existingUser = null;
+                        }
+                    }
+
                     if (!existingTasks.containsKey(issue.getId())) {
                         // task does not exist, so create it
                         Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
                                 issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
-                                0, null, null,
+                                0, null, existingUser,
                                 GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue(), issue.getId());
                         nbTaskCreated.incrementAndGet();
                     } else {
+
                         // task already exist, so update it
                         Task task = existingTasks.get(issue.getId());
                         final TaskRevision latestRevision = task.getLatestRevision();
+                        //keep existing assignment if new user assignee is not found TODO CHECK IF IS FUNCTIONALLY CORRECT
+                        if(existingUser == null) existingUser = latestRevision.getAssigned();
                         TaskRevision revision = new TaskRevision(actor,
                                 task,
                                 issue.getTitle(),
@@ -121,7 +153,7 @@ public class GithubImportPlugin implements ProjectImportService {
                                 issue.getClosedAt(),
                                 latestRevision.getEstimateWork(),
                                 latestRevision.getRemainsToBeDone(),
-                                latestRevision.getAssigned(),
+                                existingUser,
                                 latestRevision.getTaskStatus());
                         this.projectService.updateTask(actor, task, revision);
                         existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
@@ -140,6 +172,7 @@ public class GithubImportPlugin implements ProjectImportService {
                         "<li>" + nbTaskUpdated + " tasks updated</li>" +
                         "<li>" + nbTaskRemoved + " tasks removed</li>" +
                         "</ul>";
+
             } catch (RequestException e) {
                 throw new BusinessException("Github configuration is incorrect.");
             }
