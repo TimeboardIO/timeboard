@@ -31,6 +31,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
             <version>6.0.0</version>
@@ -71,7 +77,8 @@
                             timeboard.core.api.*,
                             timeboard.core.model,
                             !com.sun.jdi,
-                            *
+                            *,
+                            javax.mail.*
                         </Import-Package>
                         <Export-Package>
                             timeboard.security,
