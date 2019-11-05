@@ -265,8 +265,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             }
             taskName = request.getParameter("taskName");
             taskComment = request.getParameter("taskComments");
-            startDate = DATE_FORMAT.parse(request.getParameter("taskStartDate"));
-            endDate = DATE_FORMAT.parse(request.getParameter("taskEndDate"));
+            startDate = new Date(DATE_FORMAT.parse(request.getParameter("taskStartDate")).getTime()+(2 * 60 * 60 * 1000) +1);
+            endDate = new Date(DATE_FORMAT.parse(request.getParameter("taskEndDate")).getTime()+(2 * 60 * 60 * 1000) +1);
             estimateWork = Double.parseDouble(request.getParameter("taskEstimateWork"));
             taskStatus = request.getParameter("taskStatus") != null ? TaskStatus.valueOf(request.getParameter("taskStatus")) : TaskStatus.PENDING;
 
