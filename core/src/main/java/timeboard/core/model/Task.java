@@ -29,6 +29,7 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -190,7 +191,7 @@ public class Task implements Serializable {
     @Transient
     public double findTaskImputationValueByDate(Date date) {
         Optional<Imputation> iOpt = this.getImputations().stream()
-                .filter(imputation -> imputation.getDay().equals(date))
+                .filter(imputation -> this.areDateSameDay(date, imputation.getDay()))
                 .findFirst();
         if (iOpt.isPresent()) {
             return iOpt.get().getValue();
@@ -205,5 +206,9 @@ public class Task implements Serializable {
 
     public void setRevisions(List<TaskRevision> revisions) {
         this.revisions = revisions;
+    }
+
+    private boolean areDateSameDay(Date date1, Date date2){
+        return new SimpleDateFormat("yyyy-MM-dd").format(date1).equals(new SimpleDateFormat("yyyy-MM-dd").format(date2));
     }
 }

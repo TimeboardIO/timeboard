@@ -65,6 +65,7 @@
         remainsToBeDone double precision not null,
         revisionDate datetime(6),
         startDate date,
+        taskStatus integer,
         assigned_id bigint,
         revisionActor_id bigint,
         task_id bigint,
