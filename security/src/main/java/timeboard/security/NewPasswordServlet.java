@@ -33,17 +33,15 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.api.LoginService;
+import timeboard.security.api.EmailService;
 
 import javax.mail.*;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.security.SecureRandom;
 
 
@@ -64,6 +62,9 @@ public class NewPasswordServlet extends TimeboardServlet {
     List<LoginService> loginServices;
 
     @Reference
+    EmailService emailService;
+
+    @Reference
     UserService userService;
 
     private static SecureRandom random = new SecureRandom();
@@ -74,11 +75,6 @@ public class NewPasswordServlet extends TimeboardServlet {
     private static final String NUMERIC = "0123456789";
     private static final String SPECIAL_CHARS = "#$^+=!()*@~%&/";
 
-    private static final String mailPAASPORT = "paasport@tsc-nantes.com";
-    private static final String hostPAASPORT = "10.10.0.48";
-    private static final String portPAASPORT = "25";
-
-
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -87,8 +83,7 @@ public class NewPasswordServlet extends TimeboardServlet {
 
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) {
-        viewModel.setTemplate("security:newPassword.html");
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws MessagingException, UserException {
         String username = request.getParameter("username");
 
         User user = null;
@@ -101,36 +96,16 @@ public class NewPasswordServlet extends TimeboardServlet {
 
         if (user != null) {
 
-            final String newPassword = generatePassword(DEFAULT_SIZE_PASSWORD, ALPHA_CAPS + ALPHA + NUMERIC + SPECIAL_CHARS);
+            final String newPassword = generatePassword();
 
-            String from = mailPAASPORT;
+            this.userService.updateUserGeneratedPassword(user.getId(), newPassword);
+
             String to = user.getEmail();
             String subject = "Réinitisalisation du mot de passe";
             String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
-                   + "Login: " + user.getLogin() + "\nMot de passe: " + newPassword;
+                    + "Login: " + user.getLogin() + "\nMot de passe: " + newPassword;
+            this.emailService.sendMessage(to, subject, message);
 
-            try {
-
-                this.userService.updateUserGeneratedPassword(user.getId(), newPassword);
-
-                Properties props = new Properties();
-                props.setProperty("mail.host", hostPAASPORT);
-                props.setProperty("mail.smtp.port", portPAASPORT);
-
-                Session session = Session.getInstance(props, null);
-
-                MimeMessage msg = new MimeMessage(session);
-                msg.setText(message);
-                msg.setSubject(subject);
-                msg.setFrom(new InternetAddress(from));
-                msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
-                Transport.send(msg);
-
-            } catch (UserException e) {
-                e.printStackTrace();
-            } catch (MessagingException e) {
-                e.printStackTrace();
-            }
 
             viewModel.setTemplate("security:newPassword.html");
             viewModel.getViewDatas().put("isSuccess", true);
@@ -144,11 +119,14 @@ public class NewPasswordServlet extends TimeboardServlet {
 
     }
 
-    private static String generatePassword(int len, String dic) {
+    private static String generatePassword() {
+        String allPossibilities = ALPHA_CAPS + ALPHA + NUMERIC + SPECIAL_CHARS;
+        int passwordLength = DEFAULT_SIZE_PASSWORD;
+
         String result = "";
-        for (int i = 0; i < len; i++) {
-            int index = random.nextInt(dic.length());
-            result += dic.charAt(index);
+        for (int i = 0; i < passwordLength; i++) {
+            int index = random.nextInt(allPossibilities.length());
+            result += allPossibilities.charAt(index);
         }
         return result;
     }
