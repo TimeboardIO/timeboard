@@ -65,8 +65,9 @@ public final class UserServiceImpl implements UserService {
 
     }
 
-    public UserServiceImpl(JpaTemplate jpaTemplate) {
+    public UserServiceImpl(JpaTemplate jpaTemplate, LogService logService) {
         this.jpa = jpaTemplate;
+        this.logService = logService;
     }
 
     @Override

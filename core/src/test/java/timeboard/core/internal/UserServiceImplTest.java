@@ -32,6 +32,9 @@ import org.apache.aries.jpa.template.TransactionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.osgi.service.log.LogService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -42,6 +45,7 @@ import timeboard.core.model.User;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.util.Date;
 
 public class UserServiceImplTest {
 
@@ -62,16 +66,27 @@ public class UserServiceImplTest {
         JPA = jpaTemplate;
     }
 
+    /**
+     * Test of successful user creation
+     * @throws BusinessException
+     */
     @Test
     public void createUserTest() throws BusinessException {
 
+        LogService mockLogService = Mockito.mock(LogService.class);
 
-        UserService userService = new UserServiceImpl(JPA);
-        User newUser = new User();
-        newUser.setName("Hello");
-        newUser.setPassword("World");
-        newUser.setEmail("newuser@helloworld.com");
-        userService.createUser(newUser);
+        UserService userService = new UserServiceImpl(JPA, mockLogService);
+        User newUser = new User(
+                "login",
+                "password",
+                "name",
+                "firstName",
+                "em@il.com",
+                new Date(),
+                new Date());
+
+        User createdUser = userService.createUser(newUser);
+        Assertions.assertNotNull(createdUser);
     }
 
 }
