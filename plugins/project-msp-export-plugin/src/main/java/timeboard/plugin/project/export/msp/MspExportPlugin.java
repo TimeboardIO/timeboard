@@ -68,9 +68,9 @@ public class MspExportPlugin implements ProjectExportService {
 
         this.projectService.listProjectTasks(project).forEach(task -> {
             Task mspTask = projectFile.addTask();
-            mspTask.setName(task.getLatestRevision().getName());
-            mspTask.setStart(task.getLatestRevision().getStartDate());
-            mspTask.setStop(task.getLatestRevision().getEndDate());
+            mspTask.setName(task.getName());
+            mspTask.setStart(task.getStartDate());
+            mspTask.setStop(task.getEndDate());
             mspTask.setBaselineCost(task.getEstimateWork());
         });
 

@@ -31,7 +31,7 @@
                 <tr th:each="task : ${tasks}">
                     <td>
                         <a th:href="@{/projects/tasks/config(projectID=${project.id}, taskID=${task.id})}"
-                           th:text="${task.latestRevision.name}"></a>
+                           th:text="${task.name}"></a>
                     </td>
                 </tr>
                 </tbody>

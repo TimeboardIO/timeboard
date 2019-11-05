@@ -79,7 +79,7 @@ public class XlsExportPlugin implements ProjectExportService {
 
                HSSFRow taskRow = sheet.createRow(rowNum);
 
-               taskRow.createCell(0).setCellValue(task.getLatestRevision().getName());
+               taskRow.createCell(0).setCellValue(task.getName());
                taskRow.createCell(1).setCellValue(task.getEstimateWork());
                rowNum++;
            }

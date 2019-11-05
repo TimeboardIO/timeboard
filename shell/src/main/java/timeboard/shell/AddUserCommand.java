@@ -69,7 +69,6 @@ public class AddUserCommand implements Action {
         user.setLogin(username);
         user.setAccountCreationTime(new Date());
         userService.createUser(user);
-        System.out.println("User "+username+" is created !");
         return null;
     }
 }

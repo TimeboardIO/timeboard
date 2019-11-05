@@ -113,6 +113,10 @@ Now, you can login into Timeboard with
     username : timeboard
     password : pwd      
         
+##### Create default tasks 
+    timeboard:add-default-task -n 'Congés' \
+    timeboard:add-default-task -n 'Maladie' \
+    timeboard:add-default-task -n 'Rupture de charge'
 
 ## For test with Docker
 

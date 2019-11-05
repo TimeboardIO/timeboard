@@ -51,8 +51,6 @@
                                 {{ day.day }} {{ new Date(day.date).getDate() }}
                             </th>
                             <th class="wide one project" colspan="4"></th>
-
-
                         </tr>
                         <tr>
                             <th class="two wide">Task</th>
@@ -109,8 +107,9 @@
                                      <i class="search icon hidden" style="color: transparent;"></i>
                                     </div>
                                 </td>
-                                <td v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
-                                <td>
+                                <td colspan="4" v-if="projectID == 0" ></td>
+                                <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
+                                <td v-if="projectID > 0">
                                     <div class="ui input">
                                     <input
                                         min="0"
@@ -125,8 +124,8 @@
 
                                     </div>
                                 </td>
-                                <td v-bind:data-task-ew="taskID">{{task.estimateWork.toFixed(1)}}</td>
-                                <td
+                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID">{{task.estimateWork.toFixed(1)}}</td>
+                                <td v-if="projectID > 0"
                                         v-bind:data-task-rew="taskID">{{task.reEstimateWork.toFixed(1)}}
                                 </td>
                             </tr>

@@ -34,11 +34,8 @@ import java.util.*;
 
 
 @Entity
-public class Task implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+@PrimaryKeyJoinColumn(name = "id")
+public class Task extends AbstractTask implements Serializable {
 
     @OneToOne(targetEntity = TaskRevision.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private TaskRevision latestRevision;
@@ -46,6 +43,9 @@ public class Task implements Serializable {
     @OneToMany(targetEntity = TaskRevision.class, mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("revisionDate desc")
     private List<TaskRevision> revisions;
+
+    @Column(nullable = false)
+    private double estimateWork;
 
     /**
      * Task creation origin
@@ -65,12 +65,10 @@ public class Task implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
-    private Set<Imputation> imputations;
 
     public Task() {
+        super();
         this.revisions = new ArrayList<>();
-        this.imputations = new HashSet<>();
     }
 
 
@@ -82,12 +80,12 @@ public class Task implements Serializable {
         this.latestRevision = latestRevision;
     }
 
-    public Long getId() {
-        return id;
+    public double getEstimateWork() {
+        return estimateWork;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setEstimateWork(double estimateWork) {
+        this.estimateWork = estimateWork;
     }
 
     public String getOrigin() {
@@ -114,21 +112,7 @@ public class Task implements Serializable {
         this.project = project;
     }
 
-    public Set<Imputation> getImputations() {
-        return imputations;
-    }
 
-    public void setImputations(Set<Imputation> imputations) {
-        this.imputations = imputations;
-    }
-
-    public double getEstimateWork(){
-        if(this.getLatestRevision() != null) {
-            return this.getLatestRevision().getEstimateWork();
-        }else{
-            return 0;
-        }
-    }
 
     /**
      * EL.

@@ -147,14 +147,13 @@ public class GithubImportPlugin implements ProjectImportService {
                         if(existingUser == null) existingUser = latestRevision.getAssigned();
                         TaskRevision revision = new TaskRevision(actor,
                                 task,
-                                issue.getTitle(),
-                                issue.getBodyHtml(),
-                                issue.getCreatedAt(),
-                                issue.getClosedAt(),
-                                latestRevision.getEstimateWork(),
                                 latestRevision.getRemainsToBeDone(),
-                                existingUser,
-                                latestRevision.getTaskStatus());
+                                latestRevision.getAssigned());
+
+                        task.setName(issue.getTitle());
+                        task.setComments(issue.getBodyHtml());
+                        task.setEndDate(issue.getClosedAt());
+                        task.setStartDate(issue.getCreatedAt());
                         this.projectService.updateTask(actor, task, revision);
                         existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
                         nbTaskUpdated.incrementAndGet();

@@ -1,0 +1,43 @@
+@startuml
+
+Task "1" -- "*" TaskRevision
+Task "1" -- "1" State
+Task "*" -- "1" Project
+TaskRevision -- "1" User :assignee
+Project "*" -- "*" User
+Task  -- "1" TaskType
+Imputation "1" -- "*" Task
+
+
+
+class Task {
+Long id
+String origin
+String remotePath
+String remoteId
+
+}
+
+class TaskRevision {
+String name
+String description
+Double RE
+Double OE
+Date startDate
+Date endDate
+Date revisionDate
+
+}
+
+enum State {
+  OPEN
+  IN_PROGRESS
+  CLOSED
+}
+class TaskType {
+  String typeName
+}
+
+
+
+@enduml

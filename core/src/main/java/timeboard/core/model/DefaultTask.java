@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,59 +26,18 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
+
+import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import java.io.Serializable;
-import java.util.Date;
+
 
 @Entity
-@Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
-)
-public class Imputation implements Serializable {
+@PrimaryKeyJoinColumn(name = "id")
+public class DefaultTask extends AbstractTask implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    @Column
-    private Double value;
-
-    @Column
-    @Temporal(TemporalType.DATE)
-    private Date day;
-
-    @ManyToOne(targetEntity = AbstractTask.class)
-    private AbstractTask task;
-
-    public long getId() {
-        return id;
+    public DefaultTask() {
+        super();
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
-        this.value = value;
-    }
-
-    public Date getDay() {
-        return day;
-    }
-
-    public void setDay(Date day) {
-        this.day = day;
-    }
-
-    public AbstractTask getTask() {
-        return task;
-    }
-
-    public void setTask(AbstractTask task) {
-        this.task = task;
-    }
 }

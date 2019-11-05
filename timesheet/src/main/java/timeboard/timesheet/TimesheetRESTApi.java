@@ -122,13 +122,13 @@ public class TimesheetRESTApi extends TimeboardServlet {
                 projectTasks.getTaskRevisions().stream().forEach(task -> {
                     tasks.add(new TaskWrapper(
                             task.getId(),
-                            task.getLatestRevision().getName(),
+                            task.getName(),
                             task.getEffortSpent(),
                             task.getRemainsToBeDone(),
                             task.getEstimateWork(),
                             task.getReEstimateWork(),
-                            task.getLatestRevision().getStartDate(),
-                            task.getLatestRevision().getEndDate()));
+                            task.getStartDate(),
+                            task.getEndDate()));
 
                     days.forEach(dateWrapper -> {
                         double i = task.findTaskImputationValueByDate(dateWrapper.date);
@@ -141,7 +141,33 @@ public class TimesheetRESTApi extends TimeboardServlet {
                         projectTasks.getProject().getName(),
                         tasks));
             });
-        }
+
+            //Default tasks
+            List<TaskWrapper> tasks = new ArrayList<>();
+
+            this.projectService.listDefaultTasks(ds, de).stream().forEach(task -> {
+                tasks.add(new TaskWrapper(
+                        task.getId(),
+                        task.getName(),
+                        0,
+                        0,
+                        0,
+                        0,
+                        task.getStartDate(),
+                        task.getEndDate()));
+
+                days.forEach(dateWrapper -> {
+                    double i = task.findTaskImputationValueByDate(dateWrapper.date);
+                    imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
+                });
+
+            });
+            projects.add(new ProjectWrapper(
+                    0,
+                    "Default Tasks",
+                    tasks));
+
+            }
 
         if (this.timesheetService != null) {
             validated = this.timesheetService.isTimesheetValidated(SecurityContext.getCurrentUser(request), year, week);
