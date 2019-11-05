@@ -131,5 +131,5 @@ public interface UserService {
      * @param newPassword new password
      * @throws WrongPasswordException old password is incorrect
      */
-    void updateUserGeneratedPassword(Long userID, String newPassword) throws WrongPasswordException, UserException;
+    void updateUserGeneratedPassword(Long userID, String newPassword) throws UserException;
 }

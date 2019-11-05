@@ -29,7 +29,6 @@ package timeboard.security;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.UserException;
-import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -39,10 +38,8 @@ import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.Servlet;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +74,10 @@ public class NewPasswordServlet extends TimeboardServlet {
     private static final String NUMERIC = "0123456789";
     private static final String SPECIAL_CHARS = "#$^+=!()*@~%&/";
 
+    private static final String mailPAASPORT = "paasport@tsc-nantes.com";
+    private static final String hostPAASPORT = "10.10.0.48";
+    private static final String portPAASPORT = "25";
+
 
 
     @Override
@@ -86,24 +87,23 @@ public class NewPasswordServlet extends TimeboardServlet {
 
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, UserException, WrongPasswordException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) {
         viewModel.setTemplate("security:newPassword.html");
         String username = request.getParameter("username");
-        String origin = request.getParameter("origin");
 
         User user = null;
 
         try {
             user = this.userService.findUserByLogin(username);
-        }catch (Exception ex){
-            System.out.println(ex);
+        }catch (Exception e){
+            System.out.println(e);
         }
 
         if (user != null) {
 
             final String newPassword = generatePassword(DEFAULT_SIZE_PASSWORD, ALPHA_CAPS + ALPHA + NUMERIC + SPECIAL_CHARS);
 
-            String from = "paasport@tsc-nantes.com"; // mail PAASPORT
+            String from = mailPAASPORT;
             String to = user.getEmail();
             String subject = "Réinitisalisation du mot de passe";
             String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
@@ -114,18 +114,8 @@ public class NewPasswordServlet extends TimeboardServlet {
                 this.userService.updateUserGeneratedPassword(user.getId(), newPassword);
 
                 Properties props = new Properties();
-                props.setProperty("mail.host", "10.10.0.48"); // host PAASPORT
-                props.setProperty("mail.smtp.port", "25"); // port PAASPORT
-
-                /*
-                // Si authentification nécessaire
-                props.setProperty("mail.smtp.auth", "true");
-                    "username: " + user.getLogin() + "\npassword: " + password;
-                String loginAuth = "";
-                String passwordAuth = "";
-                Authenticator auth = new SMTPAuthenticator(loginAuth, passwordAuth);
-                Session session = Session.getInstance(props, auth);
-                 */
+                props.setProperty("mail.host", hostPAASPORT);
+                props.setProperty("mail.smtp.port", portPAASPORT);
 
                 Session session = Session.getInstance(props, null);
 
@@ -136,38 +126,23 @@ public class NewPasswordServlet extends TimeboardServlet {
                 msg.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
                 Transport.send(msg);
 
-            } catch (Exception ex) {
-                System.out.println(ex);
+            } catch (UserException e) {
+                e.printStackTrace();
+            } catch (MessagingException e) {
+                e.printStackTrace();
             }
 
-
-            response.sendRedirect(origin);
+            viewModel.setTemplate("security:newPassword.html");
+            viewModel.getViewDatas().put("isSuccess", true);
 
         } else {
             response.setStatus(403);
-            viewModel.getViewDatas().put("message", "Username incorrect.");
             viewModel.setTemplate("security:newPassword.html");
+            viewModel.getViewDatas().put("message", "Username incorrect.");
+            viewModel.getViewDatas().put("isSuccess", false);
         }
 
     }
-
-
-    /*
-    // Si authentification nécessaire
-    private class SMTPAuthenticator extends Authenticator {
-
-        private PasswordAuthentication authentication;
-
-        public SMTPAuthenticator(String login, String password) {
-            authentication = new PasswordAuthentication(login, password);
-        }
-
-        @Override
-        protected PasswordAuthentication getPasswordAuthentication() {
-            return authentication;
-        }
-    }
-    */
 
     private static String generatePassword(int len, String dic) {
         String result = "";
@@ -181,7 +156,7 @@ public class NewPasswordServlet extends TimeboardServlet {
 
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) {
         viewModel.setTemplate("security:newPassword.html");
         Map<String, Object> templateDatas = new HashMap<>();
         String origin = "/";
@@ -189,6 +164,7 @@ public class NewPasswordServlet extends TimeboardServlet {
             origin = request.getParameter("origin");
         }
         templateDatas.put("origin", origin);
+        viewModel.getViewDatas().put("isSuccess", false);
         viewModel.getViewDatas().putAll(templateDatas);
     }
 

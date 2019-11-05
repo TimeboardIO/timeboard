@@ -123,7 +123,7 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserGeneratedPassword(Long userID, String newPassword) throws WrongPasswordException, UserException {
+    public void updateUserGeneratedPassword(Long userID, String newPassword) throws UserException {
 
         User user = this.findUserByID(userID);
         if(user!=null){
