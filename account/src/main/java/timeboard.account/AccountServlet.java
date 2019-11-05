@@ -26,13 +26,13 @@ package timeboard.account;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.component.annotations.*;
+import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.api.exceptions.WrongPasswordException;
+import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -43,6 +43,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 
 @Component(
@@ -57,6 +60,13 @@ public class AccountServlet extends TimeboardServlet {
 
     @Reference
     private UserService userService;
+
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            collectionType = CollectionType.SERVICE
+    )
+    private List<ProjectImportService> projectImportServlets;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -74,8 +84,6 @@ public class AccountServlet extends TimeboardServlet {
             String newPassword = request.getParameter("password1");
             String oldPassword = request.getParameter("oldPassword");
 
-                //TODO Security checking
-
                 user.setPassword(newPassword);
                 try {
                     userService.updateUserPassword(user.getId(), oldPassword, newPassword);
@@ -92,7 +100,7 @@ public class AccountServlet extends TimeboardServlet {
                 }
 
 
-        }else if(submitButton .matches("account")){
+        }else if(submitButton.matches("account")){
             //Account modification
            String fistName = request.getParameter("firstName");
            String name = request.getParameter("name");
@@ -110,20 +118,48 @@ public class AccountServlet extends TimeboardServlet {
            }catch  (Exception e){
                viewModel.getViewDatas().put("error", "Error while updating user information.");
            }
+        }else if(submitButton.matches("external")){
+            Enumeration<String> params1 = request.getParameterNames();
+            while (params1.hasMoreElements()) {
+                String param = params1.nextElement();
+                if (param.startsWith("attr-")) {
+                    String key = param.substring(5, param.length());
+                    String value = request.getParameter(param);
+                    user.getExternalIDs().put(key, value);
+                }
+            }
+            try{
+                User u = userService.updateUser(user);
+                viewModel.getViewDatas().put("message", "External tools updated successfully !");
+            }catch  (Exception e){
+                viewModel.getViewDatas().put("error", "Error while external tools");
+            }
         }
-        viewModel.getViewDatas().put("user", user);
 
-        viewModel.setTemplate("account:account.html");
+
+        loadPage(viewModel, user);
+
     }
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         User user = SecurityContext.getCurrentUser(request);
 
+        loadPage(viewModel, user);
+    }
+    
+    private void loadPage(ViewModel viewModel, User user){
         viewModel.getViewDatas().put("user", user);
+
+        List<String> fieldNames = new ArrayList<>();
+        //import external ID field name from import plugins list
+        projectImportServlets.forEach(service -> {
+            fieldNames.addAll(service.getRequiredUserFields());
+        });
+
+        viewModel.getViewDatas().put("externalTools", fieldNames);
 
         viewModel.setTemplate("account:account.html");
     }
-
 
 }

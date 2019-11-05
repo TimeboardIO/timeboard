@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -93,6 +94,7 @@ public final class UserServiceImpl implements UserService {
             u.setName(user.getName());
             u.setLogin(user.getLogin());
             u.setEmail(user.getEmail());
+            u.setExternalIDs(user.getExternalIDs());
 
             entityManager.persist(u);
             this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
@@ -184,6 +186,18 @@ public final class UserServiceImpl implements UserService {
         }
         return jpa.txExpr(entityManager -> entityManager
                 .find(User.class, userID));
+    }
+
+    @Override
+    public User findUserByExternalID(String origin, String userExternalID) {
+        return this.jpa.txExpr(entityManager -> {
+            Query q = entityManager // MYSQL native for JSON queries
+                    .createNativeQuery("select * from User "
+                            + "where JSON_EXTRACT(externalIDs, '$."+origin+"')" +
+                            " = ?", User.class);
+            q.setParameter(1, userExternalID);
+            return (User) q.getSingleResult();
+        });
     }
 
     private String hashPassword(String password){
