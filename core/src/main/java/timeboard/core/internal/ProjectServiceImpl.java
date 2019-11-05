@@ -59,6 +59,11 @@ public class ProjectServiceImpl implements ProjectService {
     private JpaTemplate jpa;
 
 
+    public ProjectServiceImpl(){}
+
+    public ProjectServiceImpl(JpaTemplate jpa){
+     this.jpa = jpa;
+    }
 
     @Override
     public Project createProject(User owner, String projectName) throws BusinessException {
