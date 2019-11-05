@@ -47,6 +47,15 @@
             </select>
         </div>
         <div class="field">
+            <label>Task status</label>
+            <select  name="taskStatus" th:disabled="${task.taskID == null}">
+                <option th:each="status: ${allTaskStatus}"
+                        th:text="${status.label}"
+                        th:value="${status}"
+                        th:selected="${status == task.taskStatus}"></option>
+            </select>
+        </div>
+        <div class="field">
             <label>User assigned</label>
             <div class="ui category search">
                 <div class="ui icon input">
