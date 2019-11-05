@@ -148,7 +148,8 @@ public class GithubImportPlugin implements ProjectImportService {
                         TaskRevision revision = new TaskRevision(actor,
                                 task,
                                 latestRevision.getRemainsToBeDone(),
-                                latestRevision.getAssigned());
+                                latestRevision.getAssigned(),
+                                latestRevision.getTaskStatus());
 
                         task.setName(issue.getTitle());
                         task.setComments(issue.getBodyHtml());
