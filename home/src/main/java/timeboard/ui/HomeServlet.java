@@ -85,7 +85,7 @@ public class HomeServlet extends TimeboardServlet {
         User user = SecurityContext.getCurrentUser(request);
         int weeksToDisplay = 3; //TODO replace by a parameter ?
         for(int i=0; i<weeksToDisplay; i++){
-            double weekSum = timesheetService.getWeekImputationSum(user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+            double weekSum = 0;
             boolean weekIsValidated =timesheetService.isTimesheetValidated(user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
 
             Week week = new Week(c.get(Calendar.WEEK_OF_YEAR),c.get(Calendar.YEAR), weekSum, weekIsValidated);

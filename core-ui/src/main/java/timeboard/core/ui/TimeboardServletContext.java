@@ -35,8 +35,6 @@ import org.osgi.service.http.context.ServletContextHelper;
         service = ServletContextHelper.class,
         scope = ServiceScope.BUNDLE,
         property = {
-
-                Constants.SERVICE_RANKING + ":Integer=900",
                 "osgi.http.whiteboard.context.name=timeboard",
                 "osgi.http.whiteboard.context.path=/"})
 public class TimeboardServletContext extends ServletContextHelper {

@@ -44,6 +44,7 @@ import timeboard.core.model.User;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 import java.util.Date;
 
@@ -59,7 +60,10 @@ public class UserServiceImplTest {
 
             @Override
             public <R> R txExpr(TransactionType transactionType, EmFunction<R> emFunction) {
-                return emFunction.apply(em);
+                em.getTransaction().begin();
+                R res = emFunction.apply(em);
+                em.getTransaction().commit();
+                return res;
             }
         };
 
@@ -86,7 +90,13 @@ public class UserServiceImplTest {
                 new Date());
 
         User createdUser = userService.createUser(newUser);
-        Assertions.assertNotNull(createdUser);
+        Assertions.assertNotNull(createdUser.getId());
+
+        User findedUser = userService.findUserByLogin("login");
+        Assertions.assertNotNull(findedUser);
+        Assertions.assertEquals(createdUser.getId(), findedUser.getId());
+
+
     }
 
 }

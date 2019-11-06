@@ -44,7 +44,7 @@
 
     create table Project (
        id bigint not null,
-        attributes CLOB NOT NULL,
+        attributes TEXT,
         comments varchar(500),
         name varchar(50),
         quotation double precision,
@@ -94,7 +94,7 @@
         accountCreationTime date not null,
         beginWorkDate date not null,
         email varchar(255) not null,
-        externalIDs CLOB NOT NULL,
+        externalIDs TEXT,
         firstName varchar(255) not null,
         imputationFutur bit not null,
         login varchar(50) not null,

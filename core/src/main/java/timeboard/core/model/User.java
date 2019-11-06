@@ -75,7 +75,7 @@ public class User implements Serializable {
     @Column(nullable = true)
     private String matriculeID;
 
-    @Column(columnDefinition = "CLOB NOT NULL")
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToMapStringConverter.class)
     @Lob
     private Map<String, String> externalIDs;
