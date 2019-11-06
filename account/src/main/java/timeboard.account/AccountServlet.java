@@ -120,15 +120,13 @@ public class AccountServlet extends TimeboardServlet {
                viewModel.getViewDatas().put("error", "Error while updating user information.");
            }
         }else if(submitButton.matches("external")){
+            
             Enumeration<String> params1 = request.getParameterNames();
             while (params1.hasMoreElements()) {
                 String param = params1.nextElement();
                 if (param.startsWith("attr-")) {
                     String key = param.substring(5, param.length());
                     String value = request.getParameter(param);
-                    if(user.getExternalIDs() == null){
-                        user.setExternalIDs(new HashMap<>());
-                    }
                     user.getExternalIDs().put(key, value);
                 }
             }
@@ -139,8 +137,6 @@ public class AccountServlet extends TimeboardServlet {
                 viewModel.getViewDatas().put("error", "Error while external tools");
             }
         }
-
-
         loadPage(viewModel, user);
 
     }
