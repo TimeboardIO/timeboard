@@ -31,22 +31,17 @@ import org.apache.aries.jpa.template.JpaTemplate;
 import org.apache.aries.jpa.template.TransactionType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.osgi.service.log.LogService;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.api.exceptions.WrongPasswordException;
-import timeboard.core.internal.ProjectServiceImpl;
-import timeboard.core.model.Task;
 import timeboard.core.model.User;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -55,11 +50,11 @@ public class UserServiceImplTest {
 
     private static JpaTemplate JPA;
 
-    private LogService mockLogService;
-    private UserService userService;
+    private static LogService mockLogService;
+    private static UserService userService;
 
     @BeforeAll
-    public void INIT(){
+    public static void INIT(){
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("timeboard-pu-test", System.getProperties());
         EntityManager em = emf.createEntityManager();
         JpaTemplate jpaTemplate = new AbstractJpaTemplate(){
@@ -72,9 +67,18 @@ public class UserServiceImplTest {
 
         JPA = jpaTemplate;
 
+        mockLogService = Mockito.mock(LogService.class);
+        userService = new UserServiceImpl(JPA, mockLogService);
+    }
 
-        this.mockLogService = Mockito.mock(LogService.class);
-        this.userService = new UserServiceImpl(JPA, this.mockLogService);
+    @BeforeEach
+    public void resetDB(){
+        this.JPA.txExpr(entityManager -> {
+            Query q = entityManager
+                    .createQuery("TRUNCATE TABLE timeboard.User");
+            q.executeUpdate();
+            return null;
+        });
     }
 
     /**
@@ -95,10 +99,10 @@ public class UserServiceImplTest {
         User createdUser = this.userService.createUser(newUser);
         Assertions.assertNotNull(createdUser);
 
-        User myUserInDB = this.userService.findUserByLogin(createdUser.getLogin());
+        User myUserInDB = this.userService.findUserByLogin("login");
         Assertions.assertNotNull(myUserInDB);
         Assertions.assertNotNull(myUserInDB.getId());
-        Assertions.assertEquals(myUserInDB.getFirstName(), createdUser.getFirstName());
+        Assertions.assertEquals(myUserInDB.getFirstName(), "firstName");
     }
 
 
@@ -165,15 +169,17 @@ public class UserServiceImplTest {
                 new Date());
         User createdUser = this.userService.createUser(newUser);
 
-        newUser.setLogin("newLogin");
-        newUser.setFirstName("newFirstname");
-        User updatedUser = this.userService.updateUser(newUser);
+        createdUser.setLogin("newLogin");
+        createdUser.setFirstName("newFirstname");
+        User updatedUser = this.userService.updateUser(createdUser);
         Assertions.assertNotNull(updatedUser);
 
         User myUserInDB = this.userService.findUserByLogin(updatedUser.getLogin());
         Assertions.assertNotNull(myUserInDB);
-        Assertions.assertNotEquals(myUserInDB.getFirstName(), createdUser.getFirstName());
-        Assertions.assertEquals(myUserInDB.getFirstName(), updatedUser.getFirstName());
+        Assertions.assertNotEquals(myUserInDB.getFirstName(), "firstName");
+        Assertions.assertEquals(myUserInDB.getFirstName(), "newFirstname");
+        Assertions.assertNotEquals(myUserInDB.getLogin(), "login");
+        Assertions.assertEquals(myUserInDB.getLogin(), "newLogin");
     }
 
 
@@ -202,14 +208,8 @@ public class UserServiceImplTest {
                 "Aem@il.com",
                 new Date(),
                 new Date());
-     /*   User updatedUser = this.userService.updateUser(newUser);
-        Assertions.assertNotNull(updatedUser);
 
-
-        User myOldUserInDB = this.userService.findUserByLogin(updatedUser.getLogin());
-        Assertions.assertNotNull(myOldUserInDB);
-        User myNewUserInDB = this.userService.findUserByLogin(updatedUser.getLogin());
-        Assertions.assertNotNull(myNewUserInDB);*/
+        Mockito.when(this.userService.updateUser(newUser)).thenThrow(NoResultException.class);
     }
 
 
@@ -231,10 +231,10 @@ public class UserServiceImplTest {
                 new Date());
 
         User createdUser = this.userService.createUser(newUser);
-        Assertions.assertNotNull(createdUser);
 
         this.userService.updateUserPassword(createdUser.getId(), "password", "newPassword");
-
+        User userAuth = this.userService.autenticateUser("login", "newPassword");
+        Assertions.assertNotNull(userAuth);
 
     }
 
@@ -257,9 +257,15 @@ public class UserServiceImplTest {
                 new Date());
 
         User createdUser = this.userService.createUser(newUser);
-        Assertions.assertNotNull(createdUser);
 
-        this.userService.updateUserPassword(createdUser.getId(), "KOpasswordKO", "newPassword");
+        Mockito.doThrow(UserException.class).when(this.userService).updateUserPassword((long) 123, "password", "newPassword");
+        Mockito.doThrow(WrongPasswordException.class).when(this.userService).updateUserPassword(createdUser.getId(), "passwordKO", "newPassword");
+
+        this.userService.updateUserPassword(createdUser.getId(), "password", "newPassword");
+        User userAuth = this.userService.autenticateUser("login", "password");
+        Assertions.assertNull(userAuth);
+        userAuth = this.userService.autenticateUser("login", "newPassword");
+        Assertions.assertNotNull(userAuth);
 
 
     }
@@ -272,7 +278,20 @@ public class UserServiceImplTest {
      */
     @Test
     public void updateUserGeneratedPassword() throws BusinessException, UserException {
+        User newUser = new User(
+                "login",
+                "password",
+                "name",
+                "firstName",
+                "em@il.com",
+                new Date(),
+                new Date());
 
+        User createdUser = this.userService.createUser(newUser);
+
+        this.userService.updateUserGeneratedPassword(createdUser.getId(), "newPassword");
+        User userAuth = this.userService.autenticateUser("login", "newPassword");
+        Assertions.assertNotNull(userAuth);
     }
 
 
@@ -283,7 +302,24 @@ public class UserServiceImplTest {
      */
     @Test
     public void updateUserGeneratedKOPassword() throws BusinessException, UserException {
+        User newUser = new User(
+                "login",
+                "password",
+                "name",
+                "firstName",
+                "em@il.com",
+                new Date(),
+                new Date());
 
+        User createdUser = this.userService.createUser(newUser);
+
+        Mockito.doThrow(UserException.class).when(this.userService).updateUserGeneratedPassword((long) 123, "newPassword");
+
+        this.userService.updateUserGeneratedPassword(createdUser.getId(), "newPassword");
+        User userAuth = this.userService.autenticateUser("login", "password");
+        Assertions.assertNull(userAuth);
+        userAuth = this.userService.autenticateUser("login", "newPassword");
+        Assertions.assertNotNull(userAuth);
     }
 
 }
