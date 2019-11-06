@@ -28,6 +28,7 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
@@ -112,15 +113,20 @@ public abstract class AbstractTask implements Serializable {
     }
 
     @Transient
-    public double findTaskImputationValueByDate(Date date) {
+    public double findTaskImputationValueByDate(Date date, User user) {
         Optional<Imputation> iOpt = this.getImputations().stream()
-                .filter(imputation -> imputation.getDay().equals(date))
+                .filter(imputation -> areDateSameDay(date,imputation.getDay()))
+                .filter(imputation -> (imputation.getUser().getId() == user.getId()))
                 .findFirst();
         if (iOpt.isPresent()) {
             return iOpt.get().getValue();
         } else {
             return 0;
         }
+    }
+
+    private boolean areDateSameDay(Date date1, Date date2){
+        return new SimpleDateFormat("yyyy-MM-dd").format(date1).equals(new SimpleDateFormat("yyyy-MM-dd").format(date2));
     }
 
 }
