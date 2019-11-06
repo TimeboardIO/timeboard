@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserServiceImplTest {
 
     private static JpaTemplate JPA;
@@ -81,7 +80,6 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
-    @Order(1)
     public void createUserTest() throws BusinessException {
         User newUser = new User(
                 "login",
@@ -107,7 +105,6 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
-    @Order(2)
     public void createUsersTest() throws BusinessException {
 
         List<User> usersList = new ArrayList<User>();
@@ -155,7 +152,6 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
-    @Order(3)
     public void updateUserTest() throws BusinessException {
         User newUser = new User(
                 "login",
@@ -186,7 +182,6 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
-    @Order(4)
     public void updateUserKOTest() throws BusinessException {
         User oldUser = new User(
                 "login",
@@ -219,7 +214,6 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
-    @Order(5)
     public void updateUserPasswordTest() throws WrongPasswordException, UserException, BusinessException {
         User newUser = new User(
                 "login",
@@ -246,7 +240,6 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
-    @Order(6)
     public void updateUserPasswordKOTest() throws WrongPasswordException, UserException, BusinessException {
         User newUser = new User(
                 "login",
@@ -278,7 +271,6 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
-    @Order(7)
     public void updateUserGeneratedPassword() throws BusinessException, UserException {
         User newUser = new User(
                 "login",
@@ -303,7 +295,6 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
-    @Order(8)
     public void updateUserGeneratedKOPassword() throws BusinessException, UserException {
         User newUser = new User(
                 "login",
