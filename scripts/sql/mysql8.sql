@@ -38,6 +38,7 @@
         day date,
         value double precision,
         task_id bigint,
+        user_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -128,6 +129,11 @@
        add constraint FKyirjrx86v2stxnnlwni8vfgr 
        foreign key (task_id) 
        references AbstractTask (id);
+
+    alter table Imputation 
+       add constraint FKpv054mew449mf2m7itp50r57b 
+       foreign key (user_id) 
+       references User (id);
 
     alter table ProjectMembership 
        add constraint FKh59cv9s56u3sdi0ki6axsxf09 

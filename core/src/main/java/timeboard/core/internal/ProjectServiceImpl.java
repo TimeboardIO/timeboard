@@ -362,6 +362,7 @@ public class ProjectServiceImpl implements ProjectService {
                 Imputation i = new Imputation();
                 i.setDay(c.getTime());
                 i.setTask(task);
+                i.setUser(actor);
                 i.setValue(val);
                 if(projectTask != null){ //project task
                     projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - val);
@@ -384,7 +385,9 @@ public class ProjectServiceImpl implements ProjectService {
                     entityManager.remove(i);
                 } else {
                     i.setValue(val);
+                    entityManager.persist(i);
                 }
+
             }
 
             entityManager.flush();

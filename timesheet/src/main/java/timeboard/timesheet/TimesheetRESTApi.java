@@ -87,6 +87,8 @@ public class TimesheetRESTApi extends TimeboardServlet {
         final List<ImputationWrapper> imputations = new ArrayList<>();
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
+
+        final User currentUser = SecurityContext.getCurrentUser(request);
         boolean validated = false;
 
         final Calendar c = Calendar.getInstance();
@@ -131,7 +133,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getEndDate()));
 
                     days.forEach(dateWrapper -> {
-                        double i = task.findTaskImputationValueByDate(dateWrapper.date);
+                        double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
                         imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                     });
                 });
@@ -149,15 +151,12 @@ public class TimesheetRESTApi extends TimeboardServlet {
                 tasks.add(new TaskWrapper(
                         task.getId(),
                         task.getName(),
-                        0,
-                        0,
-                        0,
-                        0,
+                        0, 0,0, 0,
                         task.getStartDate(),
                         task.getEndDate()));
 
                 days.forEach(dateWrapper -> {
-                    double i = task.findTaskImputationValueByDate(dateWrapper.date);
+                    double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
                     imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                 });
 
@@ -166,11 +165,10 @@ public class TimesheetRESTApi extends TimeboardServlet {
                     0,
                     "Default Tasks",
                     tasks));
-
             }
 
         if (this.timesheetService != null) {
-            validated = this.timesheetService.isTimesheetValidated(SecurityContext.getCurrentUser(request), year, week);
+            validated = this.timesheetService.isTimesheetValidated(currentUser, year, week);
         }
 
 

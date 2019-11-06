@@ -36,6 +36,9 @@ import timeboard.core.model.Imputation;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.text.SimpleDateFormat;
 
 
 public class ImputationLoader {
@@ -50,6 +53,7 @@ public class ImputationLoader {
 
     public List<Imputation> load(List<User> usersSaved, List<Task> tasksSaved, int nbProjectsByUsers, int nbTasksByProjects, int nbImputationsByTasks){
         List<Imputation> imputationsSaved = new ArrayList<>();
+        Map<String, Double> mapDateSumImput = new HashMap<String, Double>();
 
         for (int i = 0; i < tasksSaved.size(); i++) {
 
@@ -60,7 +64,13 @@ public class ImputationLoader {
                 // Création de "nbImputationsByTasks" imputations pour simuler un nombre de jours
                 for (int j = 0; j < nbImputationsByTasks; j++) {
                     Date day = new Date(new Date().getTime() + j * (1000 * 60 * 60 * 24));
-                    Double value = Math.floor(Math.random() * 11)/10; // Value between 0 and 1 with 1 décimal max
+                    double value = this.getRandomValue(mapDateSumImput, day);//matTaskImput);
+                    if(mapDateSumImput.containsKey(this.getSimpleDate(day))) {
+                        mapDateSumImput.put(this.getSimpleDate(day), mapDateSumImput.get(this.getSimpleDate(day)) + value);
+                    }else{
+                        mapDateSumImput.put(this.getSimpleDate(day), value);
+                    }
+
                     try {
                         this.projectService.updateTaskImputation(actor, task.getId(), day, value);
                         Imputation imputation = new Imputation();
@@ -81,6 +91,25 @@ public class ImputationLoader {
         System.out.println("Imputations saved ! ");
         return imputationsSaved;
 
+    }
+
+    private double getRandomValue(Map<String, Double> mapDateSumImput, Date day){//double[][] matTaskImput){
+        double value = Math.floor(Math.random() * 6)/10; // Value between 0 and 0.5 with 1 décimal max
+
+        // Vérification: Pour une journée la valeur du temps total passé sur les tâches ne doit pas être supérieur à 1
+        double sum = 0.0;
+        if(mapDateSumImput.containsKey(this.getSimpleDate(day))){
+            sum = mapDateSumImput.get(this.getSimpleDate(day));
+        }
+        if(sum + value > 1.0 ){
+            value = 1.0 - sum;
+        }
+
+        return value;
+    }
+
+    private String getSimpleDate(Date day){
+        return new SimpleDateFormat("yyyy-MM-dd").format(day);
     }
 
 

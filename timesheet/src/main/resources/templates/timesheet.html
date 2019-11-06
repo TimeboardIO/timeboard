@@ -98,7 +98,7 @@
                                             step="0.1"
                                             v-if="(day.date >= task.startDate) && (day.date <= task.endDate)"
                                             v-on:focusout="triggerUpdateTask"
-                                            v-on:click="triggerUpdateTask"
+                                            v-on:keyup.enter="triggerUpdateTask"
                                             v-bind:data-date="day.date"
                                             v-bind:data-task="taskID"
                                             v-bind:name="'task['+taskID+']day['+day.date+']'"
