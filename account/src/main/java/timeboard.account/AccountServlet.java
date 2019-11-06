@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -125,6 +126,9 @@ public class AccountServlet extends TimeboardServlet {
                 if (param.startsWith("attr-")) {
                     String key = param.substring(5, param.length());
                     String value = request.getParameter(param);
+                    if(user.getExternalIDs() == null){
+                        user.setExternalIDs(new HashMap<>());
+                    }
                     user.getExternalIDs().put(key, value);
                 }
             }
