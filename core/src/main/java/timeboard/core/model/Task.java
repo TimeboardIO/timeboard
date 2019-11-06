@@ -65,6 +65,9 @@ public class Task extends AbstractTask implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
+    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER)
+    private Milestone milestone;
+
 
     public Task() {
         super();
@@ -112,7 +115,13 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
+    public Milestone getMilestone() {
+        return milestone;
+    }
 
+    public void setMilestone(Milestone milestone) {
+        this.milestone = milestone;
+    }
 
     /**
      * EL.
