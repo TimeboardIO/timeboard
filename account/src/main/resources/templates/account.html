@@ -147,7 +147,8 @@
                             <tr th:each="element :  ${externalTools}" th:attr="data-key=${element}" >
                                 <td th:text="${element}">  <i class="github icon"> </i> Github</td>
                                 <td>
-                                    <input type="text" th:value="${user.externalIDs.get(element)}"  th:name="'attr-'+${element}"  />
+                                    <input th:if="${user.externalIDs != null}" type="text" th:value="${user.externalIDs.containsKey(element)} ? ${user.externalIDs.get(element)} : '' "  th:name="'attr-'+${element}"  />
+                                    <input th:if="${user.externalIDs == null}" type="text" th:name="'attr-'+${element}" />
                                 </td>
                             </tr>
                             </tbody>

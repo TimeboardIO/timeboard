@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -119,6 +120,7 @@ public class AccountServlet extends TimeboardServlet {
                viewModel.getViewDatas().put("error", "Error while updating user information.");
            }
         }else if(submitButton.matches("external")){
+            
             Enumeration<String> params1 = request.getParameterNames();
             while (params1.hasMoreElements()) {
                 String param = params1.nextElement();
@@ -135,8 +137,6 @@ public class AccountServlet extends TimeboardServlet {
                 viewModel.getViewDatas().put("error", "Error while external tools");
             }
         }
-
-
         loadPage(viewModel, user);
 
     }
