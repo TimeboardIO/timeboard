@@ -110,7 +110,7 @@ public interface UserService {
      * @return user will with primary key
      * @throws BusinessException user does not exist
      */
-    User updateUser(User user);
+    User updateUser(User user) throws UserException;
 
 
     /**

@@ -29,10 +29,7 @@ import org.apache.aries.jpa.support.impl.AbstractJpaTemplate;
 import org.apache.aries.jpa.template.EmFunction;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.apache.aries.jpa.template.TransactionType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
@@ -41,23 +38,22 @@ import timeboard.core.api.exceptions.UserException;
 import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.User;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.FlushModeType;
-import javax.persistence.Persistence;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UserServiceImplTest {
 
     private static JpaTemplate JPA;
 
     private static LogService mockLogService;
     private static UserService userService;
+    private static UserService userServiceMock;
 
-    @BeforeAll
-    public static void INIT(){
+    @BeforeEach
+    public void INIT(){
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("timeboard-pu-test", System.getProperties());
         EntityManager em = emf.createEntityManager();
         JpaTemplate jpaTemplate = new AbstractJpaTemplate(){
@@ -75,16 +71,9 @@ public class UserServiceImplTest {
 
         mockLogService = Mockito.mock(LogService.class);
         userService = new UserServiceImpl(JPA, mockLogService);
-    }
 
-    @BeforeEach
-    public void resetDB(){
-        this.JPA.txExpr(entityManager -> {
-            Query q = entityManager
-                    .createQuery("TRUNCATE TABLE timeboard.User");
-            q.executeUpdate();
-            return null;
-        });
+        userServiceMock = Mockito.mock(UserService.class);
+
     }
 
     /**
@@ -92,6 +81,7 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
+    @Order(1)
     public void createUserTest() throws BusinessException {
         User newUser = new User(
                 "login",
@@ -117,6 +107,7 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
+    @Order(2)
     public void createUsersTest() throws BusinessException {
 
         List<User> usersList = new ArrayList<User>();
@@ -164,6 +155,7 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
+    @Order(3)
     public void updateUserTest() throws BusinessException {
         User newUser = new User(
                 "login",
@@ -194,6 +186,7 @@ public class UserServiceImplTest {
      * @throws BusinessException
      */
     @Test
+    @Order(4)
     public void updateUserKOTest() throws BusinessException {
         User oldUser = new User(
                 "login",
@@ -215,7 +208,7 @@ public class UserServiceImplTest {
                 new Date(),
                 new Date());
 
-        Mockito.when(this.userService.updateUser(newUser)).thenThrow(NoResultException.class);
+        Mockito.when(this.userServiceMock.updateUser(newUser)).thenThrow(UserException.class);
     }
 
 
@@ -226,6 +219,7 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
+    @Order(5)
     public void updateUserPasswordTest() throws WrongPasswordException, UserException, BusinessException {
         User newUser = new User(
                 "login",
@@ -252,6 +246,7 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
+    @Order(6)
     public void updateUserPasswordKOTest() throws WrongPasswordException, UserException, BusinessException {
         User newUser = new User(
                 "login",
@@ -264,8 +259,8 @@ public class UserServiceImplTest {
 
         User createdUser = this.userService.createUser(newUser);
 
-        Mockito.doThrow(UserException.class).when(this.userService).updateUserPassword((long) 123, "password", "newPassword");
-        Mockito.doThrow(WrongPasswordException.class).when(this.userService).updateUserPassword(createdUser.getId(), "passwordKO", "newPassword");
+        Mockito.doThrow(UserException.class).when(this.userServiceMock).updateUserPassword((long) 123, "password", "newPassword");
+        Mockito.doThrow(WrongPasswordException.class).when(this.userServiceMock).updateUserPassword(createdUser.getId(), "passwordKO", "newPassword");
 
         this.userService.updateUserPassword(createdUser.getId(), "password", "newPassword");
         User userAuth = this.userService.autenticateUser("login", "password");
@@ -283,6 +278,7 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
+    @Order(7)
     public void updateUserGeneratedPassword() throws BusinessException, UserException {
         User newUser = new User(
                 "login",
@@ -307,6 +303,7 @@ public class UserServiceImplTest {
      * @throws UserException
      */
     @Test
+    @Order(8)
     public void updateUserGeneratedKOPassword() throws BusinessException, UserException {
         User newUser = new User(
                 "login",
@@ -319,7 +316,7 @@ public class UserServiceImplTest {
 
         User createdUser = this.userService.createUser(newUser);
 
-        Mockito.doThrow(UserException.class).when(this.userService).updateUserGeneratedPassword((long) 123, "newPassword");
+        Mockito.doThrow(UserException.class).when(this.userServiceMock).updateUserGeneratedPassword((long) 123, "newPassword");
 
         this.userService.updateUserGeneratedPassword(createdUser.getId(), "newPassword");
         User userAuth = this.userService.autenticateUser("login", "password");
