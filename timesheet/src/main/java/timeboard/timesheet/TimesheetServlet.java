@@ -124,7 +124,6 @@ public class TimesheetServlet extends TimeboardServlet {
         viewModel.setTemplate("timesheet:timesheet.html");
     }
 
-
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 

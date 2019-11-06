@@ -50,6 +50,9 @@ public class Imputation implements Serializable {
     @ManyToOne(targetEntity = AbstractTask.class)
     private AbstractTask task;
 
+    @OneToOne
+    private User user;
+
     public long getId() {
         return id;
     }
@@ -78,7 +81,9 @@ public class Imputation implements Serializable {
         return task;
     }
 
-    public void setTask(AbstractTask task) {
-        this.task = task;
-    }
+    public void setTask(AbstractTask task) { this.task = task; }
+
+    public User getUser() { return user; }
+
+    public void setUser(User user) { this.user = user; }
 }
