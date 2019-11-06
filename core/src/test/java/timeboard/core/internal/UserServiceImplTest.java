@@ -41,7 +41,10 @@ import timeboard.core.api.exceptions.UserException;
 import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.User;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.FlushModeType;
+import javax.persistence.Persistence;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,7 +64,10 @@ public class UserServiceImplTest {
 
             @Override
             public <R> R txExpr(TransactionType transactionType, EmFunction<R> emFunction) {
-                return emFunction.apply(em);
+                em.getTransaction().begin();
+                R res = emFunction.apply(em);
+                em.getTransaction().commit();
+                return res;
             }
         };
 
