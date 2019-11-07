@@ -53,6 +53,10 @@ Project role is used to allow or not some actions on project.
 A task is time based job. A Task as a start date, a stop date and and original effort.
 A task is assigned to a unique Actor.
 
+### Milestone
+
+A milestone is a set of tasks. A milestone is mainly defined by a name, a date and a type.
+A project may have several milestones.
 
 ### Project Clusters
 

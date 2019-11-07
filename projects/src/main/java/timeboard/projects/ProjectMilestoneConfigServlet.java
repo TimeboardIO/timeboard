@@ -30,7 +30,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -43,10 +42,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component(
         service = Servlet.class,
@@ -62,9 +58,6 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
 
     @Reference
     public ProjectService projectService;
-
-    @Reference
-    public UserService userService;
 
 
     @Override
