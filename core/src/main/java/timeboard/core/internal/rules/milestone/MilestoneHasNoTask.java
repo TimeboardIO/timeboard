@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules;
+package timeboard.core.internal.rules.milestone;
 
 /*-
  * #%L
@@ -26,28 +26,19 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import timeboard.core.model.ProjectMembership;
-import timeboard.core.model.ProjectRole;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Milestone;
 import timeboard.core.model.User;
-import timeboard.core.model.Task;
 
-import java.util.Optional;
-
-public class ActorIsProjectMember implements Rule<Task> {
+public class MilestoneHasNoTask implements Rule<Milestone> {
 
     @Override
     public String ruleDescription() {
-        return "User is not project Owner";
+        return "Milestone with tasks cannot be removed";
     }
 
     @Override
-    public boolean isSatisfied(User u, Task thing) {
-        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
-                .filter(projectMembership ->
-                        projectMembership.getMember().getId() == u.getId()
-                                && projectMembership.getRole().equals(ProjectRole.OWNER)
-                )
-                .findFirst();
-        return userOptional.isPresent();
+    public boolean isSatisfied(User u, Milestone thing) {
+        return thing.getTasks().isEmpty();
     }
 }

@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules;
+package timeboard.core.internal.rules.milestone;
 
 /*-
  * #%L
@@ -26,18 +26,26 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.*;
 
-public class TaskHasNoImputation implements Rule<Task> {
+import java.util.Optional;
+
+public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {
 
     @Override
     public String ruleDescription() {
-        return "Task with imputations cannot be removed";
+        return "User is not project Owner";
     }
 
     @Override
-    public boolean isSatisfied(User u, Task thing) {
-        return thing.getImputations().isEmpty();
+    public boolean isSatisfied(User u, Milestone thing) {
+        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+                .filter(projectMembership ->
+                        projectMembership.getMember().getId() == u.getId()
+                                && projectMembership.getRole().equals(ProjectRole.OWNER)
+                )
+                .findFirst();
+        return userOptional.isPresent();
     }
 }

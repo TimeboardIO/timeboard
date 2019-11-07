@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules;
+package timeboard.core.internal.rules.task;
 
 /*-
  * #%L
@@ -26,18 +26,19 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import timeboard.core.model.Milestone;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Task;
 import timeboard.core.model.User;
 
-public class MilestoneHasNoTask implements Rule<Milestone> {
+public class TaskHasNoImputation implements Rule<Task> {
 
     @Override
     public String ruleDescription() {
-        return "Milestone with tasks cannot be removed";
+        return "Task with imputations cannot be removed";
     }
 
     @Override
-    public boolean isSatisfied(User u, Milestone thing) {
-        return thing.getTasks().isEmpty();
+    public boolean isSatisfied(User u, Task thing) {
+        return thing.getImputations().isEmpty();
     }
 }

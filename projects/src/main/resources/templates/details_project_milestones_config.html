@@ -79,7 +79,7 @@
 
         <button class="ui positive button" type="submit">Save</button>
 
-        <a class="ui negative basic button"
+        <a class="ui negative basic button" th:if="${milestone.id != null}"
            th:href="@{/projects/milestones/delete(milestoneID=${milestone.id}, projectID=${project.id})}">
             <i class="remove alternate icon"></i>
             Delete Milestone

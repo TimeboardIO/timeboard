@@ -29,6 +29,10 @@ package timeboard.core.internal;
 import timeboard.core.internal.rules.*;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
+import timeboard.core.internal.rules.milestone.MilestoneHasNoTask;
+import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
+import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
@@ -498,7 +502,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new TaskHasNoImputation());
-        ruleSet.addRule(new ActorIsProjectMember());
+        ruleSet.addRule(new ActorIsProjectMemberbyTask());
 
         BusinessException exp = this.jpa.txExpr(entityManager -> {
             Task task = entityManager.find(Task.class, taskID);
@@ -643,7 +647,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException {
         RuleSet<Milestone> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMember());
+        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
         ruleSet.addRule(new MilestoneHasNoTask());
 
         BusinessException exp = this.jpa.txExpr(entityManager -> {
