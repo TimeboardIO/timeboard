@@ -134,6 +134,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
         //Extract project configuration
         project.getAttributes().clear();
 
+        //new attributes
         String newAttrKey = request.getParameter("newAttrKey");
         String newAttrValue = request.getParameter("newAttrValue");
         Boolean newAttrEncrypted = false;
@@ -147,6 +148,8 @@ public class ProjectConfigServlet extends TimeboardServlet {
             }
             project.getAttributes().put(newAttrKey, new ProjectAttributValue(newAttrValue, newAttrEncrypted));
         }
+
+        //Attribute update
         Enumeration<String> params1 = request.getParameterNames();
         while (params1.hasMoreElements()) {
             String param = params1.nextElement();
@@ -158,7 +161,8 @@ public class ProjectConfigServlet extends TimeboardServlet {
             if (param.startsWith("attrenc-")) {
                 String key = param.substring(8, param.length());
                 String encrypted = request.getParameter(param);
-                project.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
+                project.getAttributes().get(key).setEncrypted(true);
+              //  project.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
             }
         }
 
