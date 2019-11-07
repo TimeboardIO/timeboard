@@ -143,7 +143,7 @@ public interface ProjectService {
      * Create a milestone
      * @return Milestone
      */
-    Milestone createMilestone(String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks);
+    Milestone createMilestone(String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project);
 
     /**
      * Create a milestone

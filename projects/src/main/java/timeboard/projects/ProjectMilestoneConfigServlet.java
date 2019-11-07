@@ -106,9 +106,9 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
             if (!getParameter(request, "milestoneID").get().isEmpty()) {
                 Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
                 currentMilestone = this.projectService.getMilestoneById(milestoneID);
-                currentMilestone = updateMilestone(currentMilestone, request);
+                currentMilestone = updateMilestone(currentMilestone, project, request);
             } else {
-                currentMilestone = createMilestone(request);
+                currentMilestone = createMilestone(project, request);
             }
 
             viewModel.getViewDatas().put("milestone", currentMilestone);
@@ -125,23 +125,24 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         }
     }
 
-    private Milestone createMilestone(HttpServletRequest request) throws ParseException {
+    private Milestone createMilestone(Project project, HttpServletRequest request) throws ParseException {
         String name = request.getParameter("milestoneName");
         Date date = new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1);
         MilestoneType type = request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY;
         Map<String, String> attributes = new HashMap<>();
         Set<Task> tasks = new HashSet<>();
 
-        return this.projectService.createMilestone(name, date, type, attributes, tasks);
+        return this.projectService.createMilestone(name, date, type, attributes, tasks, project);
     }
 
-    private Milestone updateMilestone(Milestone currentMilestone, HttpServletRequest request) throws ParseException {
+    private Milestone updateMilestone(Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException {
 
         currentMilestone.setName(request.getParameter("milestoneName"));
         currentMilestone.setDate(new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1));
         currentMilestone.setType(request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY);
         currentMilestone.setAttributes(new HashMap<>());
         currentMilestone.setTasks(new HashSet<>());
+        currentMilestone.setProject(project);
 
         return this.projectService.updateMilestone(currentMilestone);
     }

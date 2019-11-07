@@ -26,7 +26,7 @@
         </div>
         <div class="field">
             <label>Milestone type</label>
-            <select  name="milestoneType" th:disabled="${milestone.id == null}">
+            <select  name="milestoneType">
                 <option th:each="type: ${allMilestoneTypes}"
                         th:text="${type.label}"
                         th:value="${type}"
