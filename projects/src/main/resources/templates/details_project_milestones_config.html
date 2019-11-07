@@ -19,11 +19,13 @@
             <label>Milestone Name</label>
             <input name="milestoneName" placeholder="Milestone Name" required th:value="${milestone.name}" type="text">
         </div>
+
         <div class="field">
             <label>Milestone  Date</label>
             <input name="milestoneDate" placeholder="Milestone Date"
                    required th:value="${#dates.format(milestone.date, 'yyyy-MM-dd')}" type="date">
         </div>
+
         <div class="field">
             <label>Milestone type</label>
             <select  name="milestoneType">
@@ -32,6 +34,46 @@
                         th:value="${type}"
                         th:selected="${type == milestone.type}"></option>
             </select>
+        </div>
+
+        <div class="field">
+            <label>Milestone Attributes</label>
+
+            <table class="ui celled table">
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="attr : ${milestone.getAttributes()}" th:attr="data-key=${attr.key}">
+                    <td th:text="${attr.key}">
+                    </td>
+                    <td>
+                        <input type="text" th:name="'attr-'+${attr.key}" th:value="${attr.value}"/>
+                    </td>
+                    <td>
+                        <div class="ui negative basic button delete" th:attr="data-key=${attr.key}">
+                            <i class="remove alternate icon"></i>
+                            Remove
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="newAttrKey" placeholder="New attribute key"/>
+                    </td>
+                    <td>
+                        <input type="text" name="newAttrValue" placeholder="New attribute value"/>
+                    </td>
+                    <td></td>
+                </tr>
+
+                </tbody>
+            </table>
+
         </div>
 
 
@@ -44,6 +86,12 @@
         </a>
 
     </form>
+
+    <script type="text/javascript">
+       $('.delete[data-key]').click(function(){
+            $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
+       });
+    </script>
 
 </div>
 

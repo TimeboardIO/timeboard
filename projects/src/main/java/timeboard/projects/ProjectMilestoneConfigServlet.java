@@ -129,7 +129,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         String name = request.getParameter("milestoneName");
         Date date = new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1);
         MilestoneType type = request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY;
-        Map<String, String> attributes = new HashMap<>();
+        Map<String, String> attributes = this.getCurrentMilestoneAttributes(request);
         Set<Task> tasks = new HashSet<>();
 
         return this.projectService.createMilestone(name, date, type, attributes, tasks, project);
@@ -140,10 +140,30 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         currentMilestone.setName(request.getParameter("milestoneName"));
         currentMilestone.setDate(new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1));
         currentMilestone.setType(request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY);
-        currentMilestone.setAttributes(new HashMap<>());
+        currentMilestone.setAttributes(this.getCurrentMilestoneAttributes(request));
         currentMilestone.setTasks(new HashSet<>());
         currentMilestone.setProject(project);
 
         return this.projectService.updateMilestone(currentMilestone);
+    }
+
+    private Map<String, String> getCurrentMilestoneAttributes(HttpServletRequest request){
+        Map<String, String> attributes = new HashMap<>();
+
+        String newAttrKey = request.getParameter("newAttrKey");
+        String newAttrValue = request.getParameter("newAttrValue");
+        if (!newAttrKey.isEmpty()) {
+            attributes.put(newAttrKey, newAttrValue);
+        }
+        Enumeration<String> paramNames = request.getParameterNames();
+        while (paramNames.hasMoreElements()) {
+            String param = paramNames.nextElement();
+            if (param.startsWith("attr-")) {
+                String key = param.substring(5, param.length());
+                String value = request.getParameter(param);
+                attributes.put(key, value);
+            }
+        }
+        return attributes;
     }
 }

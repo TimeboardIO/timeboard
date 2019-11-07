@@ -49,7 +49,7 @@ public class Milestone implements Serializable {
     private MilestoneType type;
 
     @Column(columnDefinition = "TEXT")
-    @Convert(converter = JSONToProjectAttributsConverter.class)
+    @Convert(converter = JSONToMapStringConverter.class)
     @Lob
     private Map<String, String> attributes;
 

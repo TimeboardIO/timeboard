@@ -662,6 +662,6 @@ public class ProjectServiceImpl implements ProjectService {
         if (exp != null) {
             throw exp;
         }
-        this.logService.log(LogService.LOG_INFO, "Task " + milestoneID + " deleted by "+actor.getName());
+        this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by "+actor.getName());
     }
 }
