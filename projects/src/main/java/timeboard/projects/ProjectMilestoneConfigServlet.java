@@ -90,7 +90,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         viewModel.setTemplate("projects:details_project_milestones_config.html");
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
-        viewModel.getViewDatas().put("milestoneTypes", MilestoneType.values());
+        viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
 
     }
 
@@ -121,7 +121,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
 
             viewModel.getViewDatas().put("project", project);
             viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
-            viewModel.getViewDatas().put("milestoneTypes", MilestoneType.values());
+            viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
         }
     }
 

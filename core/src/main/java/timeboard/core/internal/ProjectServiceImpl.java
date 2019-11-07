@@ -596,7 +596,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Milestone> listProjectMilestones(Project project) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Milestone> q = entityManager.createQuery("select m from Milestones m where m.project = :project", Milestone.class);
+            TypedQuery<Milestone> q = entityManager.createQuery("select m from Milestone m where m.project = :project", Milestone.class);
             q.setParameter("project", project);
             return q.getResultList();
         });

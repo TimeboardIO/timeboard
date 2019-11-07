@@ -34,8 +34,10 @@
 
         <class>timeboard.core.model.Task</class>
         <class>timeboard.core.model.TaskRevision</class>
-        <class>timeboard.core.model.Project</class>
         <class>timeboard.core.model.TaskType</class>
+        <class>timeboard.core.model.Project</class>
+        <class>timeboard.core.model.Milestone</class>
+        <class>timeboard.core.model.MilestoneType</class>
         <class>timeboard.core.model.User</class>
         <class>timeboard.core.model.Imputation</class>
         <class>timeboard.core.model.ProjectMembership</class>

@@ -13,7 +13,7 @@
 
     <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestone"
           method="post" style="margin-left:1em;">
-        <input name="milestoneID" required th:value="${milestone.milestoneID}" type="hidden">
+        <input name="milestoneID" required th:value="${milestone.id}" type="hidden">
 
         <div class="field">
             <label>Milestone Name</label>
@@ -26,7 +26,7 @@
         </div>
         <div class="field">
             <label>Milestone type</label>
-            <select  name="milestoneType" th:disabled="${milestone.milestoneID == null}">
+            <select  name="milestoneType" th:disabled="${milestone.id == null}">
                 <option th:each="type: ${allMilestoneTypes}"
                         th:text="${type.label}"
                         th:value="${type}"
@@ -38,7 +38,7 @@
         <button class="ui positive button" type="submit">Save</button>
 
         <a class="ui negative basic button"
-           th:href="@{/projects/milestones/delete(milestoneID=${milestone.milestoneID}, projectID=${project.id})}">
+           th:href="@{/projects/milestones/delete(milestoneID=${milestone.id}, projectID=${project.id})}">
             <i class="remove alternate icon"></i>
             Delete Milestone
         </a>
