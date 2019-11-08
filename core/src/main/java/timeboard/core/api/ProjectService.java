@@ -77,9 +77,23 @@ public interface ProjectService {
 
     Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID);
 
+    Task createTaskWithMilestone(User actor,
+                                 Project project,
+                                 String taskName,
+                                 String taskComment,
+                                 Date startDate,
+                                 Date endDate,
+                                 double OE,
+                                 Long taskTypeID,
+                                 User assignedUser,
+                                 Milestone milestone
+    );
+
     Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
 
     Task updateTask(User actor, Task task, TaskRevision rev);
+
+    Task updateTaskWithMilestone(User actor, Task task, TaskRevision rev, Milestone milestone);
 
     Task getTask(long id);
 

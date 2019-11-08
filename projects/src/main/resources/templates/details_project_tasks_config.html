@@ -48,7 +48,7 @@
         </div>
         <div class="field">
             <label>Task status</label>
-            <select  name="taskStatus" th:disabled="${task.taskID == null}">
+            <select name="taskStatus" th:disabled="${task.taskID == null}">
                 <option th:each="status: ${allTaskStatus}"
                         th:text="${status.label}"
                         th:value="${status}"
@@ -75,6 +75,17 @@
                 </div>
                 <div class="results"></div>
             </div>
+        </div>
+
+        <div class="field">
+            <label>Milestone assigned</label>
+            <select name="taskMilestoneId">
+                <option></option>
+                <option th:each="milestone: ${allProjectMilestones}"
+                        th:text="${milestone.name}"
+                        th:value="${milestone.id}"
+                        th:selected="${milestone.id == task.milestoneID}"></option>
+            </select>
         </div>
 
 

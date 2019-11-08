@@ -95,6 +95,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
         viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
+        viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(project));
 
 
         /* Get datas for line-chart*/
@@ -159,13 +160,12 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             if (!getParameter(request, "taskID").get().isEmpty()) {
                 Long taskID = Long.parseLong(request.getParameter("taskID"));
                 currentTask = this.projectService.getTask(taskID);
-                currentTask = updateTask(actor, project, currentTask, request);
+                currentTask = this.updateTask(actor, project, currentTask, request);
             } else {
-                currentTask = createTask(actor, project, request);
+                currentTask = this.createTask(actor, project, request);
             }
 
             viewModel.getViewDatas().put("task", new TaskForm(currentTask));
-
 
         } catch (Exception e) {
             viewModel.getErrors().add(e);
@@ -176,6 +176,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
             viewModel.getViewDatas().put("project", project);
             viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
+            viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(project));
 
             /* Get datas for line-chart*/
             if(currentTask.getId() != null) {
@@ -185,12 +186,11 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
     }
 
     private Task createTask(User actor, Project project, HttpServletRequest request) throws ParseException {
-
         TaskForm taskForm = new TaskForm(request);
+        long milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
+        Milestone milestone = this.projectService.getMilestoneById(milestoneID);
 
-
-
-        return this.projectService.createTask(actor,
+        return this.projectService.createTaskWithMilestone(actor,
                 project,
                 taskForm.getTaskName(),
                 taskForm.getTaskComment(),
@@ -198,12 +198,15 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskForm.getEndDate(),
                 taskForm.getEstimateWork(),
                 taskForm.getTaskTypeID(),
-                this.userService.findUserByID(taskForm.getAssignedUserID())
+                this.userService.findUserByID(taskForm.getAssignedUserID()),
+                milestone
                 );
     }
 
     private Task updateTask(User actor, Project project, Task currentTask, HttpServletRequest request) throws ParseException {
         TaskForm taskForm = new TaskForm(request);
+        long milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
+        Milestone milestone = this.projectService.getMilestoneById(milestoneID);
 
         final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());
         if(taskType != null) {
@@ -214,17 +217,15 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             currentTask.setEndDate(taskForm.getEndDate());
             currentTask.setEstimateWork( taskForm.getEstimateWork());
         }
+        currentTask.setMilestone(milestone);
         final TaskRevision rev = new TaskRevision(actor,
                 currentTask,
                 currentTask.getRemainsToBeDone(),
                 this.userService.findUserByID(taskForm.getAssignedUserID()),
                 taskForm.getTaskStatus());
 
-        return this.projectService.updateTask(actor, currentTask, rev);
+        return this.projectService.updateTaskWithMilestone(actor, currentTask, rev, milestone);
     }
-
-
-
 
 
     public static class TaskForm {
@@ -239,10 +240,12 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         private User assignedUser;
         private TaskType taskType;
         private TaskStatus taskStatus;
+        private Long milestoneID;
 
         public TaskForm(Task task){
             taskID = task.getId();
             taskType = task.getTaskType();
+            milestoneID = task.getMilestone() != null ? task.getMilestone().getId() : null;
             if(task.getLatestRevision() != null) {
                 estimateWork = task.getEstimateWork();
                 startDate = task.getStartDate();
@@ -269,6 +272,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             endDate = new Date(DATE_FORMAT.parse(request.getParameter("taskEndDate")).getTime()+(2 * 60 * 60 * 1000) +1);
             estimateWork = Double.parseDouble(request.getParameter("taskEstimateWork"));
             taskStatus = request.getParameter("taskStatus") != null ? TaskStatus.valueOf(request.getParameter("taskStatus")) : TaskStatus.PENDING;
+            milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
 
             if(request.getParameter("taskTypeID") != null &&  !request.getParameter("taskTypeID").isEmpty()) {
                 taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
@@ -337,6 +341,14 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         public void setTaskStatus(TaskStatus taskStatus) {
             this.taskStatus = taskStatus;
+        }
+
+        public Long getMilestoneID() {
+            return milestoneID;
+        }
+
+        public void setMilestoneID(Long milestoneID) {
+            this.milestoneID = milestoneID;
         }
     }
 }
