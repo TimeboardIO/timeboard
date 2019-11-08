@@ -366,6 +366,14 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             final Task taskFromDB = entityManager.find(Task.class, task.getId());
             taskFromDB.setLatestRevision(rev);
+
+            taskFromDB.setTaskType(task.getTaskType());
+            taskFromDB.setName(task.getName());
+            taskFromDB.setComments(task.getComments());
+            taskFromDB.setStartDate(task.getStartDate());
+            taskFromDB.setEndDate(task.getEndDate());
+            taskFromDB.setEstimateWork( task.getEstimateWork());
+
             rev.setTask(taskFromDB);
             entityManager.persist(rev);
             entityManager.flush();
@@ -381,10 +389,17 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             final Task taskFromDB = entityManager.find(Task.class, task.getId());
             taskFromDB.setLatestRevision(rev);
+
+            taskFromDB.setTaskType(task.getTaskType());
+            taskFromDB.setName(task.getName());
+            taskFromDB.setComments(task.getComments());
+            taskFromDB.setStartDate(task.getStartDate());
+            taskFromDB.setEndDate(task.getEndDate());
+            taskFromDB.setEstimateWork(task.getEstimateWork());
+            taskFromDB.setMilestone(milestone);
+
             rev.setTask(taskFromDB);
             entityManager.persist(rev);
-
-            taskFromDB.setMilestone(milestone);
 
             entityManager.flush();
 
