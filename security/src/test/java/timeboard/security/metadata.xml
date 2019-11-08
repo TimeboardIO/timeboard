@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  #%L
+  security
+  %%
+  Copyright (C) 2019 Timeboard
+  %%
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  #L%
+  -->
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" entityID="localhost"><IDPSSODescriptor WantAuthnRequestsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol" validUntil="2019-11-07T18:12:43.143Z"><KeyDescriptor use="signing"><KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#"><X509Data><X509Certificate>MIIDfTCCAmWgAwIBAgIEbfVjBzANBgkqhkiG9w0BAQsFADBkMQswCQYDVQQGEwJVUzELMAkGA1UE
+CBMCQ0ExFjAUBgNVBAcTDU1vdW50YWluIFZpZXcxDTALBgNVBAoTBFdTTzIxDTALBgNVBAsTBFdT
+TzIxEjAQBgNVBAMTCWxvY2FsaG9zdDAeFw0xOTA4MjMxMjUwMzNaFw0yOTA4MjAxMjUwMzNaMGQx
+CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEWMBQGA1UEBxMNTW91bnRhaW4gVmlldzENMAsGA1UE
+ChMEV1NPMjENMAsGA1UECxMEV1NPMjESMBAGA1UEAxMJbG9jYWxob3N0MIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAj3mYMT8N2SR8cpimdMOTpk/M8fOxPF1BHQAiCtld4nbksILgJKsA
+34GSP5Oh4gLW21VCEPPzdGLnqfwM6ZoG/X0rcK5++VbqH/vH4Cclba6fqlLxCvTiRbPJ58Pe7+bi
+CeQ368dG2aeBPV3EhO8br3Z/LcQXASmhSWps8J3GOSx/49xzkHh59J2gJHhnvjxcszZAF35SLAb6
+F+2rJQrOJs6u7WfJv4NQxSyhcgcr4/+77JzNFEVUj4TPSBy2WGAgK5ttP5+kG3+rKs0lQjTo9h/h
+K89KjbbRvoqZdpxnwQYxFDOk0CxijZVO5Cs3cabeUHZeXehHSgXj6W+VGMiDgwIDAQABozcwNTAU
+BgNVHREEDTALgglsb2NhbGhvc3QwHQYDVR0OBBYEFFU2A4pBuR0aKGrgQAtrSlqWrNLLMA0GCSqG
+SIb3DQEBCwUAA4IBAQAX+F30hIwI+8hO9IQ9Wr40+zL6KTgDxWraB450D7UyZ/FApKK2R/vYvIqa
+b+H6u9XNCz63+sYgX6/UBSYW47ow6QMcv71xepXbwtLqq3MQr6frgP52Z2jyQtAbDpirh4/IXkhF
++S8DsDFxmlPy423LKnTqCqIfyv7Y8Y8lty5BWyfYJV7V2RJnZ4zIKv66U3exxugR0WRGWy56nIY8
+GGaroxuC9cH6NkVwN9GmYoCa9PUGynQ4NHjeg6VSwQZ279VGpLhogWS67x8V/nR+yjI+qTjjCbJq
+soHVQL90Vxa+ASD1DViBA8ar1/9Ns5vIEZet5GT1nM10ZzEK+E1QMGed</X509Certificate></X509Data></KeyInfo></KeyDescriptor><ArtifactResolutionService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://localhost:9443/samlartresolve" index="1"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="https://localhost:9443/samlsso" ResponseLocation="https://localhost:9443/samlsso"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:9443/samlsso" ResponseLocation="https://localhost:9443/samlsso"/><SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://localhost:9443/samlsso" ResponseLocation="https://localhost:9443/samlsso"/><NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</NameIDFormat><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://localhost:9443/samlsso"/><SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://localhost:9443/samlsso"/></IDPSSODescriptor></EntityDescriptor>

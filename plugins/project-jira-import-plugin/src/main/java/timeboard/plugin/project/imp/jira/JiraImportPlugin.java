@@ -76,6 +76,14 @@ public class JiraImportPlugin implements ProjectImportService {
 
             final Project project = this.projectService.getProjectByID(actor, projectID);
 
+            if(project.getAttributes().get(JIRA_USERNAME_KEY) == null){
+                throw  new BusinessException("Missing "+JIRA_USERNAME_KEY+" key");
+            }
+
+            if(project.getAttributes().get(JIRA_PASSWORD_KEY) == null){
+                throw  new BusinessException("Missing "+JIRA_PASSWORD_KEY+" key");
+            }
+
             String jiraUsername = project.getAttributes().get(JIRA_USERNAME_KEY).getValue();
             String jiraPassword = project.getAttributes().get(JIRA_PASSWORD_KEY).getValue();
 

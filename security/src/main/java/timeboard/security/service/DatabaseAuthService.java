@@ -26,13 +26,13 @@ package timeboard.security.service;
  * #L%
  */
 
+import org.osgi.service.component.annotations.*;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 import timeboard.security.api.Credential;
 import timeboard.security.api.LoginService;
 import timeboard.security.api.UsernamePasswordCredential;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 @Component(
         service = LoginService.class,
@@ -41,9 +41,12 @@ import org.osgi.service.component.annotations.Reference;
 public class DatabaseAuthService implements LoginService {
 
 
-    @Reference
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            policy = ReferencePolicy.STATIC,
+            cardinality = ReferenceCardinality.OPTIONAL
+    )
     private UserService userService;
-
 
     @Override
     public boolean isServiceValidFor(Credential credential) {

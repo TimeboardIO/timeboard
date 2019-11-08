@@ -326,9 +326,7 @@ public class ProjectServiceImpl implements ProjectService {
             rev.setTask(taskFromDB);
             entityManager.persist(rev);
             entityManager.flush();
-
             this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
-
             return taskFromDB;
         });
     }

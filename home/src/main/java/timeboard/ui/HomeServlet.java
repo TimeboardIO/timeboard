@@ -26,15 +26,13 @@ package timeboard.ui;
  * #L%
  */
 
+import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.ui.model.Week;
 
 import javax.servlet.Servlet;
@@ -58,11 +56,19 @@ import java.util.List;
 )
 public class HomeServlet extends TimeboardServlet {
 
-    @Reference
-    private ProjectService projectService;
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            policy = ReferencePolicy.STATIC,
+            cardinality = ReferenceCardinality.OPTIONAL
+    )
+    private   ProjectService projectService;
 
-    @Reference
-    private TimesheetService timesheetService;
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            policy = ReferencePolicy.STATIC,
+            cardinality = ReferenceCardinality.OPTIONAL
+    )
+    private   TimesheetService timesheetService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -84,13 +90,15 @@ public class HomeServlet extends TimeboardServlet {
         List<Week> weeks = new ArrayList<>();
         User user = SecurityContext.getCurrentUser(request);
         int weeksToDisplay = 3; //TODO replace by a parameter ?
-        for(int i=0; i<weeksToDisplay; i++){
-            double weekSum = 0;
-            boolean weekIsValidated =timesheetService.isTimesheetValidated(user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+        if(this.timesheetService != null) {
+            for (int i = 0; i < weeksToDisplay; i++) {
+                double weekSum = 0;
+                boolean weekIsValidated = timesheetService.isTimesheetValidated(user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
 
-            Week week = new Week(c.get(Calendar.WEEK_OF_YEAR),c.get(Calendar.YEAR), weekSum, weekIsValidated);
-            weeks.add(week);
-            c.roll(Calendar.WEEK_OF_YEAR,-1);
+                Week week = new Week(c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR), weekSum, weekIsValidated);
+                weeks.add(week);
+                c.roll(Calendar.WEEK_OF_YEAR, -1);
+            }
         }
 
         viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(user).size());

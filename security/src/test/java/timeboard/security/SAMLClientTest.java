@@ -1,8 +1,8 @@
-package timeboard.core.api;
+package timeboard.security;
 
 /*-
  * #%L
- * core
+ * security
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,43 +26,23 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Task;
-import timeboard.core.model.TaskRevision;
-import timeboard.core.model.User;
+import com.coveo.saml.SamlClient;
+import com.coveo.saml.SamlException;
+import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
-public interface ProjectImportService {
+public class SAMLClientTest {
 
-    String getServiceName();
+    @Test
+    public void doSAMLTest() throws IOException, SamlException {
 
-    List<String> getRequiredUserFields();
 
-    /**
-     * Synchronize project tasks with remote source
-     * @param actor
-     * @param projectID
-     * @throws BusinessException
-     */
-    String importTasksToProject(User actor, long projectID) throws BusinessException;
 
-    List<RemoteTask> getRemoteTasks(User currentUser, long projectID);
-
-    public static class RemoteTask{
-
-        private Long ID;
-
-        public Task toTask() {
-            return null;
-        }
-
-        public TaskRevision toTaskRevision() {
-            return null;
-        }
-
-        public Long getID() {
-            return ID;
-        }
     }
+
 }
