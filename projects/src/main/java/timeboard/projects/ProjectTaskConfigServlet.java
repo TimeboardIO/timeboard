@@ -187,8 +187,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
     private Task createTask(User actor, Project project, HttpServletRequest request) throws ParseException {
         TaskForm taskForm = new TaskForm(request);
-        long milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
-        Milestone milestone = this.projectService.getMilestoneById(milestoneID);
+        Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
 
         return this.projectService.createTaskWithMilestone(actor,
                 project,
@@ -205,8 +204,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
     private Task updateTask(User actor, Project project, Task currentTask, HttpServletRequest request) throws ParseException {
         TaskForm taskForm = new TaskForm(request);
-        long milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
-        Milestone milestone = this.projectService.getMilestoneById(milestoneID);
+        Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
 
         final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());
         if(taskType != null) {
@@ -272,7 +270,10 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             endDate = new Date(DATE_FORMAT.parse(request.getParameter("taskEndDate")).getTime()+(2 * 60 * 60 * 1000) +1);
             estimateWork = Double.parseDouble(request.getParameter("taskEstimateWork"));
             taskStatus = request.getParameter("taskStatus") != null ? TaskStatus.valueOf(request.getParameter("taskStatus")) : TaskStatus.PENDING;
-            milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
+
+            if(request.getParameter("taskMilestoneId") != null && !request.getParameter("taskMilestoneId").isEmpty()) {
+                milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
+            }
 
             if(request.getParameter("taskTypeID") != null &&  !request.getParameter("taskTypeID").isEmpty()) {
                 taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));

@@ -307,7 +307,9 @@ public class ProjectServiceImpl implements ProjectService {
 
             entityManager.merge(project);
             newTask.setProject(project);
-            entityManager.merge(milestone);
+            if(milestone != null) {
+                entityManager.merge(milestone);
+            }
             newTask.setMilestone(milestone);
 
             entityManager.flush();
