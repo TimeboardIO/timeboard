@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{projects:details_project_milestones.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Project Milestones details</title>
+</head>
+<body>
+
+<div layout:fragment="milestone-config">
+
+    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestone"
+          method="post" style="margin-left:1em;">
+        <input name="milestoneID" required th:value="${milestone.id}" type="hidden">
+
+        <div class="field">
+            <label>Milestone Name</label>
+            <input name="milestoneName" placeholder="Milestone Name" required th:value="${milestone.name}" type="text">
+        </div>
+
+        <div class="field">
+            <label>Milestone  Date</label>
+            <input name="milestoneDate" placeholder="Milestone Date"
+                   required th:value="${#dates.format(milestone.date, 'yyyy-MM-dd')}" type="date">
+        </div>
+
+        <div class="field">
+            <label>Milestone type</label>
+            <select  name="milestoneType">
+                <option th:each="type: ${allMilestoneTypes}"
+                        th:text="${type.label}"
+                        th:value="${type}"
+                        th:selected="${type == milestone.type}"></option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label>Milestone Attributes</label>
+
+            <table class="ui celled table">
+                <thead>
+                <tr>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="attr : ${milestone.getAttributes()}" th:attr="data-key=${attr.key}">
+                    <td th:text="${attr.key}">
+                    </td>
+                    <td>
+                        <input type="text" th:name="'attr-'+${attr.key}" th:value="${attr.value}"/>
+                    </td>
+                    <td>
+                        <div class="ui negative basic button delete" th:attr="data-key=${attr.key}">
+                            <i class="remove alternate icon"></i>
+                            Remove
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="text" name="newAttrKey" placeholder="New attribute key"/>
+                    </td>
+                    <td>
+                        <input type="text" name="newAttrValue" placeholder="New attribute value"/>
+                    </td>
+                    <td></td>
+                </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+
+
+        <button class="ui positive button" type="submit">Save</button>
+
+        <a class="ui negative basic button" th:if="${milestone.id != null}"
+           th:href="@{/projects/milestones/delete(milestoneID=${milestone.id}, projectID=${project.id})}">
+            <i class="remove alternate icon"></i>
+            Delete Milestone
+        </a>
+
+    </form>
+
+    <script type="text/javascript">
+       $('.delete[data-key]').click(function(){
+            $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
+       });
+    </script>
+
+</div>
+
+</body>
+</html>

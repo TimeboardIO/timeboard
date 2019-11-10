@@ -162,7 +162,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
             });
             projects.add(new ProjectWrapper(
-                    0,
+                    (long) 0,
                     "Default Tasks",
                     tasks));
             }
@@ -260,17 +260,17 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
     public static class ProjectWrapper {
 
-        private final long projectID;
+        private final Long projectID;
         private final String projectName;
         private final List<TaskWrapper> tasks;
 
-        public ProjectWrapper(long projectID, String projectName, List<TaskWrapper> tasks) {
+        public ProjectWrapper(Long projectID, String projectName, List<TaskWrapper> tasks) {
             this.projectID = projectID;
             this.projectName = projectName;
             this.tasks = tasks;
         }
 
-        public long getProjectID() {
+        public Long getProjectID() {
             return projectID;
         }
 
@@ -290,7 +290,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
     }
 
     public static class TaskWrapper {
-        private final long taskID;
+        private final Long taskID;
         private final String taskName;
         private final double effortSpent;
         private final double remainToBeDone;
@@ -299,7 +299,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
         private final Date startDate;
         private final Date endDate;
 
-        public TaskWrapper(long taskID, String taskName, double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork, Date startDate, Date endDate) {
+        public TaskWrapper(Long taskID, String taskName, double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork, Date startDate, Date endDate) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.effortSpent = effortSpent;
@@ -334,7 +334,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
             return effortSpent;
         }
 
-        public long getTaskID() {
+        public Long getTaskID() {
             return taskID;
         }
 
@@ -344,17 +344,17 @@ public class TimesheetRESTApi extends TimeboardServlet {
     }
 
     public static class ImputationWrapper {
-        private final long taskID;
+        private final Long taskID;
         private final double value;
         private final Date date;
 
-        public ImputationWrapper(long taskID, double value, Date date) {
+        public ImputationWrapper(Long taskID, double value, Date date) {
             this.taskID = taskID;
             this.value = value;
             this.date = date;
         }
 
-        public long getTaskID() {
+        public Long getTaskID() {
             return taskID;
         }
 

@@ -26,12 +26,13 @@ package timeboard.core.internal;
  * #L%
  */
 
-import timeboard.core.internal.rules.RuleSet;
+import timeboard.core.internal.rules.*;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.rules.ActorIsProjectMember;
-import timeboard.core.internal.rules.Rule;
-import timeboard.core.internal.rules.TaskHasNoImputation;
+import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
+import timeboard.core.internal.rules.milestone.MilestoneHasNoTask;
+import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
+import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
@@ -501,7 +502,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new TaskHasNoImputation());
-        ruleSet.addRule(new ActorIsProjectMember());
+        ruleSet.addRule(new ActorIsProjectMemberbyTask());
 
         BusinessException exp = this.jpa.txExpr(entityManager -> {
             Task task = entityManager.find(Task.class, taskID);
@@ -594,5 +595,77 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
 
+    }
+
+    @Override
+    public List<Milestone> listProjectMilestones(Project project) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Milestone> q = entityManager.createQuery("select m from Milestone m where m.project = :project", Milestone.class);
+            q.setParameter("project", project);
+            return q.getResultList();
+        });
+    }
+
+    @Override
+    public Milestone getMilestoneById(long id) {
+        return this.jpa.txExpr(entityManager -> {
+            return entityManager.find(Milestone.class, id);
+        });
+    }
+
+    @Override
+    public Milestone createMilestone(String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) {
+        return this.jpa.txExpr(entityManager -> {
+
+            Milestone newMilestone = new Milestone();
+            newMilestone.setName(name);
+            newMilestone.setDate(date);
+            newMilestone.setType(type);
+            newMilestone.setAttributes(attributes);
+            newMilestone.setTasks(tasks);
+            newMilestone.setProject(project);
+
+            entityManager.persist(newMilestone);
+            this.logService.log(LogService.LOG_INFO, "Milestone " + newMilestone);
+
+            return newMilestone;
+
+        });
+    }
+
+    @Override
+    public Milestone updateMilestone(Milestone milestone) {
+        return jpa.txExpr(em -> {
+            em.merge(milestone);
+            em.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Milestone " + milestone.getName() + " updated");
+            return milestone;
+        });
+    }
+
+    @Override
+    public void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException {
+        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        ruleSet.addRule(new MilestoneHasNoTask());
+
+        BusinessException exp = this.jpa.txExpr(entityManager -> {
+            Milestone milestone = entityManager.find(Milestone.class, milestoneID);
+
+            Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
+            if (!wrongRules.isEmpty()) {
+                return new BusinessException(wrongRules);
+            }
+
+            entityManager.remove(milestone);
+            entityManager.flush();
+            return null;
+        });
+
+        if (exp != null) {
+            throw exp;
+        }
+        this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by "+actor.getName());
     }
 }

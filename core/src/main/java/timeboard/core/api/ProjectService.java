@@ -29,10 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public interface ProjectService {
 
@@ -122,5 +119,43 @@ public interface ProjectService {
 
 
     DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException;
+
+
+    /*
+     == Milestones ==
+     */
+
+    /**
+     * Return all milestones for a project
+     * @param project project
+     * @return List milestones
+     */
+    List<Milestone> listProjectMilestones(Project project);
+
+    /**
+     * Search milestone by id
+     * @param id milestone's id
+     * @return Milestone
+     */
+    Milestone getMilestoneById(long id);
+
+    /**
+     * Create a milestone
+     * @return Milestone
+     */
+    Milestone createMilestone(String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project);
+
+    /**
+     * Update a milestone
+     * @return Milestone
+     */
+    Milestone updateMilestone(Milestone milestone);
+
+    /**
+     * Delete a milestone
+     * @param milestoneID
+     */
+    void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException;
+
 
 }
