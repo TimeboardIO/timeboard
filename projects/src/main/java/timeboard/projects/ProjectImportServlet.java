@@ -148,7 +148,6 @@ public class ProjectImportServlet extends HttpServlet {
             importResponse.getErrors().add(new BusinessException("Missing "+type+" Service"));
         }
 
-
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
         req.setAttribute("errors", importResponse.getErrors());
         req.setAttribute("importSuccess", message);
