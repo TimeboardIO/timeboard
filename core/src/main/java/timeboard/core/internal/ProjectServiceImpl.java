@@ -278,6 +278,48 @@ public class ProjectServiceImpl implements ProjectService {
             return newTask;
         });
     }
+
+    @Override
+    public Task createTaskWithMilestone(User actor,
+                                        Project project,
+                                        String taskName,
+                                        String taskComment,
+                                        Date startDate,
+                                        Date endDate,
+                                        double OE,
+                                        Long taskTypeID,
+                                        User assignedUser,
+                                        Milestone milestone
+    ) {
+        return this.jpa.txExpr(entityManager -> {
+            Task newTask = new Task();
+            newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
+            newTask.setEstimateWork(OE);
+            newTask.setName(taskName);
+            newTask.setComments(taskComment);
+            newTask.setStartDate(startDate);
+            newTask.setEndDate(endDate);
+            newTask.setComments(taskComment);
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
+            newTask.getRevisions().add(taskRevision);
+            newTask.setLatestRevision(taskRevision);
+            entityManager.persist(newTask);
+
+            entityManager.merge(project);
+            newTask.setProject(project);
+            if(milestone != null) {
+                entityManager.merge(milestone);
+            }
+            newTask.setMilestone(milestone);
+
+            entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
+
+            return newTask;
+        });
+    }
+
     @Override
     public Task createTask(User actor,
                            Project project,
@@ -324,8 +366,41 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             final Task taskFromDB = entityManager.find(Task.class, task.getId());
             taskFromDB.setLatestRevision(rev);
+
+            taskFromDB.setTaskType(task.getTaskType());
+            taskFromDB.setName(task.getName());
+            taskFromDB.setComments(task.getComments());
+            taskFromDB.setStartDate(task.getStartDate());
+            taskFromDB.setEndDate(task.getEndDate());
+            taskFromDB.setEstimateWork( task.getEstimateWork());
+
             rev.setTask(taskFromDB);
             entityManager.persist(rev);
+            entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
+
+            return taskFromDB;
+        });
+    }
+
+    @Override
+    public Task updateTaskWithMilestone(User actor, final Task task, TaskRevision rev, Milestone milestone) {
+        return this.jpa.txExpr(entityManager -> {
+            final Task taskFromDB = entityManager.find(Task.class, task.getId());
+            taskFromDB.setLatestRevision(rev);
+
+            taskFromDB.setTaskType(task.getTaskType());
+            taskFromDB.setName(task.getName());
+            taskFromDB.setComments(task.getComments());
+            taskFromDB.setStartDate(task.getStartDate());
+            taskFromDB.setEndDate(task.getEndDate());
+            taskFromDB.setEstimateWork(task.getEstimateWork());
+            taskFromDB.setMilestone(milestone);
+
+            rev.setTask(taskFromDB);
+            entityManager.persist(rev);
+
             entityManager.flush();
 
             this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
@@ -424,7 +499,6 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return this.jpa.txExpr(entityManager -> entityManager.find(TaskType.class, taskTypeID));
     }
-
 
     @Override
     public List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID) {
