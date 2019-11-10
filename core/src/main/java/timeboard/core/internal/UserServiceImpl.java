@@ -95,20 +95,23 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) {
-        return this.jpa.txExpr(entityManager -> {
+    public User updateUser(User user) throws UserException {
+        User u = this.findUserByID(user.getId());
+        if(u == null){
+            throw new UserException("User does not exist.");
+        } else {
+            return this.jpa.txExpr(entityManager -> {
+                u.setFirstName(user.getFirstName());
+                u.setName(user.getName());
+                u.setLogin(user.getLogin());
+                u.setEmail(user.getEmail());
+                u.setExternalIDs(user.getExternalIDs());
 
-            User u = entityManager.find(User.class, user.getId());
-            u.setFirstName(user.getFirstName());
-            u.setName(user.getName());
-            u.setLogin(user.getLogin());
-            u.setEmail(user.getEmail());
-            u.setExternalIDs(user.getExternalIDs());
-
-            entityManager.persist(u);
-            this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
-            return user;
-        });
+                entityManager.persist(u);
+                this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
+                return user;
+            });
+        }
     }
 
     @Override
