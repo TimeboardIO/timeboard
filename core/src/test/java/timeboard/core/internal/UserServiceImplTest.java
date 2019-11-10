@@ -25,6 +25,7 @@ package timeboard.core.internal;
  * THE SOFTWARE.
  * #L%
  */
+
 import org.apache.aries.jpa.support.impl.AbstractJpaTemplate;
 import org.apache.aries.jpa.template.EmFunction;
 import org.apache.aries.jpa.template.JpaTemplate;
