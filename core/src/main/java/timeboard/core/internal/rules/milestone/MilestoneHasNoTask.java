@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.internal.rules.milestone;
 
 /*-
  * #%L
@@ -26,64 +26,19 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Milestone;
+import timeboard.core.model.User;
 
-@Entity
-@Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
-)
-public class Imputation implements Serializable {
+public class MilestoneHasNoTask implements Rule<Milestone> {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    @Column
-    private Double value;
-
-    @Column
-    @Temporal(TemporalType.DATE)
-    private Date day;
-
-    @ManyToOne(targetEntity = AbstractTask.class)
-    private AbstractTask task;
-
-    @OneToOne
-    private User user;
-
-    public long getId() {
-        return id;
+    @Override
+    public String ruleDescription() {
+        return "Milestone with tasks cannot be removed";
     }
 
-    public void setId(long id) {
-        this.id = id;
+    @Override
+    public boolean isSatisfied(User u, Milestone thing) {
+        return thing.getTasks().isEmpty();
     }
-
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
-        this.value = value;
-    }
-
-    public Date getDay() {
-        return day;
-    }
-
-    public void setDay(Date day) {
-        this.day = day;
-    }
-
-    public AbstractTask getTask() {
-        return task;
-    }
-
-    public void setTask(AbstractTask task) { this.task = task; }
-
-    public User getUser() { return user; }
-
-    public void setUser(User user) { this.user = user; }
 }

@@ -54,10 +54,10 @@ public class LauncherLoader {
     @Reference
     UserService userService;
 
-    private final int nbUsers = 3;
-    private final int nbProjectsByUsers = 5;
-    private final int nbTasksByProjects = 10;
-    private final int nbImputationsByTasks = 8;
+    private final int nbUsers = 5;
+    private final int nbProjectsByUsers = 3;
+    private final int nbTasksByProjects = 5;
+    private final int nbImputationsByTasks = 10;
 
     @Activate
     public void load() throws BundleException, BusinessException {

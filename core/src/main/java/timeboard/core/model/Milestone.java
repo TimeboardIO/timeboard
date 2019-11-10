@@ -26,14 +26,14 @@ package timeboard.core.model;
  * #L%
  */
 
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
-
+import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 @Entity
-public class Project implements Serializable {
+public class Milestone implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,39 +42,36 @@ public class Project implements Serializable {
     @Column(length = 50, unique = false)
     private String name;
 
-    @Column
-    private Double quotation;
-
     @Temporal(TemporalType.DATE)
-    private Date startDate;
+    private Date date;
 
     @Column(length = 500)
-    private String comments;
+    private MilestoneType type;
 
     @Column(columnDefinition = "TEXT")
-    @Convert(converter = JSONToProjectAttributsConverter.class)
+    @Convert(converter = JSONToMapStringConverter.class)
     @Lob
-    private Map<String, ProjectAttributValue> attributes;
+    private Map<String, String> attributes;
 
-    @OneToMany(targetEntity = ProjectMembership.class,
-            mappedBy = "project",
-            orphanRemoval = true,
-            cascade = {CascadeType.ALL},
-            fetch = FetchType.EAGER
-    )
-    private Set<ProjectMembership> members;
+    @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
+    private Project project;
 
-
-    @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.PERSIST)
+    @OneToMany(targetEntity = Task.class, mappedBy = "milestone", cascade = CascadeType.PERSIST)
     private Set<Task> tasks;
 
-    @OneToMany(targetEntity = Milestone.class, mappedBy = "project", cascade = CascadeType.PERSIST)
-    private Set<Milestone> milestones;
 
-    public Project() {
-        members = new HashSet<>();
-        tasks = new HashSet<>();
-        this.attributes = new HashMap<>();
+    public Milestone(long id, String name, Date date, MilestoneType type, Map<String, String> attributes, Project project, Set<Task> tasks) {
+        this.id = id;
+        this.name = name;
+        this.date = date;
+        this.type = type;
+        this.attributes = attributes;
+        this.project = project;
+        this.tasks = tasks;
+    }
+
+    public Milestone() {
+
     }
 
     public Long getId() {
@@ -85,17 +82,6 @@ public class Project implements Serializable {
         this.id = id;
     }
 
-    public Double getQuotation() {
-        if(this.quotation == null){
-            return 0.0;
-        }
-        return quotation;
-    }
-
-    public void setQuotation(Double quotation) {
-        this.quotation = quotation;
-    }
-
     public String getName() {
         return name;
     }
@@ -104,28 +90,28 @@ public class Project implements Serializable {
         this.name = name;
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Date getDate() {
+        return date;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    public String getComments() {
-        return comments;
+    public MilestoneType getType() {
+        return type;
     }
 
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setType(MilestoneType type) {
+        this.type = type;
     }
 
-    public Set<ProjectMembership> getMembers() {
-        return members;
+    public Map<String, String> getAttributes() {
+        return attributes;
     }
 
-    public void setMembers(Set<ProjectMembership> members) {
-        this.members = members;
+    public void setAttributes(Map<String, String> attributes) {
+        this.attributes = attributes;
     }
 
     public Set<Task> getTasks() {
@@ -136,19 +122,13 @@ public class Project implements Serializable {
         this.tasks = tasks;
     }
 
-    public Map<String, ProjectAttributValue> getAttributes() {
-        return attributes;
+    public Project getProject() {
+        return project;
     }
 
-    public void setAttributes(Map<String, ProjectAttributValue> attributes) {
-        this.attributes = attributes;
+    public void setProject(Project project) {
+        this.project = project;
     }
 
-    public Set<Milestone> getMilestones() {
-        return milestones;
-    }
 
-    public void setMilestones(Set<Milestone> milestones) {
-        this.milestones = milestones;
-    }
 }

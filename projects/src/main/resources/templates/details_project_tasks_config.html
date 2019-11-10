@@ -80,7 +80,7 @@
 
         <button class="ui positive button" type="submit">Save</button>
 
-        <a class="ui negative basic button"
+        <a class="ui negative basic button" th:if="${task.taskID != null}"
            th:href="@{/projects/tasks/delete(taskID=${task.taskID}, projectID=${project.id})}">
             <i class="remove alternate icon"></i>
             Delete Task

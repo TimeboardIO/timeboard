@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.internal.rules.task;
 
 /*-
  * #%L
@@ -26,64 +26,29 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Date;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.ProjectMembership;
+import timeboard.core.model.ProjectRole;
+import timeboard.core.model.User;
+import timeboard.core.model.Task;
 
-@Entity
-@Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
-)
-public class Imputation implements Serializable {
+import java.util.Optional;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+public class ActorIsProjectMemberbyTask implements Rule<Task> {
 
-    @Column
-    private Double value;
-
-    @Column
-    @Temporal(TemporalType.DATE)
-    private Date day;
-
-    @ManyToOne(targetEntity = AbstractTask.class)
-    private AbstractTask task;
-
-    @OneToOne
-    private User user;
-
-    public long getId() {
-        return id;
+    @Override
+    public String ruleDescription() {
+        return "User is not project Owner";
     }
 
-    public void setId(long id) {
-        this.id = id;
+    @Override
+    public boolean isSatisfied(User u, Task thing) {
+        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+                .filter(projectMembership ->
+                        projectMembership.getMember().getId() == u.getId()
+                                && projectMembership.getRole().equals(ProjectRole.OWNER)
+                )
+                .findFirst();
+        return userOptional.isPresent();
     }
-
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
-        this.value = value;
-    }
-
-    public Date getDay() {
-        return day;
-    }
-
-    public void setDay(Date day) {
-        this.day = day;
-    }
-
-    public AbstractTask getTask() {
-        return task;
-    }
-
-    public void setTask(AbstractTask task) { this.task = task; }
-
-    public User getUser() { return user; }
-
-    public void setUser(User user) { this.user = user; }
 }

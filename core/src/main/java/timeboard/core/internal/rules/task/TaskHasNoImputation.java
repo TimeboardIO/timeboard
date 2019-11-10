@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules;
+package timeboard.core.internal.rules.task;
 
 /*-
  * #%L
@@ -26,6 +26,7 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
+import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
 

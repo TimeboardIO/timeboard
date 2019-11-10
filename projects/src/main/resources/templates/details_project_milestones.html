@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{projects:details_project_layout.html(tab='third')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Project Milestones details</title>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+    <input name="projectID" required th:value="${project.id}" type="hidden">
+    <div class="ui grid form">
+
+        <div class="four wide column" id="masters">
+            <table class="ui unstackable table">
+                <thead>
+                <tr>
+                    <th>Milestone Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <a class="ui button" th:href="@{/projects/milestones/config(projectID=${project.id})}">Create Milestone</a>
+                    </td>
+                </tr>
+                <tr th:each="milestone : ${milestones}">
+                    <td>
+                        <a th:href="@{/projects/milestones/config(projectID=${project.id}, milestoneID=${milestone.id})}"
+                           th:text="${milestone.name}"></a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="twelve wide column" id="details" layout:fragment="milestone-config">
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

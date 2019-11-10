@@ -29,7 +29,6 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -64,6 +63,9 @@ public class Task extends AbstractTask implements Serializable {
 
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
+
+    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER)
+    private Milestone milestone;
 
 
     public Task() {
@@ -112,7 +114,13 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
+    public Milestone getMilestone() {
+        return milestone;
+    }
 
+    public void setMilestone(Milestone milestone) {
+        this.milestone = milestone;
+    }
 
     /**
      * EL.
@@ -172,18 +180,6 @@ public class Task extends AbstractTask implements Serializable {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
     }
 
-    @Transient
-    public double findTaskImputationValueByDate(Date date) {
-        Optional<Imputation> iOpt = this.getImputations().stream()
-                .filter(imputation -> this.areDateSameDay(date, imputation.getDay()))
-                .findFirst();
-        if (iOpt.isPresent()) {
-            return iOpt.get().getValue();
-        } else {
-            return 0;
-        }
-    }
-
     public List<TaskRevision> getRevisions() {
         return revisions;
     }
@@ -192,7 +188,5 @@ public class Task extends AbstractTask implements Serializable {
         this.revisions = revisions;
     }
 
-    private boolean areDateSameDay(Date date1, Date date2){
-        return new SimpleDateFormat("yyyy-MM-dd").format(date1).equals(new SimpleDateFormat("yyyy-MM-dd").format(date2));
-    }
+
 }
