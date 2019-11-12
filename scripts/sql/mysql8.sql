@@ -54,6 +54,16 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table Milestone (
+       id bigint not null,
+        attributes TEXT,
+        date date,
+        name varchar(50),
+        type integer,
+        project_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Project (
        id bigint not null,
         attributes TEXT,
@@ -76,6 +86,7 @@
        estimateWork double precision not null,
         id bigint not null,
         latestRevision_id bigint,
+        milestone_id bigint,
         project_id bigint,
         taskType_id bigint,
         primary key (id)
@@ -144,6 +155,11 @@
        foreign key (user_id) 
        references User (id);
 
+    alter table Milestone 
+       add constraint FK4y2imlhl4and4511uh6lhnaiy 
+       foreign key (project_id) 
+       references Project (id);
+
     alter table ProjectMembership 
        add constraint FKh59cv9s56u3sdi0ki6axsxf09 
        foreign key (member_id) 
@@ -158,6 +174,11 @@
        add constraint FKjwuo5mqkfx9k23jd3g8vr4a2p 
        foreign key (latestRevision_id) 
        references TaskRevision (id);
+
+    alter table Task 
+       add constraint FKjl7lj35hlsnb3n8x2kyk9w5lx 
+       foreign key (milestone_id) 
+       references Milestone (id);
 
     alter table Task 
        add constraint FKkkcat6aybe3nbvhc54unstxm6 

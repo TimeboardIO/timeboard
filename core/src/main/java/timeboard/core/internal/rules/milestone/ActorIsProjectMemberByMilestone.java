@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules;
+package timeboard.core.internal.rules.milestone;
 
 /*-
  * #%L
@@ -26,14 +26,12 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import timeboard.core.model.ProjectMembership;
-import timeboard.core.model.ProjectRole;
-import timeboard.core.model.User;
-import timeboard.core.model.Task;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.*;
 
 import java.util.Optional;
 
-public class ActorIsProjectMember implements Rule<Task> {
+public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {
 
     @Override
     public String ruleDescription() {
@@ -41,7 +39,7 @@ public class ActorIsProjectMember implements Rule<Task> {
     }
 
     @Override
-    public boolean isSatisfied(User u, Task thing) {
+    public boolean isSatisfied(User u, Milestone thing) {
         Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()

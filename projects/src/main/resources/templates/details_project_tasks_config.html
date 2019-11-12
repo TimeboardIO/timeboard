@@ -48,7 +48,7 @@
         </div>
         <div class="field">
             <label>Task status</label>
-            <select  name="taskStatus" th:disabled="${task.taskID == null}">
+            <select name="taskStatus" th:disabled="${task.taskID == null}">
                 <option th:each="status: ${allTaskStatus}"
                         th:text="${status.label}"
                         th:value="${status}"
@@ -77,10 +77,21 @@
             </div>
         </div>
 
+        <div class="field">
+            <label>Milestone assigned</label>
+            <select name="taskMilestoneId">
+                <option></option>
+                <option th:each="milestone: ${allProjectMilestones}"
+                        th:text="${milestone.name}"
+                        th:value="${milestone.id}"
+                        th:selected="${milestone.id == task.milestoneID}"></option>
+            </select>
+        </div>
+
 
         <button class="ui positive button" type="submit">Save</button>
 
-        <a class="ui negative basic button"
+        <a class="ui negative basic button" th:if="${task.taskID != null}"
            th:href="@{/projects/tasks/delete(taskID=${task.taskID}, projectID=${project.id})}">
             <i class="remove alternate icon"></i>
             Delete Task

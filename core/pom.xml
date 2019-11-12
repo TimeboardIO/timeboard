@@ -147,7 +147,9 @@
                             org.apache.aries.jpa.template,
                             javax.transaction,
                             org.osgi.*,
-                            org.w3c.dom
+                            org.w3c.dom,
+                            javax.crypto.spec,
+                            javax.crypto
                         </Import-Package>
                         <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
                         <Embed-Transitive>true</Embed-Transitive>

@@ -26,12 +26,13 @@ package timeboard.core.internal;
  * #L%
  */
 
-import timeboard.core.internal.rules.RuleSet;
+import timeboard.core.internal.rules.*;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.rules.ActorIsProjectMember;
-import timeboard.core.internal.rules.Rule;
-import timeboard.core.internal.rules.TaskHasNoImputation;
+import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
+import timeboard.core.internal.rules.milestone.MilestoneHasNoTask;
+import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
+import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
@@ -278,6 +279,48 @@ public class ProjectServiceImpl implements ProjectService {
             return newTask;
         });
     }
+
+    @Override
+    public Task createTaskWithMilestone(User actor,
+                                        Project project,
+                                        String taskName,
+                                        String taskComment,
+                                        Date startDate,
+                                        Date endDate,
+                                        double OE,
+                                        Long taskTypeID,
+                                        User assignedUser,
+                                        Milestone milestone
+    ) {
+        return this.jpa.txExpr(entityManager -> {
+            Task newTask = new Task();
+            newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
+            newTask.setEstimateWork(OE);
+            newTask.setName(taskName);
+            newTask.setComments(taskComment);
+            newTask.setStartDate(startDate);
+            newTask.setEndDate(endDate);
+            newTask.setComments(taskComment);
+            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
+            newTask.getRevisions().add(taskRevision);
+            newTask.setLatestRevision(taskRevision);
+            entityManager.persist(newTask);
+
+            entityManager.merge(project);
+            newTask.setProject(project);
+            if(milestone != null) {
+                entityManager.merge(milestone);
+            }
+            newTask.setMilestone(milestone);
+
+            entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
+
+            return newTask;
+        });
+    }
+
     @Override
     public Task createTask(User actor,
                            Project project,
@@ -324,8 +367,41 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             final Task taskFromDB = entityManager.find(Task.class, task.getId());
             taskFromDB.setLatestRevision(rev);
+
+            taskFromDB.setTaskType(task.getTaskType());
+            taskFromDB.setName(task.getName());
+            taskFromDB.setComments(task.getComments());
+            taskFromDB.setStartDate(task.getStartDate());
+            taskFromDB.setEndDate(task.getEndDate());
+            taskFromDB.setEstimateWork( task.getEstimateWork());
+
             rev.setTask(taskFromDB);
             entityManager.persist(rev);
+            entityManager.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
+
+            return taskFromDB;
+        });
+    }
+
+    @Override
+    public Task updateTaskWithMilestone(User actor, final Task task, TaskRevision rev, Milestone milestone) {
+        return this.jpa.txExpr(entityManager -> {
+            final Task taskFromDB = entityManager.find(Task.class, task.getId());
+            taskFromDB.setLatestRevision(rev);
+
+            taskFromDB.setTaskType(task.getTaskType());
+            taskFromDB.setName(task.getName());
+            taskFromDB.setComments(task.getComments());
+            taskFromDB.setStartDate(task.getStartDate());
+            taskFromDB.setEndDate(task.getEndDate());
+            taskFromDB.setEstimateWork(task.getEstimateWork());
+            taskFromDB.setMilestone(milestone);
+
+            rev.setTask(taskFromDB);
+            entityManager.persist(rev);
+
             entityManager.flush();
 
             this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
@@ -425,7 +501,6 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> entityManager.find(TaskType.class, taskTypeID));
     }
 
-
     @Override
     public List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID) {
         return this.jpa.txExpr(entityManager -> {
@@ -502,7 +577,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new TaskHasNoImputation());
-        ruleSet.addRule(new ActorIsProjectMember());
+        ruleSet.addRule(new ActorIsProjectMemberbyTask());
 
         BusinessException exp = this.jpa.txExpr(entityManager -> {
             Task task = entityManager.find(Task.class, taskID);
@@ -594,5 +669,77 @@ public class ProjectServiceImpl implements ProjectService {
             return map;
         });
 
+    }
+
+    @Override
+    public List<Milestone> listProjectMilestones(Project project) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Milestone> q = entityManager.createQuery("select m from Milestone m where m.project = :project", Milestone.class);
+            q.setParameter("project", project);
+            return q.getResultList();
+        });
+    }
+
+    @Override
+    public Milestone getMilestoneById(long id) {
+        return this.jpa.txExpr(entityManager -> {
+            return entityManager.find(Milestone.class, id);
+        });
+    }
+
+    @Override
+    public Milestone createMilestone(String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) {
+        return this.jpa.txExpr(entityManager -> {
+
+            Milestone newMilestone = new Milestone();
+            newMilestone.setName(name);
+            newMilestone.setDate(date);
+            newMilestone.setType(type);
+            newMilestone.setAttributes(attributes);
+            newMilestone.setTasks(tasks);
+            newMilestone.setProject(project);
+
+            entityManager.persist(newMilestone);
+            this.logService.log(LogService.LOG_INFO, "Milestone " + newMilestone);
+
+            return newMilestone;
+
+        });
+    }
+
+    @Override
+    public Milestone updateMilestone(Milestone milestone) {
+        return jpa.txExpr(em -> {
+            em.merge(milestone);
+            em.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Milestone " + milestone.getName() + " updated");
+            return milestone;
+        });
+    }
+
+    @Override
+    public void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException {
+        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        ruleSet.addRule(new MilestoneHasNoTask());
+
+        BusinessException exp = this.jpa.txExpr(entityManager -> {
+            Milestone milestone = entityManager.find(Milestone.class, milestoneID);
+
+            Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
+            if (!wrongRules.isEmpty()) {
+                return new BusinessException(wrongRules);
+            }
+
+            entityManager.remove(milestone);
+            entityManager.flush();
+            return null;
+        });
+
+        if (exp != null) {
+            throw exp;
+        }
+        this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by "+actor.getName());
     }
 }

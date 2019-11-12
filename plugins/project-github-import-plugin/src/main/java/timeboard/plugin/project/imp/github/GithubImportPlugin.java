@@ -27,10 +27,7 @@ package timeboard.plugin.project.imp.github;
  */
 
 import org.eclipse.egit.github.core.client.RequestException;
-import timeboard.core.api.ProjectExportService;
-import timeboard.core.api.ProjectImportService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import org.eclipse.egit.github.core.Issue;
@@ -69,6 +66,9 @@ public class GithubImportPlugin implements ProjectImportService {
     @Reference
     private UserService userService;
 
+    @Reference
+    public EncryptionService encryptionService;
+
 
     @Override
     public String getServiceName() {
@@ -91,30 +91,30 @@ public class GithubImportPlugin implements ProjectImportService {
         try { //handle configuration issues
             final Project targetProject = this.projectService.getProjectByID(actor, projectID);
 
-            final ProjectAttributValue githubOAuthToken = targetProject.getAttributes().get(GITHUB_TOKEN_KEY);
-            if(githubOAuthToken == null || githubOAuthToken.getValue()== null){
+            final String githubOAuthToken = encryptionService.getProjectAttribute(targetProject, GITHUB_TOKEN_KEY);
+            if(githubOAuthToken == null || githubOAuthToken.equals("")){
                 throw new BusinessException("Missing "+GITHUB_TOKEN_KEY+" in project configuration");
             }
 
-            final ProjectAttributValue githubRepoOwner = targetProject.getAttributes().get(GITHUB_REPO_OWNER_KEY);
-            if(githubRepoOwner == null || githubRepoOwner.getValue() == null){
+            final String githubRepoOwner = encryptionService.getProjectAttribute(targetProject, GITHUB_REPO_OWNER_KEY);
+            if(githubRepoOwner == null || githubRepoOwner.equals("")){
                 throw new BusinessException("Missing "+GITHUB_REPO_OWNER_KEY+" in project configuration");
             }
 
-            final ProjectAttributValue githubRepoName = targetProject.getAttributes().get(GITHUB_REPO_NAME_KEY);
-            if(githubRepoName == null || githubRepoName.getValue() == null){
+            final String githubRepoName = encryptionService.getProjectAttribute(targetProject, GITHUB_REPO_NAME_KEY);
+            if(githubRepoName == null || githubRepoName.equals("")){
                 throw new BusinessException("Missing "+GITHUB_REPO_NAME_KEY+" in project configuration");
             }
 
             try {//handle github connexion issues
 
-                RepositoryId repositoryId = new RepositoryId(githubRepoOwner.getValue(), githubRepoName.getValue());
+                RepositoryId repositoryId = new RepositoryId(githubRepoOwner, githubRepoName);
 
                 IssueService issueService = new IssueService();
-                issueService.getClient().setOAuth2Token(githubOAuthToken.getValue());
+                issueService.getClient().setOAuth2Token(githubOAuthToken);
                 List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
-                Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue());
+                Map<Long, Task> existingTasks = this.projectService.searchExistingTasksFromOrigin(targetProject, GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName);
 
                 issues.stream().forEach(issue -> {
                     User existingUser = null;
@@ -130,13 +130,12 @@ public class GithubImportPlugin implements ProjectImportService {
                             existingUser = null;
                         }
                     }
-
                     if (!existingTasks.containsKey(issue.getId())) {
                         // task does not exist, so create it
                         Task t = this.projectService.createTask(actor, targetProject, issue.getTitle(),
                                 issue.getBodyHtml(), issue.getCreatedAt(), issue.getClosedAt(),
                                 0, null, existingUser,
-                                GITHUB_ORIGIN_KEY, githubRepoOwner.getValue() + "/" + githubRepoName.getValue(), issue.getId());
+                                GITHUB_ORIGIN_KEY, githubRepoOwner + "/" + githubRepoName, issue.getId());
                         nbTaskCreated.incrementAndGet();
                     } else {
 

@@ -29,7 +29,6 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -56,6 +55,9 @@ public class Task extends AbstractTask implements Serializable {
 
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
+
+    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER)
+    private Milestone milestone;
 
 
     public Task() {
@@ -90,7 +92,13 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
+    public Milestone getMilestone() {
+        return milestone;
+    }
 
+    public void setMilestone(Milestone milestone) {
+        this.milestone = milestone;
+    }
 
     /**
      * EL.
