@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Milestone;
 import timeboard.core.model.Project;
+import timeboard.core.model.Task;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -43,6 +44,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component(
         service = Servlet.class,
@@ -71,6 +77,7 @@ public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
             long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
             Milestone milestone = this.projectService.getMilestoneById(milestoneID);
             viewModel.getViewDatas().put("milestone", milestone);
+            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(milestone));
         }
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
@@ -78,6 +85,7 @@ public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
 
         viewModel.setTemplate("projects:details_project_milestones_links_config.html");
         viewModel.getViewDatas().put("project", project);
+        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
         viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
 
     }
@@ -94,7 +102,8 @@ public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
             if (!getParameter(request, "milestoneID").get().isEmpty()) {
                 Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
                 currentMilestone = this.projectService.getMilestoneById(milestoneID);
-                currentMilestone = addTasksToMilestone(currentMilestone, project, request);
+                currentMilestone = addMilestoneToTask(currentMilestone, request);
+               // currentMilestone = addTasksToMilestone(currentMilestone, request);
             }
 
             viewModel.getViewDatas().put("milestone", currentMilestone);
@@ -106,14 +115,30 @@ public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
             viewModel.setTemplate("projects:details_project_milestones_links_config.html");
 
             viewModel.getViewDatas().put("project", project);
+            viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
             viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
+            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(currentMilestone));
         }
     }
 
+    //TODO: To Fix
+    /*private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) {
+        String[] taskIds = request.getParameterValues("taskSelected");
+        Set<Task> tasks = Arrays.stream(taskIds).map(id -> {
+                return this.projectService.getTask(Long.valueOf(id));
+        }).collect(Collectors.toSet());
+        return this.projectService.addTasksToMilestone(currentMilestone, tasks);
+    }*/
 
-    private Milestone addTasksToMilestone(Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException {
 
-        return this.projectService.updateMilestone(currentMilestone);
+    //TODO: To Delete
+    private Milestone addMilestoneToTask(Milestone currentMilestone, HttpServletRequest request) {
+        Milestone newMilestone = currentMilestone;
+        String[] taskIds = request.getParameterValues("taskSelected");
+       for(int i = 0; i< taskIds.length; i++){
+            newMilestone =  this.projectService.addMilestoneToTask(newMilestone, taskIds[i]);
+        };
+       return newMilestone;
     }
 
 

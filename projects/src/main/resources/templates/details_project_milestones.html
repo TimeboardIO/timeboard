@@ -28,16 +28,16 @@
                 </tr>
                 <tr th:each="milestone : ${milestones}">
                     <td>
-                        <a th:href="@{/projects/milestones/config(projectID=${project.id}, milestoneID=${milestone.id})}"
+                        <a th:href="@{/projects/milestones/links-config(projectID=${project.id}, milestoneID=${milestone.id})}"
                            th:text="${milestone.name}"></a>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-        <div class="twelve wide column" id="details" layout:fragment="milestone-config">
+        <div class="twelve wide column" id="details" th:insert="projects:details_project_milestones_config.html :: milestone-config">
         </div>
-        <div class="twelve wide column" id="tasksLinks" layout:fragment="milestone-links-config">
+        <div class="right floated twelve wide column" id="tasksLinks" th:insert="projects:details_project_milestones_links_config.html :: milestone-links-config">
         </div>
     </div>
 </div>

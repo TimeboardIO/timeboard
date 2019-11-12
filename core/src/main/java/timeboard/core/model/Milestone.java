@@ -56,7 +56,7 @@ public class Milestone implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @OneToMany(targetEntity = Task.class, mappedBy = "milestone", cascade = CascadeType.PERSIST)
+    @OneToMany(targetEntity = Task.class, mappedBy = "milestone", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     private Set<Task> tasks;
 
 

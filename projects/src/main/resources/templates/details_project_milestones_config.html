@@ -9,9 +9,9 @@
 </head>
 <body>
 
-<div layout:fragment="milestone-config">
+<div th:fragment="milestone-config" th:if="${milestone != null}">
 
-    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestone"
+    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestoneForm"
           method="post" style="margin-left:1em;">
         <input name="milestoneID" required th:value="${milestone.id}" type="hidden">
 

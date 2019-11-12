@@ -9,14 +9,14 @@
 </head>
 <body>
 
-<div layout:fragment="milestone-links-config" th:if="${milestone.id != null}">
+<div th:fragment="milestone-links-config" th:if="${milestone != null && milestone.id != null}">
 
-    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestone"
+    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestoneLinksForm"
           method="post" style="margin-left:1em;">
         <input name="milestoneID" required th:value="${milestone.id}" type="hidden">
 
         <div class="field">
-            <label>Choose tasks for milestone: </label>
+            <label>Choose tasks for milestone:</label>
             <table class="ui unstackable table">
                 <thead>
                 <tr>
@@ -27,7 +27,7 @@
                 <tbody>
                 <tr th:each="task : ${allProjectTasks}">
                     <td>
-                        <input type="checkbox" name="taskSelected" th:value="true"/>
+                        <input type="checkbox" name="taskSelected" th:value="${task.id}" th:checked="${taskIdsByMilestone.contains(task.id)}"/>
                     </td>
                     <td>
                         <a th:text="${task.name}"></a>
@@ -40,12 +40,6 @@
         <button class="ui positive button" type="submit">Save</button>
 
     </form>
-
-    <script type="text/javascript">
-       $('.delete[data-key]').click(function(){
-            $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
-       });
-    </script>
 
 </div>
 
