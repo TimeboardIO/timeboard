@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{projects:details_project_milestones.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Project Milestones details</title>
+</head>
+<body>
+
+<div layout:fragment="milestone-links-config" th:if="${milestone.id != null}">
+
+    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestone"
+          method="post" style="margin-left:1em;">
+        <input name="milestoneID" required th:value="${milestone.id}" type="hidden">
+
+        <div class="field">
+            <label>Choose tasks for milestone: </label>
+            <table class="ui unstackable table">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Task Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${allProjectTasks}">
+                    <td>
+                        <input type="checkbox" name="taskSelected" th:value="true"/>
+                    </td>
+                    <td>
+                        <a th:text="${task.name}"></a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <button class="ui positive button" type="submit">Save</button>
+
+    </form>
+
+    <script type="text/javascript">
+       $('.delete[data-key]').click(function(){
+            $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
+       });
+    </script>
+
+</div>
+
+</body>
+</html>
