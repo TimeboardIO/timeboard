@@ -26,16 +26,12 @@ package timeboard.calendar;
  * #L%
  */
 
-import net.fortuna.ical4j.data.CalendarBuilder;
-import net.fortuna.ical4j.filter.Filter;
-import net.fortuna.ical4j.filter.PeriodRule;
-import net.fortuna.ical4j.model.*;
-import net.fortuna.ical4j.model.Component;
+
 import timeboard.core.api.CalendarService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimesheetService;
+
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
+
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 
@@ -45,10 +41,10 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.FileInputStream;
+import javax.servlet.MultipartConfigElement;
+
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 
 
@@ -64,6 +60,9 @@ import java.util.Collection;
 @MultipartConfig(maxFileSize = 3145728)
 public class CalendarServlet extends TimeboardServlet {
 
+
+    private static final MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement("/root/.karaf/tmp");
+
     @Reference
     private CalendarService calendarService;
 
@@ -75,7 +74,22 @@ public class CalendarServlet extends TimeboardServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
-        String url = request.getParameter("iCalFile");
+     // String url =String url = request.getParameter("iCalFile");
+        String contentType = request.getContentType();
+        if(contentType != null && contentType.startsWith("multipart/")){
+            request.setAttribute("org.eclipse.jetty.multipartConfig", MULTI_PART_CONFIG); //TODO DIRTY see jetty Request.__MULTIPART_CONFIG_ELEMENT
+            for(Part part: request.getParts()) {
+                System.out.printf("File %s, %s, %d%n", part.getName(),
+                    part.getContentType(), part.getSize());
+
+                try (InputStream is = part.getInputStream()) {
+                    // ...
+                }
+            }
+        } else {
+           //
+        }
+
 
         Collection<Part> parts = request.getParts();
 
@@ -88,13 +102,22 @@ public class CalendarServlet extends TimeboardServlet {
             }
         }
 
-        this.calendarService.importCalendarFromICS(url);
+        try{
+            String url = "";
+            this.calendarService.importCalendarFromICS(url, url);
+        }catch(Exception e){
+            //TODO Handle business exceptions
+        }
 
-        viewModel.setTemplate("calendar:calendar.html");
+       this.handleGet(request, response, viewModel);
+
     }
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+
+        viewModel.getViewDatas().put("calendars", this.calendarService.listCalendars());
+
         viewModel.setTemplate("calendar:calendar.html");
 
     }

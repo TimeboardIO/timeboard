@@ -34,10 +34,25 @@ import java.io.Serializable;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
-public class DefaultTask extends AbstractTask implements Serializable {
+public class DefaultTask extends AbstractTask implements Serializable, Cloneable {
 
     public DefaultTask() {
         super();
+    }
+
+    public Object clone() {
+        DefaultTask clone = null;
+        clone = (DefaultTask) super.clone();
+        clone.setComments(this.getComments());
+        clone.setName(this.getName());
+        clone.setStartDate(this.getStartDate());
+        clone.setEndDate(this.getEndDate());
+        clone.setOrigin(this.getOrigin());
+        clone.setRemotePath(this.getRemotePath());
+        clone.setRemoteId(this.getRemoteId());
+
+
+        return clone;
     }
 
 }

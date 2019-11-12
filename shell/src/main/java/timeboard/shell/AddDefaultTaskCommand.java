@@ -34,11 +34,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.model.DefaultTask;
-import timeboard.core.model.Project;
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -91,7 +87,7 @@ public class AddDefaultTaskCommand implements Action {
 
         task.setOrigin("timeboard");
 
-        projectService.createdDefaultTask(task);
+        projectService.createDefaultTask(task);
 
         return null;
     }

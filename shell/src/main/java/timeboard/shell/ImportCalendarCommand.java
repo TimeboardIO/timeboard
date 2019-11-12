@@ -43,8 +43,12 @@ import java.util.Date;
 @Command(scope = "timeboard", name = "import-ics", description = "Create new user account")
 public class ImportCalendarCommand implements Action {
 
-    @Option(name = "-f", aliases = {"--file"}, description = "New username (also used as login)", required = true, multiValued = false)
+    @Option(name = "-f", aliases = {"--file"}, description = "New file path", required = true, multiValued = false)
     String file;
+
+
+    @Option(name = "-n", aliases = {"--name"}, description = "New file name", required = false, multiValued = false)
+    String name;
 
 
     @Override
@@ -54,7 +58,10 @@ public class ImportCalendarCommand implements Action {
         ServiceReference<CalendarService> calendarServiceRef = bnd.getServiceReference(CalendarService.class);
         CalendarService calendarService =  bnd.getService(calendarServiceRef);
 
-        calendarService.importCalendarFromICS(file);
+        if(name == null){
+            this.name = file;
+        }
+        calendarService.importCalendarFromICS(file, file);
 
         return null;
     }

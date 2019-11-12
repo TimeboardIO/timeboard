@@ -31,12 +31,15 @@ import timeboard.core.model.Calendar;
 import timeboard.core.model.DefaultTask;
 
 import java.util.Date;
+import java.util.List;
 
 public interface CalendarService {
 
-    public boolean importCalendarFromICS(String ICS) throws BusinessException;
+    public boolean importCalendarFromICS(String name, String ICS) throws BusinessException;
 
     public Calendar createCalendar(String name, String remoteId);
 
+    List<Calendar> listCalendars();
 
+    List<DefaultTask> findExistingEvents(String remotePath, String remoteId);
 }

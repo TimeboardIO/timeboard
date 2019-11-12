@@ -11,44 +11,37 @@
 
 <div layout:fragment="content">
 
-    <div class="ui segment">
-
-        <table class="ui celled striped table">
-            <thead>
-            <tr><th colspan="3">
-               Calendars
-            </th>
-            </tr></thead>
-            <tbody>
-            <tr>
-                <td class="collapsing">
-                    <i class="calendar alternate outline icon"></i> Jours fériés en France
-                </td>
-                <td>Liste des jours fériés en france.</td>
-                <td class="right aligned collapsing"><div class="ui negative basic button delete" >
+    <div class="ui cards">
+        <div th:each="calendar : ${calendars}" class="card">
+            <div class="content">
+                <div class="header" th:text="${calendar.name}" ></div>
+                <div class="meta"> <i class="users icon"></i> Public</div>
+                <div class="ui negative basic button delete" >
                     <i class="remove alternate icon"></i>
                     Remove
-                </div></td>
-            </tr>
+                </div>
+            </div>
+        </div>
+    </div>
 
-            <tr>
-                <form enctype="multipart/form-data" method="post" action="">
-                <td class="collapsing">
-                    <div class="ui action input">
-                        <input type="text" placeholder="ICS File" readonly>
-                        <input type="file" name="iCalFile" style="display: none" accept=".ics">
-                        <a href="" class="ui icon button positive">
-                            <i class="upload icon"></i>
-                            <input type="submit">
-                        </a>
-                    </div>
-                </td>
-                <td><input type="text"/></td>
-                <td class="right aligned collapsing"></td>
-                </form>
-            </tr>
-            </tbody>
-        </table>
+
+    <div class="ui segment">
+
+        <form class="ui form" enctype="multipart/form-data" method="post" action="">
+            <div class="field">
+                <label>Calendar Name</label>
+                <input type="text" name="first-name" placeholder="Jours fériés">
+            </div>
+            <div class="field">
+                <label>ICS File</label>
+                <div>
+                    <input type="text" placeholder="jour_feries.ics" readonly>
+                    <input type="file" name="iCalFile" style="display: none" accept=".ics">
+                </div>
+            </div>
+            <button class="ui button" type="submit">Import</button>
+        </form>
+
     </div>
 
     <script src="/calendar/static/calendar.js"></script>

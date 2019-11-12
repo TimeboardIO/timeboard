@@ -321,6 +321,7 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
+
     @Override
     public Task createTask(User actor,
                            Project project,
@@ -361,6 +362,8 @@ public class ProjectServiceImpl implements ProjectService {
             return newTask;
         });
     }
+
+
 
     @Override
     public Task updateTask(User actor, final Task task, TaskRevision rev) {
@@ -639,10 +642,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException {
+    public DefaultTask createDefaultTask(DefaultTask task) throws BusinessException {
         try {
             return this.jpa.txExpr(entityManager -> {
                 entityManager.persist(task);
+
 
                 this.logService.log(LogService.LOG_INFO, "Default task " + task.getName() + " is created.");
                 return task;
@@ -650,6 +654,20 @@ public class ProjectServiceImpl implements ProjectService {
         }catch (Exception e){
             throw new BusinessException(e);
         }
+    }
+
+    @Override
+    public DefaultTask updateDefaultTask(DefaultTask task) {
+
+        return jpa.txExpr(em -> {
+            em.merge(task);
+            em.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Milestone " + task.getName() + " updated");
+            return task;
+        });
+
+
     }
 
     @Override

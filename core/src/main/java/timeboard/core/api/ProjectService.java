@@ -89,7 +89,7 @@ public interface ProjectService {
                                  Milestone milestone
     );
 
-    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
+    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId);
 
     Task updateTask(User actor, Task task, TaskRevision rev);
 
@@ -100,10 +100,6 @@ public interface ProjectService {
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
 
     List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
-
-    List<DefaultTask> listDefaultTasks(Date ds, Date de);
-
-    UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
 
     UpdatedTaskResult updateTaskRTBD(User actor, Long taskID, double rtbd);
 
@@ -131,8 +127,26 @@ public interface ProjectService {
 
     List<EffortEstimate> getEstimateByTask(long taskId);
 
+    UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
 
-    DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException;
+
+    /*
+     == Default Tasks ==
+     */
+
+    /**
+     * Create a default task
+     * @return DefaultTask
+     */
+    DefaultTask createDefaultTask(DefaultTask task) throws BusinessException;
+
+    /**
+     * Update a default task
+     * @return DefaultTask
+     */
+    DefaultTask updateDefaultTask(DefaultTask dataEvent);
+
+    List<DefaultTask> listDefaultTasks(Date ds, Date de);
 
 
     /*
@@ -170,13 +184,6 @@ public interface ProjectService {
      * @param milestoneID
      */
     void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException;
-
-
-
-
-     /*
-     == Calendar ==
-     */
 
 
 }

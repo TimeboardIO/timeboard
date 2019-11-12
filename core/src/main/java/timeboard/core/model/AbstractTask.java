@@ -36,7 +36,7 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class AbstractTask implements Serializable {
+public abstract class AbstractTask implements Serializable, Cloneable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -154,6 +154,30 @@ public abstract class AbstractTask implements Serializable {
 
     private boolean areDateSameDay(Date date1, Date date2){
         return new SimpleDateFormat("yyyy-MM-dd").format(date1).equals(new SimpleDateFormat("yyyy-MM-dd").format(date2));
+    }
+
+
+    public Object clone() {
+        AbstractTask clone = null;
+
+
+        try {
+            clone = (DefaultTask) super.clone();
+
+
+            clone.setComments(this.getComments());
+            clone.setName(this.getName());
+            clone.setStartDate(this.getStartDate());
+            clone.setEndDate(this.getEndDate());
+            clone.setOrigin(this.getOrigin());
+            clone.setRemotePath(this.getRemotePath());
+            clone.setRemoteId(this.getRemoteId());
+
+        } catch(CloneNotSupportedException e) {
+            //supposed to not append
+            e.printStackTrace(System.err);
+        }
+        return clone;
     }
 
 }
