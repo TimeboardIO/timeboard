@@ -50,14 +50,6 @@ public class Task extends AbstractTask implements Serializable {
     /**
      * Task creation origin
      */
-    @Column
-    private String origin;
-
-    @Column
-    private String remotePath;
-
-    @Column
-    private Long remoteId;
 
     @OneToOne(targetEntity = TaskType.class)
     private TaskType taskType;
@@ -88,21 +80,7 @@ public class Task extends AbstractTask implements Serializable {
         this.estimateWork = estimateWork;
     }
 
-    public String getOrigin() {
-        return origin;
-    }
 
-    public void setOrigin(String origin) {
-        this.origin = origin;
-    }
-
-    public String getRemotePath() { return remotePath; }
-
-    public void setRemotePath(String remotePath) { this.remotePath = remotePath; }
-
-    public Long getRemoteId() { return remoteId; }
-
-    public void setRemoteId(Long remoteId) { this.remoteId = remoteId; }
 
     public Project getProject() {
         return project;

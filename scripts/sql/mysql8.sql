@@ -4,7 +4,17 @@
         comments varchar(500),
         endDate date,
         name varchar(50) not null,
+        origin varchar(255),
+        remoteId varchar(255),
+        remotePath varchar(255),
         startDate date,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table Calendar (
+       id bigint not null,
+        name varchar(50),
+        prodID varchar(100),
         primary key (id)
     ) engine=InnoDB;
 
@@ -16,6 +26,8 @@
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
+
+    insert into hibernate_sequence values ( 1 );
 
     insert into hibernate_sequence values ( 1 );
 
@@ -62,9 +74,6 @@
 
     create table Task (
        estimateWork double precision not null,
-        origin varchar(255),
-        remoteId bigint,
-        remotePath varchar(255),
         id bigint not null,
         latestRevision_id bigint,
         project_id bigint,

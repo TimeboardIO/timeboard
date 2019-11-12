@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{core-ui:layouts/general.html(path='/calendar')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">Calendar</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+
+    <div class="ui segment">
+
+        <table class="ui celled striped table">
+            <thead>
+            <tr><th colspan="3">
+               Calendars
+            </th>
+            </tr></thead>
+            <tbody>
+            <tr>
+                <td class="collapsing">
+                    <i class="calendar alternate outline icon"></i> Jours fériés en France
+                </td>
+                <td>Liste des jours fériés en france.</td>
+                <td class="right aligned collapsing"><div class="ui negative basic button delete" >
+                    <i class="remove alternate icon"></i>
+                    Remove
+                </div></td>
+            </tr>
+
+            <tr>
+                <form enctype="multipart/form-data" method="post" action="">
+                <td class="collapsing">
+                    <div class="ui action input">
+                        <input type="text" placeholder="ICS File" readonly>
+                        <input type="file" name="iCalFile" style="display: none" accept=".ics">
+                        <a href="" class="ui icon button positive">
+                            <i class="upload icon"></i>
+                            <input type="submit">
+                        </a>
+                    </div>
+                </td>
+                <td><input type="text"/></td>
+                <td class="right aligned collapsing"></td>
+                </form>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/calendar/static/calendar.js"></script>
+</div>
+
+</body>
+</html>

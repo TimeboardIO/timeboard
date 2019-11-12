@@ -41,6 +41,7 @@ import org.osgi.service.log.LogService;
 
 import javax.persistence.TypedQuery;
 import java.util.*;
+import java.util.Calendar;
 import java.util.stream.Collectors;
 
 @Component(
@@ -289,7 +290,7 @@ public class ProjectServiceImpl implements ProjectService {
                            User assignedUser,
                            String origin,
                            String remotePath,
-                           Long remoteId
+                           String remoteId
                            ) {
         return this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
@@ -577,10 +578,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Map<Long, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath) {
+    public Map<String, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath) {
 
         return this.jpa.txExpr(entityManager -> {
-            Map<Long, Task> map = new HashMap<>();
+            Map<String, Task> map = new HashMap<>();
             TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project " +
                     "and t.origin = :origin " +
                     "and t.remotePath = :remotePath ", Task.class);
@@ -592,7 +593,6 @@ public class ProjectServiceImpl implements ProjectService {
             });
             return map;
         });
-
 
     }
 }

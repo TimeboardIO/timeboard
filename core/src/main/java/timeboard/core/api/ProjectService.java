@@ -80,7 +80,7 @@ public interface ProjectService {
 
     Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID);
 
-    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
+    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId);
 
     Task updateTask(User actor, Task task, TaskRevision rev);
 
@@ -105,7 +105,7 @@ public interface ProjectService {
      * @param remotePath string key of source characteristics (owner, repository, ...)
      * @return list of task corresponding to the origin
      */
-    Map<Long, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath);
+    Map<String, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath);
 
     List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID);
 
@@ -122,5 +122,12 @@ public interface ProjectService {
 
 
     DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException;
+
+
+
+     /*
+     == Calendar ==
+     */
+
 
 }

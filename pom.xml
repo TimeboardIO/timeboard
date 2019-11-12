@@ -57,6 +57,7 @@
                 <module>features</module>
                 <module>shell</module>
                 <module>account</module>
+                <module>calendar</module>
             </modules>
         </profile>
         <profile>
@@ -73,6 +74,7 @@
                 <module>sample-data</module>
                 <module>shell</module>
                 <module>account</module>
+                <module>calendar</module>
                 <module>plugins/project-xls-export-plugin</module>
                 <module>plugins/project-msp-export-plugin</module>
                 <module>plugins/project-github-import-plugin</module>

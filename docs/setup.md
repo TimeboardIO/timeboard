@@ -82,8 +82,8 @@ Command is assumed to be run in Apache Karaf Shell :
 Command is assumed to be run in Apache Karaf Shell :
 
     feature:install timeboard-core 
-    feature:install timeboard-home timeboard-projects timeboard-timesheet  
-    feature:install timeboard-shell  
+    feature:install timeboard-home timeboard-projects timeboard-timesheet  timeboard-account   
+    feature:install timeboard-shell timeboard-calendar 
 
 Open your web browser and got to 
 

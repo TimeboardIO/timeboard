@@ -89,6 +89,8 @@ public class AddDefaultTaskCommand implements Action {
             task.setEndDate(c.getTime());
         }
 
+        task.setOrigin("timeboard");
+
         projectService.createdDefaultTask(task);
 
         return null;

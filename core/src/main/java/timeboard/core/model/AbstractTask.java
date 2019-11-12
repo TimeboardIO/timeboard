@@ -54,6 +54,16 @@ public abstract class AbstractTask implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
+    @Column
+    private String origin;
+
+    @Column
+    private String remotePath;
+
+    @Column
+    private String remoteId;
+
+
     @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
     private Set<Imputation> imputations;
 
@@ -111,6 +121,23 @@ public abstract class AbstractTask implements Serializable {
     public void setImputations(Set<Imputation> imputations) {
         this.imputations = imputations;
     }
+
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getRemotePath() { return remotePath; }
+
+    public void setRemotePath(String remotePath) { this.remotePath = remotePath; }
+
+    public String getRemoteId() { return remoteId; }
+
+    public void setRemoteId(String remoteId) { this.remoteId = remoteId; }
 
     @Transient
     public double findTaskImputationValueByDate(Date date, User user) {
