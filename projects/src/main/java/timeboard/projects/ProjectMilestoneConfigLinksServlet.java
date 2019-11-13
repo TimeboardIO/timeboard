@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -106,7 +107,12 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
 
     private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) {
         String[] taskIds = request.getParameterValues("taskSelected");
-        Set<Task> newTasks = Arrays.stream(taskIds).map(id -> this.projectService.getTask(Long.valueOf(id))).collect(Collectors.toSet());
+
+        Set<Task> newTasks = new HashSet<>();
+        if(taskIds != null){
+            newTasks.addAll(Arrays.stream(taskIds).map(id -> this.projectService.getTask(Long.valueOf(id))).collect(Collectors.toSet()));
+        }
+
         Set<Task> oldTasks = this.projectService.listTaskIdsByMilestone(currentMilestone)
                 .stream()
                 .map(id -> this.projectService.getTask(id))

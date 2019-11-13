@@ -756,27 +756,19 @@ public class ProjectServiceImpl implements ProjectService {
     public Milestone addTasksToMilestone(Milestone currentMilestone, Set<Task> selectedTasks, Set<Task> oldTasks) {
         return this.jpa.txExpr(em -> {
             Milestone m = em.find(Milestone.class, currentMilestone.getId());
-            //em.merge(currentMilestone);
-            selectedTasks.forEach(t -> {
-                em.merge(t);
-            });
-            //TODO: To Fix
-            // m.setTasks(null);
-            m.getTasks().clear();
-            //m.setTasks(selectedTasks);
-            m.getTasks().addAll(selectedTasks);
 
-            //TODO: To Delete
-            /*oldTasks.forEach(t -> {
-                em.merge(t);
-                m.removeTask(t);
+            oldTasks.forEach(t -> {
+                Task tr = em.find(Task.class, t.getId());
+                tr.setMilestone(null);
+                m.getTasks().removeIf(task -> task.getId() == tr.getId());
+             });
+
+            selectedTasks.forEach(t -> {
+                Task tr = em.find(Task.class, t.getId());
+                tr.setMilestone(m);
+                m.getTasks().add(tr);
             });
-            newTasks.forEach(t -> {
-                em.merge(t);
-                m.addTask(t);
-            });
-            em.flush();*/
-            em.flush();
+
             return m;
         });
     }

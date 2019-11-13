@@ -29,6 +29,7 @@ package timeboard.core.model;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -56,7 +57,10 @@ public class Milestone implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @OneToMany(targetEntity = Task.class, mappedBy = "milestone", cascade=CascadeType.ALL/*cascade={CascadeType.MERGE,CascadeType.REFRESH}*/, fetch = FetchType.LAZY)
+    @OneToMany(
+            targetEntity = Task.class,
+            mappedBy = "milestone",
+            fetch = FetchType.LAZY)
     private Set<Task> tasks;
 
 
@@ -71,7 +75,7 @@ public class Milestone implements Serializable {
     }
 
     public Milestone() {
-
+        this.tasks = new HashSet<>();
     }
 
     public Long getId() {
@@ -130,15 +134,7 @@ public class Milestone implements Serializable {
         this.project = project;
     }
 
-    public void addTask(Task newTask) {
-        tasks.add(newTask);
-        newTask.setMilestone(this);
-    }
 
-    public void removeTask(Task oldTask) {
-        tasks.remove(oldTask);
-        oldTask.setMilestone(null);
-    }
 
 
 }
