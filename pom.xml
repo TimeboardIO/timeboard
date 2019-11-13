@@ -40,7 +40,6 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.9.10.1</version>
             </dependency>
-
             <dependency>
                 <groupId>org.eclipse.persistence</groupId>
                 <artifactId>javax.persistence</artifactId>
@@ -121,7 +120,6 @@
                 <artifactId>mockito-all</artifactId>
                 <version>1.10.19</version>
             </dependency>
-
             <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
@@ -137,7 +135,6 @@
                 <artifactId>org.osgi.service.http.whiteboard</artifactId>
                 <version>1.0.0</version>
             </dependency>
-
             <dependency>
                 <groupId>org.thymeleaf</groupId>
                 <artifactId>thymeleaf</artifactId>
@@ -148,13 +145,11 @@
                 <artifactId>thymeleaf-layout-dialect</artifactId>
                 <version>2.4.1</version>
             </dependency>
-
             <dependency>
                 <groupId>javax.mail</groupId>
                 <artifactId>mail</artifactId>
                 <version>1.4.7</version>
             </dependency>
-
             <dependency>
                 <groupId>org.apache.karaf.shell</groupId>
                 <artifactId>org.apache.karaf.shell.core</artifactId>
