@@ -33,6 +33,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.model.Milestone;
 import timeboard.core.model.MilestoneType;
 import timeboard.core.model.Project;
+import timeboard.core.model.Task;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -43,6 +44,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component(
         service = Servlet.class,
@@ -82,9 +86,9 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
                 Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
                 currentMilestone = this.projectService.getMilestoneById(milestoneID);
                 //TODO: To Delete
-                currentMilestone = addMilestoneToTask(currentMilestone, request);
+                //currentMilestone = addMilestoneToTask(currentMilestone, request);
                 //TODO: To Fix
-               // currentMilestone = addTasksToMilestone(currentMilestone, request);
+                currentMilestone = addTasksToMilestone(currentMilestone, request);
             }
 
             viewModel.getViewDatas().put("milestone", currentMilestone);
@@ -104,24 +108,31 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
     }
 
     //TODO: To Fix
-    /*private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) {
+    private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) {
         String[] taskIds = request.getParameterValues("taskSelected");
-        Set<Task> tasks = Arrays.stream(taskIds).map(id -> {
-                return this.projectService.getTask(Long.valueOf(id));
-        }).collect(Collectors.toSet());
-        return this.projectService.addTasksToMilestone(currentMilestone, tasks);
-    }*/
+        Set<Task> newTasks = Arrays.stream(taskIds).map(id -> this.projectService.getTask(Long.valueOf(id))).collect(Collectors.toSet());
+        Set<Task> oldTasks = this.projectService.listTaskIdsByMilestone(currentMilestone)
+                .stream()
+                .map(id -> this.projectService.getTask(id))
+                .collect(Collectors.toSet());
+
+        //TODO: To Delete
+        /*currentMilestone.setTasks(tasks);
+        return this.projectService.updateMilestone(currentMilestone);*/
+        //TODO: To Fix
+        return this.projectService.addTasksToMilestone(currentMilestone, newTasks,oldTasks);
+    }
 
 
     //TODO: To Delete
-    private Milestone addMilestoneToTask(Milestone currentMilestone, HttpServletRequest request) {
+    /*private Milestone addMilestoneToTask(Milestone currentMilestone, HttpServletRequest request) {
         Milestone newMilestone = currentMilestone;
         String[] taskIds = request.getParameterValues("taskSelected");
        for(int i = 0; i< taskIds.length; i++){
             newMilestone =  this.projectService.addMilestoneToTask(newMilestone, taskIds[i]);
         };
        return newMilestone;
-    }
+    }*/
 
 
 }

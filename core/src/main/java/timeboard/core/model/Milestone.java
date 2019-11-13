@@ -56,7 +56,7 @@ public class Milestone implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @OneToMany(targetEntity = Task.class, mappedBy = "milestone", cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @OneToMany(targetEntity = Task.class, mappedBy = "milestone", cascade=CascadeType.ALL/*cascade={CascadeType.MERGE,CascadeType.REFRESH}*/, fetch = FetchType.LAZY)
     private Set<Task> tasks;
 
 
@@ -128,6 +128,16 @@ public class Milestone implements Serializable {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public void addTask(Task newTask) {
+        tasks.add(newTask);
+        newTask.setMilestone(this);
+    }
+
+    public void removeTask(Task oldTask) {
+        tasks.remove(oldTask);
+        oldTask.setMilestone(null);
     }
 
 
