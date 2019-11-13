@@ -34,6 +34,7 @@ import timeboard.core.ui.ViewModel;
 
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -89,22 +90,9 @@ public class CalendarServlet extends TimeboardServlet {
         } else {
            //
         }
-
-
-        Collection<Part> parts = request.getParts();
-
-        for (Part part : parts) {
-            System.out.printf("File %s, %s, %d%n", part.getName(),
-                    part.getContentType(), part.getSize());
-
-            try (InputStream is = part.getInputStream()) {
-                // ...
-            }
-        }
-
         try{
             String url = "";
-            this.calendarService.importCalendarFromICS(url, url);
+            this.calendarService.importCalendarFromICS(SecurityContext.getCurrentUser(request), url, url);
         }catch(Exception e){
             //TODO Handle business exceptions
         }

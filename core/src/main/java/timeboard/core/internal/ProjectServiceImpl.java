@@ -506,7 +506,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID) {
         return this.jpa.txExpr(entityManager -> {
-
             TypedQuery<TaskRevision> q = entityManager
                     .createQuery("select t from TaskRevision t left join fetch t.task where " +
                                     "t.task.id = :taskID" +

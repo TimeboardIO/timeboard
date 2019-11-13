@@ -16,10 +16,9 @@
             <div class="content">
                 <div class="header" th:text="${calendar.name}" ></div>
                 <div class="meta"> <i class="users icon"></i> Public</div>
-                <div class="ui negative basic button delete" >
-                    <i class="remove alternate icon"></i>
-                    Remove
-                </div>
+                <a th:href="@{/calendar/delete(calID=${calendar.id})}">
+                    <div class="ui negative basic button delete"><i class="remove alternate icon"></i> Remove </div>
+                </a>
             </div>
         </div>
     </div>

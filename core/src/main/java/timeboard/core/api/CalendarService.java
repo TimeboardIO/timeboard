@@ -37,13 +37,18 @@ import java.util.Map;
 
 public interface CalendarService {
 
-    public boolean importCalendarFromICS(User actor, String name, String ICS) throws BusinessException;
+    boolean importCalendarFromICS(User actor, String name, String ICS) throws BusinessException;
 
-    public Calendar createOrUpdateCalendar(String name, String remoteId);
+    Calendar createOrUpdateCalendar(String name, String remoteId);
 
     List<Calendar> listCalendars();
 
     List<DefaultTask> findExistingEvents(String remotePath, String remoteId);
 
     Map<String, List<DefaultTask>> findAllEventInCalendar(Calendar calendar);
+
+    void deleteCalendarById(User actor, Long calendarID) throws BusinessException;
+
+
+
 }

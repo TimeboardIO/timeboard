@@ -43,9 +43,16 @@ import org.osgi.service.log.LogService;
 import timeboard.core.api.CalendarService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.internal.rules.RuleSet;
+import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
+import timeboard.core.internal.rules.milestone.MilestoneHasNoTask;
 import timeboard.core.model.DefaultTask;
+import timeboard.core.model.Milestone;
+import timeboard.core.model.Project;
 import timeboard.core.model.User;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.io.FileInputStream;
 import java.text.ParseException;
@@ -99,25 +106,27 @@ public class CalendarServiceImpl implements CalendarService {
             Uid uid = parsedEvent.getUid();
             DefaultTask timeboardEvent = null;
             List<DefaultTask> existingEventsWithSameId = calendarEvents.get(uid.getValue());
-
-            if(existingEventsWithSameId.isEmpty()){
-                // no existing events, so create it
-                timeboardEvent = new DefaultTask();
-                this.icsToTimeboard(parsedEvent, timeboardEvent);
-                timeboardEvent.setRemotePath(calendarRemoteId);
-                this.projectService.createDefaultTask(timeboardEvent);
-
-            } else if(existingEventsWithSameId.size() == 1){
-                //1 existing event, so update it
-                timeboardEvent = existingEventsWithSameId.get(0);
-                this.icsToTimeboard(parsedEvent, timeboardEvent);
-                timeboardEvent.setRemotePath(calendarRemoteId);
-                this.projectService.updateDefaultTask(timeboardEvent);
+            if(existingEventsWithSameId == null) {
+                existingEventsWithSameId = new ArrayList<>();
             }
+            timeboardEvent = existingEventsWithSameId.get(0);
+            if(timeboardEvent == null)  timeboardEvent = new DefaultTask(); // no existing events, so create it
+
+            this.icsToTimeboard(parsedEvent, timeboardEvent);
+            timeboardEvent.setRemotePath(calendarRemoteId);
 
             Property rRule = parsedEvent.getProperty(Property.RRULE);
             if(rRule != null){
                 this.createRecurringEvents(timeboardEvent, (RRule) rRule, existingEventsWithSameId);
+            }else{
+                if(existingEventsWithSameId.isEmpty()){
+                    // no existing events, so create it
+                    this.projectService.createDefaultTask(timeboardEvent);
+
+                } else if(existingEventsWithSameId.size() == 1){
+                    // exactly 1 existing event, so update it
+                    this.projectService.updateDefaultTask(timeboardEvent);
+                }
             }
         }
 
@@ -167,7 +176,7 @@ public class CalendarServiceImpl implements CalendarService {
         endDate.set(java.util.Calendar.HOUR_OF_DAY, 9);
         endDate.roll(java.util.Calendar.YEAR, 1);
 
-        //Create recurring tasks from recurring rules
+        // Create recurring tasks from recurring rules
         DateList dates = recur.getDates(
             new net.fortuna.ical4j.model.Date(startDate.getTime()),
             new net.fortuna.ical4j.model.Date(endDate.getTime()),
@@ -222,20 +231,22 @@ public class CalendarServiceImpl implements CalendarService {
                 q.setParameter("remoteId", remoteId);
                 return q.getSingleResult();
             });
+        } catch(Exception e){
+            // calendar not already exist
         } finally {
             if(calendar == null) { // create
                 timeboard.core.model.Calendar newCalendar = new timeboard.core.model.Calendar();
                 newCalendar.setRemoteId(remoteId);
                 newCalendar.setName(name);
-                this.jpa.txExpr(entityManager -> {
+                calendar = this.jpa.txExpr(entityManager -> {
                     entityManager.persist(newCalendar);
                     return newCalendar;
                 });
             } else { // update
                 final timeboard.core.model.Calendar toUpdateCalendar = calendar;
-                calendar.setName(name);
-                calendar.setRemoteId(remoteId);
-                this.jpa.txExpr(entityManager -> {
+                toUpdateCalendar.setName(name);
+                toUpdateCalendar.setRemoteId(remoteId);
+                calendar = this.jpa.txExpr(entityManager -> {
                     entityManager.merge(toUpdateCalendar);
                     return toUpdateCalendar;
                 });
@@ -273,7 +284,7 @@ public class CalendarServiceImpl implements CalendarService {
             return q.getResultList();
         });
 
-        Map<String, List<DefaultTask>> idToEventList = new HashMap();
+        Map<String, List<DefaultTask>> idToEventList = new HashMap<>();
         for(DefaultTask event : eventList){
             List<DefaultTask> currentList = idToEventList.get(event.getRemoteId());
             if(currentList == null){
@@ -283,6 +294,44 @@ public class CalendarServiceImpl implements CalendarService {
         }
 
         return idToEventList;
+    }
+
+    @Override
+    public void deleteCalendarById(User actor, Long calendarID) throws BusinessException {
+        RuleSet<timeboard.core.model.Calendar> ruleSet = new RuleSet<>();
+
+        BusinessException exp = this.jpa.txExpr(entityManager -> {
+            timeboard.core.model.Calendar calendar = entityManager.find(timeboard.core.model.Calendar.class, calendarID);
+
+            Set<Rule> wrongRules = ruleSet.evaluate(actor, calendar);
+            if (!wrongRules.isEmpty()) {
+                return new BusinessException(wrongRules);
+            }
+
+            TypedQuery<DefaultTask> query = entityManager.createQuery("select e from DefaultTask where e.remotePath = :remotePath", DefaultTask.class);
+            query.setParameter("remotePath", calendar.getRemoteId());
+            try{
+                List<DefaultTask> eventList = query.getResultList();
+                for(DefaultTask event : eventList){
+                    entityManager.remove(event);
+                }
+
+            }catch(Exception e){
+                // no event to delete
+            }
+
+
+            entityManager.remove(calendar);
+            entityManager.flush();
+            return null;
+        });
+
+        if (exp != null) {
+            throw exp;
+        }
+
+        this.logService.log(LogService.LOG_INFO, "Calendar " + calendarID+ " deleted by "+actor.getName());
+
     }
 
 
@@ -313,5 +362,7 @@ public class CalendarServiceImpl implements CalendarService {
         }
         return date;
     }
+
+
 
 }
