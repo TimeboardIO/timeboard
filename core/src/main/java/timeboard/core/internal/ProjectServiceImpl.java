@@ -216,8 +216,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-
-
+        /* -- TASKS -- */
 
     @Override
     public List<Task> listProjectTasks(Project project) {
@@ -574,7 +573,6 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
-
     @Override
     public void deleteTaskByID(User actor, long taskID) throws BusinessException {
 
@@ -646,7 +644,6 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             return this.jpa.txExpr(entityManager -> {
                 entityManager.persist(task);
-
 
                 this.logService.log(LogService.LOG_INFO, "Default task " + task.getName() + " is created.");
                 return task;

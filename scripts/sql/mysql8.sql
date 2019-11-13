@@ -14,7 +14,7 @@
     create table Calendar (
        id bigint not null,
         name varchar(50),
-        prodID varchar(100),
+        remoteId varchar(100),
         primary key (id)
     ) engine=InnoDB;
 

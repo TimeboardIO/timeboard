@@ -37,31 +37,46 @@ import timeboard.core.api.CalendarService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 
-import java.util.Date;
-
 @Service
 @Command(scope = "timeboard", name = "import-ics", description = "Create new user account")
 public class ImportCalendarCommand implements Action {
 
-    @Option(name = "-f", aliases = {"--file"}, description = "New file path", required = true, multiValued = false)
+    @Option(name = "-f", aliases = {"--file"}, description = "ICS file path", required = true, multiValued = false)
     String file;
 
 
-    @Option(name = "-n", aliases = {"--name"}, description = "New file name", required = false, multiValued = false)
+    @Option(name = "-n", aliases = {"--name"}, description = "Calendar name", required = false, multiValued = false)
     String name;
+
+    @Option(name = "-a", aliases = {"--actor"}, description = "Action actor", required = false, multiValued = false)
+    String username;
 
 
     @Override
     public Object execute() throws Exception {
 
         BundleContext bnd = FrameworkUtil.getBundle(ImportCalendarCommand.class).getBundleContext();
+
         ServiceReference<CalendarService> calendarServiceRef = bnd.getServiceReference(CalendarService.class);
         CalendarService calendarService =  bnd.getService(calendarServiceRef);
 
+        ServiceReference<UserService> userServiceRef = bnd.getServiceReference(UserService.class);
+        UserService userService =  bnd.getService(userServiceRef);
+
         if(name == null){
+            // user filename as name
             this.name = file;
         }
-        calendarService.importCalendarFromICS(file, file);
+
+        if(username == null){
+            // TODO dirty
+            // Use user timeboard to execute action in command line
+            username = "timeboard";
+        }
+
+        User actor = userService.findUserByLogin(username);
+
+        calendarService.importCalendarFromICS(actor, name, file);
 
         return null;
     }

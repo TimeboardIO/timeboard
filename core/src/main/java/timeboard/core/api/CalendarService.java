@@ -29,17 +29,21 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Calendar;
 import timeboard.core.model.DefaultTask;
+import timeboard.core.model.User;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface CalendarService {
 
-    public boolean importCalendarFromICS(String name, String ICS) throws BusinessException;
+    public boolean importCalendarFromICS(User actor, String name, String ICS) throws BusinessException;
 
-    public Calendar createCalendar(String name, String remoteId);
+    public Calendar createOrUpdateCalendar(String name, String remoteId);
 
     List<Calendar> listCalendars();
 
     List<DefaultTask> findExistingEvents(String remotePath, String remoteId);
+
+    Map<String, List<DefaultTask>> findAllEventInCalendar(Calendar calendar);
 }

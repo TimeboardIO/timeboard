@@ -40,7 +40,7 @@ public class Calendar {
     private String name;
 
     @Column(length = 100)
-    private String prodID;
+    private String remoteId;
 
     public long getId() {
         return id;
@@ -58,12 +58,12 @@ public class Calendar {
         this.name = name;
     }
 
-    public String getProdID() {
-        return prodID;
+    public String getRemoteId() {
+        return remoteId;
     }
 
-    public void setProdID(String prodID) {
-        this.prodID = prodID;
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
     }
 
 }
