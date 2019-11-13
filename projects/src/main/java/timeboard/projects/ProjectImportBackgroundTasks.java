@@ -1,8 +1,8 @@
-package timeboard.security;
+package timeboard.projects;
 
 /*-
  * #%L
- * security
+ * projects
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,23 +26,42 @@ package timeboard.security;
  * #L%
  */
 
-import com.coveo.saml.SamlClient;
-import com.coveo.saml.SamlException;
-import org.junit.jupiter.api.Test;
+import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
+import timeboard.core.model.User;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
-public class SAMLClientTest {
+public class ProjectImportBackgroundTasks {
 
-    @Test
-    public void doSAMLTest() throws IOException, SamlException {
+    private static ProjectImportBackgroundTasks INSTANCE;
 
+    private static ExecutorService executors = Executors.newFixedThreadPool(10);
 
+    private ProjectImportBackgroundTasks(){}
 
+    public static ProjectImportBackgroundTasks getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = new ProjectImportBackgroundTasks();
+        }
+        return INSTANCE;
     }
+
+    public void importInBackground(User actor, Runnable command){
+        executors.execute(command);
+    }
+
+
+
+
+
 
 }

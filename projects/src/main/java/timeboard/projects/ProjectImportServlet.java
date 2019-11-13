@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,10 +29,10 @@ package timeboard.projects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
-import timeboard.core.model.TaskRevision;
 import timeboard.core.model.User;
 import timeboard.security.SecurityContext;
 import org.osgi.service.component.annotations.*;
@@ -45,7 +45,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
-import java.rmi.Remote;
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +67,9 @@ public class ProjectImportServlet extends HttpServlet {
     @Reference
     private ProjectService projectService;
 
+    @Reference
+    private UserService userService;
+
     @Reference(
             policyOption = ReferencePolicyOption.GREEDY,
             cardinality = ReferenceCardinality.MULTIPLE,
@@ -87,7 +90,6 @@ public class ProjectImportServlet extends HttpServlet {
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
         final User actor = SecurityContext.getCurrentUser(req);
-        final Project project = this.projectService.getProjectByID(actor, projectID);
 
         String message = null;
 
@@ -98,52 +100,62 @@ public class ProjectImportServlet extends HttpServlet {
                 .findFirst();
 
         if(optionalService.isPresent()){
+            final ProjectImportService importPlugin = optionalService.get();
             try {
-                message = optionalService.get().importTasksToProject(SecurityContext.getCurrentUser(req), projectID);
+                ProjectImportBackgroundTasks
+                        .getInstance()
+                        .importInBackground(actor, ()->{
+                            try {
+                                final Project project = projectService.getProjectByID(actor, projectID);
 
-                final ProjectImportService importPlugin = optionalService.get();
+                                final List<ProjectImportService.RemoteTask> remoteTasks;
 
-                final List<ProjectImportService.RemoteTask> remoteTasks = importPlugin.getRemoteTasks(SecurityContext.getCurrentUser(req), projectID);
+                                remoteTasks = importPlugin.getRemoteTasks(actor, projectID);
 
-                remoteTasks.stream().forEach(task -> mergeAssignee(projectID, task));
+                                remoteTasks.stream().forEach(task -> mergeAssignee(userService, importPlugin.getServiceName(), task));
 
-                final List<ProjectImportService.RemoteTask> newTasks = remoteTasks.stream()
-                        .filter(task -> isNewTask(projectID, task)).collect(Collectors.toList());
+                                final List<ProjectImportService.RemoteTask> newTasks = remoteTasks.stream()
+                                        .filter(task -> isNewTask(projectID, task)).collect(Collectors.toList());
 
-                final List<TaskRevision> updatedTasks = remoteTasks.stream()
-                        .filter(task -> isUpdated(projectID, task)).map(remoteTask -> remoteTask.toTaskRevision()).collect(Collectors.toList());
-
-                final List<Long> deletedTasks = remoteTasks.stream()
-                        .filter(task -> isDeleted(projectID, task)).map(remoteTask -> remoteTask.getID()).collect(Collectors.toList());
-
-                newTasks.forEach(task ->
-                        {
-                            String taskName = null;
-                            String taskComment = null;
-                            Date startDate = null;
-                            Date endDate = null;
-                            double OE = 0;
-                            Long taskTypeID = null;
-                            User assignedUserID = null;
-                            String origin = null;
-                            String remotePath = null;
-                            Long remoteId = null;
-                            this.projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, remoteId);
-                        }
-                );
-
-                deletedTasks.forEach(taskID -> {
-                    try {
-                        this.projectService.deleteTaskByID(actor, taskID);
-                    } catch (BusinessException e) {
-
-                    }
-                });
+                                final List<ProjectImportService.RemoteTask> updatedTasks = remoteTasks.stream()
+                                        .filter(task -> isUpdated(projectID, task)).collect(Collectors.toList());
 
 
-            } catch (BusinessException e) {
-                importResponse.getErrors().add(e);
+                                newTasks.forEach(task ->
+                                        {
+                                            String taskName = task.getTitle();
+                                            if(taskName.length()>=100){
+                                                taskName = taskName.substring(0, 99);
+                                            }
+                                            String taskComment = null;
+                                            Date startDate = task.getStartDate();
+                                            Date endDate = null;
+                                            double OE = 0;
+                                            Long taskTypeID = null;
+                                            User assignedUserID = null;
+                                            String origin = task.getOrigin();
+                                            String remotePath = null;
+                                            Long remoteId = task.getID();
+                                            projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, remoteId);
+                                        }
+                                );
+
+                                updatedTasks.forEach(remoteTask -> {
+                                    Task taskToUpdate = projectService.getTaskByID(remoteTask.getID());
+                                    taskToUpdate.setName(remoteTask.getTitle());
+                                    projectService.updateTask(actor, taskToUpdate);
+                                });
+
+                            } catch (BusinessException e) {
+                                e.printStackTrace();
+                            }
+
+                        });
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+
         }else{
             importResponse.getErrors().add(new BusinessException("Missing "+type+" Service"));
         }
@@ -154,19 +166,22 @@ public class ProjectImportServlet extends HttpServlet {
         requestDispatcher.forward(req, resp);
     }
 
-    private boolean isDeleted(long projectID, ProjectImportService.RemoteTask task) {
-        return true;
-    }
+
 
     private boolean isUpdated(long projectID, ProjectImportService.RemoteTask task) {
-        return true;
+        return !this.isNewTask(projectID, task);
     }
 
     private boolean isNewTask(long projectID, ProjectImportService.RemoteTask task) {
-        return true;
+        Task existingTask = this.projectService.getTaskByID(task.getID());
+        return existingTask == null;
     }
 
-    private void mergeAssignee(long projectID, ProjectImportService.RemoteTask task) {
+    private void mergeAssignee(UserService userService, String externalID, ProjectImportService.RemoteTask task) {
+        final User remoteUser = userService.findUserByExternalID(externalID, task.getUserName());
+        if(remoteUser != null){
+            task.setLocalUserID(remoteUser.getId());
+        }
     }
 
     public static class ImportResponse implements Serializable {
@@ -182,4 +197,5 @@ public class ProjectImportServlet extends HttpServlet {
         }
 
     }
+
 }

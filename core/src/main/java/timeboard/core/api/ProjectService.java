@@ -91,11 +91,13 @@ public interface ProjectService {
 
     Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
 
-    Task updateTask(User actor, Task task, TaskRevision rev);
+    Task updateTask(User actor, Task task);
+
+    Task addRevisionToTask(User actor, Task task, TaskRevision rev);
 
     Task updateTaskWithMilestone(User actor, Task task, TaskRevision rev, Milestone milestone);
 
-    Task getTask(long id);
+    Task getTaskByID(long id);
 
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
 

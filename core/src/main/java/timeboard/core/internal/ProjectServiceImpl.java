@@ -362,7 +362,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Task updateTask(User actor, final Task task, TaskRevision rev) {
+    public Task updateTask(User actor, final Task task) {
+        return this.jpa.txExpr(entityManager -> {
+            entityManager.merge(task);
+            entityManager.flush();
+            return task;
+        });
+    }
+
+    @Override
+    public Task addRevisionToTask(User actor, final Task task, TaskRevision rev) {
         return this.jpa.txExpr(entityManager -> {
             final Task taskFromDB = entityManager.find(Task.class, task.getId());
             taskFromDB.setLatestRevision(rev);
@@ -408,7 +417,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Task getTask(long id) {
+    public Task getTaskByID(long id) {
         return this.jpa.txExpr(entityManager -> {
             return entityManager.find(Task.class, id);
         });

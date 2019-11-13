@@ -33,4 +33,6 @@ public interface Rule<T> {
     String ruleDescription();
 
     boolean isSatisfied(User user, T thing);
+
+
 }

@@ -12,10 +12,10 @@ package timeboard.plugin.project.imp.jira;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -52,54 +53,65 @@ public class JiraImportPlugin implements ProjectImportService {
 
     private static final String JIRA_USERNAME_KEY = "jira.username";
     private static final String JIRA_PASSWORD_KEY = "jira.password";
-    private static final String JIRA_USER_FIELD = "jira";
-    private static final List<String> JIRA_USER_FIELDS = new ArrayList<>();
+    private static final String JIRA_PROJECT_KEY = "jira.project";
+    private static final String JIRA_SERVICE_NAME = "JIRA";
 
     @Reference
     private ProjectService projectService;
 
     @Override
     public String getServiceName() {
-        return "Jira";
+        return JIRA_SERVICE_NAME;
     }
 
 
     @Override
     public List<String> getRequiredUserFields() {
-        if(JIRA_USER_FIELDS.size() != 1) JIRA_USER_FIELDS.add(JIRA_USER_FIELD);
-        return JIRA_USER_FIELDS;
+        return Arrays.asList(JIRA_USERNAME_KEY, JIRA_PASSWORD_KEY, JIRA_PROJECT_KEY);
+    }
+
+
+    private JiraRestClient getJiraRestClient(Project project) throws URISyntaxException {
+        String jiraUsername = project.getAttributes().get(JIRA_USERNAME_KEY).getValue();
+        String jiraPassword = project.getAttributes().get(JIRA_PASSWORD_KEY).getValue();
+
+        final JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
+        final URI uri = new URI("https://tsl-extranet.fr/jira");
+        return factory.createWithBasicHttpAuthentication(uri, jiraUsername, jiraPassword);
     }
 
     @Override
-    public String importTasksToProject(User actor, long projectID) throws BusinessException {
+    public List<RemoteTask> getRemoteTasks(User currentUser, long projectID) throws BusinessException {
+
+        List<RemoteTask> remoteTaskList = new ArrayList<>();
         try {
 
-            final Project project = this.projectService.getProjectByID(actor, projectID);
+            final Project project = this.projectService.getProjectByID(currentUser, projectID);
+            final JiraRestClient client = getJiraRestClient(project);
 
-            if(project.getAttributes().get(JIRA_USERNAME_KEY) == null){
-                throw  new BusinessException("Missing "+JIRA_USERNAME_KEY+" key");
-            }
-
-            if(project.getAttributes().get(JIRA_PASSWORD_KEY) == null){
-                throw  new BusinessException("Missing "+JIRA_PASSWORD_KEY+" key");
-            }
-
-            String jiraUsername = project.getAttributes().get(JIRA_USERNAME_KEY).getValue();
-            String jiraPassword = project.getAttributes().get(JIRA_PASSWORD_KEY).getValue();
-
-            final JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
-            final URI uri = new URI("https://tsl-extranet.fr/jira");
-            JiraRestClient client = factory.createWithBasicHttpAuthentication(uri, jiraUsername, jiraPassword);
-
-            client.getProjectClient().getAllProjects().get().forEach(basicProject -> {
-                System.out.println(basicProject.getName());
+            client.getSearchClient().searchJql(
+                    "project=\""+project.getAttributes().get(JIRA_PROJECT_KEY).getValue()+"\"",
+                    -1, 0, null
+            ).get().getIssues().forEach(issue -> {
+                RemoteTask rt = new RemoteTask();
+                rt.setID(issue.getId());
+                rt.setTitle(issue.getSummary());
+                rt.setOrigin(this.getOriginLabel());
+                rt.setStartDate(issue.getCreationDate().toDate());
+                remoteTaskList.add(rt);
             });
+
             client.close();
-        } catch (URISyntaxException | IOException | InterruptedException | ExecutionException e) {
+
+        } catch (URISyntaxException | InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
         }
 
-        return "";
+        return remoteTaskList;
+    }
+
+    private String getOriginLabel() {
+        return JIRA_SERVICE_NAME;
     }
 
 

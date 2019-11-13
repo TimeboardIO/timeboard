@@ -32,9 +32,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
-import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.IssueService;
-import org.eclipse.egit.github.core.service.RepositoryService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -154,7 +152,7 @@ public class GithubImportPlugin implements ProjectImportService {
                         task.setComments(issue.getBodyHtml());
                         task.setEndDate(issue.getClosedAt());
                         task.setStartDate(issue.getCreatedAt());
-                        this.projectService.updateTask(actor, task, revision);
+                        this.projectService.addRevisionToTask(actor, task, revision);
                         existingTasks.remove(task.getRemoteId(), task); //remove task in existing list to found the deleted at the end
                         nbTaskUpdated.incrementAndGet();
                     }
@@ -178,5 +176,10 @@ public class GithubImportPlugin implements ProjectImportService {
         } catch (IOException e) {
             throw new BusinessException(e);
         }
+    }
+
+    @Override
+    public List<RemoteTask> getRemoteTasks(User currentUser, long projectID) {
+        return null;
     }
 }
