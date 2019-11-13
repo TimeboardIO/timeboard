@@ -743,20 +743,6 @@ public class ProjectServiceImpl implements ProjectService {
         this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by "+actor.getName());
     }
 
-    //TODO: To Delete
-    @Override
-    public Milestone addMilestoneToTask(Milestone currentMilestone, String taskId) {
-        return jpa.txExpr(em -> {
-            em.merge(currentMilestone);
-            Task t = em.find(Task.class, Long.valueOf(taskId));
-            t.setMilestone(currentMilestone);
-            em.flush();
-
-            this.logService.log(LogService.LOG_INFO, "Milestone " + currentMilestone.getName() + " updated with tasks");
-            return currentMilestone;
-        });
-    }
-
     @Override
     public List<Long> listTaskIdsByMilestone(Milestone milestone) {
         return this.jpa.txExpr(entityManager -> {
@@ -766,7 +752,6 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
-    //TODO: To Fix
     @Override
     public Milestone addTasksToMilestone(Milestone currentMilestone, Set<Task> selectedTasks, Set<Task> oldTasks) {
         return this.jpa.txExpr(em -> {
@@ -791,6 +776,7 @@ public class ProjectServiceImpl implements ProjectService {
                 m.addTask(t);
             });
             em.flush();*/
+            em.flush();
             return m;
         });
     }

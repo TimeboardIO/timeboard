@@ -171,11 +171,7 @@ public interface ProjectService {
      */
     void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException;
 
-    //TODO: To Delete
-    Milestone addMilestoneToTask(Milestone currentMilestone, String taskId);
-
     List<Long> listTaskIdsByMilestone(Milestone milestone);
 
-    //TODO: To Fix
     Milestone addTasksToMilestone(Milestone currentMilestone, Set<Task> newTasks, Set<Task> oldTasks);
 }
