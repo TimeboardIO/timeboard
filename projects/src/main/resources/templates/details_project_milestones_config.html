@@ -11,9 +11,10 @@
 
 <div th:fragment="milestone-config" th:if="${milestone != null}">
 
-    <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestoneForm"
+    <form action="/projects/milestones/config" class="ui form segment" enctype="application/x-www-form-urlencoded" id="milestoneForm"
           method="post" style="margin-left:1em;">
         <input name="milestoneID" required th:value="${milestone.id}" type="hidden">
+        <input name="projectID" required th:value="${project.id}" type="hidden">
 
         <div class="field">
             <label>Milestone Name</label>

@@ -31,8 +31,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Milestone;
+import timeboard.core.model.MilestoneType;
 import timeboard.core.model.Project;
-import timeboard.core.model.Task;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -42,23 +42,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/milestones/links-config",
+                "osgi.http.whiteboard.servlet.pattern=/projects/milestones/config-links",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 )
-public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
+public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -68,26 +62,11 @@ public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectMilestoneLinksConfigServlet.class.getClassLoader();
+        return ProjectMilestoneConfigLinksServlet.class.getClassLoader();
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        if (request.getParameter("milestoneID") != null) {
-            long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
-            Milestone milestone = this.projectService.getMilestoneById(milestoneID);
-            viewModel.getViewDatas().put("milestone", milestone);
-            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(milestone));
-        }
-
-        long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
-
-        viewModel.setTemplate("projects:details_project_milestones_links_config.html");
-        viewModel.getViewDatas().put("project", project);
-        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
-        viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
-
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel){
     }
 
     @Override
@@ -102,7 +81,9 @@ public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
             if (!getParameter(request, "milestoneID").get().isEmpty()) {
                 Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
                 currentMilestone = this.projectService.getMilestoneById(milestoneID);
+                //TODO: To Delete
                 currentMilestone = addMilestoneToTask(currentMilestone, request);
+                //TODO: To Fix
                // currentMilestone = addTasksToMilestone(currentMilestone, request);
             }
 
@@ -112,11 +93,12 @@ public class ProjectMilestoneLinksConfigServlet extends TimeboardServlet {
         } catch (Exception e) {
             viewModel.getErrors().add(e);
         } finally {
-            viewModel.setTemplate("projects:details_project_milestones_links_config.html");
+            viewModel.setTemplate("projects:details_project_milestones_config_links.html");
 
             viewModel.getViewDatas().put("project", project);
             viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
             viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
+            viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
             viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(currentMilestone));
         }
     }
