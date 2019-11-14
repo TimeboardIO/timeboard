@@ -80,7 +80,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         if (request.getParameter("taskID") != null) {
             // Update case
             long taskID = Long.parseLong(request.getParameter("taskID"));
-            task = this.projectService.getTask(taskID);
+            task = (Task) this.projectService.getTask(taskID);
             viewModel.getViewDatas().put("task", new TaskForm(task));
         } else {
             // New task case
@@ -159,7 +159,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
             if (!getParameter(request, "taskID").get().isEmpty()) {
                 Long taskID = Long.parseLong(request.getParameter("taskID"));
-                currentTask = this.projectService.getTask(taskID);
+                currentTask = (Task) this.projectService.getTask(taskID);
                 currentTask = this.updateTask(actor, project, currentTask, request);
             } else {
                 currentTask = this.createTask(actor, project, request);
