@@ -753,18 +753,18 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone addTasksToMilestone(Milestone currentMilestone, Set<Task> selectedTasks, Set<Task> oldTasks) {
+    public Milestone addTasksToMilestone(Long currentMilestoneId, List<Long> selectedTaskIds, List<Long> oldTaskIds) {
         return this.jpa.txExpr(em -> {
-            Milestone m = em.find(Milestone.class, currentMilestone.getId());
+            Milestone m = em.find(Milestone.class, currentMilestoneId);
 
-            oldTasks.forEach(t -> {
-                Task tr = em.find(Task.class, t.getId());
+            oldTaskIds.forEach(id -> {
+                Task tr = em.find(Task.class, id);
                 tr.setMilestone(null);
                 m.getTasks().removeIf(task -> task.getId() == tr.getId());
              });
 
-            selectedTasks.forEach(t -> {
-                Task tr = em.find(Task.class, t.getId());
+            selectedTaskIds.forEach(id -> {
+                Task tr = em.find(Task.class, id);
                 tr.setMilestone(m);
                 m.getTasks().add(tr);
             });

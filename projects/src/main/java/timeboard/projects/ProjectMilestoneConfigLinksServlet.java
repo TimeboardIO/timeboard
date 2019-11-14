@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -106,19 +107,14 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
     }
 
     private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) {
-        String[] taskIds = request.getParameterValues("taskSelected");
+        String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
+        List<Long> selectedTaskIds = Arrays
+                .stream(selectedTaskIdsString)
+                .map(id -> Long.valueOf(id))
+                .collect(Collectors.toList());
+        List<Long> oldTaskIds = this.projectService.listTaskIdsByMilestone(currentMilestone);
 
-        Set<Task> newTasks = new HashSet<>();
-        if(taskIds != null){
-            newTasks.addAll(Arrays.stream(taskIds).map(id -> this.projectService.getTask(Long.valueOf(id))).collect(Collectors.toSet()));
-        }
-
-        Set<Task> oldTasks = this.projectService.listTaskIdsByMilestone(currentMilestone)
-                .stream()
-                .map(id -> this.projectService.getTask(id))
-                .collect(Collectors.toSet());
-
-        return this.projectService.addTasksToMilestone(currentMilestone, newTasks,oldTasks);
+        return this.projectService.addTasksToMilestone(currentMilestone.getId(), selectedTaskIds, oldTaskIds);
     }
 
 

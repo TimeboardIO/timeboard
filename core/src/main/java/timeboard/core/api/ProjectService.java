@@ -173,5 +173,5 @@ public interface ProjectService {
 
     List<Long> listTaskIdsByMilestone(Milestone milestone);
 
-    Milestone addTasksToMilestone(Milestone currentMilestone, Set<Task> newTasks, Set<Task> oldTasks);
+    Milestone addTasksToMilestone(Long currentMilestoneId, List<Long> newTasks, List<Long> oldTasks);
 }
