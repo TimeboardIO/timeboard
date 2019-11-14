@@ -79,13 +79,6 @@
         <bundle start-level="90">mvn:${project.groupId}/account/${project.version}</bundle>
     </feature>
 
-    <feature name="timeboard-calendar" version="${project.version}">
-        <feature>timeboard-core</feature>
-        <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
-        <bundle start-level="90">mvn:${project.groupId}/calendar/${project.version}</bundle>
-    </feature>
-
     <feature name="timeboard-projects" version="${project.version}">
         <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
