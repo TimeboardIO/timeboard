@@ -154,7 +154,7 @@ public class AccountServlet extends TimeboardServlet {
         List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list
         projectImportServlets.forEach(service -> {
-            fieldNames.addAll(service.getRequiredUserFields());
+            fieldNames.add(service.getServiceName());
         });
 
         viewModel.getViewDatas().put("externalTools", fieldNames);

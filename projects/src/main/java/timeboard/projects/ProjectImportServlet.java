@@ -132,7 +132,7 @@ public class ProjectImportServlet extends HttpServlet {
                                             Date endDate = null;
                                             double OE = 0;
                                             Long taskTypeID = null;
-                                            User assignedUserID = null;
+                                            User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
                                             String origin = task.getOrigin();
                                             String remotePath = null;
                                             Long remoteId = task.getID();

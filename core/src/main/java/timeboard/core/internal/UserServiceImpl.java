@@ -222,14 +222,20 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByExternalID(String origin, String userExternalID) {
-        return this.jpa.txExpr(entityManager -> {
-            Query q = entityManager // MYSQL native for JSON queries
-                    .createNativeQuery("select * from User "
-                            + "where JSON_EXTRACT(externalIDs, '$."+origin+"')" +
-                            " = ?", User.class);
-            q.setParameter(1, userExternalID);
-            return (User) q.getSingleResult();
-        });
+        User u;
+        try {
+            u =  this.jpa.txExpr(entityManager -> {
+                Query q = entityManager // MYSQL native for JSON queries
+                        .createNativeQuery("select * from User "
+                                + "where JSON_EXTRACT(externalIDs, '$." + origin + "')" +
+                                " = ?", User.class);
+                q.setParameter(1, userExternalID);
+                return (User) q.getSingleResult();
+            });
+        }catch (javax.persistence.NoResultException e){
+            u = null;
+        }
+        return u;
     }
 
     private String hashPassword(String password){
