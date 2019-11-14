@@ -76,7 +76,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     public boolean importCalendarAsImputationsFromICS(User actor, String url, AbstractTask task, List<User> userList,
-                                                      double value) throws BusinessException, ParserException, IOException {
+                                                      double value) throws BusinessException, ParseException, IOException {
 
         /* -- Events -- */
         Set<Imputation> existingEventList = task.getImputations();
@@ -105,7 +105,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public boolean importCalendarAsTasksFromICS(User actor, String name, String url, Project project, boolean deleteOrphan) throws BusinessException, ParserException, IOException  {
+    public boolean importCalendarAsTasksFromICS(User actor, String name, String url, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException  {
 
         /* -- Calendar -- */
         final timeboard.core.model.Calendar timeboardCalendar = this.createOrUpdateCalendar(name, url);
@@ -151,17 +151,21 @@ public class CalendarServiceImpl implements CalendarService {
      * Import ICS as Event
      * @param url ics file url
      * @return map key = remoteId, value = Event
-     * @throws ParserException when ICS parser failed
+     * @throws ParseException when ICS parser failed
      * @throws IOException when fil is not found
      */
-    private Map<String, List<Event>> importICS(final String url) throws ParserException, IOException {
+    private Map<String, List<Event>> importICS(final String url) throws  IOException, ParseException {
 
         final Map<String, List<Event>> events = new HashMap<>();
 
         final net.fortuna.ical4j.model.Calendar parsedCalendar;
         final CalendarBuilder builder = new CalendarBuilder();
         final FileInputStream fin = new FileInputStream(url);
-        parsedCalendar = builder.build(fin);
+        try{
+            parsedCalendar = builder.build(fin);
+        }catch (ParserException e){
+            throw new ParseException(e.getMessage(), e.getLineNo());
+        }
 
         for (Object o : parsedCalendar.getComponents(Component.VEVENT)) {
 
@@ -187,7 +191,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
 
-    private void icsToEvent(VEvent icsEvent, Event timeboardEvent) {
+    private void icsToEvent(VEvent icsEvent, Event timeboardEvent) throws ParseException {
 
         Uid uid = icsEvent.getUid();
 
@@ -218,7 +222,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     }
 
-    private AbstractTask eventToTask(Event event, AbstractTask task) {
+    private void eventToTask(Event event, AbstractTask task) {
 
         task.setRemoteId(event.getRemoteId());
         task.setRemotePath(event.getRemotePath());
@@ -230,8 +234,6 @@ public class CalendarServiceImpl implements CalendarService {
         task.setEndDate(event.getEndDate());
 
         task.setOrigin(event.getOrigin());
-
-        return task;
 
     }
 
@@ -275,15 +277,6 @@ public class CalendarServiceImpl implements CalendarService {
         }
     }
 
-   /* private void copyTask(DefaultTask source, DefaultTask target) {
-        // copy without dates
-        target.setName(source.getName());
-        target.setComments(source.getComments());
-        target.setOrigin(source.getOrigin());
-        target.setRemotePath(source.getRemotePath());
-        target.setRemoteId(source.getRemoteId());
-    }*/
-
     private Task getTaskByStartDate(Collection<Task> tasks, java.util.Date date) {
         Task result = null;
         for(Task t : tasks){
@@ -293,6 +286,7 @@ public class CalendarServiceImpl implements CalendarService {
         }
         return result;
     }
+
     private Imputation getImputationByStartDate(Collection<Imputation> imputations, java.util.Date date) {
         Imputation result = null;
         for(Imputation i : imputations){
@@ -374,6 +368,7 @@ public class CalendarServiceImpl implements CalendarService {
                 if (currentList == null) {
                     currentList = idToEventList.put(event.getRemoteId(), new ArrayList<>());
                 }
+                assert currentList != null;
                 currentList.add(event);
             }
         }catch(Exception e){
@@ -433,20 +428,16 @@ public class CalendarServiceImpl implements CalendarService {
         return clone;
     }
 
-    private java.util.Date getJavaDateFromProperty(Property p){
+    private java.util.Date getJavaDateFromProperty(Property p) throws ParseException {
         java.util.Date date = null;
-        try{
-            if(p != null){
-                SimpleDateFormat sdf;
-                if(p.getValue().length() == 16) sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
-                else sdf = new SimpleDateFormat("yyyyMMdd");
-                sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
-                date = sdf.parse(p.getValue());
-            }
-
-        }catch(ParseException e){
-            //TODO handle parse exception
+        if(p != null){
+            SimpleDateFormat sdf;
+            if(p.getValue().length() == 16) sdf = new SimpleDateFormat("yyyyMMdd'T'HHmmss'Z'");
+            else sdf = new SimpleDateFormat("yyyyMMdd");
+            sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT"));
+            date = sdf.parse(p.getValue());
         }
+
         return date;
     }
 

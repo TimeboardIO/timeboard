@@ -498,7 +498,7 @@ public class ProjectServiceImpl implements ProjectService {
                 tasks.addAll(query.getResultList());
             });
         }catch (Exception e){
-          //  e.printStackTrace();
+            // handle JPA Exceptions
         }
 
         try{
@@ -508,7 +508,7 @@ public class ProjectServiceImpl implements ProjectService {
                 tasks.addAll(query.getResultList());
             });
         }catch (Exception e){
-         //   e.printStackTrace();
+            //handle JPA Exceptions
         }
 
        return tasks;
