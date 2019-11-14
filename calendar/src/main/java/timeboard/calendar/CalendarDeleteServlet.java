@@ -30,10 +30,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.CalendarService;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
@@ -60,16 +58,15 @@ public class CalendarDeleteServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         long calendarId = Long.parseLong(request.getParameter("calID"));
-
         try {
             this.calendarService.deleteCalendarById(SecurityContext.getCurrentUser(request), calendarId);
         } catch (BusinessException e) {
-            viewModel.getErrors().add(e);
+           // viewModel.getErrors().add(e);
         }
-        response.sendRedirect("/projects");
+        response.sendRedirect("/calendar");
     }
 
 

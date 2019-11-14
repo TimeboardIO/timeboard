@@ -26,18 +26,20 @@ package timeboard.core.api;
  * #L%
  */
 
+import net.fortuna.ical4j.data.ParserException;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Calendar;
-import timeboard.core.model.DefaultTask;
-import timeboard.core.model.User;
+import timeboard.core.model.*;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public interface CalendarService {
 
-    boolean importCalendarFromICS(User actor, String name, String ICS) throws BusinessException;
+    boolean importCalendarAsTasksFromICS(User actor, String name, String ICS, Project project, boolean deleteOrphan) throws BusinessException, ParserException, IOException;
+
+    boolean importCalendarAsImputationsFromICS(User actor,String ICS, AbstractTask task, List<User> userList, double value, boolean deleteOrphan) throws BusinessException, ParserException, IOException ;
 
     Calendar createOrUpdateCalendar(String name, String remoteId);
 
@@ -45,7 +47,7 @@ public interface CalendarService {
 
     List<DefaultTask> findExistingEvents(String remotePath, String remoteId);
 
-    Map<String, List<DefaultTask>> findAllEventInCalendar(Calendar calendar);
+    Map<String, List<Task>> findAllEventAsTask(Calendar calendar, Project project);
 
     void deleteCalendarById(User actor, Long calendarID) throws BusinessException;
 

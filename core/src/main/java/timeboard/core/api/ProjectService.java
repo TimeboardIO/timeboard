@@ -44,6 +44,8 @@ public interface ProjectService {
 
     Project getProjectByID(User owner, Long projectID);
 
+    Project getProjectByName(String projectArg);
+
     Project deleteProjectByID(Long projectID);
 
     Project updateProject(Project project) throws BusinessException;
@@ -94,9 +96,19 @@ public interface ProjectService {
 
     Task updateTask(User actor, Task task, TaskRevision rev);
 
+    Task updateTask(User actor, Task task);
+
+    void createTasks(User actor, List<Task> taskList);
+
+    void updateTasks(User actor, List<Task> taskList);
+
+    void deleteTasks(User actor, List<Task> taskList);
+
     Task updateTaskWithMilestone(User actor, Task task, TaskRevision rev, Milestone milestone);
 
-    Task getTask(long id);
+    AbstractTask getTask(long id);
+    List<AbstractTask> getTasksByName(String name);
+
 
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
 
@@ -129,6 +141,8 @@ public interface ProjectService {
     List<EffortEstimate> getEstimateByTask(long taskId);
 
     UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
+
+    List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList);
 
 
     /*

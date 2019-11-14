@@ -26,32 +26,23 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
-import java.util.Set;
+import java.util.Date;
 
-@Entity
-public class Calendar {
+public class Event {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    @Column(length = 50, unique = false)
     private String name;
 
-    @Column(length = 100)
+    private String comments;
+
+    private Date startDate;
+
+    private Date endDate;
+
+    private String origin;
+
+    private String remotePath;
+
     private String remoteId;
-
-    @Column(length = 25)
-    private String targetType;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -59,6 +50,46 @@ public class Calendar {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    public String getRemotePath() {
+        return remotePath;
+    }
+
+    public void setRemotePath(String remotePath) {
+        this.remotePath = remotePath;
     }
 
     public String getRemoteId() {
@@ -69,4 +100,15 @@ public class Calendar {
         this.remoteId = remoteId;
     }
 
+    public Object clone() {
+        Event clone = new Event();
+        clone.setName(this.getName());
+        clone.setComments(this.getComments());
+        clone.setStartDate(this.getStartDate());
+        clone.setEndDate(this.getEndDate());
+        clone.setOrigin(this.getOrigin());
+        clone.setRemotePath(this.getRemotePath());
+        clone.setRemoteId(this.getRemoteId());
+        return clone;
+    }
 }

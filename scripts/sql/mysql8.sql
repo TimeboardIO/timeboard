@@ -15,6 +15,7 @@
        id bigint not null,
         name varchar(50),
         remoteId varchar(100),
+        targetType varchar(25),
         primary key (id)
     ) engine=InnoDB;
 

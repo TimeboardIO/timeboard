@@ -92,7 +92,7 @@ public class CalendarServlet extends TimeboardServlet {
         }
         try{
             String url = "";
-            this.calendarService.importCalendarFromICS(SecurityContext.getCurrentUser(request), url, url);
+        //    this.calendarService.importCalendarFromICS(SecurityContext.getCurrentUser(request), url, url);
         }catch(Exception e){
             //TODO Handle business exceptions
         }
@@ -111,9 +111,7 @@ public class CalendarServlet extends TimeboardServlet {
     }
 
 
-    private void createCalendar(String name, String description, String remoteID){
 
-    }
 
 
 }
