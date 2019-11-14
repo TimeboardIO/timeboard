@@ -207,14 +207,12 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
 
         final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());
-        //if(taskType != null) {
-            currentTask.setTaskType(taskType);
-            currentTask.setName(taskForm.getTaskName());
-            currentTask.setComments(taskForm.getTaskComment());
-            currentTask.setStartDate(taskForm.getStartDate());
-            currentTask.setEndDate(taskForm.getEndDate());
-            currentTask.setEstimateWork( taskForm.getEstimateWork());
-        //}
+        currentTask.setTaskType(taskType);
+        currentTask.setName(taskForm.getTaskName());
+        currentTask.setComments(taskForm.getTaskComment());
+        currentTask.setStartDate(taskForm.getStartDate());
+        currentTask.setEndDate(taskForm.getEndDate());
+        currentTask.setEstimateWork( taskForm.getEstimateWork());
         currentTask.setMilestone(milestone);
         final TaskRevision rev = new TaskRevision(actor,
                 currentTask,
@@ -224,7 +222,6 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         return this.projectService.updateTaskWithMilestone(actor, currentTask, rev, milestone);
     }
-
 
     public static class TaskForm {
         private Long taskID;
