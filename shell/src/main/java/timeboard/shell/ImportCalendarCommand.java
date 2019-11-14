@@ -53,7 +53,7 @@ public class ImportCalendarCommand implements Action {
     @Option(name = "-n", aliases = {"--name"}, description = "Calendar name", required = false, multiValued = false)
     String name;
 
-    @Option(name = "-a", aliases = {"--actor"}, description = "Action actor", required = false, multiValued = true)
+    @Option(name = "-u", aliases = {"--users"}, description = "Action actor", required = false, multiValued = true)
     List<String> usernames;
 
     @Option(name = "-p", aliases = {"--project"}, description = "Import as project tasks", required = false, multiValued = false)
@@ -100,13 +100,13 @@ public class ImportCalendarCommand implements Action {
             //treat as imputation
 
             if(!allUsers && (usernames == null || usernames.isEmpty())) throw new Exception("You must specify a user list or use option -all to apply imputations to all users");
-
+            if(imputationValue == null ) imputationValue = "1.0";
             final List<AbstractTask> tasksByName = projectService.getTasksByName(taskArg);
             final List<User> userList= new ArrayList<>();
             for(String username : usernames){
                 userList.add(userService.findUserByLogin(username));
             }
-            calendarService.importCalendarAsImputationsFromICS(actor, file, tasksByName.get(0), userList, Double.parseDouble(imputationValue), deleteOrphan);
+            calendarService.importCalendarAsImputationsFromICS(actor, file, tasksByName.get(0), userList, Double.parseDouble(imputationValue));
         }else{
 
             final Project project = projectService.getProjectByName(projectArg);

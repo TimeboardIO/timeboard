@@ -76,7 +76,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     public boolean importCalendarAsImputationsFromICS(User actor, String url, AbstractTask task, List<User> userList,
-                                                      double value, boolean deleteOrphan) throws BusinessException, ParserException, IOException {
+                                                      double value) throws BusinessException, ParserException, IOException {
 
         /* -- Events -- */
         Set<Imputation> existingEventList = task.getImputations();
@@ -122,14 +122,14 @@ public class CalendarServiceImpl implements CalendarService {
             List<Task> existingEventList = existingEvents.get(newEventList.get(0).getRemoteId());
             for (Event event : newEventList) {
                 if(existingEventList == null || existingEventList.isEmpty()) { // no existing events for this id
-                    tasksToCreate.add((Task) this.eventToTask(event, new Task())); // so create it
+                    tasksToCreate.add((Task) this.eventToTask(event, new Task(), project)); // so create it
                 } else { //  one or many events exist for this id
                     Task timeboardEvent = this.getTaskByStartDate(existingEventList, event.getStartDate());
                     if (timeboardEvent != null) { // event and task match (id & date), so update it
-                        tasksToUpdate.add((Task) this.eventToTask(event, timeboardEvent));// convert event to task
+                        tasksToUpdate.add((Task) this.eventToTask(event, timeboardEvent, project));// convert event to task
                         existingEventList.remove(timeboardEvent); // remove  to retrieve orphan at the end
                     } else { // no matching task found, so create it
-                        tasksToCreate.add((Task) this.eventToTask(event, new Task()));
+                        tasksToCreate.add((Task) this.eventToTask(event, new Task(), project));
                     }
                 }
             }
@@ -176,8 +176,7 @@ public class CalendarServiceImpl implements CalendarService {
             if(rRule != null){
                 this.createRecurringEvents(event, (RRule) rRule, events);
             }else{
-                List<Event> eventList = events.get(event.getRemoteId());
-                if(eventList == null) eventList = events.put(event.getRemoteId(), new ArrayList<>());
+                List<Event> eventList = events.computeIfAbsent(event.getRemoteId(), k -> new ArrayList<>());
                 eventList.add(event);
             }
         }
@@ -213,7 +212,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     private AbstractTask eventToTask(Event event, Task task, Project project) {
 
-       task = (Task) this.eventToTask(event, task);
+       this.eventToTask(event, task);
        task.setProject((project));
         return task;
 
@@ -242,6 +241,7 @@ public class CalendarServiceImpl implements CalendarService {
         for (User user : userList){
             Imputation imputation =  new Imputation();
             imputation.setUser(user);
+            imputation.setTask(task);
             imputation.setDay(event.getStartDate());
             imputation.setValue(value);
             result.add(imputation);
@@ -315,25 +315,25 @@ public class CalendarServiceImpl implements CalendarService {
             });
         } catch(Exception e){
             // calendar not already exist
-        } finally {
-            if(calendar == null) { // create
-                timeboard.core.model.Calendar newCalendar = new timeboard.core.model.Calendar();
-                newCalendar.setRemoteId(remoteId);
-                newCalendar.setName(name);
-                calendar = this.jpa.txExpr(entityManager -> {
-                    entityManager.persist(newCalendar);
-                    return newCalendar;
-                });
-            } else { // update
-                final timeboard.core.model.Calendar toUpdateCalendar = calendar;
-                toUpdateCalendar.setName(name);
-                toUpdateCalendar.setRemoteId(remoteId);
-                calendar = this.jpa.txExpr(entityManager -> {
-                    entityManager.merge(toUpdateCalendar);
-                    return toUpdateCalendar;
-                });
-            }
         }
+        if(calendar == null) { // create
+            timeboard.core.model.Calendar newCalendar = new timeboard.core.model.Calendar();
+            newCalendar.setRemoteId(remoteId);
+            newCalendar.setName(name);
+            calendar = this.jpa.txExpr(entityManager -> {
+                entityManager.persist(newCalendar);
+                return newCalendar;
+            });
+        } else { // update
+            final timeboard.core.model.Calendar toUpdateCalendar = calendar;
+            toUpdateCalendar.setName(name);
+            toUpdateCalendar.setRemoteId(remoteId);
+            calendar = this.jpa.txExpr(entityManager -> {
+                entityManager.merge(toUpdateCalendar);
+                return toUpdateCalendar;
+            });
+        }
+
 
         return calendar;
     }

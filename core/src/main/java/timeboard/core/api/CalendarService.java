@@ -39,7 +39,7 @@ public interface CalendarService {
 
     boolean importCalendarAsTasksFromICS(User actor, String name, String ICS, Project project, boolean deleteOrphan) throws BusinessException, ParserException, IOException;
 
-    boolean importCalendarAsImputationsFromICS(User actor,String ICS, AbstractTask task, List<User> userList, double value, boolean deleteOrphan) throws BusinessException, ParserException, IOException ;
+    boolean importCalendarAsImputationsFromICS(User actor,String ICS, AbstractTask task, List<User> userList, double value) throws BusinessException, ParserException, IOException ;
 
     Calendar createOrUpdateCalendar(String name, String remoteId);
 

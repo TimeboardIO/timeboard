@@ -488,29 +488,30 @@ public class ProjectServiceImpl implements ProjectService {
 
     public List<AbstractTask> getTasksByName(String name) {
 
-        List<Task> tasks = null;
+        final List<AbstractTask> tasks =  new ArrayList<>();
         try{
-            tasks = this.jpa.txExpr(entityManager -> {
+            this.jpa.tx(entityManager -> {
 
-                TypedQuery<Task> query = entityManager.createQuery("select t from Task where t.name = :name", Task.class);
-                query.setParameter("", name );
+                TypedQuery<Task> query = entityManager.createQuery("select distinct t from Task t left join fetch t.imputations  where t.name = :name", Task.class);
+                query.setParameter("name", name );
 
-                return query.getResultList();
+                tasks.addAll(query.getResultList());
             });
-        }catch (Exception e){}
-        if(tasks != null) return new ArrayList<>(tasks);
+        }catch (Exception e){
+          //  e.printStackTrace();
+        }
 
-        List<DefaultTask> defaultTask = null;
         try{
-            defaultTask = this.jpa.txExpr(entityManager -> {
-                TypedQuery<DefaultTask> query = entityManager.createQuery("select t from DefaultTask where t.name = :name", DefaultTask.class);
-                query.setParameter("", name );
-
-                return query.getResultList();
+            this.jpa.tx(entityManager -> {
+                TypedQuery<DefaultTask> query = entityManager.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
+                query.setParameter("name", name );
+                tasks.addAll(query.getResultList());
             });
-        }catch (Exception e){}
-        return new ArrayList<>(tasks);
+        }catch (Exception e){
+         //   e.printStackTrace();
+        }
 
+       return tasks;
     }
 
     private UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double val, EntityManager entityManager){
@@ -591,7 +592,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-
     @Override
     public UpdatedTaskResult updateTaskRTBD(User actor, Long taskID, double rtbd) {
         return this.jpa.txExpr(entityManager -> {
@@ -599,7 +599,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setRemainsToBeDone(actor, rtbd);
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated reamin to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ rtbd);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated remain to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ rtbd);
 
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
