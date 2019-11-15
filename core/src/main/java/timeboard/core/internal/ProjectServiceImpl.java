@@ -742,4 +742,34 @@ public class ProjectServiceImpl implements ProjectService {
         }
         this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by "+actor.getName());
     }
+
+    @Override
+    public List<Long> listTaskIdsByMilestone(Milestone milestone) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Long> q = entityManager.createQuery("select t.id from Task t where t.milestone = :milestone", Long.class);
+            q.setParameter("milestone", milestone);
+            return q.getResultList();
+        });
+    }
+
+    @Override
+    public Milestone addTasksToMilestone(Long currentMilestoneId, List<Long> selectedTaskIds, List<Long> oldTaskIds) {
+        return this.jpa.txExpr(em -> {
+            Milestone m = em.find(Milestone.class, currentMilestoneId);
+
+            oldTaskIds.forEach(id -> {
+                Task tr = em.find(Task.class, id);
+                tr.setMilestone(null);
+                m.getTasks().removeIf(task -> task.getId() == tr.getId());
+             });
+
+            selectedTaskIds.forEach(id -> {
+                Task tr = em.find(Task.class, id);
+                tr.setMilestone(m);
+                m.getTasks().add(tr);
+            });
+
+            return m;
+        });
+    }
 }
