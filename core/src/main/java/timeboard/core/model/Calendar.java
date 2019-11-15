@@ -26,31 +26,47 @@ package timeboard.core.model;
  * #L%
  */
 
-import java.util.Date;
+import javax.persistence.*;
+import java.util.Set;
 
-public class EffortEstimate {
+@Entity
+public class Calendar {
 
-    private Date date;
-    private Double effortEstimateValue;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
-    public EffortEstimate(Date date, Double sumPreviousValue){
-        this.date = date;
-        this.effortEstimateValue = sumPreviousValue;
+    @Column(length = 50, unique = false)
+    private String name;
+
+    @Column(length = 100)
+    private String remoteId;
+
+    @Column(length = 25)
+    private String targetType;
+
+    public long getId() {
+        return id;
     }
 
-    public Date getDate() {
-        return date;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public String getName() {
+        return name;
     }
 
-    public Double getEffortEstimateValue() {
-        return effortEstimateValue;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setEffortEstimateValue(Double effortEstimateValue) {
-        this.effortEstimateValue = effortEstimateValue;
+    public String getRemoteId() {
+        return remoteId;
     }
+
+    public void setRemoteId(String remoteId) {
+        this.remoteId = remoteId;
+    }
+
 }

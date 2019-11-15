@@ -72,6 +72,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
             long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
             Milestone milestone = this.projectService.getMilestoneById(milestoneID);
             viewModel.getViewDatas().put("milestone", milestone);
+            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(milestone));
         } else {
             // New milestone case
             viewModel.getViewDatas().put("milestone", new Milestone());
@@ -84,6 +85,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
         viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
+        viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
 
     }
 
@@ -105,6 +107,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
             }
 
             viewModel.getViewDatas().put("milestone", currentMilestone);
+            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(currentMilestone));
 
 
         } catch (Exception e) {
@@ -115,6 +118,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
             viewModel.getViewDatas().put("project", project);
             viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
             viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
+            viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
         }
     }
 

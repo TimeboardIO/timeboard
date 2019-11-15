@@ -84,10 +84,10 @@
                                     {{ getImputationSum(day.date).toFixed(1) }}
                                 </div>
                             </th>
-                            <th class="wide one" data-tooltip="Effort spent" rowspan="1">ES</th>
-                            <th class="wide one" data-tooltip="Remain To Be Done" rowspan="1">EL</th>
-                            <th class="wide one" data-tooltip="Restimate" rowspan="1">RE</th>
-                            <th class="wide one" data-tooltip="Original estimate" rowspan="1">OE</th>
+                            <th class="wide one" data-tooltip="Effort spent: Total effort spent on the task" rowspan="1">ES</th>
+                            <th class="wide one" data-tooltip="Remain To Be Done: Effort Left to complete the task" rowspan="1">EL</th>
+                            <th class="wide one" data-tooltip="Restimate: Total effort to complete the task" rowspan="1">RE</th>
+                            <th class="wide one" data-tooltip="Original estimate: Initial estimate to complete the task" rowspan="1">OE</th>
 
                         </tr>
 
@@ -133,10 +133,10 @@
 
                                     </div>
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID">{{task.estimateWork.toFixed(1)}}</td>
                                 <td v-if="projectID > 0"
                                         v-bind:data-task-rew="taskID">{{task.reEstimateWork.toFixed(1)}}
                                 </td>
+                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID">{{task.estimateWork.toFixed(1)}}</td>
                             </tr>
                         </template>
                         </tbody>

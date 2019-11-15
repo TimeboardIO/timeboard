@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -26,31 +26,31 @@ package timeboard.core.model;
  * #L%
  */
 
-import java.util.Date;
+import net.fortuna.ical4j.data.ParserException;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
 
-public class EffortEstimate {
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.List;
+import java.util.Map;
 
-    private Date date;
-    private Double effortEstimateValue;
+public interface CalendarService {
 
-    public EffortEstimate(Date date, Double sumPreviousValue){
-        this.date = date;
-        this.effortEstimateValue = sumPreviousValue;
-    }
+    boolean importCalendarAsTasksFromICS(User actor, String name, String ICS, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException;
 
-    public Date getDate() {
-        return date;
-    }
+    boolean importCalendarAsImputationsFromICS(User actor,String ICS, AbstractTask task, List<User> userList, double value) throws BusinessException, ParseException, IOException ;
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
+    Calendar createOrUpdateCalendar(String name, String remoteId);
 
-    public Double getEffortEstimateValue() {
-        return effortEstimateValue;
-    }
+    List<Calendar> listCalendars();
 
-    public void setEffortEstimateValue(Double effortEstimateValue) {
-        this.effortEstimateValue = effortEstimateValue;
-    }
+    List<DefaultTask> findExistingEvents(String remotePath, String remoteId);
+
+    Map<String, List<Task>> findAllEventAsTask(Calendar calendar, Project project);
+
+    void deleteCalendarById(User actor, Long calendarID) throws BusinessException;
+
+
+
 }

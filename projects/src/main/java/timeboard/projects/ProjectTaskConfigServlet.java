@@ -45,9 +45,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component(
@@ -80,7 +78,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         if (request.getParameter("taskID") != null) {
             // Update case
             long taskID = Long.parseLong(request.getParameter("taskID"));
-            task = this.projectService.getTask(taskID);
+            task = (Task) this.projectService.getTask(taskID);
             viewModel.getViewDatas().put("task", new TaskForm(task));
         } else {
             // New task case
@@ -117,34 +115,52 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
-        List<EffortSpent> effortSpentDB = this.projectService.getESByTaskAndPeriod(task.getId(), task.getStartDate(), task.getEndDate());
-        final Double[] lastSum = {0.0};
-        List<Double> effortSpent = listOfTaskDates
+        List<EffortSpent> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(task.getId(), task.getStartDate(), task.getEndDate());
+        final EffortSpent[] lastEffortSpentSum = {new EffortSpent(task.getStartDate(), 0.0)};
+        Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
+                .map(dateString -> {
+                    try { return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) { e.printStackTrace();}
+                    return null;
+                })
                 .map(date -> effortSpentDB.stream()
-                        .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(date))
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effort -> {
-                            lastSum[0] = effort.getSumPreviousValue();
-                            return effort.getSumPreviousValue();
+                            lastEffortSpentSum[0] = new EffortSpent(date, effort.getSumPreviousValue());
+                            return lastEffortSpentSum[0];
                         })
-                        .findFirst().orElse(lastSum[0]))
-                .collect(Collectors.toList());
-        viewModel.getViewDatas().put("effortSpent", effortSpent);
+                        .findFirst().orElse(new EffortSpent(date, lastEffortSpentSum[0].getSumPreviousValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getSumPreviousValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        viewModel.getViewDatas().put("effortSpent", effortSpentMap.values());
 
         // Datas for effort estimate (Axis Y)
-        List<EffortEstimate> effortEstimateDB = this.projectService.getEstimateByTask(task.getId());
-        final Double[] lastEstimate = {0.0};
-        List<Double> effortEstimate = listOfTaskDates
+        List<EffortLeft> effortLeftDB = this.projectService.getEffortLeftByTask(task.getId());
+        final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getEstimateWork())};
+        Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
-                .map(date -> effortEstimateDB.stream()
-                        .filter(ee -> new SimpleDateFormat(formatDateToDisplay).format(ee.getDate()).equals(date))
-                        .map(estimate -> {
-                            lastEstimate[0] = estimate.getEstimateValue();
-                            return estimate.getEstimateValue();
+                .map(dateString -> {
+                    try { return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) { e.printStackTrace();}
+                    return null;
+                })
+                .map(date -> effortLeftDB.stream()
+                        .filter(el -> new SimpleDateFormat(formatDateToDisplay).format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effortLeft -> {
+                            lastEffortEstimate[0] = new EffortEstimate(date, effortLeft.getEffortLeftValue() + effortSpentMap.get(date));
+                            return lastEffortEstimate[0];
                         })
-                        .findFirst().orElse(lastEstimate[0]))
-                .collect(Collectors.toList());
-        viewModel.getViewDatas().put("reEstimate", effortEstimate);
+                        .findFirst().orElse(new EffortEstimate(date,lastEffortEstimate[0].getEffortEstimateValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getEffortEstimateValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        viewModel.getViewDatas().put("reEstimate", effortEstimateMap.values());
     }
 
     @Override
@@ -159,7 +175,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
             if (!getParameter(request, "taskID").get().isEmpty()) {
                 Long taskID = Long.parseLong(request.getParameter("taskID"));
-                currentTask = this.projectService.getTask(taskID);
+                currentTask = (Task) this.projectService.getTask(taskID);
                 currentTask = this.updateTask(actor, project, currentTask, request);
             } else {
                 currentTask = this.createTask(actor, project, request);
@@ -207,14 +223,12 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
 
         final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());
-        //if(taskType != null) {
-            currentTask.setTaskType(taskType);
-            currentTask.setName(taskForm.getTaskName());
-            currentTask.setComments(taskForm.getTaskComment());
-            currentTask.setStartDate(taskForm.getStartDate());
-            currentTask.setEndDate(taskForm.getEndDate());
-            currentTask.setEstimateWork( taskForm.getEstimateWork());
-        //}
+        currentTask.setTaskType(taskType);
+        currentTask.setName(taskForm.getTaskName());
+        currentTask.setComments(taskForm.getTaskComment());
+        currentTask.setStartDate(taskForm.getStartDate());
+        currentTask.setEndDate(taskForm.getEndDate());
+        currentTask.setEstimateWork( taskForm.getEstimateWork());
         currentTask.setMilestone(milestone);
         final TaskRevision rev = new TaskRevision(actor,
                 currentTask,
@@ -224,7 +238,6 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         return this.projectService.updateTaskWithMilestone(actor, currentTask, rev, milestone);
     }
-
 
     public static class TaskForm {
         private Long taskID;

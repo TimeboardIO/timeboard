@@ -44,6 +44,8 @@ public interface ProjectService {
 
     Project getProjectByID(User owner, Long projectID);
 
+    Project getProjectByName(String projectArg);
+
     Project deleteProjectByID(Long projectID);
 
     Project updateProject(Project project) throws BusinessException;
@@ -91,21 +93,28 @@ public interface ProjectService {
                                  Milestone milestone
     );
 
-    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, Long remoteId);
+    Task createTask(User actor, Project project, String taskName, String taskComment,
+                    Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId);
 
     Task updateTask(User actor, Task task, TaskRevision rev);
 
+    Task updateTask(User actor, Task task);
+
+    void createTasks(User actor, List<Task> taskList);
+
+    void updateTasks(User actor, List<Task> taskList);
+
+    void deleteTasks(User actor, List<Task> taskList);
+
     Task updateTaskWithMilestone(User actor, Task task, TaskRevision rev, Milestone milestone);
 
-    Task getTask(long id);
+    AbstractTask getTask(long id);
+    List<AbstractTask> getTasksByName(String name);
+
 
     void deleteTaskByID(User actor, long taskID) throws BusinessException;
 
     List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
-
-    List<DefaultTask> listDefaultTasks(Date ds, Date de);
-
-    UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
 
     UpdatedTaskResult updateTaskRTBD(User actor, Long taskID, double rtbd);
 
@@ -118,7 +127,7 @@ public interface ProjectService {
      * @param remotePath string key of source characteristics (owner, repository, ...)
      * @return list of task corresponding to the origin
      */
-    Map<Long, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath);
+    Map<String, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath);
 
     List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID);
 
@@ -129,12 +138,32 @@ public interface ProjectService {
     /**
      * @return List all effort spent for a task.
      */
-    List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
+    List<EffortSpent> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
 
-    List<EffortEstimate> getEstimateByTask(long taskId);
+    List<EffortLeft> getEffortLeftByTask(long taskId);
+
+    UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
+
+    List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList);
 
 
-    DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException;
+    /*
+     == Default Tasks ==
+     */
+
+    /**
+     * Create a default task
+     * @return DefaultTask
+     */
+    DefaultTask createDefaultTask(DefaultTask task) throws BusinessException;
+
+    /**
+     * Update a default task
+     * @return DefaultTask
+     */
+    DefaultTask updateDefaultTask(DefaultTask dataEvent);
+
+    List<DefaultTask> listDefaultTasks(Date ds, Date de);
 
 
     /*
@@ -173,5 +202,7 @@ public interface ProjectService {
      */
     void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException;
 
+    List<Long> listTaskIdsByMilestone(Milestone milestone);
 
+    Milestone addTasksToMilestone(Long currentMilestoneId, List<Long> newTasks, List<Long> oldTasks);
 }
