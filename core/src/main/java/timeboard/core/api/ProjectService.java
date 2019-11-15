@@ -127,9 +127,9 @@ public interface ProjectService {
     /**
      * @return List all effort spent for a task.
      */
-    List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
+    List<EffortSpent> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
 
-    List<EffortEstimate> getEstimateByTask(long taskId);
+    List<EffortLeft> getEffortLeftByTask(long taskId);
 
 
     DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException;

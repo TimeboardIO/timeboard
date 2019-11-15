@@ -599,7 +599,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
+    public List<EffortSpent> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
 
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
@@ -617,10 +617,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortEstimate> getEstimateByTask(long taskId) {
+    public List<EffortLeft> getEffortLeftByTask(long taskId) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
-            "tr.revisionDate as date, tr.estimateWork as estimateValue " +
+            "tr.revisionDate as date, tr.remainsToBeDone as effortLeft  " +
             "from TaskRevision tr " +
             "where tr.task_id = :taskId and tr.id IN ( " +
                     "SELECT MAX(trBis.id) " +
@@ -632,7 +632,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return query.getResultList()
                     .stream()
-                    .map(x -> new EffortEstimate((Date) x[0], (Double) x[1]))
+                    .map(x -> new EffortLeft((Date) x[0], (Double) x[1]))
                     .collect(Collectors.toList());
         });
     }
