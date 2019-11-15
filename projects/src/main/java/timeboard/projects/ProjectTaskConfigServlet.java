@@ -116,7 +116,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         // Datas for effort spent (Axis Y)
         List<EffortSpent> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(task.getId(), task.getStartDate(), task.getEndDate());
-        final EffortSpent[] lastEffortSpentSum = {null};
+        final EffortSpent[] lastEffortSpentSum = {new EffortSpent(task.getStartDate(), 0.0)};
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -127,7 +127,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 .map(date -> effortSpentDB.stream()
                         .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effort -> {
-                            lastEffortSpentSum[0] = new EffortSpent(effort.getDate(), effort.getSumPreviousValue());
+                            lastEffortSpentSum[0] = new EffortSpent(date, effort.getSumPreviousValue());
                             return lastEffortSpentSum[0];
                         })
                         .findFirst().orElse(new EffortSpent(date, lastEffortSpentSum[0].getSumPreviousValue())))
@@ -140,18 +140,27 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         // Datas for effort estimate (Axis Y)
         List<EffortLeft> effortLeftDB = this.projectService.getEffortLeftByTask(task.getId());
-        final Double[] lastEstimate = {0.0};
-        List<Double> effortEstimate = listOfTaskDates
+        final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getEstimateWork())};
+        Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
+                .map(dateString -> {
+                    try { return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) { e.printStackTrace();}
+                    return null;
+                })
                 .map(date -> effortLeftDB.stream()
-                        .filter(el -> new SimpleDateFormat(formatDateToDisplay).format(el.getDate()).equals(date))
+                        .filter(el -> new SimpleDateFormat(formatDateToDisplay).format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effortLeft -> {
-                            lastEstimate[0] = effortLeft.getEffortLeftValue() + effortSpentMap.get(date);
-                            return effortLeft.getEffortLeftValue() +  effortSpentMap.get(date);
+                            lastEffortEstimate[0] = new EffortEstimate(date, effortLeft.getEffortLeftValue() + effortSpentMap.get(date));
+                            return lastEffortEstimate[0];
                         })
-                        .findFirst().orElse(lastEstimate[0]))
-                .collect(Collectors.toList());
-        viewModel.getViewDatas().put("reEstimate", effortEstimate);
+                        .findFirst().orElse(new EffortEstimate(date,lastEffortEstimate[0].getEffortEstimateValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getEffortEstimateValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        viewModel.getViewDatas().put("reEstimate", effortEstimateMap.values());
     }
 
     @Override
