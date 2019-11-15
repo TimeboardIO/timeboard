@@ -243,6 +243,20 @@ public class ProjectServiceImpl implements ProjectService {
             return q.getResultList();
         });
     }
+    @Override
+    public Task createTask(User actor,
+                           Long projectID,
+                           String taskName,
+                           String taskComment,
+                           Date startDate,
+                           Date endDate,
+                           double OE,
+                           Long taskTypeID,
+                           User assignedUser
+    ) {
+        Project p = jpa.txExpr(em -> em.find(Project.class, projectID));
+        return this.createTask(actor,  p, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUser);
+    }
 
     @Override
     public Task createTask(User actor,

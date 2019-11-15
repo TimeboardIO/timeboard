@@ -12,6 +12,7 @@ const updateTask = function(date, task, type, val){
 }
 
 const timesheetModel = {
+    newTask: {projectID:0, name:"", comment:"", startdate:"", enddate:"", oe:0, typeID:0 },
     week:0,
     year:0,
     sum:0,
@@ -151,32 +152,50 @@ $(document).ready(function(){
                 $(event.target).val(oldVal);
                 $(event.target).parent().removeClass('left icon loading').addClass('error');
             }
+        },
+        showCreateTaskModal: function(event){
+            $('.create-task.modal').modal({
+                onApprove : function($element){
+                $.ajax({
+                  method: "GET",
+                  url: "/timesheet/api/create_task",
+                  data: app.newTask,
+                  dataType : "application/json"
+                }).then(function(data){
+                    updateTimesheet();
+                })
+
+                },
+                detachable : false
+            }).modal('show');
         }
       }
     })
 
-
-    $.get("/timesheet/api?week="+week+"&year="+year)
-    .then(function(data){
-        app.week = data.week;
-        app.year = data.year;
-        app.validated = data.validated;
-        app.days = data.days;
-        app.imputations = data.imputations;
-        app.projects = data.projects;
-    })
-    .then(function(){
-        $('.ui.dimmer').removeClass('active');
-    }).then(function(){
-         var list = document.getElementsByClassName("day-badge");
-         for (var i = 0; i < list.length; i++ ){
-            var badge = list[i];
-             if(badge.innerText == "1.0"){
-                  badge.classList.add("green");
-                  badge.classList.remove("red");
-             }
-        }
-    });
+    var updateTimesheet = function(){
+        $.get("/timesheet/api?week="+week+"&year="+year)
+        .then(function(data){
+            app.week = data.week;
+            app.year = data.year;
+            app.validated = data.validated;
+            app.days = data.days;
+            app.imputations = data.imputations;
+            app.projects = data.projects;
+        })
+        .then(function(){
+            $('.ui.dimmer').removeClass('active');
+        }).then(function(){
+             var list = document.getElementsByClassName("day-badge");
+             for (var i = 0; i < list.length; i++ ){
+                var badge = list[i];
+                 if(badge.innerText == "1.0"){
+                      badge.classList.add("green");
+                      badge.classList.remove("red");
+                 }
+            }
+        });
+    }
+    updateTimesheet();
 
 });
 

@@ -32,7 +32,7 @@
                 </button>
             </div>
 
-            <button v-on:click="$('.create-task.modal').modal({detachable: false}).modal('show'); "style="left: 11em; position: absolute;" class="ui blue create-task button">
+            <button v-on:click="showCreateTaskModal" style="left: 11em; position: absolute;" class="ui blue create-task button">
                  New Task
             </button>
 
@@ -146,7 +146,7 @@
                 </form>
             </fieldset>
         </div>
-        <div class="ui modal create-task ">
+        <div class="ui modal create-task " style="top: 1em; position: absolute;">
             <i class="close icon"></i>
             <div class="header">
                 Create task
@@ -156,43 +156,44 @@
                       method="post" style="margin-left:1em;">
                     <div class="field">
                         <label>Project</label>
-                        <select name="project" >
-                            <option v-bind:value="project.name" v-for="(project, projectID) in projects">{{ project.name }}</option>
+                        <select v-model="newTask.projectID" name="project" >
+                            <option v-if="projectID != 0" v-bind:value="projectID" v-for="(project, projectID) in projects">{{ project.projectName }}</option>
                         </select>
                     </div>
 
-
                     <div class="field">
                         <label>Task Name</label>
-                        <input name="taskName" placeholder="Task Name" required type="text">
+                        <input v-model="newTask.name"  name="taskName" placeholder="Task Name" required type="text">
                     </div>
                     <div class="field">
                         <label>Task Description</label>
-                        <input name="taskComments" placeholder="Task Description" type="text">
+                        <input v-model="newTask.comment" name="taskComments" placeholder="Task Description" type="text">
                     </div>
                     <div class=" two fields">
                         <div class="field">
                             <label>Task Start Date</label>
-                            <input name="taskStartDate" placeholder="Task Name"
+                            <input v-model="newTask.startdate" name="taskStartDate" placeholder="Task Name"
                                    required  type="date">
                         </div>
                         <div class="field">
                             <label>Task End Date</label>
-                            <input name="taskEndDate" placeholder="Task Name" required
+                            <input v-model="newTask.enddate" name="taskEndDate" placeholder="Task Name" required
                                    type="date">
                         </div>
                     </div>
-                    <div class="field">
-                        <label>Task Original Estimate</label>
-                        <input name="taskEstimateWork" placeholder="Task OE" required type="number">
-                    </div>
-                    <div class="field">
-                        <label>Task type</label>
-                        <select  name="taskTypeID" >
-                            <option th:each="type: ${taskTypes}"
-                                    th:text="${type.typeName}"
-                                    ></option>
-                        </select>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Task Original Estimate</label>
+                            <input v-model="newTask.oe" name="taskEstimateWork" placeholder="Task OE" required type="number">
+                        </div>
+                        <div class="field">
+                            <label>Task type</label>
+                            <select  name="taskTypeID" >
+                                <option th:each="type: ${taskTypes}"
+                                        th:text="${type.typeName}" th:value="${type.id}"
+                                        ></option>
+                            </select>
+                        </div>
                     </div>
 
                 </form>
