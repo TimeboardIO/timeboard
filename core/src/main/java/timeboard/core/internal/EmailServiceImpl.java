@@ -1,4 +1,4 @@
-package timeboard.security.service;
+package timeboard.core.internal;
 
 /*-
  * #%L
@@ -27,10 +27,11 @@ package timeboard.security.service;
  */
 
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.security.api.EmailService;
+import timeboard.core.api.EmailService;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -38,6 +39,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -67,7 +69,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendMessage(String targetEmail, String subject, String message) throws MessagingException {
+    public void sendMessage( List<String> targetEmailList, String subject, String message) throws MessagingException {
             Properties props = new Properties();
             props.setProperty("mail.host", host);
             props.setProperty("mail.smtp.port", port);
@@ -78,7 +80,32 @@ public class EmailServiceImpl implements EmailService {
             msg.setText(message);
             msg.setSubject(subject);
             msg.setFrom(new InternetAddress(fromEmail));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(targetEmail));
+
+            String targetTOEmails = StringUtils.join(targetEmailList, ',');
+            msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
+
             Transport.send(msg);
+    }
+
+    @Override
+    public void sendMessageWithCC( List<String> targetEmailList, List<String> targetCCEmailList, String subject, String message) throws MessagingException {
+        Properties props = new Properties();
+        props.setProperty("mail.host", host);
+        props.setProperty("mail.smtp.port", port);
+
+        Session session = Session.getInstance(props, null);
+
+        MimeMessage msg = new MimeMessage(session);
+        msg.setText(message);
+        msg.setSubject(subject);
+        msg.setFrom(new InternetAddress(fromEmail));
+
+        String targetTOEmails = StringUtils.join(targetEmailList, ',');
+        msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
+
+        String targetCCEmails = StringUtils.join(targetCCEmailList, ',');
+        msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
+
+        Transport.send(msg);
     }
 }

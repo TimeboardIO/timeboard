@@ -40,8 +40,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
+import javax.mail.MessagingException;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.stream.Collectors;
@@ -57,6 +59,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Reference
     private UserService userService;
+
+    @Reference
+    EmailService emailService;
 
     @Reference(target = "(osgi.unit.name=timeboard-pu)", scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
@@ -302,7 +307,7 @@ public class ProjectServiceImpl implements ProjectService {
                                         User assignedUser,
                                         Milestone milestone
     ) {
-        return this.jpa.txExpr(entityManager -> {
+        Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
             newTask.setEstimateWork(OE);
@@ -329,6 +334,39 @@ public class ProjectServiceImpl implements ProjectService {
 
             return newTask;
         });
+        //Send a mail
+        try {
+            this.sendEmailCreatingTask(actor, project, assignedUser, newTaskDB);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+        //return the new task
+        return newTaskDB;
+    }
+
+    private void sendEmailCreatingTask(User actor, Project project, User assignedUser, Task newTaskDB) throws MessagingException {
+        List<String> to = new ArrayList<>();
+        project.getMembers()
+                .stream()
+                .filter(member -> member.getRole() == ProjectRole.OWNER)
+                .forEach(member -> to.add(member.getMember().getEmail()));
+
+        List<String> cc = Arrays.asList(assignedUser.getEmail(), actor.getEmail());
+
+        String subject = "Mail de création d'une tâche";
+        String message = "Bonjour,\n"
+        + actor.getFirstName() + " " + actor.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + ".\n"
+        +"Nom de la tâche : " + newTaskDB.getName() + "." + "\n"
+        +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "." + "\n"
+        +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "." + "\n"
+        +"Estimation initiale : " + newTaskDB.getEstimateWork() + "." + "\n"
+        +"Projet : " + project.getName() + "." + "\n";
+
+        this.emailService.sendMessageWithCC(to, cc, subject, message);
+    }
+
+    private String getDisplayFormatDate(Date date){
+        return  new SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 
 

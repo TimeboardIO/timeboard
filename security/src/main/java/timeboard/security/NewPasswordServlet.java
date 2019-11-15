@@ -33,12 +33,13 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.api.LoginService;
-import timeboard.security.api.EmailService;
+import timeboard.core.api.EmailService;
 
-import javax.mail.*;
+import javax.mail.MessagingException;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class NewPasswordServlet extends TimeboardServlet {
 
             this.userService.updateUserGeneratedPassword(user.getId(), newPassword);
 
-            String to = user.getEmail();
+            List<String> to = Arrays.asList(user.getEmail());
             String subject = "Réinitisalisation du mot de passe";
             String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
                     + "Login: " + user.getLogin() + "\nMot de passe: " + newPassword;
