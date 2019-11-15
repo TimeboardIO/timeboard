@@ -2,7 +2,7 @@
 
 <html layout:decorate="~{core-ui:layouts/general.html(path='/timesheet')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-model="http://www.w3.org/1999/xhtml"
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -15,17 +15,26 @@
 
     <div id="timesheet">
         <div class="ui segment timesheet-navigation-controls">
-            <div style="left: 1em; position: absolute;"
-                 v-bind:data-tooltip="!enableValidateButton()?'Please validate last week and check you have all imputation day total = 1' : false"
+            <div v-if="validated === false" style="left: 1em; position: absolute;" v-bind:data-tooltip="!enableValidateButton()?'Please validate last week and check you have all imputation day total = 1' : false"
                  data-position="right center">
-                <input v-if="validated === false"
-                       v-bind:data-week="week"
-                       v-bind:data-year="year"
-                       v-on:click="validateMyWeek"
-                       v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
-                       type="submit" value="Validate My Week">
-                <div v-if="validated === true" class="ui positive horizontal label">Week validated</div>
+                <button
+                    v-bind:data-week="week"
+                    v-bind:data-year="year"
+                    v-on:click="validateMyWeek"
+                    v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
+                    type="submit" value="Validate My Week">
+                    Validate My Week
+                </button>
             </div>
+            <div v-if="validated === true" style="left: 1em; position: absolute;" >
+                <button class="ui positive button disabled">
+                    Week validated
+                </button>
+            </div>
+
+            <button v-on:click="$('.create-task.modal').modal({detachable: false}).modal('show'); "style="left: 11em; position: absolute;" class="ui blue create-task button">
+                 New Task
+            </button>
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+lastWeek(year,week)+'&year='+lastWeekYear(year,week)">
                 <i class="left arrow icon"></i>Previous week</a>
@@ -137,6 +146,68 @@
                 </form>
             </fieldset>
         </div>
+        <div class="ui modal create-task ">
+            <i class="close icon"></i>
+            <div class="header">
+                Create task
+            </div>
+            <div class="content">
+                <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="task"
+                      method="post" style="margin-left:1em;">
+                    <div class="field">
+                        <label>Project</label>
+                        <select name="project" >
+                            <option v-bind:value="project.name" v-for="(project, projectID) in projects">{{ project.name }}</option>
+                        </select>
+                    </div>
+
+
+                    <div class="field">
+                        <label>Task Name</label>
+                        <input name="taskName" placeholder="Task Name" required type="text">
+                    </div>
+                    <div class="field">
+                        <label>Task Description</label>
+                        <input name="taskComments" placeholder="Task Description" type="text">
+                    </div>
+                    <div class=" two fields">
+                        <div class="field">
+                            <label>Task Start Date</label>
+                            <input name="taskStartDate" placeholder="Task Name"
+                                   required  type="date">
+                        </div>
+                        <div class="field">
+                            <label>Task End Date</label>
+                            <input name="taskEndDate" placeholder="Task Name" required
+                                   type="date">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Task Original Estimate</label>
+                        <input name="taskEstimateWork" placeholder="Task OE" required type="number">
+                    </div>
+                    <div class="field">
+                        <label>Task type</label>
+                        <select  name="taskTypeID" >
+                            <option th:each="type: ${taskTypes}"
+                                    th:text="${type.typeName}"
+                                    ></option>
+                        </select>
+                    </div>
+
+                </form>
+            </div>
+            <div class="actions">
+                <div class="ui black deny button">
+                    Cancel
+                </div>
+                <div class="ui positive right labeled icon button">
+                    Request
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+
         <script src="/timesheet/static/timesheet.js"></script>
 
     </div>
