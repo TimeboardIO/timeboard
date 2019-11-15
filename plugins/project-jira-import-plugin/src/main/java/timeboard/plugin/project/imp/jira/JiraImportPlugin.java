@@ -98,6 +98,9 @@ public class JiraImportPlugin implements ProjectImportService {
                 rt.setTitle(issue.getSummary());
                 rt.setOrigin(this.getOriginLabel());
                 rt.setStartDate(issue.getCreationDate().toDate());
+                if(issue.getAssignee() != null) {
+                    rt.setUserName(issue.getAssignee().getName());
+                }
                 remoteTaskList.add(rt);
             });
 
