@@ -156,8 +156,12 @@
                       method="post" style="margin-left:1em;">
                     <div class="field">
                         <label>Project</label>
-                        <select v-model="newTask.projectID" name="project" >
-                            <option v-if="projectID != 0" v-bind:value="projectID" v-for="(project, projectID) in projects">{{ project.projectName }}</option>
+
+
+                        <select class="select dropdown" name="projectID" >
+                            <option th:each="project: ${projectList}"
+                                    th:text="${project.name}" th:value="${project.id}"
+                            ></option>
                         </select>
                     </div>
 

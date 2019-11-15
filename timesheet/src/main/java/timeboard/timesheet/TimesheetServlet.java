@@ -123,6 +123,7 @@ public class TimesheetServlet extends TimeboardServlet {
 
 
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
+        viewModel.getViewDatas().put("projectList", this.projectService.listProjects(SecurityContext.getCurrentUser(request)));
 
 
         viewModel.setTemplate("timesheet:timesheet.html");
