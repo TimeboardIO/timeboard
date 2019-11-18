@@ -26,9 +26,9 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.model.MailStructure;
+import timeboard.core.model.EmailStructure;
 import timeboard.core.model.Task;
 
 public interface SendTaskEmailService {
-    MailStructure sendEmailCreatingTask(Task newTaskDB);
+    EmailStructure sendEmailCreatingTask(Task newTaskDB);
 }

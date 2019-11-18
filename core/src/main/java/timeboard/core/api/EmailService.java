@@ -27,29 +27,17 @@ package timeboard.core.api;
  */
 
 
+import timeboard.core.model.EmailStructure;
+
 import javax.mail.MessagingException;
-import java.util.List;
 
 public interface EmailService {
 
     /**
-     * Send email to a target email with subject and message
+     * Send email
      *
-     * @param targetEmailList to target emails
-     * @param subject subject
-     * @param message message
+     * @param emailStructure emailStructure with informations for email
      * @throws MessagingException message not sent
      */
-    void sendMessage( List<String> targetEmailList, String subject, String message) throws MessagingException;
-
-    /**
-     * Send email to a target email and cc-target emails with subject and message
-     *
-     * @param targetEmailList to target email
-     * @param targetCCEmailList cc target emails
-     * @param subject subject
-     * @param message message
-     * @throws MessagingException message not sent
-     */
-    void sendMessageWithCC( List<String> targetEmailList, List<String> targetCCEmailList, String subject, String message) throws MessagingException;
+    void sendMessage(EmailStructure emailStructure) throws MessagingException;
 }

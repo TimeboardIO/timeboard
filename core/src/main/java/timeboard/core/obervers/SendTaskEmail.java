@@ -55,11 +55,11 @@ public class SendTaskEmail implements SendTaskEmailService {
 
         TimeboardSubjects.NEW_TASK
                 .map(newTask -> sendEmailCreatingTask((Task) newTask) )
-                .subscribe(mailStructure ->this.emailService.sendMessageWithCC(mailStructure.getTargetEmailList(), mailStructure.getTargetCCEmailList(), mailStructure.getSubject(), mailStructure.getMessage()));
+                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
 
     @Override
-    public MailStructure sendEmailCreatingTask(Task newTaskDB) {
+    public EmailStructure sendEmailCreatingTask(Task newTaskDB) {
         List<String> to = new ArrayList<>();
         Project project = newTaskDB.getProject();
         User actor = newTaskDB.getLatestRevision().getRevisionActor();
@@ -81,7 +81,7 @@ public class SendTaskEmail implements SendTaskEmailService {
                 +"Estimation initiale : " + newTaskDB.getEstimateWork() + "." + "\n"
                 +"Projet : " + project.getName() + "." + "\n";
 
-        return new MailStructure(to, cc, subject, message);
+        return new EmailStructure(to, cc, subject, message);
     }
 
     private String getDisplayFormatDate(Date date){

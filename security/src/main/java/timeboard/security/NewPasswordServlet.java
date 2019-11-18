@@ -29,6 +29,7 @@ package timeboard.security;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.UserException;
+import timeboard.core.model.EmailStructure;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -39,10 +40,7 @@ import javax.mail.MessagingException;
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.security.SecureRandom;
 
 
@@ -105,7 +103,9 @@ public class NewPasswordServlet extends TimeboardServlet {
             String subject = "Réinitisalisation du mot de passe";
             String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
                     + "Login: " + user.getLogin() + "\nMot de passe: " + newPassword;
-            this.emailService.sendMessage(to, subject, message);
+
+            EmailStructure emailStructure = new EmailStructure(to, new ArrayList<>(), subject, message);
+            this.emailService.sendMessage(emailStructure);
 
 
             viewModel.setTemplate("security:newPassword.html");

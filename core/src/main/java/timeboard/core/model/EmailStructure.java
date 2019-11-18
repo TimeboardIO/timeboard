@@ -29,14 +29,14 @@ package timeboard.core.model;
 
 import java.util.List;
 
-public class MailStructure {
+public class EmailStructure {
 
     private List<String> targetEmailList;
     private List<String> targetCCEmailList;
     private String subject;
     private String message;
 
-    public MailStructure(List<String> targetEmailList, List<String> targetCCEmailList, String subject, String message) {
+    public EmailStructure(List<String> targetEmailList, List<String> targetCCEmailList, String subject, String message) {
         this.targetEmailList = targetEmailList;
         this.targetCCEmailList = targetCCEmailList;
         this.subject = subject;

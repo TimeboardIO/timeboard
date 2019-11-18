@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.EmailService;
+import timeboard.core.model.EmailStructure;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -39,7 +40,6 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -69,26 +69,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendMessage( List<String> targetEmailList, String subject, String message) throws MessagingException {
-            Properties props = new Properties();
-            props.setProperty("mail.host", host);
-            props.setProperty("mail.smtp.port", port);
-
-            Session session = Session.getInstance(props, null);
-
-            MimeMessage msg = new MimeMessage(session);
-            msg.setText(message);
-            msg.setSubject(subject);
-            msg.setFrom(new InternetAddress(fromEmail));
-
-            String targetTOEmails = StringUtils.join(targetEmailList, ',');
-            msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
-
-            Transport.send(msg);
-    }
-
-    @Override
-    public void sendMessageWithCC( List<String> targetEmailList, List<String> targetCCEmailList, String subject, String message) throws MessagingException {
+    public void sendMessage(EmailStructure emailStructure) throws MessagingException {
         Properties props = new Properties();
         props.setProperty("mail.host", host);
         props.setProperty("mail.smtp.port", port);
@@ -96,14 +77,14 @@ public class EmailServiceImpl implements EmailService {
         Session session = Session.getInstance(props, null);
 
         MimeMessage msg = new MimeMessage(session);
-        msg.setText(message);
-        msg.setSubject(subject);
+        msg.setText(emailStructure.getMessage());
+        msg.setSubject(emailStructure.getSubject());
         msg.setFrom(new InternetAddress(fromEmail));
 
-        String targetTOEmails = StringUtils.join(targetEmailList, ',');
+        String targetTOEmails = StringUtils.join(emailStructure.getTargetEmailList(), ',');
         msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
 
-        String targetCCEmails = StringUtils.join(targetCCEmailList, ',');
+        String targetCCEmails = StringUtils.join(emailStructure.getTargetCCEmailList(), ',');
         msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
 
         Transport.send(msg);
