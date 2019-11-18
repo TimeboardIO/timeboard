@@ -29,6 +29,7 @@ package timeboard.timesheet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
+import timeboard.core.model.TaskStatus;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.security.SecurityContext;
@@ -130,7 +131,9 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getEstimateWork(),
                             task.getReEstimateWork(),
                             task.getStartDate(),
-                            task.getEndDate()));
+                            task.getEndDate(),
+                            (task.getLatestRevision().getTaskStatus() != TaskStatus.PENDING))
+                            );
 
                     days.forEach(dateWrapper -> {
                         double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
@@ -153,7 +156,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                         task.getName(),
                         0, 0,0, 0,
                         task.getStartDate(),
-                        task.getEndDate()));
+                        task.getEndDate(), true));
 
                 days.forEach(dateWrapper -> {
                     double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
@@ -292,6 +295,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
     public static class TaskWrapper {
         private final Long taskID;
         private final String taskName;
+        private final boolean isValidated;
         private final double effortSpent;
         private final double remainToBeDone;
         private final double reEstimateWork;
@@ -299,7 +303,9 @@ public class TimesheetRESTApi extends TimeboardServlet {
         private final Date startDate;
         private final Date endDate;
 
-        public TaskWrapper(Long taskID, String taskName, double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork, Date startDate, Date endDate) {
+        public TaskWrapper(Long taskID, String taskName,
+                           double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork,
+                           Date startDate, Date endDate, boolean isValidated) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.effortSpent = effortSpent;
@@ -308,6 +314,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
             this.reEstimateWork = reEstimateWork;
             this.startDate = startDate;
             this.endDate = endDate;
+            this.isValidated = isValidated;
         }
 
         public String getStartDate() {
@@ -336,6 +343,10 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         public Long getTaskID() {
             return taskID;
+        }
+
+        public boolean getIsValidated() {
+            return isValidated;
         }
 
         public String getTaskName() {

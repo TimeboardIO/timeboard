@@ -97,9 +97,10 @@
                             <tr>
                                 <td class="ui header left aligned project" colspan="12">{{ project.projectName }}</td>
                             </tr>
+
                             <tr v-for="(task, taskID) in project.tasks">
                                 <td>{{ task.taskName }}</td>
-                                <td v-for="day in days">
+                                <td v-if="task.isValidated" v-for="day in days">
                                     <div class="ui input">
                                     <input
                                             max="1"
@@ -116,6 +117,10 @@
                                      <i class="search icon hidden" style="color: transparent;"></i>
                                     </div>
                                 </td>
+                                <td v-if="!task.isValidated " colspan="7" >
+                                    <i class="lock icon"></i> Task pending manager validation
+                                </td>
+
                                 <td colspan="4" v-if="projectID == 0" ></td>
                                 <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
                                 <td v-if="projectID > 0">
