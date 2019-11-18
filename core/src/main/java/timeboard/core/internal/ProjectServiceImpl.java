@@ -380,7 +380,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     public Task updateTask(User actor, final Task task) {
-        return this.updateTask(actor, task, null);
+        return this.updateTask(actor, task);
     }
 
     @Override
@@ -419,16 +419,6 @@ public class ProjectServiceImpl implements ProjectService {
             }
             this.logService.log(LogService.LOG_WARNING, "User " + actor + " deleted "+taskList.size()+" tasks ");
             entityManager.flush();
-        });
-    }
-
-
-    @Override
-    public Task updateTask(User actor, final Task task, TaskRevision rev) {
-        return this.jpa.txExpr(entityManager -> {
-            entityManager.merge(task);
-            entityManager.flush();
-            return task;
         });
     }
 
@@ -484,23 +474,6 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             return entityManager.find(Task.class, id);
         });
-    public AbstractTask getTask(long id) {
-        Task task = null;
-        try{
-            task = this.jpa.txExpr(entityManager -> {
-                return entityManager.find(Task.class, id);
-            });
-        }catch (Exception e){}
-        if(task != null) return task;
-
-        DefaultTask defaultTask = null;
-        try{
-            defaultTask = this.jpa.txExpr(entityManager -> {
-                return entityManager.find(DefaultTask.class, id);
-            });
-        }catch (Exception e){}
-        return defaultTask;
-
     }
 
     public List<AbstractTask> getTasksByName(String name) {

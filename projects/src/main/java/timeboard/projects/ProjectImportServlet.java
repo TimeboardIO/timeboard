@@ -136,7 +136,7 @@ public class ProjectImportServlet extends HttpServlet {
                                             String origin = task.getOrigin();
                                             String remotePath = null;
                                             Long remoteId = task.getID();
-                                            projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, remoteId);
+                                            projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, String.valueOf(remoteId));
                                         }
                                 );
 

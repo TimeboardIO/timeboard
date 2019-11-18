@@ -98,8 +98,6 @@ public interface ProjectService {
 
     Task updateTask(User actor, Task task);
 
-    Task updateTask(User actor, Task task);
-
     void createTasks(User actor, List<Task> taskList);
 
     void updateTasks(User actor, List<Task> taskList);
@@ -111,6 +109,8 @@ public interface ProjectService {
     Task updateTaskWithMilestone(User actor, Task task, TaskRevision rev, Milestone milestone);
 
     Task getTaskByID(long id);
+
+    List<AbstractTask> getTasksByName(String name);
 
 
     void deleteTaskByID(User actor, long taskID) throws BusinessException;

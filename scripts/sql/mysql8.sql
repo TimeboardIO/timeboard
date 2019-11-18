@@ -1,9 +1,20 @@
 
+    create table Calendar (
+       id bigint not null,
+        name varchar(50),
+        remoteId varchar(100),
+        targetType varchar(25),
+        primary key (id)
+    ) engine=InnoDB;
+
     create table DefaultTask (
        id bigint not null,
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
+        origin varchar(255),
+        remoteId varchar(255),
+        remotePath varchar(255),
         startDate date,
         primary key (id)
     ) engine=InnoDB;
@@ -74,11 +85,11 @@
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
+        origin varchar(255),
+        remoteId varchar(255),
+        remotePath varchar(255),
         startDate date,
         estimateWork double precision not null,
-        origin varchar(255),
-        remoteId bigint,
-        remotePath varchar(255),
         latestRevision_id bigint,
         milestone_id bigint,
         project_id bigint,
