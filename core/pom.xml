@@ -127,7 +127,8 @@
                     <instructions>
                         <Export-Package>
                             timeboard.core.api.*,
-                            timeboard.core.model
+                            timeboard.core.model,
+                            timeboard.core.observers
                         </Export-Package>
                         <Import-Package>
                             javax.persistence;version="[2,3)",

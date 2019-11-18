@@ -1,4 +1,4 @@
-package timeboard.core.obervers;
+package timeboard.core.observers;
 
 /*-
  * #%L
@@ -30,7 +30,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
-import timeboard.core.api.SendTaskEmailService;
 import timeboard.core.internal.TimeboardSubjects;
 import timeboard.core.model.*;
 
@@ -42,10 +41,10 @@ import java.util.List;
 
 
 @Component(
-        service = SendTaskEmailService.class,
+        service = SendTaskEmail.class,
         immediate = true
 )
-public class SendTaskEmail implements SendTaskEmailService {
+public class SendTaskEmail {
 
     @Reference
     EmailService emailService;
@@ -58,7 +57,6 @@ public class SendTaskEmail implements SendTaskEmailService {
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
 
-    @Override
     public EmailStructure sendEmailCreatingTask(Task newTaskDB) {
         List<String> to = new ArrayList<>();
         Project project = newTaskDB.getProject();
