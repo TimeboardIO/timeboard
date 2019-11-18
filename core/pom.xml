@@ -110,6 +110,10 @@
             <artifactId>mail</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.reactivex.rxjava2</groupId>
+            <artifactId>rxjava</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
