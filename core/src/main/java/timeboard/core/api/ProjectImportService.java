@@ -40,15 +40,6 @@ public interface ProjectImportService {
 
     List<String> getRequiredUserFields();
 
-    /**
-     * Synchronize project tasks with remote source
-     * @param actor
-     * @param projectID
-     * @throws BusinessException
-     */
-    default String importTasksToProject(User actor, long projectID) throws BusinessException{
-        return "";
-    }
 
     List<RemoteTask> getRemoteTasks(User currentUser, long projectID) throws BusinessException;
 
@@ -57,8 +48,10 @@ public interface ProjectImportService {
         private Long ID;
         private String title;
         private String userName;
+        private String comments;
         private String origin;
         private Date startDate;
+        private Date stopDate;
         private Long localUserID;
 
         public Task toTask() {
@@ -111,6 +104,22 @@ public interface ProjectImportService {
 
         public void setLocalUserID(Long localUserID) {
             this.localUserID = localUserID;
+        }
+
+        public String getComments() {
+            return comments;
+        }
+
+        public void setComments(String comments) {
+            this.comments = comments;
+        }
+
+        public Date getStopDate() {
+            return stopDate;
+        }
+
+        public void setStopDate(Date stopDate) {
+            this.stopDate = stopDate;
         }
     }
 }

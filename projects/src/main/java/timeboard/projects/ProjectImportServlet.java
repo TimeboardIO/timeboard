@@ -127,9 +127,9 @@ public class ProjectImportServlet extends HttpServlet {
                                             if(taskName.length()>=100){
                                                 taskName = taskName.substring(0, 99);
                                             }
-                                            String taskComment = null;
+                                            String taskComment = task.getComments();
                                             Date startDate = task.getStartDate();
-                                            Date endDate = null;
+                                            Date endDate = task.getStopDate();
                                             double OE = 0;
                                             Long taskTypeID = null;
                                             User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
