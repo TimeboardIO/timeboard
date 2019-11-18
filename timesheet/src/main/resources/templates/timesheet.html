@@ -141,24 +141,19 @@
                         </template>
                         </tbody>
                     </table>
-
-
                 </form>
             </fieldset>
         </div>
-        <div class="ui modal create-task " style="top: 1em; position: absolute;">
+        <div class="ui longer modal create-task " style="top: 1em; position: absolute;">
             <i class="close icon"></i>
             <div class="header">
                 Create task
             </div>
             <div class="content">
-                <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="task"
-                      method="post" style="margin-left:1em;">
+                <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
                     <div class="field">
                         <label>Project</label>
-
-
-                        <select class="select dropdown" name="projectID" >
+                        <select v-model="newTask.projectID"  class="select dropdown" name="projectID" >
                             <option th:each="project: ${projectList}"
                                     th:text="${project.name}" th:value="${project.id}"
                             ></option>
@@ -192,21 +187,21 @@
                         </div>
                         <div class="field">
                             <label>Task type</label>
-                            <select  name="taskTypeID" >
+                            <select  v-model="newTask.typeID" name="taskTypeID" >
                                 <option th:each="type: ${taskTypes}"
                                         th:text="${type.typeName}" th:value="${type.id}"
                                         ></option>
                             </select>
                         </div>
                     </div>
-
+                    <div v-bind="formError" class="ui error message"></div>
                 </form>
             </div>
             <div class="actions">
                 <div class="ui black deny button">
                     Cancel
                 </div>
-                <div class="ui positive right labeled icon button">
+                <div class="ui positive submit right labeled icon button">
                     Request
                     <i class="checkmark icon"></i>
                 </div>

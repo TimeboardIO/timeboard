@@ -76,29 +76,46 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         Date startDate = null;
         Date endDate = null;
+        response.setContentType("application/json");
+
         try{
             startDate = DATE_FORMAT.parse(request.getParameter("startdate"));
             endDate = DATE_FORMAT.parse(request.getParameter("enddate"));
 
-
         }catch(ParseException e) {
-            response.setContentType("application/json");
-            MAPPER.writeValue(response.getWriter(), "KO");
+            MAPPER.writeValue(response.getWriter(), "Incorrect date format");
+            return;
         }
+
+        if(startDate.getTime()>endDate.getTime()){
+            MAPPER.writeValue(response.getWriter(), "Start date must be before end date ");
+            return;
+        }
+
         String name = request.getParameter("name");
         String comment = request.getParameter("comment");
+        if(comment == null) comment = "";
 
         double oe = Double.parseDouble(request.getParameter("oe"));
+        if(oe <= 0.0){
+            MAPPER.writeValue(response.getWriter(), "Original estimate work must be positive ");
+            return;
+        }
+
         Long projectID = Long.parseLong(request.getParameter("projectID"));
 
         String type = request.getParameter("typeID");
         Long typeID = Long.parseLong(type);
 
-        projectService.createTask(SecurityContext.getCurrentUser(request), projectID,
-                name, comment, startDate, endDate, oe, typeID, SecurityContext.getCurrentUser(request) );
+        try{
+            projectService.createTask(SecurityContext.getCurrentUser(request), projectID,
+                    name, comment, startDate, endDate, oe, typeID, SecurityContext.getCurrentUser(request) );
+        }catch (Exception e){
+            MAPPER.writeValue(response.getWriter(), "Error in task creation please verify your inputs and retry");
+            return;
+        }
 
-        response. setStatus(HttpServletResponse.SC_OK);
-      //  MAPPER.writeValue(response.getWriter(), "ok");
+        MAPPER.writeValue(response.getWriter(), "DONE");
 
     }
 
