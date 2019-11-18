@@ -35,8 +35,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="twelve wide column" id="details" layout:fragment="milestone-config">
-
+        <div class="twelve wide column" id="details" th:insert="projects:details_project_milestones_config.html :: milestone-config">
+        </div>
+        <div class="right floated twelve wide column" id="tasksLinks" th:insert="projects:details_project_milestones_config_links.html :: milestone-config-links">
         </div>
     </div>
 </div>

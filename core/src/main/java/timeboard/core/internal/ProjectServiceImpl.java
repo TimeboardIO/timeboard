@@ -40,8 +40,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 
+import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
+import java.util.Calendar;
 import java.util.stream.Collectors;
 
 @Component(
@@ -103,6 +105,16 @@ public class ProjectServiceImpl implements ProjectService {
             Project data = em.createQuery("select p from Project p join fetch p.members m where p.id = :projectID and  m.member = :user", Project.class)
                     .setParameter("user", actor)
                     .setParameter("projectID", projectId)
+                    .getSingleResult();
+            return data;
+        });
+    }
+
+    @Override
+    public Project getProjectByName(String projectName) {
+        return jpa.txExpr(em -> {
+            Project data = em.createQuery("select p from Project p where p.name = :name", Project.class)
+                    .setParameter("name", projectName)
                     .getSingleResult();
             return data;
         });
@@ -215,8 +227,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-
-
+        /* -- TASKS -- */
 
     @Override
     public List<Task> listProjectTasks(Project project) {
@@ -242,6 +253,12 @@ public class ProjectServiceImpl implements ProjectService {
             TypedQuery<TaskType> q = entityManager.createQuery("select tt from TaskType tt", TaskType.class);
             return q.getResultList();
         });
+    }
+    @Override
+    public Task createTask(User actor, Long projectID, String taskName, String taskComment,
+                           Date startDate, Date endDate,  double OE, Long taskTypeID, User assignedUser) {
+        Project p = jpa.txExpr(em -> em.find(Project.class, projectID));
+        return this.createTask(actor,  p, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUser);
     }
 
     @Override
@@ -320,6 +337,7 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
+
     @Override
     public Task createTask(User actor,
                            Project project,
@@ -332,7 +350,7 @@ public class ProjectServiceImpl implements ProjectService {
                            User assignedUser,
                            String origin,
                            String remotePath,
-                           Long remoteId
+                           String remoteId
                            ) {
         return this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
@@ -361,8 +379,52 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
-    @Override
     public Task updateTask(User actor, final Task task) {
+        return this.updateTask(actor, task, null);
+    }
+
+    @Override
+    public void createTasks(final User actor, final List<Task> taskList) {
+        this.jpa.tx(entityManager -> {
+            for (Task newTask : taskList) {
+                final TaskRevision taskRevision = new TaskRevision(actor, newTask, 0, null, TaskStatus.PENDING);
+                newTask.getRevisions().add(taskRevision);
+                newTask.setLatestRevision(taskRevision);
+                entityManager.persist(taskRevision);
+                entityManager.persist(newTask);
+                this.logService.log(LogService.LOG_INFO, "User " + actor + " tasks "+newTask.getName()+" on "+newTask.getStartDate());
+            }
+            this.logService.log(LogService.LOG_INFO, "User " + actor + " created "+taskList.size()+" tasks ");
+
+            entityManager.flush();
+        });
+    }
+
+    @Override
+    public void updateTasks(User actor, List<Task> taskList) {
+        this.jpa.tx(entityManager -> {
+            for (Task task : taskList) {
+                entityManager.merge(task);
+            }
+            this.logService.log(LogService.LOG_INFO, "User " + actor + " updated "+taskList.size()+" tasks ");
+            entityManager.flush();
+        });
+    }
+
+    @Override
+    public void deleteTasks(User actor, List<Task> taskList) {
+        this.jpa.tx(entityManager -> {
+            for (Task task : taskList) {
+                entityManager.merge(task);
+            }
+            this.logService.log(LogService.LOG_WARNING, "User " + actor + " deleted "+taskList.size()+" tasks ");
+            entityManager.flush();
+        });
+    }
+
+
+    @Override
+    public Task updateTask(User actor, final Task task, TaskRevision rev) {
         return this.jpa.txExpr(entityManager -> {
             entityManager.merge(task);
             entityManager.flush();
@@ -374,17 +436,18 @@ public class ProjectServiceImpl implements ProjectService {
     public Task addRevisionToTask(User actor, final Task task, TaskRevision rev) {
         return this.jpa.txExpr(entityManager -> {
             final Task taskFromDB = entityManager.find(Task.class, task.getId());
-            taskFromDB.setLatestRevision(rev);
-
+            if(rev != null) {
+                taskFromDB.setLatestRevision(rev);
+                rev.setTask(taskFromDB);
+                entityManager.persist(rev);
+            }
             taskFromDB.setTaskType(task.getTaskType());
             taskFromDB.setName(task.getName());
             taskFromDB.setComments(task.getComments());
             taskFromDB.setStartDate(task.getStartDate());
             taskFromDB.setEndDate(task.getEndDate());
-            taskFromDB.setEstimateWork( task.getEstimateWork());
+            taskFromDB.setEstimateWork(task.getEstimateWork());
 
-            rev.setTask(taskFromDB);
-            entityManager.persist(rev);
             entityManager.flush();
             this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
             return taskFromDB;
@@ -421,70 +484,130 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             return entityManager.find(Task.class, id);
         });
+    public AbstractTask getTask(long id) {
+        Task task = null;
+        try{
+            task = this.jpa.txExpr(entityManager -> {
+                return entityManager.find(Task.class, id);
+            });
+        }catch (Exception e){}
+        if(task != null) return task;
+
+        DefaultTask defaultTask = null;
+        try{
+            defaultTask = this.jpa.txExpr(entityManager -> {
+                return entityManager.find(DefaultTask.class, id);
+            });
+        }catch (Exception e){}
+        return defaultTask;
+
+    }
+
+    public List<AbstractTask> getTasksByName(String name) {
+
+        final List<AbstractTask> tasks =  new ArrayList<>();
+        try{
+            this.jpa.tx(entityManager -> {
+
+                TypedQuery<Task> query = entityManager.createQuery("select distinct t from Task t left join fetch t.imputations  where t.name = :name", Task.class);
+                query.setParameter("name", name );
+
+                tasks.addAll(query.getResultList());
+            });
+        }catch (Exception e){
+            // handle JPA Exceptions
+        }
+
+        try{
+            this.jpa.tx(entityManager -> {
+                TypedQuery<DefaultTask> query = entityManager.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
+                query.setParameter("name", name );
+                tasks.addAll(query.getResultList());
+            });
+        }catch (Exception e){
+            //handle JPA Exceptions
+        }
+
+       return tasks;
+    }
+
+    private UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double val, EntityManager entityManager){
+        Calendar c = Calendar.getInstance();
+        c.setTime(day);
+        c.set(Calendar.HOUR_OF_DAY, 2);
+
+        AbstractTask task = entityManager.find(AbstractTask.class, taskID);
+        // special actions when task is a project task
+        Task projectTask = (Task.class.isInstance(task)) ? (Task) task : null;
+
+        TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
+        q.setParameter("taskID", taskID);
+        q.setParameter("day", c.getTime());
+
+        List<Imputation> existingImputations = q.getResultList();
+        if (existingImputations.isEmpty() && val > 0.0 && val <= 1.0) {
+            //No imputation for current task and day
+            Imputation i = new Imputation();
+            i.setDay(c.getTime());
+            i.setTask(task);
+            i.setUser(actor);
+            i.setValue(val);
+            if(projectTask != null){ //project task
+                projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - val);
+            }
+            entityManager.persist(i);
+        }
+
+        if (!existingImputations.isEmpty()) {
+            Imputation i = existingImputations.get(0);
+
+            if(projectTask != null){ //project task
+                if (i.getValue() < val) {
+                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - Math.abs(val - i.getValue()));
+                }
+                if (i.getValue() > val) {
+                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() + Math.abs(i.getValue() - val));
+                }
+            }
+            if (val == 0) {
+                entityManager.remove(i);
+            } else {
+                i.setValue(val);
+                entityManager.persist(i);
+            }
+        }
+        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
+
+        if(projectTask != null) { //project task
+            return new UpdatedTaskResult(projectTask.getProject().getId(), task.getId(), projectTask.getEffortSpent(), projectTask.getRemainsToBeDone(), projectTask.getEstimateWork(), projectTask.getReEstimateWork());
+        }else{
+            return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
+        }
     }
 
     @Override
     public UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double val) {
         return this.jpa.txExpr(entityManager -> {
-
-            Calendar c = Calendar.getInstance();
-            c.setTime(day);
-            c.set(Calendar.HOUR_OF_DAY, 2);
-
-            AbstractTask task = entityManager.find(AbstractTask.class, taskID);
-            // special actions when task is a project task
-            Task projectTask = (Task.class.isInstance(task)) ? (Task) task : null;
-
-            TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
-            q.setParameter("taskID", taskID);
-            q.setParameter("day", c.getTime());
-
-            List<Imputation> existingImputations = q.getResultList();
-            if (existingImputations.isEmpty() && val > 0.0 && val <= 1.0) {
-                //No imputation for current task and day
-                Imputation i = new Imputation();
-                i.setDay(c.getTime());
-                i.setTask(task);
-                i.setUser(actor);
-                i.setValue(val);
-                if(projectTask != null){ //project task
-                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - val);
-                }
-                entityManager.persist(i);
-            }
-
-            if (!existingImputations.isEmpty()) {
-                Imputation i = existingImputations.get(0);
-
-                if(projectTask != null){ //project task
-                    if (i.getValue() < val) {
-                        projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - Math.abs(val - i.getValue()));
-                    }
-                    if (i.getValue() > val) {
-                        projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() + Math.abs(i.getValue() - val));
-                    }
-                }
-                if (val == 0) {
-                    entityManager.remove(i);
-                } else {
-                    i.setValue(val);
-                    entityManager.persist(i);
-                }
-
-            }
-
+            UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, taskID, day, val, entityManager);
             entityManager.flush();
-
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
-
-            if(projectTask != null) { //project task
-                return new UpdatedTaskResult(projectTask.getProject().getId(), task.getId(), projectTask.getEffortSpent(), projectTask.getRemainsToBeDone(), projectTask.getEstimateWork(), projectTask.getReEstimateWork());
-            }else{
-                return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
-            }
-
+            return updatedTaskResult;
         });
     }
+
+
+    @Override
+    public List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList) {
+        return this.jpa.txExpr(entityManager -> {
+            List<UpdatedTaskResult> result = new ArrayList<>();
+            for(Imputation imputation : imputationsList){
+                UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, imputation.getTask().getId(), imputation.getDay(), imputation.getValue(), entityManager);
+                result.add(updatedTaskResult);
+            }
+            entityManager.flush();
+            return result;
+        });
+    }
+
 
     @Override
     public UpdatedTaskResult updateTaskRTBD(User actor, Long taskID, double rtbd) {
@@ -493,7 +616,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setRemainsToBeDone(actor, rtbd);
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated reamin to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ rtbd);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated remain to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ rtbd);
 
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
         });
@@ -510,7 +633,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID) {
         return this.jpa.txExpr(entityManager -> {
-
             TypedQuery<TaskRevision> q = entityManager
                     .createQuery("select t from TaskRevision t left join fetch t.task where " +
                                     "t.task.id = :taskID" +
@@ -577,7 +699,6 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
-
     @Override
     public void deleteTaskByID(User actor, long taskID) throws BusinessException {
 
@@ -606,7 +727,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortSpent> getESByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
+    public List<EffortSpent> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
 
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
@@ -624,10 +745,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortEstimate> getEstimateByTask(long taskId) {
+    public List<EffortLeft> getEffortLeftByTask(long taskId) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
-            "tr.revisionDate as date, tr.estimateWork as estimateValue " +
+            "tr.revisionDate as date, tr.remainsToBeDone as effortLeft  " +
             "from TaskRevision tr " +
             "where tr.task_id = :taskId and tr.id IN ( " +
                     "SELECT MAX(trBis.id) " +
@@ -639,13 +760,13 @@ public class ProjectServiceImpl implements ProjectService {
 
             return query.getResultList()
                     .stream()
-                    .map(x -> new EffortEstimate((Date) x[0], (Double) x[1]))
+                    .map(x -> new EffortLeft((Date) x[0], (Double) x[1]))
                     .collect(Collectors.toList());
         });
     }
 
     @Override
-    public DefaultTask createdDefaultTask(DefaultTask task) throws BusinessException {
+    public DefaultTask createDefaultTask(DefaultTask task) throws BusinessException {
         try {
             return this.jpa.txExpr(entityManager -> {
                 entityManager.persist(task);
@@ -659,10 +780,24 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Map<Long, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath) {
+    public DefaultTask updateDefaultTask(DefaultTask task) {
+
+        return jpa.txExpr(em -> {
+            em.merge(task);
+            em.flush();
+
+            this.logService.log(LogService.LOG_INFO, "Milestone " + task.getName() + " updated");
+            return task;
+        });
+
+
+    }
+
+    @Override
+    public Map<String, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath) {
 
         return this.jpa.txExpr(entityManager -> {
-            Map<Long, Task> map = new HashMap<>();
+            Map<String, Task> map = new HashMap<>();
             TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project " +
                     "and t.origin = :origin " +
                     "and t.remotePath = :remotePath ", Task.class);
@@ -674,7 +809,6 @@ public class ProjectServiceImpl implements ProjectService {
             });
             return map;
         });
-
 
     }
 
@@ -748,5 +882,35 @@ public class ProjectServiceImpl implements ProjectService {
             throw exp;
         }
         this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by "+actor.getName());
+    }
+
+    @Override
+    public List<Long> listTaskIdsByMilestone(Milestone milestone) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Long> q = entityManager.createQuery("select t.id from Task t where t.milestone = :milestone", Long.class);
+            q.setParameter("milestone", milestone);
+            return q.getResultList();
+        });
+    }
+
+    @Override
+    public Milestone addTasksToMilestone(Long currentMilestoneId, List<Long> selectedTaskIds, List<Long> oldTaskIds) {
+        return this.jpa.txExpr(em -> {
+            Milestone m = em.find(Milestone.class, currentMilestoneId);
+
+            oldTaskIds.forEach(id -> {
+                Task tr = em.find(Task.class, id);
+                tr.setMilestone(null);
+                m.getTasks().removeIf(task -> task.getId() == tr.getId());
+             });
+
+            selectedTaskIds.forEach(id -> {
+                Task tr = em.find(Task.class, id);
+                tr.setMilestone(m);
+                m.getTasks().add(tr);
+            });
+
+            return m;
+        });
     }
 }

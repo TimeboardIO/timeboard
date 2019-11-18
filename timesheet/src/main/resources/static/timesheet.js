@@ -12,6 +12,8 @@ const updateTask = function(date, task, type, val){
 }
 
 const timesheetModel = {
+    newTask: {projectID:0, name:"", comment:"", startdate:"", enddate:"", oe:0, typeID:0 },
+    formError:"",
     week:0,
     year:0,
     sum:0,
@@ -87,11 +89,42 @@ const timesheetModel = {
 
 $(document).ready(function(){
 
-    $('.ui.dimmer').addClass('active');
-
     const week = $("meta[property='timesheet']").attr('week');
     const year = $("meta[property='timesheet']").attr('year');
     const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
+
+    const formValidationRules = {
+        fields: {
+          projectID: {
+            identifier: 'projectID',
+            rules: [ { type   : 'empty', prompt : 'Please select project'  } ]
+          },
+          taskName: {
+            identifier: 'taskName',
+             rules: [ { type   : 'empty', prompt : 'Please enter task name'  } ]
+          },
+          taskStartDate: {
+            identifier: 'taskStartDate',
+            rules: [
+            { type: "empty", prompt : 'Please enter task start date'  } ]
+          },
+          taskEndDate: {
+            identifier: 'taskEndDate',
+            rules: [
+            { type: "empty", prompt : 'Please enter task end date'  } ]
+          },
+          taskEstimateWork: {
+            identifier: 'taskEstimateWork',
+            rules: [ { type   : 'empty', prompt : 'Please enter task estimate work in days'  },
+             { type   : 'number', prompt : 'Please enter task a number estimate work in days'  } ]
+          },
+          taskTypeID: {
+            identifier: 'taskTypeID',
+            rules: [ { type   : 'empty', prompt : 'Please enter task type '  } ]
+          }
+        }
+    };
+
 
 
     var app = new Vue({
@@ -151,32 +184,61 @@ $(document).ready(function(){
                 $(event.target).val(oldVal);
                 $(event.target).parent().removeClass('left icon loading').addClass('error');
             }
+        },
+        showCreateTaskModal: function(event){
+            $('.create-task.modal').modal({
+                onApprove : function($element){
+                    var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    if(validated){
+                        $.ajax({
+                            method: "GET",
+                            url: "/timesheet/api/create_task",
+                            data: app.newTask,
+                          }).then(function(data) {
+                              if(data == "DONE"){
+                                 updateTimesheet();
+                                 $('.create-task .ui.form').form('reset');
+                                 $('.create-task.modal').modal('hide');
+                              }else{
+                                $('.ui.error.message').text(data);
+                                $('.ui.error.message').show();
+                              }
+
+                          });
+                    }
+                    return false;
+                },
+                detachable : false
+            }).modal('show');
         }
       }
     })
 
-
-    $.get("/timesheet/api?week="+week+"&year="+year)
-    .then(function(data){
-        app.week = data.week;
-        app.year = data.year;
-        app.validated = data.validated;
-        app.days = data.days;
-        app.imputations = data.imputations;
-        app.projects = data.projects;
-    })
-    .then(function(){
-        $('.ui.dimmer').removeClass('active');
-    }).then(function(){
-         var list = document.getElementsByClassName("day-badge");
-         for (var i = 0; i < list.length; i++ ){
-            var badge = list[i];
-             if(badge.innerText == "1.0"){
-                  badge.classList.add("green");
-                  badge.classList.remove("red");
-             }
-        }
-    });
+    var updateTimesheet = function(){
+        $('.ui.dimmer').addClass('active');
+        $.get("/timesheet/api?week="+week+"&year="+year)
+        .then(function(data){
+            app.week = data.week;
+            app.year = data.year;
+            app.validated = data.validated;
+            app.days = data.days;
+            app.imputations = data.imputations;
+            app.projects = data.projects;
+        })
+        .then(function(){
+            $('.ui.dimmer').removeClass('active');
+        }).then(function(){
+             var list = document.getElementsByClassName("day-badge");
+             for (var i = 0; i < list.length; i++ ){
+                var badge = list[i];
+                 if(badge.innerText == "1.0"){
+                      badge.classList.add("green");
+                      badge.classList.remove("red");
+                 }
+            }
+        });
+    }
+    updateTimesheet();
 
 });
 

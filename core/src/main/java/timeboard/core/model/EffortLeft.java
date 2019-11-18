@@ -28,14 +28,14 @@ package timeboard.core.model;
 
 import java.util.Date;
 
-public class EffortEstimate {
+public class EffortLeft {
 
     private Date date;
-    private Double effortEstimateValue;
+    private Double effortLeftValue;
 
-    public EffortEstimate(Date date, Double sumPreviousValue){
+    public EffortLeft(Date date, Double effortLeftValue){
         this.date = date;
-        this.effortEstimateValue = sumPreviousValue;
+        this.effortLeftValue = effortLeftValue;
     }
 
     public Date getDate() {
@@ -46,11 +46,11 @@ public class EffortEstimate {
         this.date = date;
     }
 
-    public Double getEffortEstimateValue() {
-        return effortEstimateValue;
+    public Double getEffortLeftValue() {
+        return effortLeftValue;
     }
 
-    public void setEffortEstimateValue(Double effortEstimateValue) {
-        this.effortEstimateValue = effortEstimateValue;
+    public void setEffortLeftValue(Double effortLeftValue) {
+        this.effortLeftValue = effortLeftValue;
     }
 }
