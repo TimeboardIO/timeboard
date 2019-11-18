@@ -249,6 +249,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         private Long assignedUserID;
         private Long taskTypeID;
         private User assignedUser;
+
         private TaskType taskType;
         private TaskStatus taskStatus;
         private Long milestoneID;
@@ -339,6 +340,14 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         public void setTaskTypeID(Long taskTypeID) {
             this.taskTypeID = taskTypeID;
+        }
+
+        public TaskType getTaskType() {
+            return taskType;
+        }
+
+        public void setTaskType(TaskType taskType) {
+            this.taskType = taskType;
         }
 
         public User getAssignedUser() {
