@@ -34,17 +34,14 @@ import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.model.*;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Component(
-        service = SendTaskEmail.class,
+        service = SendNewPasswordEmail.class,
         immediate = true
 )
-public class SendTaskEmail {
+public class SendNewPasswordEmail {
 
     @Reference
     EmailService emailService;
@@ -52,32 +49,20 @@ public class SendTaskEmail {
     @Activate
     public void activate(){
 
-        TimeboardSubjects.NEW_TASK
-                .map(newTask -> sendEmailCreatingTask(newTask) )
+        TimeboardSubjects.NEW_PASSWORD
+                .map(userPasswordMap -> sendEmailNewPassword(userPasswordMap) )
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
 
-    public EmailStructure sendEmailCreatingTask(Task newTaskDB) {
-        List<String> to = new ArrayList<>();
-        Project project = newTaskDB.getProject();
-        User actor = newTaskDB.getLatestRevision().getRevisionActor();
-        User assignedUser = newTaskDB.getLatestRevision().getAssigned();
+    public EmailStructure sendEmailNewPassword(Map<User, String> userPasswordMap) {
+        User user = (User) userPasswordMap.keySet().toArray()[0];
+        String password = userPasswordMap.get(user);
 
-        project.getMembers()
-                .stream()
-                .filter(member -> member.getRole() == ProjectRole.OWNER)
-                .forEach(member -> to.add(member.getMember().getEmail()));
-
-        List<String> cc = Arrays.asList(assignedUser.getEmail(), actor.getEmail());
-
-        String subject = "Mail de création d'une tâche";
-        String message = "Bonjour,\n"
-                + actor.getFirstName() + " " + actor.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + ".\n"
-                +"Nom de la tâche : " + newTaskDB.getName() + ".\n"
-                +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + ".\n"
-                +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + ".\n"
-                +"Estimation initiale : " + newTaskDB.getEstimateWork() + ".\n"
-                +"Projet : " + project.getName() + ".\n";
+        List<String> to = Arrays.asList(user.getEmail());
+        List<String> cc = new ArrayList<>();
+        String subject = "Réinitisalisation du mot de passe";
+        String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
+                + "Login: " + user.getLogin() + "\nMot de passe: " + password;
 
         return new EmailStructure(to, cc, subject, message);
     }

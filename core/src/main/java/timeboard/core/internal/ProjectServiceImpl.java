@@ -26,7 +26,6 @@ package timeboard.core.internal;
  * #L%
  */
 
-import io.reactivex.subjects.Subject;
 import timeboard.core.internal.rules.*;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
@@ -43,7 +42,6 @@ import org.osgi.service.log.LogService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.Calendar;
 import java.util.stream.Collectors;

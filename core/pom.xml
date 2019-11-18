@@ -128,7 +128,9 @@
                         <Export-Package>
                             timeboard.core.api.*,
                             timeboard.core.model,
-                            timeboard.core.observers
+                            timeboard.core.observers,
+                            io.reactivex.*,
+                            org.reactivestreams.*
                         </Export-Package>
                         <Import-Package>
                             javax.persistence;version="[2,3)",
@@ -137,7 +139,8 @@
                             org.osgi.*,
                             org.w3c.dom,
                             javax.crypto.spec,
-                            javax.crypto
+                            javax.crypto,
+                            javax.mail.*
                         </Import-Package>
                         <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
                         <Embed-Transitive>true</Embed-Transitive>

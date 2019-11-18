@@ -1,4 +1,4 @@
-package timeboard.core.internal;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -31,8 +31,11 @@ import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
 
+import java.util.Map;
+
 public class TimeboardSubjects {
 
-    public static PublishSubject<Object> NEW_TASK = PublishSubject.create();
+    public static PublishSubject<Task> NEW_TASK = PublishSubject.create();
+    public static PublishSubject<Map<User, String>> NEW_PASSWORD = PublishSubject.create();
 
 }
