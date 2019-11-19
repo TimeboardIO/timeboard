@@ -194,7 +194,7 @@ public class ProjectServiceImpl implements ProjectService {
             List<Long> currentMembers = project.getMembers().stream().map(pm -> pm.getMember().getId()).collect(Collectors.toList());
             List<Long> membershipToAdd = memberships.keySet().stream().filter(mID -> currentMembers.contains(mID) == false).collect(Collectors.toList());
 
-
+            //Update existing membership
             project.getMembers().forEach(projectMembership -> {
                 if (memberships.containsKey(projectMembership.getMember().getId())) {
                     // Update existing user membership role
@@ -206,10 +206,13 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             });
 
-            //Remove membership
+            //Remove old membership
             membershipToRemove.forEach(idToRemove -> {
                 project.getMembers().removeIf(member -> member.getMembershipID() == idToRemove);
-                entityManager.remove(entityManager.find(ProjectMembership.class, idToRemove));
+                ProjectMembership pmToRemove = entityManager.find(ProjectMembership.class, idToRemove);
+                if(pmToRemove != null) {
+                    entityManager.remove(pmToRemove);
+                }
             });
 
             //Add new membership
