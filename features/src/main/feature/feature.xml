@@ -47,7 +47,7 @@
     <feature name="timeboard-core" version="${project.version}">
         <feature>timeboard-base</feature>
         <feature>timeboard-datasource</feature>
-        <bundle start-level="85">mvn:${project.groupId}/core/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/core/${project.version}</bundle>
     </feature>
 
 
@@ -55,55 +55,55 @@
         <feature>war</feature>
         <feature>timeboard-base</feature>
         <bundle start-level="80">mvn:${project.groupId}/core-ui/${project.version}</bundle>
-        <bundle start-level="85">mvn:${project.groupId}/theme/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/theme/${project.version}</bundle>
     </feature>
 
 
     <feature name="timeboard-security" version="${project.version}">
         <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <bundle start-level="90">mvn:${project.groupId}/security/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/security/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-home" version="${project.version}">
         <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
         <feature>timeboard-security</feature>
-        <bundle start-level="90">mvn:${project.groupId}/home/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/home/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-account" version="${project.version}">
         <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
         <feature>timeboard-security</feature>
-        <bundle start-level="90">mvn:${project.groupId}/account/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/account/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-projects" version="${project.version}">
         <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
         <feature>timeboard-security</feature>
-        <bundle start-level="90">mvn:${project.groupId}/projects/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/projects/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-timesheet" version="${project.version}">
         <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
         <feature>timeboard-security</feature>
-        <bundle start-level="90">mvn:${project.groupId}/timesheet/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/timesheet/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-plugins" version="${project.version}">
         <feature>timeboard-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/project-github-import-plugin/${project.version}</bundle>
-        <bundle start-level="90">mvn:${project.groupId}/project-jira-import-plugin/${project.version}</bundle>
-        <bundle start-level="90">mvn:${project.groupId}/project-msp-export-plugin/${project.version}</bundle>
-        <bundle start-level="90">mvn:${project.groupId}/project-xls-export-plugin/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/project-github-import-plugin/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/project-jira-import-plugin/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/project-msp-export-plugin/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/project-xls-export-plugin/${project.version}</bundle>
     </feature>
 
 
     <feature name="timeboard-shell" version="${project.version}">
         <feature>timeboard-core</feature>
-        <bundle start-level="90">mvn:${project.groupId}/shell/${project.version}</bundle>
+        <bundle start-level="80">mvn:${project.groupId}/shell/${project.version}</bundle>
     </feature>
 </features>

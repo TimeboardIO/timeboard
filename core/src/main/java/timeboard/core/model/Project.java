@@ -65,10 +65,10 @@ public class Project implements Serializable {
     private Set<ProjectMembership> members;
 
 
-    @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.PERSIST)
+    @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
-    @OneToMany(targetEntity = Milestone.class, mappedBy = "project", cascade = CascadeType.PERSIST)
+    @OneToMany(targetEntity = Milestone.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Milestone> milestones;
 
     public Project() {

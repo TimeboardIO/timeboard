@@ -1,16 +1,4 @@
 
-    create table AbstractTask (
-       id bigint not null,
-        comments varchar(500),
-        endDate date,
-        name varchar(50) not null,
-        origin varchar(255),
-        remoteId varchar(255),
-        remotePath varchar(255),
-        startDate date,
-        primary key (id)
-    ) engine=InnoDB;
-
     create table Calendar (
        id bigint not null,
         name varchar(50),
@@ -21,6 +9,13 @@
 
     create table DefaultTask (
        id bigint not null,
+        comments varchar(500),
+        endDate date,
+        name varchar(100) not null,
+        origin varchar(255),
+        remoteId varchar(255),
+        remotePath varchar(255),
+        startDate date,
         primary key (id)
     ) engine=InnoDB;
 
@@ -86,8 +81,15 @@
     ) engine=InnoDB;
 
     create table Task (
-       estimateWork double precision not null,
-        id bigint not null,
+       id bigint not null,
+        comments varchar(500),
+        endDate date,
+        name varchar(100) not null,
+        origin varchar(255),
+        remoteId varchar(255),
+        remotePath varchar(255),
+        startDate date,
+        estimateWork double precision not null,
         latestRevision_id bigint,
         milestone_id bigint,
         project_id bigint,
@@ -143,16 +145,6 @@
     alter table User 
        add constraint UK_587tdsv8u5cvheyo9i261xhry unique (login);
 
-    alter table DefaultTask 
-       add constraint FKmjpua8f0woa8mb5uaojwwxiba 
-       foreign key (id) 
-       references AbstractTask (id);
-
-    alter table Imputation 
-       add constraint FKyirjrx86v2stxnnlwni8vfgr 
-       foreign key (task_id) 
-       references AbstractTask (id);
-
     alter table Imputation 
        add constraint FKpv054mew449mf2m7itp50r57b 
        foreign key (user_id) 
@@ -192,11 +184,6 @@
        add constraint FKigksw4egslpbdevlab7ucu8lb 
        foreign key (taskType_id) 
        references TaskType (id);
-
-    alter table Task 
-       add constraint FKrvdfql6piqe3nxp7ta02s1xm9 
-       foreign key (id) 
-       references AbstractTask (id);
 
     alter table TaskRevision 
        add constraint FKp9ssbxu7c3w7fr3jukkget1ne 

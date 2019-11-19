@@ -1,8 +1,8 @@
-package timeboard.security.service;
+package timeboard.projects;
 
 /*-
  * #%L
- * security
+ * projects
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security.service;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,45 +26,42 @@ package timeboard.security.service;
  * #L%
  */
 
-import org.osgi.service.component.annotations.*;
+import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
 import timeboard.core.model.User;
-import timeboard.security.api.Credential;
-import timeboard.security.api.LoginService;
-import timeboard.security.api.UsernamePasswordCredential;
 
-@Component(
-        service = LoginService.class,
-        immediate = true
-)
-public class DatabaseAuthService implements LoginService {
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
+public class ProjectImportBackgroundTasks {
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            policy = ReferencePolicy.STATIC,
-            cardinality = ReferenceCardinality.OPTIONAL
-    )
-    private UserService userService;
+    private static ProjectImportBackgroundTasks INSTANCE;
 
-    @Override
-    public boolean isServiceValidFor(Credential credential) {
-        return credential instanceof UsernamePasswordCredential;
-    }
+    private static ExecutorService executors = Executors.newFixedThreadPool(10);
 
-    @Override
-    public boolean validateCredential(Credential credential) {
-        UsernamePasswordCredential upc = (UsernamePasswordCredential) credential;
-        User user = null;
-        try {
+    private ProjectImportBackgroundTasks(){}
 
-            user = this.userService.autenticateUser(upc.getUsername(), upc.getPassword());
-
-        } catch (Exception e) {
-                e.printStackTrace();
+    public static ProjectImportBackgroundTasks getInstance(){
+        if(INSTANCE == null){
+            INSTANCE = new ProjectImportBackgroundTasks();
         }
-
-        return user != null;
+        return INSTANCE;
     }
+
+    public void importInBackground(User actor, Runnable command){
+        executors.execute(command);
+    }
+
+
+
+
+
+
 }
