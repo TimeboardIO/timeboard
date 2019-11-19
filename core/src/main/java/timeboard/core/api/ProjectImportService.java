@@ -27,8 +27,11 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Task;
+import timeboard.core.model.TaskRevision;
 import timeboard.core.model.User;
 
+import java.util.Date;
 import java.util.List;
 
 public interface ProjectImportService {
@@ -37,12 +40,86 @@ public interface ProjectImportService {
 
     List<String> getRequiredUserFields();
 
-    /**
-     * Synchronize project tasks with remote source
-     * @param actor
-     * @param projectID
-     * @throws BusinessException
-     */
-    String importTasksToProject(User actor, long projectID) throws BusinessException;
 
+    List<RemoteTask> getRemoteTasks(User currentUser, long projectID) throws BusinessException;
+
+    public static class RemoteTask{
+
+        private Long ID;
+        private String title;
+        private String userName;
+        private String comments;
+        private String origin;
+        private Date startDate;
+        private Date stopDate;
+        private Long localUserID;
+
+        public Task toTask() {
+            return null;
+        }
+
+        public Long getID() {
+            return ID;
+        }
+
+        public void setID(Long id) {
+            this.ID = id;
+        }
+
+        public void setTitle(String summary) {
+            this.title = summary;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getUserName() {
+            return userName;
+        }
+
+        public void setUserName(String userName) {
+            this.userName = userName;
+        }
+
+        public void setOrigin(String o) {
+            this.origin = o;
+        }
+
+        public void setStartDate(Date date) {
+            this.startDate = date;
+        }
+
+        public String getOrigin() {
+            return origin;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public Long getLocalUserID() {
+            return localUserID;
+        }
+
+        public void setLocalUserID(Long localUserID) {
+            this.localUserID = localUserID;
+        }
+
+        public String getComments() {
+            return comments;
+        }
+
+        public void setComments(String comments) {
+            this.comments = comments;
+        }
+
+        public Date getStopDate() {
+            return stopDate;
+        }
+
+        public void setStopDate(Date stopDate) {
+            this.stopDate = stopDate;
+        }
+    }
 }

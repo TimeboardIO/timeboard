@@ -45,7 +45,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component(
@@ -78,7 +81,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         if (request.getParameter("taskID") != null) {
             // Update case
             long taskID = Long.parseLong(request.getParameter("taskID"));
-            task = (Task) this.projectService.getTask(taskID);
+            task = this.projectService.getTaskByID(taskID);
             viewModel.getViewDatas().put("task", new TaskForm(task));
         } else {
             // New task case
@@ -175,7 +178,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
             if (!getParameter(request, "taskID").get().isEmpty()) {
                 Long taskID = Long.parseLong(request.getParameter("taskID"));
-                currentTask = (Task) this.projectService.getTask(taskID);
+                currentTask = this.projectService.getTaskByID(taskID);
                 currentTask = this.updateTask(actor, project, currentTask, request);
             } else {
                 currentTask = this.createTask(actor, project, request);

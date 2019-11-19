@@ -380,7 +380,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     public Task updateTask(User actor, final Task task) {
-        return this.updateTask(actor, task, null);
+        return this.updateTask(actor, task);
     }
 
     @Override
@@ -422,9 +422,8 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
-
     @Override
-    public Task updateTask(User actor, final Task task, TaskRevision rev) {
+    public Task addRevisionToTask(User actor, final Task task, TaskRevision rev) {
         return this.jpa.txExpr(entityManager -> {
             final Task taskFromDB = entityManager.find(Task.class, task.getId());
             if(rev != null) {
@@ -440,9 +439,7 @@ public class ProjectServiceImpl implements ProjectService {
             taskFromDB.setEstimateWork(task.getEstimateWork());
 
             entityManager.flush();
-
             this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
-
             return taskFromDB;
         });
     }
@@ -473,23 +470,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public AbstractTask getTask(long id) {
-        Task task = null;
-        try{
-            task = this.jpa.txExpr(entityManager -> {
-                return entityManager.find(Task.class, id);
-            });
-        }catch (Exception e){}
-        if(task != null) return task;
-
-        DefaultTask defaultTask = null;
-        try{
-            defaultTask = this.jpa.txExpr(entityManager -> {
-                return entityManager.find(DefaultTask.class, id);
-            });
-        }catch (Exception e){}
-        return defaultTask;
-
+    public Task getTaskByID(long id) {
+        return this.jpa.txExpr(entityManager -> {
+            return entityManager.find(Task.class, id);
+        });
     }
 
     public List<AbstractTask> getTasksByName(String name) {

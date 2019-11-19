@@ -26,6 +26,7 @@ package timeboard.security;
  * #L%
  */
 
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
@@ -62,8 +63,13 @@ public class LoginServlet extends TimeboardServlet {
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, policyOption = ReferencePolicyOption.GREEDY)
     List<LoginService> loginServices;
 
-    @Reference
-    UserService userService;
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            policy = ReferencePolicy.STATIC,
+            cardinality = ReferenceCardinality.OPTIONAL
+    )
+    private UserService userService;
+
 
 
     @Override

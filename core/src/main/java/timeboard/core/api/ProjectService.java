@@ -96,8 +96,6 @@ public interface ProjectService {
     Task createTask(User actor, Project project, String taskName, String taskComment,
                     Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId);
 
-    Task updateTask(User actor, Task task, TaskRevision rev);
-
     Task updateTask(User actor, Task task);
 
     void createTasks(User actor, List<Task> taskList);
@@ -106,9 +104,12 @@ public interface ProjectService {
 
     void deleteTasks(User actor, List<Task> taskList);
 
+    Task addRevisionToTask(User actor, Task task, TaskRevision rev);
+
     Task updateTaskWithMilestone(User actor, Task task, TaskRevision rev, Milestone milestone);
 
-    AbstractTask getTask(long id);
+    Task getTaskByID(long id);
+
     List<AbstractTask> getTasksByName(String name);
 
 

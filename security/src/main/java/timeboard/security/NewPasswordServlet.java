@@ -64,8 +64,12 @@ public class NewPasswordServlet extends TimeboardServlet {
     @Reference
     EmailService emailService;
 
-    @Reference
-    UserService userService;
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            policy = ReferencePolicy.STATIC,
+            cardinality = ReferenceCardinality.OPTIONAL
+    )
+    private UserService userService;
 
     private static SecureRandom random = new SecureRandom();
 
