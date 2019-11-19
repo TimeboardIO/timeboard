@@ -17,11 +17,8 @@ after_success:
 
 
 deploy:
-  - provider: releases
-    api_key: "$GITHUB_TOKEN"
-    file: "features/target/features-1.0-SNAPSHOT.kar"
+  - provider: s3
+    access_key_id: "$AWS_ACCESS_KEY"
+    secret_access_key: "$AWS_SECRET_KEY"
+    bucket: "$AWS_BUCKET"
     skip_cleanup: true
-    on:
-      tags: true
-  - provider: script
-    script: bash docker_push
