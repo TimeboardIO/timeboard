@@ -111,7 +111,8 @@ public class ProjectConfigServlet extends TimeboardServlet {
         viewModel.setTemplate("projects:details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        //Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        Project project = this.projectService.getProjectById(id);
 
 
         Map<String, Object> map = new HashMap<>();
@@ -126,7 +127,8 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        //Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        Project project = this.projectService.getProjectById(id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
         project.setQuotation(Double.parseDouble(request.getParameter("projectQuotation")));

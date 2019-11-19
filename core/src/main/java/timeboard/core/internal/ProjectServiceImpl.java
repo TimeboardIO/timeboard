@@ -110,6 +110,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Project getProjectById(Long projectId) {
+        return jpa.txExpr(em -> {
+            Project data = em.createQuery("select p from Project p where p.id = :projectId", Project.class)
+                    .setParameter("projectId", projectId)
+                    .getSingleResult();
+            return data;
+        });
+    }
+
+    @Override
     public Project getProjectByName(String projectName) {
         return jpa.txExpr(em -> {
             Project data = em.createQuery("select p from Project p where p.name = :name", Project.class)
@@ -189,14 +199,18 @@ public class ProjectServiceImpl implements ProjectService {
                 if (memberships.containsKey(projectMembership.getMember().getId())) {
                     // Update existing user membership role
                     projectMembership.setRole(memberships.get(projectMembership.getMember().getId()));
+                    entityManager.merge(projectMembership);
                 } else {
                     // Store user to removed
-                    membershipToRemove.add(projectMembership.getMember().getId());
+                    membershipToRemove.add(projectMembership.getMembershipID());
                 }
             });
 
             //Remove membership
-            project.getMembers().removeIf(projectMembership -> membershipToRemove.contains(projectMembership.getMember().getId()));
+            membershipToRemove.forEach(idToRemove -> {
+                project.getMembers().removeIf(member -> member.getMembershipID() == idToRemove);
+                entityManager.remove(entityManager.find(ProjectMembership.class, idToRemove));
+            });
 
             //Add new membership
             membershipToAdd.forEach((aLong) -> {
