@@ -35,7 +35,7 @@ import java.util.Map;
 
 public class TimeboardSubjects {
 
-    public static PublishSubject<Task> NEW_TASK = PublishSubject.create();
-    public static PublishSubject<Map<User, String>> NEW_PASSWORD = PublishSubject.create();
+    public static PublishSubject<Task> CREATE_TASK = PublishSubject.create();
+    public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
 
 }

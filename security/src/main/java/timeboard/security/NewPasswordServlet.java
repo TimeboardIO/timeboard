@@ -78,13 +78,24 @@ public class NewPasswordServlet extends TimeboardServlet {
         return NewPasswordServlet.class.getClassLoader();
     }
 
+    @Override
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) {
+        viewModel.setTemplate("security:newPassword.html");
+        Map<String, Object> templateDatas = new HashMap<>();
+        String origin = "/";
+        if (request.getParameter("origin") != null) {
+            origin = request.getParameter("origin");
+        }
+        templateDatas.put("origin", origin);
+        viewModel.getViewDatas().put("isSuccess", false);
+        viewModel.getViewDatas().putAll(templateDatas);
+    }
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws MessagingException, UserException {
         String username = request.getParameter("username");
 
         User user = null;
-
         try {
             user = this.userService.findUserByLogin(username);
         }catch (Exception e){
@@ -94,16 +105,14 @@ public class NewPasswordServlet extends TimeboardServlet {
         if (user != null) {
 
             final String newPassword = generatePassword();
-
             this.userService.updateUserGeneratedPassword(user.getId(), newPassword);
+            viewModel.setTemplate("security:newPassword.html");
+            viewModel.getViewDatas().put("isSuccess", true);
 
             // Send email
             Map<User, String> userPasswordMap = new HashMap<>();
             userPasswordMap.put(user, newPassword);
-            TimeboardSubjects.NEW_PASSWORD.onNext(userPasswordMap);
-
-            viewModel.setTemplate("security:newPassword.html");
-            viewModel.getViewDatas().put("isSuccess", true);
+            TimeboardSubjects.GENERATE_PASSWORD.onNext(userPasswordMap);
 
         } else {
             response.setStatus(403);
@@ -124,21 +133,6 @@ public class NewPasswordServlet extends TimeboardServlet {
             result += allPossibilities.charAt(index);
         }
         return result;
-    }
-
-
-
-    @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) {
-        viewModel.setTemplate("security:newPassword.html");
-        Map<String, Object> templateDatas = new HashMap<>();
-        String origin = "/";
-        if (request.getParameter("origin") != null) {
-            origin = request.getParameter("origin");
-        }
-        templateDatas.put("origin", origin);
-        viewModel.getViewDatas().put("isSuccess", false);
-        viewModel.getViewDatas().putAll(templateDatas);
     }
 
 

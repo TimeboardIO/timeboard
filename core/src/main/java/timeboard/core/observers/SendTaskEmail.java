@@ -52,7 +52,7 @@ public class SendTaskEmail {
     @Activate
     public void activate(){
 
-        TimeboardSubjects.NEW_TASK
+        TimeboardSubjects.CREATE_TASK
                 .map(newTask -> sendEmailCreatingTask(newTask) )
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }

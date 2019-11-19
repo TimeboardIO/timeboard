@@ -265,7 +265,7 @@ public class ProjectServiceImpl implements ProjectService {
                            Long taskTypeID,
                            User assignedUser
                            ) {
-        return this.jpa.txExpr(entityManager -> {
+        Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
             newTask.setEstimateWork(OE);
@@ -287,6 +287,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             return newTask;
         });
+
+        // Send email
+        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
+
+        return newTaskDB;
     }
 
     @Override
@@ -330,7 +335,7 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
         // Send email
-        TimeboardSubjects.NEW_TASK.onNext(newTaskDB);
+        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
 
         return newTaskDB;
     }
@@ -350,7 +355,7 @@ public class ProjectServiceImpl implements ProjectService {
                            String remotePath,
                            String remoteId
                            ) {
-        return this.jpa.txExpr(entityManager -> {
+        Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
             final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
@@ -375,6 +380,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             return newTask;
         });
+
+        // Send email
+        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
+
+        return newTaskDB;
     }
 
     public Task updateTask(User actor, final Task task) {

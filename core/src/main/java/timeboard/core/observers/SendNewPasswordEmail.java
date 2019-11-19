@@ -49,7 +49,7 @@ public class SendNewPasswordEmail {
     @Activate
     public void activate(){
 
-        TimeboardSubjects.NEW_PASSWORD
+        TimeboardSubjects.GENERATE_PASSWORD
                 .map(userPasswordMap -> sendEmailNewPassword(userPasswordMap) )
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
@@ -60,7 +60,7 @@ public class SendNewPasswordEmail {
 
         List<String> to = Arrays.asList(user.getEmail());
         List<String> cc = new ArrayList<>();
-        String subject = "Réinitisalisation du mot de passe";
+        String subject = "Réinitialisation du mot de passe";
         String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
                 + "Login: " + user.getLogin() + "\nMot de passe: " + password;
 

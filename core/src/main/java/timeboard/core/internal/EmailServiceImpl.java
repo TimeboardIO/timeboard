@@ -40,8 +40,10 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Component(
         service = EmailService.class,
@@ -81,10 +83,12 @@ public class EmailServiceImpl implements EmailService {
         msg.setSubject(emailStructure.getSubject());
         msg.setFrom(new InternetAddress(fromEmail));
 
-        String targetTOEmails = StringUtils.join(emailStructure.getTargetEmailList(), ',');
+        List<String> listTOEmailsWithoutDuplicate = emailStructure.getTargetEmailList().stream().distinct().collect(Collectors.toList());
+        String targetTOEmails = StringUtils.join(listTOEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
 
-        String targetCCEmails = StringUtils.join(emailStructure.getTargetCCEmailList(), ',');
+        List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCEmailList().stream().distinct().collect(Collectors.toList());
+        String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
 
         Transport.send(msg);
