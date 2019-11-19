@@ -100,7 +100,13 @@
 
                             <tr v-for="(task, taskID) in project.tasks">
                                 <td>{{ task.taskName }}</td>
-                                <td v-if="task.isValidated" v-for="day in days">
+                                <td v-if="task.status == 'PENDING'" colspan="7" class="primary">
+                                    <i class="hourglass half icon"></i> Task pending manager validation
+                                </td>
+                                <td  v-else-if="task.status == 'REFUSED'" colspan="7" class="negative">
+                                    <i class="times icon"></i> Task have been rejected by a manager
+                                </td>
+                                <td v-else v-for="day in days">
                                     <div class="ui input">
                                     <input
                                             max="1"
@@ -117,9 +123,7 @@
                                      <i class="search icon hidden" style="color: transparent;"></i>
                                     </div>
                                 </td>
-                                <td v-if="!task.isValidated " colspan="7" >
-                                    <i class="lock icon"></i> Task pending manager validation
-                                </td>
+
 
                                 <td colspan="4" v-if="projectID == 0" ></td>
                                 <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>

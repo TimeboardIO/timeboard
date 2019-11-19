@@ -131,8 +131,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getEstimateWork(),
                             task.getReEstimateWork(),
                             task.getStartDate(),
-                            task.getEndDate(),
-                            (task.getLatestRevision().getTaskStatus() != TaskStatus.PENDING))
+                            task.getEndDate(), task.getLatestRevision().getTaskStatus().name())
                             );
 
                     days.forEach(dateWrapper -> {
@@ -156,7 +155,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                         task.getName(),
                         0, 0,0, 0,
                         task.getStartDate(),
-                        task.getEndDate(), true));
+                        task.getEndDate(), TaskStatus.IN_PROGESS.name()));
 
                 days.forEach(dateWrapper -> {
                     double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
@@ -295,7 +294,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
     public static class TaskWrapper {
         private final Long taskID;
         private final String taskName;
-        private final boolean isValidated;
+        private final String status;
         private final double effortSpent;
         private final double remainToBeDone;
         private final double reEstimateWork;
@@ -305,7 +304,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         public TaskWrapper(Long taskID, String taskName,
                            double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork,
-                           Date startDate, Date endDate, boolean isValidated) {
+                           Date startDate, Date endDate, String status) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.effortSpent = effortSpent;
@@ -314,7 +313,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
             this.reEstimateWork = reEstimateWork;
             this.startDate = startDate;
             this.endDate = endDate;
-            this.isValidated = isValidated;
+            this.status = status;
         }
 
         public String getStartDate() {
@@ -345,8 +344,8 @@ public class TimesheetRESTApi extends TimeboardServlet {
             return taskID;
         }
 
-        public boolean getIsValidated() {
-            return isValidated;
+        public String getStatus() {
+            return status;
         }
 
         public String getTaskName() {

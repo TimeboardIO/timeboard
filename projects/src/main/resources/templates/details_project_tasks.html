@@ -14,6 +14,7 @@
     <div class="ui grid">
         <div class="four wide column">
             <div class="ui vertical fluid tabular menu">
+
                 <a th:classappend="${task == null && validation == 'false'} ? active" class="ui button positive item" th:href="@{/projects/tasks/config(projectID=${project.id})}">Create Task</a>
                 <a th:classappend="${task == null && validation == 'true'} ? active" class="item" th:href="@{/projects/tasks/validation(projectID=${project.id})}"><i style="font-style: italic;">Pending tasks</i></a>
                 <a th:each="t : ${tasks}" th:classappend="${task != null && t.id == task.taskID } ? active" class="item" th:href="@{/projects/tasks/config(projectID=${project.id}, taskID=${t.id})}"

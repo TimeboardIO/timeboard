@@ -108,7 +108,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         Task task;
         try{
-            task = (Task) this.projectService.getTask(taskId);
+            task = (Task) this.projectService.getTaskByID(taskId);
         } catch (ClassCastException e){
             MAPPER.writeValue(response.getWriter(), "Task is not a project task.");
             return;
@@ -119,7 +119,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         final TaskRevision lastRevision = task.getLatestRevision();
         final TaskRevision newRevision = new TaskRevision(SecurityContext.getCurrentUser(request), task,
                 lastRevision.getRemainsToBeDone(),lastRevision.getAssigned(), status);
-        this.projectService.updateTask(SecurityContext.getCurrentUser(request),task, newRevision);
+        this.projectService.addRevisionToTask(SecurityContext.getCurrentUser(request),task, newRevision);
 
         MAPPER.writeValue(response.getWriter(), "DONE");
         return;

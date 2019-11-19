@@ -1,11 +1,15 @@
 
 
 const taskValidationModel = {
-    userTasks: {}
+    userTasks: {},
+    project: "",
+    baseUrl: ""
 }
 
 $(document).ready(function(){
     const project = $("meta[property='taskValidation']").attr('project');
+    const baseUrl = $("meta[property='taskValidation']").attr('baseurl');
+
     var app = new Vue({
         el: '#taskValidation',
         data: taskValidationModel,
@@ -15,6 +19,8 @@ $(document).ready(function(){
                     $.get("/projects/tasks/api?action=getPendingTasks&project="+project)
                     .then(function(data){
                         app.userTasks = data;
+                        app.project = $("meta[property='taskValidation']").attr('project');
+                        app.baseUrl = $("meta[property='taskValidation']").attr('baseurl');
                     })
                     .then(function(){
                         $('.ui.dimmer').removeClass('active');
@@ -38,7 +44,7 @@ $(document).ready(function(){
              },
              denyTask : function(user, task) {
                     let app = this;
-                    $.get("/projects/tasks/api?action=approveTask&project="+project+"&taskId="+task.taskID)
+                    $.get("/projects/tasks/api?action=denyTask&project="+project+"&taskId="+task.taskID)
                     .then(function(data){
                         if(data == "DONE"){
                             user.tasks = user.tasks.filter(function (item) {

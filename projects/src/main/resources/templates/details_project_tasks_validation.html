@@ -7,16 +7,8 @@
 
 <head>
     <title>Project Tasks validation</title>
-    <meta property="taskValidation" th:project="${project.id}" />
-    <style>
-        .fade-enter-active, .fade-leave-active {
-             transition: opacity .5s;
-        }
-        .fade-enter, .fade-leave-to {
-          opacity: 0;
-        }
+    <meta property="taskValidation" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
 
-    </style>
 </head>
 <body>
 
@@ -43,7 +35,7 @@
             </div>
             <div v-for="task in user.tasks" class="item" v-bind:key="task.taskID">
                 <div class="content">
-                    <a  href="@{/projects/tasks/config(projectID=${project.id}, taskID=${task.id}" class="header"> {{ task.taskName }} </a>
+                    <a  v-bind:href="baseUrl + '&taskID=' + task.taskID" class="header"> {{ task.taskName }} </a>
                     <div class="meta">
                         <span class="cinema">From {{ new Date(task.startDate).toLocaleDateString('en-EN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
                             to {{  new Date(task.endDate).toLocaleDateString('en-EN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
