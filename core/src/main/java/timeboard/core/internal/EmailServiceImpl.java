@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
         service = EmailService.class,
         scope = ServiceScope.SINGLETON,
         property = {
-                "timeboard.mail.fromEmail=paasport@tsc-nantes.com",
+                "timeboard.mail.fromEmail=timeboard@tsc-nantes.com",
                 "timeboard.mail.host=10.10.0.48",
                 "timeboard.mail.port=25"
 

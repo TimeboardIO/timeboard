@@ -72,12 +72,12 @@ public class SendTaskEmail {
 
         String subject = "Mail de création d'une tâche";
         String message = "Bonjour,\n"
-                + actor.getFirstName() + " " + actor.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + ".\n"
-                +"Nom de la tâche : " + newTaskDB.getName() + ".\n"
-                +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + ".\n"
-                +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + ".\n"
-                +"Estimation initiale : " + newTaskDB.getEstimateWork() + ".\n"
-                +"Projet : " + project.getName() + ".\n";
+                + actor.getFirstName() + " " + actor.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
+                +"Nom de la tâche : " + newTaskDB.getName() + "\n"
+                +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
+                +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "\n"
+                +"Estimation initiale : " + newTaskDB.getEstimateWork() + "\n"
+                +"Projet : " + project.getName() + "\n";
 
         return new EmailStructure(to, cc, subject, message);
     }
