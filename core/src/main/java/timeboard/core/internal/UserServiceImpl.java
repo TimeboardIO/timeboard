@@ -119,12 +119,12 @@ public final class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<User> searchUserByName(final String prefix) {
+    public List<User> searchUserByEmail(final String prefix) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<User> q = entityManager
                     .createQuery(
                             "select u from User u "
-                                    + "where u.name LIKE CONCAT('%',:prefix,'%')",
+                                    + "where u.email LIKE CONCAT('%',:prefix,'%')",
                             User.class);
             q.setParameter("prefix", prefix);
             return q.getResultList();
@@ -132,7 +132,7 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchUserByName(final String prefix, final Long pID) {
+    public List<User> searchUserByEmail(final String prefix, final Long pID) {
         return this.jpa.txExpr(entityManager -> {
             Project project = entityManager.find(Project.class, pID);
             List<User> matchedUser = project.getMembers().stream()

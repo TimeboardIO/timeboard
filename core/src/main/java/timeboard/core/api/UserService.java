@@ -48,7 +48,7 @@ public interface UserService {
      * @param prefix prefix used to search user
      * @return list of users
      */
-    List<User> searchUserByName(String prefix);
+    List<User> searchUserByEmail(String prefix);
 
     /**
      * Search user where name start with prefix, limit to project with
@@ -58,7 +58,7 @@ public interface UserService {
      * @param projectID project primary key
      * @return list of users
      */
-    List<User> searchUserByName(String prefix, Long projectID);
+    List<User> searchUserByEmail(String prefix, Long projectID);
 
 
     /**

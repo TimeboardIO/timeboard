@@ -43,7 +43,7 @@
                 </div>
                 <div class="field">
                     <label>Project Description</label>
-                    <textarea name="projectDescription" placeholder="Project Description" required
+                    <textarea name="projectDescription" placeholder="Project Description" 
                               th:text="${project.comments}">
                     </textarea>
                 </div>
@@ -120,7 +120,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="membership : ${members}" th:id="${membership.member.id}">
-                            <td th:text="${membership.member.name}">
+                            <td th:text="${membership.member.email}">
                             </td>
                             <td>
                                 <select th:name="'members['+${membership.member.id}+']'">
@@ -191,8 +191,7 @@
                     },
                     fields: {
                         results : 'items',
-                        title   : 'name',
-                        description : 'email'
+                        title   : 'email'
                     },
                     onSelect: function(result, response) {
                         $('#projects').append("<input type='text' name='members["+result.id+"]' />");
