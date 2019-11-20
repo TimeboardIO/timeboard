@@ -26,6 +26,7 @@ package timeboard.core.observers;
  * #L%
  */
 
+import io.reactivex.schedulers.Schedulers;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -35,6 +36,7 @@ import timeboard.core.model.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.Executors;
 
 
 @Component(
@@ -51,6 +53,7 @@ public class SendNewPasswordEmail {
 
         TimeboardSubjects.GENERATE_PASSWORD
                 .map(userPasswordMap -> sendEmailNewPassword(userPasswordMap) )
+                .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
 

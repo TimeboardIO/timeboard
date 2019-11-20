@@ -26,6 +26,7 @@ package timeboard.core.observers;
  * #L%
  */
 
+import io.reactivex.schedulers.Schedulers;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -38,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 
 @Component(
@@ -54,6 +56,7 @@ public class SendTaskEmail {
 
         TimeboardSubjects.CREATE_TASK
                 .map(newTask -> sendEmailCreatingTask(newTask) )
+                .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
 
