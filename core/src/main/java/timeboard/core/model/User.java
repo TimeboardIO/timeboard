@@ -156,6 +156,14 @@ public class User implements Serializable {
         this.validateOwnImputation = validateOwnImputation;
     }
 
+    @Transient
+    public String getScreenName(){
+        if(this.getFirstName() == null || this.getName() == null){
+            return this.getEmail();
+        }
+        return this.getFirstName()+" "+this.getName();
+    }
+
 
     public Map<String, String> getExternalIDs() {
         return externalIDs;

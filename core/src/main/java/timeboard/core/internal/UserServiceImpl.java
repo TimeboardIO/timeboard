@@ -26,18 +26,17 @@ package timeboard.core.internal;
  * #L%
  */
 
+import org.apache.aries.jpa.template.JpaTemplate;
 import org.mindrot.jbcrypt.BCrypt;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
-import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
-import org.apache.aries.jpa.template.JpaTemplate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceScope;
 
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
@@ -63,7 +62,7 @@ public final class UserServiceImpl implements UserService {
     @Reference
     private LogService logService;
 
-    public UserServiceImpl(){
+    public UserServiceImpl() {
 
     }
 
@@ -90,32 +89,28 @@ public final class UserServiceImpl implements UserService {
         return this.jpa.txExpr(entityManager -> {
             entityManager.persist(user);
             this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
+            entityManager.flush();
             return user;
         });
     }
 
 
-
     @Override
-    public User updateUser(User user) throws UserException {
-        User u = this.findUserByID(user.getId());
-        if(u == null){
-            throw new UserException("User does not exist.");
-        } else {
-            return this.jpa.txExpr(entityManager -> {
+    public User updateUser(User user) {
+        return this.jpa.txExpr(entityManager -> {
+            User u = this.findUserByID(user.getId());
+            if (u != null) {
                 u.setFirstName(user.getFirstName());
                 u.setName(user.getName());
                 u.setEmail(user.getEmail());
                 u.setExternalIDs(user.getExternalIDs());
+            }
+            entityManager.flush();
+            this.logService.log(LogService.LOG_INFO, "User " + user.getEmail() + " updated.");
+            return user;
+        });
 
-                entityManager.persist(u);
-                this.logService.log(LogService.LOG_INFO, "User "+ user.getEmail()+" updated.");
-                return user;
-            });
-        }
     }
-
-
 
 
     @Override
@@ -148,7 +143,7 @@ public final class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByID(final Long userID) {
-        if(userID == null){
+        if (userID == null) {
             return null;
         }
         return jpa.txExpr(entityManager -> entityManager
@@ -177,7 +172,7 @@ public final class UserServiceImpl implements UserService {
     public User findUserByExternalID(String origin, String userExternalID) {
         User u;
         try {
-            u =  this.jpa.txExpr(entityManager -> {
+            u = this.jpa.txExpr(entityManager -> {
                 Query q = entityManager // MYSQL native for JSON queries
                         .createNativeQuery("select * from User "
                                 + "where JSON_EXTRACT(externalIDs, '$." + origin + "')" +
@@ -185,7 +180,7 @@ public final class UserServiceImpl implements UserService {
                 q.setParameter(1, userExternalID);
                 return (User) q.getSingleResult();
             });
-        }catch (javax.persistence.NoResultException e){
+        } catch (javax.persistence.NoResultException e) {
             u = null;
         }
         return u;
@@ -195,7 +190,7 @@ public final class UserServiceImpl implements UserService {
     public User userProvisionning(String email) throws BusinessException {
 
         User user = this.findUserByEmail(email);
-        if(user == null){
+        if (user == null) {
             //Create user
             user = new User(null, null, email, new Date(), new Date());
             user = this.createUser(user);
@@ -204,11 +199,11 @@ public final class UserServiceImpl implements UserService {
         return user;
     }
 
-    private String hashPassword(String password){
-       return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
 
-    private boolean checkPassword(String password, String hash){
-       return BCrypt.checkpw(password, hash);
+    private boolean checkPassword(String password, String hash) {
+        return BCrypt.checkpw(password, hash);
     }
 }

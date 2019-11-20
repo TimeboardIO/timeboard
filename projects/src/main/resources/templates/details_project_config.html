@@ -120,7 +120,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="membership : ${members}" th:id="${membership.member.id}">
-                            <td th:text="${membership.member.email}">
+                            <td th:text="${membership.member.screenName}">
                             </td>
                             <td>
                                 <select th:name="'members['+${membership.member.id}+']'">
@@ -194,7 +194,8 @@
                     },
                     fields: {
                         results : 'items',
-                        title   : 'email'
+                        title   : 'screenName',
+                        description :'email'
                     },
                     onSelect: function(result, response) {
                         $('#members').find('tbody')
