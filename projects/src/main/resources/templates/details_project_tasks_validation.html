@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{projects:details_project_tasks.html}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Project Tasks validation</title>
+    <meta property="taskValidation" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
+</head>
+<body>
+<div layout:fragment="task-validation">
+    <input name="projectID" required th:value="${project.id}" type="hidden">
+    <div class="ui inverted dimmer">
+        <div class="ui text loader">Loading</div>
+    </div>
+    <div id="taskValidation" class="ui divided items">
+
+        <div v-if="userTasks.length == 0" class="item">
+            <div class="content">
+                <h3 style="text-align: center;">No pending task</h3>
+            </div>
+        </div>
+        <template v-for="user in userTasks">
+            <div  class="item">
+                <div class="content">
+                    <h3  v-if="user.id == 0" style="text-align: center;">Unassigned tasks</h3>
+                    <h3  v-else="user.id == 0" style="text-align: center;">{{ user.firstName }} {{ user.name }}</h3>
+                </div>
+            </div>
+            <div v-for="task in user.tasks" class="item" v-bind:key="task.taskID">
+                <div class="content">
+                    <a  v-bind:href="baseUrl + '&taskID=' + task.taskID" class="header"> {{ task.taskName }} </a>
+                    <div class="meta">
+                        <span class="cinema">From {{ new Date(task.startDate).toLocaleDateString('en-EN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}
+                            to {{  new Date(task.endDate).toLocaleDateString('en-EN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}</span>
+                    </div>
+                    <div class="description">
+                        <p>{{ task.taskComment }}</p>
+                    </div>
+                    <div class="extra">
+                        <div v-on:click="approveTask(user, task)" class="ui right floated positive button"> Approve <i class="right check icon"></i> </div>
+                        <div v-on:click="denyTask(user, task)" class="ui right floated negative button"> Deny <i class="right times icon"></i> </div>
+                        <div class="ui label">Estimate work: {{ task.estimateWork }} days</div>
+                    </div>
+                </div>
+            </div>
+        </template>
+        <script src="/projects/static/task_validation.js"></script>
+    </div>
+</div>
+
+</body>
+</html>

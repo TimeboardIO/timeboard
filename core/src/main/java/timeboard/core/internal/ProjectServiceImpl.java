@@ -545,12 +545,15 @@ public class ProjectServiceImpl implements ProjectService {
         // special actions when task is a project task
         Task projectTask = (Task.class.isInstance(task)) ? (Task) task : null;
 
+        // Task is available for imputations if this is a default task (not a project task) or task status is not pending
+        boolean taskAvailableForImputations = (projectTask == null || projectTask.getLatestRevision().getTaskStatus() != TaskStatus.PENDING);
+
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
         q.setParameter("taskID", taskID);
         q.setParameter("day", c.getTime());
 
         List<Imputation> existingImputations = q.getResultList();
-        if (existingImputations.isEmpty() && val > 0.0 && val <= 1.0) {
+        if (existingImputations.isEmpty() && val > 0.0 && val <= 1.0 && taskAvailableForImputations) {
             //No imputation for current task and day
             Imputation i = new Imputation();
             i.setDay(c.getTime());
