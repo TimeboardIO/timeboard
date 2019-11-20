@@ -526,7 +526,8 @@ public class ProjectServiceImpl implements ProjectService {
             i.setUser(actor);
             i.setValue(val);
             if(projectTask != null){ //project task
-                projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - val);
+                projectTask.updateCurrentRemainsToBeDone(actor,Math.max(projectTask.getRemainsToBeDone() - val, 0));
+                projectTask.getImputations().add(i);
             }
             entityManager.persist(i);
         }
@@ -536,17 +537,24 @@ public class ProjectServiceImpl implements ProjectService {
 
             if(projectTask != null){ //project task
                 if (i.getValue() < val) {
-                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - Math.abs(val - i.getValue()));
+                    projectTask.updateCurrentRemainsToBeDone(actor,
+                            Math.max(projectTask.getRemainsToBeDone() - Math.abs(val - i.getValue()), 0));
+
                 }
-                if (i.getValue() > val) {
-                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() + Math.abs(i.getValue() - val));
+                if (i.getValue() > val && projectTask.getRemainsToBeDone() > 0) {
+                    projectTask.updateCurrentRemainsToBeDone(actor,
+                            Math.max(projectTask.getRemainsToBeDone() + Math.abs(i.getValue() - val), 0));
                 }
+
             }
             if (val == 0) {
                 entityManager.remove(i);
+                task.getImputations().remove(i);
             } else {
                 i.setValue(val);
                 entityManager.persist(i);
+                task.getImputations().remove(i);
+                task.getImputations().add(i);
             }
         }
         this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
