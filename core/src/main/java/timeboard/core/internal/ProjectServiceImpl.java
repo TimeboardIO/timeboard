@@ -110,6 +110,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public Project getProjectByIdWithAllMembers(Long projectId) {
+        return jpa.txExpr(em -> {
+            Project data = em.createQuery("select p from Project p where p.id = :projectId", Project.class)
+                    .setParameter("projectId", projectId)
+                    .getSingleResult();
+            return data;
+        });
+    }
+
+    @Override
     public Project getProjectByName(String projectName) {
         return jpa.txExpr(em -> {
             Project data = em.createQuery("select p from Project p where p.name = :name", Project.class)
@@ -184,19 +194,27 @@ public class ProjectServiceImpl implements ProjectService {
             List<Long> currentMembers = project.getMembers().stream().map(pm -> pm.getMember().getId()).collect(Collectors.toList());
             List<Long> membershipToAdd = memberships.keySet().stream().filter(mID -> currentMembers.contains(mID) == false).collect(Collectors.toList());
 
-
+            //Update existing membership
             project.getMembers().forEach(projectMembership -> {
                 if (memberships.containsKey(projectMembership.getMember().getId())) {
                     // Update existing user membership role
                     projectMembership.setRole(memberships.get(projectMembership.getMember().getId()));
+                    entityManager.merge(projectMembership);
                 } else {
                     // Store user to removed
-                    membershipToRemove.add(projectMembership.getMember().getId());
+                    membershipToRemove.add(projectMembership.getMembershipID());
                 }
             });
 
-            //Remove membership
-            project.getMembers().removeIf(projectMembership -> membershipToRemove.contains(projectMembership.getMember().getId()));
+            //Remove old membership
+            membershipToRemove.forEach(idToRemove -> {
+                project.getMembers().removeIf(member -> member.getMembershipID() == idToRemove);
+                ProjectMembership pmToRemove = entityManager.find(ProjectMembership.class, idToRemove);
+                if(pmToRemove != null) {
+                    entityManager.remove(pmToRemove);
+                }
+            });
+            entityManager.merge(project);
 
             //Add new membership
             membershipToAdd.forEach((aLong) -> {
