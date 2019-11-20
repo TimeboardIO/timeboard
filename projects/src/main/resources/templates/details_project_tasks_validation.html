@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{projects:details_project_tasks.html(validation = 'true')}"
+<html layout:decorate="~{projects:details_project_tasks.html}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-bind="http://www.w3.org/1999/xhtml">
@@ -8,17 +8,13 @@
 <head>
     <title>Project Tasks validation</title>
     <meta property="taskValidation" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
-
 </head>
 <body>
-
 <div layout:fragment="task-validation">
     <input name="projectID" required th:value="${project.id}" type="hidden">
-
     <div class="ui inverted dimmer">
         <div class="ui text loader">Loading</div>
     </div>
-
     <div id="taskValidation" class="ui divided items">
 
         <div v-if="userTasks.length == 0" class="item">
@@ -52,9 +48,7 @@
             </div>
         </template>
         <script src="/projects/static/task_validation.js"></script>
-
     </div>
-
 </div>
 
 </body>
