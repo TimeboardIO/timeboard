@@ -18,6 +18,7 @@ deploy:
   - provider: s3
     access_key_id: "$AWS_ACCESS_KEY"
     secret_access_key: "$AWS_SECRET_KEY"
+    local_dir: "features/target/features-1.0-SNAPSHOT.kar"
     bucket: "$AWS_BUCKET"
     region: eu-west-1
     skip_cleanup: true
