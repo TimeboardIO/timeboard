@@ -441,7 +441,7 @@ public class ProjectServiceImpl implements ProjectService {
             i.setUser(actor);
             i.setValue(val);
             if(projectTask != null){ //project task
-                projectTask.setEffortLeft(projectTask.getEffortLeft() - val);
+                projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() - val, 0));
             }
             entityManager.persist(i);
         }
@@ -451,11 +451,13 @@ public class ProjectServiceImpl implements ProjectService {
 
             if(projectTask != null){ //project task
                 if (i.getValue() < val) {
-                    projectTask.setEffortLeft(projectTask.getEffortLeft() - Math.abs(val - i.getValue()));
+                    projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() - Math.abs(val - i.getValue()), 0));
+
                 }
-                if (i.getValue() > val) {
-                    projectTask.setEffortLeft(projectTask.getEffortLeft() + Math.abs(i.getValue() - val));
+                if (i.getValue() > val && projectTask.getEffortLeft() > 0) {
+                    projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() + Math.abs(i.getValue() - val), 0));
                 }
+
             }
             if (val == 0) {
                 entityManager.remove(i);
