@@ -32,7 +32,7 @@
                 </button>
             </div>
 
-            <button v-on:click="showCreateTaskModal" style="left: 11em; position: absolute;" class="ui blue create-task button">
+            <button v-on:click="showCreateTaskModal(null, null, $event)" style="left: 11em; position: absolute;" class="ui blue create-task button">
                  New Task
             </button>
 
@@ -104,7 +104,10 @@
                                     <i class="hourglass half icon"></i> Task pending manager validation
                                 </td>
                                 <td  v-else-if="task.status == 'REFUSED'" colspan="7" class="negative">
-                                    <i class="times icon"></i> Task have been rejected by a manager
+                                    <i class="times icon"></i> Task have been rejected by a manager, please modify and request again.
+                                    <button v-on:click="showCreateTaskModal(projectID, task, $event)" class="ui right labeled icon button">
+                                        <i class="right arrow icon"></i> Edit
+                                    </button>
                                 </td>
                                 <td v-else v-for="day in days">
                                     <div class="ui input">
@@ -170,28 +173,28 @@
 
                     <div class="field">
                         <label>Task Name</label>
-                        <input v-model="newTask.name"  name="taskName" placeholder="Task Name" required type="text">
+                        <input v-model="newTask.taskName"  name="taskName" placeholder="Task Name" required type="text">
                     </div>
                     <div class="field">
                         <label>Task Description</label>
-                        <input v-model="newTask.comment" name="taskComments" placeholder="Task Description" type="text">
+                        <input v-model="newTask.taskComments" name="taskComments" placeholder="Task Description" type="text">
                     </div>
                     <div class=" two fields">
                         <div class="field">
                             <label>Task Start Date</label>
-                            <input v-model="newTask.startdate" name="taskStartDate" placeholder="Task Name"
+                            <input v-model="newTask.startDate" name="taskStartDate" placeholder="Task Name"
                                    required  type="date">
                         </div>
                         <div class="field">
                             <label>Task End Date</label>
-                            <input v-model="newTask.enddate" name="taskEndDate" placeholder="Task Name" required
+                            <input v-model="newTask.endDate" name="taskEndDate" placeholder="Task Name" required
                                    type="date">
                         </div>
                     </div>
                     <div class="two fields">
                         <div class="field">
                             <label>Task Original Estimate</label>
-                            <input v-model="newTask.oe" name="taskEstimateWork" placeholder="Task OE" required type="number">
+                            <input v-model="newTask.estimateWork" name="taskEstimateWork" placeholder="Task OE" required type="number">
                         </div>
                         <div class="field">
                             <label>Task type</label>

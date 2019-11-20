@@ -126,12 +126,13 @@ public class TimesheetRESTApi extends TimeboardServlet {
                     tasks.add(new TaskWrapper(
                             task.getId(),
                             task.getName(),
+                            task.getComments(),
                             task.getEffortSpent(),
                             task.getRemainsToBeDone(),
                             task.getEstimateWork(),
                             task.getReEstimateWork(),
                             task.getStartDate(),
-                            task.getEndDate(), task.getLatestRevision().getTaskStatus().name())
+                            task.getEndDate(), task.getLatestRevision().getTaskStatus().name(), task.getTaskType().getId())
                             );
 
                     days.forEach(dateWrapper -> {
@@ -152,10 +153,11 @@ public class TimesheetRESTApi extends TimeboardServlet {
             this.projectService.listDefaultTasks(ds, de).stream().forEach(task -> {
                 tasks.add(new TaskWrapper(
                         task.getId(),
-                        task.getName(),
+                        task.getName(), task.getComments(),
                         0, 0,0, 0,
                         task.getStartDate(),
-                        task.getEndDate(), TaskStatus.IN_PROGESS.name()));
+                        task.getEndDate(), TaskStatus.IN_PROGESS.name(), 0L)
+                );
 
                 days.forEach(dateWrapper -> {
                     double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
@@ -292,8 +294,11 @@ public class TimesheetRESTApi extends TimeboardServlet {
     }
 
     public static class TaskWrapper {
+
         private final Long taskID;
+        private final Long typeID;
         private final String taskName;
+        private final String taskComments;
         private final String status;
         private final double effortSpent;
         private final double remainToBeDone;
@@ -302,11 +307,13 @@ public class TimesheetRESTApi extends TimeboardServlet {
         private final Date startDate;
         private final Date endDate;
 
-        public TaskWrapper(Long taskID, String taskName,
+        public TaskWrapper(Long taskID, String taskName, String taskComments,
                            double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork,
-                           Date startDate, Date endDate, String status) {
+                           Date startDate, Date endDate, String status, Long typeID) {
             this.taskID = taskID;
             this.taskName = taskName;
+            this.taskComments = taskComments;
+            this.typeID = typeID;
             this.effortSpent = effortSpent;
             this.remainToBeDone = remainToBeDone;
             this.estimateWork = estimateWork;
@@ -326,6 +333,14 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         public double getRemainToBeDone() {
             return remainToBeDone;
+        }
+
+        public String getTaskComments() {
+            return taskComments;
+        }
+
+        public Long getTypeID() {
+            return typeID;
         }
 
         public double getReEstimateWork() {
