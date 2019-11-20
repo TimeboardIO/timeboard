@@ -39,8 +39,10 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,9 +73,19 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> createUsers(List<User> users) {
+        return this.jpa.txExpr(entityManager -> {
+            users.forEach(user -> {
+                entityManager.persist(user);
+                this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
+            });
+            return users;
+        });
+    }
+
+    @Override
     public User createUser(final User user) throws BusinessException {
 
-        user.setPassword(this.hashPassword(user.getPassword()));
 
         return this.jpa.txExpr(entityManager -> {
             entityManager.persist(user);
@@ -82,17 +94,7 @@ public final class UserServiceImpl implements UserService {
         });
     }
 
-    @Override
-    public List<User> createUsers(List<User> users) throws BusinessException {
-        return this.jpa.txExpr(entityManager -> {
-            users.forEach(user -> {
-                user.setPassword(this.hashPassword(user.getPassword()));
-                entityManager.persist(user);
-                this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
-            });
-            return users;
-        });
-    }
+
 
     @Override
     public User updateUser(User user) throws UserException {
@@ -103,58 +105,18 @@ public final class UserServiceImpl implements UserService {
             return this.jpa.txExpr(entityManager -> {
                 u.setFirstName(user.getFirstName());
                 u.setName(user.getName());
-                u.setLogin(user.getLogin());
                 u.setEmail(user.getEmail());
                 u.setExternalIDs(user.getExternalIDs());
 
                 entityManager.persist(u);
-                this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
+                this.logService.log(LogService.LOG_INFO, "User "+ user.getEmail()+" updated.");
                 return user;
             });
         }
     }
 
-    @Override
-    public void updateUserPassword(Long userID, String oldPassword, String newPassword) throws WrongPasswordException, UserException {
 
-        User user = this.findUserByID(userID);
-        if(user!=null && this.checkPassword(oldPassword, user.getPassword())){
-            this.jpa.txExpr(entityManager -> {
-                User u = entityManager.find(User.class, userID);
 
-                u.setPassword(this.hashPassword(newPassword));
-
-                entityManager.persist(u);
-                this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + " successfully change his password.");
-                return u;
-            });
-        }else if(user != null){
-            throw new WrongPasswordException();
-        }else{
-            throw new UserException("User does not exist.");
-        }
-
-    }
-
-    @Override
-    public void updateUserGeneratedPassword(Long userID, String newPassword) throws UserException {
-
-        User user = this.findUserByID(userID);
-        if(user!=null){
-            this.jpa.txExpr(entityManager -> {
-                User u = entityManager.find(User.class, userID);
-
-                u.setPassword(this.hashPassword(newPassword));
-
-                entityManager.persist(u);
-                this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + "'s password has successfully been generated.");
-                return u;
-            });
-        }else {
-            throw new UserException("User does not exist.");
-        }
-
-    }
 
     @Override
     public List<User> searchUserByName(final String prefix) {
@@ -183,33 +145,6 @@ public final class UserServiceImpl implements UserService {
         });
     }
 
-    @Override
-    public User autenticateUser(final String login, final String password) {
-        User u = this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager
-                    .createQuery("select u from User u "
-                            + "where u.login = :login ", User.class);
-            q.setParameter("login", login);
-            return q.getSingleResult();
-        });
-
-        if(!this.checkPassword(password, u.getPassword())) {
-            u = null;
-        }
-
-        return u;
-    }
-
-    @Override
-    public User findUserByLogin(final String login) {
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager
-                    .createQuery("select u from User u "
-                            + "where u.login = :login", User.class);
-            q.setParameter("login", login);
-            return q.getSingleResult();
-        });
-    }
 
     @Override
     public User findUserByID(final Long userID) {
@@ -218,6 +153,24 @@ public final class UserServiceImpl implements UserService {
         }
         return jpa.txExpr(entityManager -> entityManager
                 .find(User.class, userID));
+    }
+
+    @Override
+    public User findUserByEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        return jpa.txExpr(entityManager -> {
+            TypedQuery<User> q = entityManager.createQuery("from User u where u.email=:email", User.class);
+            q.setParameter("email", email);
+            User user;
+            try {
+                user = q.getSingleResult();
+            } catch (NoResultException e) {
+                user = null;
+            }
+            return user;
+        });
     }
 
     @Override
@@ -236,6 +189,19 @@ public final class UserServiceImpl implements UserService {
             u = null;
         }
         return u;
+    }
+
+    @Override
+    public User userProvisionning(String email) throws BusinessException {
+
+        User user = this.findUserByEmail(email);
+        if(user == null){
+            //Create user
+            user = new User(null, null, email, new Date(), new Date());
+            user = this.createUser(user);
+
+        }
+        return user;
     }
 
     private String hashPassword(String password){

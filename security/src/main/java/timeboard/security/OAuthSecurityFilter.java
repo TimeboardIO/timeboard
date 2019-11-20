@@ -44,16 +44,15 @@ import java.util.Map;
         property = {
                 "osgi.http.whiteboard.filter.regex=/*",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)",
-                "timeboard.security.login-url=/login",
+                "timeboard.security.login-url=https://timeboard.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=30a5bn5q26pieur9kq3cqh6u5j&redirect_uri=http://localhost:8181/signin",
                 "timeboard.security.logout-url=/logout",
                 "timeboard.security.newPassword-url=/newPassword"
         }
 )
-public class AuthSecurityFilter implements Filter {
+public class OAuthSecurityFilter implements Filter {
 
     private String loginURL;
     private String logoutURL;
-    private String newPassword;
 
 
     @Reference
@@ -64,7 +63,6 @@ public class AuthSecurityFilter implements Filter {
         this.logService.log(LogService.LOG_INFO, "Security Filter is activated");
         this.loginURL = properties.get("timeboard.security.login-url");
         this.logoutURL = properties.get("timeboard.security.logout-url");
-        this.newPassword = properties.get("timeboard.security.newPassword-url");
     }
 
     @Override
@@ -77,8 +75,7 @@ public class AuthSecurityFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        boolean isLogin = req.getServletPath().equals(this.loginURL);
-        boolean isAskNewPassword = req.getServletPath().equals(this.newPassword);
+        boolean isLogin = req.getServletPath().equals(this.loginURL) || req.getServletPath().equals("/signin");
         boolean isStatic =
                 req.getServletPath().startsWith("/static")
                         || req.getServletPath().equals("/favicon.ico");
@@ -89,10 +86,10 @@ public class AuthSecurityFilter implements Filter {
         }
 
 
-        if (!isLogged && !isStatic && !isLogin && !isAskNewPassword) {
+        if (!isLogged && !isStatic && !isLogin) {
             String origin = ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString();
             origin = URLEncoder.encode(origin, StandardCharsets.UTF_8.toString());
-            res.sendRedirect(this.loginURL + "?origin=" + origin);
+            res.sendRedirect(this.loginURL);
         } else {
             chain.doFilter(request, response);
         }

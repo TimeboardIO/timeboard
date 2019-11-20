@@ -40,10 +40,6 @@
 
             <div class="content">
                 <div class="ui list">
-                    <div class="item">
-                        <i class="users icon"></i>
-                        <div class="content" th:text="${user.login}" ></div>
-                    </div>
 
                     <div class="item">
                         <i class="clock outline icon"></i>
@@ -79,10 +75,7 @@
                             </div>
                         </div>
                         <div class="two fields">
-                            <div class="field">
-                                <label>Nickname</label>
-                                <input type="text" name="login" placeholder="Login" th:value="${user.login}">
-                            </div>
+
                             <div class="field">
                                 <label>E-mail</label>
                                 <input type="email" name="email" placeholder="john@mygroup.io" th:value="${user.email}">
