@@ -1,4 +1,4 @@
-package timeboard.security.api;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -27,18 +27,17 @@ package timeboard.security.api;
  */
 
 
+import timeboard.core.model.EmailStructure;
+
 import javax.mail.MessagingException;
 
 public interface EmailService {
 
     /**
-     * Send email to a target email with subject and message
+     * Send email
      *
-     * @param targetEmail target email
-     * @param subject subject
-     * @param message message
+     * @param emailStructure emailStructure with informations for email
      * @throws MessagingException message not sent
      */
-    void sendMessage(String targetEmail, String subject, String message) throws MessagingException;
-
+    void sendMessage(EmailStructure emailStructure) throws MessagingException;
 }
