@@ -65,7 +65,7 @@ public class SendNewPasswordEmail {
         List<String> cc = new ArrayList<>();
         String subject = "Réinitialisation du mot de passe";
         String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
-                + "Login: " + user.getLogin() + "\nMot de passe: " + password;
+                + "Login: " + user.getEmail() + "\nMot de passe: " + password;
 
         return new EmailStructure(to, cc, subject, message);
     }

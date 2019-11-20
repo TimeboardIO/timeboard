@@ -120,12 +120,9 @@
         beginWorkDate date not null,
         email varchar(255) not null,
         externalIDs TEXT,
-        firstName varchar(255) not null,
+        firstName varchar(255),
         imputationFutur bit not null,
-        login varchar(50) not null,
-        matriculeID varchar(255),
-        name varchar(255) not null,
-        password varchar(255) not null,
+        name varchar(255),
         validateOwnImputation bit not null,
         primary key (id)
     ) engine=InnoDB;
@@ -143,7 +140,7 @@
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
     alter table User 
-       add constraint UK_587tdsv8u5cvheyo9i261xhry unique (login);
+       add constraint UK_e6gkqunxajvyxl5uctpl2vl2p unique (email);
 
     alter table Imputation 
        add constraint FKpv054mew449mf2m7itp50r57b 

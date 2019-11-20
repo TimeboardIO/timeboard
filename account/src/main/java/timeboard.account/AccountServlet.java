@@ -79,38 +79,14 @@ public class AccountServlet extends TimeboardServlet {
         User user = SecurityContext.getCurrentUser(request);
 
         String submitButton = request.getParameter("formType");
-        if(submitButton.matches("password")){
-            //Password modification
-
-            String newPassword = request.getParameter("password1");
-            String oldPassword = request.getParameter("oldPassword");
-
-                user.setPassword(newPassword);
-                try {
-                    userService.updateUserPassword(user.getId(), oldPassword, newPassword);
-                    viewModel.getViewDatas().put("message", "Password changed successfully !");
-               /* } catch (WrongPasswordException e) { //TODO custom exception make OSGI controller crash
-                    viewModel.getViewDatas().put("error", "Old password is incorrect.");
-                } catch (UserException e) {
-                    e.printStackTrace();
-                    viewModel.getViewDatas().put("error", "Error while updating user password.");
-                }*/
-
-                }catch(Exception e){ //TODO replace by multiple catch 
-                    viewModel.getViewDatas().put("error", "Old password is incorrect.");
-                }
-
-
-        }else if(submitButton.matches("account")){
+        if(submitButton.matches("account")){
             //Account modification
            String fistName = request.getParameter("firstName");
            String name = request.getParameter("name");
-           String login = request.getParameter("login");
            String email = request.getParameter("email");
 
            user.setFirstName(fistName);
            user.setName(name);
-           user.setLogin(login);
            user.setEmail(email);
 
            try{
