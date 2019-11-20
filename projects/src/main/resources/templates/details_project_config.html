@@ -167,6 +167,7 @@
     </form>
     <script>
 
+/*<![CDATA[*/
         $('.ui.checkbox')
           .checkbox();
 
@@ -184,6 +185,8 @@
             $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
         });
 
+
+        var roles = [(${rolesForNewMember})]
         $('.ui.search')
             .search({
                 apiSettings: {
@@ -194,12 +197,29 @@
                         title   : 'email'
                     },
                     onSelect: function(result, response) {
-                        $('#projects').append("<input type='text' name='members["+result.id+"]' />");
-                        $('#projects').submit();
+                        $('#members').find('tbody')
+                            .append($('<tr id='+result.id+'>')
+                                .append($('<td>').append(result.email))
+                                .append($('<td>')
+                                    .append($('<select id="mySelect" name="members['+result.id+']">'))
+                                )
+                                .append($('<td>')
+                                    .append($('<button class="ui negative basic button" onclick="removeUser('+result.id+')">')
+                                        .append($('<i class="remove alternate icon">'))
+                                        .append("Remove")
+                                    )
+                                )
+                            )
+                        $.each(roles, function(key, value) {
+                             $('#mySelect')
+                                 .append($("<option></option>")
+                                 .attr("value",value)
+                                 .text(value));
+                        });
                     },
-                minCharacters : 3
+                    minCharacters : 3
             });
-
+/*]]>*/
 
     </script>
 </div>
