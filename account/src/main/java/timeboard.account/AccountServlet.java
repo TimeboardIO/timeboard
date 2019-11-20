@@ -83,7 +83,6 @@ public class AccountServlet extends TimeboardServlet {
             //Account modification
            String fistName = request.getParameter("firstName");
            String name = request.getParameter("name");
-           String login = request.getParameter("login");
            String email = request.getParameter("email");
 
            user.setFirstName(fistName);
