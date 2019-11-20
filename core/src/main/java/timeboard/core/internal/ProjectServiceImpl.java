@@ -110,7 +110,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectById(Long projectId) {
+    public Project getProjectByIdWithAllMembers(Long projectId) {
         return jpa.txExpr(em -> {
             Project data = em.createQuery("select p from Project p where p.id = :projectId", Project.class)
                     .setParameter("projectId", projectId)
@@ -214,6 +214,7 @@ public class ProjectServiceImpl implements ProjectService {
                     entityManager.remove(pmToRemove);
                 }
             });
+            entityManager.merge(project);
 
             //Add new membership
             membershipToAdd.forEach((aLong) -> {

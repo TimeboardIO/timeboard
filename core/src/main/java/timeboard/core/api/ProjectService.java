@@ -44,7 +44,7 @@ public interface ProjectService {
 
     Project getProjectByID(User owner, Long projectID);
 
-    Project getProjectById(Long projectId);
+    Project getProjectByIdWithAllMembers(Long projectId);
 
     Project getProjectByName(String projectArg);
 
