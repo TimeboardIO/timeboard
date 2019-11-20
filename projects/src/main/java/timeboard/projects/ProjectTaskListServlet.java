@@ -63,7 +63,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        viewModel.getViewDatas().put("task", null);
+        viewModel.getViewDatas().put("list", true);
 
         this.forward(request, response, String.format("/projects/tasks/config?projectID=%s", id), viewModel);
 

@@ -31,6 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Project;
+import timeboard.core.model.Task;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -68,6 +69,7 @@ public class ProjectsTaskValidationServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
         viewModel.getViewDatas().put("project", project);
         viewModel.setTemplate("projects:details_project_tasks_validation.html");
+        viewModel.getViewDatas().put("task", false);
 
 
 

@@ -82,11 +82,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             // Update case
             long taskID = Long.parseLong(request.getParameter("taskID"));
             task = this.projectService.getTaskByID(taskID);
-            viewModel.getViewDatas().put("task", new TaskForm(task));
-        } else {
-            // New task case
-            viewModel.getViewDatas().put("task", new TaskForm(task));
         }
+        viewModel.getViewDatas().put("task", new TaskForm(task));
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
