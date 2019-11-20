@@ -61,7 +61,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Reference(target = "(osgi.unit.name=timeboard-pu)", scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
 
-
     public ProjectServiceImpl(){}
 
     public ProjectServiceImpl(JpaTemplate jpa){
@@ -272,7 +271,7 @@ public class ProjectServiceImpl implements ProjectService {
                            Long taskTypeID,
                            User assignedUser
                            ) {
-        return this.jpa.txExpr(entityManager -> {
+        Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
             newTask.setEstimateWork(OE);
@@ -294,6 +293,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             return newTask;
         });
+
+        // Send email
+        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
+
+        return newTaskDB;
     }
 
     @Override
@@ -308,7 +312,7 @@ public class ProjectServiceImpl implements ProjectService {
                                         User assignedUser,
                                         Milestone milestone
     ) {
-        return this.jpa.txExpr(entityManager -> {
+        Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
             newTask.setEstimateWork(OE);
@@ -335,6 +339,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             return newTask;
         });
+
+        // Send email
+        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
+
+        return newTaskDB;
     }
 
 
@@ -352,7 +361,7 @@ public class ProjectServiceImpl implements ProjectService {
                            String remotePath,
                            String remoteId
                            ) {
-        return this.jpa.txExpr(entityManager -> {
+        Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
             final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
@@ -377,6 +386,11 @@ public class ProjectServiceImpl implements ProjectService {
 
             return newTask;
         });
+
+        // Send email
+        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
+
+        return newTaskDB;
     }
 
     public Task updateTask(User actor, final Task task) {

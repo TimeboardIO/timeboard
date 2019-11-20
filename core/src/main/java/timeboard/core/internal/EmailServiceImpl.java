@@ -1,4 +1,4 @@
-package timeboard.security.service;
+package timeboard.core.internal;
 
 /*-
  * #%L
@@ -27,10 +27,12 @@ package timeboard.security.service;
  */
 
 
+import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.security.api.EmailService;
+import timeboard.core.api.EmailService;
+import timeboard.core.model.EmailStructure;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -38,14 +40,16 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Component(
         service = EmailService.class,
         scope = ServiceScope.SINGLETON,
         property = {
-                "timeboard.mail.fromEmail=paasport@tsc-nantes.com",
+                "timeboard.mail.fromEmail=timeboard@tsc-nantes.com",
                 "timeboard.mail.host=10.10.0.48",
                 "timeboard.mail.port=25"
 
@@ -67,18 +71,26 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendMessage(String targetEmail, String subject, String message) throws MessagingException {
-            Properties props = new Properties();
-            props.setProperty("mail.host", host);
-            props.setProperty("mail.smtp.port", port);
+    public void sendMessage(EmailStructure emailStructure) throws MessagingException {
+        Properties props = new Properties();
+        props.setProperty("mail.host", host);
+        props.setProperty("mail.smtp.port", port);
 
-            Session session = Session.getInstance(props, null);
+        Session session = Session.getInstance(props, null);
 
-            MimeMessage msg = new MimeMessage(session);
-            msg.setText(message);
-            msg.setSubject(subject);
-            msg.setFrom(new InternetAddress(fromEmail));
-            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(targetEmail));
-            Transport.send(msg);
+        MimeMessage msg = new MimeMessage(session);
+        msg.setText(emailStructure.getMessage());
+        msg.setSubject(emailStructure.getSubject());
+        msg.setFrom(new InternetAddress(fromEmail));
+
+        List<String> listTOEmailsWithoutDuplicate = emailStructure.getTargetEmailList().stream().distinct().collect(Collectors.toList());
+        String targetTOEmails = StringUtils.join(listTOEmailsWithoutDuplicate, ',');
+        msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
+
+        List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCEmailList().stream().distinct().collect(Collectors.toList());
+        String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
+        msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
+
+        Transport.send(msg);
     }
 }
