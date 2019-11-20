@@ -27,6 +27,7 @@ package timeboard.security;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -51,20 +52,33 @@ import java.util.Map;
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
+                "oauth.token.url=https://timeboard.auth.eu-west-1.amazoncognito.com/oauth2/token",
+                "oauth.userinfo.url=https://timeboard.auth.eu-west-1.amazoncognito.com/oauth2/userInfo",
+                "oauth.clientid=changeme",
+                "oauth.secretid=changeme",
                 "osgi.http.whiteboard.servlet.pattern=/signin",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
+        },
+        configurationPid = {"timeboard.oauth"}
 )
 public class SigninServlet extends HttpServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String URL = "https://timeboard.auth.eu-west-1.amazoncognito.com/oauth2/token";
-    private static final String USER_INFO = "https://timeboard.auth.eu-west-1.amazoncognito.com/oauth2/userInfo";
-    private static final String clientID = "30a5bn5q26pieur9kq3cqh6u5j";
-    private static final String secretID = "1irma1tt29kkt55voovf2nfneiibfbue216mdi0sngrihe59gmts";
+    private String tokenURL;
+    private String userInfoURL;
+    private String clientID;
+    private String secretID;
 
     @Reference
     private UserService userService;
+
+    @Activate
+    private void init(Map<String, String> params){
+        this.tokenURL = params.get("oauth.token.url");
+        this.userInfoURL = params.get("oauth.userinfo.url");
+        this.clientID = params.get("oauth.clientid");
+        this.secretID = params.get("oauth.secretid");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -89,7 +103,7 @@ public class SigninServlet extends HttpServlet {
                     .POST(HttpRequest.BodyPublishers.ofString(params.toString()))
                     .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((clientID + ":" + secretID).getBytes()))
                     .header("Content-Type", "application/x-www-form-urlencoded")
-                    .uri(URI.create(URL))
+                    .uri(URI.create(this.tokenURL))
                     .build();
 
             final String tokens = client.send(oauthTokenRequest, HttpResponse.BodyHandlers.ofString()).body();
@@ -100,7 +114,7 @@ public class SigninServlet extends HttpServlet {
                     .newBuilder()
                     .GET()
                     .header("Authorization", "Bearer " + tokensMap.get("access_token").toString())
-                    .uri(URI.create(USER_INFO))
+                    .uri(URI.create(this.userInfoURL))
                     .build();
 
             final String userInfo = client.send(oauthUserInfoRequest, HttpResponse.BodyHandlers.ofString()).body();

@@ -44,15 +44,17 @@ import java.util.Map;
         property = {
                 "osgi.http.whiteboard.filter.regex=/*",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)",
-                "timeboard.security.login-url=https://timeboard.auth.eu-west-1.amazoncognito.com/login?response_type=code&client_id=30a5bn5q26pieur9kq3cqh6u5j&redirect_uri=http://localhost:8181/signin",
-                "timeboard.security.logout-url=/logout",
+                "oauth.login.url=https://timeboard.auth.eu-west-1.amazoncognito.com/login",
+                "oauth.clientid=changeme",
+                "oauth.redirect.uri=http://localhost:8181/signin",
                 "timeboard.security.newPassword-url=/newPassword"
-        }
+        },
+        configurationPid = {"timeboard.oauth"}
 )
 public class OAuthSecurityFilter implements Filter {
 
+
     private String loginURL;
-    private String logoutURL;
 
 
     @Reference
@@ -61,8 +63,11 @@ public class OAuthSecurityFilter implements Filter {
     @Activate
     private void activate(Map<String, String> properties) {
         this.logService.log(LogService.LOG_INFO, "Security Filter is activated");
-        this.loginURL = properties.get("timeboard.security.login-url");
-        this.logoutURL = properties.get("timeboard.security.logout-url");
+        this.loginURL = String.format(
+                properties.get("oauth.login.url") + "?response_type=code&client_id=%s&redirect_uri=%s",
+                properties.get("oauth.clientid"),
+                properties.get("oauth.redirect.uri")
+                );
     }
 
     @Override
