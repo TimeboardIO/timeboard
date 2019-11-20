@@ -13,11 +13,13 @@ script:
   - mvn -f features/pom.xml install karaf:kar
 
 
+
 deploy:
   - provider: s3
     access_key_id: "$AWS_ACCESS_KEY"
     secret_access_key: "$AWS_SECRET_KEY"
     bucket: "$AWS_BUCKET"
+    region: eu-west-1
     skip_cleanup: true
     on:
       branch: develop
