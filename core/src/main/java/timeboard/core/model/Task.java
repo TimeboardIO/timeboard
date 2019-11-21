@@ -56,7 +56,7 @@ public class Task extends AbstractTask implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER, optional = true)
     private Milestone milestone;
 
     @OneToOne

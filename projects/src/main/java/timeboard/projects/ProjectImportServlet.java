@@ -31,6 +31,7 @@ import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Milestone;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
@@ -136,7 +137,8 @@ public class ProjectImportServlet extends HttpServlet {
                                             String origin = task.getOrigin();
                                             String remotePath = null;
                                             Long remoteId = task.getID();
-                                            projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, String.valueOf(remoteId));
+                                            Milestone milestone = null;
+                                            projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, String.valueOf(remoteId), milestone);
                                         }
                                 );
 

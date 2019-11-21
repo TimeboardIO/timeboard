@@ -12,7 +12,7 @@
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
-        origin varchar(255),
+        origin varchar(255) not null,
         remoteId varchar(255),
         remotePath varchar(255),
         startDate date,
@@ -85,12 +85,14 @@
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
-        origin varchar(255),
+        origin varchar(255) not null,
         remoteId varchar(255),
         remotePath varchar(255),
         startDate date,
-        estimateWork double precision not null,
-        latestRevision_id bigint,
+        effortLeft double precision not null,
+        originalEstimate double precision not null,
+        taskStatus integer not null,
+        assigned_id bigint,
         milestone_id bigint,
         project_id bigint,
         taskType_id bigint,
@@ -99,11 +101,12 @@
 
     create table TaskRevision (
        id bigint not null,
-        remainsToBeDone double precision not null,
+        effortLeft double precision not null,
+        effortSpent double precision not null,
+        originalEstimate double precision not null,
+        realEffort double precision not null,
         revisionDate datetime(6),
-        taskStatus integer,
         assigned_id bigint,
-        revisionActor_id bigint,
         task_id bigint,
         primary key (id)
     ) engine=InnoDB;
@@ -163,9 +166,9 @@
        references Project (id);
 
     alter table Task 
-       add constraint FKjwuo5mqkfx9k23jd3g8vr4a2p 
-       foreign key (latestRevision_id) 
-       references TaskRevision (id);
+       add constraint FKc44lafqphn0ecv9phdfate2kb 
+       foreign key (assigned_id) 
+       references User (id);
 
     alter table Task 
        add constraint FKjl7lj35hlsnb3n8x2kyk9w5lx 
@@ -185,11 +188,6 @@
     alter table TaskRevision 
        add constraint FKp9ssbxu7c3w7fr3jukkget1ne 
        foreign key (assigned_id) 
-       references User (id);
-
-    alter table TaskRevision 
-       add constraint FK16welq7uyu2n2xmycgw23ebgq 
-       foreign key (revisionActor_id) 
        references User (id);
 
     alter table TaskRevision 

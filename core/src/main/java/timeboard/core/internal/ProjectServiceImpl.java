@@ -73,7 +73,6 @@ public class ProjectServiceImpl implements ProjectService {
     public Project createProject(User owner, String projectName) throws BusinessException {
 
         return this.jpa.txExpr(entityManager -> {
-
             Project newProject = new Project();
             newProject.setName(projectName);
             newProject.setStartDate(new Date());
@@ -273,97 +272,9 @@ public class ProjectServiceImpl implements ProjectService {
             return q.getResultList();
         });
     }
-    @Override
-    public Task createTask(User actor, Long projectID, String taskName, String taskComment,
-                           Date startDate, Date endDate,  double OE, Long taskTypeID, User assignedUser) {
-        Project p = jpa.txExpr(em -> em.find(Project.class, projectID));
-        return this.createTask(actor,  p, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUser);
-    }
 
-    @Override
-    public Task createTask(User actor,
-                           Project project,
-                           String taskName,
-                           String taskComment,
-                           Date startDate,
-                           Date endDate,
-                           double OE,
-                           Long taskTypeID,
-                           User assignedUser
-                           ) {
-        Task newTaskDB = this.jpa.txExpr(entityManager -> {
-            Task newTask = new Task();
-            newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            newTask.setOriginalEstimate(OE);
-            newTask.setName(taskName);
-            newTask.setComments(taskComment);
-            newTask.setStartDate(startDate);
-            newTask.setEndDate(endDate);
-            newTask.setComments(taskComment);
-            newTask.setEffortLeft(OE);
-            newTask.setTaskStatus(TaskStatus.PENDING);
-            newTask.setAssigned(assignedUser);
 
-            entityManager.merge(project);
-            newTask.setProject(project);
-            entityManager.flush();
 
-            TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
-            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
-
-            return newTask;
-        });
-
-        // Send email
-
-        return newTaskDB;
-    }
-
-    @Override
-    public Task createTaskWithMilestone(User actor,
-                                        Project project,
-                                        String taskName,
-                                        String taskComment,
-                                        Date startDate,
-                                        Date endDate,
-                                        double OE,
-                                        Long taskTypeID,
-                                        User assignedUser,
-                                        Milestone milestone
-    ) {
-        Task newTaskDB = this.jpa.txExpr(entityManager -> {
-            Task newTask = new Task();
-            newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            newTask.setOriginalEstimate(OE);
-            newTask.setName(taskName);
-            newTask.setComments(taskComment);
-            newTask.setStartDate(startDate);
-            newTask.setEndDate(endDate);
-            newTask.setComments(taskComment);
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
-            newTask.getRevisions().add(taskRevision);
-            newTask.setLatestRevision(taskRevision);
-            entityManager.persist(newTask);
-
-            entityManager.merge(project);
-            newTask.setProject(project);
-            if(milestone != null) {
-                entityManager.merge(milestone);
-            }
-            newTask.setMilestone(milestone);
-
-            entityManager.flush();
-
-            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
-
-            return newTask;
-        });
-
-        // Send email
-        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
-
-        return newTaskDB;
-    }
 
 
     @Override
@@ -378,14 +289,12 @@ public class ProjectServiceImpl implements ProjectService {
                            User assignedUser,
                            String origin,
                            String remotePath,
-                           String remoteId
+                           String remoteId,
+                           Milestone milestone
                            ) {
         Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
-            newTask.getRevisions().add(taskRevision);
-            newTask.setLatestRevision(taskRevision);
             newTask.setOrigin(origin);
             newTask.setRemotePath(remotePath);
             newTask.setRemoteId(remoteId);
@@ -395,37 +304,45 @@ public class ProjectServiceImpl implements ProjectService {
             newTask.setStartDate(startDate);
             newTask.setEndDate(endDate);
             newTask.setComments(taskComment);
+            newTask.setEffortLeft(OE);
+            newTask.setTaskStatus(TaskStatus.PENDING);
+            newTask.setAssigned(assignedUser);
+            if(milestone != null) {
+                entityManager.merge(milestone);
+            }
+            newTask.setMilestone(milestone);
 
             entityManager.persist(newTask);
             entityManager.merge(project);
             newTask.setProject(project);
             entityManager.flush();
 
+            TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
             this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
 
             return newTask;
         });
 
-        // Send email
-        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
-
         return newTaskDB;
     }
 
+    @Override
     public Task updateTask(User actor, final Task task) {
-        return this.updateTask(actor, task);
+        return this.jpa.txExpr(entityManager -> {
+            //TODO check actor permissions
+            if(task.getProject().isMember(actor)) {
+                entityManager.merge(task);
+                entityManager.flush();
+            }
+            return task;
+        });
     }
 
     @Override
     public void createTasks(final User actor, final List<Task> taskList) {
         this.jpa.tx(entityManager -> {
-            for (Task newTask : taskList) {
-                final TaskRevision taskRevision = new TaskRevision(actor, newTask, 0, null, TaskStatus.PENDING);
-                newTask.getRevisions().add(taskRevision);
-                newTask.setLatestRevision(taskRevision);
-                entityManager.persist(taskRevision);
-                entityManager.persist(newTask);
-                this.logService.log(LogService.LOG_INFO, "User " + actor + " tasks "+newTask.getName()+" on "+newTask.getStartDate());
+            for (Task newTask : taskList) {  //TODO create task here
+                this.logService.log(LogService.LOG_DEBUG, "User " + actor + " tasks "+newTask.getName()+" on "+newTask.getStartDate());
             }
             this.logService.log(LogService.LOG_INFO, "User " + actor + " created "+taskList.size()+" tasks ");
 
@@ -441,6 +358,11 @@ public class ProjectServiceImpl implements ProjectService {
             }
             this.logService.log(LogService.LOG_INFO, "User " + actor + " updated "+taskList.size()+" tasks ");
             entityManager.flush();
+
+            taskList.stream().forEach(task -> {
+                TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
+            });
+
         });
     }
 
@@ -455,52 +377,9 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
-    @Override
-    public Task addRevisionToTask(User actor, final Task task, TaskRevision rev) {
-        return this.jpa.txExpr(entityManager -> {
-            final Task taskFromDB = entityManager.find(Task.class, task.getId());
-            if(rev != null) {
-                taskFromDB.setLatestRevision(rev);
-                rev.setTask(taskFromDB);
-                entityManager.persist(rev);
-            }
-            taskFromDB.setTaskType(task.getTaskType());
-            taskFromDB.setName(task.getName());
-            taskFromDB.setComments(task.getComments());
-            taskFromDB.setStartDate(task.getStartDate());
-            taskFromDB.setEndDate(task.getEndDate());
-            taskFromDB.setOriginalEstimate(task.getOriginalEstimate());
 
-            entityManager.flush();
-            this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
-            return taskFromDB;
-        });
-    }
 
-    @Override
-    public Task updateTaskWithMilestone(User actor, final Task task, TaskRevision rev, Milestone milestone) {
-        return this.jpa.txExpr(entityManager -> {
-            final Task taskFromDB = entityManager.find(Task.class, task.getId());
-            taskFromDB.setLatestRevision(rev);
 
-            taskFromDB.setTaskType(task.getTaskType());
-            taskFromDB.setName(task.getName());
-            taskFromDB.setComments(task.getComments());
-            taskFromDB.setStartDate(task.getStartDate());
-            taskFromDB.setEndDate(task.getEndDate());
-            taskFromDB.setOriginalEstimate(task.getOriginalEstimate());
-            taskFromDB.setMilestone(milestone);
-
-            rev.setTask(taskFromDB);
-            entityManager.persist(rev);
-
-            entityManager.flush();
-
-            this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
-
-            return taskFromDB;
-        });
-    }
 
     @Override
     public Task getTaskByID(long id) {
@@ -547,7 +426,7 @@ public class ProjectServiceImpl implements ProjectService {
         Task projectTask = (Task.class.isInstance(task)) ? (Task) task : null;
 
         // Task is available for imputations if this is a default task (not a project task) or task status is not pending
-        boolean taskAvailableForImputations = (projectTask == null || projectTask.getLatestRevision().getTaskStatus() != TaskStatus.PENDING);
+        boolean taskAvailableForImputations = (projectTask == null || projectTask.getTaskStatus() != TaskStatus.PENDING);
 
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
         q.setParameter("taskID", taskID);
@@ -562,7 +441,7 @@ public class ProjectServiceImpl implements ProjectService {
             i.setUser(actor);
             i.setValue(val);
             if(projectTask != null){ //project task
-                projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getEffortLeft() - val);
+                projectTask.setEffortLeft(projectTask.getEffortLeft() - val);
             }
             entityManager.persist(i);
         }
@@ -572,10 +451,10 @@ public class ProjectServiceImpl implements ProjectService {
 
             if(projectTask != null){ //project task
                 if (i.getValue() < val) {
-                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getEffortLeft() - Math.abs(val - i.getValue()));
+                    projectTask.setEffortLeft(projectTask.getEffortLeft() - Math.abs(val - i.getValue()));
                 }
                 if (i.getValue() > val) {
-                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getEffortLeft() + Math.abs(i.getValue() - val));
+                    projectTask.setEffortLeft(projectTask.getEffortLeft() + Math.abs(i.getValue() - val));
                 }
             }
             if (val == 0) {
@@ -619,13 +498,13 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public UpdatedTaskResult updateTaskRTBD(User actor, Long taskID, double rtbd) {
+    public UpdatedTaskResult updateTaskEffortLeft(User actor, Long taskID, double effortLeft) {
         return this.jpa.txExpr(entityManager -> {
             Task task = entityManager.find(Task.class, taskID);
-            task.setRemainsToBeDone(actor, rtbd);
+            task.setEffortLeft(effortLeft);
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated remain to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ rtbd);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated remain to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ effortLeft);
 
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
         });
