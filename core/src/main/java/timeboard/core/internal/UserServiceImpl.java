@@ -34,7 +34,6 @@ import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 
@@ -133,7 +132,7 @@ public final class UserServiceImpl implements UserService {
             List<User> matchedUser = project.getMembers().stream()
                     .filter(projectMembership -> projectMembership
                             .getMember()
-                            .getName().startsWith(prefix))
+                            .getEmail().startsWith(prefix))
                     .map(projectMembership -> projectMembership.getMember())
                     .collect(Collectors.toList());
             return matchedUser;
@@ -187,14 +186,14 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User userProvisionning(String email) throws BusinessException {
+    public User userProvisionning(String sub, String email) throws BusinessException {
 
         User user = this.findUserByEmail(email);
-        if (user == null) {
+        if (user == null || !user.getRemoteSubject().equals(sub)) {
             //Create user
             user = new User(null, null, email, new Date(), new Date());
+            user.setRemoteSubject(sub);
             user = this.createUser(user);
-
         }
         return user;
     }

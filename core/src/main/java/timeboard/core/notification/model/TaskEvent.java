@@ -1,4 +1,4 @@
-package timeboard.core.api;
+package timeboard.core.notification.model;
 
 /*-
  * #%L
@@ -26,19 +26,44 @@ package timeboard.core.api;
  * #L%
  */
 
-import io.reactivex.subjects.PublishSubject;
-import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
-import timeboard.core.notification.model.TaskEvent;
 
-import java.util.Map;
+import java.util.Date;
 
-public class TimeboardSubjects {
+public class TaskEvent extends TimeboardEvent {
+    private Task task;
+    private User actor;
+    private TimeboardEventType eventType;
 
-    public static PublishSubject<TaskEvent> TASK_EVENTS = PublishSubject.create();
+    public TaskEvent(TimeboardEventType eventType, Task task, User actor) {
+        super(new Date());
+        this.eventType = eventType;
+        this.task = task;
+        this.actor = actor;
+    }
 
-    public static PublishSubject<Task> CREATE_TASK = PublishSubject.create();
-    public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
+    public TimeboardEventType getEventType() {
+        return eventType;
+    }
 
+    public void setEventType(TimeboardEventType eventType) {
+        this.eventType = eventType;
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
+    }
+
+    public User getActor() {
+        return actor;
+    }
+
+    public void setActor(User actor) {
+        this.actor = actor;
+    }
 }

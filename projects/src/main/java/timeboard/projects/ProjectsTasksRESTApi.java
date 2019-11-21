@@ -109,6 +109,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         Task task;
         try{
             task = (Task) this.projectService.getTaskByID(taskId);
+            task.setTaskStatus(status);
+            this.projectService.updateTask(SecurityContext.getCurrentUser(request), task);
         } catch (ClassCastException e){
             MAPPER.writeValue(response.getWriter(), "Task is not a project task.");
             return;
@@ -116,11 +118,6 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             MAPPER.writeValue(response.getWriter(), "Task id not found.");
             return;
         }
-        final TaskRevision lastRevision = task.getLatestRevision();
-        final TaskRevision newRevision = new TaskRevision(SecurityContext.getCurrentUser(request), task,
-                lastRevision.getRemainsToBeDone(),lastRevision.getAssigned(), status);
-        this.projectService.addRevisionToTask(SecurityContext.getCurrentUser(request),task, newRevision);
-
         MAPPER.writeValue(response.getWriter(), "DONE");
         return;
     }
@@ -146,8 +143,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         final Map<Long, UserTasksWrapper> result = new HashMap<>();
 
         for (Task task : tasks){
-            if(task.getLatestRevision().getTaskStatus() == TaskStatus.PENDING){
-                User assignee = task.getLatestRevision().getAssigned();
+            if(task.getTaskStatus() == TaskStatus.PENDING){
+                User assignee = task.getAssigned();
                 if(assignee == null){
                     assignee = new User();
                     assignee.setId(0);
@@ -161,7 +158,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                                 task.getId(),
                                 task.getName(),
                                 task.getComments(),
-                                task.getEstimateWork(),
+                                task.getOriginalEstimate(),
                                 task.getStartDate(),
                                 task.getEndDate())
                         );

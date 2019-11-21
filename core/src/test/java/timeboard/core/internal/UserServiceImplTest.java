@@ -60,8 +60,6 @@ public class UserServiceImplTest {
 
             @Override
             public <R> R txExpr(TransactionType transactionType, EmFunction<R> emFunction) {
-                System.out.println(transactionType.toString());
-                System.out.println(em.isJoinedToTransaction());
                 R res;
                 if((transactionType == TransactionType.Required) && em.isJoinedToTransaction()){
                     res = emFunction.apply(em);
@@ -70,7 +68,6 @@ public class UserServiceImplTest {
                     res = emFunction.apply(em);
                     em.getTransaction().commit();
                 }
-                System.out.println("---");
 
                 return res;
             }

@@ -12,7 +12,7 @@
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
-        origin varchar(255),
+        origin varchar(255) not null,
         remoteId varchar(255),
         remotePath varchar(255),
         startDate date,
@@ -85,12 +85,14 @@
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
-        origin varchar(255),
+        origin varchar(255) not null,
         remoteId varchar(255),
         remotePath varchar(255),
         startDate date,
-        estimateWork double precision not null,
-        latestRevision_id bigint,
+        effortLeft double precision not null,
+        originalEstimate double precision not null,
+        taskStatus integer not null,
+        assigned_id bigint,
         milestone_id bigint,
         project_id bigint,
         taskType_id bigint,
@@ -99,11 +101,12 @@
 
     create table TaskRevision (
        id bigint not null,
-        remainsToBeDone double precision not null,
+        effortLeft double precision not null,
+        effortSpent double precision not null,
+        originalEstimate double precision not null,
+        realEffort double precision not null,
         revisionDate datetime(6),
-        taskStatus integer,
         assigned_id bigint,
-        revisionActor_id bigint,
         task_id bigint,
         primary key (id)
     ) engine=InnoDB;
@@ -123,6 +126,7 @@
         firstName varchar(255),
         imputationFutur bit not null,
         name varchar(255),
+        remoteSubject varchar(255),
         validateOwnImputation bit not null,
         primary key (id)
     ) engine=InnoDB;
@@ -140,7 +144,7 @@
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
     alter table User 
-       add constraint UK_e6gkqunxajvyxl5uctpl2vl2p unique (email);
+       add constraint UK_ku4ibpw23c8xcgjt4sov3w3kv unique (remoteSubject);
 
     alter table Imputation 
        add constraint FKpv054mew449mf2m7itp50r57b 
@@ -163,9 +167,9 @@
        references Project (id);
 
     alter table Task 
-       add constraint FKjwuo5mqkfx9k23jd3g8vr4a2p 
-       foreign key (latestRevision_id) 
-       references TaskRevision (id);
+       add constraint FKc44lafqphn0ecv9phdfate2kb 
+       foreign key (assigned_id) 
+       references User (id);
 
     alter table Task 
        add constraint FKjl7lj35hlsnb3n8x2kyk9w5lx 
@@ -185,11 +189,6 @@
     alter table TaskRevision 
        add constraint FKp9ssbxu7c3w7fr3jukkget1ne 
        foreign key (assigned_id) 
-       references User (id);
-
-    alter table TaskRevision 
-       add constraint FK16welq7uyu2n2xmycgw23ebgq 
-       foreign key (revisionActor_id) 
        references User (id);
 
     alter table TaskRevision 

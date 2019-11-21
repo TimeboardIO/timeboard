@@ -1,4 +1,4 @@
-package timeboard.core.api;
+package timeboard.core.notification.model;
 
 /*-
  * #%L
@@ -26,19 +26,8 @@ package timeboard.core.api;
  * #L%
  */
 
-import io.reactivex.subjects.PublishSubject;
-import timeboard.core.model.Project;
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
-import timeboard.core.notification.model.TaskEvent;
+public enum TimeboardEventType {
 
-import java.util.Map;
-
-public class TimeboardSubjects {
-
-    public static PublishSubject<TaskEvent> TASK_EVENTS = PublishSubject.create();
-
-    public static PublishSubject<Task> CREATE_TASK = PublishSubject.create();
-    public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
-
+    CREATE,
+    UPDATE
 }

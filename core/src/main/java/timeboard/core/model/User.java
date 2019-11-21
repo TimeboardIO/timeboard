@@ -57,8 +57,11 @@ public class User implements Serializable {
     @Column(nullable = true)
     private String firstName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private String email;
+
+    @Column(nullable = true, unique = true)
+    private String remoteSubject;
 
     @Column(nullable = false)
     private boolean imputationFutur = false;
@@ -97,6 +100,13 @@ public class User implements Serializable {
         this.id = id;
     }
 
+    public String getRemoteSubject() {
+        return remoteSubject;
+    }
+
+    public void setRemoteSubject(String remoteSubject) {
+        this.remoteSubject = remoteSubject;
+    }
 
     public Date getAccountCreationTime() {
         return accountCreationTime;

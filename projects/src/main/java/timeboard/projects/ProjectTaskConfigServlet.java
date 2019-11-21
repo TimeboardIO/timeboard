@@ -139,8 +139,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("effortSpent", effortSpentMap.values());
 
         // Datas for effort estimate (Axis Y)
-        List<EffortLeft> effortLeftDB = this.projectService.getEffortLeftByTask(task.getId());
-        final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getEstimateWork())};
+        List<EffortLeft> effortLeftDB = this.projectService.getTaskEffortLeftHistory(task.getId());
+        final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getOriginalEstimate())};
         Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -205,7 +205,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         TaskForm taskForm = new TaskForm(request);
         Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
 
-        return this.projectService.createTaskWithMilestone(actor,
+        return this.projectService.createTask(actor,
                 project,
                 taskForm.getTaskName(),
                 taskForm.getTaskComment(),
@@ -214,6 +214,9 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskForm.getEstimateWork(),
                 taskForm.getTaskTypeID(),
                 this.userService.findUserByID(taskForm.getAssignedUserID()),
+                ProjectService.ORIGIN_TIMEBOARD,
+                null,
+                null,
                 milestone
                 );
     }
@@ -228,15 +231,10 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         currentTask.setComments(taskForm.getTaskComment());
         currentTask.setStartDate(taskForm.getStartDate());
         currentTask.setEndDate(taskForm.getEndDate());
-        currentTask.setEstimateWork( taskForm.getEstimateWork());
+        currentTask.setOriginalEstimate( taskForm.getEstimateWork());
         currentTask.setMilestone(milestone);
-        final TaskRevision rev = new TaskRevision(actor,
-                currentTask,
-                currentTask.getRemainsToBeDone(),
-                this.userService.findUserByID(taskForm.getAssignedUserID()),
-                taskForm.getTaskStatus());
 
-        return this.projectService.updateTaskWithMilestone(actor, currentTask, rev, milestone);
+        return this.projectService.updateTask(actor, currentTask);
     }
 
     public static class TaskForm {
@@ -258,20 +256,17 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             taskID = task.getId();
             taskType = task.getTaskType();
             milestoneID = task.getMilestone() != null ? task.getMilestone().getId() : null;
-            if(task.getLatestRevision() != null) {
-                estimateWork = task.getEstimateWork();
-                startDate = task.getStartDate();
-                endDate = task.getEndDate();
-                assignedUser = task.getLatestRevision().getAssigned();
-                taskName = task.getName();
-                taskComment = task.getComments();
-                taskStatus = task.getLatestRevision().getTaskStatus();
-            }else{
-                startDate = new Date();
-                endDate = new Date();
-                assignedUser = null;
-                taskStatus = TaskStatus.PENDING;
-            }
+
+            estimateWork = task.getOriginalEstimate();
+            startDate = task.getStartDate();
+            endDate = task.getEndDate();
+            assignedUser = task.getAssigned();
+            taskName = task.getName();
+            taskComment = task.getComments();
+            taskStatus = task.getTaskStatus();
+            taskStatus = TaskStatus.PENDING;
+
+
         }
 
         public TaskForm(HttpServletRequest request) throws ParseException {

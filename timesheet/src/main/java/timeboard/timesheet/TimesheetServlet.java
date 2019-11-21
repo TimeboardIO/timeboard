@@ -150,7 +150,7 @@ public class TimesheetServlet extends TimeboardServlet {
 
             if (type.equals("rtbd")) {
                 double rtbd = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskRTBD(actor, taskID, rtbd);
+                updatedTask = this.projectService.updateTaskEffortLeft(actor, taskID, rtbd);
             }
 
 
