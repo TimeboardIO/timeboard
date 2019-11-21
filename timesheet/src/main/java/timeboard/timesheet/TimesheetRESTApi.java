@@ -132,7 +132,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getOriginalEstimate(),
                             task.getRealEffort(),
                             task.getStartDate(),
-                            task.getEndDate(), task.getTaskStatus().name())
+                            task.getEndDate(), task.getTaskStatus().name(), task.getTaskType().getId())
                             );
 
                     days.forEach(dateWrapper -> {
