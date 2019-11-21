@@ -159,8 +159,8 @@ public class ProjectServiceImpl implements ProjectService {
         return jpa.txExpr(em -> {
 
             TypedQuery<Object[]> q = em.createQuery("select " +
-                    "COALESCE(sum(t.estimateWork),0) as estimateWork, " +
-                    "COALESCE(sum(t.latestRevision.remainsToBeDone),0) as remainsToBeDone " +
+                    "COALESCE(sum(t.originalEstimate),0) as originalEstimate, " +
+                    "COALESCE(sum(t.effortLeft),0) as remainsToBeDone " +
                     "from Task t " +
                     "where t.project = :project ", Object[].class);
 
@@ -259,7 +259,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Task> listUserTasks(User user) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.latestRevision.assigned = :user", Task.class);
+            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.assigned = :user", Task.class);
             q.setParameter("user", user);
             return q.getResultList();
         });
@@ -544,7 +544,7 @@ public class ProjectServiceImpl implements ProjectService {
                     .createQuery("select distinct t from Task t left join fetch t.imputations where " +
                                     "t.endDate >= :ds " +
                                     "and t.startDate <= :de " +
-                                    "and t.latestRevision.assigned = :actor "
+                                    "and t.assigned = :actor "
                             , Task.class);
             q.setParameter("ds", ds);
             q.setParameter("de", de);
@@ -633,10 +633,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortLeft> getEffortLeftByTask(long taskId) {
+    public List<EffortLeft> getTaskEffortLeftHistory(long taskId) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
-            "tr.revisionDate as date, tr.remainsToBeDone as effortLeft  " +
+            "tr.revisionDate as date, tr.effortLeft as effortLeft  " +
             "from TaskRevision tr " +
             "where tr.task_id = :taskId and tr.id IN ( " +
                     "SELECT MAX(trBis.id) " +

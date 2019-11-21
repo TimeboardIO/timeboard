@@ -127,7 +127,7 @@ public interface ProjectService {
      */
     List<EffortSpent> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
 
-    List<EffortLeft> getEffortLeftByTask(long taskId);
+    List<EffortLeft> getTaskEffortLeftHistory(long taskId);
 
     UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
 

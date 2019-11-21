@@ -139,7 +139,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("effortSpent", effortSpentMap.values());
 
         // Datas for effort estimate (Axis Y)
-        List<EffortLeft> effortLeftDB = this.projectService.getEffortLeftByTask(task.getId());
+        List<EffortLeft> effortLeftDB = this.projectService.getTaskEffortLeftHistory(task.getId());
         final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getOriginalEstimate())};
         Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
