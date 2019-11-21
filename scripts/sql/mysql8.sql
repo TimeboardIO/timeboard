@@ -126,6 +126,7 @@
         firstName varchar(255),
         imputationFutur bit not null,
         name varchar(255),
+        remoteSubject varchar(255),
         validateOwnImputation bit not null,
         primary key (id)
     ) engine=InnoDB;
@@ -143,7 +144,7 @@
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
     alter table User 
-       add constraint UK_e6gkqunxajvyxl5uctpl2vl2p unique (email);
+       add constraint UK_ku4ibpw23c8xcgjt4sov3w3kv unique (remoteSubject);
 
     alter table Imputation 
        add constraint FKpv054mew449mf2m7itp50r57b 

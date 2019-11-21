@@ -28,7 +28,6 @@ package timeboard.core.api;
 
 
 import timeboard.core.api.exceptions.UserException;
-import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.User;
 import timeboard.core.api.exceptions.BusinessException;
 
@@ -90,7 +89,7 @@ public interface UserService {
 
     User findUserByExternalID(String origin, String userExternalID);
 
-    User userProvisionning(String email) throws BusinessException;
+    User userProvisionning(String sub, String email) throws BusinessException;
 
     List<User> createUsers(List<User> usersList);
 }

@@ -121,7 +121,7 @@ public class SigninServlet extends HttpServlet {
 
             final Map<String, String> userInfoMap = MAPPER.readValue(userInfo, Map.class);
 
-            User user = this.userService.userProvisionning(userInfoMap.get("email"));
+            User user = this.userService.userProvisionning(userInfoMap.get("sub"), userInfoMap.get("email"));
             HttpSession session = req.getSession(true);
             session.setAttribute("user", user);
             resp.sendRedirect("/");
