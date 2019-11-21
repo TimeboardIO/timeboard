@@ -55,31 +55,30 @@ public class SendTaskEmail {
     public void activate(){
 
         TimeboardSubjects.CREATE_TASK
-                .map(newTask -> sendEmailCreatingTask(newTask) )
+                .map(newTask -> sendEmailCreatingTask(new User(), newTask) )
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
 
-    public EmailStructure sendEmailCreatingTask(Task newTaskDB) {
+    public EmailStructure sendEmailCreatingTask(User creator, Task newTaskDB) {
         List<String> to = new ArrayList<>();
         Project project = newTaskDB.getProject();
-        User actor = newTaskDB.getLatestRevision().getRevisionActor();
-        User assignedUser = newTaskDB.getLatestRevision().getAssigned();
+        User assignedUser = newTaskDB.getAssigned();
 
         project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == ProjectRole.OWNER)
                 .forEach(member -> to.add(member.getMember().getEmail()));
 
-        List<String> cc = Arrays.asList(assignedUser.getEmail(), actor.getEmail());
+        List<String> cc = Arrays.asList(assignedUser.getEmail(), creator.getEmail());
 
         String subject = "Mail de création d'une tâche";
         String message = "Bonjour,\n"
-                + actor.getFirstName() + " " + actor.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
+                + creator.getFirstName() + " " + creator.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
                 +"Nom de la tâche : " + newTaskDB.getName() + "\n"
                 +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
                 +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "\n"
-                +"Estimation initiale : " + newTaskDB.getEstimateWork() + "\n"
+                +"Estimation initiale : " + newTaskDB.getOriginalEstimate() + "\n"
                 +"Projet : " + project.getName() + "\n";
 
         return new EmailStructure(to, cc, subject, message);

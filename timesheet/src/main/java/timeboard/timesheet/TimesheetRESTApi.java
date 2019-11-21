@@ -127,9 +127,9 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getId(),
                             task.getName(),
                             task.getEffortSpent(),
-                            task.getRemainsToBeDone(),
-                            task.getEstimateWork(),
-                            task.getReEstimateWork(),
+                            task.getEffortLeft(),
+                            task.getOriginalEstimate(),
+                            task.getRealEffort(),
                             task.getStartDate(),
                             task.getEndDate(), task.getLatestRevision().getTaskStatus().name())
                             );

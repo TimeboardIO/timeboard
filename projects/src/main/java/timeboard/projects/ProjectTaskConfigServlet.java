@@ -140,7 +140,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
         // Datas for effort estimate (Axis Y)
         List<EffortLeft> effortLeftDB = this.projectService.getEffortLeftByTask(task.getId());
-        final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getEstimateWork())};
+        final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getOriginalEstimate())};
         Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -228,11 +228,11 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         currentTask.setComments(taskForm.getTaskComment());
         currentTask.setStartDate(taskForm.getStartDate());
         currentTask.setEndDate(taskForm.getEndDate());
-        currentTask.setEstimateWork( taskForm.getEstimateWork());
+        currentTask.setOriginalEstimate( taskForm.getEstimateWork());
         currentTask.setMilestone(milestone);
         final TaskRevision rev = new TaskRevision(actor,
                 currentTask,
-                currentTask.getRemainsToBeDone(),
+                currentTask.getEffortLeft(),
                 this.userService.findUserByID(taskForm.getAssignedUserID()),
                 taskForm.getTaskStatus());
 
@@ -259,7 +259,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             taskType = task.getTaskType();
             milestoneID = task.getMilestone() != null ? task.getMilestone().getId() : null;
             if(task.getLatestRevision() != null) {
-                estimateWork = task.getEstimateWork();
+                estimateWork = task.getOriginalEstimate();
                 startDate = task.getStartDate();
                 endDate = task.getEndDate();
                 assignedUser = task.getLatestRevision().getAssigned();

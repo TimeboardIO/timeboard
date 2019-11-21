@@ -161,7 +161,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                                 task.getId(),
                                 task.getName(),
                                 task.getComments(),
-                                task.getEstimateWork(),
+                                task.getOriginalEstimate(),
                                 task.getStartDate(),
                                 task.getEndDate())
                         );

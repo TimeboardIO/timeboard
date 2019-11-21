@@ -39,6 +39,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
+import timeboard.core.notification.model.TaskEvent;
+import timeboard.core.notification.model.TimeboardEventType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -292,28 +294,27 @@ public class ProjectServiceImpl implements ProjectService {
         Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            newTask.setEstimateWork(OE);
+            newTask.setOriginalEstimate(OE);
             newTask.setName(taskName);
             newTask.setComments(taskComment);
             newTask.setStartDate(startDate);
             newTask.setEndDate(endDate);
             newTask.setComments(taskComment);
-            final TaskRevision taskRevision = new TaskRevision(actor, newTask, OE, assignedUser, TaskStatus.PENDING);
-            newTask.getRevisions().add(taskRevision);
-            newTask.setLatestRevision(taskRevision);
-            entityManager.persist(newTask);
+            newTask.setEffortLeft(OE);
+            newTask.setTaskStatus(TaskStatus.PENDING);
+            newTask.setAssigned(assignedUser);
 
             entityManager.merge(project);
             newTask.setProject(project);
             entityManager.flush();
 
+            TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
             this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
 
             return newTask;
         });
 
         // Send email
-        TimeboardSubjects.CREATE_TASK.onNext(newTaskDB);
 
         return newTaskDB;
     }
@@ -333,7 +334,7 @@ public class ProjectServiceImpl implements ProjectService {
         Task newTaskDB = this.jpa.txExpr(entityManager -> {
             Task newTask = new Task();
             newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
-            newTask.setEstimateWork(OE);
+            newTask.setOriginalEstimate(OE);
             newTask.setName(taskName);
             newTask.setComments(taskComment);
             newTask.setStartDate(startDate);
@@ -468,7 +469,7 @@ public class ProjectServiceImpl implements ProjectService {
             taskFromDB.setComments(task.getComments());
             taskFromDB.setStartDate(task.getStartDate());
             taskFromDB.setEndDate(task.getEndDate());
-            taskFromDB.setEstimateWork(task.getEstimateWork());
+            taskFromDB.setOriginalEstimate(task.getOriginalEstimate());
 
             entityManager.flush();
             this.logService.log(LogService.LOG_INFO, "Task " + task.getId() + " updated by "+actor.getName()+" in project "+task.getProject().getName());
@@ -487,7 +488,7 @@ public class ProjectServiceImpl implements ProjectService {
             taskFromDB.setComments(task.getComments());
             taskFromDB.setStartDate(task.getStartDate());
             taskFromDB.setEndDate(task.getEndDate());
-            taskFromDB.setEstimateWork(task.getEstimateWork());
+            taskFromDB.setOriginalEstimate(task.getOriginalEstimate());
             taskFromDB.setMilestone(milestone);
 
             rev.setTask(taskFromDB);
@@ -561,7 +562,7 @@ public class ProjectServiceImpl implements ProjectService {
             i.setUser(actor);
             i.setValue(val);
             if(projectTask != null){ //project task
-                projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - val);
+                projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getEffortLeft() - val);
             }
             entityManager.persist(i);
         }
@@ -571,10 +572,10 @@ public class ProjectServiceImpl implements ProjectService {
 
             if(projectTask != null){ //project task
                 if (i.getValue() < val) {
-                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() - Math.abs(val - i.getValue()));
+                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getEffortLeft() - Math.abs(val - i.getValue()));
                 }
                 if (i.getValue() > val) {
-                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getRemainsToBeDone() + Math.abs(i.getValue() - val));
+                    projectTask.updateCurrentRemainsToBeDone(actor,projectTask.getEffortLeft() + Math.abs(i.getValue() - val));
                 }
             }
             if (val == 0) {
@@ -587,7 +588,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
 
         if(projectTask != null) { //project task
-            return new UpdatedTaskResult(projectTask.getProject().getId(), task.getId(), projectTask.getEffortSpent(), projectTask.getRemainsToBeDone(), projectTask.getEstimateWork(), projectTask.getReEstimateWork());
+            return new UpdatedTaskResult(projectTask.getProject().getId(), task.getId(), projectTask.getEffortSpent(), projectTask.getEffortLeft(), projectTask.getOriginalEstimate(), projectTask.getRealEffort());
         }else{
             return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
         }
@@ -626,7 +627,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated remain to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ rtbd);
 
-            return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getRemainsToBeDone(), task.getEstimateWork(), task.getReEstimateWork());
+            return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
         });
     }
 

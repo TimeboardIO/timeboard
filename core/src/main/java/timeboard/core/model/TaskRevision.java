@@ -33,49 +33,49 @@ import java.util.Date;
 
 
 @Entity
-public class TaskRevision implements Serializable, Cloneable {
+public class TaskRevision implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
-    private Double remainsToBeDone;
-
-    @OneToOne(targetEntity = Task.class, cascade = {CascadeType.PERSIST})
-    private Task task;
-
-    @OneToOne
-    private User assigned;
-
-
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private Date revisionDate;
 
+    @OneToOne(targetEntity = Task.class, cascade = {CascadeType.PERSIST})
+    private Task task;
+
+    /**
+     * Current task assigned at revision date
+     */
     @OneToOne
-    private User revisionActor;
+    private User assigned;
 
-    private TaskStatus taskStatus;
+    @Column(nullable = false)
+    private double originalEstimate;
 
-    public TaskRevision(User actor, Task t, double rtbd, User assignedUser, TaskStatus taskStatus) {
-        this.setRevisionDate(new Date());
-        this.setRemainsToBeDone(rtbd);
-        this.setRevisionActor(actor);
-        this.setAssigned(assignedUser);
-        this.setTask(t);
-        this.setTaskStatus(taskStatus);
-    }
+    @Column(nullable = false)
+    private double effortLeft;
+
+    @Column(nullable = false)
+    private double effortSpent;
+
+    @Column(nullable = false)
+    private double realEffort;
 
     public TaskRevision(){
     }
 
-    public Date getRevisionDate() {
-        return revisionDate;
-    }
 
-    public void setRevisionDate(Date revisionDate) {
+    public TaskRevision(Date revisionDate, Task task, User assigned, double originalEstimate, double effortLeft, double effortSpent, double realEffort) {
         this.revisionDate = revisionDate;
+        this.task = task;
+        this.assigned = assigned;
+        this.originalEstimate = originalEstimate;
+        this.effortLeft = effortLeft;
+        this.effortSpent = effortSpent;
+        this.realEffort = realEffort;
     }
 
     public Long getId() {
@@ -86,12 +86,12 @@ public class TaskRevision implements Serializable, Cloneable {
         this.id = id;
     }
 
-    public Double getRemainsToBeDone() {
-        return remainsToBeDone;
+    public Date getRevisionDate() {
+        return revisionDate;
     }
 
-    public void setRemainsToBeDone(Double remainsToBeDone) {
-        this.remainsToBeDone = remainsToBeDone;
+    public void setRevisionDate(Date revisionDate) {
+        this.revisionDate = revisionDate;
     }
 
     public Task getTask() {
@@ -102,14 +102,6 @@ public class TaskRevision implements Serializable, Cloneable {
         this.task = task;
     }
 
-    public User getRevisionActor() {
-        return revisionActor;
-    }
-
-    public void setRevisionActor(User revisionActor) {
-        this.revisionActor = revisionActor;
-    }
-
     public User getAssigned() {
         return assigned;
     }
@@ -118,24 +110,38 @@ public class TaskRevision implements Serializable, Cloneable {
         this.assigned = assigned;
     }
 
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
+    public double getOriginalEstimate() {
+        return originalEstimate;
     }
 
-    public void setTaskStatus(TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
+    public void setOriginalEstimate(double originalEstimate) {
+        this.originalEstimate = originalEstimate;
     }
-    @Override
-    protected TaskRevision clone()  {
 
-        final TaskRevision taskRevision = new TaskRevision();
-        taskRevision.setTask(this.getTask());
-        taskRevision.setAssigned(this.getAssigned());
-        taskRevision.setRevisionActor(this.getRevisionActor());
-        taskRevision.setRemainsToBeDone(this.getRemainsToBeDone());
-        taskRevision.setRevisionDate(this.getRevisionDate());
-        taskRevision.setTaskStatus(this.getTaskStatus());
-
-        return taskRevision;
+    public double getEffortLeft() {
+        return effortLeft;
     }
+
+    public void setEffortLeft(double effortLeft) {
+        this.effortLeft = effortLeft;
+    }
+
+    public double getEffortSpent() {
+        return effortSpent;
+    }
+
+    public void setEffortSpent(double effortSpent) {
+        this.effortSpent = effortSpent;
+    }
+
+    public double getRealEffort() {
+        return realEffort;
+    }
+
+    public void setRealEffort(double realEffort) {
+        this.realEffort = realEffort;
+    }
+
+
+
 }
