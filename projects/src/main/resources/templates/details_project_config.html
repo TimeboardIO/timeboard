@@ -200,7 +200,7 @@
                     onSelect: function(result, response) {
                         $('#members').find('tbody')
                             .append($('<tr id='+result.id+'>')
-                                .append($('<td>').append(result.email))
+                                .append($('<td>').append(result.screenName))
                                 .append($('<td>')
                                     .append($('<select id="mySelect" name="members['+result.id+']">'))
                                 )
