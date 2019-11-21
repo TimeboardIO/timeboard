@@ -132,7 +132,7 @@ public final class UserServiceImpl implements UserService {
             List<User> matchedUser = project.getMembers().stream()
                     .filter(projectMembership -> projectMembership
                             .getMember()
-                            .getName().startsWith(prefix))
+                            .getEmail().startsWith(prefix))
                     .map(projectMembership -> projectMembership.getMember())
                     .collect(Collectors.toList());
             return matchedUser;
@@ -189,7 +189,7 @@ public final class UserServiceImpl implements UserService {
     public User userProvisionning(String sub, String email) throws BusinessException {
 
         User user = this.findUserByEmail(email);
-        if (user == null) {
+        if (user == null || !user.getRemoteSubject().equals(sub)) {
             //Create user
             user = new User(null, null, email, new Date(), new Date());
             user.setRemoteSubject(sub);
