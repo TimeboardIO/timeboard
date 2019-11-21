@@ -54,13 +54,13 @@ public abstract class AbstractTask implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    @Column
+    @Column(nullable = false)
     private String origin;
 
-    @Column
+    @Column(nullable = true)
     private String remotePath;
 
-    @Column
+    @Column(nullable = true)
     private String remoteId;
 
 
@@ -128,7 +128,7 @@ public abstract class AbstractTask implements Serializable {
     }
 
     public void setOrigin(String origin) {
-        this.origin = origin;
+        this.origin = origin.toLowerCase();
     }
 
     public String getRemotePath() { return remotePath; }
