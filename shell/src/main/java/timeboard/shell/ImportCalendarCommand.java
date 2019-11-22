@@ -95,7 +95,7 @@ public class ImportCalendarCommand implements Action {
             this.name = file;
         }
 
-        User actor = userService.findUserByLogin("timeboard"); //TODO dirty
+        User actor = userService.findUserByEmail("timeboard"); //TODO dirty
         if(taskArg != null){
             //treat as imputation
 
@@ -104,7 +104,7 @@ public class ImportCalendarCommand implements Action {
             final List<AbstractTask> tasksByName = projectService.getTasksByName(taskArg);
             final List<User> userList= new ArrayList<>();
             for(String username : usernames){
-                userList.add(userService.findUserByLogin(username));
+                userList.add(userService.findUserByEmail(username));
             }
             calendarService.importCalendarAsImputationsFromICS(actor, file, tasksByName.get(0), userList, Double.parseDouble(imputationValue));
         }else{

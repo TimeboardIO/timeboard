@@ -34,15 +34,18 @@ import java.util.*;
 public interface ProjectService {
 
 
+    String ORIGIN_TIMEBOARD = "timeboard";
 
     /*
-    === Projects ===
-     */
+        === Projects ===
+         */
     Project createProject(User owner, String projectName) throws BusinessException;
 
     List<Project> listProjects(User owner);
 
     Project getProjectByID(User owner, Long projectID);
+
+    Project getProjectByIdWithAllMembers(Long projectId);
 
     Project getProjectByName(String projectArg);
 
@@ -77,24 +80,10 @@ public interface ProjectService {
      */
     List<TaskType> listTaskType();
 
-    Task createTask(User actor, Project project, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID);
 
-    Task createTask(User actor, Long projectID, String taskName, String taskComment, Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID);
-
-    Task createTaskWithMilestone(User actor,
-                                 Project project,
-                                 String taskName,
-                                 String taskComment,
-                                 Date startDate,
-                                 Date endDate,
-                                 double OE,
-                                 Long taskTypeID,
-                                 User assignedUser,
-                                 Milestone milestone
-    );
 
     Task createTask(User actor, Project project, String taskName, String taskComment,
-                    Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId);
+                    Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId, Milestone milestone);
 
     Task updateTask(User actor, Task task);
 
@@ -104,9 +93,6 @@ public interface ProjectService {
 
     void deleteTasks(User actor, List<Task> taskList);
 
-    Task addRevisionToTask(User actor, Task task, TaskRevision rev);
-
-    Task updateTaskWithMilestone(User actor, Task task, TaskRevision rev, Milestone milestone);
 
     Task getTaskByID(long id);
 
@@ -117,7 +103,7 @@ public interface ProjectService {
 
     List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
 
-    UpdatedTaskResult updateTaskRTBD(User actor, Long taskID, double rtbd);
+    UpdatedTaskResult updateTaskEffortLeft(User actor, Long taskID, double effortLeft);
 
     TaskType findTaskTypeByID(Long taskTypeID);
 
@@ -141,7 +127,7 @@ public interface ProjectService {
      */
     List<EffortSpent> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate);
 
-    List<EffortLeft> getEffortLeftByTask(long taskId);
+    List<EffortLeft> getTaskEffortLeftHistory(long taskId);
 
     UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double imputation);
 

@@ -1,8 +1,8 @@
-package timeboard.security;
+package timeboard.core.notification.model;
 
 /*-
  * #%L
- * webui
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,24 +26,15 @@ package timeboard.security;
  * #L%
  */
 
-public class LoginForm {
+import java.io.Serializable;
+import java.util.Date;
 
-    private String username;
-    private String password;
+public class TimeboardEvent  implements Serializable {
 
-    public String getUsername() {
-        return username;
+    private Date eventDate;
+
+    protected TimeboardEvent(Date date){
+        this.eventDate =  date;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

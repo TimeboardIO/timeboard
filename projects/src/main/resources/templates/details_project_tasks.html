@@ -11,34 +11,23 @@
 
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
-    <div class="ui grid form">
-
-        <div class="four wide column" id="masters">
-            <table class="ui unstackable table">
-                <thead>
-                <tr>
-                    <th>Task Name</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>
-                        <a class="ui button" th:href="@{/projects/tasks/config(projectID=${project.id})}">Create
-                            Task</a>
-
-                    </td>
-                </tr>
-                <tr th:each="task : ${tasks}">
-                    <td>
-                        <a th:href="@{/projects/tasks/config(projectID=${project.id}, taskID=${task.id})}"
-                           th:text="${task.name}"></a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+    <div class="ui grid">
+        <div class="four wide column">
+            <div class="ui vertical fluid tabular menu">
+                <a th:classappend="${task && task.taskID == null} ? active" class="ui button positive item" th:href="@{/projects/tasks/config(projectID=${project.id})}">Create Task</a>
+                <a th:classappend="${!task } ? active" class="item" th:href="@{/projects/tasks/validation(projectID=${project.id})}"><i style="font-style: italic;">Pending tasks</i></a>
+                <a th:each="t : ${tasks}" th:classappend="${task && t.id == task.taskID} ? active" class="item" th:href="@{/projects/tasks/config(projectID=${project.id}, taskID=${t.id})}"
+                   th:text="${t.name}" >
+                </a>
+            </div>
         </div>
-        <div class="twelve wide column" id="details" layout:fragment="task-config">
+        <div class="twelve wide stretched column">
+            <div th:if="${task}" class="ui segment" layout:fragment="task-config">
 
+            </div>
+            <div th:if="${!task}" class="ui segment" layout:fragment="task-validation">
+
+            </div>
         </div>
     </div>
 </div>

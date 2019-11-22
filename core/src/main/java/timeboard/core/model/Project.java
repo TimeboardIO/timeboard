@@ -151,4 +151,9 @@ public class Project implements Serializable {
     public void setMilestones(Set<Milestone> milestones) {
         this.milestones = milestones;
     }
+
+    public boolean isMember(User actor) {
+        //TODO check if actor is member of current project
+        return true;
+    }
 }

@@ -44,16 +44,17 @@ import java.util.Map;
         property = {
                 "osgi.http.whiteboard.filter.regex=/*",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)",
-                "timeboard.security.login-url=/login",
-                "timeboard.security.logout-url=/logout",
+                "oauth.login.url=https://timeboard.auth.eu-west-1.amazoncognito.com/login",
+                "oauth.clientid=changeme",
+                "oauth.redirect.uri=http://localhost:8181/signin",
                 "timeboard.security.newPassword-url=/newPassword"
-        }
+        },
+        configurationPid = {"timeboard.oauth"}
 )
-public class AuthSecurityFilter implements Filter {
+public class OAuthSecurityFilter implements Filter {
+
 
     private String loginURL;
-    private String logoutURL;
-    private String newPassword;
 
 
     @Reference
@@ -62,9 +63,11 @@ public class AuthSecurityFilter implements Filter {
     @Activate
     private void activate(Map<String, String> properties) {
         this.logService.log(LogService.LOG_INFO, "Security Filter is activated");
-        this.loginURL = properties.get("timeboard.security.login-url");
-        this.logoutURL = properties.get("timeboard.security.logout-url");
-        this.newPassword = properties.get("timeboard.security.newPassword-url");
+        this.loginURL = String.format(
+                properties.get("oauth.login.url") + "?response_type=code&client_id=%s&redirect_uri=%s",
+                properties.get("oauth.clientid"),
+                properties.get("oauth.redirect.uri")
+                );
     }
 
     @Override
@@ -77,8 +80,7 @@ public class AuthSecurityFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        boolean isLogin = req.getServletPath().equals(this.loginURL);
-        boolean isAskNewPassword = req.getServletPath().equals(this.newPassword);
+        boolean isLogin = req.getServletPath().equals(this.loginURL) || req.getServletPath().equals("/signin");
         boolean isStatic =
                 req.getServletPath().startsWith("/static")
                         || req.getServletPath().equals("/favicon.ico");
@@ -89,10 +91,10 @@ public class AuthSecurityFilter implements Filter {
         }
 
 
-        if (!isLogged && !isStatic && !isLogin && !isAskNewPassword) {
+        if (!isLogged && !isStatic && !isLogin) {
             String origin = ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString();
             origin = URLEncoder.encode(origin, StandardCharsets.UTF_8.toString());
-            res.sendRedirect(this.loginURL + "?origin=" + origin);
+            res.sendRedirect(this.loginURL);
         } else {
             chain.doFilter(request, response);
         }

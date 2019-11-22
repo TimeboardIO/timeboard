@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  S3Bucket:
+    Type: String
+    Description: S3 Buket name that host application
+  S3Object:
+    Type: String
+    Description: Application Object Key
+Resources:
+  ServiceRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "*"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "root"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action: "*"
+                Resource: "*"
+  DeploymentGroupName:
+    Type: 'AWS::CodeDeploy::DeploymentGroup'
+    Properties:
+      ApplicationName:
+        Ref: 'CodeDeployApplication'
+      Deployment:
+        Description: "Timeboard deployment"
+        Ec2TagFilters:
+          Key: 'APP'
+          Type: 'KEY_AND_VALUE'
+          Value: 'TIMEBOARD'
+        IgnoreApplicationStopFailures: true
+        Revision:
+          RevisionType: GitHub
+          GitHubLocation:
+            CommitId:
+              Ref: GithubCommitID
+            Repository:
+              Ref: GithubRepo
+      ServiceRoleArn:
+        Fn::GetAtt: [ ServiceRole, Arn ]
+  TwentyFivePercentAtATime:
+    Type: 'AWS::CodeDeploy::DeploymentConfig'
+    Properties:
+      MinimumHealthyHosts:
+        Type: "FLEET_PERCENT"
+        Value: 75
+  CodeDeployApplication:
+    Type: 'AWS::CodeDeploy::Application'
+    DependsOn:
+      - TwentyFivePercentAtATime
+  DeployPipeline:
+    Type: 'AWS::CodePipeline::Pipeline'
+    Properties:
+      Stages:
+        - Actions:
+            -
+              Name: Deploy
+              ActionTypeId:
+                Category: Deploy
+                Owner: AWS
+                Version: 1
+                Provider: CodeDeploy
+              Configuration:
+                ApplicationName:
+                  Ref: CodeDeployApplication
+                DeploymentGroupName:
+                  Ref: DeploymentGroupName
+              RunOrder: 1

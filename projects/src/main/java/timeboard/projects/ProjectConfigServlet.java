@@ -26,6 +26,8 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
@@ -48,10 +50,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -89,20 +89,24 @@ public class ProjectConfigServlet extends TimeboardServlet {
     @Reference
     public EncryptionService encryptionService;
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
         return ProjectConfigServlet.class.getClassLoader();
     }
 
 
-    private void prepareTemplateData(Project project, Map<String, Object> map) {
+    private void prepareTemplateData(Project project, Map<String, Object> map) throws JsonProcessingException {
 
         map.put("project", project);
         map.put("members", project.getMembers());
         map.put("roles", ProjectRole.values());
+        map.put("rolesForNewMember", OBJECT_MAPPER.writeValueAsString(ProjectRole.values()));
         map.put("exports", this.projectExportServices);
         map.put("imports", this.projectImportServices);
         map.put("tasks", this.projectService.listProjectTasks(project));
+
     }
 
 
@@ -111,9 +115,8 @@ public class ProjectConfigServlet extends TimeboardServlet {
         viewModel.setTemplate("projects:details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
-
-
+        Project project = this.projectService.getProjectByIdWithAllMembers(id);
+        
         Map<String, Object> map = new HashMap<>();
         prepareTemplateData(project, map);
         viewModel.getViewDatas().putAll(map);
@@ -126,7 +129,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        Project project = this.projectService.getProjectByIdWithAllMembers(id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
         project.setQuotation(Double.parseDouble(request.getParameter("projectQuotation")));

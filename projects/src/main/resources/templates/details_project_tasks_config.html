@@ -168,11 +168,11 @@
                     },
                     fields: {
                         results : 'items',
-                        title   : 'name',
+                        title   : 'screenName',
                         description : 'email'
                     },
                     onSelect: function(result, response) {
-                        $('.assigned').val(result.name);
+                        $('.assigned').val(result.screenName);
                         $('.taskAssigned').val(result.id);
                      },
                 minCharacters : 3
