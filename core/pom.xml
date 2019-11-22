@@ -128,7 +128,7 @@
                         <Export-Package>
                             timeboard.core.api.*,
                             timeboard.core.model,
-                            timeboard.core.observers,
+                            timeboard.core.notification,
                             io.reactivex.*,
                             org.reactivestreams.*
                         </Export-Package>

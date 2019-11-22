@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.notification.model;
 
 /*-
  * #%L
@@ -31,32 +31,32 @@ import java.util.List;
 
 public class EmailStructure {
 
-    private List<String> targetEmailList;
-    private List<String> targetCCEmailList;
+    private List<String> targetUserList;
+    private List<String> targetCCUserList;
     private String subject;
     private String message;
 
-    public EmailStructure(List<String> targetEmailList, List<String> targetCCEmailList, String subject, String message) {
-        this.targetEmailList = targetEmailList;
-        this.targetCCEmailList = targetCCEmailList;
+    public EmailStructure(List<String> targetUserList, List<String> targetCCUserList, String subject, String message) {
+        this.targetUserList = targetUserList;
+        this.targetCCUserList = targetCCUserList;
         this.subject = subject;
         this.message = message;
     }
 
-    public List<String> getTargetEmailList() {
-        return targetEmailList;
+    public List<String> getTargetUserList() {
+        return targetUserList;
     }
 
-    public void setTargetEmailList(List<String> targetEmailList) {
-        this.targetEmailList = targetEmailList;
+    public void setTargetUserList(List<String> targetUserList) {
+        this.targetUserList = targetUserList;
     }
 
-    public List<String> getTargetCCEmailList() {
-        return targetCCEmailList;
+    public List<String> getTargetCCUserList() {
+        return targetCCUserList;
     }
 
-    public void setTargetCCEmailList(List<String> targetCCEmailList) {
-        this.targetCCEmailList = targetCCEmailList;
+    public void setTargetCCUserList(List<String> targetCCUserList) {
+        this.targetCCUserList = targetCCUserList;
     }
 
     public String getSubject() {

@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.EmailService;
-import timeboard.core.model.EmailStructure;
+import timeboard.core.notification.model.EmailStructure;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -83,11 +83,11 @@ public class EmailServiceImpl implements EmailService {
         msg.setSubject(emailStructure.getSubject());
         msg.setFrom(new InternetAddress(fromEmail));
 
-        List<String> listTOEmailsWithoutDuplicate = emailStructure.getTargetEmailList().stream().distinct().collect(Collectors.toList());
+        List<String> listTOEmailsWithoutDuplicate = emailStructure.getTargetUserList().stream().distinct().collect(Collectors.toList());
         String targetTOEmails = StringUtils.join(listTOEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
 
-        List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCEmailList().stream().distinct().collect(Collectors.toList());
+        List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList().stream().distinct().collect(Collectors.toList());
         String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
 
