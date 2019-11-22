@@ -11,6 +11,9 @@ before_install:
 script:
   - mvn clean install -P full
   - mvn -f features/pom.xml install karaf:kar
+  - mkdir build
+  - cp features/target/features-1.0-SNAPSHOT.kar ./build/
+  - cp -r scripts/aws/ ./build/
 
 
 
@@ -18,7 +21,7 @@ deploy:
   - provider: s3
     access_key_id: "$AWS_ACCESS_KEY"
     secret_access_key: "$AWS_SECRET_KEY"
-    local_dir: "features/target"
+    local_dir: "build"
     bucket: "$AWS_BUCKET"
     region: eu-west-1
     skip_cleanup: true

@@ -1,0 +1,9 @@
+version: 0.0
+os: linux
+files:
+  - source: features-1.0-SNAPSHOT.kar
+    destination: /etc/karaf/apache-karaf-4.2.6/deploy
+  - source: org.ops4j.datasource-timeboard-core-ds.cfg
+    destination: /etc/karaf/apache-karaf-4.2.6/etc
+  - source: org.ops4j.pax.web.cfg
+    destination: /etc/karaf/apache-karaf-4.2.6/etc
