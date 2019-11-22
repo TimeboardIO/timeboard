@@ -96,7 +96,7 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
         String comment = request.getParameter("taskComments");
         if(comment == null) comment = "";
 
-        double oe = Double.parseDouble(request.getParameter("estimateWork"));
+        double oe = Double.parseDouble(request.getParameter("originalEstimate"));
         if(oe <= 0.0){
             MAPPER.writeValue(response.getWriter(), "Original original estimate must be positive ");
             return;

@@ -12,7 +12,7 @@ const updateTask = function(date, task, type, val){
 }
 
 const timesheetModel = {
-    newTask:  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", estimateWork:0, typeID:0 },
+    newTask:  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 },
     formError:"",
     week:0,
     year:0,
@@ -194,10 +194,10 @@ $(document).ready(function(){
                  this.newTask.taskComments = task.taskComments;
                  this.newTask.startDate = task.startDate;
                  this.newTask.endDate = task.endDate;
-                 this.newTask.estimateWork = task.estimateWork;
+                 this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
             }else{
-                 this.newTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", estimateWork:0, typeID:0 };
+                 this.newTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 };
             }
             $('.create-task.modal').modal({
                 onApprove : function($element){
