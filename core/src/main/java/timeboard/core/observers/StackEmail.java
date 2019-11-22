@@ -55,8 +55,6 @@ public class StackEmail {
     @Activate
     public void activate(){
 
-
-
         TimeboardSubjects.TASK_EVENTS
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
                 .buffer(10, TimeUnit.SECONDS)
