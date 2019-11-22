@@ -115,8 +115,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
-        List<EffortSpent> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(task.getId(), task.getStartDate(), task.getEndDate());
-        final EffortSpent[] lastEffortSpentSum = {new EffortSpent(task.getStartDate(), 0.0)};
+        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(task.getId(), task.getStartDate(), task.getEndDate());
+        final EffortHistory[] lastEffortSpentSum = {new EffortHistory(task.getStartDate(), 0.0)};
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -127,20 +127,20 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 .map(date -> effortSpentDB.stream()
                         .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effort -> {
-                            lastEffortSpentSum[0] = new EffortSpent(date, effort.getSumPreviousValue());
+                            lastEffortSpentSum[0] = new EffortHistory(date, effort.getValue());
                             return lastEffortSpentSum[0];
                         })
-                        .findFirst().orElse(new EffortSpent(date, lastEffortSpentSum[0].getSumPreviousValue())))
+                        .findFirst().orElse(new EffortHistory(date, lastEffortSpentSum[0].getValue())))
                 .collect(Collectors.toMap(
                         e -> e.getDate(),
-                        e -> e.getSumPreviousValue(),
+                        e -> e.getValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
         viewModel.getViewDatas().put("effortSpent", effortSpentMap.values());
 
         // Datas for effort estimate (Axis Y)
-        List<EffortLeft> effortLeftDB = this.projectService.getTaskEffortLeftHistory(task.getId());
-        final EffortEstimate[] lastEffortEstimate = {new EffortEstimate(task.getStartDate(), task.getOriginalEstimate())};
+        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(task.getId());
+        final EffortHistory[] lastEffortEstimate = {new EffortHistory(task.getStartDate(), task.getOriginalEstimate())};
         Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -151,13 +151,13 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 .map(date -> effortLeftDB.stream()
                         .filter(el -> new SimpleDateFormat(formatDateToDisplay).format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effortLeft -> {
-                            lastEffortEstimate[0] = new EffortEstimate(date, effortLeft.getEffortLeftValue() + effortSpentMap.get(date));
+                            lastEffortEstimate[0] = new EffortHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
                             return lastEffortEstimate[0];
                         })
-                        .findFirst().orElse(new EffortEstimate(date,lastEffortEstimate[0].getEffortEstimateValue())))
+                        .findFirst().orElse(new EffortHistory(date, lastEffortEstimate[0].getValue())))
                 .collect(Collectors.toMap(
                         e -> e.getDate(),
-                        e -> e.getEffortEstimateValue(),
+                        e -> e.getValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
         viewModel.getViewDatas().put("reEstimate", effortEstimateMap.values());
