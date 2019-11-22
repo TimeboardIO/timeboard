@@ -24,9 +24,9 @@
                 <div class="content">
                     <div class="ui mini statistic">
                         <div class="value"
-                             th:text="${#numbers.formatDecimal(dashboard.estimateWork,1,1,'COMMA')}"></div>
+                             th:text="${#numbers.formatDecimal(dashboard.originalEstimate,1,1,'COMMA')}"></div>
                         <div class="label">
-                            Estimate Work
+                            Original Estimate
                         </div>
                     </div>
 
@@ -39,18 +39,18 @@
 
                     <div class="ui mini statistic">
                         <div class="value"
-                             th:text="${#numbers.formatDecimal(dashboard.remainToBeDone,1,1,'COMMA')}"></div>
+                             th:text="${#numbers.formatDecimal(dashboard.effortLeft,1,1,'COMMA')}"></div>
                         <div class="label">
-                            Remain To Be Done
+                            Effort Left
                         </div>
                     </div>
 
 
                     <div class="ui mini statistic">
                         <div class="value"
-                             th:text="${#numbers.formatDecimal(dashboard.reEstimateWork,1,1,'COMMA')}"></div>
+                             th:text="${#numbers.formatDecimal(dashboard.realEffort,1,1,'COMMA')}"></div>
                         <div class="label">
-                            ReEstimate Work
+                            Real Effort
                         </div>
                     </div>
                 </div>
@@ -64,10 +64,10 @@
       /*<![CDATA[*/
 
          var qt = /*[[${dashboard.quotation}]]*/ 'QT';
-         var oe = /*[[${dashboard.estimateWork}]]*/ 'EW';
-         var re = /*[[${dashboard.reEstimateWork}]]*/ 'RE';
+         var oe = /*[[${dashboard.originalEstimate}]]*/ 'OE';
+         var re = /*[[${dashboard.realEffort}]]*/ 'RE';
          var es = /*[[${dashboard.effortSpent}]]*/ 'ES';
-         var el = /*[[${dashboard.remainToBeDone}]]*/ 'EL';
+         var el = /*[[${dashboard.effortLeft}]]*/ 'EL';
 
 
         const data = {
@@ -80,25 +80,25 @@
                 borderWidth: 3
             },
             {
-                label: 'Estimated Work',
+                label: 'Original Estimate',
                 data: [0, oe,0,0],
                 backgroundColor: '#ff6384',
                 borderWidth: 3
             },
              {
-                label: 'REestimated Work',
+                label: 'Real Effort',
                 data: [0, 0,re,0],
                 backgroundColor: '#36a2eb',
                 borderWidth: 3
             },
              {
-                label: 'ES',
+                label: 'Effort Spent',
                 data: [0, 0, 0,es],
                 backgroundColor: '#cc65fe',
                 borderWidth: 3
             },
              {
-                label: 'EL',
+                label: 'Effort Left',
                 data: [0, 0, 0, el],
                 backgroundColor: '#ffce56',
                 borderWidth: 3
