@@ -1,5 +1,5 @@
 /**
-* type = imputation | rtbd
+* type = imputation | effortLeft
 */
 const updateTask = function(date, task, type, val){
 
@@ -113,10 +113,10 @@ $(document).ready(function(){
             rules: [
             { type: "empty", prompt : 'Please enter task end date'  } ]
           },
-          taskEstimateWork: {
-            identifier: 'taskEstimateWork',
-            rules: [ { type   : 'empty', prompt : 'Please enter task estimate work in days'  },
-             { type   : 'number', prompt : 'Please enter task a number estimate work in days'  } ]
+          taskOriginalEstimate: {
+            identifier: 'taskOriginalEstimate',
+            rules: [ { type   : 'empty', prompt : 'Please enter task original estimate in days'  },
+             { type   : 'number', prompt : 'Please enter task a number original estimate in days'  } ]
           },
           taskTypeID: {
             identifier: 'taskTypeID',
@@ -139,17 +139,17 @@ $(document).ready(function(){
                 app.validated=true;
             });
         },
-        triggerUpdateRTBD: function(event){
+        triggerUpdateEffortLeft: function(event){
 
             $(event.target).parent().addClass('left icon loading').removeClass('error');
-            const taskID = $(event.target).attr('data-task-rtbd');
+            const taskID = $(event.target).attr('data-task-effortLeft');
             const val = $(event.target).val();
-            updateTask(null, taskID, 'rtbd', val)
+            updateTask(null, taskID, 'effortLeft', val)
             .then(function(updateTask){
                     app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
-                    app.projects[updateTask.projectID].tasks[updateTask.taskID].reEstimateWork = updateTask.reEstimateWork;
-                    app.projects[updateTask.projectID].tasks[updateTask.taskID].estimateWork = updateTask.estimateWork;
-                    app.projects[updateTask.projectID].tasks[updateTask.taskID].remainToBeDone = updateTask.remainToBeDone;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
                     $(event.target).parent().removeClass('left icon loading');
                 });
         },
@@ -174,9 +174,9 @@ $(document).ready(function(){
                 updateTask(date, taskID, 'imputation', newval)
                 .then(function(updateTask){
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
-                        app.projects[updateTask.projectID].tasks[updateTask.taskID].reEstimateWork = updateTask.reEstimateWork;
-                        app.projects[updateTask.projectID].tasks[updateTask.taskID].estimateWork = updateTask.estimateWork;
-                        app.projects[updateTask.projectID].tasks[updateTask.taskID].remainToBeDone = updateTask.remainToBeDone;
+                        app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
+                        app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
+                        app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
                         app.imputations[date][taskID] = newval;
                         $(event.target).parent().removeClass('left icon loading');
                     });

@@ -30,15 +30,15 @@ import java.io.Serializable;
 
 public final class ProjectDashboard implements Serializable {
 
-    private final double estimateWork;
-    private final double remainToBeDone;
+    private final double originalEstimate;
+    private final double effortLeft;
     private final double effortSpent;
     private final double quotation;
 
-    public ProjectDashboard(double quotation, double estimateWork, double remainToBeDone, double effortSpent) {
+    public ProjectDashboard(double quotation, double originalEstimate, double effortLeft, double effortSpent) {
         this.quotation = quotation;
-        this.estimateWork = estimateWork;
-        this.remainToBeDone = remainToBeDone;
+        this.originalEstimate = originalEstimate;
+        this.effortLeft = effortLeft;
         this.effortSpent = effortSpent;
     }
 
@@ -46,16 +46,16 @@ public final class ProjectDashboard implements Serializable {
         return quotation;
     }
 
-    public final double getEstimateWork() {
-        return estimateWork;
+    public final double getOriginalEstimate() {
+        return originalEstimate;
     }
 
-    public final double getReEstimateWork() {
-        return getEffortSpent() + getRemainToBeDone();
+    public final double getRealEffort() {
+        return getEffortSpent() + getEffortLeft();
     }
 
-    public final double getRemainToBeDone() {
-        return remainToBeDone;
+    public final double getEffortLeft() {
+        return effortLeft;
     }
 
     public final double getEffortSpent() {

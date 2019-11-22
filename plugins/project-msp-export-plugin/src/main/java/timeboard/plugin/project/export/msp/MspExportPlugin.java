@@ -71,7 +71,7 @@ public class MspExportPlugin implements ProjectExportService {
             mspTask.setName(task.getName());
             mspTask.setStart(task.getStartDate());
             mspTask.setStop(task.getEndDate());
-            mspTask.setBaselineCost(task.getEffortLeft());
+            mspTask.setBaselineCost(task.getOriginalEstimate());
         });
 
         writer.write(projectFile, output);
