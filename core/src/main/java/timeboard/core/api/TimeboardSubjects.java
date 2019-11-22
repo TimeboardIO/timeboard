@@ -29,7 +29,7 @@ package timeboard.core.api;
 import io.reactivex.subjects.PublishSubject;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
-import timeboard.core.notification.model.TaskEvent;
+import timeboard.core.notification.model.event.TaskEvent;
 
 import java.util.Map;
 

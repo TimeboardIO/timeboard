@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.notification.model.event;
 
 /*-
  * #%L
@@ -26,44 +26,9 @@ package timeboard.core.notification.model;
  * #L%
  */
 
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
+public enum TimeboardEventType {
 
-import java.util.Date;
-
-public class TaskEvent extends TimeboardEvent {
-    private Task task;
-    private User actor;
-    private TimeboardEventType eventType;
-
-    public TaskEvent(TimeboardEventType eventType, Task task, User actor) {
-        super(new Date());
-        this.eventType = eventType;
-        this.task = task;
-        this.actor = actor;
-    }
-
-    public TimeboardEventType getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(TimeboardEventType eventType) {
-        this.eventType = eventType;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
-    public User getActor() {
-        return actor;
-    }
-
-    public void setActor(User actor) {
-        this.actor = actor;
-    }
+    CREATE,
+    UPDATE,
+    DELETE
 }

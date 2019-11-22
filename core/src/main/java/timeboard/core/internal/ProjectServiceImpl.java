@@ -39,8 +39,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
-import timeboard.core.notification.model.TaskEvent;
-import timeboard.core.notification.model.TimeboardEventType;
+import timeboard.core.notification.model.event.TaskEvent;
+import timeboard.core.notification.model.event.TimeboardEventType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
