@@ -13,7 +13,7 @@ script:
   - mvn -f features/pom.xml install karaf:kar
   - mkdir build
   - cp features/target/features-1.0-SNAPSHOT.kar ./build/
-  - cp -r scripts/aws/ ./build/
+  - cp -r scripts/aws/* ./build
 
 
 
