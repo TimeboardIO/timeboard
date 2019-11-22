@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.notification.model.event;
 
 /*-
  * #%L
@@ -30,6 +30,10 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class TimeboardEvent  implements Serializable {
+
+    public Date getEventDate() {
+        return eventDate;
+    }
 
     private Date eventDate;
 

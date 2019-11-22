@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.notification.model.event;
 
 /*-
  * #%L
@@ -26,21 +26,32 @@ package timeboard.core.notification.model;
  * #L%
  */
 
+import timeboard.core.model.Project;
+import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
+import timeboard.core.notification.model.TimeboardEventType;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 public class TaskEvent extends TimeboardEvent {
     private Task task;
     private User actor;
     private TimeboardEventType eventType;
 
+    private List<User> usersToNotify;
+    private List<User> usersToInform;
+
     public TaskEvent(TimeboardEventType eventType, Task task, User actor) {
         super(new Date());
         this.eventType = eventType;
         this.task = task;
         this.actor = actor;
+
+        this.constructUsersList();
     }
 
     public TimeboardEventType getEventType() {
@@ -49,6 +60,14 @@ public class TaskEvent extends TimeboardEvent {
 
     public void setEventType(TimeboardEventType eventType) {
         this.eventType = eventType;
+    }
+
+    public List<User> getUsersToNotify() {
+        return usersToNotify;
+    }
+
+    public List<User> getUsersToInform() {
+        return usersToInform;
     }
 
     public Task getTask() {
@@ -66,4 +85,22 @@ public class TaskEvent extends TimeboardEvent {
     public void setActor(User actor) {
         this.actor = actor;
     }
+
+
+
+    private void constructUsersList(){
+
+        usersToNotify = new ArrayList<>();
+        Project project = task.getProject();
+        User assignedUser = task.getAssigned();
+
+        project.getMembers()
+                .stream()
+                .filter(member -> member.getRole() == ProjectRole.OWNER)
+                .forEach(member -> usersToNotify.add(member.getMember()));
+
+        usersToInform = Arrays.asList(assignedUser, actor);
+
+    }
+
 }
