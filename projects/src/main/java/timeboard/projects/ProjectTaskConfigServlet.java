@@ -136,7 +136,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                         e -> e.getSumPreviousValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
-        viewModel.getViewDatas().put("effortSpent", effortSpentMap.values());
+        viewModel.getViewDatas().put("effortSpentDatasForChart", effortSpentMap.values());
 
         // Datas for effort estimate (Axis Y)
         List<EffortLeft> effortLeftDB = this.projectService.getTaskEffortLeftHistory(task.getId());
@@ -160,7 +160,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                         e -> e.getEffortEstimateValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
-        viewModel.getViewDatas().put("realEffort", effortEstimateMap.values());
+        viewModel.getViewDatas().put("realEffortDatasForChart", effortEstimateMap.values());
     }
 
     @Override

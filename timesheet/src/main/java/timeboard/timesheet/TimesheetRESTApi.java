@@ -122,7 +122,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
             this.projectService.listTasksByProject(actor, ds, de).stream().forEach(projectTasks -> {
                 List<TaskWrapper> tasks = new ArrayList<>();
 
-                projectTasks.getTaskRevisions().stream().forEach(task -> {
+                projectTasks.getTasks().stream().forEach(task -> {
                     tasks.add(new TaskWrapper(
                             task.getId(),
                             task.getName(),
@@ -132,7 +132,9 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getOriginalEstimate(),
                             task.getRealEffort(),
                             task.getStartDate(),
-                            task.getEndDate(), task.getTaskStatus().name(), task.getTaskType().getId())
+                            task.getEndDate(),
+                            task.getTaskStatus().name(),
+                            task.getTaskType().getId())
                             );
 
                     days.forEach(dateWrapper -> {
