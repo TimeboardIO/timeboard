@@ -74,9 +74,9 @@ public class SearchUsersService extends HttpServlet {
         List<User> users = new ArrayList<>();
 
         if (projectID != null) {
-            users.addAll(this.userService.searchUserByName(query, projectID));
+            users.addAll(this.userService.searchUserByEmail(query, projectID));
         } else {
-            users.addAll(this.userService.searchUserByName(query));
+            users.addAll(this.userService.searchUserByEmail(query));
         }
         SearchResult searchResult = new SearchResult(users.size(), users);
 

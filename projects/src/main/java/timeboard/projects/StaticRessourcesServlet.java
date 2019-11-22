@@ -1,8 +1,8 @@
-package timeboard.core.model;
+package timeboard.projects;
 
 /*-
  * #%L
- * core
+ * webui
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,22 +26,19 @@ package timeboard.core.model;
  * #L%
  */
 
+import org.osgi.service.component.annotations.Component;
 
-public enum TaskStatus {
-    PENDING("En attente"),
-    IN_PROGESS("En cours"),
-    DONE("Réalisée"),
-    REFUSED("Refusée");
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServlet;
 
-    public final String label;
 
-    private TaskStatus(String label) {
-        this.label = label;
-    }
+@Component(
+        service = Servlet.class,
+        property = {
+                "osgi.http.whiteboard.resource.pattern=/projects/static/*",
+                "osgi.http.whiteboard.resource.prefix=/static"}
+)
+public class StaticRessourcesServlet extends HttpServlet {
 
-    String getLabel(){
-        return this.label;
-    }
+
 }
-
-

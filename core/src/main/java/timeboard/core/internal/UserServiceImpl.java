@@ -26,21 +26,21 @@ package timeboard.core.internal;
  * #L%
  */
 
-import org.mindrot.jbcrypt.BCrypt;
-import org.osgi.service.log.LogService;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.exceptions.UserException;
-import timeboard.core.api.exceptions.WrongPasswordException;
-import timeboard.core.model.Project;
-import timeboard.core.model.User;
 import org.apache.aries.jpa.template.JpaTemplate;
+import org.mindrot.jbcrypt.BCrypt;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
+import org.osgi.service.log.LogService;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Project;
+import timeboard.core.model.User;
 
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,7 +61,7 @@ public final class UserServiceImpl implements UserService {
     @Reference
     private LogService logService;
 
-    public UserServiceImpl(){
+    public UserServiceImpl() {
 
     }
 
@@ -71,22 +71,9 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(final User user) throws BusinessException {
-
-        user.setPassword(this.hashPassword(user.getPassword()));
-
-        return this.jpa.txExpr(entityManager -> {
-            entityManager.persist(user);
-            this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
-            return user;
-        });
-    }
-
-    @Override
-    public List<User> createUsers(List<User> users) throws BusinessException {
+    public List<User> createUsers(List<User> users) {
         return this.jpa.txExpr(entityManager -> {
             users.forEach(user -> {
-                user.setPassword(this.hashPassword(user.getPassword()));
                 entityManager.persist(user);
                 this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
             });
@@ -95,74 +82,43 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User user) throws UserException {
-        User u = this.findUserByID(user.getId());
-        if(u == null){
-            throw new UserException("User does not exist.");
-        } else {
-            return this.jpa.txExpr(entityManager -> {
+    public User createUser(final User user) throws BusinessException {
+
+
+        return this.jpa.txExpr(entityManager -> {
+            entityManager.persist(user);
+            this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
+            entityManager.flush();
+            return user;
+        });
+    }
+
+
+    @Override
+    public User updateUser(User user) {
+        return this.jpa.txExpr(entityManager -> {
+            User u = this.findUserByID(user.getId());
+            if (u != null) {
                 u.setFirstName(user.getFirstName());
                 u.setName(user.getName());
-                u.setLogin(user.getLogin());
                 u.setEmail(user.getEmail());
                 u.setExternalIDs(user.getExternalIDs());
-
-                entityManager.persist(u);
-                this.logService.log(LogService.LOG_INFO, "User "+ user.getLogin()+" updated.");
-                return user;
-            });
-        }
-    }
-
-    @Override
-    public void updateUserPassword(Long userID, String oldPassword, String newPassword) throws WrongPasswordException, UserException {
-
-        User user = this.findUserByID(userID);
-        if(user!=null && this.checkPassword(oldPassword, user.getPassword())){
-            this.jpa.txExpr(entityManager -> {
-                User u = entityManager.find(User.class, userID);
-
-                u.setPassword(this.hashPassword(newPassword));
-
-                entityManager.persist(u);
-                this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + " successfully change his password.");
-                return u;
-            });
-        }else if(user != null){
-            throw new WrongPasswordException();
-        }else{
-            throw new UserException("User does not exist.");
-        }
+            }
+            entityManager.flush();
+            this.logService.log(LogService.LOG_INFO, "User " + user.getEmail() + " updated.");
+            return user;
+        });
 
     }
 
-    @Override
-    public void updateUserGeneratedPassword(Long userID, String newPassword) throws UserException {
-
-        User user = this.findUserByID(userID);
-        if(user!=null){
-            this.jpa.txExpr(entityManager -> {
-                User u = entityManager.find(User.class, userID);
-
-                u.setPassword(this.hashPassword(newPassword));
-
-                entityManager.persist(u);
-                this.logService.log(LogService.LOG_INFO, "User " + u.getLogin() + "'s password has successfully been generated.");
-                return u;
-            });
-        }else {
-            throw new UserException("User does not exist.");
-        }
-
-    }
 
     @Override
-    public List<User> searchUserByName(final String prefix) {
+    public List<User> searchUserByEmail(final String prefix) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<User> q = entityManager
                     .createQuery(
                             "select u from User u "
-                                    + "where u.name LIKE CONCAT('%',:prefix,'%')",
+                                    + "where u.email LIKE CONCAT('%',:prefix,'%')",
                             User.class);
             q.setParameter("prefix", prefix);
             return q.getResultList();
@@ -170,50 +126,23 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchUserByName(final String prefix, final Long pID) {
+    public List<User> searchUserByEmail(final String prefix, final Long pID) {
         return this.jpa.txExpr(entityManager -> {
             Project project = entityManager.find(Project.class, pID);
             List<User> matchedUser = project.getMembers().stream()
                     .filter(projectMembership -> projectMembership
                             .getMember()
-                            .getName().startsWith(prefix))
+                            .getEmail().startsWith(prefix))
                     .map(projectMembership -> projectMembership.getMember())
                     .collect(Collectors.toList());
             return matchedUser;
         });
     }
 
-    @Override
-    public User autenticateUser(final String login, final String password) {
-        User u = this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager
-                    .createQuery("select u from User u "
-                            + "where u.login = :login ", User.class);
-            q.setParameter("login", login);
-            return q.getSingleResult();
-        });
-
-        if(!this.checkPassword(password, u.getPassword())) {
-            u = null;
-        }
-
-        return u;
-    }
-
-    @Override
-    public User findUserByLogin(final String login) {
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager
-                    .createQuery("select u from User u "
-                            + "where u.login = :login", User.class);
-            q.setParameter("login", login);
-            return q.getSingleResult();
-        });
-    }
 
     @Override
     public User findUserByID(final Long userID) {
-        if(userID == null){
+        if (userID == null) {
             return null;
         }
         return jpa.txExpr(entityManager -> entityManager
@@ -221,10 +150,28 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findUserByEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        return jpa.txExpr(entityManager -> {
+            TypedQuery<User> q = entityManager.createQuery("from User u where u.email=:email", User.class);
+            q.setParameter("email", email);
+            User user;
+            try {
+                user = q.getSingleResult();
+            } catch (NoResultException e) {
+                user = null;
+            }
+            return user;
+        });
+    }
+
+    @Override
     public User findUserByExternalID(String origin, String userExternalID) {
         User u;
         try {
-            u =  this.jpa.txExpr(entityManager -> {
+            u = this.jpa.txExpr(entityManager -> {
                 Query q = entityManager // MYSQL native for JSON queries
                         .createNativeQuery("select * from User "
                                 + "where JSON_EXTRACT(externalIDs, '$." + origin + "')" +
@@ -232,17 +179,30 @@ public final class UserServiceImpl implements UserService {
                 q.setParameter(1, userExternalID);
                 return (User) q.getSingleResult();
             });
-        }catch (javax.persistence.NoResultException e){
+        } catch (javax.persistence.NoResultException e) {
             u = null;
         }
         return u;
     }
 
-    private String hashPassword(String password){
-       return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    @Override
+    public User userProvisionning(String sub, String email) throws BusinessException {
+
+        User user = this.findUserByEmail(email);
+        if (user == null || !user.getRemoteSubject().equals(sub)) {
+            //Create user
+            user = new User(null, null, email, new Date(), new Date());
+            user.setRemoteSubject(sub);
+            user = this.createUser(user);
+        }
+        return user;
     }
 
-    private boolean checkPassword(String password, String hash){
-       return BCrypt.checkpw(password, hash);
+    private String hashPassword(String password) {
+        return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+
+    private boolean checkPassword(String password, String hash) {
+        return BCrypt.checkpw(password, hash);
     }
 }

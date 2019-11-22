@@ -43,9 +43,6 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(nullable = false, unique = true, length = 50)
-    private String login;
-
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
     private Date accountCreationTime;
@@ -54,17 +51,17 @@ public class User implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date beginWorkDate;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = false)
     private String email;
 
-    @Column(nullable = false)
-    private String password;
+    @Column(nullable = true, unique = true)
+    private String remoteSubject;
 
     @Column(nullable = false)
     private boolean imputationFutur = false;
@@ -72,8 +69,6 @@ public class User implements Serializable {
     @Column(nullable = false)
     private boolean validateOwnImputation = false;
 
-    @Column(nullable = true)
-    private String matriculeID;
 
     @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToMapStringConverter.class)
@@ -86,10 +81,9 @@ public class User implements Serializable {
     }
 
 
-    public User(final String login, final String password, final String name, final String firstName,
+    public User(final String name, final String firstName,
                 final String email, final Date accountCreationTime, final Date beginWorkDate) {
-        this.login = login;
-        this.password = password;
+
         this.name = name;
         this.firstName = firstName;
         this.email = email;
@@ -106,12 +100,12 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getLogin() {
-        return login;
+    public String getRemoteSubject() {
+        return remoteSubject;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setRemoteSubject(String remoteSubject) {
+        this.remoteSubject = remoteSubject;
     }
 
     public Date getAccountCreationTime() {
@@ -154,13 +148,6 @@ public class User implements Serializable {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public boolean isImputationFutur() {
         return imputationFutur;
@@ -179,13 +166,14 @@ public class User implements Serializable {
         this.validateOwnImputation = validateOwnImputation;
     }
 
-    public String getMatriculeID() {
-        return matriculeID;
+    @Transient
+    public String getScreenName(){
+        if(this.getFirstName() == null || this.getName() == null){
+            return this.getEmail();
+        }
+        return this.getFirstName()+" "+this.getName();
     }
 
-    public void setMatriculeID(String matriculeID) {
-        this.matriculeID = matriculeID;
-    }
 
     public Map<String, String> getExternalIDs() {
         return externalIDs;

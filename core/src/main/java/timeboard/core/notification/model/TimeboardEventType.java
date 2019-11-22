@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.notification.model;
 
 /*-
  * #%L
@@ -26,22 +26,8 @@ package timeboard.core.model;
  * #L%
  */
 
+public enum TimeboardEventType {
 
-public enum TaskStatus {
-    PENDING("En attente"),
-    IN_PROGESS("En cours"),
-    DONE("Réalisée"),
-    REFUSED("Refusée");
-
-    public final String label;
-
-    private TaskStatus(String label) {
-        this.label = label;
-    }
-
-    String getLabel(){
-        return this.label;
-    }
+    CREATE,
+    UPDATE
 }
-
-

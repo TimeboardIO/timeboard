@@ -36,19 +36,19 @@ import java.util.*;
 @PrimaryKeyJoinColumn(name = "id")
 public class Task extends AbstractTask implements Serializable {
 
-    @OneToOne(targetEntity = TaskRevision.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private TaskRevision latestRevision;
+
 
     @OneToMany(targetEntity = TaskRevision.class, mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("revisionDate desc")
     private List<TaskRevision> revisions;
 
     @Column(nullable = false)
-    private double estimateWork;
+    private double originalEstimate;
 
-    /**
-     * Task creation origin
-     */
+    @Column(nullable = false)
+    private double effortLeft;
+
+    @Column(nullable = false)
+    private TaskStatus taskStatus;
 
     @OneToOne(targetEntity = TaskType.class)
     private TaskType taskType;
@@ -56,8 +56,11 @@ public class Task extends AbstractTask implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER, optional = true)
     private Milestone milestone;
+
+    @OneToOne
+    private User assigned;
 
 
     public Task() {
@@ -66,23 +69,33 @@ public class Task extends AbstractTask implements Serializable {
     }
 
 
-    public TaskRevision getLatestRevision() {
-        return latestRevision;
+    public double getOriginalEstimate() {
+        return originalEstimate;
     }
 
-    public void setLatestRevision(TaskRevision latestRevision) {
-        this.latestRevision = latestRevision;
+    public void setOriginalEstimate(double originalEstimate) {
+        this.originalEstimate = originalEstimate;
     }
 
-    public double getEstimateWork() {
-        return estimateWork;
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
     }
 
-    public void setEstimateWork(double estimateWork) {
-        this.estimateWork = estimateWork;
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
+    public User getAssigned() {
+        return assigned;
+    }
 
+    public void setAssigned(User assigned) {
+        this.assigned = assigned;
+    }
+
+    public void setEffortLeft(double effortLeft) {
+        this.effortLeft = effortLeft;
+    }
 
     public Project getProject() {
         return project;
@@ -99,35 +112,11 @@ public class Task extends AbstractTask implements Serializable {
     public void setMilestone(Milestone milestone) {
         this.milestone = milestone;
     }
-
-    /**
-     * EL.
-     *
-     * @return EL
-     */
-    @Transient
-    public double getRemainsToBeDone() {
-        if(this.getLatestRevision() != null) {
-            return this.getLatestRevision().getRemainsToBeDone();
-        }else{
-            return 0;
-        }
+    
+    public double getEffortLeft() {
+        return this.effortLeft;
     }
-
-    @Transient
-    public void setRemainsToBeDone(final User actor, double rtbd) {
-        TaskRevision taskRevision = this.getLatestRevision().clone();
-        taskRevision.setRemainsToBeDone(rtbd);
-        taskRevision.setRevisionDate(new Date());
-        taskRevision.setRevisionActor(actor);
-        this.setLatestRevision(taskRevision);
-        this.revisions.add(taskRevision);
-    }
-
-    @Transient
-    public void updateCurrentRemainsToBeDone(final User actor, double rtbd) {
-        this.getLatestRevision().setRemainsToBeDone(rtbd);
-    }
+  
 
     public TaskType getTaskType() {
         return taskType;
@@ -139,29 +128,31 @@ public class Task extends AbstractTask implements Serializable {
 
 
     /**
-     * RE.
+     * Real Effort = EffortSpent + EffortLeft
      *
-     * @return RE
+     * @return Real Effort
      */
     @Transient
-    public double getReEstimateWork() {
-        return this.getEffortSpent() + this.getRemainsToBeDone();
+    public double getRealEffort() {
+        return this.getEffortSpent() + this.getEffortLeft();
     }
 
     /**
-     * ES.
+     * Effort Spent
      *
-     * @return ES
+     * @return Effort Spent
      */
     @Transient
     public double getEffortSpent() {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
     }
 
+    @Deprecated
     public List<TaskRevision> getRevisions() {
         return revisions;
     }
 
+    @Deprecated
     public void setRevisions(List<TaskRevision> revisions) {
         this.revisions = revisions;
     }

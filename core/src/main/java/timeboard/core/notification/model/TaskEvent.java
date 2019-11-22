@@ -1,8 +1,8 @@
-package timeboard.security.api;
+package timeboard.core.notification.model;
 
 /*-
  * #%L
- * security
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,19 +26,44 @@ package timeboard.security.api;
  * #L%
  */
 
+import timeboard.core.model.Task;
+import timeboard.core.model.User;
 
-import javax.mail.MessagingException;
+import java.util.Date;
 
-public interface EmailService {
+public class TaskEvent extends TimeboardEvent {
+    private Task task;
+    private User actor;
+    private TimeboardEventType eventType;
 
-    /**
-     * Send email to a target email with subject and message
-     *
-     * @param targetEmail target email
-     * @param subject subject
-     * @param message message
-     * @throws MessagingException message not sent
-     */
-    void sendMessage(String targetEmail, String subject, String message) throws MessagingException;
+    public TaskEvent(TimeboardEventType eventType, Task task, User actor) {
+        super(new Date());
+        this.eventType = eventType;
+        this.task = task;
+        this.actor = actor;
+    }
 
+    public TimeboardEventType getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(TimeboardEventType eventType) {
+        this.eventType = eventType;
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    public void setTask(Task task) {
+        this.task = task;
+    }
+
+    public User getActor() {
+        return actor;
+    }
+
+    public void setActor(User actor) {
+        this.actor = actor;
+    }
 }

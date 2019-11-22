@@ -51,23 +51,18 @@ public class UserLoader {
         for (int i = 0; i < nbUsers; i++) {
             User u = new User();
             u.setName("timeboard" + i);
-            u.setPassword("timeboard" + i);
             u.setEmail("user" + i + "@timeboard.com");
             u.setImputationFutur(true);
             u.setBeginWorkDate(new Date());
             u.setFirstName("User" + i);
-            u.setLogin("timeboard" + i);
             u.setAccountCreationTime(new Date());
             usersToSave.add(u);
             System.out.println("Stage user : "+u.getName());
         }
 
-        try {
             userSaved = this.userService.createUsers(usersToSave);
             System.out.println("Save "+usersToSave.size()+" users");
-        } catch (BusinessException e) {
-            e.printStackTrace();
-        }
+
 
         return userSaved;
 

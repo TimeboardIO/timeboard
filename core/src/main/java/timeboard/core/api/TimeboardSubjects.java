@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -26,22 +26,19 @@ package timeboard.core.model;
  * #L%
  */
 
+import io.reactivex.subjects.PublishSubject;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
+import timeboard.core.model.User;
+import timeboard.core.notification.model.TaskEvent;
 
-public enum TaskStatus {
-    PENDING("En attente"),
-    IN_PROGESS("En cours"),
-    DONE("Réalisée"),
-    REFUSED("Refusée");
+import java.util.Map;
 
-    public final String label;
+public class TimeboardSubjects {
 
-    private TaskStatus(String label) {
-        this.label = label;
-    }
+    public static PublishSubject<TaskEvent> TASK_EVENTS = PublishSubject.create();
 
-    String getLabel(){
-        return this.label;
-    }
+    public static PublishSubject<Task> CREATE_TASK = PublishSubject.create();
+    public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
+
 }
-
-
