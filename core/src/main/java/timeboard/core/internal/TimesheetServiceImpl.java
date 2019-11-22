@@ -105,7 +105,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
             for(int i=1; i<=5; i++) {
 
-                TypedQuery<Double> q = entityManager.createQuery("select sum(value) from Imputation i where i.task.latestRevision.assigned = :user and i.day = :day ", Double.class);
+                TypedQuery<Double> q = entityManager.createQuery("select sum(value) from Imputation i where i.user = :user and i.day = :day ", Double.class);
                 q.setParameter("user", userTimesheet);
                 q.setParameter("day", c.getTime());
                 final List<Double> resultList = q.getResultList();
