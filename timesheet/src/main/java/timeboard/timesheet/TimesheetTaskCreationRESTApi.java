@@ -79,8 +79,8 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
         response.setContentType("application/json");
 
         try{
-            startDate = DATE_FORMAT.parse(request.getParameter("startdate"));
-            endDate = DATE_FORMAT.parse(request.getParameter("enddate"));
+            startDate = DATE_FORMAT.parse(request.getParameter("startDate"));
+            endDate = DATE_FORMAT.parse(request.getParameter("endDate"));
 
         }catch(ParseException e) {
             MAPPER.writeValue(response.getWriter(), "Incorrect date format");
@@ -92,11 +92,11 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
             return;
         }
 
-        String name = request.getParameter("name");
-        String comment = request.getParameter("comment");
+        String name = request.getParameter("taskName");
+        String comment = request.getParameter("taskComments");
         if(comment == null) comment = "";
 
-        double oe = Double.parseDouble(request.getParameter("oe"));
+        double oe = Double.parseDouble(request.getParameter("estimateWork"));
         if(oe <= 0.0){
             MAPPER.writeValue(response.getWriter(), "Original estimate work must be positive ");
             return;
@@ -109,6 +109,15 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
         String type = request.getParameter("typeID");
         Long typeID = Long.parseLong(type);
 
+        Long taskID = Long.parseLong(request.getParameter("taskID"));
+        if(!(taskID != null && taskID == 0 )){
+            try {
+                projectService.deleteTaskByID(SecurityContext.getCurrentUser(request), taskID);
+            } catch (Exception e){
+                MAPPER.writeValue(response.getWriter(), e.getMessage());
+                return;
+            }
+        }
         try{
             projectService.createTask(SecurityContext.getCurrentUser(request), project,
                     name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );

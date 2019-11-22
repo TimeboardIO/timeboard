@@ -12,7 +12,7 @@ const updateTask = function(date, task, type, val){
 }
 
 const timesheetModel = {
-    newTask: {projectID:0, name:"", comment:"", startdate:"", enddate:"", oe:0, typeID:0 },
+    newTask:  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", estimateWork:0, typeID:0 },
     formError:"",
     week:0,
     year:0,
@@ -185,7 +185,20 @@ $(document).ready(function(){
                 $(event.target).parent().removeClass('left icon loading').addClass('error');
             }
         },
-        showCreateTaskModal: function(event){
+        showCreateTaskModal: function(projectID, task, event){
+        event.preventDefault()
+            if(task){
+                 this.newTask.projectID = projectID;
+                 this.newTask.taskID = task.taskID
+                 this.newTask.taskName = task.taskName;
+                 this.newTask.taskComments = task.taskComments;
+                 this.newTask.startDate = task.startDate;
+                 this.newTask.endDate = task.endDate;
+                 this.newTask.estimateWork = task.estimateWork;
+                 this.newTask.typeID = task.typeID;
+            }else{
+                 this.newTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", estimateWork:0, typeID:0 };
+            }
             $('.create-task.modal').modal({
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
@@ -224,6 +237,7 @@ $(document).ready(function(){
             app.days = data.days;
             app.imputations = data.imputations;
             app.projects = data.projects;
+
         })
         .then(function(){
             $('.ui.dimmer').removeClass('active');
