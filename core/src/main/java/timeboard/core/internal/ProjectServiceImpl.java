@@ -298,13 +298,13 @@ public class ProjectServiceImpl implements ProjectService {
             newTask.setOrigin(origin);
             newTask.setRemotePath(remotePath);
             newTask.setRemoteId(remoteId);
-
             newTask.setName(taskName);
             newTask.setComments(taskComment);
             newTask.setStartDate(startDate);
             newTask.setEndDate(endDate);
             newTask.setComments(taskComment);
             newTask.setEffortLeft(OE);
+            newTask.setOriginalEstimate(OE);
             newTask.setTaskStatus(TaskStatus.PENDING);
             newTask.setAssigned(assignedUser);
             if(milestone != null) {
