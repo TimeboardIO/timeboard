@@ -29,6 +29,7 @@ package timeboard.core.notification.model;
 import timeboard.core.model.User;
 import timeboard.core.notification.model.event.TimeboardEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UserNotificationStructure {
@@ -37,8 +38,10 @@ public class UserNotificationStructure {
 
     public UserNotificationStructure(User targetUser) {
         this.targetUser = targetUser;
-    }
+        notificationEventList = new ArrayList<>();
+        informEventList = new ArrayList<>();
 
+    }
 
     List<TimeboardEvent> notificationEventList;
     List<TimeboardEvent> informEventList;

@@ -57,7 +57,7 @@ public class StackEmail {
 
         TimeboardSubjects.TASK_EVENTS
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-                .buffer(10, TimeUnit.SECONDS)
+                .buffer(30, TimeUnit.SECONDS)
                 .map(timedEvents -> notificationEventToUserEvent(timedEvents))
                 .flatMapIterable(l -> l)
                 .subscribe(struc ->System.out.println(generateMailFromEventList(struc).getMessage()));
@@ -86,14 +86,14 @@ public class StackEmail {
     }
 
     private List<UserNotificationStructure> notificationEventToUserEvent(List<TaskEvent> events) {
-        HashMap<User, UserNotificationStructure> dataList = new HashMap<User, UserNotificationStructure>();
+        HashMap<Long, UserNotificationStructure> dataList = new HashMap<Long, UserNotificationStructure>();
 
         for(TaskEvent event : events){
             for(User user : event.getUsersToNotify()){
-                dataList.computeIfAbsent(user, t -> new UserNotificationStructure(user)).notify(event);
+                dataList.computeIfAbsent(user.getId(), t -> new UserNotificationStructure(user)).notify(event);
             }
             for(User user : event.getUsersToInform()){
-                dataList.computeIfAbsent(user, t -> new UserNotificationStructure(user)).inform(event);
+                dataList.computeIfAbsent(user.getId(), t -> new UserNotificationStructure(user)).inform(event);
             }
         }
         return new ArrayList<>(dataList.values());

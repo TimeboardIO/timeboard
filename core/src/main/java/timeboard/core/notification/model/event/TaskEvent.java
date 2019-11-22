@@ -90,6 +90,7 @@ public class TaskEvent extends TimeboardEvent {
     private void constructUsersList(){
 
         usersToNotify = new ArrayList<>();
+        usersToInform = new ArrayList<>();
         Project project = task.getProject();
         User assignedUser = task.getAssigned();
 
@@ -98,7 +99,8 @@ public class TaskEvent extends TimeboardEvent {
                 .filter(member -> member.getRole() == ProjectRole.OWNER)
                 .forEach(member -> usersToNotify.add(member.getMember()));
 
-        usersToInform = Arrays.asList(assignedUser, actor);
+        if(assignedUser != null ) usersToInform.add(assignedUser);
+        usersToInform.add(actor);
 
     }
 
