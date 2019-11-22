@@ -160,13 +160,13 @@ public class ProjectServiceImpl implements ProjectService {
 
             TypedQuery<Object[]> q = em.createQuery("select " +
                     "COALESCE(sum(t.originalEstimate),0) as originalEstimate, " +
-                    "COALESCE(sum(t.effortLeft),0) as remainsToBeDone " +
+                    "COALESCE(sum(t.effortLeft),0) as effortLeft " +
                     "from Task t " +
                     "where t.project = :project ", Object[].class);
 
             q.setParameter("project", project);
 
-            Object[] EWandRTBD = q.getSingleResult();
+            Object[] OEandEL = q.getSingleResult();
 
             TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) " +
                     "from Task t left outer join t.imputations i " +
@@ -176,7 +176,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             final Double effortSpent = effortSpentQuery.getSingleResult();
 
-            return new ProjectDashboard(project.getQuotation(), (Double) EWandRTBD[0], (Double) EWandRTBD[1], effortSpent);
+            return new ProjectDashboard(project.getQuotation(), (Double) OEandEL[0], (Double) OEandEL[1], effortSpent);
 
         });
     }
@@ -441,7 +441,8 @@ public class ProjectServiceImpl implements ProjectService {
             i.setUser(actor);
             i.setValue(val);
             if(projectTask != null){ //project task
-                projectTask.setEffortLeft(projectTask.getEffortLeft() - val);
+                projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() - val, 0));
+                projectTask.getImputations().add(i);
             }
             entityManager.persist(i);
         }
@@ -451,17 +452,22 @@ public class ProjectServiceImpl implements ProjectService {
 
             if(projectTask != null){ //project task
                 if (i.getValue() < val) {
-                    projectTask.setEffortLeft(projectTask.getEffortLeft() - Math.abs(val - i.getValue()));
+                    projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() - Math.abs(val - i.getValue()), 0));
+
                 }
-                if (i.getValue() > val) {
-                    projectTask.setEffortLeft(projectTask.getEffortLeft() + Math.abs(i.getValue() - val));
+                if (i.getValue() > val && projectTask.getEffortLeft() > 0) {
+                    projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() + Math.abs(i.getValue() - val), 0));
                 }
+
             }
             if (val == 0) {
                 entityManager.remove(i);
+                task.getImputations().remove(i);
             } else {
                 i.setValue(val);
                 entityManager.persist(i);
+                task.getImputations().remove(i);
+                task.getImputations().add(i);
             }
         }
         this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
@@ -504,7 +510,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setEffortLeft(effortLeft);
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated remain to be done for task "+taskID+" in project "+task.getProject().getName()+" with value "+ effortLeft);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task "+taskID+" in project "+task.getProject().getName()+" with value "+ effortLeft);
 
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
         });

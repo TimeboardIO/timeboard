@@ -301,23 +301,23 @@ public class TimesheetRESTApi extends TimeboardServlet {
         private final String taskComments;
         private final String status;
         private final double effortSpent;
-        private final double remainToBeDone;
-        private final double reEstimateWork;
-        private final double estimateWork;
+        private final double effortLeft;
+        private final double realEffort;
+        private final double originalEstimate;
         private final Date startDate;
         private final Date endDate;
 
         public TaskWrapper(Long taskID, String taskName, String taskComments,
-                           double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork,
+                           double effortSpent, double effortLeft, double originalEstimate, double realEffort,
                            Date startDate, Date endDate, String status, Long typeID) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComments = taskComments;
             this.typeID = typeID;
             this.effortSpent = effortSpent;
-            this.remainToBeDone = remainToBeDone;
-            this.estimateWork = estimateWork;
-            this.reEstimateWork = reEstimateWork;
+            this.effortLeft = effortLeft;
+            this.originalEstimate = originalEstimate;
+            this.realEffort = realEffort;
             this.startDate = startDate;
             this.endDate = endDate;
             this.status = status;
@@ -331,8 +331,8 @@ public class TimesheetRESTApi extends TimeboardServlet {
             return DATE_FORMAT.format(endDate);
         }
 
-        public double getRemainToBeDone() {
-            return remainToBeDone;
+        public double getEffortLeft() {
+            return effortLeft;
         }
 
         public String getTaskComments() {
@@ -343,12 +343,12 @@ public class TimesheetRESTApi extends TimeboardServlet {
             return typeID;
         }
 
-        public double getReEstimateWork() {
-            return reEstimateWork;
+        public double getRealEffort() {
+            return realEffort;
         }
 
-        public double getEstimateWork() {
-            return estimateWork;
+        public double getOriginalEstimate() {
+            return originalEstimate;
         }
 
         public double getEffortSpent() {

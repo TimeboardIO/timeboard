@@ -160,7 +160,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                         e -> e.getEffortEstimateValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
-        viewModel.getViewDatas().put("reEstimate", effortEstimateMap.values());
+        viewModel.getViewDatas().put("realEffort", effortEstimateMap.values());
     }
 
     @Override
@@ -211,7 +211,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 taskForm.getTaskComment(),
                 taskForm.getStartDate(),
                 taskForm.getEndDate(),
-                taskForm.getEstimateWork(),
+                taskForm.getOriginalEstimate(),
                 taskForm.getTaskTypeID(),
                 this.userService.findUserByID(taskForm.getAssignedUserID()),
                 ProjectService.ORIGIN_TIMEBOARD,
@@ -231,7 +231,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         currentTask.setComments(taskForm.getTaskComment());
         currentTask.setStartDate(taskForm.getStartDate());
         currentTask.setEndDate(taskForm.getEndDate());
-        currentTask.setOriginalEstimate( taskForm.getEstimateWork());
+        currentTask.setOriginalEstimate( taskForm.getOriginalEstimate());
         currentTask.setMilestone(milestone);
 
         return this.projectService.updateTask(actor, currentTask);
@@ -243,7 +243,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         private String taskComment;
         private Date startDate;
         private Date endDate;
-        private Double estimateWork;
+        private Double originalEstimate;
         private Long assignedUserID;
         private Long taskTypeID;
         private User assignedUser;
@@ -257,7 +257,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             taskType = task.getTaskType();
             milestoneID = task.getMilestone() != null ? task.getMilestone().getId() : null;
 
-            estimateWork = task.getOriginalEstimate();
+            originalEstimate = task.getOriginalEstimate();
             startDate = task.getStartDate();
             endDate = task.getEndDate();
             assignedUser = task.getAssigned();
@@ -277,7 +277,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             taskComment = request.getParameter("taskComments");
             startDate = new Date(DATE_FORMAT.parse(request.getParameter("taskStartDate")).getTime()+(2 * 60 * 60 * 1000) +1);
             endDate = new Date(DATE_FORMAT.parse(request.getParameter("taskEndDate")).getTime()+(2 * 60 * 60 * 1000) +1);
-            estimateWork = Double.parseDouble(request.getParameter("taskEstimateWork"));
+            originalEstimate = Double.parseDouble(request.getParameter("taskOriginalEstimate"));
             taskStatus = request.getParameter("taskStatus") != null ? TaskStatus.valueOf(request.getParameter("taskStatus")) : TaskStatus.PENDING;
 
             if(request.getParameter("taskMilestoneId") != null && !request.getParameter("taskMilestoneId").isEmpty()) {
@@ -317,8 +317,8 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             return endDate;
         }
 
-        public Double getEstimateWork() {
-            return estimateWork;
+        public Double getOriginalEstimate() {
+            return originalEstimate;
         }
 
         public Long getAssignedUserID() {

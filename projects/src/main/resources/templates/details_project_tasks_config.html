@@ -35,7 +35,7 @@
         </div>
         <div class="field">
             <label>Task Original Estimate</label>
-            <input name="taskEstimateWork" placeholder="Task OE" required th:value="${task.estimateWork}" type="number">
+            <input name="taskOriginalEstimate" placeholder="Task OE" required th:value="${task.originalEstimate}" type="number">
         </div>
         <div class="field">
             <label>Task type</label>
@@ -121,8 +121,8 @@
                     steppedLine: true
                   },
                   {
-                    data: /*[[${reEstimate}]]*/,
-                    label: "Effort Estimate for " + /*[[${task.taskName}]]*/,
+                    data: /*[[${realEffort}]]*/,
+                    label: "Real effort for " + /*[[${task.taskName}]]*/,
                     borderColor: "#ff6384",
                     fill: true,
                     steppedLine: true
@@ -132,7 +132,7 @@
               options: {
                 title: {
                   display: true,
-                  text: 'Task - Effort Estimate and Effort Spent graph'
+                  text: 'Task - Real Effort and Effort Spent graph'
                 },
                 scales: {
                     yAxes: [{

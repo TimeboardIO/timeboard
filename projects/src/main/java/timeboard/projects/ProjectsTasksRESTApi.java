@@ -210,14 +210,14 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         private final Long taskID;
         private final String taskName;
         private final String taskComment;
-        private final double estimateWork;
+        private final double originalEstimate;
         private final Date startDate;
         private final Date endDate;
-        public TaskWrapper(Long taskID, String taskName, String taskComment, double estimateWork, Date startDate, Date endDate) {
+        public TaskWrapper(Long taskID, String taskName, String taskComment, double originalEstimate, Date startDate, Date endDate) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComment = taskComment;
-            this.estimateWork = estimateWork;
+            this.originalEstimate = originalEstimate;
             this.startDate = startDate;
             this.endDate = (endDate != null ? endDate : new Date());
         }
@@ -230,8 +230,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             return DATE_FORMAT.format(endDate);
         }
 
-        public double getEstimateWork() {
-            return estimateWork;
+        public double getOriginalEstimate() {
+            return originalEstimate;
         }
 
         public Long getTaskID() {

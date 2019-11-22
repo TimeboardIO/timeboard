@@ -72,7 +72,7 @@ public class XlsExportPlugin implements ProjectExportService {
 
            HSSFRow headerRow = sheet.createRow(0);
            headerRow.createCell(0).setCellValue("Task name");
-           headerRow.createCell(1).setCellValue("Task estimated work");
+           headerRow.createCell(1).setCellValue("Task Original Estimate");
 
            int rowNum = 1;
            for (Task task : this.projectService.listProjectTasks(project)) {
