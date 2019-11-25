@@ -45,7 +45,7 @@ public class ProjectTasks {
         return project;
     }
 
-    public List<Task> getTaskRevisions() {
+    public List<Task> getTasks() {
         return tasks;
     }
 }

@@ -541,7 +541,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de) {
-        final List<ProjectTasks> projectTaskRevisions = new ArrayList<>();
+        final List<ProjectTasks> projectTasks = new ArrayList<>();
 
         this.jpa.tx(entityManager -> {
 
@@ -567,11 +567,11 @@ public class ProjectServiceImpl implements ProjectService {
             });
 
             rebalanced.forEach((project, ts) -> {
-                projectTaskRevisions.add(new ProjectTasks(project, ts));
+                projectTasks.add(new ProjectTasks(project, ts));
             });
 
         });
-        return projectTaskRevisions;
+        return projectTasks;
     }
 
     @Override
