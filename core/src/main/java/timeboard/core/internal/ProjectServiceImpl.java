@@ -611,6 +611,8 @@ public class ProjectServiceImpl implements ProjectService {
 
             entityManager.remove(task);
             entityManager.flush();
+            TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
+
             return null;
         });
 

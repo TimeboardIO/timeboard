@@ -55,10 +55,10 @@ public class SendTaskEmail {
     @Activate
     public void activate(){
 
-        TimeboardSubjects.CREATE_TASK
+       /* TimeboardSubjects.CREATE_TASK
                 .map(newTask -> sendEmailCreatingTask(new User(), newTask) )
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
+                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));*/
     }
 
     public EmailStructure sendEmailCreatingTask(User creator, Task newTaskDB) {

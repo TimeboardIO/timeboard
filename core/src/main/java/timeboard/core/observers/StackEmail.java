@@ -33,12 +33,18 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
+import timeboard.core.internal.TemplateGenerator;
+import timeboard.core.model.EmailSummaryModel;
+import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.notification.model.EmailStructure;
 import timeboard.core.notification.model.UserNotificationStructure;
 import timeboard.core.notification.model.event.TaskEvent;
 import timeboard.core.notification.model.event.TimeboardEvent;
+import timeboard.core.notification.model.event.TimeboardEventType;
+import timeboard.core.notification.model.event.TimesheetEvent;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -52,43 +58,57 @@ public class StackEmail {
     @Reference
     EmailService emailService;
 
+    TemplateGenerator templateGenerator = new TemplateGenerator();
+
     @Activate
     public void activate(){
 
-        TimeboardSubjects.TASK_EVENTS
+        TimeboardSubjects.TIMEBOARD_EVENTS
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
                 .buffer(30, TimeUnit.SECONDS)
                 .map(timedEvents -> notificationEventToUserEvent(timedEvents))
-                .flatMapIterable(l -> l)
-                .subscribe(struc ->System.out.println(generateMailFromEventList(struc).getMessage()));
+                .flatMapIterable(l -> l).onErrorResumeNext(e -> {
+                    System.out.println(e);
+                 })
+                .subscribe(struc ->this.emailService.sendMessage(generateMailFromEventList(struc)));
                // .subscribe(userNotificationStructure ->this.emailService.sendMessage(generateMailFromEventList(userNotificationStructure)));
     }
 
     private EmailStructure generateMailFromEventList(UserNotificationStructure userNotificationStructures) {
 
-        String message = "";
-        for(TimeboardEvent taskEvents : userNotificationStructures.getNotificationEventList()){
-            message+= taskEvents.getEventDate();
+        Map<String, Object> data  = new HashMap<>();
+
+        List<TimesheetEvent> validatedTimesheets = new ArrayList<>();
+
+
+        Map<Long, EmailSummaryModel> projects = new HashMap<>();
+        String subject = "[Timeboard] Daily summary";
+
+        for(TimeboardEvent event : userNotificationStructures.getNotificationEventList()){
+
+            if(event instanceof TaskEvent){
+                Task t = ((TaskEvent) event).getTask();
+                if(((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
+                if(((TaskEvent) event).getEventType() == TimeboardEventType.DELETE) projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
+            } else if(event instanceof TimesheetEvent){
+                validatedTimesheets.add((TimesheetEvent) event);
+            }
+
         }
-/*
+        data.put("projects", projects.values());
+        data.put("validatedTimesheets", validatedTimesheets);
 
-            String subject = "Mail de création d'une tâche";
-            String message = "Bonjour,\n"
-                + actor.getFirstName() + " " + actor.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
-                +"Nom de la tâche : " + newTaskDB.getName() + "\n"
-                +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
-                +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "\n"
-                +"Estimation initiale : " + newTaskDB.getEstimateWork() + "\n"
-                +"Projet : " + project.getName() + "\n";
-
-        return new EmailStructure(to, cc, subject, message);*/
-        return new EmailStructure(null, null, null, message);
+        String message = templateGenerator.getTemplateString("core-ui:layouts/mail.html", data);
+                ArrayList<String> list = new ArrayList<String>();
+                list.add(userNotificationStructures.getTargetUser().getEmail());
+        return new EmailStructure(list, null, subject, message);
     }
 
-    private List<UserNotificationStructure> notificationEventToUserEvent(List<TaskEvent> events) {
+
+    private List<UserNotificationStructure> notificationEventToUserEvent(List<TimeboardEvent> events) {
         HashMap<Long, UserNotificationStructure> dataList = new HashMap<Long, UserNotificationStructure>();
 
-        for(TaskEvent event : events){
+        for(TimeboardEvent event : events){
             for(User user : event.getUsersToNotify()){
                 dataList.computeIfAbsent(user.getId(), t -> new UserNotificationStructure(user)).notify(event);
             }
@@ -98,5 +118,12 @@ public class StackEmail {
         }
         return new ArrayList<>(dataList.values());
     }
+    private String getDisplayFormatDate(Date date){
+        return  new SimpleDateFormat("dd/MM/yyyy").format(date);
+    }
+
+
+
+
 
 }

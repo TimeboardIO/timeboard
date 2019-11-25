@@ -26,18 +26,34 @@ package timeboard.core.api;
  * #L%
  */
 
+import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import timeboard.core.model.Task;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import timeboard.core.model.User;
 import timeboard.core.notification.model.event.TaskEvent;
+import timeboard.core.notification.model.event.TimeboardEvent;
+import timeboard.core.notification.model.event.TimesheetEvent;
 
 import java.util.Map;
-
+@Component(
+        service = TimeboardSubjects.class,
+        immediate = true
+)
 public class TimeboardSubjects {
 
-    public static PublishSubject<TaskEvent> TASK_EVENTS = PublishSubject.create();
+    public static PublishSubject<TaskEvent> TASK_EVENTS =  PublishSubject.create();
+    public static PublishSubject<TimesheetEvent> TIMESHEET_EVENTS =  PublishSubject.create();
+    public static Observable<TimeboardEvent> TIMEBOARD_EVENTS =  PublishSubject.create();
 
-    public static PublishSubject<Task> CREATE_TASK = PublishSubject.create();
+    @Activate
+    void activate(){
+         TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TASK_EVENTS);
+         TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TIMESHEET_EVENTS);
+
+    }
+
+    //TODO remove those subjects
     public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
 
 }

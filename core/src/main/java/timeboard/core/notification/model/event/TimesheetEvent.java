@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.notification.model.event;
 
 /*-
  * #%L
@@ -27,42 +27,21 @@ package timeboard.core.notification.model;
  */
 
 import timeboard.core.model.User;
-import timeboard.core.notification.model.event.TimeboardEvent;
+import timeboard.core.model.ValidatedTimesheet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
 
-public class UserNotificationStructure {
+public class TimesheetEvent extends TimeboardEvent {
 
-    private User targetUser;
+    private ValidatedTimesheet timesheet;
 
-    private List<TimeboardEvent> notificationEventList;
-    private List<TimeboardEvent> informEventList;
+    public TimesheetEvent(ValidatedTimesheet timesheet) {
+        super(new Date());
 
-    public UserNotificationStructure(User targetUser) {
-        this.targetUser = targetUser;
-        notificationEventList = new ArrayList<>();
-        informEventList = new ArrayList<>();
-
-    }
-    public void notify(TimeboardEvent event){
-        notificationEventList.add(event);
+        this.timesheet = timesheet;
     }
 
-    public void inform(TimeboardEvent event){
-        informEventList.add(event);
+    public ValidatedTimesheet getTimesheet() {
+        return timesheet;
     }
-
-    public User getTargetUser() {
-        return targetUser;
-    }
-
-    public List<TimeboardEvent> getNotificationEventList() {
-        return notificationEventList;
-    }
-
-    public List<TimeboardEvent> getInformEventList() {
-        return informEventList;
-    }
-
 }

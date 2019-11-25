@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.internal;
 
 /*-
  * #%L
@@ -26,43 +26,48 @@ package timeboard.core.notification.model;
  * #L%
  */
 
-import timeboard.core.model.User;
-import timeboard.core.notification.model.event.TimeboardEvent;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.thymeleaf.templatemode.TemplateMode;
+import timeboard.core.ui.OSGITemplateResolver;
 
-public class UserNotificationStructure {
+import java.util.Locale;
+import java.util.Map;
 
-    private User targetUser;
+public class TemplateGenerator {
 
-    private List<TimeboardEvent> notificationEventList;
-    private List<TimeboardEvent> informEventList;
+    private OSGITemplateResolver resolver = new OSGITemplateResolver();
 
-    public UserNotificationStructure(User targetUser) {
-        this.targetUser = targetUser;
-        notificationEventList = new ArrayList<>();
-        informEventList = new ArrayList<>();
+    private boolean init = false;
 
-    }
-    public void notify(TimeboardEvent event){
-        notificationEventList.add(event);
-    }
+    public void init()  {
 
-    public void inform(TimeboardEvent event){
-        informEventList.add(event);
-    }
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setPrefix("/templates/");
+        resolver.setCacheable(true);
+        resolver.setCacheTTLMs(50000L);
+        resolver.setCharacterEncoding("utf-8");
 
-    public User getTargetUser() {
-        return targetUser;
+        init = true;
     }
 
-    public List<TimeboardEvent> getNotificationEventList() {
-        return notificationEventList;
-    }
 
-    public List<TimeboardEvent> getInformEventList() {
-        return informEventList;
+    public String getTemplateString(String templateName, Map<String, Object> templateData){
+        if(!init) init();
+
+        TemplateEngine engine = new TemplateEngine();
+        engine.setTemplateResolver(resolver);
+        engine.addDialect(new LayoutDialect());
+        final Context ctx = new Context(Locale.FRANCE);
+
+        templateData.forEach((s, o) -> {
+            ctx.setVariable(s, o);
+        });
+
+        return engine.process(templateName, ctx);
+
     }
 
 }

@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.model;
 
 /*-
  * #%L
@@ -26,43 +26,40 @@ package timeboard.core.notification.model;
  * #L%
  */
 
-import timeboard.core.model.User;
-import timeboard.core.notification.model.event.TimeboardEvent;
+import timeboard.core.notification.model.event.TaskEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserNotificationStructure {
+public class EmailSummaryModel {
 
-    private User targetUser;
+    private Project project;
+    private List<TaskEvent> createdTasks = new ArrayList<>();
 
-    private List<TimeboardEvent> notificationEventList;
-    private List<TimeboardEvent> informEventList;
+    private List<TaskEvent> deletedTasks = new ArrayList<>();
 
-    public UserNotificationStructure(User targetUser) {
-        this.targetUser = targetUser;
-        notificationEventList = new ArrayList<>();
-        informEventList = new ArrayList<>();
-
-    }
-    public void notify(TimeboardEvent event){
-        notificationEventList.add(event);
+    public EmailSummaryModel(Project p) {
+        this.project = p;
     }
 
-    public void inform(TimeboardEvent event){
-        informEventList.add(event);
+    public void addCreatedTask(TaskEvent e) {
+        createdTasks.add(e) ;
     }
 
-    public User getTargetUser() {
-        return targetUser;
+    public void addDeletedTask(TaskEvent e) {
+        deletedTasks.add(e) ;
     }
 
-    public List<TimeboardEvent> getNotificationEventList() {
-        return notificationEventList;
+
+    public Project getProject() {
+        return project;
     }
 
-    public List<TimeboardEvent> getInformEventList() {
-        return informEventList;
+    public List<TaskEvent> getCreatedTasks() {
+        return createdTasks;
     }
 
+    public List<TaskEvent> getDeletedTasks() {
+        return deletedTasks;
+    }
 }

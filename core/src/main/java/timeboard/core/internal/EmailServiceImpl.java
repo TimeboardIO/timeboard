@@ -79,18 +79,20 @@ public class EmailServiceImpl implements EmailService {
         Session session = Session.getInstance(props, null);
 
         MimeMessage msg = new MimeMessage(session);
-        msg.setText(emailStructure.getMessage());
         msg.setSubject(emailStructure.getSubject());
         msg.setFrom(new InternetAddress(fromEmail));
+        msg.setContent(emailStructure.getMessage(), "text/html; charset=utf-8");
 
         List<String> listTOEmailsWithoutDuplicate = emailStructure.getTargetUserList().stream().distinct().collect(Collectors.toList());
         String targetTOEmails = StringUtils.join(listTOEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
 
-        List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList().stream().distinct().collect(Collectors.toList());
-        String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
-        msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
-
+        if(emailStructure.getTargetCCUserList() != null) {
+            List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList().stream().distinct().collect(Collectors.toList());
+            String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
+            msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
+        }
         Transport.send(msg);
     }
+
 }

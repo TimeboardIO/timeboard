@@ -41,8 +41,6 @@ public class TaskEvent extends TimeboardEvent {
     private User actor;
     private TimeboardEventType eventType;
 
-    private List<User> usersToNotify;
-    private List<User> usersToInform;
 
     public TaskEvent(TimeboardEventType eventType, Task task, User actor) {
         super(new Date());
@@ -59,14 +57,6 @@ public class TaskEvent extends TimeboardEvent {
 
     public void setEventType(TimeboardEventType eventType) {
         this.eventType = eventType;
-    }
-
-    public List<User> getUsersToNotify() {
-        return usersToNotify;
-    }
-
-    public List<User> getUsersToInform() {
-        return usersToInform;
     }
 
     public Task getTask() {
@@ -89,15 +79,13 @@ public class TaskEvent extends TimeboardEvent {
 
     private void constructUsersList(){
 
-        usersToNotify = new ArrayList<>();
-        usersToInform = new ArrayList<>();
         Project project = task.getProject();
         User assignedUser = task.getAssigned();
 
         project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == ProjectRole.OWNER)
-                .forEach(member -> usersToNotify.add(member.getMember()));
+                .forEach(member -> this.usersToNotify.add(member.getMember()));
 
         if(assignedUser != null ) usersToInform.add(assignedUser);
         usersToInform.add(actor);

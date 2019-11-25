@@ -28,6 +28,7 @@ package timeboard.core.internal;
 
 import org.osgi.service.log.LogService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.Task;
@@ -38,6 +39,7 @@ import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
+import timeboard.core.notification.model.event.TimesheetEvent;
 
 import javax.persistence.TypedQuery;
 import java.util.Calendar;
@@ -126,6 +128,8 @@ public class TimesheetServiceImpl implements TimesheetService {
         this.jpa.tx(entityManager -> {
             entityManager.persist(validatedTimesheet);
         });
+
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet));
 
         this.logService.log(LogService.LOG_INFO, "Week " + week + " validated for user" + userTimesheet.getName()+" by user "+actor.getName());
 
