@@ -74,7 +74,7 @@ public class ProjectTaskDeleteServlet extends TimeboardServlet {
         }
 
 
-        this.forward(request, response, String.format("/projects/tasks?projectID=%s", projectID), viewModel);
+        response.sendRedirect(String.format("/projects/tasks?projectID=%s", projectID));
     }
 
 
