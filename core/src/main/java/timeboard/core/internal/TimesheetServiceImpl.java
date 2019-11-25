@@ -129,7 +129,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             entityManager.persist(validatedTimesheet);
         });
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService));
 
         this.logService.log(LogService.LOG_INFO, "Week " + week + " validated for user" + userTimesheet.getName()+" by user "+actor.getName());
 

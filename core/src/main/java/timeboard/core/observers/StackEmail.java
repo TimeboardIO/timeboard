@@ -37,6 +37,7 @@ import timeboard.core.internal.TemplateGenerator;
 import timeboard.core.model.EmailSummaryModel;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
+import timeboard.core.model.ValidatedTimesheet;
 import timeboard.core.notification.model.EmailStructure;
 import timeboard.core.notification.model.UserNotificationStructure;
 import timeboard.core.notification.model.event.TaskEvent;
@@ -65,20 +66,19 @@ public class StackEmail {
 
         TimeboardSubjects.TIMEBOARD_EVENTS
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-                .buffer(30, TimeUnit.SECONDS)
+                .buffer(90, TimeUnit.SECONDS)
                 .map(timedEvents -> notificationEventToUserEvent(timedEvents))
                 .flatMapIterable(l -> l).onErrorResumeNext(e -> {
                     System.out.println(e);
                  })
                 .subscribe(struc ->this.emailService.sendMessage(generateMailFromEventList(struc)));
-               // .subscribe(userNotificationStructure ->this.emailService.sendMessage(generateMailFromEventList(userNotificationStructure)));
     }
 
     private EmailStructure generateMailFromEventList(UserNotificationStructure userNotificationStructures) {
 
         Map<String, Object> data  = new HashMap<>();
 
-        List<TimesheetEvent> validatedTimesheets = new ArrayList<>();
+        List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
 
 
         Map<Long, EmailSummaryModel> projects = new HashMap<>();
@@ -91,7 +91,7 @@ public class StackEmail {
                 if(((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
                 if(((TaskEvent) event).getEventType() == TimeboardEventType.DELETE) projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
             } else if(event instanceof TimesheetEvent){
-                validatedTimesheets.add((TimesheetEvent) event);
+                validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             }
 
         }
