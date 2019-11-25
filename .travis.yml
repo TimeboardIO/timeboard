@@ -15,7 +15,7 @@ script:
   - mkdir build
   - cp features/target/features-1.0-SNAPSHOT.kar ./temp/
   - cp -r scripts/aws/* ./temp
-  - zip -r ./build/timeboard.zip ./temp/*
+  - zip -r -j ./build/timeboard.zip ./temp/*
 
 
 
