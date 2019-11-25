@@ -7,3 +7,8 @@ files:
     destination: /etc/karaf/apache-karaf-4.2.6/etc
   - source: org.ops4j.pax.web.cfg
     destination: /etc/karaf/apache-karaf-4.2.6/etc
+hooks:
+  BeforeInstall:
+    - location: /etc/karaf/apache-karaf-4.2.6/deploy/bin/stop
+  ApplicationStart:
+    - location: /etc/karaf/apache-karaf-4.2.6/deploy/bin/start
