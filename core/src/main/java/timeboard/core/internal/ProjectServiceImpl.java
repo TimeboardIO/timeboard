@@ -621,7 +621,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortSpent> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
+    public List<EffortHistory> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
 
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
@@ -633,13 +633,13 @@ public class ProjectServiceImpl implements ProjectService {
 
             return query.getResultList()
                     .stream()
-                    .map(x -> new EffortSpent((Date) x[0], (Double) x[1]))
+                    .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
                     .collect(Collectors.toList());
         });
     }
 
     @Override
-    public List<EffortLeft> getTaskEffortLeftHistory(long taskId) {
+    public List<EffortHistory> getTaskEffortLeftHistory(long taskId) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
             "tr.revisionDate as date, tr.effortLeft as effortLeft  " +
@@ -654,7 +654,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             return query.getResultList()
                     .stream()
-                    .map(x -> new EffortLeft((Date) x[0], (Double) x[1]))
+                    .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
                     .collect(Collectors.toList());
         });
     }
