@@ -61,7 +61,7 @@
                 <div class="ui icon input">
 
                     <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser != null}"
-                           th:value="${task.assignedUser.name}" type="text"/>
+                           th:value="${task.assignedUser.screenName}" type="text"/>
                     <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser == null}"
                            type="text"/>
 
@@ -114,14 +114,14 @@
               data: {
                 labels: /*[[${listOfTaskDates}]]*/,
                 datasets: [{
-                    data: /*[[${effortSpent}]]*/,
+                    data: /*[[${effortSpentDatasForChart}]]*/,
                     label: "Effort spent for " + /*[[${task.taskName}]]*/,
                     borderColor: "#3e95cd",
                     fill: true,
                     steppedLine: true
                   },
                   {
-                    data: /*[[${realEffort}]]*/,
+                    data: /*[[${realEffortDatasForChart}]]*/,
                     label: "Real effort for " + /*[[${task.taskName}]]*/,
                     borderColor: "#ff6384",
                     fill: true,

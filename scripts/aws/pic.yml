@@ -16,7 +16,7 @@ Resources:
           - Effect: "Allow"
             Principal:
               Service:
-                - "*"
+                - "codedeploy.amazonaws.com"
             Action:
               - "sts:AssumeRole"
       Path: "/"
@@ -28,52 +28,7 @@ Resources:
               - Effect: "Allow"
                 Action: "*"
                 Resource: "*"
-  DeploymentGroupName:
-    Type: 'AWS::CodeDeploy::DeploymentGroup'
-    Properties:
-      ApplicationName:
-        Ref: 'CodeDeployApplication'
-      Deployment:
-        Description: "Timeboard deployment"
-        Ec2TagFilters:
-          Key: 'APP'
-          Type: 'KEY_AND_VALUE'
-          Value: 'TIMEBOARD'
-        IgnoreApplicationStopFailures: true
-        Revision:
-          RevisionType: GitHub
-          GitHubLocation:
-            CommitId:
-              Ref: GithubCommitID
-            Repository:
-              Ref: GithubRepo
-      ServiceRoleArn:
-        Fn::GetAtt: [ ServiceRole, Arn ]
-  TwentyFivePercentAtATime:
-    Type: 'AWS::CodeDeploy::DeploymentConfig'
-    Properties:
-      MinimumHealthyHosts:
-        Type: "FLEET_PERCENT"
-        Value: 75
+
+
   CodeDeployApplication:
     Type: 'AWS::CodeDeploy::Application'
-    DependsOn:
-      - TwentyFivePercentAtATime
-  DeployPipeline:
-    Type: 'AWS::CodePipeline::Pipeline'
-    Properties:
-      Stages:
-        - Actions:
-            -
-              Name: Deploy
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: CodeDeploy
-              Configuration:
-                ApplicationName:
-                  Ref: CodeDeployApplication
-                DeploymentGroupName:
-                  Ref: DeploymentGroupName
-              RunOrder: 1
