@@ -68,6 +68,7 @@ public class SigninServlet extends HttpServlet {
     private String userInfoURL;
     private String clientID;
     private String secretID;
+    private String redirectURI;
 
     @Reference
     private UserService userService;
@@ -78,6 +79,7 @@ public class SigninServlet extends HttpServlet {
         this.userInfoURL = params.get("oauth.userinfo.url");
         this.clientID = params.get("oauth.clientid");
         this.secretID = params.get("oauth.secretid");
+        this.redirectURI = params.get("oauth.redirect.uri");
     }
 
     @Override
@@ -95,7 +97,7 @@ public class SigninServlet extends HttpServlet {
             params.append("&");
             params.append("code").append("=").append(oauthCode);
             params.append("&");
-            params.append("redirect_uri").append("=").append("http://localhost:8181/signin");
+            params.append("redirect_uri").append("=").append(this.redirectURI);
 
 
             final HttpRequest oauthTokenRequest = HttpRequest
