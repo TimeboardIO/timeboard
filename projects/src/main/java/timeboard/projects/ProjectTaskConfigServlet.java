@@ -224,6 +224,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
     private Task updateTask(User actor, Project project, Task currentTask, HttpServletRequest request) throws ParseException {
         TaskForm taskForm = new TaskForm(request);
         Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
+        User assigned = this.userService.findUserByID(taskForm.getAssignedUserID());
 
         final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());
         currentTask.setTaskType(taskType);
@@ -233,6 +234,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         currentTask.setEndDate(taskForm.getEndDate());
         currentTask.setOriginalEstimate( taskForm.getOriginalEstimate());
         currentTask.setMilestone(milestone);
+        currentTask.setAssigned(assigned);
 
         return this.projectService.updateTask(actor, currentTask);
     }
