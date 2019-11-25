@@ -28,51 +28,7 @@ Resources:
               - Effect: "Allow"
                 Action: "*"
                 Resource: "*"
-  DeploymentGroupName:
-    Type: 'AWS::CodeDeploy::DeploymentGroup'
-    Properties:
-      ApplicationName:
-        Ref: 'CodeDeployApplication'
-      Ec2TagFilters:
-        - Key: 'SYSTEM'
-          Type: 'KEY_AND_VALUE'
-          Value: 'TIMEBOARD'
-      Deployment:
-        Description: "Timeboard deployment"
-        IgnoreApplicationStopFailures: true
-        Revision:
-          RevisionType: S3
-          S3Location:
-            BundleType: "zip"
-            Bucket: !Ref S3Bucket
-            Key: !Ref S3Object
-      ServiceRoleArn:
-        Fn::GetAtt: [ ServiceRole, Arn ]
-  TwentyFivePercentAtATime:
-    Type: 'AWS::CodeDeploy::DeploymentConfig'
-    Properties:
-      MinimumHealthyHosts:
-        Type: "FLEET_PERCENT"
-        Value: 75
+
+
   CodeDeployApplication:
     Type: 'AWS::CodeDeploy::Application'
-    DependsOn:
-      - TwentyFivePercentAtATime
-  DeployPipeline:
-    Type: 'AWS::CodePipeline::Pipeline'
-    Properties:
-      Stages:
-        - Actions:
-            -
-              Name: Deploy
-              ActionTypeId:
-                Category: Deploy
-                Owner: AWS
-                Version: 1
-                Provider: CodeDeploy
-              Configuration:
-                ApplicationName:
-                  Ref: CodeDeployApplication
-                DeploymentGroupName:
-                  Ref: DeploymentGroupName
-              RunOrder: 1

@@ -9,6 +9,6 @@ files:
     destination: /etc/karaf/apache-karaf-4.2.7/etc
 hooks:
   BeforeInstall:
-    - location: /etc/karaf/apache-karaf-4.2.7/bin/stop
+    - location: ./stopKaraf.sh
   ApplicationStart:
-    - location: /etc/karaf/apache-karaf-4.2.7/bin/start
+    - location: ./startKaraf.sh
