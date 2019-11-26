@@ -28,6 +28,7 @@ package timeboard.plugin.project.export.xls;
 
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
@@ -61,7 +62,7 @@ public class XlsExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(User actor, long projectID, OutputStream output) throws IOException {
+    public void export(User actor, long projectID, OutputStream output) throws IOException, BusinessException {
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
@@ -75,7 +76,7 @@ public class XlsExportPlugin implements ProjectExportService {
            headerRow.createCell(1).setCellValue("Task Original Estimate");
 
            int rowNum = 1;
-           for (Task task : this.projectService.listProjectTasks(project)) {
+           for (Task task : this.projectService.listProjectTasks(actor, project)) {
 
                HSSFRow taskRow = sheet.createRow(rowNum);
 

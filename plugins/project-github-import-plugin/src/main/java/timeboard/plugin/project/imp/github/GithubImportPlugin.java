@@ -78,7 +78,7 @@ public class GithubImportPlugin implements ProjectImportService {
     }
 
     @Override
-    public List<RemoteTask> getRemoteTasks(User currentUser, long projectID) {
+    public List<RemoteTask> getRemoteTasks(User currentUser, long projectID) throws BusinessException {
         final Project targetProject = this.projectService.getProjectByID(currentUser, projectID);
         final List<RemoteTask> remoteTasks = new ArrayList<>();
 

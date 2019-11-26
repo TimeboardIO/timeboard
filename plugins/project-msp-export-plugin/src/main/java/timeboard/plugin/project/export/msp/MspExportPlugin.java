@@ -28,6 +28,7 @@ package timeboard.plugin.project.export.msp;
 
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 import net.sf.mpxj.ProjectFile;
@@ -60,13 +61,13 @@ public class MspExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(User actor, long projectID, OutputStream output) throws IOException {
+    public void export(User actor, long projectID, OutputStream output) throws IOException, BusinessException {
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
         MPXWriter writer = new MPXWriter();
         ProjectFile projectFile = new ProjectFile();
 
-        this.projectService.listProjectTasks(project).forEach(task -> {
+        this.projectService.listProjectTasks(actor, project).forEach(task -> {
             Task mspTask = projectFile.addTask();
             mspTask.setName(task.getName());
             mspTask.setStart(task.getStartDate());
