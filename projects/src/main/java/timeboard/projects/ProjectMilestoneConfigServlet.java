@@ -26,10 +26,12 @@ package timeboard.projects;
  * #L%
  */
 
+import net.fortuna.ical4j.data.ParserException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -66,73 +68,79 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+       User actor = SecurityContext.getCurrentUser(request);
         if (request.getParameter("milestoneID") != null) {
             // Update case
             long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
-            Milestone milestone = this.projectService.getMilestoneById(milestoneID);
+            try {
+            Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
             viewModel.getViewDatas().put("milestone", milestone);
-            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(milestone));
+            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, milestone));
+            } catch (BusinessException e) {
+                viewModel.getErrors().add(e);
+            }
         } else {
             // New milestone case
             viewModel.getViewDatas().put("milestone", new Milestone());
         }
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
+        Project project = null;
+        try {
+            project = this.projectService.getProjectByID(actor, projectID);
+            viewModel.getViewDatas().put("project", project);
+            viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
+            viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(actor, project));
+        } catch (BusinessException e) {
+            viewModel.getErrors().add(e);
+        }
 
-        viewModel.setTemplate("projects:details_project_milestones_config.html");
-        viewModel.getViewDatas().put("project", project);
-        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
         viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
-        viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
+        viewModel.setTemplate("projects:details_project_milestones_config.html");
 
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel)
+            throws ServletException, IOException, BusinessException, ParseException {
 
+        User actor = SecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
+        Project project = this.projectService.getProjectByID(actor, projectID);
+        viewModel.getViewDatas().put("project", project);
         Milestone currentMilestone = null;
+        viewModel.setTemplate("projects:details_project_milestones_config.html");
 
-        try {
-
-            if (!getParameter(request, "milestoneID").get().isEmpty()) {
-                Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
-                currentMilestone = this.projectService.getMilestoneById(milestoneID);
-                currentMilestone = updateMilestone(currentMilestone, project, request);
-            } else {
-                currentMilestone = createMilestone(project, request);
-            }
-
-            viewModel.getViewDatas().put("milestone", currentMilestone);
-            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(currentMilestone));
-
-
-        } catch (Exception e) {
-            viewModel.getErrors().add(e);
-        } finally {
-            viewModel.setTemplate("projects:details_project_milestones_config.html");
-
-            viewModel.getViewDatas().put("project", project);
-            viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
-            viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
-            viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
+        if (!getParameter(request, "milestoneID").get().isEmpty()) {
+            Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
+            currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
+            currentMilestone = updateMilestone(currentMilestone, project, request);
+        } else {
+            currentMilestone = createMilestone(project, request);
         }
+
+        viewModel.getViewDatas().put("milestone", currentMilestone);
+        viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, currentMilestone));
+        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
+        viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
+        viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(actor, project));
+
     }
 
-    private Milestone createMilestone(Project project, HttpServletRequest request) throws ParseException {
+    private Milestone createMilestone(Project project, HttpServletRequest request) throws ParseException, BusinessException {
+        User actor = SecurityContext.getCurrentUser(request);
         String name = request.getParameter("milestoneName");
         Date date = new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1);
         MilestoneType type = request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY;
         Map<String, String> attributes = this.getCurrentMilestoneAttributes(request);
         Set<Task> tasks = new HashSet<>();
 
-        return this.projectService.createMilestone(name, date, type, attributes, tasks, project);
+        return this.projectService.createMilestone(actor, name, date, type, attributes, tasks, project);
     }
 
-    private Milestone updateMilestone(Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException {
+    private Milestone updateMilestone(Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException, BusinessException {
+        User actor = SecurityContext.getCurrentUser(request);
 
         currentMilestone.setName(request.getParameter("milestoneName"));
         currentMilestone.setDate(new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1));
@@ -141,7 +149,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         currentMilestone.setTasks(new HashSet<>());
         currentMilestone.setProject(project);
 
-        return this.projectService.updateMilestone(currentMilestone);
+        return this.projectService.updateMilestone(actor, currentMilestone);
     }
 
     private Map<String, String> getCurrentMilestoneAttributes(HttpServletRequest request){

@@ -31,10 +31,9 @@ import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Milestone;
-import timeboard.core.model.Project;
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
+import timeboard.core.model.*;
+import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
 import org.osgi.service.component.annotations.*;
 
@@ -61,7 +60,7 @@ import java.util.stream.Collectors;
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 )
-public class ProjectImportServlet extends HttpServlet {
+public class ProjectImportServlet extends TimeboardServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -79,14 +78,19 @@ public class ProjectImportServlet extends HttpServlet {
     private List<ProjectImportService> projectImportServlets;
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected ClassLoader getTemplateResolutionClassLoader() {
+        return ProjectExportServlet.class.getClassLoader();
+    }
+
+    @Override
+    protected void handlePost(HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
         requestDispatcher.forward(req, resp);
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
@@ -115,11 +119,19 @@ public class ProjectImportServlet extends HttpServlet {
 
                                 remoteTasks.stream().forEach(task -> mergeAssignee(userService, importPlugin.getServiceName(), task));
 
-                                final List<ProjectImportService.RemoteTask> newTasks = remoteTasks.stream()
-                                        .filter(task -> isNewTask(projectID, task)).collect(Collectors.toList());
+                                final List<ProjectImportService.RemoteTask> newTasks = new ArrayList<>();
+                                for (ProjectImportService.RemoteTask task1 : remoteTasks) {
+                                    if (isNewTask(actor, projectID, task1)) {
+                                        newTasks.add(task1);
+                                    }
+                                }
 
-                                final List<ProjectImportService.RemoteTask> updatedTasks = remoteTasks.stream()
-                                        .filter(task -> isUpdated(projectID, task)).collect(Collectors.toList());
+                                final List<ProjectImportService.RemoteTask> updatedTasks = new ArrayList<>();
+                                for (ProjectImportService.RemoteTask task1 : remoteTasks) {
+                                    if (isUpdated(actor, projectID, task1)) {
+                                        updatedTasks.add(task1);
+                                    }
+                                }
 
 
                                 newTasks.forEach(task ->
@@ -142,11 +154,11 @@ public class ProjectImportServlet extends HttpServlet {
                                         }
                                 );
 
-                                updatedTasks.forEach(remoteTask -> {
-                                    Task taskToUpdate = projectService.getTaskByID(remoteTask.getID());
+                                for (ProjectImportService.RemoteTask remoteTask : updatedTasks) {
+                                    Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getID());
                                     taskToUpdate.setName(remoteTask.getTitle());
                                     projectService.updateTask(actor, taskToUpdate);
-                                });
+                                }
 
                             } catch (BusinessException e) {
                                 e.printStackTrace();
@@ -170,12 +182,12 @@ public class ProjectImportServlet extends HttpServlet {
 
 
 
-    private boolean isUpdated(long projectID, ProjectImportService.RemoteTask task) {
-        return !this.isNewTask(projectID, task);
+    private boolean isUpdated(User actor,long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
+        return !this.isNewTask(actor, projectID, task);
     }
 
-    private boolean isNewTask(long projectID, ProjectImportService.RemoteTask task) {
-        Task existingTask = this.projectService.getTaskByID(task.getID());
+    private boolean isNewTask(User actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException{
+        AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getID());
         return existingTask == null;
     }
 

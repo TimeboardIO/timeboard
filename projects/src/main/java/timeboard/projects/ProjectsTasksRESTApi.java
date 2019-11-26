@@ -32,8 +32,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
@@ -67,7 +69,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws IOException, BusinessException {
         final String action = request.getParameter("action");
 
         response.setContentType("application/json");
@@ -84,15 +86,16 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         }
     }
 
-    private void approveTask(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void approveTask(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
        this.changeTaskStatus(request, response, TaskStatus.IN_PROGESS);
     }
 
-    private void denyTask(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void denyTask(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
         this.changeTaskStatus(request, response, TaskStatus.REFUSED);
     }
 
-    private void changeTaskStatus(HttpServletRequest request, HttpServletResponse response, TaskStatus status) throws IOException {
+    private void changeTaskStatus(HttpServletRequest request, HttpServletResponse response, TaskStatus status) throws IOException, BusinessException {
+        User actor = SecurityContext.getCurrentUser(request);
         final String taskIdStr = request.getParameter("taskId");
         Long taskId = null;
         if(taskIdStr != null) {
@@ -108,9 +111,9 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         Task task;
         try{
-            task = (Task) this.projectService.getTaskByID(taskId);
+            task = (Task) this.projectService.getTaskByID(actor, taskId);
             task.setTaskStatus(status);
-            this.projectService.updateTask(SecurityContext.getCurrentUser(request), task);
+            this.projectService.updateTask(actor, task);
         } catch (ClassCastException e){
             MAPPER.writeValue(response.getWriter(), "Task is not a project task.");
             return;
@@ -122,7 +125,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         return;
     }
 
-    private void getPendingTasks(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void getPendingTasks(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -132,13 +135,13 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             MAPPER.writeValue(response.getWriter(), "Incorrect project argument");
             return;
         }
-        final User currentUser = SecurityContext.getCurrentUser(request);
-        final Project project = this.projectService.getProjectByID(currentUser, projectID);
+        final User actor = SecurityContext.getCurrentUser(request);
+        final Project project = this.projectService.getProjectByID(actor, projectID);
         if(project == null){
             MAPPER.writeValue(response.getWriter(), "Project does not exists or you don't have enough permissions to access it.");
             return;
         }
-        final List<Task> tasks = this.projectService.listProjectTasks(project);
+        final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
 
         final Map<Long, UserTasksWrapper> result = new HashMap<>();
 

@@ -76,7 +76,7 @@ public class TimesheetValidationServlet extends TimeboardServlet {
         int year = Integer.parseInt(request.getParameter("year"));
         User actor = SecurityContext.getCurrentUser(request);
         try{
-            this.timesheetService.validateTimesheet(actor.getId(), actor.getId(), year, week);
+            this.timesheetService.validateTimesheet(actor, actor, year, week);
             response.setStatus(201);
         }catch (Exception e){ // TimesheetException
             response.setStatus(412);

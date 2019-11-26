@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicyOption;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
@@ -104,7 +105,13 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
 
         User actor = SecurityContext.getCurrentUser(request);
         Long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(actor, projectID);
+        Project project = null;
+        try {
+            project = this.projectService.getProjectByID(actor, projectID);
+        } catch (BusinessException e) {
+            MAPPER.writeValue(response.getWriter(), e.getMessage());
+            return;
+        }
 
         String type = request.getParameter("typeID");
         Long typeID = Long.parseLong(type);

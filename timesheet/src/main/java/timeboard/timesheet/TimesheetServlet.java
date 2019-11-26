@@ -32,6 +32,8 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
+import timeboard.core.model.AbstractTask;
+import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -136,21 +138,22 @@ public class TimesheetServlet extends TimeboardServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         try {
+            final User actor = SecurityContext.getCurrentUser(request);
             String type = request.getParameter("type");
             Long taskID = Long.parseLong(request.getParameter("task"));
-            final User actor = SecurityContext.getCurrentUser(request);
+            AbstractTask task = this.projectService.getTaskByID(actor, taskID);
 
             UpdatedTaskResult updatedTask = null;
 
             if (type.equals("imputation")) {
                 Date day = DATE_FORMAT.parse(request.getParameter("day"));
                 double imputation = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskImputation(actor, taskID, day, imputation);
+                updatedTask = this.projectService.updateTaskImputation(actor, task, day, imputation);
             }
 
             if (type.equals("effortLeft")) {
                 double effortLeft = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskEffortLeft(actor, taskID, effortLeft);
+                updatedTask = this.projectService.updateTaskEffortLeft(actor, (Task) task, effortLeft);
             }
 
 

@@ -28,6 +28,7 @@ package timeboard.projects;
 
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -76,34 +77,37 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+
+        User actor = SecurityContext.getCurrentUser(request);
         Task task = new Task();
         if (request.getParameter("taskID") != null) {
             // Update case
             long taskID = Long.parseLong(request.getParameter("taskID"));
-            task = this.projectService.getTaskByID(taskID);
+            task = (Task) this.projectService.getTaskByID(actor, taskID);
         }
         viewModel.getViewDatas().put("task", new TaskForm(task));
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
+        Project project = this.projectService.getProjectByID(actor, projectID);
 
         viewModel.setTemplate("projects:details_project_tasks_config.html");
         viewModel.getViewDatas().put("project", project);
-        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
+        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
         viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
-        viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(project));
+        viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
 
 
         /* Get datas for line-chart*/
         if(task.getId() != null) {
-            this.getDatasForCharts(viewModel, task);
+            this.getDatasForCharts(actor, viewModel, task);
         }
 
     }
 
-    private void getDatasForCharts(ViewModel viewModel, Task task) {
+    private void getDatasForCharts(User actor, ViewModel viewModel, Task task) throws BusinessException {
+
         // Datas for dates (Axis X)
         String formatLocalDate = "yyyy-MM-dd";
         String formatDateToDisplay = "dd/MM/yyyy";
@@ -115,7 +119,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("listOfTaskDates", listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
-        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(task.getId(), task.getStartDate(), task.getEndDate());
+        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
         final EffortHistory[] lastEffortSpentSum = {new EffortHistory(task.getStartDate(), 0.0)};
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
@@ -139,7 +143,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("effortSpentDatasForChart", effortSpentMap.values());
 
         // Datas for effort estimate (Axis Y)
-        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(task.getId());
+        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
         final EffortHistory[] lastEffortEstimate = {new EffortHistory(task.getStartDate(), task.getOriginalEstimate())};
         Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
@@ -164,18 +168,18 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         final User actor = SecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
+        Project project = this.projectService.getProjectByID(actor, projectID);
           Task currentTask = null;
 
         try {
 
             if (!getParameter(request, "taskID").get().isEmpty()) {
                 Long taskID = Long.parseLong(request.getParameter("taskID"));
-                currentTask = this.projectService.getTaskByID(taskID);
+                currentTask = (Task) this.projectService.getTaskByID(actor, taskID);
                 currentTask = this.updateTask(actor, project, currentTask, request);
             } else {
                 currentTask = this.createTask(actor, project, request);
@@ -188,22 +192,22 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         } finally {
             viewModel.setTemplate("projects:details_project_tasks_config.html");
 
-            viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
+            viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
             viewModel.getViewDatas().put("project", project);
             viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
-            viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(project));
+            viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
 
             /* Get datas for line-chart*/
             if(currentTask.getId() != null) {
-                this.getDatasForCharts(viewModel, currentTask);
+                this.getDatasForCharts(actor, viewModel, currentTask);
             }
         }
     }
 
-    private Task createTask(User actor, Project project, HttpServletRequest request) throws ParseException {
+    private Task createTask(User actor, Project project, HttpServletRequest request) throws ParseException, BusinessException {
         TaskForm taskForm = new TaskForm(request);
-        Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
+        Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(actor, taskForm.getMilestoneID()) : null;
 
         return this.projectService.createTask(actor,
                 project,
@@ -221,9 +225,9 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
                 );
     }
 
-    private Task updateTask(User actor, Project project, Task currentTask, HttpServletRequest request) throws ParseException {
+    private Task updateTask(User actor, Project project, Task currentTask, HttpServletRequest request) throws ParseException, BusinessException {
         TaskForm taskForm = new TaskForm(request);
-        Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(taskForm.getMilestoneID()) : null;
+        Milestone milestone = taskForm.getMilestoneID() != null ? this.projectService.getMilestoneById(actor, taskForm.getMilestoneID()) : null;
         User assigned = this.userService.findUserByID(taskForm.getAssignedUserID());
 
         final TaskType taskType = this.projectService.findTaskTypeByID(taskForm.getTaskTypeID());

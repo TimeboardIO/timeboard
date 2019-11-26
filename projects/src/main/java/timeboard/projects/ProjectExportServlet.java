@@ -28,7 +28,11 @@ package timeboard.projects;
 
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
+import timeboard.core.model.User;
+import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
 import org.osgi.service.component.annotations.*;
 
@@ -51,7 +55,7 @@ import java.util.Optional;
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 )
-public class ProjectExportServlet  extends HttpServlet {
+public class ProjectExportServlet  extends TimeboardServlet {
 
     @Reference
     private ProjectService projectService;
@@ -64,13 +68,20 @@ public class ProjectExportServlet  extends HttpServlet {
     private List<ProjectExportService> projectExportServices;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected ClassLoader getTemplateResolutionClassLoader() {
+        return ProjectExportServlet.class.getClassLoader();
+    }
 
+
+    @Override
+    protected void handleGet(HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+
+        User actor = SecurityContext.getCurrentUser(req);
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
 
-        final Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(req), projectID);
-        project.setTasks(new HashSet<>(this.projectService.listProjectTasks(project)));
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        project.setTasks(new HashSet<>(this.projectService.listProjectTasks(actor, project)));
 
         final Optional<ProjectExportService> optionalService = this.projectExportServices.stream()
                 .filter(projectExportService -> projectExportService.isCandidate(type))
@@ -93,4 +104,6 @@ public class ProjectExportServlet  extends HttpServlet {
             resp.setStatus(404);
         }
     }
+
+
 }
