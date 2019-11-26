@@ -50,3 +50,18 @@ Resources:
           Value: "TIMEBOARD"
       ServiceRoleArn:
         Fn::GetAtt: [ ServiceRole, Arn ]
+  WebAppDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      DeploymentConfigName: "CodeDeployDefault.AllAtOnce"
+      ApplicationName:
+        Ref: "TimeboardApplication"
+      DeploymentStyle:
+        DeploymentType: "IN_PLACE"
+        DeploymentOption: "WITHOUT_TRAFFIC_CONTROL"
+      Ec2TagFilters:
+        - Key: "SYSTEM"
+          Type: "KEY_AND_VALUE"
+          Value: "TIMEBOARD"
+      ServiceRoleArn:
+        Fn::GetAtt: [ ServiceRole, Arn ]
