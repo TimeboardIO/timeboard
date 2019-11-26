@@ -9,6 +9,8 @@
 - [See setup dev env manual](docs/setup.md)
 
 - [Dev cheatsheet](docs/cheatsheet.md)
+
+- [Self-Signed Certificate Procedure](docs/selfSignedCertProcedure.md)
          
  
 # Screenshots
