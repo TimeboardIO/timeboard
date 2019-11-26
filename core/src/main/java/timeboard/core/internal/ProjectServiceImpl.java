@@ -819,4 +819,14 @@ public class ProjectServiceImpl implements ProjectService {
             return m;
         });
     }
+
+    @Override
+    public TaskType createTaskType(String name) {
+        return this.jpa.txExpr(entityManager -> {
+            TaskType taskType = new TaskType();
+            taskType.setTypeName(name);
+            entityManager.persist(taskType);
+            return taskType;
+        });
+    }
 }
