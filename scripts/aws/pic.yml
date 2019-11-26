@@ -2,10 +2,13 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   S3Bucket:
     Type: String
-    Description: S3 Buket name that host application
-  S3Object:
+    Description: S3 Buket name that host application assets
+  AppZip:
     Type: String
-    Description: Application Object Key
+    Description: Configuration Application ZIP
+  LetsencryptZip:
+    Type: String
+    Description: Certbot setup Application ZIP
 Resources:
   ServiceRole:
     Type: "AWS::IAM::Role"
@@ -28,7 +31,37 @@ Resources:
               - Effect: "Allow"
                 Action: "*"
                 Resource: "*"
-
-
-  CodeDeployApplication:
+  TimeboardApplication:
     Type: 'AWS::CodeDeploy::Application'
+  Letsencrypt:
+    Type: 'AWS::CodeDeploy::Application'
+  DeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      DeploymentConfigName: "CodeDeployDefault.AllAtOnce"
+      ApplicationName:
+        Ref: "Letsencrypt"
+      DeploymentStyle:
+        DeploymentType: "IN_PLACE"
+        DeploymentOption: "WITHOUT_TRAFFIC_CONTROL"
+      Ec2TagFilters:
+        - Key: "SYSTEM"
+          Type: "KEY_AND_VALUE"
+          Value: "TIMEBOARD"
+      ServiceRoleArn:
+        Fn::GetAtt: [ ServiceRole, Arn ]
+  WebAppDeploymentGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    Properties:
+      DeploymentConfigName: "CodeDeployDefault.AllAtOnce"
+      ApplicationName:
+        Ref: "TimeboardApplication"
+      DeploymentStyle:
+        DeploymentType: "IN_PLACE"
+        DeploymentOption: "WITHOUT_TRAFFIC_CONTROL"
+      Ec2TagFilters:
+        - Key: "SYSTEM"
+          Type: "KEY_AND_VALUE"
+          Value: "TIMEBOARD"
+      ServiceRoleArn:
+        Fn::GetAtt: [ ServiceRole, Arn ]
