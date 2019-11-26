@@ -26,7 +26,6 @@ package timeboard.core.observers;
  * #L%
  */
 
-import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -45,47 +44,47 @@ import timeboard.core.notification.model.event.TimeboardEvent;
 import timeboard.core.notification.model.event.TimeboardEventType;
 import timeboard.core.notification.model.event.TimesheetEvent;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component(
-        service = StackEmail.class,
+        service = SendSummaryEmail.class,
         immediate = true
 )
-public class StackEmail {
+public class SendSummaryEmail {
 
     @Reference
-    EmailService emailService;
+    private EmailService emailService;
 
-    TemplateGenerator templateGenerator = new TemplateGenerator();
+    private TemplateGenerator templateGenerator = new TemplateGenerator();
 
     @Activate
     public void activate(){
-
-        TimeboardSubjects.TIMEBOARD_EVENTS
-                .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-                .buffer(90, TimeUnit.SECONDS)
-                .map(timedEvents -> notificationEventToUserEvent(timedEvents))
-                .flatMapIterable(l -> l).onErrorResumeNext(e -> {
-                    System.out.println(e);
-                 })
-                .subscribe(struc ->this.emailService.sendMessage(generateMailFromEventList(struc)));
+        TimeboardSubjects.TIMEBOARD_EVENTS // Listen for all timeboard app events
+                .observeOn(Schedulers.from(Executors.newFixedThreadPool(10))) // Observe on 10 threads
+                .buffer(5, TimeUnit.MINUTES) // Aggregate mails every 5 minutes TODO add configuration
+                .map(this::notificationEventToUserEvent) // Rebalance events by user to notify/inform
+                .flatMapIterable(l -> l) // transform user list to single events
+                .subscribe(struc ->this.emailService.sendMessage(generateMailFromEventList(struc))); //create and send individual summary
     }
 
-    private EmailStructure generateMailFromEventList(UserNotificationStructure userNotificationStructures) {
+    /**
+     * Transform user with his notifications to email structure
+     * Work for task create/delete events and timesheet validation events
+     * @param userNotificationStructure structure user 1 -- * events to notify/inform
+     * @return email ready structure
+     */
+    private EmailStructure generateMailFromEventList(UserNotificationStructure userNotificationStructure) {
 
         Map<String, Object> data  = new HashMap<>();
 
         List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
-
-
         Map<Long, EmailSummaryModel> projects = new HashMap<>();
+
         String subject = "[Timeboard] Daily summary";
 
-        for(TimeboardEvent event : userNotificationStructures.getNotificationEventList()){
-
+        for(TimeboardEvent event : userNotificationStructure.getNotificationEventList()){
             if(event instanceof TaskEvent){
                 Task t = ((TaskEvent) event).getTask();
                 if(((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
@@ -93,20 +92,24 @@ public class StackEmail {
             } else if(event instanceof TimesheetEvent){
                 validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             }
-
         }
         data.put("projects", projects.values());
         data.put("validatedTimesheets", validatedTimesheets);
 
-        String message = templateGenerator.getTemplateString("core-ui:layouts/mail.html", data);
-                ArrayList<String> list = new ArrayList<String>();
-                list.add(userNotificationStructures.getTargetUser().getEmail());
+        String message = templateGenerator.getTemplateString("core-ui:mail/summary.html", data);
+                ArrayList<String> list = new ArrayList<>();
+                list.add(userNotificationStructure.getTargetUser().getEmail());
         return new EmailStructure(list, null, subject, message);
     }
 
 
+    /**
+     * Rebalance events by user to notify/inform
+     * @param events list of events
+     * @return userNotificationStructure structure user 1 -- * events to notify/inform
+     */
     private List<UserNotificationStructure> notificationEventToUserEvent(List<TimeboardEvent> events) {
-        HashMap<Long, UserNotificationStructure> dataList = new HashMap<Long, UserNotificationStructure>();
+        HashMap<Long, UserNotificationStructure> dataList = new HashMap<>();
 
         for(TimeboardEvent event : events){
             for(User user : event.getUsersToNotify()){
@@ -117,9 +120,6 @@ public class StackEmail {
             }
         }
         return new ArrayList<>(dataList.values());
-    }
-    private String getDisplayFormatDate(Date date){
-        return  new SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 
 

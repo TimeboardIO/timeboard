@@ -47,6 +47,7 @@ import java.util.concurrent.Executors;
         service = SendTaskEmail.class,
         immediate = true
 )
+//TODO keep this class ?
 public class SendTaskEmail {
 
     @Reference

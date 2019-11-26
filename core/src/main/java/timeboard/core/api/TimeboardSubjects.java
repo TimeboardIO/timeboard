@@ -34,8 +34,9 @@ import timeboard.core.model.User;
 import timeboard.core.notification.model.event.TaskEvent;
 import timeboard.core.notification.model.event.TimeboardEvent;
 import timeboard.core.notification.model.event.TimesheetEvent;
-
 import java.util.Map;
+
+
 @Component(
         service = TimeboardSubjects.class,
         immediate = true
@@ -48,12 +49,12 @@ public class TimeboardSubjects {
 
     @Activate
     void activate(){
+        //Merge all Timeboard app events
          TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TASK_EVENTS);
          TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TIMESHEET_EVENTS);
-
     }
 
-    //TODO remove those subjects
+    //TODO keep this subject ?
     public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
 
 }

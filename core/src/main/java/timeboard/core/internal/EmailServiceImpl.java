@@ -94,5 +94,4 @@ public class EmailServiceImpl implements EmailService {
         }
         Transport.send(msg);
     }
-
 }

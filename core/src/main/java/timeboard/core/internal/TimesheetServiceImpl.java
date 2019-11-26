@@ -31,7 +31,6 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.TimesheetException;
-import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 import timeboard.core.api.TimesheetService;
@@ -40,10 +39,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import timeboard.core.notification.model.event.TimesheetEvent;
-
 import javax.persistence.TypedQuery;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 @Component(

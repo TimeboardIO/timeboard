@@ -30,7 +30,6 @@ package timeboard.core.api;
 import timeboard.core.notification.model.EmailStructure;
 
 import javax.mail.MessagingException;
-import java.util.List;
 
 public interface EmailService {
 

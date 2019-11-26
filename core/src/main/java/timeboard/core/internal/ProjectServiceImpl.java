@@ -41,7 +41,6 @@ import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 import timeboard.core.notification.model.event.TaskEvent;
 import timeboard.core.notification.model.event.TimeboardEventType;
-
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
@@ -306,7 +305,6 @@ public class ProjectServiceImpl implements ProjectService {
             newTask.setEffortLeft(OE);
             newTask.setOriginalEstimate(OE);
             newTask.setTaskStatus(TaskStatus.PENDING);
-
             newTask.setAssigned(assignedUser);
             if(milestone != null) {
                 entityManager.merge(milestone);

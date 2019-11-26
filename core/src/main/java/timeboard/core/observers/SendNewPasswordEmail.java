@@ -44,6 +44,7 @@ import java.util.concurrent.Executors;
         service = SendNewPasswordEmail.class,
         immediate = true
 )
+//TODO keep this useless class ?
 public class SendNewPasswordEmail {
 
     @Reference
