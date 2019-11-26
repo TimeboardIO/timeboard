@@ -174,8 +174,8 @@ public final class UserServiceImpl implements UserService {
         try {
             u = this.jpa.txExpr(entityManager -> {
                 Query q = entityManager
-                        .createQuery("select * from User u where u.remoteSubject = :sub", User.class);
-                q.setParameter(1, remoteSubject);
+                        .createQuery("select u from User u where u.remoteSubject = :sub", User.class);
+                q.setParameter("sub", remoteSubject);
                 return (User) q.getSingleResult();
             });
         } catch (NoResultException | NonUniqueResultException e) {
