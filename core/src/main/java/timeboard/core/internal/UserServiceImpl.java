@@ -38,6 +38,7 @@ import timeboard.core.model.Project;
 import timeboard.core.model.User;
 
 import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.Date;
@@ -168,6 +169,23 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findUserBySubject(String remoteSubject){
+        User u;
+        try {
+            u = this.jpa.txExpr(entityManager -> {
+                Query q = entityManager
+                        .createQuery("select * from User u where u.remoteSubject = :sub", User.class);
+                q.setParameter(1, remoteSubject);
+                return (User) q.getSingleResult();
+            });
+        } catch (NoResultException | NonUniqueResultException e) {
+            u = null;
+        }
+        return u;
+    }
+
+
+    @Override
     public User findUserByExternalID(String origin, String userExternalID) {
         User u;
         try {
@@ -188,8 +206,8 @@ public final class UserServiceImpl implements UserService {
     @Override
     public User userProvisionning(String sub, String email) throws BusinessException {
 
-        User user = this.findUserByEmail(email);
-        if (user == null || !user.getRemoteSubject().equals(sub)) {
+        User user = this.findUserBySubject(sub);
+        if (user == null) {
             //Create user
             user = new User(null, null, email, new Date(), new Date());
             user.setRemoteSubject(sub);

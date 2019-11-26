@@ -39,6 +39,13 @@ import java.util.List;
  */
 public interface UserService {
 
+    /**
+     * Search user by remote subject
+     *
+     * @param remoteSubject prefix used to search user
+     * @return list of users
+     */
+     User findUserBySubject(String remoteSubject);
 
 
     /**
