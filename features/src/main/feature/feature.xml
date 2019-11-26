@@ -42,7 +42,7 @@
             org.osgi.service.https.enabled=true
             org.osgi.service.http.port.secure=8443
             org.osgi.service.http.secure.enabled=true
-            org.ops4j.pax.web.ssl.keystore=./etc/keystores/keystore.jks
+            org.ops4j.pax.web.ssl.keystore=${karaf.etc}/keystores/keystore
             org.ops4j.pax.web.ssl.password=password
             org.ops4j.pax.web.ssl.keypassword=password
         </config>
