@@ -192,4 +192,6 @@ public interface ProjectService {
     List<Long> listTaskIdsByMilestone(Milestone milestone);
 
     Milestone addTasksToMilestone(Long currentMilestoneId, List<Long> newTasks, List<Long> oldTasks);
+
+    TaskType createTaskType(String name);
 }
