@@ -45,11 +45,11 @@
             <a class="ui button positive" th:href="@{/projects/create}">Create Project</a>
         </div>
 
-        <div class="ui grid segment">
-            <div class="four wide column" th:each="project : ${projects}">
-                <div class="ui card">
+        <div class="ui five stackable cards">
+            <div class="ui card" th:each="project : ${projects}">
                     <div class="image">
                         <div class="badge" style="text-transform: capitalize;"
+                             th:style="'background-color:'+${project.getColor()}"
                              th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">P
                         </div>
                     </div>
@@ -70,7 +70,6 @@
                            th:href="@{/projects/delete(projectID=${project.id})}">Delete</a>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 
