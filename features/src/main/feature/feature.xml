@@ -4,7 +4,10 @@
           xmlns="http://karaf.apache.org/xmlns/features/v1.4.0"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
-    <repository>mvn:org.ops4j.pax.web/pax-web-features/7.3.4/xml/features</repository>
+    <repository>mvn:org.ops4j.pax.web/pax-web-features/7.3.5/xml/features</repository>
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/3.3.4/xml/features</repository>
+    <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/1.0.6/xml</repository>
+    <repository>mvn:org.apache.karaf.features/standard/[4,5)/xml/features</repository>
 
     <feature name="timeboard-base" version="${project.version}">
         <feature>scr</feature>
@@ -101,9 +104,8 @@
     </feature>
 
     <feature name="timeboard-reporting" version="${project.version}">
-        <feature>timeboard-core</feature>
-        <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>aries-jax-rs-whiteboard</feature>
         <bundle start-level="80">mvn:${project.groupId}/reporting/${project.version}</bundle>
     </feature>
 

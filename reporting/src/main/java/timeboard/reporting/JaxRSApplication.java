@@ -2,7 +2,7 @@ package timeboard.reporting;
 
 /*-
  * #%L
- * timesheet
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.reporting;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,31 +27,17 @@ package timeboard.reporting;
  */
 
 import org.osgi.service.component.annotations.Component;
-import timeboard.core.ui.NavigationExtPoint;
+
+import javax.ws.rs.core.Application;
 
 @Component(
-        service = NavigationExtPoint.class
+        service = Application.class,
+        immediate = true,
+        property = {
+                "osgi.jaxrs.application.base=/rest",
+                "osgi.jaxrs.name=.default"
+        }
 )
-public class ReportingNavigationProvider implements NavigationExtPoint {
+public class JaxRSApplication extends Application{
 
-    @Override
-    public String getNavigationLabel() {
-        return "Reporting";
-    }
-
-
-    @Override
-    public String getNavigationPath() {
-        return ReportingServlet.URL;
-    }
-
-    @Override
-    public int getNavigationWeight() {
-        return 50;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "chart bar";
-    }
 }

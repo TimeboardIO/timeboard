@@ -57,7 +57,6 @@ public abstract class TimeboardServlet extends HttpServlet {
             ServiceReference<NavigationEntryRegistryService> sr = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(NavigationEntryRegistryService.class);
             this.navRegistry = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(sr);
         }catch(Exception e){
-            e.printStackTrace();
         }
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setPrefix("/templates/");
