@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.observers.emails;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.notification.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,43 +26,52 @@ package timeboard.core.notification.model;
  * #L%
  */
 
-import timeboard.core.model.User;
-import timeboard.core.notification.model.event.TimeboardEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class UserNotificationStructure {
+public class EmailStructure {
 
-    private User targetUser;
+    private List<String> targetUserList;
+    private List<String> targetCCUserList;
+    private String subject;
+    private String message;
 
-    private List<TimeboardEvent> notificationEventList;
-    private List<TimeboardEvent> informEventList;
-
-    public UserNotificationStructure(User targetUser) {
-        this.targetUser = targetUser;
-        notificationEventList = new ArrayList<>();
-        informEventList = new ArrayList<>();
-
-    }
-    public void notify(TimeboardEvent event){
-        notificationEventList.add(event);
+    public EmailStructure(List<String> targetUserList, List<String> targetCCUserList, String subject, String message) {
+        this.targetUserList = targetUserList;
+        this.targetCCUserList = targetCCUserList;
+        this.subject = subject;
+        this.message = message;
     }
 
-    public void inform(TimeboardEvent event){
-        informEventList.add(event);
+    public List<String> getTargetUserList() {
+        return targetUserList;
     }
 
-    public User getTargetUser() {
-        return targetUser;
+    public void setTargetUserList(List<String> targetUserList) {
+        this.targetUserList = targetUserList;
     }
 
-    public List<TimeboardEvent> getNotificationEventList() {
-        return notificationEventList;
+    public List<String> getTargetCCUserList() {
+        return targetCCUserList;
     }
 
-    public List<TimeboardEvent> getInformEventList() {
-        return informEventList;
+    public void setTargetCCUserList(List<String> targetCCUserList) {
+        this.targetCCUserList = targetCCUserList;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
+    public void setSubject(String subject) {
+        this.subject = subject;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }

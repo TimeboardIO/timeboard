@@ -1,4 +1,4 @@
-package timeboard.core.notification.model.event;
+package timeboard.core.internal.events;
 
 /*-
  * #%L
@@ -26,36 +26,9 @@ package timeboard.core.notification.model.event;
  * #L%
  */
 
-import timeboard.core.model.User;
+public enum TimeboardEventType {
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-public class TimeboardEvent  implements Serializable {
-
-    protected Date eventDate;
-
-    protected List<User> usersToNotify;
-    protected List<User> usersToInform;
-
-    public Date getEventDate() {
-        return eventDate;
-    }
-
-    protected TimeboardEvent(Date date){
-        this.eventDate =  date;
-        usersToNotify = new ArrayList<>();
-        usersToInform = new ArrayList<>();
-    }
-
-    public List<User> getUsersToNotify() {
-        return usersToNotify;
-    }
-
-    public List<User> getUsersToInform() {
-        return usersToInform;
-    }
-
+    CREATE,
+    UPDATE,
+    DELETE
 }

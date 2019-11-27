@@ -32,7 +32,6 @@ import org.osgi.framework.ServiceReference;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;

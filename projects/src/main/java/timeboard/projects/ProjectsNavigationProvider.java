@@ -26,8 +26,8 @@ package timeboard.projects;
  * #L%
  */
 
-import timeboard.core.ui.NavigationExtPoint;
 import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
 @Component(
         service = NavigationExtPoint.class,

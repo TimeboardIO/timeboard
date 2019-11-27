@@ -26,19 +26,10 @@ package timeboard.projects;
  * #L%
  */
 
-import timeboard.core.api.ProjectImportService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
-import timeboard.core.model.Task;
 import timeboard.core.model.User;
 
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 public class ProjectImportBackgroundTasks {
 

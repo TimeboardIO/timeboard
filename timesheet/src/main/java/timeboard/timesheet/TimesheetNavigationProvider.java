@@ -26,8 +26,8 @@ package timeboard.timesheet;
  * #L%
  */
 
-import timeboard.core.ui.NavigationExtPoint;
 import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
 import java.util.Calendar;
 import java.util.Date;

@@ -26,14 +26,14 @@ package timeboard.projects;
  * #L%
  */
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
 

@@ -1,4 +1,4 @@
-package timeboard.core.notification.model.event;
+package timeboard.core.observers.logs;
 
 /*-
  * #%L
@@ -26,36 +26,39 @@ package timeboard.core.notification.model.event;
  * #L%
  */
 
-import timeboard.core.api.ProjectService;
-import timeboard.core.model.Project;
-import timeboard.core.model.ProjectRole;
-import timeboard.core.model.ValidatedTimesheet;
+import io.reactivex.disposables.Disposable;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.log.LogService;
+import timeboard.core.api.TimeboardSubjects;
 
-import java.util.Date;
-import java.util.List;
+@Component(
+        service = LogTasksComponent.class,
+        immediate = true
+)
+public class LogTasksComponent {
 
-public class TimesheetEvent extends TimeboardEvent {
+    @Reference
+    private LogService logService;
 
-    private ValidatedTimesheet timesheet;
+    private Disposable disposable;
 
 
-    public TimesheetEvent(ValidatedTimesheet timesheet, ProjectService projectService) {
-        super(new Date());
-
-        this.timesheet = timesheet;
-
-        List<Project> projects = projectService.listProjects(timesheet.getUser());
-
-        projects.stream().forEach(project -> project.getMembers()
-                .stream()
-                .filter(member -> member.getRole() == ProjectRole.OWNER)
-                .forEach(member -> this.usersToNotify.add(member.getMember())));
-
-        usersToInform.add(timesheet.getUser());
+    @Activate
+    private void init() {
+        this.disposable = TimeboardSubjects.TASK_EVENTS.subscribe(taskEvent -> {
+            this.logService.log(LogService.LOG_INFO, String.format("User % has %s task %s", taskEvent.getActor().getScreenName(), taskEvent.getEventType(), taskEvent.getTask().getId()));
+        });
     }
 
+    @Deactivate
+    private void destroy() {
 
-    public ValidatedTimesheet getTimesheet() {
-        return timesheet;
+        if (this.disposable != null && !this.disposable.isDisposed()) {
+            this.disposable.dispose();
+        }
+
     }
 }

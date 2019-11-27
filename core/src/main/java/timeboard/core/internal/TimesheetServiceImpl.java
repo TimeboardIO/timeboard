@@ -36,9 +36,9 @@ import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.TimesheetException;
+import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
-import timeboard.core.notification.model.event.TimesheetEvent;
 
 import javax.persistence.TypedQuery;
 import java.util.Calendar;

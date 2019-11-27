@@ -26,8 +26,8 @@ package timeboard.theme;
  * #L%
  */
 
-import timeboard.core.ui.CssService;
 import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.CssService;
 
 import java.util.ArrayList;
 import java.util.List;

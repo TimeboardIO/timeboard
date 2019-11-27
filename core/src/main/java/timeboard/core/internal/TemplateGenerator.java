@@ -28,7 +28,6 @@ package timeboard.core.internal;
 
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 

@@ -27,11 +27,11 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import timeboard.core.api.UserService;
-import timeboard.core.model.User;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.api.UserService;
+import timeboard.core.model.User;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;

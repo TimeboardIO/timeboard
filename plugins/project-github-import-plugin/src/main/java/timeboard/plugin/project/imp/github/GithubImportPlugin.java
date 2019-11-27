@@ -26,20 +26,12 @@ package timeboard.plugin.project.imp.github;
  * #L%
  */
 
-import org.eclipse.egit.github.core.client.RequestException;
-import timeboard.core.api.*;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-
-import java.io.IOException;
-import java.rmi.Remote;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import timeboard.core.api.exceptions.BusinessException;
 
 @Component(
         service = ProjectImportService.class,

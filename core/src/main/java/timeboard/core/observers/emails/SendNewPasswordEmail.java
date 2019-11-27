@@ -1,4 +1,4 @@
-package timeboard.core.observers;
+package timeboard.core.observers.emails;
 
 /*-
  * #%L
@@ -33,7 +33,6 @@ import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.model.User;
-import timeboard.core.notification.model.EmailStructure;
 
 import java.text.SimpleDateFormat;
 import java.util.*;

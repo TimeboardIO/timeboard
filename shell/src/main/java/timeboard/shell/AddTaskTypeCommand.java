@@ -34,10 +34,6 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import timeboard.core.api.ProjectService;
-import timeboard.core.model.DefaultTask;
-
-import java.util.Calendar;
-import java.util.Date;
 
 @Service
 @Command(scope = "timeboard", name = "add-task-type", description = "Create a new task type")

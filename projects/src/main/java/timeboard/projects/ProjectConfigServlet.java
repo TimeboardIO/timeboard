@@ -28,6 +28,7 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.osgi.service.component.annotations.*;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
@@ -40,20 +41,16 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
-import org.osgi.service.component.annotations.*;
 
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**

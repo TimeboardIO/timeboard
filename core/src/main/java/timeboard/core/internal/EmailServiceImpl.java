@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.EmailService;
-import timeboard.core.notification.model.EmailStructure;
+import timeboard.core.observers.emails.EmailStructure;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;

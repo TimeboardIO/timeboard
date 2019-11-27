@@ -29,16 +29,12 @@ package timeboard.sample;
 
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.model.Imputation;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
-import timeboard.core.model.Imputation;
 
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class ImputationLoader {

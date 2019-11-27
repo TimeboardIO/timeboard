@@ -1,4 +1,4 @@
-package timeboard.core.observers;
+package timeboard.core.observers.emails;
 
 /*-
  * #%L
@@ -34,7 +34,6 @@ import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
-import timeboard.core.notification.model.EmailStructure;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
