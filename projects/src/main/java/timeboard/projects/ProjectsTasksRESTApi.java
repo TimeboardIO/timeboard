@@ -74,7 +74,9 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         response.setContentType("application/json");
 
-        if(action.matches("getPendingTasks")){
+        if(action.matches("getTasks")){
+            this.getTasks(request, response);
+        }else if(action.matches("getPendingTasks")){
             this.getPendingTasks(request, response);
         }else if(action.matches("approveTask")){
             this.approveTask(request, response);
@@ -122,7 +124,6 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             return;
         }
         MAPPER.writeValue(response.getWriter(), "DONE");
-        return;
     }
 
     private void getPendingTasks(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
@@ -163,7 +164,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                                 task.getComments(),
                                 task.getOriginalEstimate(),
                                 task.getStartDate(),
-                                task.getEndDate())
+                                task.getEndDate(),
+                                assignee.getFirstName()+" "+assignee.getName())
                         );
             }
         }
@@ -171,6 +173,50 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         response.setContentType("application/json");
         MAPPER.writeValue(response.getWriter(), new ArrayList<>(result.values()));
     }
+    private void getTasks(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
+
+        final String strProjectID = request.getParameter("project");
+        Long projectID = null;
+        if(strProjectID != null){
+            projectID = Long.parseLong(strProjectID);
+        }else{
+            MAPPER.writeValue(response.getWriter(), "Incorrect project argument");
+            return;
+        }
+        final User actor = SecurityContext.getCurrentUser(request);
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        if(project == null){
+            MAPPER.writeValue(response.getWriter(), "Project does not exists or you don't have enough permissions to access it.");
+            return;
+        }
+        final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
+
+        final List<TaskWrapper> result = new ArrayList<>();
+
+        for (Task task : tasks){
+                User assignee = task.getAssigned();
+                if(assignee == null){
+                    assignee = new User();
+                    assignee.setId(0);
+                    assignee.setName("");
+                    assignee.setFirstName("");
+                }
+
+            result. add(new TaskWrapper(
+                    task.getId(),
+                    task.getName(),
+                    task.getComments(),
+                    task.getOriginalEstimate(),
+                    task.getStartDate(),
+                    task.getEndDate(),
+                    assignee.getFirstName()+" "+assignee.getName()));
+
+        }
+
+        response.setContentType("application/json");
+        MAPPER.writeValue(response.getWriter(), result.toArray());
+    }
+
     public static class UserTasksWrapper{
 
         private final String firstName;
@@ -216,13 +262,15 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         private final double originalEstimate;
         private final Date startDate;
         private final Date endDate;
-        public TaskWrapper(Long taskID, String taskName, String taskComment, double originalEstimate, Date startDate, Date endDate) {
+        private final String assignee;
+        public TaskWrapper(Long taskID, String taskName, String taskComment, double originalEstimate, Date startDate, Date endDate, String assignee) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComment = taskComment;
             this.originalEstimate = originalEstimate;
             this.startDate = startDate;
             this.endDate = (endDate != null ? endDate : new Date());
+            this.assignee = assignee;
         }
 
         public String getStartDate() {

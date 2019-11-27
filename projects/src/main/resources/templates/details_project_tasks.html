@@ -2,34 +2,61 @@
 
 <html layout:decorate="~{projects:details_project_layout.html(tab='second')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>Project Tasks details</title>
+    <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
+
 </head>
 <body>
 
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
-    <div class="ui grid">
-        <div class="four wide column">
-            <div class="ui vertical fluid tabular menu">
-                <a th:classappend="${task && task.taskID == null} ? active" class="ui button positive item" th:href="@{/projects/tasks/config(projectID=${project.id})}">Create Task</a>
-                <a th:classappend="${!task } ? active" class="item" th:href="@{/projects/tasks/validation(projectID=${project.id})}"><i style="font-style: italic;">Pending tasks</i></a>
-                <a th:each="t : ${tasks}" th:classappend="${task && t.id == task.taskID} ? active" class="item" th:href="@{/projects/tasks/config(projectID=${project.id}, taskID=${t.id})}"
-                   th:text="${t.name}" >
-                </a>
-            </div>
-        </div>
-        <div class="twelve wide stretched column">
-            <div th:if="${task}" class="ui segment" layout:fragment="task-config">
+    <script type="text/x-template" id="grid-template">
+    <table class="ui celled table">
+        <thead>
+        <tr><th v-for="key in columns"
+                @click="sortBy(key)"
+                :class="{ active: sortKey == key }" > {{ key | capitalize }}  <i class="icon caret" :class="sortOrders[key] > 0 ? 'up' : 'down'">
+          </i> </th>
+            <th>Actions</th>
+        </tr></thead>
+        <tbody>
+        <tr>
+            <td  v-for="key in columns">
+                <div class="ui fluid icon input">
+                    <input type="text" v-bind:placeholder="key +'..' ">
+                    <i class="search icon"></i>
+                </div>
+            </td>
+            <td></td>
+        </tr>
 
-            </div>
-            <div th:if="${!task}" class="ui segment" layout:fragment="task-validation">
+        <tr v-for="entry in filteredTasks">
+            <td  v-for="key in columns">{{entry[key]}}</td>
+            <td>
 
-            </div>
-        </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </script>
+    <div id="tasksList">
+        <form id="search">
+            Search <input name="query" v-model="searchQuery">
+        </form>
+        <demo-grid
+                :tasks="gridData"
+                :columns="gridColumns"
+                :filter-key="searchQuery">
+        </demo-grid>
+
+        <script src="/projects/static/tasks.js"></script>
+
+
     </div>
+
 </div>
 
 </body>
