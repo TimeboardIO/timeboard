@@ -16,9 +16,9 @@
 }
 
 body{
-       background: rgb(102,138,160);
-       background: linear-gradient(180deg, rgba(102,138,160,1) 0%, rgba(251,252,253,1) 100%);
-       background-repeat: repeat-y;
+       background: rgb(110,138,158);
+       background: linear-gradient(180deg, rgba(110,138,158,1) 0%, rgba(221,227,232,1) 100%);
+       background-repeat: no-repeat;
 }
 html{
        height: 100%;

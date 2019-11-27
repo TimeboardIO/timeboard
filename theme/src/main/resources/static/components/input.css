@@ -37,7 +37,7 @@
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   text-align: left;
   line-height: 1.21428571em;
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
   padding: 0.67857143em 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -164,19 +164,19 @@
 ---------------------*/
 
 .ui.input.error > input {
-  background-color: #FFF6F6;
-  border-color: #E0B4B4;
-  color: #9F3A38;
+  background-color: #FFF6F6 !important;
+  border-color: #E0B4B4 !important;
+  color: #9F3A38 !important;
   -webkit-box-shadow: none;
           box-shadow: none;
 }
 
 /* Error Placeholder */
 .ui.input.error > input::-webkit-input-placeholder {
-  color: #e7bdbc;
+  color: #e7bdbc !important;
 }
 .ui.input.error > input::-moz-placeholder {
-  color: #e7bdbc;
+  color: #e7bdbc !important;
 }
 .ui.input.error > input:-ms-input-placeholder {
   color: #e7bdbc !important;
@@ -184,10 +184,10 @@
 
 /* Focused Error Placeholder */
 .ui.input.error > input:focus::-webkit-input-placeholder {
-  color: #da9796;
+  color: #da9796 !important;
 }
 .ui.input.error > input:focus::-moz-placeholder {
-  color: #da9796;
+  color: #da9796 !important;
 }
 .ui.input.error > input:focus:-ms-input-placeholder {
   color: #da9796 !important;
@@ -511,6 +511,11 @@
          Theme Overrides
 *******************************/
 
+ui.input.error > input {
+  background-color: #fff6f6 !important;
+  border-color: #e0b4b4 !important;
+  color: #9f3a38 !important;
+}
 
 
 /*******************************

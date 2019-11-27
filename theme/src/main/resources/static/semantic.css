@@ -554,10 +554,12 @@ template {
              Page
 *******************************/
 
+/*
 html,
 body {
   height: 100%;
 }
+*/
 
 html {
   font-size: 14px;
@@ -770,9 +772,15 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 }
 
 body {
-  background: #668aa0;
-  /* background: linear-gradient(180deg, rgba(102,138,160,1) 0%, rgba(251,252,253,1) 100%); */
-  background-repeat: repeat-y;
+  background: #6e8a9e;
+  background: -webkit-gradient(linear, left top, left bottom, from(#6e8a9e), to(#dde3e8));
+  background: -webkit-linear-gradient(top, #6e8a9e 0%, #dde3e8 100%);
+  background: linear-gradient(180deg, #6e8a9e 0%, #dde3e8 100%);
+  background-repeat: no-repeat;
+}
+
+html {
+  height: 100%;
 }
 
 .login {
@@ -7788,7 +7796,7 @@ a.ui.inverted.grey.header:hover {
 }
 
 /*******************************
-           Overrides
+           Header Overrides
 *******************************/
 
 @font-face {
@@ -14325,7 +14333,7 @@ img.ui.bordered.image {
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
   text-align: left;
   line-height: 1.21428571em;
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
   padding: 0.67857143em 1em;
   background: #FFFFFF;
   border: 1px solid rgba(34, 36, 38, 0.15);
@@ -14457,9 +14465,9 @@ img.ui.bordered.image {
 ---------------------*/
 
 .ui.input.error > input {
-  background-color: #FFF6F6;
-  border-color: #E0B4B4;
-  color: #9F3A38;
+  background-color: #FFF6F6 !important;
+  border-color: #E0B4B4 !important;
+  color: #9F3A38 !important;
   -webkit-box-shadow: none;
   box-shadow: none;
 }
@@ -14467,11 +14475,11 @@ img.ui.bordered.image {
 /* Error Placeholder */
 
 .ui.input.error > input::-webkit-input-placeholder {
-  color: #e7bdbc;
+  color: #e7bdbc !important;
 }
 
 .ui.input.error > input::-moz-placeholder {
-  color: #e7bdbc;
+  color: #e7bdbc !important;
 }
 
 .ui.input.error > input:-ms-input-placeholder {
@@ -14481,11 +14489,11 @@ img.ui.bordered.image {
 /* Focused Error Placeholder */
 
 .ui.input.error > input:focus::-webkit-input-placeholder {
-  color: #da9796;
+  color: #da9796 !important;
 }
 
 .ui.input.error > input:focus::-moz-placeholder {
-  color: #da9796;
+  color: #da9796 !important;
 }
 
 .ui.input.error > input:focus:-ms-input-placeholder {
@@ -14855,6 +14863,12 @@ img.ui.bordered.image {
 /*******************************
          Theme Overrides
 *******************************/
+
+ui.input.error > input {
+  background-color: #fff6f6 !important;
+  border-color: #e0b4b4 !important;
+  color: #9f3a38 !important;
+}
 
 /*******************************
          Site Overrides
@@ -26707,9 +26721,9 @@ Floated Menu / Item
 
 .ui.table thead th {
   cursor: auto;
-  background: #F9FAFB;
+  background: #3d6488;
   text-align: inherit;
-  color: rgba(0, 0, 0, 0.87);
+  color: #FFFFFF;
   padding: 0.78571429em 0.78571429em;
   vertical-align: inherit;
   font-style: none;
@@ -27359,11 +27373,11 @@ Floated Menu / Item
 /* Red */
 
 .ui.red.table {
-  border-top: 0.2em solid #DB2828;
+  border-top: 0.2em solid #C53E43;
 }
 
 .ui.inverted.red.table {
-  background-color: #DB2828 !important;
+  background-color: #C53E43 !important;
   color: #FFFFFF !important;
 }
 
@@ -27403,11 +27417,11 @@ Floated Menu / Item
 /* Green */
 
 .ui.green.table {
-  border-top: 0.2em solid #21BA45;
+  border-top: 0.2em solid #4dc98d;
 }
 
 .ui.inverted.green.table {
-  background-color: #21BA45 !important;
+  background-color: #4dc98d !important;
   color: #FFFFFF !important;
 }
 
@@ -27425,11 +27439,11 @@ Floated Menu / Item
 /* Blue */
 
 .ui.blue.table {
-  border-top: 0.2em solid #2185D0;
+  border-top: 0.2em solid #3d6488;
 }
 
 .ui.inverted.blue.table {
-  background-color: #2185D0 !important;
+  background-color: #3d6488 !important;
   color: #FFFFFF !important;
 }
 
@@ -27938,6 +27952,23 @@ Floated Menu / Item
 
 .ui.large.table {
   font-size: 1.1em;
+}
+
+.project {
+  padding: 0.38571429em 0.78571429em !important;
+  background-color: #d1dceb !important;
+  color: #375d8f !important;
+  font-size: 1.25em !important;
+}
+
+th.project {
+  font-size: 1em !important;
+  font-weight: normal;
+}
+
+th,
+td {
+  text-align: center !important;
 }
 
 /*******************************
