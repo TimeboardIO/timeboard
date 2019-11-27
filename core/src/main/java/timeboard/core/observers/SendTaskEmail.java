@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.model.*;
+import timeboard.core.notification.model.EmailStructure;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import java.util.concurrent.Executors;
         service = SendTaskEmail.class,
         immediate = true
 )
+//TODO keep this class ?
 public class SendTaskEmail {
 
     @Reference
@@ -54,10 +56,10 @@ public class SendTaskEmail {
     @Activate
     public void activate(){
 
-        TimeboardSubjects.CREATE_TASK
+       /* TimeboardSubjects.CREATE_TASK
                 .map(newTask -> sendEmailCreatingTask(new User(), newTask) )
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
+                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));*/
     }
 
     public EmailStructure sendEmailCreatingTask(User creator, Task newTaskDB) {

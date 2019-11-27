@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.notification.model.event;
 
 /*-
  * #%L
@@ -26,44 +26,36 @@ package timeboard.core.notification.model;
  * #L%
  */
 
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
+import timeboard.core.api.ProjectService;
+import timeboard.core.model.Project;
+import timeboard.core.model.ProjectRole;
+import timeboard.core.model.ValidatedTimesheet;
 
 import java.util.Date;
+import java.util.List;
 
-public class TaskEvent extends TimeboardEvent {
-    private Task task;
-    private User actor;
-    private TimeboardEventType eventType;
+public class TimesheetEvent extends TimeboardEvent {
 
-    public TaskEvent(TimeboardEventType eventType, Task task, User actor) {
+    private ValidatedTimesheet timesheet;
+
+
+    public TimesheetEvent(ValidatedTimesheet timesheet, ProjectService projectService) {
         super(new Date());
-        this.eventType = eventType;
-        this.task = task;
-        this.actor = actor;
+
+        this.timesheet = timesheet;
+
+        List<Project> projects = projectService.listProjects(timesheet.getUser());
+
+        projects.stream().forEach(project -> project.getMembers()
+                .stream()
+                .filter(member -> member.getRole() == ProjectRole.OWNER)
+                .forEach(member -> this.usersToNotify.add(member.getMember())));
+
+        usersToInform.add(timesheet.getUser());
     }
 
-    public TimeboardEventType getEventType() {
-        return eventType;
-    }
 
-    public void setEventType(TimeboardEventType eventType) {
-        this.eventType = eventType;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
-    public User getActor() {
-        return actor;
-    }
-
-    public void setActor(User actor) {
-        this.actor = actor;
+    public ValidatedTimesheet getTimesheet() {
+        return timesheet;
     }
 }

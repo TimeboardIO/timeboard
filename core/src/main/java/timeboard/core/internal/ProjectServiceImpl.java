@@ -41,9 +41,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
-import timeboard.core.notification.model.TaskEvent;
-import timeboard.core.notification.model.TimeboardEventType;
-
+import timeboard.core.notification.model.event.TaskEvent;
+import timeboard.core.notification.model.event.TimeboardEventType;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.util.*;
@@ -491,60 +490,29 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val, EntityManager entityManager){
-
-
         Calendar c = Calendar.getInstance();
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
 
         // special actions when task is a project task
-        Task projectTask = (Task.class.isInstance(task)) ? (Task) task : null;
+        Task projectTask = (task instanceof Task) ? (Task) task : null;
 
         // Task is available for imputations if this is a default task (not a project task) or task status is not pending
         boolean taskAvailableForImputations = (projectTask == null || projectTask.getTaskStatus() != TaskStatus.PENDING);
 
+        //DB Query
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
         q.setParameter("taskID", task.getId());
         q.setParameter("day", c.getTime());
 
+        // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
         List<Imputation> existingImputations = q.getResultList();
-        if (existingImputations.isEmpty() && val > 0.0 && val <= 1.0 && taskAvailableForImputations) {
-            //No imputation for current task and day
-            Imputation i = new Imputation();
-            i.setDay(c.getTime());
-            i.setTask(task);
-            i.setUser(actor);
-            i.setValue(val);
-            if(projectTask != null){ //project task
-                projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() - val, 0));
-                projectTask.getImputations().add(i);
-            }
-            entityManager.persist(i);
+
+        if(taskAvailableForImputations){
+            this.addOrUpdateOrDeleteImputation(existingImputations.isEmpty() ? null : existingImputations.get(0), task, actor, val,c.getTime(), entityManager );
         }
 
-        if (!existingImputations.isEmpty()) {
-            Imputation i = existingImputations.get(0);
-
-            if(projectTask != null){ //project task
-                if (i.getValue() < val) {
-                    projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() - Math.abs(val - i.getValue()), 0));
-
-                }
-                if (i.getValue() > val && projectTask.getEffortLeft() > 0) {
-                    projectTask.setEffortLeft(Math.max(projectTask.getEffortLeft() + Math.abs(i.getValue() - val), 0));
-                }
-
-            }
-            if (val == 0) {
-                entityManager.remove(i);
-                task.getImputations().remove(i);
-            } else {
-                i.setValue(val);
-                entityManager.persist(i);
-                task.getImputations().remove(i);
-                task.getImputations().add(i);
-            }
-        }
+        entityManager.merge(task);
         this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
 
         if(projectTask != null) { //project task
@@ -552,6 +520,46 @@ public class ProjectServiceImpl implements ProjectService {
         }else{
             return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
         }
+    }
+
+
+    private void addOrUpdateOrDeleteImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager ){
+        Task projectTask = (task instanceof Task) ? (Task) task : null;
+
+        if (i == null && (val > 0.0) && (val <= 1.0)) { 
+            //No imputation for current task and day
+            i = new Imputation();
+            i.setDay(date);
+            i.setTask(task);
+            i.setUser(actor);
+            i.setValue(val);
+            updateEffortLeftFromImputationValue(projectTask, 0, val);
+            entityManager.persist(i);
+        } else  { // There is an existing imputation for this day and task
+            updateEffortLeftFromImputationValue(projectTask, i.getValue(), val);
+            i.setValue(val);
+            if (val == 0) {  //if value equal to 0 then remove imputation
+                entityManager.remove(i);
+            } else { // else save new value
+                entityManager.persist(i);
+            }
+        }
+    }
+    private void updateEffortLeftFromImputationValue(Task projectTask, double currentImputationValue, double newImputationValue){
+        if(projectTask == null) return;
+        double currentEL = projectTask.getEffortLeft();
+        double newEL = currentEL ; // new effort left
+
+        if (currentEL == 0) return;
+        double diffValue =  Math.abs(newImputationValue - currentImputationValue);
+
+        if (currentImputationValue < newImputationValue) {
+            newEL = currentEL - diffValue;
+        }
+        if (currentImputationValue > newImputationValue) {
+            newEL = currentEL + diffValue;
+        }
+        projectTask.setEffortLeft(Math.max(newEL, 0));
     }
 
     @Override
@@ -691,6 +699,8 @@ public class ProjectServiceImpl implements ProjectService {
 
             entityManager.remove(task);
             entityManager.flush();
+            TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
+
             return null;
         });
 
@@ -945,6 +955,16 @@ public class ProjectServiceImpl implements ProjectService {
             });
 
             return m;
+        });
+    }
+
+    @Override
+    public TaskType createTaskType(String name) {
+        return this.jpa.txExpr(entityManager -> {
+            TaskType taskType = new TaskType();
+            taskType.setTypeName(name);
+            entityManager.persist(taskType);
+            return taskType;
         });
     }
 }

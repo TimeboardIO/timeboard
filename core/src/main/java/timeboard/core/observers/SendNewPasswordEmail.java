@@ -33,6 +33,7 @@ import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.model.*;
+import timeboard.core.notification.model.EmailStructure;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -43,6 +44,7 @@ import java.util.concurrent.Executors;
         service = SendNewPasswordEmail.class,
         immediate = true
 )
+//TODO keep this useless class ?
 public class SendNewPasswordEmail {
 
     @Reference

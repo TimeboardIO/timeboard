@@ -1,8 +1,8 @@
-package timeboard.core.api;
+package timeboard.core.notification.model.event;
 
 /*-
  * #%L
- * security
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,18 +26,36 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.model.User;
 
-import timeboard.core.notification.model.EmailStructure;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-import javax.mail.MessagingException;
+public class TimeboardEvent  implements Serializable {
 
-public interface EmailService {
+    protected Date eventDate;
 
-    /**
-     * Send email
-     *
-     * @param emailStructure emailStructure with informations for email
-     * @throws MessagingException message not sent
-     */
-    void sendMessage(EmailStructure emailStructure) throws MessagingException;
+    protected List<User> usersToNotify;
+    protected List<User> usersToInform;
+
+    public Date getEventDate() {
+        return eventDate;
+    }
+
+    protected TimeboardEvent(Date date){
+        this.eventDate =  date;
+        usersToNotify = new ArrayList<>();
+        usersToInform = new ArrayList<>();
+    }
+
+    public List<User> getUsersToNotify() {
+        return usersToNotify;
+    }
+
+    public List<User> getUsersToInform() {
+        return usersToInform;
+    }
+
 }

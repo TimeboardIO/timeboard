@@ -176,12 +176,10 @@ public interface ProjectService {
     List<Task> listTasksByMilestone(User actor, Milestone milestone) throws BusinessException;
 
     Milestone addTasksToMilestone(User actor, Milestone currentMilestone, List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
-
-
+    TaskType createTaskType(String name);
     /**
      * @return List all task types.
      */
     List<TaskType> listTaskType();
-
     TaskType findTaskTypeByID(Long taskTypeID);
 }

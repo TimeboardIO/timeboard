@@ -156,4 +156,13 @@ public class Project implements Serializable {
         //TODO check if actor is member of current project
         return true;
     }
+
+    @Transient
+    public String getColor(){
+        if(this.getAttributes().get("project.color") != null){
+            return this.getAttributes().get("project.color").getValue();
+        }else{
+            return "#957DAD";
+        }
+    }
 }
