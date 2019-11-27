@@ -1354,8 +1354,8 @@ Floated Menu / Item
 }
 .ui.menu .violet.active.item,
 .ui.violet.menu .active.item {
-  border-color: #6435C9 !important;
-  color: #6435C9 !important;
+  border-color: #957DAD !important;
+  color: #957DAD !important;
 }
 .ui.menu .purple.active.item,
 .ui.purple.menu .active.item {
@@ -1587,7 +1587,7 @@ Floated Menu / Item
 /* Violet */
 .ui.inverted.menu .violet.active.item,
 .ui.inverted.violet.menu {
-  background-color: #6435C9;
+  background-color: #957DAD;
 }
 .ui.inverted.violet.menu .item:before {
   background-color: rgba(34, 36, 38, 0.1);
@@ -2037,12 +2037,6 @@ Floated Menu / Item
 }
 .ui.massive.vertical.menu {
   width: 25rem;
-}
-@font-face {
-  font-family: 'Roboto';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Roboto'), local('Roboto-Regular'), url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu4mxP.ttf) format('truetype');
 }
 
 

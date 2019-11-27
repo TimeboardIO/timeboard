@@ -14,25 +14,50 @@
     <form action="" class="ui form segment" enctype="application/x-www-form-urlencoded" id="task"
           method="post" style="margin-left:1em;">
         <input name="taskID" required th:value="${task.taskID}" type="hidden">
+        <div class=" two fields">
+            <div class="field">
+                <label>Task Name</label>
+                <input name="taskName" placeholder="Task Name" required th:value="${task.taskName}" type="text">
+            </div>
+            <div class="field">
+                <label>User assigned</label>
+                <div class="ui category search">
+                    <div class="ui icon input">
+
+                        <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser != null}"
+                               th:value="${task.assignedUser.name}" type="text"/>
+                        <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser == null}"
+                               type="text"/>
+
+                        <input class="taskAssigned" name="taskAssigned" th:if="${task.assignedUser != null}"
+                               th:value="${task.assignedUser.id}" type="hidden"/>
+                        <input class="taskAssigned" name="taskAssigned" th:if="${task.assignedUser == null}" type="hidden"
+                               value=""/>
+
+                        <i class="search icon"></i>
+                    </div>
+                    <div class="results"></div>
+                </div>
+            </div>
+        </div>
 
         <div class="field">
-            <label>Task Name</label>
-            <input name="taskName" placeholder="Task Name" required th:value="${task.taskName}" type="text">
-        </div>
-        <div class="field">
             <label>Task Description</label>
-            <input name="taskComments" placeholder="Task Description" th:value="${task.taskComment}" type="text">
+            <textarea name="taskComments" placeholder="Task Description" th:text="${task.taskComment}" rows="2"></textarea>
         </div>
-        <div class="field">
-            <label>Task Start Date</label>
-            <input name="taskStartDate" placeholder="Task Name"
-                   required th:value="${#dates.format(task.startDate, 'yyyy-MM-dd')}" type="date">
+        <div class="two fields">
+            <div class="field">
+                <label>Task Start Date</label>
+                <input name="taskStartDate" placeholder="Task Name"
+                       required th:value="${#dates.format(task.startDate, 'yyyy-MM-dd')}" type="date">
+            </div>
+            <div class="field">
+                <label>Task End Date</label>
+                <input name="taskEndDate" placeholder="Task Name" required
+                       th:value="${#dates.format(task.endDate, 'yyyy-MM-dd')}" type="date">
+            </div>
         </div>
-        <div class="field">
-            <label>Task End Date</label>
-            <input name="taskEndDate" placeholder="Task Name" required
-                   th:value="${#dates.format(task.endDate, 'yyyy-MM-dd')}" type="date">
-        </div>
+        <div class="four fields">
         <div class="field">
             <label>Task Original Estimate</label>
             <input name="taskOriginalEstimate" placeholder="Task OE" required th:value="${task.originalEstimate}" type="number">
@@ -55,27 +80,7 @@
                         th:selected="${status == task.taskStatus}"></option>
             </select>
         </div>
-        <div class="field">
-            <label>User assigned</label>
-            <div class="ui category search">
-                <div class="ui icon input">
 
-                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser != null}"
-                           th:value="${task.assignedUser.screenName}" type="text"/>
-                    <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser == null}"
-                           type="text"/>
-
-                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assignedUser != null}"
-                           th:value="${task.assignedUser.id}" type="hidden"/>
-                    <input class="taskAssigned" name="taskAssigned" th:if="${task.assignedUser == null}" type="hidden"
-                           value=""/>
-
-
-                    <i class="search icon"></i>
-                </div>
-                <div class="results"></div>
-            </div>
-        </div>
 
         <div class="field">
             <label>Milestone assigned</label>
@@ -87,7 +92,7 @@
                         th:selected="${milestone.id == task.milestoneID}"></option>
             </select>
         </div>
-
+        </div>
 
         <button class="ui positive button" type="submit">Save</button>
 
@@ -161,6 +166,10 @@
     </div>
 
     <script>
+    $('select.dropdown')
+      .dropdown()
+    ;
+
          $('.ui.search')
             .search({
                 apiSettings: {

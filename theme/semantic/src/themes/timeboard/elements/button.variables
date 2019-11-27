@@ -21,7 +21,7 @@
 @backgroundColor      : @white;
 @backgroundImage      : linear-gradient(transparent, rgba(0, 0, 0, 0.02));
 
-@solidBorderColor: #DDDDDD;
+@solidBorderColor: @lightGrey;
 
 @borderBoxShadowColor: @solidBorderColor;
 @borderBoxShadow: 0px 0px 0px 1px @solidBorderColor inset;
@@ -46,11 +46,11 @@
 
 @downBackgroundColor: @white;
 @downBackgroundImage: linear-gradient(rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.04));
-@downTextColor: #222222;
+@downTextColor: @lightGrey;
 @downBoxShadow: @borderBoxShadow;
 
-@activeBackgroundColor: #F0F0F0;
-@activeBoxShadow: 0px 0px 0px 1px #DDDDDD;
+@activeBackgroundColor: @lightGrey;
+@activeBoxShadow: 0px 0px 0px 1px @lightGrey;
 
 /*-------------------
       Variations
@@ -65,7 +65,7 @@
 @basicDownBackground: @white;
 @basicDownBoxShadow: @downBoxShadow;
 
-@basicActiveBackground: #FFFFFF;
+@basicActiveBackground: @white;
 @basicActiveBoxShadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2);
 
 /* Labeled */
@@ -78,12 +78,9 @@
 @coloredBackgroundImage : @subtleGradient;
 @coloredBoxShadow       : 0px 0px 0px 1px rgba(0, 0, 0, 0.1) inset;
 
-/* Primary */
-@primaryColor       : #4184F3;
 @primaryBoxShadow   : 0px 0px 0px 1px #0157E4 inset;
 
 /* Secondary */
-@secondaryColor           : #EEEEEE;
 @secondaryBackgroundImage : @backgroundImage;
 @secondaryTextColor       : @textColor;
 @secondaryBoxShadow       : @borderBoxShadow;

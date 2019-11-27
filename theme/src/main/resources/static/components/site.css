@@ -149,6 +149,10 @@ input::-moz-selection {
   background-color: rgba(100, 100, 100, 0.4);
   color: rgba(0, 0, 0, 0.87);
 }
+textarea::-moz-selection, input::-moz-selection {
+  background-color: rgba(100, 100, 100, 0.4);
+  color: rgba(0, 0, 0, 0.87);
+}
 textarea::selection,
 input::selection {
   background-color: rgba(100, 100, 100, 0.4);
@@ -198,18 +202,13 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
         Global Overrides
 *******************************/
 
-.timesheet-navigation-controls {
-  margin-bottom: 1em;
-  text-align: right;
-}
-.timesheet-validation-controls {
-  margin-top: 1em;
-}
+
+/* Core */
 .navigation {
   background-color: white ! important;
 }
 body {
-  background: #6e8a9e;
+  background: #dde3e8;
   background: -webkit-gradient(linear, left top, left bottom, from(#6e8a9e), to(#dde3e8));
   background: -webkit-linear-gradient(top, #6e8a9e 0%, #dde3e8 100%);
   background: linear-gradient(180deg, #6e8a9e 0%, #dde3e8 100%);
@@ -217,53 +216,94 @@ body {
 }
 html {
   height: 100%;
+  background: #dde3e8;
 }
-.login {
-  position: fixed;
-  bottom: 0px;
-  right: 0px;
-  left: 0px;
-  top: 0px;
-  
-/* background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
-       background-size: 600% 600%;
-       background-color: pink; */
-  background: -webkit-gradient(linear, left top, left bottom, from(#668aa0), color-stop(99%, #fbfcfd)) !important;
-  background: -webkit-linear-gradient(top, #668aa0 0%, #fbfcfd 99%) !important;
-  background: linear-gradient(to bottom, #668aa0 0%, #fbfcfd 99%) !important;
-  -webkit-animation: AnimationName 12s ease infinite;
-  animation: AnimationName 12s ease infinite;
+th,
+td {
+  text-align: center;
 }
-@-webkit-keyframes AnimationName {
-  0% {
-    background-position: 0% 68%;
-  }
-  50% {
-    background-position: 100% 33%;
-  }
-  100% {
-    background-position: 0% 68%;
-  }
+.ui.primary.button:hover {
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important;
+          box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important;
 }
-@keyframes AnimationName {
-  0% {
-    background-position: 0% 68%;
-  }
-  50% {
-    background-position: 100% 33%;
-  }
-  100% {
-    background-position: 0% 68%;
-  }
+.ui.secondary.button:hover {
+  -webkit-box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important;
+          box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important;
 }
-div.login > .grid {
-  height: 100%;
+h1.ui.header,
+.ui.huge.header {
+  font-weight: normal;
+  color: #3d6488;
 }
-.login .image {
-  margin-top: -100px;
+h2.ui.header,
+.ui.large.header {
+  font-weight: normal;
+  color: #3d6488;
 }
-.login .column {
-  max-width: 450px;
+ui.input.error > input {
+  background-color: #fff6f6 !important;
+  border-color: #e0b4b4 !important;
+  color: #9f3a38 !important;
+}
+/** Timesheet **/
+#timesheet table td {
+  padding: 0.3rem 0.3rem;
+}
+#timesheet fieldset input {
+  text-align: center;
+  border: 0px solid #fff;
+  background-color: rgba(1, 0, 1, 0);
+}
+#timesheet input[type=number]::-webkit-inner-spin-button,
+#timesheet input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+#timesheet button.create-task {
+  left: 11em;
+  position: absolute;
+}
+#timesheet fieldset {
+  padding: 0px;
+  margin: 0px;
+  border: none;
+}
+#timesheet td:focus {
+  background-color: rgba(128, 128, 200, 0.3);
+}
+#timesheet .timesheet-navigation-controls {
+  margin-bottom: 1em;
+  text-align: right;
+}
+#timesheet .timesheet-validation-controls {
+  margin-top: 1em;
+}
+#timesheet .project {
+  padding: 0.38571429em 0.78571429em !important;
+  background-color: #D1DCEB !important;
+  color: #3d6488 !important;
+  font-size: 1.25em !important;
+}
+#timesheet th.project {
+  font-size: 1em !important;
+  font-weight: normal;
+}
+/** PROJECT **/
+.badge {
+  text-align: center;
+  width: 3em;
+  margin: 0 auto;
+  background-color: #957DAD;
+  line-height: 3em;
+  border-radius: 5em;
+  margin-top: 0.5em;
+  font-size: 3em;
+  color: white;
+  margin-bottom: 0.5em;
+}
+.menu.project :not(.active) {
+  color: white !important;
+  font-weight: bold !important;
 }
 
 
