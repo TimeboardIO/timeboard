@@ -44,8 +44,17 @@ public class AccountNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationParams() {
-
         return "";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 200;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "child";
     }
 
     @Override
