@@ -63,18 +63,12 @@ public class ProjectTaskDeleteServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long taskID = Long.parseLong(request.getParameter("taskID"));
         long projectID = Long.parseLong(request.getParameter("projectID"));
 
-        try {
-            this.projectService.deleteTaskByID(SecurityContext.getCurrentUser(request), taskID);
-        } catch (BusinessException e) {
-            viewModel.getErrors().add(e);
-        }
-
-
         response.sendRedirect(String.format("/projects/tasks?projectID=%s", projectID));
+        this.projectService.deleteTaskByID(SecurityContext.getCurrentUser(request), taskID);
     }
 
 

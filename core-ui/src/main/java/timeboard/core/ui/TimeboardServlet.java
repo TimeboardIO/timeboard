@@ -42,10 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public abstract class TimeboardServlet extends HttpServlet {
 
@@ -104,11 +101,16 @@ public abstract class TimeboardServlet extends HttpServlet {
         try {
             this.handleGet(request, response, viewModel);
         } catch (Exception e) {
-            viewModel.getErrors().add(e);
-            System.out.println(e.getMessage());
+            if(request.getSession().getAttribute("errors") != null) {
+                ((List) request.getSession().getAttribute("errors")).add(e);
+            }else{
+                request.getSession().setAttribute("errors", new LinkedList<>(Arrays.asList(e)));
+            }
             e.printStackTrace(System.err);
         }
-        doService(request, response, viewModel);
+        if(viewModel.getTemplate() != null){
+            doService(request, response, viewModel);
+        }
     }
 
     @Override
@@ -158,6 +160,11 @@ public abstract class TimeboardServlet extends HttpServlet {
         //Used to forward errors between servlets
         if (request.getAttribute("errors") != null) {
             viewModel.getErrors().addAll((Collection<? extends Exception>) request.getAttribute("errors"));
+        }
+        //Used to forward errors out of servlets
+        if (request.getSession().getAttribute("errors") != null) {
+            viewModel.getErrors().addAll((Collection<? extends Exception>) request.getSession().getAttribute("errors"));
+            ((Collection<? extends Exception>) request.getSession().getAttribute("errors")).clear();
         }
         ctx.setVariable("errors", viewModel.getErrors());
 
