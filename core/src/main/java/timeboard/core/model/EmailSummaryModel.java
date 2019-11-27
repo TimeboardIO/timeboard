@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.model;
 
 /*-
  * #%L
@@ -26,8 +26,40 @@ package timeboard.core.notification.model;
  * #L%
  */
 
-public enum TimeboardEventType {
+import timeboard.core.notification.model.event.TaskEvent;
 
-    CREATE,
-    UPDATE
+import java.util.ArrayList;
+import java.util.List;
+
+public class EmailSummaryModel {
+
+    private Project project;
+    private List<TaskEvent> createdTasks = new ArrayList<>();
+
+    private List<TaskEvent> deletedTasks = new ArrayList<>();
+
+    public EmailSummaryModel(Project p) {
+        this.project = p;
+    }
+
+    public void addCreatedTask(TaskEvent e) {
+        createdTasks.add(e) ;
+    }
+
+    public void addDeletedTask(TaskEvent e) {
+        deletedTasks.add(e) ;
+    }
+
+
+    public Project getProject() {
+        return project;
+    }
+
+    public List<TaskEvent> getCreatedTasks() {
+        return createdTasks;
+    }
+
+    public List<TaskEvent> getDeletedTasks() {
+        return deletedTasks;
+    }
 }

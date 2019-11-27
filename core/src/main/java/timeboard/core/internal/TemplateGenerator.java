@@ -1,4 +1,4 @@
-package timeboard.core.api;
+package timeboard.core.internal;
 
 /*-
  * #%L
@@ -26,35 +26,48 @@ package timeboard.core.api;
  * #L%
  */
 
-import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import timeboard.core.model.User;
-import timeboard.core.notification.model.event.TaskEvent;
-import timeboard.core.notification.model.event.TimeboardEvent;
-import timeboard.core.notification.model.event.TimesheetEvent;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+
+import org.thymeleaf.templatemode.TemplateMode;
+import timeboard.core.ui.OSGITemplateResolver;
+
+import java.util.Locale;
 import java.util.Map;
 
+public class TemplateGenerator {
 
-@Component(
-        service = TimeboardSubjects.class,
-        immediate = true
-)
-public class TimeboardSubjects {
+    private OSGITemplateResolver resolver = new OSGITemplateResolver();
 
-    public static PublishSubject<TaskEvent> TASK_EVENTS =  PublishSubject.create();
-    public static PublishSubject<TimesheetEvent> TIMESHEET_EVENTS =  PublishSubject.create();
-    public static Observable<TimeboardEvent> TIMEBOARD_EVENTS =  PublishSubject.create();
+    private boolean init = false;
 
-    @Activate
-    void activate(){
-        //Merge all Timeboard app events
-         TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TASK_EVENTS);
-         TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TIMESHEET_EVENTS);
+    public void init()  {
+
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setPrefix("/templates/");
+        resolver.setCacheable(true);
+        resolver.setCacheTTLMs(50000L);
+        resolver.setCharacterEncoding("utf-8");
+
+        init = true;
     }
 
-    //TODO keep this subject ?
-    public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
+
+    public String getTemplateString(String templateName, Map<String, Object> templateData){
+        if(!init) init();
+
+        TemplateEngine engine = new TemplateEngine();
+        engine.setTemplateResolver(resolver);
+        engine.addDialect(new LayoutDialect());
+        final Context ctx = new Context(Locale.FRANCE);
+
+        templateData.forEach((s, o) -> {
+            ctx.setVariable(s, o);
+        });
+
+        return engine.process(templateName, ctx);
+
+    }
 
 }

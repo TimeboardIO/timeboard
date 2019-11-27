@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.notification.model.event;
 
 /*-
  * #%L
@@ -26,15 +26,9 @@ package timeboard.core.notification.model;
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.Date;
+public enum TimeboardEventType {
 
-public class TimeboardEvent  implements Serializable {
-
-    private Date eventDate;
-
-    protected TimeboardEvent(Date date){
-        this.eventDate =  date;
-    }
-
+    CREATE,
+    UPDATE,
+    DELETE
 }
