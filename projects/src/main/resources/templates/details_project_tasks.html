@@ -2,17 +2,22 @@
 
 <html layout:decorate="~{projects:details_project_layout.html(tab='second')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>Project Tasks details</title>
     <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
 
+    <style>
+
+    </style>
 </head>
 <body>
 
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
+
     <script type="text/x-template" id="grid-template">
     <table class="ui celled table">
         <thead>
@@ -43,11 +48,71 @@
     </table>
     </script>
     <div id="tasksList">
+
+        <div class="ui segment">
+            <a class="ui primary create-task button" v-on:click="showCreateTaskModal(null, null, $event)" >New Task</a>
+        </div>
+
         <demo-grid
                 :tasks="gridData"
                 :columns="gridColumns"
                 :filter-key="searchQueries">
         </demo-grid>
+
+        <div class="ui modal create-task " >
+            <i class="close icon"></i>
+            <div  class="header">
+                Create task
+            </div>
+            <div class="content">
+                <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
+                    <div class="field">
+                        <label>Task Name</label>
+                        <input v-model="newTask.taskName"  name="taskName" placeholder="Task Name" required type="text">
+                    </div>
+                    <div class="field">
+                        <label>Task Description</label>
+                        <input v-model="newTask.taskComments" name="taskComments" placeholder="Task Description" type="text">
+                    </div>
+                    <div class=" two fields">
+                        <div class="field">
+                            <label>Task Start Date</label>
+                            <input v-model="newTask.startDate" name="taskStartDate" placeholder="Task Name"
+                                   required  type="date">
+                        </div>
+                        <div class="field">
+                            <label>Task End Date</label>
+                            <input v-model="newTask.endDate" name="taskEndDate" placeholder="Task Name" required
+                                   type="date">
+                        </div>
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Task Original Estimate</label>
+                            <input v-model="newTask.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" required type="number">
+                        </div>
+                        <div class="field">
+                            <label>Task type</label>
+                            <select  v-model="newTask.typeID" name="taskTypeID" >
+                                <option th:each="type: ${taskTypes}"
+                                        th:text="${type.typeName}" th:value="${type.id}"
+                                ></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div v-bind="formError" class="ui error message"></div>
+                </form>
+            </div>
+            <div class="actions">
+                <div class="ui black deny button">
+                    Cancel
+                </div>
+                <div class="ui positive submit right labeled icon button">
+                    Request
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
 
         <script src="/projects/static/tasks.js"></script>
 

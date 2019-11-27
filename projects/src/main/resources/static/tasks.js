@@ -52,20 +52,97 @@ Vue.component('demo-grid', {
    }
  })
 
+ const formValidationRules = {
+        fields: {
+          projectID: {
+            identifier: 'projectID',
+            rules: [ { type   : 'empty', prompt : 'Please select project'  } ]
+          },
+          taskName: {
+            identifier: 'taskName',
+             rules: [ { type   : 'empty', prompt : 'Please enter task name'  } ]
+          },
+          taskStartDate: {
+            identifier: 'taskStartDate',
+            rules: [
+            { type: "empty", prompt : 'Please enter task start date'  } ]
+          },
+          taskEndDate: {
+            identifier: 'taskEndDate',
+            rules: [
+            { type: "empty", prompt : 'Please enter task end date'  } ]
+          },
+          taskOriginalEstimate: {
+            identifier: 'taskOriginalEstimate',
+            rules: [ { type   : 'empty', prompt : 'Please enter task original estimate in days'  },
+             { type   : 'number', prompt : 'Please enter task a number original estimate in days'  } ]
+          },
+          taskTypeID: {
+            identifier: 'taskTypeID',
+            rules: [ { type   : 'empty', prompt : 'Please enter task type '  } ]
+          }
+        }
+    };
+
  // bootstrap the demo
 var app = new Vue({
+
     el: '#tasksList',
     data: {
-     searchQuery: '',
-     searchQueries: [{key : 'taskName', value: ''}, {key : 'taskComment', value: ''}, {key : 'startDate', value: ''},
-      {key : 'endDate', value: ''}, {key : 'originalEstimate', value: ''}, {key : 'assignee', value: ''}],
-     gridColumns: ['taskName', 'taskComment', 'startDate', 'endDate', 'originalEstimate', 'assignee'],
-     gridData: [ ]
+        searchQuery: '',
+        searchQueries: [{key : 'taskName', value: ''}, {key : 'taskComment', value: ''}, {key : 'startDate', value: ''},
+            {key : 'endDate', value: ''}, {key : 'oE', value: ''}, {key : 'assignee', value: ''}, {key : 'status', value: ''}],
+        gridColumns: ['taskName', 'taskComment', 'startDate', 'endDate', 'oE', 'assignee', 'status'],
+        gridData: [ ],
+        newTask:  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 },
+        formError:"",
+    },
+    methods: {
+        showCreateTaskModal: function(projectID, task, event){
+            event.preventDefault();
+            if(task){
+                 this.newTask.projectID = projectID;
+                 this.newTask.taskID = task.taskID
+                 this.newTask.taskName = task.taskName;
+                 this.newTask.taskComments = task.taskComments;
+                 this.newTask.startDate = task.startDate;
+                 this.newTask.endDate = task.endDate;
+                 this.newTask.originalEstimate = task.originalEstimate;
+                 this.newTask.typeID = task.typeID;
+            }else{
+                 this.newTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 };
+            }
+            $('.create-task.modal').modal({
+                onApprove : function($element){
+                    var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    if(validated){
+                        $.ajax({
+                            method: "GET",
+                            url: "/timesheet/api/create_task",
+                            data: app.newTask,
+                          }).then(function(data) {
+                              if(data == "DONE"){
+                                 updateTimesheet();
+                                 $('.create-task .ui.form').form('reset');
+                                 $('.create-task.modal').modal('hide');
+                              }else{
+                                $('.ui.error.message').text(data);
+                                $('.ui.error.message').show();
+                              }
+
+                          });
+                    }
+                    return false;
+                },
+                detachable : false, centered: true
+            }).modal('show');
+        }
     }
 });
 
 $(document).ready(function(){
     const project = $("meta[property='tasks']").attr('project');
+
 
     $.get("/projects/tasks/api?action=getTasks&project="+project)
     .then(function(data){

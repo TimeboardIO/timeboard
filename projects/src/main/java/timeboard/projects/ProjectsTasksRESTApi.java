@@ -168,7 +168,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                                 task.getOriginalEstimate(),
                                 task.getStartDate(),
                                 task.getEndDate(),
-                                assignee.getFirstName()+" "+assignee.getName())
+                                assignee.getFirstName()+" "+assignee.getName(),
+                                task.getTaskStatus().name())
                         );
             }
         }
@@ -212,7 +213,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                     task.getOriginalEstimate(),
                     task.getStartDate(),
                     task.getEndDate(),
-                    assignee.getFirstName()+" "+assignee.getName()));
+                    assignee.getFirstName()+" "+assignee.getName(),
+                    task.getTaskStatus().name()));
 
         }
 
@@ -262,18 +264,20 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         private final Long taskID;
         private final String taskName;
         private final String taskComment;
-        private final double originalEstimate;
+        private final double oE;
         private final Date startDate;
         private final Date endDate;
         private final String assignee;
-        public TaskWrapper(Long taskID, String taskName, String taskComment, double originalEstimate, Date startDate, Date endDate, String assignee) {
+        private final String status;
+        public TaskWrapper(Long taskID, String taskName, String taskComment, double oE, Date startDate, Date endDate, String assignee, String status) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComment = taskComment;
-            this.originalEstimate = originalEstimate;
+            this.oE = oE;
             this.startDate = startDate;
             this.endDate = (endDate != null ? endDate : new Date());
             this.assignee = assignee;
+            this.status = status;
         }
 
         public String getStartDate() {
@@ -284,8 +288,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             return DATE_FORMAT.format(endDate);
         }
 
-        public double getOriginalEstimate() {
-            return originalEstimate;
+        public double getoE() {
+            return oE;
         }
 
         public Long getTaskID() {
@@ -294,6 +298,13 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         public String getTaskName() {
             return taskName;
+        }
+
+        public String getAssignee() {
+            return assignee;
+        }
+        public String getStatus() {
+            return status;
         }
 
         public String getTaskComment() {
