@@ -134,7 +134,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getStartDate(),
                             task.getEndDate(),
                             task.getTaskStatus().name(),
-                            task.getTaskType().getId())
+                            task.getTaskType() != null ? task.getTaskType().getId() : 0)
                             );
 
                     days.forEach(dateWrapper -> {
