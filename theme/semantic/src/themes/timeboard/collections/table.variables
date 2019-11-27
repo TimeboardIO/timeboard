@@ -41,7 +41,7 @@
 @headerBorder: 1px solid @internalBorderColor;
 @headerDivider: none;
 /*@headerBackground: @offWhite;*/
-@headerBackground: #3d6488;
+@headerBackground: @primaryColor;
 @headerAlign: inherit;
 @headerVerticalAlign: inherit;
 /*@headerColor: @textColor;*/
@@ -140,10 +140,10 @@
 
 /* Active */
 @activeColor: @textColor;
-@activeBackgroundColor: #E0E0E0;
+@activeBackgroundColor: @lightGrey;
 @activeBoxShadow: @stateMarkerWidth 0px 0px @activeColor inset;
 
-@activeBackgroundHover: #EFEFEF;
+@activeBackgroundHover: @lightGrey;
 @activeColorHover: @selectedTextColor;
 
 /*--------------
@@ -205,7 +205,7 @@
 @coloredBorderRadius: 0em 0em @borderRadius @borderRadius;
 
 /* Inverted */
-@invertedBackground: #333333;
+@invertedBackground: @grey ;
 @invertedBorder: none;
 @invertedCellBorderColor: @whiteBorderColor;
 @invertedCellColor: @invertedTextColor;

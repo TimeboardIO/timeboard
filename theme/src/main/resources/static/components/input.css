@@ -93,7 +93,7 @@
 .ui.input > input:active,
 .ui.input.down input {
   border-color: rgba(0, 0, 0, 0.3);
-  background: #FAFAFA;
+  background: #FFFFFF;
   color: rgba(0, 0, 0, 0.87);
   -webkit-box-shadow: none;
           box-shadow: none;
@@ -511,11 +511,6 @@
          Theme Overrides
 *******************************/
 
-ui.input.error > input {
-  background-color: #fff6f6 !important;
-  border-color: #e0b4b4 !important;
-  color: #9f3a38 !important;
-}
 
 
 /*******************************

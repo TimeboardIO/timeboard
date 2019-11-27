@@ -54,6 +54,10 @@
 @primaryColor        : #3d6488;
 @secondaryColor      : @black;
 
+
+@backgroundGradientColor1 : #668aa0;
+@backgroundGradientColor2 : #fbfcfd;
+
 @lightPrimaryColor   : #75a7d5;
 @lightSecondaryColor : @lightBlack;
 
@@ -220,6 +224,7 @@
 --------------------*/
 
 /*---  Colors  ---*/
+
 /*@red              : #DB2828;*/
 @red              : #C53E43;
 @orange           : #F2711C;
@@ -229,8 +234,7 @@
 @green            : #4dc98d;
 @teal             : #00B5AD;
 @blue             : @primaryColor;
-/*@blue             : #2185D0;*/
-@violet           : #6435C9;
+@violet           : #957DAD;
 @purple           : #A333C8;
 @pink             : #E03997;
 @brown            : #A5673F;
@@ -244,13 +248,20 @@
 @lightOlive       : #D9E778;
 @lightGreen       : #2ECC40;
 @lightTeal        : #6DFFFF;
-@lightBlue        : #54C8FF;
+@lightBlue        : #D1DCEB;
 @lightViolet      : #A291FB;
 @lightPurple      : #DC73FF;
 @lightPink        : #FF8EDF;
 @lightBrown       : #D67C1C;
 @lightGrey        : #DCDDDE;
 @lightBlack       : #545454;
+
+/*---- Dark Colors ---*/
+@darkRed          : #9f3a38;
+@veryLightRed      : #fff6f6;
+@inputBorderColor : #e0b4b4;
+
+
 
 /*---   Neutrals  ---*/
 @fullBlack        : #000000;
