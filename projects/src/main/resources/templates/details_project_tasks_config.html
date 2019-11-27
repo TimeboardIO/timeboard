@@ -25,7 +25,7 @@
                     <div class="ui icon input">
 
                         <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser != null}"
-                               th:value="${task.assignedUser.name}" type="text"/>
+                               th:value="${task.assignedUser.screenName}" type="text"/>
                         <input class="prompt assigned" placeholder="Search user..." th:if="${task.assignedUser == null}"
                                type="text"/>
 
