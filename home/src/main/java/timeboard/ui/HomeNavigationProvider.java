@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.ui;
 
 /*-
  * #%L
@@ -26,8 +26,8 @@ package timeboard.timesheet;
  * #L%
  */
 
-import timeboard.core.ui.NavigationExtPoint;
 import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -35,33 +35,26 @@ import java.util.Date;
 @Component(
         service = NavigationExtPoint.class
 )
-public class TimesheetNavigationProvider implements NavigationExtPoint {
+public class HomeNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Timesheet";
+        return "Home";
     }
 
-    @Override
-    public String getNavigationParams() {
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-
-        return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));
-    }
 
     @Override
     public String getNavigationPath() {
-        return "/timesheet";
+        return "/";
     }
 
     @Override
     public int getNavigationWeight() {
-        return 100;
+        return 0;
     }
 
     @Override
     public String getNavigationLogo() {
-        return "calendar alternate outline";
+        return "home";
     }
 }

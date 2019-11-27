@@ -28,6 +28,7 @@ package timeboard.core.ui;
 
 import org.osgi.service.component.annotations.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Component(
@@ -44,6 +45,7 @@ public class NavigationEntryRegistryService {
     private volatile List<NavigationExtPoint> entries;
 
     public List<NavigationExtPoint> getEntries() {
+        this.entries.sort(Comparator.comparing(o -> ((Integer) o.getNavigationWeight())));
         return this.entries;
     }
 

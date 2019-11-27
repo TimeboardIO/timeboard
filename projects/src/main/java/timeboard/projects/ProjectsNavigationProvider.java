@@ -44,4 +44,14 @@ public class ProjectsNavigationProvider implements NavigationExtPoint {
     public String getNavigationPath() {
         return "/projects";
     }
+
+    @Override
+    public int getNavigationWeight() {
+        return 50;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "tasks";
+    }
 }
