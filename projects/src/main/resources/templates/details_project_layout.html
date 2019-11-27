@@ -9,7 +9,7 @@
 
 <div layout:fragment="content">
 
-    <div class="ui top attached tabular menu project">
+    <div class="ui attached pointing menu">
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
            th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
