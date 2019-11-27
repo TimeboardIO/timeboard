@@ -28,11 +28,7 @@ package timeboard.account;
 
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.UserException;
-import timeboard.core.api.exceptions.WrongPasswordException;
-import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -45,7 +41,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 
 

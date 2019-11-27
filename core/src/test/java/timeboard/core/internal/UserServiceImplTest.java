@@ -36,7 +36,6 @@ import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
-import timeboard.core.api.exceptions.WrongPasswordException;
 import timeboard.core.model.User;
 
 import javax.persistence.*;

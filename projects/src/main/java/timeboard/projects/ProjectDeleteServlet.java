@@ -27,10 +27,15 @@ package timeboard.projects;
  */
 
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Project;
+import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.ui.ViewModel;
+import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -60,10 +65,12 @@ public class ProjectDeleteServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
+        User actor = SecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        this.projectService.deleteProjectByID(projectID);
+        Project project = this.projectService.getProjectByID(actor, projectID);
+        this.projectService.deleteProjectByID(actor, project);
 
         response.sendRedirect("/projects");
     }

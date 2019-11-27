@@ -72,7 +72,7 @@ public class ImputationLoader {
                     }
 
                     try {
-                        this.projectService.updateTaskImputation(actor, task.getId(), day, value);
+                        this.projectService.updateTaskImputation(actor, task, day, value);
                         Imputation imputation = new Imputation();
                         imputation.setDay(day);
                         imputation.setTask(task);

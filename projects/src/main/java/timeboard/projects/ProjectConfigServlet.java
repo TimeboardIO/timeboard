@@ -32,9 +32,11 @@ import timeboard.core.api.EncryptionService;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.ProjectRole;
+import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -97,7 +99,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
     }
 
 
-    private void prepareTemplateData(Project project, Map<String, Object> map) throws JsonProcessingException {
+    private void prepareTemplateData(User actor, Project project, Map<String, Object> map) throws JsonProcessingException, BusinessException {
 
         map.put("project", project);
         map.put("members", project.getMembers());
@@ -105,31 +107,36 @@ public class ProjectConfigServlet extends TimeboardServlet {
         map.put("rolesForNewMember", OBJECT_MAPPER.writeValueAsString(ProjectRole.values()));
         map.put("exports", this.projectExportServices);
         map.put("imports", this.projectImportServices);
-        map.put("tasks", this.projectService.listProjectTasks(project));
+        map.put("tasks", this.projectService.listProjectTasks(actor, project));
 
     }
 
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
+        User actor = SecurityContext.getCurrentUser(request);
+
+
         viewModel.setTemplate("projects:details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
-        Project project = this.projectService.getProjectByIdWithAllMembers(id);
+        Project project = this.projectService.getProjectByIdWithAllMembers(actor, id);
         
         Map<String, Object> map = new HashMap<>();
-        prepareTemplateData(project, map);
+        prepareTemplateData(actor, project, map);
         viewModel.getViewDatas().putAll(map);
     }
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+        User actor = SecurityContext.getCurrentUser(request);
+
         viewModel.setTemplate("projects:details_project_config.html");
         Map<String, Object> map = new HashMap<>();
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByIdWithAllMembers(id);
+        Project project = this.projectService.getProjectByIdWithAllMembers(actor, id);
         project.setName(request.getParameter("projectName"));
         project.setComments(request.getParameter("projectDescription"));
         project.setQuotation(Double.parseDouble(request.getParameter("projectQuotation")));
@@ -185,9 +192,9 @@ public class ProjectConfigServlet extends TimeboardServlet {
             }
         }
 
-        this.projectService.updateProject(project, memberships);
+        this.projectService.updateProject(actor, project, memberships);
 
-        prepareTemplateData(project, map);
+        prepareTemplateData(actor, project, map);
 
         viewModel.getViewDatas().putAll(map);
     }

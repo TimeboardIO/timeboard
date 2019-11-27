@@ -50,6 +50,10 @@ public class ImportCalendarCommand implements Action {
     @Option(name = "-f", aliases = {"--file"}, description = "ICS file path", required = true, multiValued = false)
     String file;
 
+
+    @Option(name = "-a", aliases = {"--actor"}, description = "user actor email", required = true, multiValued = false)
+    String actorEmail;
+
     @Option(name = "-n", aliases = {"--name"}, description = "Calendar name", required = false, multiValued = false)
     String name;
 
@@ -95,13 +99,13 @@ public class ImportCalendarCommand implements Action {
             this.name = file;
         }
 
-        User actor = userService.findUserByEmail("timeboard"); //TODO dirty
+        User actor = userService.findUserByEmail(actorEmail); //TODO dirty
         if(taskArg != null){
             //treat as imputation
 
             if(!allUsers && (usernames == null || usernames.isEmpty())) throw new Exception("You must specify a user list or use option -all to apply imputations to all users");
             if(imputationValue == null ) imputationValue = "1.0";
-            final List<AbstractTask> tasksByName = projectService.getTasksByName(taskArg);
+            final List<AbstractTask> tasksByName = projectService.getTasksByName(actor, taskArg);
             final List<User> userList= new ArrayList<>();
             for(String username : usernames){
                 userList.add(userService.findUserByEmail(username));
@@ -109,7 +113,7 @@ public class ImportCalendarCommand implements Action {
             calendarService.importCalendarAsImputationsFromICS(actor, file, tasksByName.get(0), userList, Double.parseDouble(imputationValue));
         }else{
 
-            final Project project = projectService.getProjectByName(projectArg);
+            final Project project = projectService.getProjectByName(actor, projectArg);
             calendarService.importCalendarAsTasksFromICS(actor, name, file, project, deleteOrphan);
 
         }

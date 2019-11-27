@@ -34,13 +34,13 @@ public interface TimesheetService {
     /**
      * Validate user timesheet.
      *
-     * @param actorID         user PK who trigger this function.
-     * @param userTimesheetID user PK which be used to build timehseet to validate
+     * @param actor         user who trigger this function.
+     * @param userTimesheet user which be used to build timehseet to validate
      * @param year            timesheet year
      * @param week            timesheet week
      * @return true if timesheet is validate else, false.
      */
-    void validateTimesheet(long actorID, long userTimesheetID, int year, int week) throws TimesheetException;
+    void validateTimesheet(User actor, User userTimesheet, int year, int week) throws TimesheetException;
 
     /**
      * @param userTimesheet user used to check timesheet validation state.

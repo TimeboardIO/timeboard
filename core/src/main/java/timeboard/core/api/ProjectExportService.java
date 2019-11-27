@@ -26,6 +26,7 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public interface ProjectExportService {
 
     String getName();
 
-    void export(User actor, long projectID, OutputStream output) throws IOException;
+    void export(User actor, long projectID, OutputStream output) throws IOException, BusinessException;
 
     String getExtension();
 }

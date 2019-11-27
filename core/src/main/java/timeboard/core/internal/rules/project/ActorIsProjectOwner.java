@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules.task;
+package timeboard.core.internal.rules.project;
 
 /*-
  * #%L
@@ -27,27 +27,30 @@ package timeboard.core.internal.rules.task;
  */
 
 import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Project;
 import timeboard.core.model.ProjectMembership;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.User;
-import timeboard.core.model.Task;
 
 import java.util.Optional;
 
-public class ActorIsProjectMemberbyTask implements Rule<Task> {
+public class ActorIsProjectOwner implements Rule<Project> {
 
     @Override
     public String ruleDescription() {
-        return "User is not project member";
+        return "User is not project Owner";
     }
 
     @Override
-    public boolean isSatisfied(User u, Task thing) {
-        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+    public boolean isSatisfied(User u, Project thing) {
+        Optional<ProjectMembership> userOptional = thing.getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()
+                                && projectMembership.getRole().equals(ProjectRole.OWNER)
                 )
                 .findFirst();
         return userOptional.isPresent();
     }
+
+
 }

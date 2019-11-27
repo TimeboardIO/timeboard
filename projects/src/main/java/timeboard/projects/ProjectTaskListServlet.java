@@ -27,7 +27,9 @@ package timeboard.projects;
  */
 
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
+import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -67,12 +69,13 @@ public class ProjectTaskListServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        User actor = SecurityContext.getCurrentUser(request);
+        Project project = this.projectService.getProjectByID(actor, id);
 
         viewModel.setTemplate("projects:details_project_tasks.html");
-        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(project));
+        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("project", project);
     }
 }

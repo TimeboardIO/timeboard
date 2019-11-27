@@ -30,7 +30,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
+import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -61,23 +63,25 @@ public class ProjectMilestoneListServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+        User actor = SecurityContext.getCurrentUser(request);
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        Project project = this.projectService.getProjectByID(actor, id);
 
         viewModel.setTemplate("projects:details_project_milestones.html");
-        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
+        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
         viewModel.getViewDatas().put("project", project);
 
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), id);
+        User actor = SecurityContext.getCurrentUser(request);
+        Project project = this.projectService.getProjectByID(actor, id);
 
         viewModel.setTemplate("projects:details_project_milestones.html");
-        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
+        viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
         viewModel.getViewDatas().put("project", project);
     }
 }

@@ -31,6 +31,8 @@ import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
 import timeboard.core.internal.rules.milestone.MilestoneHasNoTask;
+import timeboard.core.internal.rules.project.ActorIsProjectMember;
+import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
@@ -110,39 +112,71 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectByIdWithAllMembers(Long projectId) {
-        return jpa.txExpr(em -> {
-            Project data = em.createQuery("select p from Project p where p.id = :projectId", Project.class)
+    public Project getProjectByIdWithAllMembers(User actor, Long projectId) throws BusinessException{
+        Project project =  jpa.txExpr(em -> {
+            return em.createQuery("select p from Project p where p.id = :projectId", Project.class)
                     .setParameter("projectId", projectId)
                     .getSingleResult();
-            return data;
         });
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
+        return project;
+
     }
 
     @Override
-    public Project getProjectByName(String projectName) {
-        return jpa.txExpr(em -> {
+    public Project getProjectByName(User actor, String projectName) throws BusinessException {
+
+        Project project = jpa.txExpr(em -> {
             Project data = em.createQuery("select p from Project p where p.name = :name", Project.class)
                     .setParameter("name", projectName)
                     .getSingleResult();
+            if(!data.getMembers().contains(actor)) return null;
             return data;
         });
+
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
+        return project;
     }
 
     @Override
-    public Project deleteProjectByID(Long projectID) {
+    public Project deleteProjectByID(User actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectOwner());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         return jpa.txExpr(em -> {
-            Project p = em.find(Project.class, projectID);
-            em.remove(p);
+            em.remove(project);
             em.flush();
 
-            this.logService.log(LogService.LOG_INFO, "Project " + p.getName() + " deleted");
-            return p;
+            this.logService.log(LogService.LOG_INFO, "Project " + project.getName() + " deleted");
+            return project;
         });
     }
 
     @Override
-    public Project updateProject(Project project) throws BusinessException {
+    public Project updateProject(User actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectOwner());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         return jpa.txExpr(em -> {
             em.merge(project);
             em.flush();
@@ -153,7 +187,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDashboard projectDashboard(Project project) {
+    public ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
 
         return jpa.txExpr(em -> {
 
@@ -182,7 +223,14 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Project updateProject(Project project, Map<Long, ProjectRole> memberships) throws BusinessException {
+    public Project updateProject(User actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException {
+
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectOwner());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
 
         return this.jpa.txExpr(entityManager -> {
 
@@ -235,7 +283,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void save(ProjectMembership projectMembership) {
+    public void save(User actor, ProjectMembership projectMembership) throws BusinessException {
+
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectOwner());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, projectMembership.getProject());
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         this.jpa.tx(entityManager -> {
             entityManager.persist(projectMembership);
         });
@@ -247,7 +303,15 @@ public class ProjectServiceImpl implements ProjectService {
         /* -- TASKS -- */
 
     @Override
-    public List<Task> listProjectTasks(Project project) {
+    public List<Task> listProjectTasks(User actor, Project project) throws BusinessException {
+
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectOwner());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project", Task.class);
             q.setParameter("project", project);
@@ -381,13 +445,23 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Task getTaskByID(long id) {
-        return this.jpa.txExpr(entityManager -> {
-            return entityManager.find(Task.class, id);
+    public AbstractTask getTaskByID(User user, long id) throws BusinessException {
+        AbstractTask task =  this.jpa.txExpr(entityManager -> {
+            return entityManager.find(AbstractTask.class, id);
         });
+        if(task instanceof Task){
+            RuleSet<Task> ruleSet = new RuleSet<>();
+            ruleSet.addRule(new ActorIsProjectMemberbyTask());
+            Set<Rule> wrongRules = ruleSet.evaluate(user, (Task) task);
+            if (!wrongRules.isEmpty()) {
+                throw new BusinessException(wrongRules);
+            }
+        }
+
+        return task;
     }
 
-    public List<AbstractTask> getTasksByName(String name) {
+    public List<AbstractTask> getTasksByName(User user, String name) {
 
         final List<AbstractTask> tasks =  new ArrayList<>();
         try{
@@ -415,13 +489,11 @@ public class ProjectServiceImpl implements ProjectService {
        return tasks;
     }
 
-    private UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double val, EntityManager entityManager) {
-        //Init calendar
+    private UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val, EntityManager entityManager){
         Calendar c = Calendar.getInstance();
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
 
-        AbstractTask task = entityManager.find(AbstractTask.class, taskID);
         // special actions when task is a project task
         Task projectTask = (task instanceof Task) ? (Task) task : null;
 
@@ -430,7 +502,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         //DB Query
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
-        q.setParameter("taskID", taskID);
+        q.setParameter("taskID", task.getId());
         q.setParameter("day", c.getTime());
 
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
@@ -491,9 +563,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public UpdatedTaskResult updateTaskImputation(User actor, Long taskID, Date day, double val) {
+        public UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val) {
         return this.jpa.txExpr(entityManager -> {
-            UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, taskID, day, val, entityManager);
+            UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, task, day, val, entityManager);
             entityManager.flush();
             return updatedTaskResult;
         });
@@ -505,7 +577,7 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             List<UpdatedTaskResult> result = new ArrayList<>();
             for(Imputation imputation : imputationsList){
-                UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, imputation.getTask().getId(), imputation.getDay(), imputation.getValue(), entityManager);
+                UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, imputation.getTask(), imputation.getDay(), imputation.getValue(), entityManager);
                 result.add(updatedTaskResult);
             }
             entityManager.flush();
@@ -515,13 +587,19 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public UpdatedTaskResult updateTaskEffortLeft(User actor, Long taskID, double effortLeft) {
+    public UpdatedTaskResult updateTaskEffortLeft(User actor, Task task, double effortLeft) throws BusinessException {
+        RuleSet<Task> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberbyTask());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
         return this.jpa.txExpr(entityManager -> {
-            Task task = entityManager.find(Task.class, taskID);
             task.setEffortLeft(effortLeft);
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task "+taskID+" in project "+task.getProject().getName()+" with value "+ effortLeft);
+
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task "+task.getId()+" in project "+task.getProject().getName()+" with value "+ effortLeft);
 
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
         });
@@ -634,13 +712,19 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortHistory> getEffortSpentByTaskAndPeriod(long taskId, Date startTaskDate, Date endTaskDate) {
+    public List<EffortHistory> getEffortSpentByTaskAndPeriod(User actor, Task task, Date startTaskDate, Date endTaskDate) throws BusinessException {
+        RuleSet<Task> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberbyTask());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
 
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
                     "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue " +
                     "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
-            query.setParameter("taskId", taskId);
+            query.setParameter("taskId", task.getId());
             query.setParameter("startTaskDate", startTaskDate);
             query.setParameter("endTaskDate", endTaskDate);
 
@@ -651,8 +735,16 @@ public class ProjectServiceImpl implements ProjectService {
         });
     }
 
+
     @Override
-    public List<EffortHistory> getTaskEffortLeftHistory(long taskId) {
+    public List<EffortHistory> getTaskEffortLeftHistory(User actor, Task task) throws BusinessException {
+        RuleSet<Task> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberbyTask());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
             "tr.revisionDate as date, tr.effortLeft as effortLeft  " +
@@ -663,7 +755,7 @@ public class ProjectServiceImpl implements ProjectService {
                     "GROUP BY trBis.task_id, DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")" +
              ");");
 
-            query.setParameter("taskId", taskId);
+            query.setParameter("taskId", task.getId());
 
             return query.getResultList()
                     .stream()
@@ -701,7 +793,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Map<String, Task> searchExistingTasksFromOrigin(Project project, String origin, String remotePath) {
+    public Map<String, Task> searchExistingTasksFromOrigin(User actor, Project project, String origin, String remotePath) throws BusinessException {
+
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
 
         return this.jpa.txExpr(entityManager -> {
             Map<String, Task> map = new HashMap<>();
@@ -720,7 +819,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Milestone> listProjectMilestones(Project project) {
+    public List<Milestone> listProjectMilestones(User actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Milestone> q = entityManager.createQuery("select m from Milestone m where m.project = :project", Milestone.class);
             q.setParameter("project", project);
@@ -729,14 +835,30 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone getMilestoneById(long id) {
-        return this.jpa.txExpr(entityManager -> {
+    public Milestone getMilestoneById(User user, long id) throws BusinessException {
+
+        Milestone milestone = this.jpa.txExpr(entityManager -> {
             return entityManager.find(Milestone.class, id);
         });
+        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        Set<Rule> wrongRules = ruleSet.evaluate(user, milestone);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+        return milestone;
     }
 
     @Override
-    public Milestone createMilestone(String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) {
+    public Milestone createMilestone(User actor, String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) throws BusinessException {
+
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         return this.jpa.txExpr(entityManager -> {
 
             Milestone newMilestone = new Milestone();
@@ -756,7 +878,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone updateMilestone(Milestone milestone) {
+    public Milestone updateMilestone(User actor, Milestone milestone) throws BusinessException {
+        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
         return jpa.txExpr(em -> {
             em.merge(milestone);
             em.flush();
@@ -792,27 +920,36 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Long> listTaskIdsByMilestone(Milestone milestone) {
+    public List<Task> listTasksByMilestone(User actor, Milestone milestone) throws BusinessException {
+        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Long> q = entityManager.createQuery("select t.id from Task t where t.milestone = :milestone", Long.class);
+            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.milestone = :milestone", Task.class);
             q.setParameter("milestone", milestone);
             return q.getResultList();
         });
     }
 
     @Override
-    public Milestone addTasksToMilestone(Long currentMilestoneId, List<Long> selectedTaskIds, List<Long> oldTaskIds) {
-        return this.jpa.txExpr(em -> {
-            Milestone m = em.find(Milestone.class, currentMilestoneId);
+    public Milestone addTasksToMilestone(User actor, Milestone m, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
+        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, m);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
 
-            oldTaskIds.forEach(id -> {
-                Task tr = em.find(Task.class, id);
+        return this.jpa.txExpr(em -> {
+            oldTaskIds.forEach(tr -> {
                 tr.setMilestone(null);
                 m.getTasks().removeIf(task -> task.getId() == tr.getId());
              });
 
-            selectedTaskIds.forEach(id -> {
-                Task tr = em.find(Task.class, id);
+            selectedTaskIds.forEach(tr -> {
                 tr.setMilestone(m);
                 m.getTasks().add(tr);
             });

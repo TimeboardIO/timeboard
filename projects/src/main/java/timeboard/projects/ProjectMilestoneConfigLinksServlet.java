@@ -30,10 +30,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
-import timeboard.core.model.Milestone;
-import timeboard.core.model.MilestoneType;
-import timeboard.core.model.Project;
-import timeboard.core.model.Task;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
@@ -76,8 +74,9 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
+        User actor = SecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
         Milestone currentMilestone = null;
@@ -86,12 +85,13 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
 
             if (!getParameter(request, "milestoneID").get().isEmpty()) {
                 Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
-                currentMilestone = this.projectService.getMilestoneById(milestoneID);
+                currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
                 currentMilestone = addTasksToMilestone(currentMilestone, request);
             }
 
             viewModel.getViewDatas().put("milestone", currentMilestone);
 
+            viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(actor, project));
 
         } catch (Exception e) {
             viewModel.getErrors().add(e);
@@ -99,22 +99,29 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
             viewModel.setTemplate("projects:details_project_milestones_config_links.html");
 
             viewModel.getViewDatas().put("project", project);
-            viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(project));
-            viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(project));
+            viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
             viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
-            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTaskIdsByMilestone(currentMilestone));
+            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, currentMilestone));
         }
     }
 
-    private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) {
+    private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) throws BusinessException {
+        User actor = SecurityContext.getCurrentUser(request);
         String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
-        List<Long> selectedTaskIds = Arrays
+        List<Task> selectedTasks = Arrays
                 .stream(selectedTaskIdsString)
-                .map(id -> Long.valueOf(id))
-                .collect(Collectors.toList());
-        List<Long> oldTaskIds = this.projectService.listTaskIdsByMilestone(currentMilestone);
+                .map(id -> {
+                    Task t = null;
+                    try {
+                        t = (Task) projectService.getTaskByID(actor, Long.getLong(id));
+                    } catch (Exception e) { }
+                    finally {
+                        return t;
+                    }
+                }).collect(Collectors.toList());
+        List<Task> oldTasks = this.projectService.listTasksByMilestone(actor, currentMilestone);
 
-        return this.projectService.addTasksToMilestone(currentMilestone.getId(), selectedTaskIds, oldTaskIds);
+        return this.projectService.addTasksToMilestone(actor, currentMilestone, selectedTasks, oldTasks);
     }
 
 

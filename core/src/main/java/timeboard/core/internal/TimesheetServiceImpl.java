@@ -66,10 +66,8 @@ public class TimesheetServiceImpl implements TimesheetService {
     private LogService logService;
 
     @Override
-    public void validateTimesheet(long actorID, long userTimesheetID, int year, int week) throws TimesheetException {
+    public void validateTimesheet(User actor, User userTimesheet, int year, int week) throws TimesheetException {
 
-        User actor = this.userService.findUserByID(actorID);
-        User userTimesheet = this.userService.findUserByID(userTimesheetID);
 
         //check if validation is possible
 
