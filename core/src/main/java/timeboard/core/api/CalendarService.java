@@ -26,7 +26,6 @@ package timeboard.core.api;
  * #L%
  */
 
-import net.fortuna.ical4j.data.ParserException;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 

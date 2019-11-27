@@ -31,10 +31,7 @@ import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 public class TaskEvent extends TimeboardEvent {
     private Task task;

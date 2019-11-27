@@ -34,6 +34,7 @@ import timeboard.core.model.User;
 import timeboard.core.notification.model.event.TaskEvent;
 import timeboard.core.notification.model.event.TimeboardEvent;
 import timeboard.core.notification.model.event.TimesheetEvent;
+
 import java.util.Map;
 
 

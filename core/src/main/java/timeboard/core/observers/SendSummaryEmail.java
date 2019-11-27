@@ -44,7 +44,10 @@ import timeboard.core.notification.model.event.TimeboardEvent;
 import timeboard.core.notification.model.event.TimeboardEventType;
 import timeboard.core.notification.model.event.TimesheetEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 

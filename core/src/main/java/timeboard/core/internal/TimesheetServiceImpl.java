@@ -26,19 +26,20 @@ package timeboard.core.internal;
  * #L%
  */
 
-import org.osgi.service.log.LogService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.TimesheetException;
-import timeboard.core.model.User;
-import timeboard.core.model.ValidatedTimesheet;
-import timeboard.core.api.TimesheetService;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
+import org.osgi.service.log.LogService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimeboardSubjects;
+import timeboard.core.api.TimesheetService;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.TimesheetException;
+import timeboard.core.model.User;
+import timeboard.core.model.ValidatedTimesheet;
 import timeboard.core.notification.model.event.TimesheetEvent;
+
 import javax.persistence.TypedQuery;
 import java.util.Calendar;
 import java.util.List;

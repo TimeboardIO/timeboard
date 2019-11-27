@@ -30,7 +30,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.EncryptionService;
-
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
 

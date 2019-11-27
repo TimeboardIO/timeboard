@@ -32,7 +32,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.model.*;
+import timeboard.core.model.User;
 import timeboard.core.notification.model.EmailStructure;
 
 import java.text.SimpleDateFormat;

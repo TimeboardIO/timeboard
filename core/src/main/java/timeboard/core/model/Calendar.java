@@ -27,7 +27,6 @@ package timeboard.core.model;
  */
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 public class Calendar {
