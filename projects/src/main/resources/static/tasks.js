@@ -3,7 +3,7 @@ Vue.component('demo-grid', {
    props: {
      tasks: Array,
      columns: Array,
-     filterKey: String
+     filterKey: Array,
    },
    data: function () {
      var sortOrders = {}
@@ -18,14 +18,15 @@ Vue.component('demo-grid', {
    computed: {
      filteredTasks: function () {
        var sortKey = this.sortKey
-       var filterKey = this.filterKey && this.filterKey.toLowerCase()
+       var filterKey = this.filterKey.filter(function (f) { return f.value != '' });
        var order = this.sortOrders[sortKey] || 1
        var tasks = this.tasks
-       if (filterKey) {
+       var keepThis = this;
+       if (filterKey.length > 0) {
          tasks = tasks.filter(function (row) {
-           return Object.keys(row).some(function (key) {
-             return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-           })
+            return filterKey.some(function(f, i, array){
+               return String(row[f.key]).toLowerCase().indexOf(String(f.value).toLowerCase()) > -1
+            });
          })
        }
        if (sortKey) {
@@ -56,6 +57,8 @@ var app = new Vue({
     el: '#tasksList',
     data: {
      searchQuery: '',
+     searchQueries: [{key : 'taskName', value: ''}, {key : 'taskComment', value: ''}, {key : 'startDate', value: ''},
+      {key : 'endDate', value: ''}, {key : 'originalEstimate', value: ''}, {key : 'assignee', value: ''}],
      gridColumns: ['taskName', 'taskComment', 'startDate', 'endDate', 'originalEstimate', 'assignee'],
      gridData: [ ]
     }

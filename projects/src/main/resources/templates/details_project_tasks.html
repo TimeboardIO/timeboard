@@ -26,7 +26,7 @@
         <tr>
             <td  v-for="key in columns">
                 <div class="ui fluid icon input">
-                    <input type="text" v-bind:placeholder="key +'..' ">
+                    <input  v-model="filterKey[columns.indexOf(key)].value"  type="text" v-bind:placeholder="key +'..' ">
                     <i class="search icon"></i>
                 </div>
             </td>
@@ -43,13 +43,10 @@
     </table>
     </script>
     <div id="tasksList">
-        <form id="search">
-            Search <input name="query" v-model="searchQuery">
-        </form>
         <demo-grid
                 :tasks="gridData"
                 :columns="gridColumns"
-                :filter-key="searchQuery">
+                :filter-key="searchQueries">
         </demo-grid>
 
         <script src="/projects/static/tasks.js"></script>
