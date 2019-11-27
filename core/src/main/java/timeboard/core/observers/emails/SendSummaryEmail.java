@@ -1,4 +1,4 @@
-package timeboard.core.observers;
+package timeboard.core.observers.emails;
 
 /*-
  * #%L
@@ -33,18 +33,19 @@ import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.internal.TemplateGenerator;
+import timeboard.core.internal.events.TaskEvent;
+import timeboard.core.internal.events.TimeboardEvent;
+import timeboard.core.internal.events.TimeboardEventType;
+import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.EmailSummaryModel;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
-import timeboard.core.notification.model.EmailStructure;
-import timeboard.core.notification.model.UserNotificationStructure;
-import timeboard.core.notification.model.event.TaskEvent;
-import timeboard.core.notification.model.event.TimeboardEvent;
-import timeboard.core.notification.model.event.TimeboardEventType;
-import timeboard.core.notification.model.event.TimesheetEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 

@@ -26,7 +26,6 @@ package timeboard.core.ui;
  * #L%
  */
 
-import org.osgi.framework.Constants;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.context.ServletContextHelper;

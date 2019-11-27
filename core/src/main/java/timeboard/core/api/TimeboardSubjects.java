@@ -30,10 +30,11 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import timeboard.core.internal.events.TaskEvent;
+import timeboard.core.internal.events.TimeboardEvent;
+import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.User;
-import timeboard.core.notification.model.event.TaskEvent;
-import timeboard.core.notification.model.event.TimeboardEvent;
-import timeboard.core.notification.model.event.TimesheetEvent;
+
 import java.util.Map;
 
 

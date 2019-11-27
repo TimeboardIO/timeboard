@@ -29,7 +29,10 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface ProjectService {
 

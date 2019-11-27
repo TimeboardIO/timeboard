@@ -27,7 +27,9 @@ package timeboard.core.internal.rules.project;
  */
 
 import timeboard.core.internal.rules.Rule;
-import timeboard.core.model.*;
+import timeboard.core.model.Project;
+import timeboard.core.model.ProjectMembership;
+import timeboard.core.model.User;
 
 import java.util.Optional;
 

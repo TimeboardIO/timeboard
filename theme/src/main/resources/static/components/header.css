@@ -458,22 +458,22 @@ a.ui.blue.header:hover {
 
 /* Inverted */
 .ui.inverted.blue.header {
-  color: #54C8FF !important;
+  color: #D1DCEB !important;
 }
 a.ui.inverted.blue.header:hover {
-  color: #3ac0ff !important;
+  color: #bdcee5 !important;
 }
 
 /*--- Violet ---*/
 
 .ui.violet.header {
-  color: #6435C9 !important;
+  color: #957DAD !important;
 }
 a.ui.violet.header:hover {
-  color: #5829bb !important;
+  color: #886ba6 !important;
 }
 .ui.violet.dividing.header {
-  border-bottom: 2px solid #6435C9;
+  border-bottom: 2px solid #957DAD;
 }
 
 /* Inverted */
@@ -724,16 +724,6 @@ a.ui.inverted.grey.header:hover {
   font-style: normal;
   font-weight: 400;
   src: local('Roboto'), local('Roboto-Regular'), url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu4mxP.ttf) format('truetype');
-}
-h1.ui.header,
-.ui.huge.header {
-  font-weight: normal;
-  color: #3d6488;
-}
-h2.ui.header,
-.ui.large.header {
-  font-weight: normal;
-  color: #3d6488;
 }
 
 

@@ -1,4 +1,4 @@
-package timeboard.core.notification.model.event;
+package timeboard.core.internal.events;
 
 /*-
  * #%L
@@ -26,70 +26,36 @@ package timeboard.core.notification.model.event;
  * #L%
  */
 
+import timeboard.core.api.ProjectService;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
+import timeboard.core.model.ValidatedTimesheet;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class TaskEvent extends TimeboardEvent {
-    private Task task;
-    private User actor;
-    private TimeboardEventType eventType;
+public class TimesheetEvent extends TimeboardEvent {
+
+    private ValidatedTimesheet timesheet;
 
 
-    public TaskEvent(TimeboardEventType eventType, Task task, User actor) {
+    public TimesheetEvent(ValidatedTimesheet timesheet, ProjectService projectService) {
         super(new Date());
-        this.eventType = eventType;
-        this.task = task;
-        this.actor = actor;
 
-        this.constructUsersList();
-    }
+        this.timesheet = timesheet;
 
-    public TimeboardEventType getEventType() {
-        return eventType;
-    }
+        List<Project> projects = projectService.listProjects(timesheet.getUser());
 
-    public void setEventType(TimeboardEventType eventType) {
-        this.eventType = eventType;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public void setTask(Task task) {
-        this.task = task;
-    }
-
-    public User getActor() {
-        return actor;
-    }
-
-    public void setActor(User actor) {
-        this.actor = actor;
-    }
-
-
-
-    private void constructUsersList(){
-
-        Project project = task.getProject();
-        User assignedUser = task.getAssigned();
-
-        project.getMembers()
+        projects.stream().forEach(project -> project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == ProjectRole.OWNER)
-                .forEach(member -> this.usersToNotify.add(member.getMember()));
+                .forEach(member -> this.usersToNotify.add(member.getMember())));
 
-        if(assignedUser != null ) usersToInform.add(assignedUser);
-        usersToInform.add(actor);
-
+        usersToInform.add(timesheet.getUser());
     }
 
+
+    public ValidatedTimesheet getTimesheet() {
+        return timesheet;
+    }
 }

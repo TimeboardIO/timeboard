@@ -29,8 +29,8 @@ package timeboard.sample;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
 import timeboard.core.model.Project;
+import timeboard.core.model.User;
 
 import java.util.ArrayList;
 import java.util.List;

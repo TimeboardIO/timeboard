@@ -1,4 +1,4 @@
-package timeboard.core.ui;
+package timeboard.core.internal.events;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.ui;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,27 +26,9 @@ package timeboard.core.ui;
  * #L%
  */
 
-import org.osgi.service.component.annotations.*;
+public enum TimeboardEventType {
 
-import java.util.Comparator;
-import java.util.List;
-
-@Component(
-        service = NavigationEntryRegistryService.class,
-        immediate = true
-)
-public class NavigationEntryRegistryService {
-
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            policy = ReferencePolicy.DYNAMIC,
-            cardinality = ReferenceCardinality.MULTIPLE
-    )
-    private volatile List<NavigationExtPoint> entries;
-
-    public List<NavigationExtPoint> getEntries() {
-        this.entries.sort(Comparator.comparing(o -> ((Integer) o.getNavigationWeight())));
-        return this.entries;
-    }
-
+    CREATE,
+    UPDATE,
+    DELETE
 }

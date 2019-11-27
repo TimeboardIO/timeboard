@@ -1,70 +1,136 @@
 /*******************************
         Global Overrides
 *******************************/
-
-.timesheet-navigation-controls{
-    margin-bottom: 1em;
-    text-align: right;
-}
-
-.timesheet-validation-controls{
-    margin-top: 1em;
-}
-
+/* Core */
 .navigation{
     background-color : white ! important;
 }
 
 body{
-       background: rgb(110,138,158);
+       background: rgba(221,227,232,1);
        background: linear-gradient(180deg, rgba(110,138,158,1) 0%, rgba(221,227,232,1) 100%);
        background-repeat: no-repeat;
 }
 html{
        height: 100%;
+       background: rgba(221,227,232,1);
 }
 
-.login{
 
-        position: fixed;
-        bottom: 0px;
-        right: 0px;
-        left: 0px;
-        top: 0px;
-
-      /* background: linear-gradient(40deg, #44b79a, #33b6dd, #b37dff);
-       background-size: 600% 600%;
-       background-color: pink; */
-
-       background: linear-gradient(to bottom, #668aa0 0%,#fbfcfd 99%) !important;
-
-       -webkit-animation: AnimationName 12s ease infinite;
-       -moz-animation: AnimationName 12s ease infinite;
-       animation: AnimationName 12s ease infinite;
-
-       @-webkit-keyframes AnimationName {
-           0%{background-position:0% 68%}
-           50%{background-position:100% 33%}
-           100%{background-position:0% 68%}
-       }
-       @-moz-keyframes AnimationName {
-           0%{background-position:0% 68%}
-           50%{background-position:100% 33%}
-           100%{background-position:0% 68%}
-       }
-       @keyframes AnimationName {
-           0%{background-position:0% 68%}
-           50%{background-position:100% 33%}
-           100%{background-position:0% 68%}
-       }
-   }
-
-div.login > .grid {
-  height: 100%;
+th, td {
+    text-align: center;
 }
-.login .image {
-  margin-top: -100px;
+
+.ui.primary.button:hover {
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset,
+    0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important
+  ;
 }
-.login .column {
-  max-width: 450px;
+
+.ui.secondary.button:hover {
+  box-shadow:
+    0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset,
+    0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important
+  ;
 }
+
+
+h1.ui.header,
+.ui.huge.header {
+  font-weight: normal;
+  color : @primaryColor;
+}
+
+h2.ui.header,
+.ui.large.header {
+  font-weight: normal;
+  color : @primaryColor;
+
+}
+
+ui.input.error > input {
+    background-color: @veryLightRed !important;
+    border-color: @inputBorderColor !important;
+    color: @darkRed !important;
+
+}
+
+
+
+/** Timesheet **/
+
+#timesheet{
+    table td{
+
+        padding: 0.3rem 0.3rem;
+    }
+    fieldset input{
+        text-align: center;
+        border: 0px solid #fff;
+        background-color: rgba(1,0,1,0);
+    }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    button.create-task{
+        left: 11em; position: absolute;
+    }
+
+    fieldset{
+        padding: 0px; margin: 0px; border: none;
+    }
+    td:focus {
+        background-color: rgba(128,128,200,0.3);
+    }
+    .timesheet-navigation-controls{
+        margin-bottom: 1em;
+        text-align: right;
+    }
+
+    .timesheet-validation-controls{
+        margin-top: 1em;
+    }
+
+    .project{
+        padding: 0.38571429em 0.78571429em !important;
+        background-color: @lightBlue !important;
+        color: @primaryColor !important;
+        font-size: 1.25em !important;
+    }
+
+    th.project{
+        font-size: 1em !important;
+        font-weight: normal;
+    }
+
+}
+
+/** PROJECT **/
+.badge{
+       text-align: center;
+        width: 3em;
+        margin: 0 auto;
+        background-color: @violet;
+        line-height: 3em;
+        border-radius: 5em;
+        margin-top: 0.5em;
+        font-size: 3em;
+        color: white;
+        margin-bottom: 0.5em;
+}
+
+
+.menu.project{
+    :not(.active){
+        color: white !important;
+        font-weight: bold !important;
+    }
+}
+
+
+
+

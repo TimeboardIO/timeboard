@@ -26,7 +26,6 @@ package timeboard.projects;
  * #L%
  */
 
-import net.fortuna.ical4j.data.ParserException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;

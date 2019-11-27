@@ -32,7 +32,6 @@ import org.osgi.framework.ServiceReference;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -54,9 +53,12 @@ public abstract class TimeboardServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-
-        ServiceReference<NavigationEntryRegistryService> sr = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(NavigationEntryRegistryService.class);
-        this.navRegistry = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(sr);
+        try {
+            ServiceReference<NavigationEntryRegistryService> sr = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(NavigationEntryRegistryService.class);
+            this.navRegistry = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(sr);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setPrefix("/templates/");
         resolver.setCacheable(true);

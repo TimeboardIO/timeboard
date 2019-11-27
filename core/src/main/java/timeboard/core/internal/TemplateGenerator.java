@@ -26,19 +26,17 @@ package timeboard.core.internal;
  * #L%
  */
 
-import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
 import org.thymeleaf.templatemode.TemplateMode;
-import timeboard.core.ui.OSGITemplateResolver;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.util.Locale;
 import java.util.Map;
 
 public class TemplateGenerator {
 
-    private OSGITemplateResolver resolver = new OSGITemplateResolver();
+    private ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
 
     private boolean init = false;
 
@@ -50,6 +48,7 @@ public class TemplateGenerator {
         resolver.setCacheTTLMs(50000L);
         resolver.setCharacterEncoding("utf-8");
 
+
         init = true;
     }
 
@@ -59,7 +58,6 @@ public class TemplateGenerator {
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
-        engine.addDialect(new LayoutDialect());
         final Context ctx = new Context(Locale.FRANCE);
 
         templateData.forEach((s, o) -> {

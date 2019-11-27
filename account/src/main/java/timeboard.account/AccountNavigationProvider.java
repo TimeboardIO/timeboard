@@ -29,9 +29,6 @@ package timeboard.account;
 import org.osgi.service.component.annotations.Component;
 import timeboard.core.ui.NavigationExtPoint;
 
-import java.util.Calendar;
-import java.util.Date;
-
 @Component(
         service = NavigationExtPoint.class
 )
@@ -44,8 +41,17 @@ public class AccountNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationParams() {
-
         return "";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 200;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "child";
     }
 
     @Override

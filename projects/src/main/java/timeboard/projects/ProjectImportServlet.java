@@ -27,6 +27,7 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
@@ -35,22 +36,18 @@ import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.security.SecurityContext;
-import org.osgi.service.component.annotations.*;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
-import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component(
         service = Servlet.class,

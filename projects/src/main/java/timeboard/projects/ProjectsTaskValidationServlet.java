@@ -32,7 +32,6 @@ import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
-import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;

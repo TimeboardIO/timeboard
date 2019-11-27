@@ -1,4 +1,4 @@
-package timeboard.core.notification.model.event;
+package timeboard.core.observers.logs;
 
 /*-
  * #%L
@@ -26,9 +26,39 @@ package timeboard.core.notification.model.event;
  * #L%
  */
 
-public enum TimeboardEventType {
+import io.reactivex.disposables.Disposable;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.log.LogService;
+import timeboard.core.api.TimeboardSubjects;
 
-    CREATE,
-    UPDATE,
-    DELETE
+@Component(
+        service = LogTasksComponent.class,
+        immediate = true
+)
+public class LogTasksComponent {
+
+    @Reference
+    private LogService logService;
+
+    private Disposable disposable;
+
+
+    @Activate
+    private void init() {
+        this.disposable = TimeboardSubjects.TASK_EVENTS.subscribe(taskEvent -> {
+            this.logService.log(LogService.LOG_INFO, String.format("User % has %s task %s", taskEvent.getActor().getScreenName(), taskEvent.getEventType(), taskEvent.getTask().getId()));
+        });
+    }
+
+    @Deactivate
+    private void destroy() {
+
+        if (this.disposable != null && !this.disposable.isDisposed()) {
+            this.disposable.dispose();
+        }
+
+    }
 }

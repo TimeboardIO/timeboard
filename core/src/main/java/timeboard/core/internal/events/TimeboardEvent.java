@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.internal.events;
 
 /*-
  * #%L
@@ -27,42 +27,35 @@ package timeboard.core.notification.model;
  */
 
 import timeboard.core.model.User;
-import timeboard.core.notification.model.event.TimeboardEvent;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-public class UserNotificationStructure {
+public class TimeboardEvent  implements Serializable {
 
-    private User targetUser;
+    protected Date eventDate;
 
-    private List<TimeboardEvent> notificationEventList;
-    private List<TimeboardEvent> informEventList;
+    protected List<User> usersToNotify;
+    protected List<User> usersToInform;
 
-    public UserNotificationStructure(User targetUser) {
-        this.targetUser = targetUser;
-        notificationEventList = new ArrayList<>();
-        informEventList = new ArrayList<>();
-
-    }
-    public void notify(TimeboardEvent event){
-        notificationEventList.add(event);
+    public Date getEventDate() {
+        return eventDate;
     }
 
-    public void inform(TimeboardEvent event){
-        informEventList.add(event);
+    protected TimeboardEvent(Date date){
+        this.eventDate =  date;
+        usersToNotify = new ArrayList<>();
+        usersToInform = new ArrayList<>();
     }
 
-    public User getTargetUser() {
-        return targetUser;
+    public List<User> getUsersToNotify() {
+        return usersToNotify;
     }
 
-    public List<TimeboardEvent> getNotificationEventList() {
-        return notificationEventList;
-    }
-
-    public List<TimeboardEvent> getInformEventList() {
-        return informEventList;
+    public List<User> getUsersToInform() {
+        return usersToInform;
     }
 
 }

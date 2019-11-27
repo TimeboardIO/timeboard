@@ -26,8 +26,8 @@ package timeboard.timesheet;
  * #L%
  */
 
-import timeboard.core.ui.NavigationExtPoint;
 import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -53,5 +53,15 @@ public class TimesheetNavigationProvider implements NavigationExtPoint {
     @Override
     public String getNavigationPath() {
         return "/timesheet";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 100;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "calendar alternate outline";
     }
 }

@@ -26,7 +26,7 @@ package timeboard.core.model;
  * #L%
  */
 
-import timeboard.core.notification.model.event.TaskEvent;
+import timeboard.core.internal.events.TaskEvent;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -26,20 +26,19 @@ package timeboard.sample;
  * #L%
  */
 
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.BundleException;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
-import timeboard.core.model.Project;
-import timeboard.core.model.User;
-import timeboard.core.model.Task;
-import timeboard.core.model.Imputation;
-import timeboard.core.api.exceptions.BusinessException;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Imputation;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
+import timeboard.core.model.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component(

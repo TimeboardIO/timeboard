@@ -1,4 +1,4 @@
-package timeboard.core.observers;
+package timeboard.core.observers.emails;
 
 /*-
  * #%L
@@ -32,23 +32,19 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.model.*;
-import timeboard.core.notification.model.EmailStructure;
+import timeboard.core.model.User;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 
 @Component(
-        service = SendTaskEmail.class,
+        service = SendNewPasswordEmail.class,
         immediate = true
 )
-//TODO keep this class ?
-public class SendTaskEmail {
+//TODO keep this useless class ?
+public class SendNewPasswordEmail {
 
     @Reference
     EmailService emailService;
@@ -56,32 +52,21 @@ public class SendTaskEmail {
     @Activate
     public void activate(){
 
-       /* TimeboardSubjects.CREATE_TASK
-                .map(newTask -> sendEmailCreatingTask(new User(), newTask) )
+        TimeboardSubjects.GENERATE_PASSWORD
+                .map(userPasswordMap -> sendEmailNewPassword(userPasswordMap) )
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));*/
+                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
     }
 
-    public EmailStructure sendEmailCreatingTask(User creator, Task newTaskDB) {
-        List<String> to = new ArrayList<>();
-        Project project = newTaskDB.getProject();
-        User assignedUser = newTaskDB.getAssigned();
+    public EmailStructure sendEmailNewPassword(Map<User, String> userPasswordMap) {
+        User user = (User) userPasswordMap.keySet().toArray()[0];
+        String password = userPasswordMap.get(user);
 
-        project.getMembers()
-                .stream()
-                .filter(member -> member.getRole() == ProjectRole.OWNER)
-                .forEach(member -> to.add(member.getMember().getEmail()));
-
-        List<String> cc = Arrays.asList(assignedUser.getEmail(), creator.getEmail());
-
-        String subject = "Mail de création d'une tâche";
-        String message = "Bonjour,\n"
-                + creator.getFirstName() + " " + creator.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
-                +"Nom de la tâche : " + newTaskDB.getName() + "\n"
-                +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
-                +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "\n"
-                +"Estimation initiale : " + newTaskDB.getOriginalEstimate() + "\n"
-                +"Projet : " + project.getName() + "\n";
+        List<String> to = Arrays.asList(user.getEmail());
+        List<String> cc = new ArrayList<>();
+        String subject = "Réinitialisation du mot de passe";
+        String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
+                + "Login: " + user.getEmail() + "\nMot de passe: " + password;
 
         return new EmailStructure(to, cc, subject, message);
     }

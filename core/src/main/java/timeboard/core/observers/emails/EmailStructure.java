@@ -1,4 +1,4 @@
-package timeboard.core.notification.model;
+package timeboard.core.observers.emails;
 
 /*-
  * #%L

@@ -13,7 +13,9 @@
     <link href="/static/charts/Chart.min.css" rel="stylesheet">
 </head>
 <body>
-<div th:replace="core-ui:fragments/navigation.html :: nav(${path})"></div>
+<div
+        class="ui left fixed vertical menu"
+        th:include="core-ui:fragments/navigation.html :: nav(${path})" ></div>
 <div class="ui container negative message" th:each="err : ${errors}">
     <i class="close icon"></i>
     <div class="header">
@@ -22,7 +24,11 @@
     <p th:text="${err.getMessage()}"></p>
 </div>
 
-<div layout:fragment="content" style="padding:1em">
+<div layout:fragment="content" class="pusher" style="
+    margin-left: 230px;
+    margin-right: 20px;
+    margin-top: 0px;
+    padding-top: 10px;">
     Main content
 </div>
 </body>

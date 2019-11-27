@@ -2,7 +2,7 @@
 
 <html layout:decorate="~{core-ui:layouts/general.html(path='/timesheet')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-model="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
@@ -32,14 +32,14 @@
                 </button>
             </div>
 
-            <button v-on:click="showCreateTaskModal(null, null, $event)" style="left: 11em; position: absolute;" class="ui blue create-task button">
+            <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button">
                  New Task
             </button>
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet?week='+lastWeek(year,week)+'&year='+lastWeekYear(year,week)">
                 <i class="left arrow icon"></i>Previous week</a>
 
-            <span class="ui blue circular label bug">Week {{ week }}</span>
+            <span class="ui blue circular label">Week {{ week }}</span>
 
             <a class="ui right labeled icon button" v-bind:href="'/timesheet?week='+nextWeek(year,week)+'&year='+nextWeekYear(year,week)">
                 <i class="right arrow icon"></i>Next week</a>
@@ -49,7 +49,7 @@
             <div class="ui text loader">Loading</div>
         </div>
         <div class="ui segment">
-            <fieldset v-bind:disabled="validated === true" style="padding: 0px; margin: 0px; border: none;">
+            <fieldset v-bind:disabled="validated === true">
                 <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
 
                     <table class="ui celled table" style="text-align:center">

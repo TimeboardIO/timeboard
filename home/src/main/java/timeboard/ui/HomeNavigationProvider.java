@@ -1,8 +1,8 @@
-package timeboard.core.notification.model.event;
+package timeboard.ui;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.core.notification.model.event;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,36 +26,32 @@ package timeboard.core.notification.model.event;
  * #L%
  */
 
-import timeboard.core.api.ProjectService;
-import timeboard.core.model.Project;
-import timeboard.core.model.ProjectRole;
-import timeboard.core.model.ValidatedTimesheet;
+import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-import java.util.Date;
-import java.util.List;
+@Component(
+        service = NavigationExtPoint.class
+)
+public class HomeNavigationProvider implements NavigationExtPoint {
 
-public class TimesheetEvent extends TimeboardEvent {
-
-    private ValidatedTimesheet timesheet;
-
-
-    public TimesheetEvent(ValidatedTimesheet timesheet, ProjectService projectService) {
-        super(new Date());
-
-        this.timesheet = timesheet;
-
-        List<Project> projects = projectService.listProjects(timesheet.getUser());
-
-        projects.stream().forEach(project -> project.getMembers()
-                .stream()
-                .filter(member -> member.getRole() == ProjectRole.OWNER)
-                .forEach(member -> this.usersToNotify.add(member.getMember())));
-
-        usersToInform.add(timesheet.getUser());
+    @Override
+    public String getNavigationLabel() {
+        return "Home";
     }
 
 
-    public ValidatedTimesheet getTimesheet() {
-        return timesheet;
+    @Override
+    public String getNavigationPath() {
+        return "/";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 0;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "home";
     }
 }

@@ -26,9 +26,17 @@ package timeboard.core.internal;
  * #L%
  */
 
-import timeboard.core.internal.rules.*;
+import org.apache.aries.jpa.template.JpaTemplate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceScope;
+import org.osgi.service.log.LogService;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.events.TaskEvent;
+import timeboard.core.internal.events.TimeboardEventType;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
 import timeboard.core.internal.rules.milestone.MilestoneHasNoTask;
 import timeboard.core.internal.rules.project.ActorIsProjectMember;
@@ -36,17 +44,11 @@ import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
-import org.apache.aries.jpa.template.JpaTemplate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceScope;
-import org.osgi.service.log.LogService;
-import timeboard.core.notification.model.event.TaskEvent;
-import timeboard.core.notification.model.event.TimeboardEventType;
+
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component(
