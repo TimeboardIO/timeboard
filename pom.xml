@@ -191,6 +191,7 @@
                 <module>features</module>
                 <module>shell</module>
                 <module>account</module>
+                <module>reporting</module>
             </modules>
         </profile>
         <profile>
@@ -207,6 +208,7 @@
                 <module>sample-data</module>
                 <module>shell</module>
                 <module>account</module>
+                <module>reporting</module>
                 <module>plugins/project-xls-export-plugin</module>
                 <module>plugins/project-msp-export-plugin</module>
                 <module>plugins/project-github-import-plugin</module>
@@ -275,6 +277,7 @@
             </plugin>
         </plugins>
     </build>
+
 
     <reporting>
         <plugins>
