@@ -18,82 +18,112 @@
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
 
-    <script type="text/x-template" id="grid-template">
-    <table class="ui celled table">
-        <thead>
-        <tr><th v-for="key in columns"
-                @click="sortBy(key)"
-                :class="{ active: sortKey == key }" > {{ key | capitalize }}  <i class="icon caret" :class="sortOrders[key] > 0 ? 'up' : 'down'">
-          </i> </th>
-            <th>Actions</th>
-        </tr></thead>
-        <tbody>
-        <tr>
-            <td  v-for="key in columns">
-                <div class="ui fluid icon input">
-                    <input  v-model="filterKey[columns.indexOf(key)].value"  type="text" v-bind:placeholder="key +'..' ">
-                    <i class="search icon"></i>
-                </div>
-            </td>
-            <td></td>
-        </tr>
 
-        <tr v-for="entry in filteredTasks">
-            <td  v-for="key in columns">{{entry[key]}}</td>
-            <td>
+    <script type="text/x-template" id="task-list-template">
+        <table class="ui celled table">
+            <thead>
+            <tr><th style="text-align:center;" v-for="key in columns"
+                    @click="sortBy(key)"
+                    :class="{ active: sortKey == key }" > {{ key | capitalize }}  <i class="icon caret" :class="sortOrders[key] > 0 ? 'up' : 'down'">
+              </i> </th>
+                <th>Actions</th>
+            </tr></thead>
+            <tbody>
+            <tr>
+                <td v-for="key in columns">
+                    <div class="ui fluid icon input">
+                        <input  v-model="filterKey[columns.indexOf(key)].value"  type="text" v-bind:placeholder="key +'..' ">
+                        <i class="search icon"></i>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
 
-            </td>
-        </tr>
-        </tbody>
-    </table>
+            <tr v-for="entry in filteredTasks">
+                <td  style="text-align:center;" v-for="key in columns">{{entry[key]}}</td>
+                <td>
+                    <button class="ui negative icon button">
+                        <i class="close icon"></i>
+                    </button>
+                    <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui primary icon button">
+                        <i class="edit icon"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
     </script>
-    <div id="tasksList">
+    <script type="text/x-template" id="pending-task-list-template"  >
+        <table class="ui celled table" v-if="filteredTasks.length > 0">
+            <thead>
 
-        <div class="ui segment">
-            <a class="ui primary create-task button" v-on:click="showCreateTaskModal(null, null, $event)" >New Task</a>
-        </div>
+            <tr>
+                <th class="task-title" v-bind:colspan="columns.length">
+                    Pending tasks
+                </th>
+            </tr>
+            <tr>
+                <th style="text-align:center;" v-for="key in columns" v-if="key != 'status'"
+                    @click="sortBy(key)"
+                    :class="{ active: sortKey == key }" > {{ key | capitalize }}  <i class="icon caret" :class="sortOrders[key] > 0 ? 'up' : 'down'">
+              </i> </th>
+                <th>Actions</th>
+            </tr></thead>
+            <tbody>
 
-        <demo-grid
-                :tasks="gridData"
-                :columns="gridColumns"
-                :filter-key="searchQueries">
-        </demo-grid>
+            <tr v-for="entry in filteredTasks" >
+                <td style="text-align:center;" v-for="key in columns" v-if="key != 'status'">{{entry[key]}}</td>
+                <td style="text-align:center;">
+                    <button class="ui positive icon button">
+                        Approve
+                        <i class="check icon"></i>
+                    </button>
+                    <button class="ui negative icon button">
+                        Deny
+                        <i class="close icon"></i>
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
+    </script>
+
+    <script type="text/x-template" id="task-modal-template"  >
         <div class="ui modal create-task " >
             <i class="close icon"></i>
-            <div  class="header">
-                Create task
-            </div>
+            <div  v-bind="modalTitle"  class="header"></div>
             <div class="content">
                 <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
                     <div class="field">
                         <label>Task Name</label>
-                        <input v-model="newTask.taskName"  name="taskName" placeholder="Task Name" required type="text">
+                        <input v-model="task.taskName"  name="taskName" placeholder="Task Name" required type="text">
                     </div>
                     <div class="field">
                         <label>Task Description</label>
-                        <input v-model="newTask.taskComments" name="taskComments" placeholder="Task Description" type="text">
+                        <input v-model="task.taskComments" name="taskComments" placeholder="Task Description" type="text">
                     </div>
                     <div class=" two fields">
                         <div class="field">
                             <label>Task Start Date</label>
-                            <input v-model="newTask.startDate" name="taskStartDate" placeholder="Task Name"
+                            <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name"
                                    required  type="date">
                         </div>
                         <div class="field">
                             <label>Task End Date</label>
-                            <input v-model="newTask.endDate" name="taskEndDate" placeholder="Task Name" required
+                            <input v-model="task.endDate" name="taskEndDate" placeholder="Task Name" required
                                    type="date">
                         </div>
                     </div>
                     <div class="two fields">
                         <div class="field">
                             <label>Task Original Estimate</label>
-                            <input v-model="newTask.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" required type="number">
+                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" required type="number">
                         </div>
                         <div class="field">
                             <label>Task type</label>
-                            <select  v-model="newTask.typeID" name="taskTypeID" >
+                            <select  v-model="task.typeID" name="taskTypeID" >
                                 <option th:each="type: ${taskTypes}"
                                         th:text="${type.typeName}" th:value="${type.id}"
                                 ></option>
@@ -113,11 +143,34 @@
                 </div>
             </div>
         </div>
+    </script>
+
+    <div id="tasksList">
+
+        <div class="ui segment">
+            <a class="ui primary create-task button" v-on:click="showCreateTaskModal(null, null, $event)" >New Task</a>
+        </div>
+        <pending-task-list
+                :tasks="gridData"
+                :columns="gridColumns"
+                :filter-key="searchQueries">
+        </pending-task-list>
+        <task-list
+                :tasks="gridData"
+                :columns="gridColumns"
+                :filter-key="searchQueries">
+        </task-list>
+
+        <task-modal
+                :task="newTask"
+                :form-error="formError"
+                :modal-title="modalTitle">
+        </task-modal>
 
         <script src="/projects/static/tasks.js"></script>
 
 
-    </div>
+</div>
 
 </div>
 

@@ -263,16 +263,16 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     public static class TaskWrapper {
         private final Long taskID;
         private final String taskName;
-        private final String taskComment;
+        private final String taskComments;
         private final double oE;
         private final Date startDate;
         private final Date endDate;
         private final String assignee;
         private final String status;
-        public TaskWrapper(Long taskID, String taskName, String taskComment, double oE, Date startDate, Date endDate, String assignee, String status) {
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, String status) {
             this.taskID = taskID;
             this.taskName = taskName;
-            this.taskComment = taskComment;
+            this.taskComments = taskComments;
             this.oE = oE;
             this.startDate = startDate;
             this.endDate = (endDate != null ? endDate : new Date());
@@ -307,8 +307,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             return status;
         }
 
-        public String getTaskComment() {
-            return taskComment;
+        public String getTaskComments() {
+            return taskComments;
         }
     }
 

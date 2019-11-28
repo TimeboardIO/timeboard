@@ -1,6 +1,8 @@
 /**
 * type = imputation | effortLeft
 */
+const axios = require('axios');
+
 const updateTask = function(date, task, type, val){
 
     return $.post("/timesheet", {
@@ -199,13 +201,22 @@ $(document).ready(function(){
             }else{
                  this.newTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 };
             }
+            var keepThis = this;
             $('.create-task.modal').modal({
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     if(validated){
-                        $.ajax({
-                            method: "GET",
-                            url: "/timesheet/api/create_task",
+                    axios.post('/timesheet/api/task', app.object)
+                    .then(function (response) {
+                        // Success
+                        console.log(response.data)
+                    },function (response) {
+                        // Error
+                        console.log(response.data)
+                    });
+                        /*$.ajax({
+                            method: "POST",
+                            url: "/timesheet/api/task",
                             data: app.newTask,
                           }).then(function(data) {
                               if(data == "DONE"){
@@ -217,7 +228,7 @@ $(document).ready(function(){
                                 $('.ui.error.message').show();
                               }
 
-                          });
+                          });*/
                     }
                     return false;
                 },

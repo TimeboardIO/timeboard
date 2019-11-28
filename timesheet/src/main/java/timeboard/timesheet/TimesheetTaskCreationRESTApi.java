@@ -51,7 +51,7 @@ import java.util.Date;
 @Component(
         service = Servlet.class,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/timesheet/api/create_task",
+                "osgi.http.whiteboard.servlet.pattern=/timesheet/api/task",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 
