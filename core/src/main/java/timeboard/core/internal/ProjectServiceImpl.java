@@ -308,7 +308,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<Task> listProjectTasks(User actor, Project project) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectOwner());
+        ruleSet.addRule(new ActorIsProjectMember());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
