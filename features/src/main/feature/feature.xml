@@ -104,6 +104,10 @@
     </feature>
 
     <feature name="timeboard-reporting" version="${project.version}">
+        <config name="org.apache.aries.jax.rs.whiteboard.default">
+            default.web=false
+            enabled=false
+        </config>
         <feature>cxf-jaxrs</feature>
         <feature>aries-jax-rs-whiteboard</feature>
         <bundle start-level="80">mvn:${project.groupId}/reporting/${project.version}</bundle>

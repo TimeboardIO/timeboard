@@ -39,10 +39,8 @@ import javax.ws.rs.core.MediaType;
 @Component(
         service = RestAPI.class,
         property = {
-                "osgi.jaxrs.resource=true",
-                "osgi.jaxrs.application.select=(osgi.jaxrs.name=.default)"
-        },
-        immediate = true)
+                "osgi.jaxrs.resource=true"
+        })
 @Path("/hello")
 @Produces(MediaType.APPLICATION_JSON)
 public class RestAPI {
@@ -53,10 +51,12 @@ public class RestAPI {
     }
 
 
-    @GET
-    @Path("/{name}")
-    public String sayHello(@PathParam("name") String name) {
-        return "{'name': 'Hello " + name + "'}";
-    }
 
+
+    @GET
+    @Path("/")
+    public String sayHello() {
+
+        return "{'name': 'Hello " + "name" + "'}";
+    }
 }

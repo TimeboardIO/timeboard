@@ -27,17 +27,28 @@ package timeboard.reporting;
  */
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 
-import javax.ws.rs.core.Application;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
+import java.io.IOException;
 
 @Component(
-        service = Application.class,
-        immediate = true,
+        service = ContainerRequestFilter.class,
         property = {
-                "osgi.jaxrs.application.base=/rest",
-                "osgi.jaxrs.name=.default"
-        }
+                "osgi.jaxrs.extension=true"
+        },
+        immediate = true
 )
-public class JaxRSApplication extends Application{
+public class RestFilter implements ContainerRequestFilter {
 
+    @Context
+    HttpServletRequest req;
+
+    @Override
+    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+        System.out.println("Filter executed.");
+    }
 }
