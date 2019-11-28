@@ -27,6 +27,17 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
@@ -36,18 +47,6 @@ import timeboard.core.model.*;
 
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Component(
         service = Servlet.class,
@@ -82,7 +81,7 @@ public class ProjectImportServlet extends TimeboardServlet {
     @Override
     protected void handlePost(User actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         requestDispatcher.forward(req, resp);
     }
 
@@ -100,12 +99,12 @@ public class ProjectImportServlet extends TimeboardServlet {
                 .filter(projectImportService -> projectImportService.getServiceName().equals(type))
                 .findFirst();
 
-        if(optionalService.isPresent()){
+        if (optionalService.isPresent()) {
             final ProjectImportService importPlugin = optionalService.get();
             try {
                 ProjectImportBackgroundTasks
                         .getInstance()
-                        .importInBackground(actor, ()->{
+                        .importInBackground(actor, () -> {
                             try {
                                 final Project project = projectService.getProjectByID(actor, projectID);
 
@@ -133,7 +132,7 @@ public class ProjectImportServlet extends TimeboardServlet {
                                 newTasks.forEach(task ->
                                         {
                                             String taskName = task.getTitle();
-                                            if(taskName.length()>=100){
+                                            if (taskName.length()>=100) {
                                                 taskName = taskName.substring(0, 99);
                                             }
                                             String taskComment = task.getComments();
@@ -166,11 +165,11 @@ public class ProjectImportServlet extends TimeboardServlet {
             }
 
 
-        }else{
-            importResponse.getErrors().add(new BusinessException("Missing "+type+" Service"));
+        } else {
+            importResponse.getErrors().add(new BusinessException("Missing " + type + " Service"));
         }
 
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         req.setAttribute("errors", importResponse.getErrors());
         req.setAttribute("importSuccess", message);
         requestDispatcher.forward(req, resp);

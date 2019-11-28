@@ -26,10 +26,9 @@ package timeboard.core.model;
  * #L%
  */
 
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
+import javax.persistence.*;
 
 
 @Entity
@@ -86,7 +85,7 @@ public class Project implements Serializable {
     }
 
     public Double getQuotation() {
-        if(this.quotation == null){
+        if (this.quotation == null) {
             return 0.0;
         }
         return quotation;
@@ -158,10 +157,10 @@ public class Project implements Serializable {
     }
 
     @Transient
-    public String getColor(){
-        if(this.getAttributes().get("project.color") != null){
+    public String getColor() {
+        if (this.getAttributes().get("project.color") != null) {
             return this.getAttributes().get("project.color").getValue();
-        }else{
+        } else {
             return "#957DAD";
         }
     }

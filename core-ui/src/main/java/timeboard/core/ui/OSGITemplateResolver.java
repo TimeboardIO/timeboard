@@ -26,6 +26,11 @@ package timeboard.core.ui;
  * #L%
  */
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
+import java.util.Map;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
@@ -33,24 +38,16 @@ import org.thymeleaf.IEngineConfiguration;
 import org.thymeleaf.templateresolver.AbstractConfigurableTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
-import java.util.Map;
-
 public class OSGITemplateResolver extends AbstractConfigurableTemplateResolver {
-
-
 
     @Override
     protected ITemplateResource computeTemplateResource(IEngineConfiguration iEngineConfiguration, String s, String s1, String s2, String s3, Map<String, Object> map) {
         BundleContext ctx = FrameworkUtil.getBundle(OSGITemplateResolver.class).getBundleContext();
-        String bundleName = "timeboard."+s1.split(":")[0];
-        String templateName = this.getPrefix()+s1.split(":")[1];
+        String bundleName = "timeboard." + s1.split(":")[0];
+        String templateName = this.getPrefix() + s1.split(":")[1];
         Bundle bundle = null;
-        for(Bundle b : ctx.getBundles()){
-            if(b.getSymbolicName().equals(bundleName)){
+        for (Bundle b : ctx.getBundles()) {
+            if (b.getSymbolicName().equals(bundleName)) {
                 bundle = b;
             }
         }

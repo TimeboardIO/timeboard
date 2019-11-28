@@ -26,9 +26,9 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.*;
 
 @Entity
 @Table(
@@ -81,9 +81,15 @@ public class Imputation implements Serializable {
         return task;
     }
 
-    public void setTask(AbstractTask task) { this.task = task; }
+    public void setTask(AbstractTask task) {
+        this.task = task;
+    }
 
-    public User getUser() { return user; }
+    public User getUser() {
+        return user;
+    }
 
-    public void setUser(User user) { this.user = user; }
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

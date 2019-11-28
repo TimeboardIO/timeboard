@@ -26,6 +26,14 @@ package timeboard.account;
  * #L%
  */
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
@@ -73,8 +81,8 @@ public class AccountServlet extends TimeboardServlet {
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         String submitButton = request.getParameter("formType");
-        if(submitButton.matches("account")){
-            //Account modification
+        if (submitButton.matches("account")) {
+           //Account modification
            String fistName = request.getParameter("firstName");
            String name = request.getParameter("name");
            String email = request.getParameter("email");
@@ -86,10 +94,10 @@ public class AccountServlet extends TimeboardServlet {
            try{
               User u = userService.updateUser(actor);
                viewModel.getViewDatas().put("message", "User account changed successfully !");
-           }catch  (Exception e){
+           } catch (Exception e) {
                viewModel.getViewDatas().put("error", "Error while updating user information.");
            }
-        }else if(submitButton.matches("external")){
+        } else if (submitButton.matches("external")) {
             
             Enumeration<String> params1 = request.getParameterNames();
             while (params1.hasMoreElements()) {
@@ -103,7 +111,7 @@ public class AccountServlet extends TimeboardServlet {
             try{
                 User u = userService.updateUser(actor);
                 viewModel.getViewDatas().put("message", "External tools updated successfully !");
-            }catch  (Exception e){
+            } catch (Exception e) {
                 viewModel.getViewDatas().put("error", "Error while external tools");
             }
         }
@@ -116,7 +124,7 @@ public class AccountServlet extends TimeboardServlet {
         loadPage(viewModel, actor);
     }
     
-    private void loadPage(ViewModel viewModel, User user){
+    private void loadPage(ViewModel viewModel, User user) {
         viewModel.getViewDatas().put("user", user);
 
         List<String> fieldNames = new ArrayList<>();

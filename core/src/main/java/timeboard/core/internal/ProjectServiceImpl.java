@@ -26,6 +26,11 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.Calendar;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,12 +50,6 @@ import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import java.util.Calendar;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Component(
         service = ProjectService.class,
         immediate = true
@@ -66,7 +65,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Reference(target = "(osgi.unit.name=timeboard-pu)", scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
 
-    public ProjectServiceImpl(){}
+    public ProjectServiceImpl() {
+
+    }
 
     public ProjectServiceImpl(JpaTemplate jpa){
      this.jpa = jpa;
@@ -114,7 +115,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectByIdWithAllMembers(User actor, Long projectId) throws BusinessException{
+    public Project getProjectByIdWithAllMembers(User actor, Long projectId) throws BusinessException {
         Project project =  jpa.txExpr(em -> {
             return em.createQuery("select p from Project p where p.id = :projectId", Project.class)
                     .setParameter("projectId", projectId)
@@ -200,19 +201,19 @@ public class ProjectServiceImpl implements ProjectService {
 
         return jpa.txExpr(em -> {
 
-            TypedQuery<Object[]> q = em.createQuery("select " +
-                    "COALESCE(sum(t.originalEstimate),0) as originalEstimate, " +
-                    "COALESCE(sum(t.effortLeft),0) as effortLeft " +
-                    "from Task t " +
-                    "where t.project = :project ", Object[].class);
+            TypedQuery<Object[]> q = em.createQuery("select "
+                    + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
+                    + "COALESCE(sum(t.effortLeft),0) as effortLeft "
+                    + "from Task t "
+                    + "where t.project = :project ", Object[].class);
 
             q.setParameter("project", project);
 
             Object[] OEandEL = q.getSingleResult();
 
-            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) " +
-                    "from Task t left outer join t.imputations i " +
-                    "where t.project = :project ", Double.class);
+            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
+                    + "from Task t left outer join t.imputations i "
+                    + "where t.project = :project ", Double.class);
 
             effortSpentQuery.setParameter("project", project);
 

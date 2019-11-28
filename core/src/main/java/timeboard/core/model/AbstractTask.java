@@ -26,13 +26,13 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import javax.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -67,7 +67,7 @@ public abstract class AbstractTask implements Serializable {
     @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
     private Set<Imputation> imputations;
 
-    public AbstractTask(){
+    public AbstractTask() {
         this.imputations = new HashSet<>();
     }
 
@@ -78,9 +78,13 @@ public abstract class AbstractTask implements Serializable {
         this.setEndDate(endDate);
     }
 
-    public Long getId() { return id; }
+    public Long getId() {
+      return id;
+    }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) {
+      this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -131,29 +135,39 @@ public abstract class AbstractTask implements Serializable {
         this.origin = origin.toLowerCase();
     }
 
-    public String getRemotePath() { return remotePath; }
+    public String getRemotePath() {
+      return remotePath;
+    }
 
-    public void setRemotePath(String remotePath) { this.remotePath = remotePath; }
+    public void setRemotePath(String remotePath) {
+      this.remotePath = remotePath;
+    }
 
-    public String getRemoteId() { return remoteId; }
+    public String getRemoteId() {
+      return remoteId;
+    }
 
-    public void setRemoteId(String remoteId) { this.remoteId = remoteId; }
+    public void setRemoteId(String remoteId) {
+      this.remoteId = remoteId;
+    }
 
     @Transient
     public double findTaskImputationValueByDate(Date date, User user) {
-        Optional<Imputation> iOpt = this.getImputations().stream()
+        Optional<Imputation> imputationOptional = this.getImputations().stream()
                 .filter(imputation -> areDateSameDay(date,imputation.getDay()))
                 .filter(imputation -> (imputation.getUser().getId() == user.getId()))
                 .findFirst();
-        if (iOpt.isPresent()) {
-            return iOpt.get().getValue();
+        if (imputationOptional.isPresent()) {
+            return imputationOptional.get().getValue();
         } else {
             return 0;
         }
     }
 
-    private boolean areDateSameDay(Date date1, Date date2){
-        return new SimpleDateFormat("yyyy-MM-dd").format(date1).equals(new SimpleDateFormat("yyyy-MM-dd").format(date2));
+    private boolean areDateSameDay(Date date1, Date date2) {
+        return new SimpleDateFormat("yyyy-MM-dd")
+                .format(date1)
+                .equals(new SimpleDateFormat("yyyy-MM-dd").format(date2));
     }
 
 

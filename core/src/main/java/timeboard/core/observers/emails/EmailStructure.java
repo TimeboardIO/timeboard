@@ -26,7 +26,6 @@ package timeboard.core.observers.emails;
  * #L%
  */
 
-
 import java.util.List;
 
 public class EmailStructure {

@@ -29,7 +29,7 @@ package timeboard.core.ui;
 public interface BrandingService {
 
     /**
-     * Provide application name for pages title
+     * Provide application name for pages title.
      *
      * @return
      */

@@ -26,6 +26,14 @@ package timeboard.projects;
  * #L%
  */
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
@@ -35,15 +43,6 @@ import timeboard.core.model.*;
 
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Component(
         service = Servlet.class,
@@ -127,7 +126,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
 
     private Milestone createMilestone(User actor, Project project, HttpServletRequest request) throws ParseException, BusinessException {
         String name = request.getParameter("milestoneName");
-        Date date = new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1);
+        Date date = new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime() + (2 * 60 * 60 * 1000) + 1);
         MilestoneType type = request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY;
         Map<String, String> attributes = this.getCurrentMilestoneAttributes(request);
         Set<Task> tasks = new HashSet<>();
@@ -138,7 +137,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
     private Milestone updateMilestone(User actor, Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException, BusinessException {
 
         currentMilestone.setName(request.getParameter("milestoneName"));
-        currentMilestone.setDate(new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1));
+        currentMilestone.setDate(new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime() + (2 * 60 * 60 * 1000) + 1));
         currentMilestone.setType(request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY);
         currentMilestone.setAttributes(this.getCurrentMilestoneAttributes(request));
         currentMilestone.setTasks(new HashSet<>());
@@ -147,7 +146,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         return this.projectService.updateMilestone(actor, currentMilestone);
     }
 
-    private Map<String, String> getCurrentMilestoneAttributes(HttpServletRequest request){
+    private Map<String, String> getCurrentMilestoneAttributes(HttpServletRequest request) {
         Map<String, String> attributes = new HashMap<>();
 
         String newAttrKey = request.getParameter("newAttrKey");

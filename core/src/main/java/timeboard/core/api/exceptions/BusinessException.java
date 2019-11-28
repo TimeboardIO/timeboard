@@ -26,10 +26,9 @@ package timeboard.core.api.exceptions;
  * #L%
  */
 
-import timeboard.core.internal.rules.Rule;
-
 import java.util.HashSet;
 import java.util.Set;
+import timeboard.core.internal.rules.Rule;
 
 public class BusinessException extends Exception {
 

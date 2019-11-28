@@ -26,10 +26,9 @@ package timeboard.projects;
  * #L%
  */
 
-import timeboard.core.model.User;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import timeboard.core.model.User;
 
 public class ProjectImportBackgroundTasks {
 
@@ -37,10 +36,12 @@ public class ProjectImportBackgroundTasks {
 
     private static ExecutorService executors = Executors.newFixedThreadPool(10);
 
-    private ProjectImportBackgroundTasks(){}
+    private ProjectImportBackgroundTasks() {
 
-    public static ProjectImportBackgroundTasks getInstance(){
-        if(INSTANCE == null){
+    }
+
+    public static ProjectImportBackgroundTasks getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new ProjectImportBackgroundTasks();
         }
         return INSTANCE;
@@ -49,10 +50,6 @@ public class ProjectImportBackgroundTasks {
     public void importInBackground(User actor, Runnable command){
         executors.execute(command);
     }
-
-
-
-
 
 
 }

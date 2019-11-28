@@ -26,24 +26,22 @@ package timeboard.core.internal;
  * #L%
  */
 
-
-import org.apache.commons.lang.StringUtils;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.EmailService;
-import timeboard.core.observers.emails.EmailStructure;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.api.EmailService;
+import timeboard.core.observers.emails.EmailStructure;
 
 @Component(
         service = EmailService.class,
@@ -64,7 +62,7 @@ public class EmailServiceImpl implements EmailService {
     private String port;
 
     @Activate
-    private void init(Map<String, String> conf){
+    private void init(Map<String, String> conf) {
         this.fromEmail = conf.get("timeboard.mail.fromEmail");
         this.host = conf.get("timeboard.mail.host");
         this.port = conf.get("timeboard.mail.port");
@@ -83,11 +81,11 @@ public class EmailServiceImpl implements EmailService {
         msg.setFrom(new InternetAddress(fromEmail));
         msg.setContent(emailStructure.getMessage(), "text/html; charset=utf-8");
 
-        List<String> listTOEmailsWithoutDuplicate = emailStructure.getTargetUserList().stream().distinct().collect(Collectors.toList());
-        String targetTOEmails = StringUtils.join(listTOEmailsWithoutDuplicate, ',');
-        msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetTOEmails));
+        List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList().stream().distinct().collect(Collectors.toList());
+        String targetToEmails = StringUtils.join(listToEmailsWithoutDuplicate, ',');
+        msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetToEmails));
 
-        if(emailStructure.getTargetCCUserList() != null) {
+        if (emailStructure.getTargetCCUserList() != null) {
             List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList().stream().distinct().collect(Collectors.toList());
             String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
             msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
