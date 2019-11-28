@@ -49,7 +49,9 @@ import java.util.List;
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
+
         property = {
+                "service.ranking=0",
                 "osgi.http.whiteboard.servlet.pattern=/",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }

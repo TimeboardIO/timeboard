@@ -26,39 +26,18 @@ package timeboard.reporting;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Application;
 
 @Component(
-        service = RestAPI.class,
+        service = Application.class,
+        scope = ServiceScope.SINGLETON,
         property = {
-                "osgi.jaxrs.resource=true",
-                "osgi.jaxrs.application.select=(osgi.jaxrs.name=.default)"
+                "osgi.jaxrs.name=.default",
+                "osgi.jaxrs.application.base=/api"
         }
 )
-@Path("/hello")
-@Produces(MediaType.APPLICATION_JSON)
-public class RestAPI {
-
-    @Activate
-    private void init(){
-        System.out.println("Start rest API !");
-    }
-
-
-
-
-    @GET
-    @Path("/")
-    public String sayHello() {
-
-        return "{'name': 'Hello " + "name" + "'}";
-    }
+public class RestApplication extends Application {
 }
