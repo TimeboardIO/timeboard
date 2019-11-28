@@ -169,7 +169,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                                 task.getStartDate(),
                                 task.getEndDate(),
                                 assignee.getFirstName()+" "+assignee.getName(),
-                                task.getTaskStatus().name())
+                                task.getTaskStatus().name(),
+                                (task.getTaskType() != null ?task.getTaskType().getId() : 0L))
                         );
             }
         }
@@ -214,7 +215,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                     task.getStartDate(),
                     task.getEndDate(),
                     assignee.getFirstName()+" "+assignee.getName(),
-                    task.getTaskStatus().name()));
+                    task.getTaskStatus().name(),
+                    (task.getTaskType() != null ?task.getTaskType().getId() : 0L)));
 
         }
 
@@ -269,7 +271,10 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         private final Date endDate;
         private final String assignee;
         private final String status;
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, String status) {
+
+        private final Long type;
+
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, String status, Long type) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComments = taskComments;
@@ -278,6 +283,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             this.endDate = (endDate != null ? endDate : new Date());
             this.assignee = assignee;
             this.status = status;
+            this.type = type;
         }
 
         public String getStartDate() {
@@ -298,6 +304,10 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         public String getTaskName() {
             return taskName;
+        }
+
+        public Long getType() {
+            return type;
         }
 
         public String getAssignee() {

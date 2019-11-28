@@ -146,15 +146,13 @@ Vue.component('task-modal', {
             identifier: 'taskOriginalEstimate',
             rules: [ { type   : 'empty', prompt : 'Please enter task original estimate in days'  },
              { type   : 'number', prompt : 'Please enter task a number original estimate in days'  } ]
-          },
-          taskTypeID: {
-            identifier: 'taskTypeID',
-            rules: [ { type   : 'empty', prompt : 'Please enter task type '  } ]
           }
         }
     };
+
  const emptyTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 }
- // bootstrap the demo
+
+
 var app = new Vue({
 
     el: '#tasksList',
@@ -164,7 +162,7 @@ var app = new Vue({
             {key : 'endDate', value: ''}, {key : 'oE', value: ''}, {key : 'assignee', value: ''}, {key : 'status', value: ''}],
         gridColumns: ['taskName', 'taskComments', 'startDate', 'endDate', 'oE', 'assignee', 'status'],
         gridData: [ ],
-        newTask: emptyTask,
+        newTask: Object.assign({}, emptyTask),
         formError:"",
         modalTitle:""
     },
@@ -180,10 +178,10 @@ var app = new Vue({
                  this.newTask.startDate = task.startDate;
                  this.newTask.endDate = task.endDate;
                  this.newTask.originalEstimate = task.oE;
-                 this.newTask.typeID = task.typeID;
+                 this.newTask.typeID = task.type;
             }else{
                  this.modalTitle = "Create task";
-                 this.newTask = emptyTask;
+                 Object.assign(this.newTask , emptyTask);
             }
             $('.create-task.modal').modal({
                 onApprove : function($element){
