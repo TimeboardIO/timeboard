@@ -37,7 +37,7 @@ import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
 import timeboard.core.model.User;
-import timeboard.core.ui.HttpSecurityContext;
+
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -72,33 +72,32 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws IOException, BusinessException {
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws IOException, BusinessException {
         final String action = request.getParameter("action");
 
         response.setContentType("application/json");
 
         if(action.matches("getPendingTasks")){
-            this.getPendingTasks(request, response);
+            this.getPendingTasks(actor, request, response);
         }else if(action.matches("approveTask")){
-            this.approveTask(request, response);
+            this.approveTask(actor, request, response);
         }else if(action.matches("denyTask")){
-            this.denyTask(request, response);
+            this.denyTask(actor, request, response);
         }else{
             MAPPER.writeValue(response.getWriter(), "Unknown action.");
             return;
         }
     }
 
-    private void approveTask(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
-       this.changeTaskStatus(request, response, TaskStatus.IN_PROGESS);
+    private void approveTask(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
+       this.changeTaskStatus(actor, request, response, TaskStatus.IN_PROGESS);
     }
 
-    private void denyTask(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
-        this.changeTaskStatus(request, response, TaskStatus.REFUSED);
+    private void denyTask(User actor,HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
+        this.changeTaskStatus(actor, request, response, TaskStatus.REFUSED);
     }
 
-    private void changeTaskStatus(HttpServletRequest request, HttpServletResponse response, TaskStatus status) throws IOException, BusinessException {
-        User actor = HttpSecurityContext.getCurrentUser(request);
+    private void changeTaskStatus(User actor, HttpServletRequest request, HttpServletResponse response, TaskStatus status) throws IOException, BusinessException {
         final String taskIdStr = request.getParameter("taskId");
         Long taskId = null;
         if(taskIdStr != null) {
@@ -128,7 +127,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         return;
     }
 
-    private void getPendingTasks(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
+    private void getPendingTasks(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -138,7 +137,6 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             MAPPER.writeValue(response.getWriter(), "Incorrect project argument");
             return;
         }
-        final User actor = HttpSecurityContext.getCurrentUser(request);
         final Project project = this.projectService.getProjectByID(actor, projectID);
         if(project == null){
             MAPPER.writeValue(response.getWriter(), "Project does not exists or you don't have enough permissions to access it.");

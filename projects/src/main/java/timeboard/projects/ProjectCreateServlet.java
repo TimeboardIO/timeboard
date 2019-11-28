@@ -31,7 +31,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.ui.HttpSecurityContext;
+import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -64,14 +64,14 @@ public class ProjectCreateServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("projects:create_project.html");
         Map<String, Object> result = new HashMap<>();
         result.put("projectName", request.getParameter("projectName"));
 
 
         try {
-            this.projectService.createProject(HttpSecurityContext.getCurrentUser(request), result.get("projectName").toString());
+            this.projectService.createProject(actor, result.get("projectName").toString());
             response.sendRedirect("/projects");
         } catch (BusinessException e) {
             result.put("error", "Project " + result.get("projectName").toString() + " already exist");
@@ -81,7 +81,7 @@ public class ProjectCreateServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("projects:create_project.html");
 
     }

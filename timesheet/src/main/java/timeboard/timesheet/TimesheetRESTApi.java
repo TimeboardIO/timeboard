@@ -35,7 +35,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.TaskStatus;
 import timeboard.core.model.User;
-import timeboard.core.ui.HttpSecurityContext;
+
 import timeboard.core.ui.TimeboardServlet;
 
 import javax.servlet.Servlet;
@@ -89,7 +89,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
 
-        final User currentUser = HttpSecurityContext.getCurrentUser(request);
+        final User currentUser = getActorFromRequestAttributes(request);
         boolean validated = false;
 
         final Calendar c = Calendar.getInstance();
@@ -118,8 +118,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         //Get tasks for current week
         if (this.projectService != null) {
-            User actor = HttpSecurityContext.getCurrentUser(request);
-            this.projectService.listTasksByProject(actor, ds, de).stream().forEach(projectTasks -> {
+            this.projectService.listTasksByProject(getActorFromRequestAttributes(request), ds, de).stream().forEach(projectTasks -> {
                 List<TaskWrapper> tasks = new ArrayList<>();
 
                 projectTasks.getTasks().stream().forEach(task -> {

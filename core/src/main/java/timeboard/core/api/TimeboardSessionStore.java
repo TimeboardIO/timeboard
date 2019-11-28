@@ -42,6 +42,10 @@ public interface TimeboardSessionStore {
 
     TimeboardSession createSession(User user);
 
+    void invalidateSession(UUID uuid);
+
+    List<TimeboardSession> listSessions();
+
     class TimeboardSession implements Serializable {
         private final UUID sessionUUID;
         private final Date createDate;

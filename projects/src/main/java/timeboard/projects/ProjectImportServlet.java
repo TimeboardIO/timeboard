@@ -33,7 +33,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.HttpSecurityContext;
+
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -80,18 +80,17 @@ public class ProjectImportServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handlePost(User actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
         requestDispatcher.forward(req, resp);
     }
 
     @Override
-    protected void handleGet(HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handleGet(User actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
-        final User actor = HttpSecurityContext.getCurrentUser(req);
 
         String message = null;
 

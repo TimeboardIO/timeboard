@@ -30,6 +30,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
+import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -37,6 +39,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 
 @Component(
@@ -47,21 +50,29 @@ import java.io.IOException;
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 )
-public class LogoutServlet extends HttpServlet {
+public class LogoutServlet extends TimeboardServlet {
 
     @Reference
     LogService logService;
 
+    @Reference
+    private TimeboardSessionStore sessionStore;
+
+
+    @Override
+    protected ClassLoader getTemplateResolutionClassLoader() {
+        return LogoutServlet.class.getClassLoader();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
+        UUID sessionID = HttpSecurityContext.getCurrentSessionID(req, this.sessionStore);
 
-        req.getSession().removeAttribute("username");
-        req.getSession().invalidate();
+        this.sessionStore.invalidateSession(sessionID);
 
         this.logService.log(LogService.LOG_INFO, "Logout : " + req.getSession().getAttribute("username"));
 
-        resp.sendRedirect("/login");
+        resp.sendRedirect("/");
     }
 }

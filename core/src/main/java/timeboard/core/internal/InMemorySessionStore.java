@@ -28,25 +28,38 @@ package timeboard.core.internal;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.log.LogService;
 import timeboard.core.model.User;
 import timeboard.core.api.TimeboardSessionStore;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Component(
         service = TimeboardSessionStore.class,
-        immediate = true
+        scope = ServiceScope.SINGLETON
 )
 public class InMemorySessionStore implements TimeboardSessionStore {
+
+    @Reference
+    private LogService logService;
 
     private final static Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
             .maximumSize(5000)
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .build();
+
+    @Activate
+    private void init(){
+        this.logService.log(LogService.LOG_INFO, String.format("Start session store : %s", this.toString()));
+    }
 
     @Override
     public Optional<TimeboardSession> getSession(UUID sessionUUID) {
@@ -60,6 +73,18 @@ public class InMemorySessionStore implements TimeboardSessionStore {
         TimeboardSession session = new TimeboardSession(sessionUUID);
         session.getPayload().put("user", user);
         SESSION_STORE.put(sessionUUID, session);
+        this.logService.log(LogService.LOG_INFO, String.format("Create session from user %s with sessionUUID %s", user.getScreenName(), sessionUUID.toString()));
         return session;
+    }
+
+    @Override
+    public void invalidateSession(UUID uuid) {
+        SESSION_STORE.invalidate(uuid);
+        this.logService.log(LogService.LOG_INFO, String.format("Invalidate session %s", uuid));
+    }
+
+    @Override
+    public List<TimeboardSession> listSessions() {
+        return new ArrayList<>(SESSION_STORE.asMap().values());
     }
 }

@@ -34,7 +34,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
-import timeboard.core.ui.HttpSecurityContext;
+
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -70,9 +70,8 @@ public class ProjectDashboardServlet extends TimeboardServlet {
 
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
-        User actor = HttpSecurityContext.getCurrentUser(request);
         final long id = Long.parseLong(request.getParameter("projectID"));
         final Project project = this.projectService.getProjectByID(actor, id);
 

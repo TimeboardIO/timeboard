@@ -32,7 +32,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.core.ui.HttpSecurityContext;
+
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -70,8 +70,7 @@ public class AccountServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        User user = HttpSecurityContext.getCurrentUser(request);
+    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         String submitButton = request.getParameter("formType");
         if(submitButton.matches("account")){
@@ -80,12 +79,12 @@ public class AccountServlet extends TimeboardServlet {
            String name = request.getParameter("name");
            String email = request.getParameter("email");
 
-           user.setFirstName(fistName);
-           user.setName(name);
-           user.setEmail(email);
+            actor.setFirstName(fistName);
+            actor.setName(name);
+            actor.setEmail(email);
 
            try{
-              User u = userService.updateUser(user);
+              User u = userService.updateUser(actor);
                viewModel.getViewDatas().put("message", "User account changed successfully !");
            }catch  (Exception e){
                viewModel.getViewDatas().put("error", "Error while updating user information.");
@@ -98,25 +97,23 @@ public class AccountServlet extends TimeboardServlet {
                 if (param.startsWith("attr-")) {
                     String key = param.substring(5, param.length());
                     String value = request.getParameter(param);
-                    user.getExternalIDs().put(key, value);
+                    actor.getExternalIDs().put(key, value);
                 }
             }
             try{
-                User u = userService.updateUser(user);
+                User u = userService.updateUser(actor);
                 viewModel.getViewDatas().put("message", "External tools updated successfully !");
             }catch  (Exception e){
                 viewModel.getViewDatas().put("error", "Error while external tools");
             }
         }
-        loadPage(viewModel, user);
+        loadPage(viewModel, actor);
 
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        User user = HttpSecurityContext.getCurrentUser(request);
-
-        loadPage(viewModel, user);
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        loadPage(viewModel, actor);
     }
     
     private void loadPage(ViewModel viewModel, User user){

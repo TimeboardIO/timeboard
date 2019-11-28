@@ -59,11 +59,12 @@ public class RestFilter implements ContainerRequestFilter {
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
-        User user = HttpSecurityContext.getCurrentUser(this.req);
+        User user = HttpSecurityContext.getCurrentUser(this.req, this.timeboardSessionStore);
 
         if(user == null){
             throw new SecurityException();
         }
+        containerRequestContext.setProperty("actor", user);
 
         System.out.println("Filter executed :)");
     }

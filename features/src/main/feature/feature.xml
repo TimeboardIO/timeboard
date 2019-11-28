@@ -41,7 +41,7 @@
             org.ops4j.pax.web.config.file=${karaf.etc}/jetty.xml
             org.apache.karaf.features.configKey=org.ops4j.pax.web
             org.ops4j.pax.web.session.timeout=30
-            org.osgi.service.http.enabled=true
+            org.osgi.service.http.enabled=false
             org.osgi.service.https.enabled=true
             org.osgi.service.http.port.secure=8443
             org.osgi.service.http.secure.enabled=true

@@ -26,29 +26,33 @@ package timeboard.core.ui;
  * #L%
  */
 
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 import timeboard.core.model.User;
 import timeboard.core.api.TimeboardSessionStore;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import java.net.http.HttpRequest;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-public class HttpSecurityContext {
 
+class HttpSecurityContext {
 
-    public static User getCurrentUser(HttpServletRequest req) {
+    public static UUID  getCurrentSessionID(HttpServletRequest req, TimeboardSessionStore sessionStore) {
+        UUID u = null;
+
+        if(req.getCookies() != null) {
+            Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
+
+            if (sessionCookie.isPresent()) {
+                u = UUID.fromString(sessionCookie.get().getValue());
+            }
+        }
+        return u;
+    }
+
+    public static User getCurrentUser(HttpServletRequest req, TimeboardSessionStore sessionStore) {
         User u = null;
-        Bundle bnd = FrameworkUtil.getBundle(HttpSecurityContext.class);
-        BundleContext ctx = bnd.getBundleContext();
-        ServiceReference<TimeboardSessionStore> sr = ctx.getServiceReference(TimeboardSessionStore.class);
-        TimeboardSessionStore sessionStore = ctx.getService(sr);
 
         if(req.getCookies() != null) {
             Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
@@ -63,4 +67,6 @@ public class HttpSecurityContext {
         }
         return u;
     }
+
+
 }
