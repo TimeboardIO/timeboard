@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.security;
 
 /*-
  * #%L
- * reporting
+ * security
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,29 +26,42 @@ package timeboard.reporting;
  * #L%
  */
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.model.User;
+import timeboard.security.api.TimeboardSessionStore;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
-import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Component(
-        service = ContainerRequestFilter.class,
-        property = {
-                "osgi.jaxrs.extension=true"
-        },
-        immediate = true
+        service = TimeboardSessionStore.class,
+        immediate = true,
+        scope = ServiceScope.SINGLETON
 )
-public class RestFilter implements ContainerRequestFilter {
+public class InMemorySessionStore implements TimeboardSessionStore {
 
-    @Context
-    HttpServletRequest req;
+    private final static Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
+            .maximumSize(5000)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build();
 
     @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        System.out.println("Filter executed.");
+    public Optional<TimeboardSession> getSession(UUID sessionUUID) {
+        TimeboardSession session = SESSION_STORE.getIfPresent(sessionUUID);
+        return Optional.of(session);
+    }
+
+    @Override
+    public TimeboardSession createSession(User user) {
+        UUID sessionUUID = UUID.randomUUID();
+        TimeboardSession session = new TimeboardSession(sessionUUID);
+        session.getPayload().put("user", user);
+        SESSION_STORE.put(sessionUUID, session);
+        return session;
     }
 }

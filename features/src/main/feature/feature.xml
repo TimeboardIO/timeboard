@@ -108,6 +108,7 @@
             default.web=false
             enabled=false
         </config>
+        <feature>timeboard-security</feature>
         <feature>cxf-jaxrs</feature>
         <feature>aries-jax-rs-whiteboard</feature>
         <bundle start-level="80">mvn:${project.groupId}/reporting/${project.version}</bundle>
