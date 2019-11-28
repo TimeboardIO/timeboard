@@ -106,6 +106,12 @@ Vue.component('task-list', {
       sortBy: function (key) {
         this.sortKey = key
         this.sortOrders[key] = this.sortOrders[key] * -1
+      },
+      approveTask: function(event, task){
+        event.target.classList.toggle('loading');
+      },
+      denyTask: function(event, task){
+        event.target.classList.toggle('loading');
       }
     }
   });
@@ -150,7 +156,12 @@ Vue.component('task-modal', {
         }
     };
 
- const emptyTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 }
+ const emptyTask =  {
+        taskID: 0, projectID: 0, taskName: "", taskComments: "",
+        startDate:"", endDate:"",
+        originalEstimate: 0, typeID: 0,
+        assignee : "", assigneeID:0
+}
 
 
 var app = new Vue({
@@ -179,6 +190,7 @@ var app = new Vue({
                  this.newTask.endDate = task.endDate;
                  this.newTask.originalEstimate = task.oE;
                  this.newTask.typeID = task.type;
+                 this.newTask.assignee = task.assignee;
             }else{
                  this.modalTitle = "Create task";
                  Object.assign(this.newTask , emptyTask);
@@ -244,8 +256,31 @@ var app = new Vue({
 
 $(document).ready(function(){
     const project = $("meta[property='tasks']").attr('project');
+
     $.get("/projects/tasks/api?action=getTasks&project="+project)
     .then(function(data){
          app.gridData = data;
+         $('.ui.dimmer').removeClass('active');
     });
+
+
+     $('select.dropdown') .dropdown() ;
+
+     $('.ui.search')
+        .search({
+            apiSettings: {
+                    url: '/search?q={query}&projectID='+project+''
+                },
+                fields: {
+                    results : 'items',
+                    title   : 'screenName',
+                    description : 'email'
+                },
+                onSelect: function(result, response) {
+                    $('.assigned').val(result.screenName);
+                    $('.taskAssigned').val(result.id);
+                 },
+            minCharacters : 3
+        });
+
 });

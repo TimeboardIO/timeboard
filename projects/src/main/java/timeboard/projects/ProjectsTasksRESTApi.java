@@ -168,7 +168,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                                 task.getOriginalEstimate(),
                                 task.getStartDate(),
                                 task.getEndDate(),
-                                assignee.getFirstName()+" "+assignee.getName(),
+                                assignee.getScreenName(), assignee.getId(),
                                 task.getTaskStatus().name(),
                                 (task.getTaskType() != null ?task.getTaskType().getId() : 0L))
                         );
@@ -214,7 +214,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                     task.getOriginalEstimate(),
                     task.getStartDate(),
                     task.getEndDate(),
-                    assignee.getFirstName()+" "+assignee.getName(),
+                    assignee.getScreenName(), assignee.getId(),
                     task.getTaskStatus().name(),
                     (task.getTaskType() != null ?task.getTaskType().getId() : 0L)));
 
@@ -270,11 +270,13 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         private final Date startDate;
         private final Date endDate;
         private final String assignee;
+        private final Long assigneeID;
+
         private final String status;
 
         private final Long type;
 
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, String status, Long type) {
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long type) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComments = taskComments;
@@ -284,6 +286,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             this.assignee = assignee;
             this.status = status;
             this.type = type;
+            this.assigneeID = assigneeID;
         }
 
         public String getStartDate() {
@@ -308,6 +311,10 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         public Long getType() {
             return type;
+        }
+
+        public Long getAssigneeID() {
+            return assigneeID;
         }
 
         public String getAssignee() {

@@ -9,17 +9,17 @@
     <title>Project Tasks details</title>
     <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
 
-    <style>
-
-    </style>
 </head>
 <body>
 
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
 
-
     <script type="text/x-template" id="task-list-template">
+        <div class="dimmable">
+            <div class="ui active inverted dimmer">
+                <div class="ui loader"></div>
+            </div>
         <table class="ui celled table">
             <thead>
             <tr><th style="text-align:center;" v-for="key in columns"
@@ -52,12 +52,12 @@
             </tr>
             </tbody>
         </table>
-
+        </div>
     </script>
     <script type="text/x-template" id="pending-task-list-template"  >
+
         <table class="ui celled table" v-if="filteredTasks.length > 0">
             <thead>
-
             <tr>
                 <th class="task-title" v-bind:colspan="columns.length">
                     Pending tasks
@@ -75,11 +75,11 @@
             <tr v-for="entry in filteredTasks" >
                 <td style="text-align:center;" v-for="key in columns" v-if="key != 'status'">{{entry[key]}}</td>
                 <td style="text-align:center;">
-                    <button class="ui positive icon button">
+                    <button  @click="approveTask($event, entry)" class="ui positive icon button">
                         Approve
                         <i class="check icon"></i>
                     </button>
-                    <button class="ui negative icon button">
+                    <button @click="denyTask($event, entry)"  class="ui negative icon button">
                         Deny
                         <i class="close icon"></i>
                     </button>
@@ -94,11 +94,29 @@
         <div class="ui modal create-task " >
             <i class="close icon"></i>
             <div  v-bind="modalTitle"  class="header"></div>
-            <div class="content">
+            <div class="scrolling content">
                 <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
-                    <div class="field">
-                        <label>Task Name</label>
-                        <input v-model="task.taskName"  name="taskName" placeholder="Task Name" required type="text">
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Task Name</label>
+                            <input v-model="task.taskName"  name="taskName" placeholder="Task Name" required type="text">
+                        </div>
+                        <div class="field">
+                            <label>User assigned</label>
+                            <div class="ui category search">
+                                <div class="ui icon input">
+
+                                    <input class="prompt assigned" placeholder="Search user..."
+                                           v-model="task.assignee" type="text"/>
+
+                                    <input class="taskAssigned" name="taskAssigned"
+                                           v-model="task.assigneeID" type="hidden"/>
+
+                                    <i class="search icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
                     </div>
                     <div class="field">
                         <label>Task Description</label>
@@ -146,10 +164,9 @@
     </script>
 
     <div id="tasksList">
-
-        <div class="ui segment">
-            <a class="ui primary create-task button" v-on:click="showCreateTaskModal(null, null, $event)" >New Task</a>
-        </div>
+        <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task icon button">
+            New Task <i class="plus icon"></i>
+        </button>
         <pending-task-list
                 :tasks="gridData"
                 :columns="gridColumns"
