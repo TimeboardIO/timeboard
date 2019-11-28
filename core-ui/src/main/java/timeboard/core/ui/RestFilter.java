@@ -64,8 +64,8 @@ public class RestFilter implements ContainerRequestFilter {
         if(user == null){
             throw new SecurityException();
         }
-        containerRequestContext.setProperty("actor", user);
 
+        containerRequestContext.setProperty("actor", user);
         System.out.println("Filter executed :)");
     }
 }

@@ -60,7 +60,8 @@ public class RestAPI {
 
     @GET
     @Path("/")
-    public String sayHello() {
-        return "{'name': 'Hello :)'}";
+    public String sayHello(@Context HttpServletRequest req) {
+        User user = (User) req.getAttribute("actor");
+        return "{'name': 'Hello '"+user.getScreenName()+"''}";
     }
 }
