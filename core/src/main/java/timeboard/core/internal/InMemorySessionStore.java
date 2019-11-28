@@ -1,4 +1,4 @@
-package timeboard.security;
+package timeboard.core.internal;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,37 +26,40 @@ package timeboard.security;
  * #L%
  */
 
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.model.User;
-import timeboard.security.api.TimeboardSessionStore;
+import timeboard.core.api.TimeboardSessionStore;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
-public class SecurityContext {
+@Component(
+        service = TimeboardSessionStore.class,
+        immediate = true
+)
+public class InMemorySessionStore implements TimeboardSessionStore {
 
+    private final static Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
+            .maximumSize(5000)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build();
 
-    public static User getCurrentUser(HttpServletRequest req) {
-        User u = null;
-        BundleContext ctx = FrameworkUtil.getBundle(SecurityContext.class).getBundleContext();
-        ServiceReference<TimeboardSessionStore> sr = ctx.getServiceReference(TimeboardSessionStore.class);
-        TimeboardSessionStore sessionStore = ctx.getService(sr);
+    @Override
+    public Optional<TimeboardSession> getSession(UUID sessionUUID) {
+        TimeboardSession session = SESSION_STORE.getIfPresent(sessionUUID);
+        return Optional.ofNullable(session);
+    }
 
-        Optional<Cookie> sessionCookie = Arrays.asList(req.getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
-
-        if (sessionCookie.isPresent()) {
-            Optional<TimeboardSessionStore.TimeboardSession> userSession = sessionStore.getSession(UUID.fromString(sessionCookie.get().getValue()));
-
-            if (userSession.isPresent()) {
-                u = (User) userSession.get().getPayload().get("user");
-            }
-        }
-        return u;
+    @Override
+    public TimeboardSession createSession(User user) {
+        UUID sessionUUID = UUID.randomUUID();
+        TimeboardSession session = new TimeboardSession(sessionUUID);
+        session.getPayload().put("user", user);
+        SESSION_STORE.put(sessionUUID, session);
+        return session;
     }
 }

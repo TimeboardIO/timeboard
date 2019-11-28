@@ -32,9 +32,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -74,9 +74,9 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
+        Project project = this.projectService.getProjectByID(HttpSecurityContext.getCurrentUser(request), projectID);
         Milestone currentMilestone = null;
 
         try {
@@ -104,7 +104,7 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
     }
 
     private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) throws BusinessException {
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
         String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
         List<Task> selectedTasks = Arrays
                 .stream(selectedTaskIdsString)

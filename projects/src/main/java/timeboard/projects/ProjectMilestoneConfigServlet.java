@@ -32,9 +32,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -68,7 +68,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
-       User actor = SecurityContext.getCurrentUser(request);
+       User actor = HttpSecurityContext.getCurrentUser(request);
         if (request.getParameter("milestoneID") != null) {
             // Update case
             long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
@@ -104,7 +104,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel)
             throws ServletException, IOException, BusinessException, ParseException {
 
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
         viewModel.getViewDatas().put("project", project);
@@ -128,7 +128,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
     }
 
     private Milestone createMilestone(Project project, HttpServletRequest request) throws ParseException, BusinessException {
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
         String name = request.getParameter("milestoneName");
         Date date = new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1);
         MilestoneType type = request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY;
@@ -139,7 +139,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
     }
 
     private Milestone updateMilestone(Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException, BusinessException {
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
 
         currentMilestone.setName(request.getParameter("milestoneName"));
         currentMilestone.setDate(new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime()+(2 * 60 * 60 * 1000) +1));

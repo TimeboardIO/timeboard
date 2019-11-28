@@ -32,7 +32,7 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.ui.model.Week;
 
 import javax.servlet.Servlet;
@@ -88,7 +88,7 @@ public class HomeServlet extends TimeboardServlet {
         Calendar c = Calendar.getInstance();
         c.setTime(d);
         List<Week> weeks = new ArrayList<>();
-        User user = SecurityContext.getCurrentUser(request);
+        User user = HttpSecurityContext.getCurrentUser(request);
         int weeksToDisplay = 3; //TODO replace by a parameter ?
         if(this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {

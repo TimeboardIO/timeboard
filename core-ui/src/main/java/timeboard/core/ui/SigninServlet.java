@@ -1,4 +1,4 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L
@@ -34,7 +34,7 @@ import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
-import timeboard.security.api.TimeboardSessionStore;
+import timeboard.core.api.TimeboardSessionStore;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.*;

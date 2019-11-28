@@ -63,43 +63,32 @@
 
     <feature name="timeboard-core-ui" version="${project.version}">
         <feature>war</feature>
-        <feature>timeboard-base</feature>
+        <feature>timeboard-core</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>aries-jax-rs-whiteboard</feature>
         <bundle start-level="80">mvn:${project.groupId}/core-ui/${project.version}</bundle>
         <bundle start-level="80">mvn:${project.groupId}/theme/${project.version}</bundle>
     </feature>
 
 
-    <feature name="timeboard-security" version="${project.version}">
-        <feature>timeboard-core</feature>
-        <feature>timeboard-core-ui</feature>
-        <bundle start-level="80">mvn:${project.groupId}/security/${project.version}</bundle>
-    </feature>
 
     <feature name="timeboard-home" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/home/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-account" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/account/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-projects" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/projects/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-timesheet" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/timesheet/${project.version}</bundle>
     </feature>
 
@@ -108,9 +97,7 @@
             default.web=false
             enabled=false
         </config>
-        <feature>timeboard-security</feature>
-        <feature>cxf-jaxrs</feature>
-        <feature>aries-jax-rs-whiteboard</feature>
+        <feature>timeboard-core-ui</feature>
         <bundle start-level="80">mvn:${project.groupId}/reporting/${project.version}</bundle>
     </feature>
 

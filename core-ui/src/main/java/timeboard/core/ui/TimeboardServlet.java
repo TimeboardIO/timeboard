@@ -147,7 +147,7 @@ public abstract class TimeboardServlet extends HttpServlet {
 
     protected void doService(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException {
         response.setCharacterEncoding(resolver.getCharacterEncoding());
-        viewModel.getViewDatas().put("user", request.getSession().getAttribute("user"));
+        viewModel.getViewDatas().put("user", HttpSecurityContext.getCurrentUser(request));
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);

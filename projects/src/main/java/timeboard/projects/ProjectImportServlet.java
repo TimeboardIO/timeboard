@@ -33,9 +33,9 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
@@ -91,7 +91,7 @@ public class ProjectImportServlet extends TimeboardServlet {
 
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
-        final User actor = SecurityContext.getCurrentUser(req);
+        final User actor = HttpSecurityContext.getCurrentUser(req);
 
         String message = null;
 

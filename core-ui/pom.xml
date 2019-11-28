@@ -17,6 +17,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <scope>compile</scope>
@@ -56,6 +62,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.http.whiteboard</artifactId>
             <scope>provided</scope>
@@ -87,11 +99,13 @@
                             com.fasterxml.jackson.*,
                         </Export-Package>
                         <Import-Package>
-                            javax.servlet,
-                            javax.servlet.http,
-                            org.osgi.*,
-                            org.w3c.dom,
-                            !com.fasterxml
+                            !com.sun.jdi.*,
+                            !com.thoughtworks.*,
+                            !groovy.*,
+                            !com.fasterxml,
+                            !org.apache.*,
+                            !org.slf4j.*,
+                            *
                         </Import-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

@@ -1,8 +1,8 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L
- * reporting
+ * security
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,44 +26,38 @@ package timeboard.security;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.security.api.TimeboardSessionStore;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import timeboard.core.model.User;
+import timeboard.core.api.TimeboardSessionStore;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-@Component(
-        service = ContainerRequestFilter.class,
-        property = {
-                "osgi.jaxrs.extension=true"
-        },
-        immediate = true
-)
-public class RestFilter implements ContainerRequestFilter {
+public class HttpSecurityContext {
 
-    @Context
-    HttpServletRequest req;
 
-    @Reference
-    private TimeboardSessionStore timeboardSessionStore;
+    public static User getCurrentUser(HttpServletRequest req) {
+        User u = null;
+        Bundle bnd = FrameworkUtil.getBundle(HttpSecurityContext.class);
+        BundleContext ctx = bnd.getBundleContext();
+        ServiceReference<TimeboardSessionStore> sr = ctx.getServiceReference(TimeboardSessionStore.class);
+        TimeboardSessionStore sessionStore = ctx.getService(sr);
 
-    @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        Optional<Cookie> cookie = Arrays.asList(this.req.getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
-        if(!cookie.isPresent()){
-            System.out.println("missing session cookie");
-        }else{
-            this.timeboardSessionStore.getSession(UUID.fromString(cookie.get().getValue()));
+        Optional<Cookie> sessionCookie = Arrays.asList(req.getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
+
+        if (sessionCookie.isPresent()) {
+            Optional<TimeboardSessionStore.TimeboardSession> userSession = sessionStore.getSession(UUID.fromString(sessionCookie.get().getValue()));
+
+            if (userSession.isPresent()) {
+                u = (User) userSession.get().getPayload().get("user");
+            }
         }
-        System.out.println("Filter executed :)");
+        return u;
     }
 }

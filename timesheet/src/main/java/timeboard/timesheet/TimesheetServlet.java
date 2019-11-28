@@ -35,9 +35,9 @@ import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
@@ -123,7 +123,7 @@ public class TimesheetServlet extends TimeboardServlet {
         final Date de = findEndDate(c, week, year);
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
-        final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(SecurityContext.getCurrentUser(request), lastWeekYear, lastWeek);
+        final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(HttpSecurityContext.getCurrentUser(request), lastWeekYear, lastWeek);
 
         viewModel.getViewDatas().put("week", week);
         viewModel.getViewDatas().put("year", year);
@@ -131,7 +131,7 @@ public class TimesheetServlet extends TimeboardServlet {
 
 
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
-        viewModel.getViewDatas().put("projectList", this.projectService.listProjects(SecurityContext.getCurrentUser(request)));
+        viewModel.getViewDatas().put("projectList", this.projectService.listProjects(HttpSecurityContext.getCurrentUser(request)));
 
 
         viewModel.setTemplate("timesheet:timesheet.html");
@@ -141,7 +141,7 @@ public class TimesheetServlet extends TimeboardServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         try {
-            final User actor = SecurityContext.getCurrentUser(request);
+            final User actor = HttpSecurityContext.getCurrentUser(request);
             String type = request.getParameter("type");
             Long taskID = Long.parseLong(request.getParameter("task"));
             AbstractTask task = this.projectService.getTaskByID(actor, taskID);

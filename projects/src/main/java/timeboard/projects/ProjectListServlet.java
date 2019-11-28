@@ -31,9 +31,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -64,7 +64,7 @@ public class ProjectListServlet extends TimeboardServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("projects:projects.html");
-        User user = SecurityContext.getCurrentUser(request);
+        User user = HttpSecurityContext.getCurrentUser(request);
         viewModel.getViewDatas().put("projects", this.projectService.listProjects(user));
     }
 }

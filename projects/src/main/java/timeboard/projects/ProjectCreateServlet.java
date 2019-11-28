@@ -31,9 +31,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -71,7 +71,7 @@ public class ProjectCreateServlet extends TimeboardServlet {
 
 
         try {
-            this.projectService.createProject(SecurityContext.getCurrentUser(request.getSession()), result.get("projectName").toString());
+            this.projectService.createProject(HttpSecurityContext.getCurrentUser(request), result.get("projectName").toString());
             response.sendRedirect("/projects");
         } catch (BusinessException e) {
             result.put("error", "Project " + result.get("projectName").toString() + " already exist");

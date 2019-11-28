@@ -1,4 +1,4 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L

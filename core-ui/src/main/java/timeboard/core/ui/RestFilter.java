@@ -1,8 +1,8 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L
- * security
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,42 +26,43 @@ package timeboard.security;
  * #L%
  */
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.model.User;
-import timeboard.security.api.TimeboardSessionStore;
+import org.osgi.service.component.annotations.Reference;
+import timeboard.core.api.TimeboardSessionStore;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 @Component(
-        service = TimeboardSessionStore.class,
-        immediate = true,
-        scope = ServiceScope.SINGLETON
+        service = ContainerRequestFilter.class,
+        property = {
+                "osgi.jaxrs.extension=true"
+        },
+        immediate = true
 )
-public class InMemorySessionStore implements TimeboardSessionStore {
+public class RestFilter implements ContainerRequestFilter {
 
-    private final static Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
-            .maximumSize(5000)
-            .expireAfterWrite(30, TimeUnit.MINUTES)
-            .build();
+    @Context
+    HttpServletRequest req;
 
-    @Override
-    public Optional<TimeboardSession> getSession(UUID sessionUUID) {
-        TimeboardSession session = SESSION_STORE.getIfPresent(sessionUUID);
-        return Optional.of(session);
-    }
+    @Reference
+    private TimeboardSessionStore timeboardSessionStore;
 
     @Override
-    public TimeboardSession createSession(User user) {
-        UUID sessionUUID = UUID.randomUUID();
-        TimeboardSession session = new TimeboardSession(sessionUUID);
-        session.getPayload().put("user", user);
-        SESSION_STORE.put(sessionUUID, session);
-        return session;
+    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
+        Optional<Cookie> cookie = Arrays.asList(this.req.getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
+        if(!cookie.isPresent()){
+            System.out.println("missing session cookie");
+        }else{
+            this.timeboardSessionStore.getSession(UUID.fromString(cookie.get().getValue()));
+        }
+        System.out.println("Filter executed :)");
     }
 }

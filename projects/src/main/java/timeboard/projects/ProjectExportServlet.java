@@ -32,9 +32,9 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -75,7 +75,7 @@ public class ProjectExportServlet  extends TimeboardServlet {
     @Override
     protected void handleGet(HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
-        User actor = SecurityContext.getCurrentUser(req);
+        User actor = HttpSecurityContext.getCurrentUser(req);
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
 
@@ -88,7 +88,7 @@ public class ProjectExportServlet  extends TimeboardServlet {
 
         if(optionalService.isPresent()){
             try(ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-                optionalService.get().export(SecurityContext.getCurrentUser(req), project.getId(), buf);
+                optionalService.get().export(HttpSecurityContext.getCurrentUser(req), project.getId(), buf);
                 resp.setContentLengthLong(buf.toByteArray().length);
                 resp.setHeader("Expires:", "0");
                 resp.setHeader("Content-Disposition", "attachment; filename="+project.getName()+"."+optionalService.get().getExtension());
