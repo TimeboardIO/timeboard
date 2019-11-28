@@ -50,13 +50,15 @@ public class HttpSecurityContext {
         ServiceReference<TimeboardSessionStore> sr = ctx.getServiceReference(TimeboardSessionStore.class);
         TimeboardSessionStore sessionStore = ctx.getService(sr);
 
-        Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
+        if(req.getCookies() != null) {
+            Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
 
-        if (sessionCookie.isPresent()) {
-            Optional<TimeboardSessionStore.TimeboardSession> userSession = sessionStore.getSession(UUID.fromString(sessionCookie.get().getValue()));
+            if (sessionCookie.isPresent()) {
+                Optional<TimeboardSessionStore.TimeboardSession> userSession = sessionStore.getSession(UUID.fromString(sessionCookie.get().getValue()));
 
-            if (userSession.isPresent()) {
-                u = (User) userSession.get().getPayload().get("user");
+                if (userSession.isPresent()) {
+                    u = (User) userSession.get().getPayload().get("user");
+                }
             }
         }
         return u;
