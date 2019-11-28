@@ -35,6 +35,7 @@ import timeboard.core.api.TimeboardSessionStore;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.net.http.HttpRequest;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public class HttpSecurityContext {
         ServiceReference<TimeboardSessionStore> sr = ctx.getServiceReference(TimeboardSessionStore.class);
         TimeboardSessionStore sessionStore = ctx.getService(sr);
 
-        Optional<Cookie> sessionCookie = Arrays.asList(req.getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
+        Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
 
         if (sessionCookie.isPresent()) {
             Optional<TimeboardSessionStore.TimeboardSession> userSession = sessionStore.getSession(UUID.fromString(sessionCookie.get().getValue()));

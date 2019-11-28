@@ -29,6 +29,7 @@ package timeboard.core.ui;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -50,19 +51,20 @@ import java.util.UUID;
 public class RestFilter implements ContainerRequestFilter {
 
     @Context
-    HttpServletRequest req;
+    private HttpServletRequest req;
 
     @Reference
     private TimeboardSessionStore timeboardSessionStore;
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-        Optional<Cookie> cookie = Arrays.asList(this.req.getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
-        if(!cookie.isPresent()){
-            System.out.println("missing session cookie");
-        }else{
-            this.timeboardSessionStore.getSession(UUID.fromString(cookie.get().getValue()));
+
+        User user = HttpSecurityContext.getCurrentUser(this.req);
+
+        if(user == null){
+            throw new SecurityException();
         }
+
         System.out.println("Filter executed :)");
     }
 }

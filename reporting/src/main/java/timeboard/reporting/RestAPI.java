@@ -28,13 +28,16 @@ package timeboard.reporting;
 
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.net.http.HttpRequest;
 
 @Component(
         service = RestAPI.class,
@@ -47,18 +50,19 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class RestAPI {
 
+    @Context
+    private HttpServletRequest req;
+
     @Activate
     private void init(){
         System.out.println("Start rest API !");
     }
 
 
-
-
     @GET
     @Path("/")
     public String sayHello() {
-
-        return "{'name': 'Hello " + "name" + "'}";
+        User user = HttpSecurityContext.getCurrentUser(req);
+        return "{'name': 'Hello " + user.getScreenName() + "'}";
     }
 }
