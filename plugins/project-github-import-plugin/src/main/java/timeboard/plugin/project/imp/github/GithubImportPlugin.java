@@ -31,7 +31,18 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import timeboard.core.api.EncryptionService;
+import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Project;
+import timeboard.core.model.User;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 @Component(
         service = ProjectImportService.class,
