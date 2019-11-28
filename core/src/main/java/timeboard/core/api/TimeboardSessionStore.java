@@ -1,4 +1,4 @@
-package timeboard.security;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,16 +28,42 @@ package timeboard.security;
 
 import timeboard.core.model.User;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
-public class SecurityContext {
+public interface TimeboardSessionStore {
 
-    public static User getCurrentUser(HttpSession sess) {
-        return (User) sess.getAttribute("user");
+    /**
+     *
+     * @param sessionUUID sessionUUID
+     * @return session if exist or null
+     */
+    Optional<TimeboardSession> getSession(UUID sessionUUID);
+
+    TimeboardSession createSession(User user);
+
+    class TimeboardSession implements Serializable {
+        private final UUID sessionUUID;
+        private final Date createDate;
+        private final Map<String, Object> payload = new HashMap<>();
+
+        public TimeboardSession(UUID sessionUUID) {
+            this.sessionUUID = sessionUUID;
+            this.createDate = new Date();
+        }
+
+        public Date getCreateDate() {
+            return createDate;
+        }
+
+        public UUID getSessionUUID() {
+            return sessionUUID;
+        }
+
+        public Map<String, Object> getPayload() {
+            return payload;
+        }
+
     }
 
-    public static User getCurrentUser(HttpServletRequest req) {
-        return getCurrentUser(req.getSession());
-    }
 }

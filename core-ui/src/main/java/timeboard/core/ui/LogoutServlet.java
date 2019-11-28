@@ -1,4 +1,4 @@
-package timeboard.reporting;
+package timeboard.core.ui;
 
 /*-
  * #%L
@@ -26,12 +26,14 @@ package timeboard.reporting;
  * #L%
  */
 
-import org.osgi.service.component.annotations.*;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.log.LogService;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -41,30 +43,25 @@ import java.io.IOException;
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
-                "osgi.http.whiteboard.servlet.pattern="+ReportingServlet.URL,
+                "osgi.http.whiteboard.servlet.pattern=/logout",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 )
-public class ReportingServlet extends TimeboardServlet {
+public class LogoutServlet extends HttpServlet {
 
-    public static final String URL = "/reporting";
+    @Reference
+    LogService logService;
 
 
     @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ReportingServlet.class.getClassLoader();
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+
+        req.getSession().removeAttribute("username");
+        req.getSession().invalidate();
+
+        this.logService.log(LogService.LOG_INFO, "Logout : " + req.getSession().getAttribute("username"));
+
+        resp.sendRedirect("/login");
     }
-
-    @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("reporting:reporting.html");
-    }
-
-    @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("reporting:reporting.html");
-
-    }
-
-
 }

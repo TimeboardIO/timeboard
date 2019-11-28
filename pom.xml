@@ -182,23 +182,18 @@
             <id>core</id>
             <modules>
                 <module>core</module>
-                <module>security</module>
                 <module>theme</module>
                 <module>core-ui</module>
                 <module>home</module>
-                <module>projects</module>
-                <module>timesheet</module>
-                <module>features</module>
-                <module>shell</module>
                 <module>account</module>
                 <module>reporting</module>
+                <module>features</module>
             </modules>
         </profile>
         <profile>
             <id>full</id>
             <modules>
                 <module>core</module>
-                <module>security</module>
                 <module>theme</module>
                 <module>core-ui</module>
                 <module>home</module>

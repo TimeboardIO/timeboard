@@ -1,4 +1,4 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L
@@ -34,12 +34,10 @@ import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
+import timeboard.core.api.TimeboardSessionStore;
 
 import javax.servlet.Servlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -72,6 +70,10 @@ public class SigninServlet extends HttpServlet {
 
     @Reference
     private UserService userService;
+
+    @Reference
+    private TimeboardSessionStore timeboardSessionStore;
+
 
     @Activate
     private void init(Map<String, String> params){
@@ -123,9 +125,12 @@ public class SigninServlet extends HttpServlet {
 
             final Map<String, String> userInfoMap = MAPPER.readValue(userInfo, Map.class);
 
-            User user = this.userService.userProvisionning(userInfoMap.get("sub"), userInfoMap.get("email"));
-            HttpSession session = req.getSession(true);
-            session.setAttribute("user", user);
+            final User user = this.userService.userProvisionning(userInfoMap.get("sub"), userInfoMap.get("email"));
+
+            final TimeboardSessionStore.TimeboardSession session = this.timeboardSessionStore.createSession(user);
+
+            final Cookie sessionCookie = new Cookie("timeboard", session.getSessionUUID().toString());
+            resp.addCookie(sessionCookie);
             resp.sendRedirect("/");
 
         } catch (InterruptedException | BusinessException e) {

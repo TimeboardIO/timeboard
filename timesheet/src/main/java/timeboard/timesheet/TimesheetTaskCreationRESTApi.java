@@ -36,8 +36,8 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
@@ -102,7 +102,7 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
             return;
         }
 
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
         Long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = null;
         try {
@@ -118,14 +118,14 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
         Long taskID = Long.parseLong(request.getParameter("taskID"));
         if(!(taskID != null && taskID == 0 )){
             try {
-                projectService.deleteTaskByID(SecurityContext.getCurrentUser(request), taskID);
+                projectService.deleteTaskByID(HttpSecurityContext.getCurrentUser(request), taskID);
             } catch (Exception e){
                 MAPPER.writeValue(response.getWriter(), e.getMessage());
                 return;
             }
         }
         try{
-            projectService.createTask(SecurityContext.getCurrentUser(request), project,
+            projectService.createTask(HttpSecurityContext.getCurrentUser(request), project,
                     name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
         }catch (Exception e){
             MAPPER.writeValue(response.getWriter(), "Error in task creation please verify your inputs and retry");

@@ -52,12 +52,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>security</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>core-ui</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -84,8 +78,6 @@
                             timeboard.core.model,
                             timeboard.core.ui,
                             timeboard.core.api,
-                            timeboard.security,
-                            timeboard.security.api,
                             org.xml.sax
                         </Import-Package>
                         <Export-Package>

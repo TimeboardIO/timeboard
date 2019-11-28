@@ -33,9 +33,9 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -65,7 +65,7 @@ public class ProjectsTaskValidationServlet extends TimeboardServlet {
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long id = Long.parseLong(request.getParameter("projectID"));
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
         Project project = this.projectService.getProjectByID(actor, id);
 
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));

@@ -31,9 +31,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -68,7 +68,7 @@ public class ProjectMilestoneDeleteServlet extends TimeboardServlet {
         long projectID = Long.parseLong(request.getParameter("projectID"));
 
         response.sendRedirect(String.format("/projects/milestones?projectID=%s", projectID));
-        this.projectService.deleteMilestoneByID(SecurityContext.getCurrentUser(request), milestoneID);
+        this.projectService.deleteMilestoneByID(HttpSecurityContext.getCurrentUser(request), milestoneID);
     }
 
 

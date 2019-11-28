@@ -32,7 +32,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
+import timeboard.core.ui.HttpSecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -71,7 +71,7 @@ public class AccountServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        User user = SecurityContext.getCurrentUser(request);
+        User user = HttpSecurityContext.getCurrentUser(request);
 
         String submitButton = request.getParameter("formType");
         if(submitButton.matches("account")){
@@ -114,7 +114,7 @@ public class AccountServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        User user = SecurityContext.getCurrentUser(request);
+        User user = HttpSecurityContext.getCurrentUser(request);
 
         loadPage(viewModel, user);
     }

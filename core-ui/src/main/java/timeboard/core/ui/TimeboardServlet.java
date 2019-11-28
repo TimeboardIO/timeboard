@@ -57,7 +57,6 @@ public abstract class TimeboardServlet extends HttpServlet {
             ServiceReference<NavigationEntryRegistryService> sr = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(NavigationEntryRegistryService.class);
             this.navRegistry = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(sr);
         }catch(Exception e){
-            e.printStackTrace();
         }
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setPrefix("/templates/");
@@ -148,7 +147,7 @@ public abstract class TimeboardServlet extends HttpServlet {
 
     protected void doService(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException {
         response.setCharacterEncoding(resolver.getCharacterEncoding());
-        viewModel.getViewDatas().put("user", request.getSession().getAttribute("user"));
+        viewModel.getViewDatas().put("user", HttpSecurityContext.getCurrentUser(request));
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);

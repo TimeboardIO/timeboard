@@ -38,9 +38,9 @@ import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -111,7 +111,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
 
 
         viewModel.setTemplate("projects:details_project_config.html");
@@ -126,7 +126,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
 
         viewModel.setTemplate("projects:details_project_config.html");
         Map<String, Object> map = new HashMap<>();

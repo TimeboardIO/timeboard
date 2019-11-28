@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.core.internal;
 
 /*-
  * #%L
- * timesheet
+ * security
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.reporting;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,32 +26,40 @@ package timeboard.reporting;
  * #L%
  */
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.osgi.service.component.annotations.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.model.User;
+import timeboard.core.api.TimeboardSessionStore;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Component(
-        service = NavigationExtPoint.class
+        service = TimeboardSessionStore.class,
+        immediate = true
 )
-public class ReportingNavigationProvider implements NavigationExtPoint {
+public class InMemorySessionStore implements TimeboardSessionStore {
+
+    private final static Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
+            .maximumSize(5000)
+            .expireAfterWrite(30, TimeUnit.MINUTES)
+            .build();
 
     @Override
-    public String getNavigationLabel() {
-        return "Reporting";
-    }
-
-
-    @Override
-    public String getNavigationPath() {
-        return ReportingServlet.URL;
-    }
-
-    @Override
-    public int getNavigationWeight() {
-        return 50;
+    public Optional<TimeboardSession> getSession(UUID sessionUUID) {
+        TimeboardSession session = SESSION_STORE.getIfPresent(sessionUUID);
+        return Optional.ofNullable(session);
     }
 
     @Override
-    public String getNavigationLogo() {
-        return "chart bar";
+    public TimeboardSession createSession(User user) {
+        UUID sessionUUID = UUID.randomUUID();
+        TimeboardSession session = new TimeboardSession(sessionUUID);
+        session.getPayload().put("user", user);
+        SESSION_STORE.put(sessionUUID, session);
+        return session;
     }
 }

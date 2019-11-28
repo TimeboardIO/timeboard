@@ -1,4 +1,4 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L
@@ -30,6 +30,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LogService;
+import timeboard.core.ui.HttpSecurityContext;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -85,11 +86,7 @@ public class OAuthSecurityFilter implements Filter {
                 req.getServletPath().startsWith("/static")
                         || req.getServletPath().equals("/favicon.ico");
 
-        boolean isLogged = req.getSession(false) != null;
-        if (isLogged) {
-            isLogged = req.getSession(false).getAttribute("user") != null;
-        }
-
+        boolean isLogged = HttpSecurityContext.getCurrentUser(req) != null;
 
         if (!isLogged && !isStatic && !isLogin) {
             String origin = ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString();

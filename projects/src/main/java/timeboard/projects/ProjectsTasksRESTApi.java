@@ -37,9 +37,9 @@ import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
 import timeboard.core.model.User;
+import timeboard.core.ui.HttpSecurityContext;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
@@ -98,7 +98,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     }
 
     private void changeTaskStatus(HttpServletRequest request, HttpServletResponse response, TaskStatus status) throws IOException, BusinessException {
-        User actor = SecurityContext.getCurrentUser(request);
+        User actor = HttpSecurityContext.getCurrentUser(request);
         final String taskIdStr = request.getParameter("taskId");
         Long taskId = null;
         if(taskIdStr != null) {
@@ -138,7 +138,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             MAPPER.writeValue(response.getWriter(), "Incorrect project argument");
             return;
         }
-        final User actor = SecurityContext.getCurrentUser(request);
+        final User actor = HttpSecurityContext.getCurrentUser(request);
         final Project project = this.projectService.getProjectByID(actor, projectID);
         if(project == null){
             MAPPER.writeValue(response.getWriter(), "Project does not exists or you don't have enough permissions to access it.");

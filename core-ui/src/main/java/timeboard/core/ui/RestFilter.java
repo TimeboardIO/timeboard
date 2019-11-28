@@ -1,8 +1,8 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L
- * webui
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,40 +28,43 @@ package timeboard.security;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.log.LogService;
+import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
 import java.io.IOException;
-
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
+        service = ContainerRequestFilter.class,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/logout",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
+                "osgi.jaxrs.extension=true"
+        },
+        immediate = true
 )
-public class LogoutServlet extends HttpServlet {
+public class RestFilter implements ContainerRequestFilter {
+
+    @Context
+    private HttpServletRequest req;
 
     @Reference
-    LogService logService;
-
+    private TimeboardSessionStore timeboardSessionStore;
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
+        User user = HttpSecurityContext.getCurrentUser(this.req);
 
-        req.getSession().removeAttribute("username");
-        req.getSession().invalidate();
+        if(user == null){
+            throw new SecurityException();
+        }
 
-        this.logService.log(LogService.LOG_INFO, "Logout : " + req.getSession().getAttribute("username"));
-
-        resp.sendRedirect("/login");
+        System.out.println("Filter executed :)");
     }
 }
