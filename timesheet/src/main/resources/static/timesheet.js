@@ -206,7 +206,7 @@ $(document).ready(function(){
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     if(validated){
-                    axios.post('/timesheet/api/task', app.object)
+                    $.post('/timesheet/api/task', app.object)
                     .then(function (response) {
                         // Success
                         console.log(response.data)

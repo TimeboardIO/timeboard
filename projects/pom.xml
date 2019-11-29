@@ -81,7 +81,8 @@
                             timeboard.core.ui,
                             org.xml.sax,
                             javax.crypto.spec,
-                            javax.crypto
+                            javax.crypto,
+                            javax.ws.*
                         </Import-Package>
                         <Export-Package>
                             timeboard.projects

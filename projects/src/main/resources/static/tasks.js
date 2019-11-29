@@ -108,12 +108,11 @@ Vue.component('task-list', {
         this.sortOrders[key] = this.sortOrders[key] * -1
       },
       approveTask: function(event, task){
+        var keepThis = this;
         event.target.classList.toggle('loading');
         $.get("/api/tasks/approve?task="+task.taskID)
             .then(function(data){
-                 gridData = gridData.filter(function(entry){
-                    entry.taskID = task.taskID;
-                 });
+                 task.status = 'IN_PROGRESS';
                  event.target.classList.toggle('loading');
             });
       },
@@ -121,9 +120,7 @@ Vue.component('task-list', {
         event.target.classList.toggle('loading');
          $.get("/api/tasks/deny?task="+task.taskID)
             .then(function(data){
-                 gridData = gridData.filter(function(entry){
-                    entry.taskID = task.taskID;
-                 });
+                task.status = 'REFUSED';
                  event.target.classList.toggle('loading');
             });
       }
@@ -184,8 +181,8 @@ var app = new Vue({
     data: {
         searchQuery: '',
         searchQueries: [{key : 'taskName', value: ''}, {key : 'taskComments', value: ''}, {key : 'startDate', value: ''},
-            {key : 'endDate', value: ''}, {key : 'oE', value: ''}, {key : 'assignee', value: ''}, {key : 'status', value: ''}],
-        gridColumns: ['taskName', 'taskComments', 'startDate', 'endDate', 'oE', 'assignee', 'status'],
+            {key : 'endDate', value: ''}, {key : 'originalEstimate', value: ''}, {key : 'assignee', value: ''}, {key : 'status', value: ''}],
+        gridColumns: ['taskName', 'taskComments', 'startDate', 'endDate', 'originalEstimate', 'assignee', 'status'],
         gridData: [ ],
         newTask: Object.assign({}, emptyTask),
         formError:"",
@@ -202,8 +199,8 @@ var app = new Vue({
                  this.newTask.taskComments = task.taskComments;
                  this.newTask.startDate = task.startDate;
                  this.newTask.endDate = task.endDate;
-                 this.newTask.originalEstimate = task.oE;
-                 this.newTask.typeID = task.type;
+                 this.newTask.originalEstimate = task.originalEstimate;
+                 this.newTask.typeID = task.typeID;
                  this.newTask.assignee = task.assignee;
             }else{
                  this.modalTitle = "Create task";
@@ -214,8 +211,8 @@ var app = new Vue({
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     if(validated){
                         $.ajax({
-                            method: "GET",
-                            url: "/timesheet/api/create_task",
+                            method: "POST",
+                            url: "/api/tasks",
                             data: app.newTask,
                           }).then(function(data) {
                               if(data == "DONE"){

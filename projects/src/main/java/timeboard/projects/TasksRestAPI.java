@@ -1,4 +1,4 @@
-package timeboard.reporting;
+package timeboard.projects;
 
 /*-
  * #%L
@@ -26,7 +26,6 @@ package timeboard.reporting;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectService;
@@ -38,14 +37,13 @@ import timeboard.core.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.GET;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -71,7 +69,7 @@ public class TasksRestAPI {
 
     @Activate
     private void init(){
-        System.out.println("Start tasks rest API !");
+        System.out.println("Start Tasks rest API !");
     }
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
@@ -79,7 +77,7 @@ public class TasksRestAPI {
 
     @GET
     @Path("/")
-    public String sayHello(@Context HttpServletRequest request) throws Exception {
+    public String getTasks(@Context HttpServletRequest request) throws Exception {
         User actor = (User) req.getAttribute("actor");
 
         final String strProjectID = request.getParameter("project");
@@ -123,24 +121,23 @@ public class TasksRestAPI {
         return MAPPER.writeValueAsString(result.toArray());
     }
 
-    @PATCH
-    @Path("/")
-    private String approveTask(@Context HttpServletRequest request) throws Exception {
+    @GET
+    @Path("/approve")
+    public String approveTask(@Context HttpServletRequest request) throws Exception {
         User actor = (User) req.getAttribute("actor");
-
         return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGESS);
     }
 
-    /*@GET
+    @GET
     @Path("/deny")
-    private String denyTask(@Context HttpServletRequest request) throws IOException, BusinessException {
+    public String denyTask(@Context HttpServletRequest request) throws Exception {
         User actor = (User) req.getAttribute("actor");
 
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
-    }*/
+    }
 
     private String changeTaskStatus(User actor, HttpServletRequest request,  TaskStatus status) throws Exception{
-        final String taskIdStr = request.getParameter("taskId");
+        final String taskIdStr = request.getParameter("task");
         Long taskId = null;
         if(taskIdStr != null) {
             taskId = Long.parseLong(taskIdStr);
@@ -165,30 +162,89 @@ public class TasksRestAPI {
     }
 
 
-    public static class TaskWrapper {
-        private final Long taskID;
-        private final String taskName;
-        private final String taskComments;
-        private final double oE;
-        private final Date startDate;
-        private final Date endDate;
-        private final String assignee;
-        private final Long assigneeID;
+    @POST
+    @Consumes("application/json")
+    @Path("/")
+    public String createTask(TaskWrapper toto) throws Exception {
+        User actor = (User) req.getAttribute("actor");
+        Date startDate = null;
+        Date endDate = null;
+/*
+        try{
+            startDate = DATE_FORMAT.parse(request.getParameter("startDate"));
+            endDate = DATE_FORMAT.parse(request.getParameter("endDate"));
 
-        private final String status;
+        }catch(Exception e) {
+            throw new Exception("Incorrect date format");
+        }
 
-        private final Long type;
+        if(startDate.getTime()>endDate.getTime()){
+            throw new Exception("Start date must be before end date ");
+        }
 
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long type) {
+        String name = request.getParameter("taskName");
+        String comment = request.getParameter("taskComments");
+        if(comment == null) comment = "";
+
+        double oe = Double.parseDouble(request.getParameter("originalEstimate"));
+        if(oe <= 0.0){
+            throw new Exception( "Original original estimate must be positive ");
+        }
+
+        Long projectID = Long.parseLong(request.getParameter("projectID"));
+        Project project = null;
+        try {
+            project = this.projectService.getProjectByID(actor, projectID);
+        } catch (BusinessException e) {
+            throw new Exception(e.getMessage());
+        }
+
+        String type = request.getParameter("typeID");
+        Long typeID = Long.parseLong(type);
+
+        Long taskID = Long.parseLong(request.getParameter("taskID"));
+        if(!(taskID != null && taskID == 0 )){
+            try {
+                projectService.deleteTaskByID(actor, taskID);
+            } catch (Exception e){
+                throw new Exception( e.getMessage());
+            }
+        }
+        try{
+            projectService.createTask(actor, project,
+                    name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
+        }catch (Exception e){
+            throw new Exception("Error in task creation please verify your inputs and retry");
+        }
+*/
+        return MAPPER.writeValueAsString("DONE");
+
+    }
+
+
+
+    public static class TaskWrapper implements Serializable {
+        public final Long taskID;
+        public final String taskName;
+        public final String taskComments;
+        public final double originalEstimate;
+        public final Date startDate;
+        public final Date endDate;
+        public final String assignee;
+        public final Long assigneeID;
+        public final String status;
+        public final Long typeID;
+
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComments = taskComments;
-            this.oE = oE;
+            this.originalEstimate = originalEstimate;
             this.startDate = startDate;
             this.endDate = (endDate != null ? endDate : new Date());
             this.assignee = assignee;
             this.status = status;
-            this.type = type;
+            this.typeID = typeID;
             this.assigneeID = assigneeID;
         }
 
@@ -200,8 +256,8 @@ public class TasksRestAPI {
             return DATE_FORMAT.format(endDate);
         }
 
-        public double getoE() {
-            return oE;
+        public double getOriginalEstimate() {
+            return originalEstimate;
         }
 
         public Long getTaskID() {
@@ -212,8 +268,8 @@ public class TasksRestAPI {
             return taskName;
         }
 
-        public Long getType() {
-            return type;
+        public Long getTypeID() {
+            return typeID;
         }
 
         public Long getAssigneeID() {
