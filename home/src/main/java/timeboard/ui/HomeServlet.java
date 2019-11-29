@@ -86,19 +86,24 @@ public class HomeServlet extends TimeboardServlet {
 
         //load previous weeks data
         Date d = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(d);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(d);
         List<Week> weeks = new ArrayList<>();
         User user = actor;
-        int weeksToDisplay = 3; //TODO replace by a parameter ?
+        int weeksToDisplay = 3; // actual week and the two previous ones
         if(this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                double weekSum = 0;
-                boolean weekIsValidated = timesheetService.isTimesheetValidated(user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+                boolean weekIsValidated = timesheetService.isTimesheetValidated(user, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
-                Week week = new Week(c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR), weekSum, weekIsValidated);
+                calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
+                Date firstDayOfWeek = calendar.getTime();
+                calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
+                Date lastDayOfWeek = calendar.getTime();
+                double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, user);
+
+                Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsValidated);
                 weeks.add(week);
-                c.roll(Calendar.WEEK_OF_YEAR, -1);
+                calendar.roll(Calendar.WEEK_OF_YEAR, -1);
             }
         }
 

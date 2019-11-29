@@ -42,6 +42,7 @@ import timeboard.core.model.ValidatedTimesheet;
 
 import javax.persistence.TypedQuery;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Component(
@@ -149,34 +150,20 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public double getWeekImputationSum(User userTimesheet, int year, int week) {
+    public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user) {
         return this.jpa.txExpr(entityManager -> {
-
-            double weekSum = 0.0;
-
-            final Calendar c = Calendar.getInstance();
-            c.clear();
-            c.set(Calendar.WEEK_OF_YEAR, week);
-            c.set(Calendar.YEAR, year);
-
-            for(int i=1; i<=7; i++) {
-
-                TypedQuery<Double> q = entityManager.createQuery("select sum(value) from Imputation i where i.task.latestRevision.assigned = :user and i.day = :day ", Double.class);
-                q.setParameter("user", userTimesheet);
-                q.setParameter("day", c.getTime());
-                try {
-                    weekSum += q.getSingleResult();
-                } catch (Exception e) {
-                    //There is no imputation for this day
-                }
-                c.roll(Calendar.DAY_OF_WEEK,1);
-            }
-            return weekSum;
+            TypedQuery<Double> q = entityManager.createQuery(
+                    "SELECT sum(i.value) \n" +
+                            "FROM Imputation i\n" +
+                            "WHERE i.user = :user \n" +
+                            "AND i.day > :firstDayOfWeek\n" +
+                            "AND i.day < :lastDayOfWeek"
+                    , Double.class);
+            q.setParameter("firstDayOfWeek", firstDayOfWeek);
+            q.setParameter("lastDayOfWeek", lastDayOfWeek);
+            q.setParameter("user", user);
+            return q.getSingleResult();
         });
-
-
-
-
-
     }
+    
 }
