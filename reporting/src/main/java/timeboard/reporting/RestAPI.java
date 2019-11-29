@@ -33,6 +33,7 @@ import timeboard.core.model.User;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -59,8 +60,15 @@ public class RestAPI {
 
 
     @GET
-    @Path("/")
+    @Path("/get")
     public String sayHello(@Context HttpServletRequest req) {
+        User user = (User) req.getAttribute("actor");
+        return "{'name': 'Hello '"+user.getScreenName()+"''}";
+    }
+
+    @POST
+    @Path("/post")
+    public String sayHelloPost(@Context HttpServletRequest req) {
         User user = (User) req.getAttribute("actor");
         return "{'name': 'Hello '"+user.getScreenName()+"''}";
     }

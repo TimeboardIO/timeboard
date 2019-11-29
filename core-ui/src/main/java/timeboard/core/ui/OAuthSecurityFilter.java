@@ -54,7 +54,7 @@ import java.util.Map;
                 "oauth.redirect.uri=http://localhost:8181/signin",
                 "timeboard.security.newPassword-url=/newPassword"
         },
-        scope = ServiceScope.PROTOTYPE,
+        scope = ServiceScope.SINGLETON,
         configurationPid = {"timeboard.oauth"}
 )
 public class OAuthSecurityFilter implements Filter {
