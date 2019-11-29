@@ -153,7 +153,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Double> q = entityManager.createQuery(
-                    "SELECT sum(i.value) \n" +
+                    "SELECT COALESCE(sum(i.value),0) \n" +
                             "FROM Imputation i\n" +
                             "WHERE i.user = :user \n" +
                             "AND i.day > :firstDayOfWeek\n" +
