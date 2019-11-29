@@ -1,8 +1,8 @@
-package timeboard.security;
+package timeboard.reporting;
 
 /*-
  * #%L
- * security
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,18 +26,42 @@ package timeboard.security;
  * #L%
  */
 
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
 import timeboard.core.model.User;
 
+
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
-public class SecurityContext {
+@Component(
+        service = RestAPI.class,
+        property = {
+                "osgi.jaxrs.resource=true",
+                "osgi.jaxrs.application.select=(osgi.jaxrs.name=.default)"
+        }
+)
+@Path("/hello")
+@Produces(MediaType.APPLICATION_JSON)
+public class RestAPI {
 
-    public static User getCurrentUser(HttpSession sess) {
-        return (User) sess.getAttribute("user");
+    @Context
+    private HttpServletRequest req;
+
+    @Activate
+    private void init(){
+        System.out.println("Start rest API !");
     }
 
-    public static User getCurrentUser(HttpServletRequest req) {
-        return getCurrentUser(req.getSession());
+
+    @GET
+    @Path("/")
+    public String sayHello(@Context HttpServletRequest req) {
+        User user = (User) req.getAttribute("actor");
+        return "{'name': 'Hello '"+user.getScreenName()+"''}";
     }
 }

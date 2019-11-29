@@ -40,7 +40,6 @@ import timeboard.core.model.ProjectRole;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -110,8 +109,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
-        User actor = SecurityContext.getCurrentUser(request);
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
 
 
         viewModel.setTemplate("projects:details_project_config.html");
@@ -125,8 +123,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        User actor = SecurityContext.getCurrentUser(request);
+    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
         viewModel.setTemplate("projects:details_project_config.html");
         Map<String, Object> map = new HashMap<>();

@@ -32,6 +32,7 @@ import org.osgi.framework.ServiceReference;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
+import timeboard.core.model.User;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -57,7 +58,6 @@ public abstract class TimeboardServlet extends HttpServlet {
             ServiceReference<NavigationEntryRegistryService> sr = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(NavigationEntryRegistryService.class);
             this.navRegistry = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(sr);
         }catch(Exception e){
-            e.printStackTrace();
         }
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setPrefix("/templates/");
@@ -101,7 +101,7 @@ public abstract class TimeboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final ViewModel viewModel = new ViewModel();
         try {
-            this.handleGet(request, response, viewModel);
+            this.handleGet(getActorFromRequestAttributes(request), request, response, viewModel);
         } catch (Exception e) {
             if(request.getSession().getAttribute("errors") != null) {
                 ((List) request.getSession().getAttribute("errors")).add(e);
@@ -119,7 +119,7 @@ public abstract class TimeboardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final ViewModel viewModel = new ViewModel();
         try {
-            this.handlePost(request, response, viewModel);
+            this.handlePost(getActorFromRequestAttributes(request), request, response, viewModel);
         } catch (Exception e) {
             viewModel.getErrors().add(e);
             System.out.println(e.getMessage());
@@ -128,10 +128,14 @@ public abstract class TimeboardServlet extends HttpServlet {
         doService(request, response, viewModel);
     }
 
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
+    protected User getActorFromRequestAttributes(HttpServletRequest request) {
+        return (User) request.getAttribute("actor");
     }
 
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
+    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
+    }
+
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
     }
 
 
@@ -148,7 +152,7 @@ public abstract class TimeboardServlet extends HttpServlet {
 
     protected void doService(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException {
         response.setCharacterEncoding(resolver.getCharacterEncoding());
-        viewModel.getViewDatas().put("user", request.getSession().getAttribute("user"));
+        viewModel.getViewDatas().put("user", getActorFromRequestAttributes(request));
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);

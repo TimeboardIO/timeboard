@@ -1,4 +1,4 @@
-package timeboard.security;
+package timeboard.core.ui;
 
 /*-
  * #%L
@@ -30,6 +30,9 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LogService;
+import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
+
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -56,6 +59,9 @@ public class OAuthSecurityFilter implements Filter {
 
     private String loginURL;
 
+
+    @Reference
+    private TimeboardSessionStore timeboardSessionStore;
 
     @Reference
     private LogService logService;
@@ -85,17 +91,15 @@ public class OAuthSecurityFilter implements Filter {
                 req.getServletPath().startsWith("/static")
                         || req.getServletPath().equals("/favicon.ico");
 
-        boolean isLogged = req.getSession(false) != null;
-        if (isLogged) {
-            isLogged = req.getSession(false).getAttribute("user") != null;
-        }
-
+        User user = HttpSecurityContext.getCurrentUser(req, this.timeboardSessionStore);
+        boolean isLogged = user != null;
 
         if (!isLogged && !isStatic && !isLogin) {
             String origin = ((HttpServletRequest) request).getRequestURI() + "?" + ((HttpServletRequest) request).getQueryString();
             origin = URLEncoder.encode(origin, StandardCharsets.UTF_8.toString());
             res.sendRedirect(this.loginURL);
         } else {
+            request.setAttribute("actor", user);
             chain.doFilter(request, response);
         }
     }

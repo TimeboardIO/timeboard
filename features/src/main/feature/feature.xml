@@ -4,7 +4,10 @@
           xmlns="http://karaf.apache.org/xmlns/features/v1.4.0"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
-    <repository>mvn:org.ops4j.pax.web/pax-web-features/7.3.4/xml/features</repository>
+    <repository>mvn:org.ops4j.pax.web/pax-web-features/7.3.5/xml/features</repository>
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/3.3.4/xml/features</repository>
+    <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/1.0.6/xml</repository>
+    <repository>mvn:org.apache.karaf.features/standard/[4,5)/xml/features</repository>
 
     <feature name="timeboard-base" version="${project.version}">
         <feature>scr</feature>
@@ -38,7 +41,7 @@
             org.ops4j.pax.web.config.file=${karaf.etc}/jetty.xml
             org.apache.karaf.features.configKey=org.ops4j.pax.web
             org.ops4j.pax.web.session.timeout=30
-            org.osgi.service.http.enabled=true
+            org.osgi.service.http.enabled=false
             org.osgi.service.https.enabled=true
             org.osgi.service.http.port.secure=8443
             org.osgi.service.http.secure.enabled=true
@@ -60,50 +63,41 @@
 
     <feature name="timeboard-core-ui" version="${project.version}">
         <feature>war</feature>
-        <feature>timeboard-base</feature>
+        <feature>timeboard-core</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>aries-jax-rs-whiteboard</feature>
         <bundle start-level="80">mvn:${project.groupId}/core-ui/${project.version}</bundle>
         <bundle start-level="80">mvn:${project.groupId}/theme/${project.version}</bundle>
     </feature>
 
 
-    <feature name="timeboard-security" version="${project.version}">
-        <feature>timeboard-core</feature>
-        <feature>timeboard-core-ui</feature>
-        <bundle start-level="80">mvn:${project.groupId}/security/${project.version}</bundle>
-    </feature>
 
     <feature name="timeboard-home" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/home/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-account" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/account/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-projects" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/projects/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-timesheet" version="${project.version}">
-        <feature>timeboard-core</feature>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/timesheet/${project.version}</bundle>
     </feature>
 
     <feature name="timeboard-reporting" version="${project.version}">
-        <feature>timeboard-core</feature>
+        <config name="org.apache.aries.jax.rs.whiteboard.default">
+            default.web=false
+            enabled=true
+        </config>
         <feature>timeboard-core-ui</feature>
-        <feature>timeboard-security</feature>
         <bundle start-level="80">mvn:${project.groupId}/reporting/${project.version}</bundle>
     </feature>
 

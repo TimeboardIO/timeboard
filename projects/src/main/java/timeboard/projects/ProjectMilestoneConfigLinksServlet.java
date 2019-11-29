@@ -32,9 +32,9 @@ import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
+
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -68,15 +68,14 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel){
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel){
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
-        User actor = SecurityContext.getCurrentUser(request);
         long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(SecurityContext.getCurrentUser(request), projectID);
+        Project project = this.projectService.getProjectByID(actor, projectID);
         Milestone currentMilestone = null;
 
         try {
@@ -84,7 +83,7 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
             if (!getParameter(request, "milestoneID").get().isEmpty()) {
                 Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
                 currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
-                currentMilestone = addTasksToMilestone(currentMilestone, request);
+                currentMilestone = addTasksToMilestone(actor, currentMilestone, request);
             }
 
             viewModel.getViewDatas().put("milestone", currentMilestone);
@@ -103,8 +102,7 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
         }
     }
 
-    private Milestone addTasksToMilestone(Milestone currentMilestone, HttpServletRequest request) throws BusinessException {
-        User actor = SecurityContext.getCurrentUser(request);
+    private Milestone addTasksToMilestone(User actor, Milestone currentMilestone, HttpServletRequest request) throws BusinessException {
         String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
         List<Task> selectedTasks = Arrays
                 .stream(selectedTaskIdsString)

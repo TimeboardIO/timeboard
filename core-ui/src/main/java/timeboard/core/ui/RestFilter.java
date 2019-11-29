@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.core.ui;
 
 /*-
  * #%L
- * timesheet
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.reporting;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,31 +27,45 @@ package timeboard.reporting;
  */
 
 import org.osgi.service.component.annotations.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import org.osgi.service.component.annotations.Reference;
+import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
 
 @Component(
-        service = NavigationExtPoint.class
+        service = ContainerRequestFilter.class,
+        property = {
+                "osgi.jaxrs.extension=true"
+        },
+        immediate = true
 )
-public class ReportingNavigationProvider implements NavigationExtPoint {
+public class RestFilter implements ContainerRequestFilter {
+
+    @Context
+    private HttpServletRequest req;
+
+    @Reference
+    private TimeboardSessionStore timeboardSessionStore;
 
     @Override
-    public String getNavigationLabel() {
-        return "Reporting";
-    }
+    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
+        User user = HttpSecurityContext.getCurrentUser(this.req, this.timeboardSessionStore);
 
-    @Override
-    public String getNavigationPath() {
-        return ReportingServlet.URL;
-    }
+        if(user == null){
+            throw new SecurityException();
+        }
 
-    @Override
-    public int getNavigationWeight() {
-        return 50;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "chart bar";
+        containerRequestContext.setProperty("actor", user);
+        System.out.println("Filter executed :)");
     }
 }

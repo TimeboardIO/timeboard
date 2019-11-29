@@ -32,7 +32,6 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.security.SecurityContext;
 import timeboard.ui.model.Week;
 
 import javax.servlet.Servlet;
@@ -49,7 +48,9 @@ import java.util.List;
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
+
         property = {
+                "service.ranking=0",
                 "osgi.http.whiteboard.servlet.pattern=/",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
@@ -76,19 +77,19 @@ public class HomeServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("home:home.html");
     }
 
     @Override
-    protected void handleGet(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         //load previous weeks data
         Date d = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(d);
         List<Week> weeks = new ArrayList<>();
-        User user = SecurityContext.getCurrentUser(request);
+        User user = actor;
         int weeksToDisplay = 3; //TODO replace by a parameter ?
         if(this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {

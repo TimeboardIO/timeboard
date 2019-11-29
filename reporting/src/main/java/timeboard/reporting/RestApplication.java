@@ -1,8 +1,8 @@
-package timeboard.security.api;
+package timeboard.reporting;
 
 /*-
  * #%L
- * security
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.security.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,10 +26,18 @@ package timeboard.security.api;
  * #L%
  */
 
-public interface LoginService {
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ServiceScope;
 
-    boolean isServiceValidFor(Credential credential);
+import javax.ws.rs.core.Application;
 
-    boolean validateCredential(Credential credential);
-
+@Component(
+        service = Application.class,
+        scope = ServiceScope.SINGLETON,
+        property = {
+                "osgi.jaxrs.name=.default",
+                "osgi.jaxrs.application.base=/api"
+        }
+)
+public class RestApplication extends Application {
 }

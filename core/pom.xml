@@ -119,6 +119,11 @@
             <artifactId>thymeleaf</artifactId>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>28.1-jre</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -145,7 +150,8 @@
                             org.w3c.dom,
                             javax.crypto.spec,
                             javax.crypto,
-                            javax.mail.*
+                            javax.mail.*,
+                            !com.google.*
                         </Import-Package>
                         <Meta-Persistence>META-INF/persistence.xml</Meta-Persistence>
                         <Embed-Transitive>true</Embed-Transitive>
