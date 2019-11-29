@@ -26,7 +26,6 @@ package timeboard.theme;
  * #L%
  */
 
-
 import java.util.ArrayList;
 import java.util.List;
 import org.osgi.service.component.annotations.Component;

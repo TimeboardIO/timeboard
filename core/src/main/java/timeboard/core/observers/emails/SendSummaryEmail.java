@@ -27,6 +27,12 @@ package timeboard.core.observers.emails;
  */
 
 import io.reactivex.schedulers.Schedulers;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -42,12 +48,6 @@ import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 @Component(
         service = SendSummaryEmail.class,
@@ -61,17 +61,17 @@ public class SendSummaryEmail {
     private TemplateGenerator templateGenerator = new TemplateGenerator();
 
     @Activate
-    public void activate(){
+    public void activate() {
         TimeboardSubjects.TIMEBOARD_EVENTS // Listen for all timeboard app events
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10))) // Observe on 10 threads
                 .buffer(5, TimeUnit.MINUTES) // Aggregate mails every 5 minutes TODO add configuration
                 .map(this::notificationEventToUserEvent) // Rebalance events by user to notify/inform
                 .flatMapIterable(l -> l) // transform user list to single events
-                .subscribe(struc ->this.emailService.sendMessage(generateMailFromEventList(struc))); //create and send individual summary
+                .subscribe(struc -> this.emailService.sendMessage(generateMailFromEventList(struc))); //create and send individual summary
     }
 
     /**
-     * Transform user with his notifications to email structure
+     * Transform user with his notifications to email structure.
      * Work for task create/delete events and timesheet validation events
      * @param userNotificationStructure structure user 1 -- * events to notify/inform
      * @return email ready structure
@@ -85,12 +85,16 @@ public class SendSummaryEmail {
 
         String subject = "[Timeboard] Daily summary";
 
-        for(TimeboardEvent event : userNotificationStructure.getNotificationEventList()){
-            if(event instanceof TaskEvent){
+        for (TimeboardEvent event : userNotificationStructure.getNotificationEventList()) {
+            if (event instanceof TaskEvent) {
                 Task t = ((TaskEvent) event).getTask();
-                if(((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
-                if(((TaskEvent) event).getEventType() == TimeboardEventType.DELETE) projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
-            } else if(event instanceof TimesheetEvent){
+                if (((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) {
+                    projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
+                }
+                if (((TaskEvent) event).getEventType() == TimeboardEventType.DELETE) {
+                    projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
+                }
+            } else if (event instanceof TimesheetEvent) {
                 validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             }
         }
@@ -105,18 +109,18 @@ public class SendSummaryEmail {
 
 
     /**
-     * Rebalance events by user to notify/inform
+     * Rebalance events by user to notify/inform.
      * @param events list of events
      * @return userNotificationStructure structure user 1 -- * events to notify/inform
      */
     private List<UserNotificationStructure> notificationEventToUserEvent(List<TimeboardEvent> events) {
         HashMap<Long, UserNotificationStructure> dataList = new HashMap<>();
 
-        for(TimeboardEvent event : events){
-            for(User user : event.getUsersToNotify()){
+        for (TimeboardEvent event : events) {
+            for (User user : event.getUsersToNotify()) {
                 dataList.computeIfAbsent(user.getId(), t -> new UserNotificationStructure(user)).notify(event);
             }
-            for(User user : event.getUsersToInform()){
+            for (User user : event.getUsersToInform()) {
                 dataList.computeIfAbsent(user.getId(), t -> new UserNotificationStructure(user)).inform(event);
             }
         }

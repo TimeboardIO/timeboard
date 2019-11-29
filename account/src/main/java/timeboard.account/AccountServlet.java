@@ -42,16 +42,6 @@ import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
-
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
@@ -91,7 +81,7 @@ public class AccountServlet extends TimeboardServlet {
             actor.setName(name);
             actor.setEmail(email);
 
-           try{
+           try {
               User u = userService.updateUser(actor);
                viewModel.getViewDatas().put("message", "User account changed successfully !");
            } catch (Exception e) {
@@ -108,7 +98,7 @@ public class AccountServlet extends TimeboardServlet {
                     actor.getExternalIDs().put(key, value);
                 }
             }
-            try{
+            try {
                 User u = userService.updateUser(actor);
                 viewModel.getViewDatas().put("message", "External tools updated successfully !");
             } catch (Exception e) {

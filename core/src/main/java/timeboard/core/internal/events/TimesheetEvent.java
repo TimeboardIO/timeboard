@@ -26,13 +26,13 @@ package timeboard.core.internal.events;
  * #L%
  */
 
+import java.util.Date;
+import java.util.List;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.ValidatedTimesheet;
 
-import java.util.Date;
-import java.util.List;
 
 public class TimesheetEvent extends TimeboardEvent {
 

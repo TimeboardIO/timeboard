@@ -109,8 +109,9 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
                     Task t = null;
                     try {
                         t = (Task) projectService.getTaskByID(actor, Long.getLong(id));
-                    } catch (Exception e) { }
-                    finally {
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
                         return t;
                     }
                 }).collect(Collectors.toList());

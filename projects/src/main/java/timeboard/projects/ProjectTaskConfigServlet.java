@@ -26,21 +26,6 @@ package timeboard.projects;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
-
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,6 +36,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
+import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.ViewModel;
 
 @Component(
         service = Servlet.class,
@@ -99,7 +97,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
 
 
         /* Get datas for line-chart*/
-        if(task.getId() != null) {
+        if (task.getId() != null) {
             this.getDatasForCharts(actor, viewModel, task);
         }
 
@@ -123,8 +121,11 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
-                    try { return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
-                    } catch (ParseException e) { e.printStackTrace();}
+                    try {
+                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     return null;
                 })
                 .map(date -> effortSpentDB.stream()
@@ -147,8 +148,11 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
-                    try { return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
-                    } catch (ParseException e) { e.printStackTrace();}
+                    try {
+                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     return null;
                 })
                 .map(date -> effortLeftDB.stream()
@@ -197,7 +201,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
             viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
 
             /* Get datas for line-chart*/
-            if(currentTask.getId() != null) {
+            if (currentTask.getId() != null) {
                 this.getDatasForCharts(actor, viewModel, currentTask);
             }
         }
@@ -234,7 +238,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         currentTask.setComments(taskForm.getTaskComment());
         currentTask.setStartDate(taskForm.getStartDate());
         currentTask.setEndDate(taskForm.getEndDate());
-        currentTask.setOriginalEstimate( taskForm.getOriginalEstimate());
+        currentTask.setOriginalEstimate(taskForm.getOriginalEstimate());
         currentTask.setMilestone(milestone);
         currentTask.setAssigned(assigned);
 
@@ -256,7 +260,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         private TaskStatus taskStatus;
         private Long milestoneID;
 
-        public TaskForm(Task task){
+        public TaskForm(Task task) {
             taskID = task.getId();
             taskType = task.getTaskType();
             milestoneID = task.getMilestone() != null ? task.getMilestone().getId() : null;
@@ -274,25 +278,25 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         }
 
         public TaskForm(HttpServletRequest request) throws ParseException {
-            if(!request.getParameter("taskID").isEmpty()) {
+            if (!request.getParameter("taskID").isEmpty()) {
                 taskID = Long.parseLong(request.getParameter("taskID"));
             }
             taskName = request.getParameter("taskName");
             taskComment = request.getParameter("taskComments");
-            startDate = new Date(DATE_FORMAT.parse(request.getParameter("taskStartDate")).getTime()+(2 * 60 * 60 * 1000) +1);
-            endDate = new Date(DATE_FORMAT.parse(request.getParameter("taskEndDate")).getTime()+(2 * 60 * 60 * 1000) +1);
+            startDate = new Date(DATE_FORMAT.parse(request.getParameter("taskStartDate")).getTime() + (2 * 60 * 60 * 1000) + 1);
+            endDate = new Date(DATE_FORMAT.parse(request.getParameter("taskEndDate")).getTime() + (2 * 60 * 60 * 1000) + 1);
             originalEstimate = Double.parseDouble(request.getParameter("taskOriginalEstimate"));
             taskStatus = request.getParameter("taskStatus") != null ? TaskStatus.valueOf(request.getParameter("taskStatus")) : TaskStatus.PENDING;
 
-            if(request.getParameter("taskMilestoneId") != null && !request.getParameter("taskMilestoneId").isEmpty()) {
+            if (request.getParameter("taskMilestoneId") != null && !request.getParameter("taskMilestoneId").isEmpty()) {
                 milestoneID = Long.parseLong(request.getParameter("taskMilestoneId"));
             }
 
-            if(request.getParameter("taskTypeID") != null &&  !request.getParameter("taskTypeID").isEmpty()) {
+            if (request.getParameter("taskTypeID") != null &&  !request.getParameter("taskTypeID").isEmpty()) {
                 taskTypeID = Long.parseLong(request.getParameter("taskTypeID"));
             }
 
-            if(request.getParameter("taskAssigned") != null && !request.getParameter("taskAssigned").isEmpty()) {
+            if (request.getParameter("taskAssigned") != null && !request.getParameter("taskAssigned").isEmpty()) {
                 assignedUserID = Long.parseLong(request.getParameter("taskAssigned"));
             }
         }

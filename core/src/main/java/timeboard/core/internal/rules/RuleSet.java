@@ -26,10 +26,9 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import timeboard.core.model.User;
-
 import java.util.HashSet;
 import java.util.Set;
+import timeboard.core.model.User;
 
 public class RuleSet<T> {
 

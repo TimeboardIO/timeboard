@@ -26,13 +26,12 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.Locale;
+import java.util.Map;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-
-import java.util.Locale;
-import java.util.Map;
 
 public class TemplateGenerator {
 
@@ -53,16 +52,16 @@ public class TemplateGenerator {
     }
 
 
-    public String getTemplateString(String templateName, Map<String, Object> templateData){
-        if(!init) init();
+    public String getTemplateString(String templateName, Map<String, Object> templateData) {
+        if (!init) {
+            init();
+        }
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
         final Context ctx = new Context(Locale.FRANCE);
 
-        templateData.forEach((s, o) -> {
-            ctx.setVariable(s, o);
-        });
+        templateData.forEach(ctx::setVariable);
 
         return engine.process(templateName, ctx);
 

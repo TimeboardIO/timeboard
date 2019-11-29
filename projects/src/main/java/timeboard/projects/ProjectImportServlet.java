@@ -129,24 +129,23 @@ public class ProjectImportServlet extends TimeboardServlet {
                                 }
 
 
-                                newTasks.forEach(task ->
-                                        {
-                                            String taskName = task.getTitle();
-                                            if (taskName.length()>=100) {
-                                                taskName = taskName.substring(0, 99);
-                                            }
-                                            String taskComment = task.getComments();
-                                            Date startDate = task.getStartDate();
-                                            Date endDate = task.getStopDate();
-                                            double OE = 0;
-                                            Long taskTypeID = null;
-                                            User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
-                                            String origin = task.getOrigin();
-                                            String remotePath = null;
-                                            Long remoteId = task.getID();
-                                            Milestone milestone = null;
-                                            projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, String.valueOf(remoteId), milestone);
+                                newTasks.forEach(task -> {
+                                        String taskName = task.getTitle();
+                                        if (taskName.length() >= 100) {
+                                            taskName = taskName.substring(0, 99);
                                         }
+                                        String taskComment = task.getComments();
+                                        Date startDate = task.getStartDate();
+                                        Date endDate = task.getStopDate();
+                                        double OE = 0;
+                                        Long taskTypeID = null;
+                                        User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
+                                        String origin = task.getOrigin();
+                                        String remotePath = null;
+                                        Long remoteId = task.getID();
+                                        Milestone milestone = null;
+                                        projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, String.valueOf(remoteId), milestone);
+                                    }
                                 );
 
                                 for (ProjectImportService.RemoteTask remoteTask : updatedTasks) {
@@ -181,14 +180,14 @@ public class ProjectImportServlet extends TimeboardServlet {
         return !this.isNewTask(actor, projectID, task);
     }
 
-    private boolean isNewTask(User actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException{
+    private boolean isNewTask(User actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
         AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getID());
         return existingTask == null;
     }
 
     private void mergeAssignee(UserService userService, String externalID, ProjectImportService.RemoteTask task) {
         final User remoteUser = userService.findUserByExternalID(externalID, task.getUserName());
-        if(remoteUser != null){
+        if (remoteUser != null) {
             task.setLocalUserID(remoteUser.getId());
         }
     }

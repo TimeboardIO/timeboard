@@ -85,8 +85,8 @@ public class ProjectExportServlet  extends TimeboardServlet {
                 .filter(projectExportService -> projectExportService.isCandidate(type))
                 .findFirst();
 
-        if(optionalService.isPresent()){
-            try(ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+        if (optionalService.isPresent()) {
+            try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
                 optionalService.get().export(actor, project.getId(), buf);
                 resp.setContentLengthLong(buf.toByteArray().length);
                 resp.setHeader("Expires:", "0");

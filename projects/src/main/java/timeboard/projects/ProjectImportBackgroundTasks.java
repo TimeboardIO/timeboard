@@ -47,7 +47,7 @@ public class ProjectImportBackgroundTasks {
         return INSTANCE;
     }
 
-    public void importInBackground(User actor, Runnable command){
+    public void importInBackground(User actor, Runnable command) {
         executors.execute(command);
     }
 

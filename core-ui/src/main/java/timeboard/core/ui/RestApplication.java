@@ -26,10 +26,10 @@ package timeboard.core.ui;
  * #L%
  */
 
+import javax.ws.rs.core.Application;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 
-import javax.ws.rs.core.Application;
 
 @Component(
         service = Application.class,

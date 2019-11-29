@@ -26,21 +26,17 @@ package timeboard.core.api;
  * #L%
  */
 
-
+import java.util.List;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.User;
-
-import java.util.List;
-
 
 /**
  * Service for users and accounts management.
  */
 public interface UserService {
-
-    /**
-     * Search user by remote subject
+     /**
+     * Search user by remote subject.
      *
      * @param remoteSubject prefix used to search user
      * @return list of users
@@ -84,7 +80,7 @@ public interface UserService {
     User findUserByEmail(String email);
 
     /**
-     * Update user
+     * Update user.
      *
      * @param user to update
      * @return user will with primary key

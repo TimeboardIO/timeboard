@@ -26,20 +26,16 @@ package timeboard.core.ui;
  * #L%
  */
 
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.core.Context;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.model.User;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
 
 @Component(
         service = ContainerRequestFilter.class,
@@ -63,7 +59,7 @@ public class RestFilter implements ContainerRequestFilter {
 
         User user = this.securityContextService.getCurrentUser(this.req);
 
-        if(user == null){
+        if (user == null) {
             throw new SecurityException();
         }
 

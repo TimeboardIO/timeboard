@@ -26,6 +26,13 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.mindrot.jbcrypt.BCrypt;
 import org.osgi.service.component.annotations.Component;
@@ -37,13 +44,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Component(
         service = UserService.class,
@@ -169,7 +169,7 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserBySubject(String remoteSubject){
+    public User findUserBySubject(String remoteSubject) {
         User u;
         try {
             u = this.jpa.txExpr(entityManager -> {
@@ -192,8 +192,8 @@ public final class UserServiceImpl implements UserService {
             u = this.jpa.txExpr(entityManager -> {
                 Query q = entityManager // MYSQL native for JSON queries
                         .createNativeQuery("select * from User "
-                                + "where JSON_EXTRACT(externalIDs, '$." + origin + "')" +
-                                " = ?", User.class);
+                                + "where JSON_EXTRACT(externalIDs, '$." + origin + "')"
+                                + " = ?", User.class);
                 q.setParameter(1, userExternalID);
                 return (User) q.getSingleResult();
             });

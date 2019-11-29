@@ -26,6 +26,15 @@ package timeboard.core.ui;
  * #L%
  */
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
@@ -34,15 +43,6 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import timeboard.core.model.User;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.*;
 
 public abstract class TimeboardServlet extends HttpServlet {
 
@@ -57,7 +57,8 @@ public abstract class TimeboardServlet extends HttpServlet {
         try {
             ServiceReference<NavigationEntryRegistryService> sr = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(NavigationEntryRegistryService.class);
             this.navRegistry = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(sr);
-        }catch(Exception e){
+        } catch(Exception e) {
+            e.printStackTrace();
         }
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setPrefix("/templates/");
@@ -103,14 +104,14 @@ public abstract class TimeboardServlet extends HttpServlet {
         try {
             this.handleGet(getActorFromRequestAttributes(request), request, response, viewModel);
         } catch (Exception e) {
-            if(request.getSession().getAttribute("errors") != null) {
+            if (request.getSession().getAttribute("errors") != null) {
                 ((List) request.getSession().getAttribute("errors")).add(e);
-            }else{
+            } else {
                 request.getSession().setAttribute("errors", new LinkedList<>(Arrays.asList(e)));
             }
             e.printStackTrace(System.err);
         }
-        if(viewModel.getTemplate() != null){
+        if (viewModel.getTemplate() != null) {
             doService(request, response, viewModel);
         }
     }
@@ -159,9 +160,7 @@ public abstract class TimeboardServlet extends HttpServlet {
         engine.addDialect(new LayoutDialect());
 
         final WebContext ctx = new WebContext(request, response, request.getServletContext());
-        viewModel.getViewDatas().forEach((s, o) -> {
-            ctx.setVariable(s, o);
-        });
+        viewModel.getViewDatas().forEach(ctx::setVariable);
 
         //Used to forward errors between servlets
         if (request.getAttribute("errors") != null) {
@@ -200,7 +199,7 @@ public abstract class TimeboardServlet extends HttpServlet {
         }
     }
 
-    protected Optional<String> getParameter(final HttpServletRequest req, final String paramName){
+    protected Optional<String> getParameter(final HttpServletRequest req, final String paramName) {
         return Optional.of(req.getParameter(paramName));
     }
 
