@@ -26,11 +26,10 @@ package timeboard.theme;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
-import timeboard.core.ui.JavascriptService;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.JavascriptService;
 
 @Component(
         service = JavascriptService.class,

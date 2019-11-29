@@ -38,7 +38,7 @@ public enum MilestoneType {
         this.label = label;
     }
 
-    String getLabel(){
+    String getLabel() {
         return this.label;
     }
 }

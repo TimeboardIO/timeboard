@@ -26,16 +26,15 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.Base64;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
 
 
 @Component(
@@ -59,7 +58,7 @@ public class EncryptionServiceImpl implements EncryptionService {
                 cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"));
                 value = new String(cipher.doFinal(Base64.getDecoder().decode(value)));
             } catch (Exception  e) {
-
+                // Catch error empty
             }
         }
         return value;
@@ -67,15 +66,16 @@ public class EncryptionServiceImpl implements EncryptionService {
 
     @Override
     public String encryptAttribute(String strToEncrypt) {
-        try{
+        try {
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"));
             return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
-        }catch(Exception e){
+        } catch (Exception e) {
             return null;
         }
     }
-/*
+
+    /*
     public static void main(String[] args) {
         String key = "test";
         EncryptionService encryptionService = new EncryptionServiceImpl();

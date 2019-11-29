@@ -28,6 +28,7 @@ package timeboard.core.api;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
+import java.util.Map;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import timeboard.core.internal.events.TaskEvent;
@@ -35,7 +36,6 @@ import timeboard.core.internal.events.TimeboardEvent;
 import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.User;
 
-import java.util.Map;
 
 
 @Component(
@@ -49,8 +49,8 @@ public class TimeboardSubjects {
     public static Observable<TimeboardEvent> TIMEBOARD_EVENTS =  PublishSubject.create();
 
     @Activate
-    void activate(){
-        //Merge all Timeboard app events
+    void activate() {
+         //Merge all Timeboard app events
          TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TASK_EVENTS);
          TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TIMESHEET_EVENTS);
     }

@@ -32,7 +32,7 @@ public class ProjectAttributValue {
     private boolean isEncrypted;
     private String value;
 
-    public ProjectAttributValue(){
+    public ProjectAttributValue() {
          this.isPrivate = false;
          this.isEncrypted = false;
     }
@@ -61,8 +61,8 @@ public class ProjectAttributValue {
         return isPrivate;
     }
 
-    public void setPrivate(boolean aPrivate) {
-        isPrivate = aPrivate;
+    public void setPrivate(boolean isPrivate) {
+        isPrivate = isPrivate;
     }
 
     public String getValue() {

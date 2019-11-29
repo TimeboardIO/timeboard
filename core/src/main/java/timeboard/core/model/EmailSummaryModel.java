@@ -26,10 +26,9 @@ package timeboard.core.model;
  * #L%
  */
 
-import timeboard.core.internal.events.TaskEvent;
-
 import java.util.ArrayList;
 import java.util.List;
+import timeboard.core.internal.events.TaskEvent;
 
 public class EmailSummaryModel {
 
@@ -43,11 +42,11 @@ public class EmailSummaryModel {
     }
 
     public void addCreatedTask(TaskEvent e) {
-        createdTasks.add(e) ;
+        createdTasks.add(e);
     }
 
     public void addDeletedTask(TaskEvent e) {
-        deletedTasks.add(e) ;
+        deletedTasks.add(e);
     }
 
 

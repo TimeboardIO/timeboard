@@ -28,6 +28,15 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.ProjectExportService;
@@ -41,21 +50,11 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 
 /**
- * Display project details form
- * <p>
- * ex : /projects/details?id=
+ * Display project details form.
+ *
+ * <p>Ex : /projects/details?id=
  */
 @Component(
         service = Servlet.class,
@@ -126,7 +125,6 @@ public class ProjectConfigServlet extends TimeboardServlet {
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
         viewModel.setTemplate("projects:details_project_config.html");
-        Map<String, Object> map = new HashMap<>();
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
@@ -147,7 +145,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
         }
 
         if (!newAttrKey.isEmpty()) {
-            if(newAttrEncrypted){
+            if (newAttrEncrypted) {
                 newAttrValue = this.encryptionService.encryptAttribute(newAttrValue);
             }
             project.getAttributes().put(newAttrKey, new ProjectAttributValue(newAttrValue, newAttrEncrypted));
@@ -166,7 +164,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
                 String key = param.substring(8, param.length());
                 String encrypted = request.getParameter(param);
                 project.getAttributes().get(key).setEncrypted(true);
-              //  project.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
+                // project.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
             }
         }
 
@@ -188,6 +186,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
         this.projectService.updateProject(actor, project, memberships);
 
+        Map<String, Object> map = new HashMap<>();
         prepareTemplateData(actor, project, map);
 
         viewModel.getViewDatas().putAll(map);

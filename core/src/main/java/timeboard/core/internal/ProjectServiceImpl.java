@@ -26,6 +26,11 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.*;
+import java.util.Calendar;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -45,12 +50,6 @@ import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import java.util.Calendar;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Component(
         service = ProjectService.class,
         immediate = true
@@ -66,9 +65,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Reference(target = "(osgi.unit.name=timeboard-pu)", scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
 
-    public ProjectServiceImpl(){}
+    public ProjectServiceImpl() {
 
-    public ProjectServiceImpl(JpaTemplate jpa){
+    }
+
+    public ProjectServiceImpl(JpaTemplate jpa) {
      this.jpa = jpa;
     }
 
@@ -114,7 +115,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectByIdWithAllMembers(User actor, Long projectId) throws BusinessException{
+    public Project getProjectByIdWithAllMembers(User actor, Long projectId) throws BusinessException {
         Project project =  jpa.txExpr(em -> {
             return em.createQuery("select p from Project p where p.id = :projectId", Project.class)
                     .setParameter("projectId", projectId)
@@ -138,7 +139,9 @@ public class ProjectServiceImpl implements ProjectService {
             Project data = em.createQuery("select p from Project p where p.name = :name", Project.class)
                     .setParameter("name", projectName)
                     .getSingleResult();
-            if(!data.getMembers().contains(actor)) return null;
+            if (!data.getMembers().contains(actor)) {
+                return null;
+            }
             return data;
         });
 
@@ -200,25 +203,25 @@ public class ProjectServiceImpl implements ProjectService {
 
         return jpa.txExpr(em -> {
 
-            TypedQuery<Object[]> q = em.createQuery("select " +
-                    "COALESCE(sum(t.originalEstimate),0) as originalEstimate, " +
-                    "COALESCE(sum(t.effortLeft),0) as effortLeft " +
-                    "from Task t " +
-                    "where t.project = :project ", Object[].class);
+            TypedQuery<Object[]> q = em.createQuery("select "
+                    + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
+                    + "COALESCE(sum(t.effortLeft),0) as effortLeft "
+                    + "from Task t "
+                    + "where t.project = :project ", Object[].class);
 
             q.setParameter("project", project);
 
-            Object[] OEandEL = q.getSingleResult();
+            Object[] originalEstimateAndEffortLeft = q.getSingleResult();
 
-            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) " +
-                    "from Task t left outer join t.imputations i " +
-                    "where t.project = :project ", Double.class);
+            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
+                    + "from Task t left outer join t.imputations i "
+                    + "where t.project = :project ", Double.class);
 
             effortSpentQuery.setParameter("project", project);
 
             final Double effortSpent = effortSpentQuery.getSingleResult();
 
-            return new ProjectDashboard(project.getQuotation(), (Double) OEandEL[0], (Double) OEandEL[1], effortSpent);
+            return new ProjectDashboard(project.getQuotation(), (Double) originalEstimateAndEffortLeft[0], (Double) originalEstimateAndEffortLeft[1], effortSpent);
 
         });
     }
@@ -241,8 +244,6 @@ public class ProjectServiceImpl implements ProjectService {
             //Update existing membership
             List<Long> membershipToRemove = new ArrayList<>();
 
-            List<Long> currentMembers = project.getMembers().stream().map(pm -> pm.getMember().getId()).collect(Collectors.toList());
-            List<Long> membershipToAdd = memberships.keySet().stream().filter(mID -> currentMembers.contains(mID) == false).collect(Collectors.toList());
 
             //Update existing membership
             project.getMembers().forEach(projectMembership -> {
@@ -260,18 +261,28 @@ public class ProjectServiceImpl implements ProjectService {
             membershipToRemove.forEach(idToRemove -> {
                 project.getMembers().removeIf(member -> member.getMembershipID() == idToRemove);
                 ProjectMembership pmToRemove = entityManager.find(ProjectMembership.class, idToRemove);
-                if(pmToRemove != null) {
+                if (pmToRemove != null) {
                     entityManager.remove(pmToRemove);
                 }
             });
             entityManager.merge(project);
 
+
             //Add new membership
-            membershipToAdd.forEach((aLong) -> {
+            List<Long> currentMembers = project.getMembers()
+                    .stream()
+                    .map(pm -> pm.getMember().getId())
+                    .collect(Collectors.toList());
+            List<Long> membershipToAdd = memberships.keySet()
+                    .stream()
+                    .filter(membershipId -> currentMembers.contains(membershipId) == false)
+                    .collect(Collectors.toList());
+
+            membershipToAdd.forEach((membershipId) -> {
                 ProjectMembership projectMembership = new ProjectMembership();
                 projectMembership.setProject(project);
-                projectMembership.setRole(memberships.get(aLong));
-                projectMembership.setMember(this.userService.findUserByID(aLong));
+                projectMembership.setRole(memberships.get(membershipId));
+                projectMembership.setMember(this.userService.findUserByID(membershipId));
                 entityManager.persist(projectMembership);
                 project.getMembers().add(projectMembership);
             });
@@ -297,12 +308,12 @@ public class ProjectServiceImpl implements ProjectService {
         this.jpa.tx(entityManager -> {
             entityManager.persist(projectMembership);
         });
-        this.logService.log(LogService.LOG_INFO, "User " + projectMembership.getMember().getName() + " add to project "+projectMembership.getProject().getName());
+        this.logService.log(LogService.LOG_INFO, "User " + projectMembership.getMember().getName() + " add to project " + projectMembership.getProject().getName());
 
     }
 
 
-        /* -- TASKS -- */
+    /* -- TASKS -- */
 
     @Override
     public List<Task> listProjectTasks(User actor, Project project) throws BusinessException {
@@ -349,7 +360,7 @@ public class ProjectServiceImpl implements ProjectService {
                            String taskComment,
                            Date startDate,
                            Date endDate,
-                           double OE,
+                           double originalEstimate,
                            Long taskTypeID,
                            User assignedUser,
                            String origin,
@@ -368,11 +379,11 @@ public class ProjectServiceImpl implements ProjectService {
             newTask.setStartDate(startDate);
             newTask.setEndDate(endDate);
             newTask.setComments(taskComment);
-            newTask.setEffortLeft(OE);
-            newTask.setOriginalEstimate(OE);
+            newTask.setEffortLeft(originalEstimate);
+            newTask.setOriginalEstimate(originalEstimate);
             newTask.setTaskStatus(TaskStatus.PENDING);
             newTask.setAssigned(assignedUser);
-            if(milestone != null) {
+            if (milestone != null) {
                 entityManager.merge(milestone);
             }
             newTask.setMilestone(milestone);
@@ -383,7 +394,7 @@ public class ProjectServiceImpl implements ProjectService {
             entityManager.flush();
 
             TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
-            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by "+actor.getName()+" in project "+project.getName());
+            this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by " + actor.getName() + " in project " + project.getName());
 
             return newTask;
         });
@@ -395,7 +406,7 @@ public class ProjectServiceImpl implements ProjectService {
     public Task updateTask(User actor, final Task task) {
         return this.jpa.txExpr(entityManager -> {
             //TODO check actor permissions
-            if(task.getProject().isMember(actor)) {
+            if (task.getProject().isMember(actor)) {
                 entityManager.merge(task);
                 entityManager.flush();
             }
@@ -407,9 +418,9 @@ public class ProjectServiceImpl implements ProjectService {
     public void createTasks(final User actor, final List<Task> taskList) {
         this.jpa.tx(entityManager -> {
             for (Task newTask : taskList) {  //TODO create task here
-                this.logService.log(LogService.LOG_DEBUG, "User " + actor + " tasks "+newTask.getName()+" on "+newTask.getStartDate());
+                this.logService.log(LogService.LOG_DEBUG, "User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
             }
-            this.logService.log(LogService.LOG_INFO, "User " + actor + " created "+taskList.size()+" tasks ");
+            this.logService.log(LogService.LOG_INFO, "User " + actor + " created " + taskList.size() + " tasks ");
 
             entityManager.flush();
         });
@@ -421,7 +432,7 @@ public class ProjectServiceImpl implements ProjectService {
             for (Task task : taskList) {
                 entityManager.merge(task);
             }
-            this.logService.log(LogService.LOG_INFO, "User " + actor + " updated "+taskList.size()+" tasks ");
+            this.logService.log(LogService.LOG_INFO, "User " + actor + " updated " + taskList.size() + " tasks ");
             entityManager.flush();
 
             taskList.stream().forEach(task -> {
@@ -437,7 +448,7 @@ public class ProjectServiceImpl implements ProjectService {
             for (Task task : taskList) {
                 entityManager.merge(task);
             }
-            this.logService.log(LogService.LOG_WARNING, "User " + actor + " deleted "+taskList.size()+" tasks ");
+            this.logService.log(LogService.LOG_WARNING, "User " + actor + " deleted " + taskList.size() + " tasks ");
             entityManager.flush();
         });
     }
@@ -451,7 +462,7 @@ public class ProjectServiceImpl implements ProjectService {
         AbstractTask task =  this.jpa.txExpr(entityManager -> {
             return entityManager.find(AbstractTask.class, id);
         });
-        if(task instanceof Task){
+        if (task instanceof Task) {
             RuleSet<Task> ruleSet = new RuleSet<>();
             ruleSet.addRule(new ActorIsProjectMemberbyTask());
             Set<Rule> wrongRules = ruleSet.evaluate(user, (Task) task);
@@ -466,32 +477,32 @@ public class ProjectServiceImpl implements ProjectService {
     public List<AbstractTask> getTasksByName(User user, String name) {
 
         final List<AbstractTask> tasks =  new ArrayList<>();
-        try{
+        try {
             this.jpa.tx(entityManager -> {
 
                 TypedQuery<Task> query = entityManager.createQuery("select distinct t from Task t left join fetch t.imputations  where t.name = :name", Task.class);
-                query.setParameter("name", name );
+                query.setParameter("name", name);
 
                 tasks.addAll(query.getResultList());
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             // handle JPA Exceptions
         }
 
-        try{
+        try {
             this.jpa.tx(entityManager -> {
                 TypedQuery<DefaultTask> query = entityManager.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
-                query.setParameter("name", name );
+                query.setParameter("name", name);
                 tasks.addAll(query.getResultList());
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             //handle JPA Exceptions
         }
 
        return tasks;
     }
 
-    private UpdatedTaskResult updateTaskImputation(User actor, Task task, Date day, double val, EntityManager entityManager){
+    private UpdatedTaskResult updateTaskImputation(User actor, Task task, Date day, double val, EntityManager entityManager) {
         Calendar c = Calendar.getInstance();
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
@@ -508,22 +519,24 @@ public class ProjectServiceImpl implements ProjectService {
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
         List<Imputation> existingImputations = q.getResultList();
 
-        if(taskAvailableForImputations){
-            this.addOrUpdateOrDeleteImputation(existingImputations.isEmpty() ? null : existingImputations.get(0), task, actor, val,c.getTime(), entityManager );
+        if (taskAvailableForImputations) {
+            this.addOrUpdateOrDeleteImputation(existingImputations.isEmpty() ? null : existingImputations.get(0),
+                    task, actor, val,c.getTime(), entityManager);
         }
 
         entityManager.merge(task);
-        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((task!= null) ? task.getProject().getName() : "default") +" with value "+ val);
+        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + task.getId()
+                + "(" + day + ") in project " + ((task != null) ? task.getProject().getName() : "default") + " with value " + val);
 
-        if(task != null) { //project task
+        if (task != null) { //project task
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
-        }else{
+        } else {
             return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
         }
     }
 
 
-    private void addOrUpdateOrDeleteImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager ){
+    private void addOrUpdateOrDeleteImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
         Task projectTask = (task instanceof Task) ? (Task) task : null;
 
         if (i == null && (val > 0.0) && (val <= 1.0)) { 
@@ -545,12 +558,17 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
     }
-    private void updateEffortLeftFromImputationValue(Task projectTask, double currentImputationValue, double newImputationValue){
-        if(projectTask == null) return;
-        double currentEL = projectTask.getEffortLeft();
-        double newEL = currentEL ; // new effort left
 
-        if (currentEL == 0) return;
+    private void updateEffortLeftFromImputationValue(Task projectTask, double currentImputationValue, double newImputationValue) {
+        if (projectTask == null) {
+            return;
+        }
+        double currentEL = projectTask.getEffortLeft();
+        double newEL = currentEL; // new effort left
+
+        if (currentEL == 0) {
+            return;
+        }
         double diffValue =  Math.abs(newImputationValue - currentImputationValue);
 
         if (currentImputationValue < newImputationValue) {
@@ -576,7 +594,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList) {
         return this.jpa.txExpr(entityManager -> {
             List<UpdatedTaskResult> result = new ArrayList<>();
-            for(Imputation imputation : imputationsList){
+            for (Imputation imputation : imputationsList) {
                 UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue(), entityManager);
                 result.add(updatedTaskResult);
             }
@@ -598,8 +616,8 @@ public class ProjectServiceImpl implements ProjectService {
             task.setEffortLeft(effortLeft);
             entityManager.flush();
 
-
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task "+task.getId()+" in project "+task.getProject().getName()+" with value "+ effortLeft);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task " + task.getId()
+                    + " in project " + task.getProject().getName() + " with value " + effortLeft);
 
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
         });
@@ -607,7 +625,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public TaskType findTaskTypeByID(Long taskTypeID) {
-        if(taskTypeID == null){
+        if (taskTypeID == null) {
             return null;
         }
         return this.jpa.txExpr(entityManager -> entityManager.find(TaskType.class, taskTypeID));
@@ -617,11 +635,10 @@ public class ProjectServiceImpl implements ProjectService {
     public List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<TaskRevision> q = entityManager
-                    .createQuery("select t from TaskRevision t left join fetch t.task where " +
-                                    "t.task.id = :taskID" +
-                                    "group by t.task " +
-                                    "having max(t.revisionDate)"
-                            , TaskRevision.class);
+                    .createQuery("select t from TaskRevision t left join fetch t.task where "
+                                    + "t.task.id = :taskID"
+                                    + "group by t.task "
+                                    + "having max(t.revisionDate)", TaskRevision.class);
             q.setParameter("taskID", taskID);
             return q.getResultList();
         });
@@ -636,11 +653,10 @@ public class ProjectServiceImpl implements ProjectService {
 
 
             TypedQuery<Task> q = entityManager
-                    .createQuery("select distinct t from Task t left join fetch t.imputations where " +
-                                    "t.endDate >= :ds " +
-                                    "and t.startDate <= :de " +
-                                    "and t.assigned = :actor "
-                            , Task.class);
+                    .createQuery("select distinct t from Task t left join fetch t.imputations where "
+                                    + "t.endDate >= :ds "
+                                    + "and t.startDate <= :de "
+                                    + "and t.assigned = :actor ", Task.class);
             q.setParameter("ds", ds);
             q.setParameter("de", de);
             q.setParameter("actor", actor);
@@ -669,10 +685,9 @@ public class ProjectServiceImpl implements ProjectService {
        return this.jpa.txExpr(entityManager -> {
 
             TypedQuery<DefaultTask> q = entityManager
-                    .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where " +
-                                    "t.endDate >= :ds " +
-                                    "and t.startDate <= :de "
-                            , DefaultTask.class);
+                    .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
+                                    + "t.endDate >= :ds "
+                                    + "and t.startDate <= :de ", DefaultTask.class);
             q.setParameter("ds", ds);
             q.setParameter("de", de);
             List<DefaultTask> tasks = q.getResultList();
@@ -707,7 +722,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (exp != null) {
             throw exp;
         }
-        this.logService.log(LogService.LOG_INFO, "Task " + taskID + " deleted by "+actor.getName());
+        this.logService.log(LogService.LOG_INFO, "Task " + taskID + " deleted by " + actor.getName());
 
     }
 
@@ -721,9 +736,9 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
-                    "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue " +
-                    "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select "
+                    + "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue "
+                    + "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
             query.setParameter("taskId", task.getId());
             query.setParameter("startTaskDate", startTaskDate);
             query.setParameter("endTaskDate", endTaskDate);
@@ -746,14 +761,14 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select " +
-            "tr.revisionDate as date, tr.effortLeft as effortLeft  " +
-            "from TaskRevision tr " +
-            "where tr.task_id = :taskId and tr.id IN ( " +
-                    "SELECT MAX(trBis.id) " +
-                    "FROM TaskRevision trBis " +
-                    "GROUP BY trBis.task_id, DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")" +
-             ");");
+            TypedQuery<Object[]> query = (TypedQuery<Object[]>) entityManager.createNativeQuery("select "
+            + "tr.revisionDate as date, tr.effortLeft as effortLeft  "
+            + "from TaskRevision tr "
+            + "where tr.task_id = :taskId and tr.id IN ( "
+                    + "SELECT MAX(trBis.id) "
+                    + "FROM TaskRevision trBis "
+                    + "GROUP BY trBis.task_id, DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")"
+             + ");");
 
             query.setParameter("taskId", task.getId());
 
@@ -773,7 +788,7 @@ public class ProjectServiceImpl implements ProjectService {
                 this.logService.log(LogService.LOG_INFO, "Default task " + task.getName() + " is created.");
                 return task;
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BusinessException(e);
         }
     }
@@ -803,14 +818,15 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return this.jpa.txExpr(entityManager -> {
-            Map<String, Task> map = new HashMap<>();
-            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project " +
-                    "and t.origin = :origin " +
-                    "and t.remotePath = :remotePath ", Task.class);
+            TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project "
+                    + "and t.origin = :origin "
+                    + "and t.remotePath = :remotePath ", Task.class);
             q.setParameter("project", project);
             q.setParameter("origin", origin);
             q.setParameter("remotePath", remotePath);
-            q.getResultList().forEach( task -> {
+
+            Map<String, Task> map = new HashMap<>();
+            q.getResultList().forEach(task -> {
                 map.put(task.getRemoteId(), task);
             });
             return map;
@@ -916,7 +932,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (exp != null) {
             throw exp;
         }
-        this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by "+actor.getName());
+        this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by " + actor.getName());
     }
 
     @Override

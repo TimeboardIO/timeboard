@@ -26,12 +26,12 @@ package timeboard.core.internal.events;
  * #L%
  */
 
+import java.util.Date;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
 
-import java.util.Date;
 
 public class TaskEvent extends TimeboardEvent {
     private Task task;
@@ -74,8 +74,7 @@ public class TaskEvent extends TimeboardEvent {
 
 
 
-    private void constructUsersList(){
-
+    private void constructUsersList() {
         Project project = task.getProject();
         User assignedUser = task.getAssigned();
 
@@ -84,7 +83,9 @@ public class TaskEvent extends TimeboardEvent {
                 .filter(member -> member.getRole() == ProjectRole.OWNER)
                 .forEach(member -> this.usersToNotify.add(member.getMember()));
 
-        if(assignedUser != null ) usersToInform.add(assignedUser);
+        if (assignedUser != null) {
+            usersToInform.add(assignedUser);
+        }
         usersToInform.add(actor);
 
     }

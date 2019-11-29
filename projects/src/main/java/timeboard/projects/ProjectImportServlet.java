@@ -27,6 +27,17 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
@@ -36,18 +47,6 @@ import timeboard.core.model.*;
 
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Component(
         service = Servlet.class,
@@ -82,7 +81,7 @@ public class ProjectImportServlet extends TimeboardServlet {
     @Override
     protected void handlePost(User actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         requestDispatcher.forward(req, resp);
     }
 
@@ -100,12 +99,12 @@ public class ProjectImportServlet extends TimeboardServlet {
                 .filter(projectImportService -> projectImportService.getServiceName().equals(type))
                 .findFirst();
 
-        if(optionalService.isPresent()){
+        if (optionalService.isPresent()) {
             final ProjectImportService importPlugin = optionalService.get();
             try {
                 ProjectImportBackgroundTasks
                         .getInstance()
-                        .importInBackground(actor, ()->{
+                        .importInBackground(actor, () -> {
                             try {
                                 final Project project = projectService.getProjectByID(actor, projectID);
 
@@ -130,28 +129,29 @@ public class ProjectImportServlet extends TimeboardServlet {
                                 }
 
 
-                                newTasks.forEach(task ->
-                                        {
-                                            String taskName = task.getTitle();
-                                            if(taskName.length()>=100){
-                                                taskName = taskName.substring(0, 99);
-                                            }
-                                            String taskComment = task.getComments();
-                                            Date startDate = task.getStartDate();
-                                            Date endDate = task.getStopDate();
-                                            double OE = 0;
-                                            Long taskTypeID = null;
-                                            User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
-                                            String origin = task.getOrigin();
-                                            String remotePath = null;
-                                            Long remoteId = task.getID();
-                                            Milestone milestone = null;
-                                            projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, String.valueOf(remoteId), milestone);
+                                newTasks.forEach(task -> {
+                                        String taskName = task.getTitle();
+                                        if (taskName.length() >= 100) {
+                                            taskName = taskName.substring(0, 99);
                                         }
+                                        String taskComment = task.getComments();
+                                        Date startDate = task.getStartDate();
+                                        Date endDate = task.getStopDate();
+                                        double originaEstimate = 0;
+                                        Long taskTypeID = null;
+                                        User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
+                                        String origin = task.getOrigin();
+                                        String remotePath = null;
+                                        Long remoteId = task.getId();
+                                        Milestone milestone = null;
+                                        projectService.createTask(actor, project, taskName, taskComment,
+                                                startDate, endDate, originaEstimate, taskTypeID, assignedUserID, origin,
+                                                remotePath, String.valueOf(remoteId), milestone);
+                                    }
                                 );
 
                                 for (ProjectImportService.RemoteTask remoteTask : updatedTasks) {
-                                    Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getID());
+                                    Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getId());
                                     taskToUpdate.setName(remoteTask.getTitle());
                                     projectService.updateTask(actor, taskToUpdate);
                                 }
@@ -166,11 +166,11 @@ public class ProjectImportServlet extends TimeboardServlet {
             }
 
 
-        }else{
-            importResponse.getErrors().add(new BusinessException("Missing "+type+" Service"));
+        } else {
+            importResponse.getErrors().add(new BusinessException("Missing " + type + " Service"));
         }
 
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID="+projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         req.setAttribute("errors", importResponse.getErrors());
         req.setAttribute("importSuccess", message);
         requestDispatcher.forward(req, resp);
@@ -182,14 +182,14 @@ public class ProjectImportServlet extends TimeboardServlet {
         return !this.isNewTask(actor, projectID, task);
     }
 
-    private boolean isNewTask(User actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException{
-        AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getID());
+    private boolean isNewTask(User actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
+        AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getId());
         return existingTask == null;
     }
 
     private void mergeAssignee(UserService userService, String externalID, ProjectImportService.RemoteTask task) {
         final User remoteUser = userService.findUserByExternalID(externalID, task.getUserName());
-        if(remoteUser != null){
+        if (remoteUser != null) {
             task.setLocalUserID(remoteUser.getId());
         }
     }

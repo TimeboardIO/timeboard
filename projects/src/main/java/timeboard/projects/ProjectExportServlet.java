@@ -26,6 +26,15 @@ package timeboard.projects;
  * #L%
  */
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
@@ -36,15 +45,6 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
 
 @Component(
         service = Servlet.class,
@@ -85,12 +85,12 @@ public class ProjectExportServlet  extends TimeboardServlet {
                 .filter(projectExportService -> projectExportService.isCandidate(type))
                 .findFirst();
 
-        if(optionalService.isPresent()){
-            try(ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+        if (optionalService.isPresent()) {
+            try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
                 optionalService.get().export(actor, project.getId(), buf);
                 resp.setContentLengthLong(buf.toByteArray().length);
                 resp.setHeader("Expires:", "0");
-                resp.setHeader("Content-Disposition", "attachment; filename="+project.getName()+"."+optionalService.get().getExtension());
+                resp.setHeader("Content-Disposition", "attachment; filename=" + project.getName() + "." + optionalService.get().getExtension());
                 resp.setContentType(optionalService.get().getMimeType());
 
                 resp.getOutputStream().write(buf.toByteArray());
@@ -98,7 +98,7 @@ public class ProjectExportServlet  extends TimeboardServlet {
 
                 resp.setStatus(201);
             }
-        }else{
+        } else {
             resp.setStatus(404);
         }
     }

@@ -27,6 +27,9 @@ package timeboard.core.observers.emails;
  */
 
 import io.reactivex.schedulers.Schedulers;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.Executors;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -34,9 +37,6 @@ import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.model.User;
 
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.Executors;
 
 
 @Component(
@@ -50,12 +50,12 @@ public class SendNewPasswordEmail {
     EmailService emailService;
 
     @Activate
-    public void activate(){
+    public void activate() {
 
         TimeboardSubjects.GENERATE_PASSWORD
-                .map(userPasswordMap -> sendEmailNewPassword(userPasswordMap) )
+                .map(userPasswordMap -> sendEmailNewPassword(userPasswordMap))
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
-                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));
+                .subscribe(emailStructure -> this.emailService.sendMessage(emailStructure));
     }
 
     public EmailStructure sendEmailNewPassword(Map<User, String> userPasswordMap) {
@@ -71,7 +71,7 @@ public class SendNewPasswordEmail {
         return new EmailStructure(to, cc, subject, message);
     }
 
-    private String getDisplayFormatDate(Date date){
+    private String getDisplayFormatDate(Date date) {
         return  new SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 

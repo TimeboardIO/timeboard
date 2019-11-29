@@ -33,7 +33,7 @@ public class EffortHistory {
     private Date date;
     private Double value;
 
-    public EffortHistory(Date date, Double value){
+    public EffortHistory(Date date, Double value) {
         this.date = date;
         this.value = value;
     }
