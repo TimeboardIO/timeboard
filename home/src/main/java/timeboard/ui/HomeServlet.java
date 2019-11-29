@@ -99,7 +99,7 @@ public class HomeServlet extends TimeboardServlet {
                 Date firstDayOfWeek = calendar.getTime();
                 calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
                 Date lastDayOfWeek = calendar.getTime();
-                double weekSum = this.projectService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, (User)request.getSession().getAttribute("user"));
+                double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, user);
 
                 Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsValidated);
                 weeks.add(week);
