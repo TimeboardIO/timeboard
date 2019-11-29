@@ -29,11 +29,9 @@ package timeboard.projects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
-import timeboard.core.model.Task;
-import timeboard.core.model.TaskStatus;
-import timeboard.core.model.User;
+import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -74,6 +72,9 @@ public class TasksRestAPI {
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
     private ProjectService projectService;
+
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    private UserService userService;
 
     @GET
     @Path("/")
@@ -138,19 +139,19 @@ public class TasksRestAPI {
 
     private String changeTaskStatus(User actor, HttpServletRequest request,  TaskStatus status) throws Exception{
         final String taskIdStr = request.getParameter("task");
-        Long taskId = null;
+        Long taskID = null;
         if(taskIdStr != null) {
-            taskId = Long.parseLong(taskIdStr);
+            taskID = Long.parseLong(taskIdStr);
         }else{
             throw new Exception("Missing argument taskId.");
         }
-        if(taskId == null) {
+        if(taskID == null) {
             throw new Exception("Invalid argument taskId.");
         }
 
         Task task;
         try{
-            task = (Task) this.projectService.getTaskByID(actor, taskId);
+            task = (Task) this.projectService.getTaskByID(actor, taskID);
             task.setTaskStatus(status);
             this.projectService.updateTask(actor, task);
         } catch (ClassCastException e){
@@ -161,6 +162,33 @@ public class TasksRestAPI {
         return MAPPER.writeValueAsString("DONE");
     }
 
+    @GET
+    @Path("/delete")
+    public String deleteTask(@Context HttpServletRequest request) throws Exception {
+        User actor = (User) req.getAttribute("actor");
+
+
+        final String taskIdStr = request.getParameter("task");
+        Long taskID = null;
+        if(taskIdStr != null) {
+            taskID = Long.parseLong(taskIdStr);
+        }else{
+            throw new Exception("Missing argument taskId.");
+        }
+        if(taskID == null) {
+            throw new Exception("Invalid argument taskId.");
+        }
+
+        try {
+            projectService.deleteTaskByID(actor, taskID);
+        } catch (Exception e){
+            throw new Exception( e.getMessage());
+        }
+
+        return MAPPER.writeValueAsString("DONE");
+    }
+
+
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -169,10 +197,9 @@ public class TasksRestAPI {
         User actor = (User) req.getAttribute("actor");
         Date startDate = null;
         Date endDate = null;
-/*
         try{
-            startDate = DATE_FORMAT.parse(request.getParameter("startDate"));
-            endDate = DATE_FORMAT.parse(request.getParameter("endDate"));
+            startDate = DATE_FORMAT.parse(taskWrapper.startDate);
+            endDate = DATE_FORMAT.parse(taskWrapper.endDate);
 
         }catch(Exception e) {
             throw new Exception("Incorrect date format");
@@ -182,45 +209,58 @@ public class TasksRestAPI {
             throw new Exception("Start date must be before end date ");
         }
 
-        String name = request.getParameter("taskName");
-        String comment = request.getParameter("taskComments");
+        String name = taskWrapper.taskName;
+        String comment = taskWrapper.taskComments;
         if(comment == null) comment = "";
 
-        double oe = Double.parseDouble(request.getParameter("originalEstimate"));
+        double oe = taskWrapper.originalEstimate;
         if(oe <= 0.0){
             throw new Exception( "Original original estimate must be positive ");
         }
 
-        Long projectID = Long.parseLong(request.getParameter("projectID"));
+        Long projectID = taskWrapper.projectID;
         Project project = null;
         try {
             project = this.projectService.getProjectByID(actor, projectID);
-        } catch (BusinessException e) {
+        } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
 
-        String type = request.getParameter("typeID");
-        Long typeID = Long.parseLong(type);
+        Task task = null;
+        Long typeID = taskWrapper.typeID;
 
-        Long taskID = Long.parseLong(request.getParameter("taskID"));
+        Long taskID =taskWrapper.taskID;
         if(!(taskID != null && taskID == 0 )){
-            try {
-                projectService.deleteTaskByID(actor, taskID);
-            } catch (Exception e){
-                throw new Exception( e.getMessage());
+            try{
+                task = (Task) projectService.getTaskByID(actor, taskID);
+
+                User assignee = userService.findUserByID(taskWrapper.assigneeID);
+                final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
+                task.setName(taskWrapper.getTaskName());
+                task.setComments(taskWrapper.getTaskComments());
+                task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
+                task.setStartDate(DATE_FORMAT.parse(taskWrapper.getStartDate()));
+                task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
+                task.setAssigned(assignee);
+                task.setTaskType(taskType);
+                task.setTaskStatus(TaskStatus.valueOf(taskWrapper.getStatus()));
+
+                projectService.updateTask(actor,task);
+            }catch (Exception e){
+                throw new Exception("Error in task creation please verify your inputs and retry");
+            }
+        }else{
+            try{
+                task = projectService.createTask(actor, project,
+                        name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
+            }catch (Exception e){
+                throw new Exception("Error in task creation please verify your inputs and retry");
             }
         }
-        try{
-            projectService.createTask(actor, project,
-                    name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
-        }catch (Exception e){
-            throw new Exception("Error in task creation please verify your inputs and retry");
-        }
-*/
-        return MAPPER.writeValueAsString("DONE");
+
+        return MAPPER.writeValueAsString(taskWrapper);
 
     }
-
 
 
     public static class TaskWrapper implements Serializable {
@@ -228,8 +268,8 @@ public class TasksRestAPI {
         public String taskName;
         public String taskComments;
         public double originalEstimate;
-        public Date startDate;
-        public Date endDate;
+        public String startDate;
+        public String endDate;
         public String assignee;
         public Long assigneeID;
         public String status;
@@ -243,8 +283,8 @@ public class TasksRestAPI {
             this.taskName = taskName;
             this.taskComments = taskComments;
             this.originalEstimate = originalEstimate;
-            this.startDate = startDate;
-            this.endDate = endDate;
+            this.startDate = DATE_FORMAT.format(startDate);
+            this.endDate = DATE_FORMAT.format(endDate);
             this.assignee = assignee;
             this.assigneeID = assigneeID;
             this.status = status;
@@ -283,20 +323,8 @@ public class TasksRestAPI {
             this.originalEstimate = originalEstimate;
         }
 
-        public Date getStartDate() {
+        public String getStartDate() {
             return startDate;
-        }
-
-        public void setStartDate(Date startDate) {
-            this.startDate = startDate;
-        }
-
-        public Date getEndDate() {
-            return endDate;
-        }
-
-        public void setEndDate(Date endDate) {
-            this.endDate = endDate;
         }
 
         public String getAssignee() {
@@ -337,6 +365,10 @@ public class TasksRestAPI {
 
         public void setProjectID(Long projectID) {
             this.projectID = projectID;
+        }
+
+        public String getEndDate() {
+           return this.endDate;
         }
     }
 }

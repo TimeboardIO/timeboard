@@ -42,7 +42,7 @@
             <tr v-for="entry in filteredTasks">
                 <td  style="text-align:center;" v-for="key in columns">{{entry[key]}}</td>
                 <td>
-                    <button class="ui negative icon button">
+                    <button @click="deleteTask($event, entry)" class="ui negative icon button">
                         <i class="close icon"></i>
                     </button>
                     <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui primary icon button">

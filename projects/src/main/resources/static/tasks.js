@@ -1,3 +1,5 @@
+const currentProjectID = $("meta[property='tasks']").attr('project');
+
 Vue.component('task-list', {
    template: '#task-list-template',
    props: {
@@ -51,6 +53,15 @@ Vue.component('task-list', {
      },
      showCreateTaskModal: function(projectID, task, event){
         this.$parent.showCreateTaskModal(projectID, task, event);
+     },
+     deleteTask: function(event, task){
+        keepThis = this;
+        event.target.classList.toggle('loading');
+        $.get("/api/tasks/delete?task="+task.taskID)
+         .then(function(data){
+             keepThis.tasks.splice( keepThis.tasks.indexOf(task), 1 );
+             event.target.classList.toggle('loading');
+         });
      }
    }
  });
@@ -121,7 +132,7 @@ Vue.component('task-list', {
          $.get("/api/tasks/deny?task="+task.taskID)
             .then(function(data){
                 task.status = 'REFUSED';
-                 event.target.classList.toggle('loading');
+                event.target.classList.toggle('loading');
             });
       }
     }
@@ -168,7 +179,7 @@ Vue.component('task-modal', {
     };
 
  const emptyTask =  {
-        taskID: 0, projectID: 0, taskName: "", taskComments: "",
+        taskID: 0, projectID: currentProjectID, taskName: "", taskComments: "",
         startDate:"", endDate:"",
         originalEstimate: 0, typeID: 0,
         assignee : "", assigneeID:0
@@ -202,32 +213,37 @@ var app = new Vue({
                  this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
                  this.newTask.assignee = task.assignee;
+                 this.newTask.status = task.status;
+                 this.newTask.projectID = currentProjectID;
             }else{
                  this.modalTitle = "Create task";
                  Object.assign(this.newTask , emptyTask);
             }
+            keepThis = this;
             $('.create-task.modal').modal({
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     var object = {};
                     if(validated){
-
                         $.ajax({
                             method: "POST",
                             url: "/api/tasks",
                             data: JSON.stringify(app.newTask),
                             contentType: "application/json",
-                            dataType: "json"
-                          }).then(function(data) {
-                              if(data == "DONE"){
-                                 updateTimesheet();
-                                 $('.create-task .ui.form').form('reset');
-                                 $('.create-task.modal').modal('hide');
-                              }else{
-                                $('.ui.error.message').text(data);
+                            dataType: "json",
+                            success : function(data, textStatus, jqXHR) {
+                                keepThis.gridData = keepThis.gridData.filter(function(el){
+                                    return el.taskID != data.taskID;
+                                });
+                                keepThis.gridData.push(data);
+                                $('.create-task .ui.form').form('reset');
+                                $('.create-task.modal').modal('hide');
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                $('.ui.error.message').text(textStatus);
                                 $('.ui.error.message').show();
-                              }
-                          });
+                            }
+                        });
                     }
                     return false;
                 },
@@ -237,10 +253,10 @@ var app = new Vue({
     }
 });
 
-$(document).ready(function(){
-    const project = $("meta[property='tasks']").attr('project');
 
-    $.get("/api/tasks?project="+project)
+$(document).ready(function(){
+
+    $.get("/api/tasks?project="+currentProjectID)
     .then(function(data){
          app.gridData = data;
          $('.ui.dimmer').removeClass('active');
@@ -252,7 +268,7 @@ $(document).ready(function(){
      $('.ui.search')
         .search({
             apiSettings: {
-                    url: '/search?q={query}&projectID='+project+''
+                    url: '/search?q={query}&projectID='+currentProjectID+''
                 },
                 fields: {
                     results : 'items',
