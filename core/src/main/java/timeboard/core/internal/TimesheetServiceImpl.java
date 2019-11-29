@@ -26,6 +26,10 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import javax.persistence.TypedQuery;
 import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -40,10 +44,6 @@ import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 
-import javax.persistence.TypedQuery;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 @Component(
         service = TimesheetService.class
@@ -87,7 +87,9 @@ public class TimesheetServiceImpl implements TimesheetService {
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         boolean lastWeekValidated = this.isTimesheetValidated(userTimesheet, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
-        if(!lastWeekValidated) throw new TimesheetException("Can not validate this week, previous week is not validated");
+        if (!lastWeekValidated) {
+            throw new TimesheetException("Can not validate this week, previous week is not validated");
+        }
 
 
         //2 - all imputation day sum == 1
@@ -102,7 +104,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             c.setFirstDayOfWeek(Calendar.MONDAY);
             c.set(Calendar.DAY_OF_WEEK, 2);
 
-            for(int i=1; i<=5; i++) {
+            for (int i = 1; i <= 5; i++) {
 
                 TypedQuery<Double> q = entityManager.createQuery("select sum(value) from Imputation i where i.user = :user and i.day = :day ", Double.class);
                 q.setParameter("user", userTimesheet);
@@ -114,7 +116,9 @@ public class TimesheetServiceImpl implements TimesheetService {
             return result;
 
         });
-        if(!allDailyImputationTotalsAreOne) throw new TimesheetException("Can not validate this week, all daily imputations totals are not equals to 1");
+        if (!allDailyImputationTotalsAreOne) {
+            throw new TimesheetException("Can not validate this week, all daily imputations totals are not equals to 1");
+        }
 
         ValidatedTimesheet validatedTimesheet = new ValidatedTimesheet();
         validatedTimesheet.setValidatedBy(actor);
@@ -128,14 +132,15 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService));
 
-        this.logService.log(LogService.LOG_INFO, "Week " + week + " validated for user" + userTimesheet.getName()+" by user "+actor.getName());
+        this.logService.log(LogService.LOG_INFO, "Week " + week + " validated for user" + userTimesheet.getName() + " by user " + actor.getName());
 
     }
 
     @Override
     public boolean isTimesheetValidated(User userTimesheet, int year, int week) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<ValidatedTimesheet> q = entityManager.createQuery("select vt from ValidatedTimesheet vt where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
+            TypedQuery<ValidatedTimesheet> q = entityManager.createQuery("select vt from ValidatedTimesheet vt "
+                    + "where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
             q.setParameter("week", week);
             q.setParameter("year", year);
             q.setParameter("user", userTimesheet);
@@ -153,12 +158,11 @@ public class TimesheetServiceImpl implements TimesheetService {
     public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Double> q = entityManager.createQuery(
-                    "SELECT COALESCE(sum(i.value),0) \n" +
-                            "FROM Imputation i\n" +
-                            "WHERE i.user = :user \n" +
-                            "AND i.day > :firstDayOfWeek\n" +
-                            "AND i.day < :lastDayOfWeek"
-                    , Double.class);
+                    "SELECT COALESCE(sum(i.value),0) \n"
+                            + "FROM Imputation i\n"
+                            + "WHERE i.user = :user \n"
+                            + "AND i.day > :firstDayOfWeek\n"
+                            + "AND i.day < :lastDayOfWeek", Double.class);
             q.setParameter("firstDayOfWeek", firstDayOfWeek);
             q.setParameter("lastDayOfWeek", lastDayOfWeek);
             q.setParameter("user", user);

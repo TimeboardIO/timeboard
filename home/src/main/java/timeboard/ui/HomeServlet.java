@@ -26,6 +26,15 @@ package timeboard.ui;
  * #L%
  */
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
@@ -33,16 +42,6 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.ui.model.Week;
-
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 
 @Component(
@@ -91,7 +90,7 @@ public class HomeServlet extends TimeboardServlet {
         List<Week> weeks = new ArrayList<>();
         User user = actor;
         int weeksToDisplay = 3; // actual week and the two previous ones
-        if(this.timesheetService != null) {
+        if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
                 boolean weekIsValidated = timesheetService.isTimesheetValidated(user, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 

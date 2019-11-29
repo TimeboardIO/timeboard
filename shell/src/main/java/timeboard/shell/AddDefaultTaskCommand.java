@@ -26,6 +26,8 @@ package timeboard.shell;
  * #L%
  */
 
+import java.util.Calendar;
+import java.util.Date;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -35,9 +37,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.DefaultTask;
-
-import java.util.Calendar;
-import java.util.Date;
 
 @Service
 @Command(scope = "timeboard", name = "add-default-task", description = "Create a new default task")
@@ -65,21 +64,21 @@ public class AddDefaultTaskCommand implements Action {
 
         DefaultTask task = new DefaultTask();
         task.setName(name);
-        if(comment != null) {
+        if (comment != null) {
             task.setComments(comment);
-        } else{
+        } else {
             task.setComments(name);
         }
-        if(startDate != null) {
+        if (startDate != null) {
             task.setStartDate(startDate);
-        } else{
+        } else {
             Calendar c = Calendar.getInstance();
             c.set(1,Calendar.JANUARY,1);
             task.setStartDate(c.getTime());
         }
-        if(endDate != null) {
+        if (endDate != null) {
             task.setEndDate(endDate);
-        } else{
+        } else {
             Calendar c = Calendar.getInstance();
             c.set(9999,Calendar.DECEMBER,31);
             task.setEndDate(c.getTime());

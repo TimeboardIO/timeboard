@@ -26,11 +26,9 @@ package timeboard.account;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
-
 import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
-
+import org.osgi.service.component.annotations.Component;
 
 @Component(
         service = Servlet.class,

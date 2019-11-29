@@ -26,12 +26,10 @@ package timeboard.core.model;
  * #L%
  */
 
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.persistence.*;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
@@ -129,7 +127,7 @@ public class Task extends AbstractTask implements Serializable {
 
 
     /**
-     * Real Effort = EffortSpent + EffortLeft
+     * Real Effort = EffortSpent + EffortLeft.
      *
      * @return Real Effort
      */
@@ -139,7 +137,7 @@ public class Task extends AbstractTask implements Serializable {
     }
 
     /**
-     * Effort Spent
+     * Effort Spent.
      *
      * @return Effort Spent
      */

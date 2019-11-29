@@ -27,6 +27,14 @@ package timeboard.timesheet;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -36,17 +44,8 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
-
 import timeboard.core.ui.TimeboardServlet;
 
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 @Component(
         service = Servlet.class,
@@ -78,26 +77,28 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
         Date endDate = null;
         response.setContentType("application/json");
 
-        try{
+        try {
             startDate = DATE_FORMAT.parse(request.getParameter("startDate"));
             endDate = DATE_FORMAT.parse(request.getParameter("endDate"));
 
-        }catch(ParseException e) {
+        } catch (ParseException e) {
             MAPPER.writeValue(response.getWriter(), "Incorrect date format");
             return;
         }
 
-        if(startDate.getTime()>endDate.getTime()){
+        if (startDate.getTime() > endDate.getTime()) {
             MAPPER.writeValue(response.getWriter(), "Start date must be before end date ");
             return;
         }
 
         String name = request.getParameter("taskName");
         String comment = request.getParameter("taskComments");
-        if(comment == null) comment = "";
+        if (comment == null) {
+            comment = "";
+        }
 
         double oe = Double.parseDouble(request.getParameter("originalEstimate"));
-        if(oe <= 0.0){
+        if (oe <= 0.0) {
             MAPPER.writeValue(response.getWriter(), "Original original estimate must be positive ");
             return;
         }
@@ -116,18 +117,18 @@ public class TimesheetTaskCreationRESTApi extends TimeboardServlet {
         Long typeID = Long.parseLong(type);
 
         Long taskID = Long.parseLong(request.getParameter("taskID"));
-        if(!(taskID != null && taskID == 0 )){
+        if (!(taskID != null && taskID == 0)) {
             try {
                 projectService.deleteTaskByID(getActorFromRequestAttributes(request), taskID);
-            } catch (Exception e){
+            } catch (Exception e) {
                 MAPPER.writeValue(response.getWriter(), e.getMessage());
                 return;
             }
         }
-        try{
+        try {
             projectService.createTask(getActorFromRequestAttributes(request), project,
-                    name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
-        }catch (Exception e){
+                    name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null);
+        } catch (Exception e) {
             MAPPER.writeValue(response.getWriter(), "Error in task creation please verify your inputs and retry");
             return;
         }

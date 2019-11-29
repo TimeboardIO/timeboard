@@ -26,6 +26,8 @@ package timeboard.shell;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.karaf.shell.api.action.Action;
 import org.apache.karaf.shell.api.action.Command;
 import org.apache.karaf.shell.api.action.Option;
@@ -40,16 +42,12 @@ import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @Command(scope = "timeboard", name = "import-ics", description = "Create new user account")
 public class ImportCalendarCommand implements Action {
 
     @Option(name = "-f", aliases = {"--file"}, description = "ICS file path", required = true, multiValued = false)
     String file;
-
 
     @Option(name = "-a", aliases = {"--actor"}, description = "user actor email", required = true, multiValued = false)
     String actorEmail;
@@ -75,11 +73,10 @@ public class ImportCalendarCommand implements Action {
     @Option(name = "-do", aliases = {"--delete-orphan"}, description = "Delete orphan", required = false, multiValued = false)
     boolean deleteOrphan;
 
-
     @Override
     public Object execute() throws Exception {
 
-        if(!(taskArg != null || projectArg != null)){
+        if (!(taskArg != null || projectArg != null)) {
             throw new Exception("You must specify either project -p or default task");
         }
 
@@ -94,27 +91,31 @@ public class ImportCalendarCommand implements Action {
         ServiceReference<ProjectService> projectServiceRef = bnd.getServiceReference(ProjectService.class);
         ProjectService projectService =  bnd.getService(projectServiceRef);
 
-        if(name == null){
+        if (name == null) {
             // user filename as name
             this.name = file;
         }
 
         User actor = userService.findUserByEmail(actorEmail); //TODO dirty
-        if(taskArg != null){
+        if (taskArg != null) {
             //treat as imputation
 
-            if(!allUsers && (usernames == null || usernames.isEmpty())) throw new Exception("You must specify a user list or use option -all to apply imputations to all users");
-            if(imputationValue == null ) imputationValue = "1.0";
+            if (!allUsers && (usernames == null || usernames.isEmpty())) {
+                throw new Exception("You must specify a user list or use option -all to apply imputations to all users");
+            }
+            if (imputationValue == null) {
+                imputationValue = "1.0";
+            }
             final List<AbstractTask> tasksByName = projectService.getTasksByName(actor, taskArg);
-            final List<User> userList= new ArrayList<>();
-            for(String username : usernames){
+            final List<User> userList = new ArrayList<>();
+            for (String username : usernames) {
                 userList.add(userService.findUserByEmail(username));
             }
-            calendarService.importCalendarAsImputationsFromICS(actor, file, tasksByName.get(0), userList, Double.parseDouble(imputationValue));
-        }else{
+            calendarService.importCalendarAsImputationsFromIcs(actor, file, tasksByName.get(0), userList, Double.parseDouble(imputationValue));
+        } else {
 
             final Project project = projectService.getProjectByName(actor, projectArg);
-            calendarService.importCalendarAsTasksFromICS(actor, name, file, project, deleteOrphan);
+            calendarService.importCalendarAsTasksFromIcs(actor, name, file, project, deleteOrphan);
 
         }
 

@@ -26,10 +26,9 @@ package timeboard.core.ui;
  * #L%
  */
 
-import org.osgi.service.component.annotations.*;
-
 import java.util.Comparator;
 import java.util.List;
+import org.osgi.service.component.annotations.*;
 
 @Component(
         service = NavigationEntryRegistryService.class,

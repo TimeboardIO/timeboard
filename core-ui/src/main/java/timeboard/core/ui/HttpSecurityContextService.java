@@ -26,18 +26,18 @@ package timeboard.core.ui;
  * #L%
  */
 
+import java.util.Arrays;
+import java.util.Optional;
+import java.util.UUID;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
-import timeboard.core.model.User;
 import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
 
 
 @Component(
@@ -56,7 +56,7 @@ public class HttpSecurityContextService {
     public  UUID  getCurrentSessionID(HttpServletRequest req) {
         UUID u = null;
 
-        if(req.getCookies() != null) {
+        if (req.getCookies() != null) {
             Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
 
             if (sessionCookie.isPresent()) {
@@ -69,7 +69,7 @@ public class HttpSecurityContextService {
     public  User getCurrentUser(HttpServletRequest req) {
         User u = null;
 
-        if(req.getCookies() != null) {
+        if (req.getCookies() != null) {
             Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
 
             if (sessionCookie.isPresent()) {
@@ -78,7 +78,7 @@ public class HttpSecurityContextService {
 
                 if (userSession.isPresent()) {
                     u = (User) userSession.get().getPayload().get("user");
-                }else{
+                } else {
                     this.logService.log(LogService.LOG_INFO, String.format("No session for cookie %s in keystore %s", uuid.toString(), this.sessionStore));
                 }
             }

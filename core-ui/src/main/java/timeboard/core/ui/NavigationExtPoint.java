@@ -32,11 +32,11 @@ public interface NavigationExtPoint {
 
     public String getNavigationPath();
 
-    public default int getNavigationWeight(){
+    public default int getNavigationWeight() {
         return 0;
     }
 
-    public default String getNavigationLogo(){
+    public default String getNavigationLogo() {
         return "hourglass";
     }
 

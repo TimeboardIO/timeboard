@@ -26,6 +26,11 @@ package timeboard.core.observers.emails;
  * #L%
  */
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -34,12 +39,6 @@ import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 
 @Component(
@@ -76,16 +75,16 @@ public class SendTaskEmail {
         String subject = "Mail de création d'une tâche";
         String message = "Bonjour,\n"
                 + creator.getFirstName() + " " + creator.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
-                +"Nom de la tâche : " + newTaskDB.getName() + "\n"
-                +"Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
-                +"Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "\n"
-                +"Estimation initiale : " + newTaskDB.getOriginalEstimate() + "\n"
-                +"Projet : " + project.getName() + "\n";
+                + "Nom de la tâche : " + newTaskDB.getName() + "\n"
+                + "Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
+                + "Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "\n"
+                + "Estimation initiale : " + newTaskDB.getOriginalEstimate() + "\n"
+                + "Projet : " + project.getName() + "\n";
 
         return new EmailStructure(to, cc, subject, message);
     }
 
-    private String getDisplayFormatDate(Date date){
+    private String getDisplayFormatDate(Date date) {
         return  new SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 

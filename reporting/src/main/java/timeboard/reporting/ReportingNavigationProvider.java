@@ -1,8 +1,8 @@
-package timeboard.core.internal.rules;
+package timeboard.reporting;
 
 /*-
  * #%L
- * core
+ * KanbanProjectPlugin
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,26 +26,32 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import java.util.HashSet;
-import java.util.Set;
-import timeboard.core.model.User;
+import org.osgi.service.component.annotations.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-public class RuleSet<T> {
+@Component(
+        service = NavigationExtPoint.class,
+        immediate = true
+)
+public class ReportingNavigationProvider implements NavigationExtPoint {
 
-    private final Set<Rule> rules = new HashSet<>();
-
-    public void addRule(Rule r) {
-        this.rules.add(r);
+    @Override
+    public String getNavigationLabel() {
+        return "Reporting";
     }
 
-    public Set<Rule> evaluate(User actor, T o) {
-        Set<Rule> noSatisfiedRules = new HashSet<>();
-        for (Rule r : this.rules) {
-            if (!r.isSatisfied(actor, o)) {
-                noSatisfiedRules.add(r);
-            }
-        }
-        return noSatisfiedRules;
+    @Override
+    public String getNavigationPath() {
+        return "/reporting";
     }
 
+    @Override
+    public int getNavigationWeight() {
+        return 5000;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "chart pie";
+    }
 }

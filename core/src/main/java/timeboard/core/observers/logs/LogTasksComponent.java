@@ -49,7 +49,10 @@ public class LogTasksComponent {
     @Activate
     private void init() {
         this.disposable = TimeboardSubjects.TASK_EVENTS.subscribe(taskEvent -> {
-            this.logService.log(LogService.LOG_INFO, String.format("User % has %s task %s", taskEvent.getActor().getScreenName(), taskEvent.getEventType(), taskEvent.getTask().getId()));
+            this.logService.log(
+                    LogService.LOG_INFO, String.format("User % has %s task %s",
+                    taskEvent.getActor().getScreenName(), taskEvent.getEventType(), taskEvent.getTask().getId())
+            );
         });
     }
 

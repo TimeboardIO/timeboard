@@ -26,13 +26,13 @@ package timeboard.core.internal.rules.project;
  * #L%
  */
 
+import java.util.Optional;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectMembership;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.User;
 
-import java.util.Optional;
 
 public class ActorIsProjectOwner implements Rule<Project> {
 

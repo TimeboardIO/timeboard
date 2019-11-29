@@ -26,16 +26,15 @@ package timeboard.core.api;
  * #L%
  */
 
+import java.util.Date;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.User;
 
-import java.util.Date;
 
 public interface TimesheetService {
 
     /**
      * Validate user timesheet.
-     *
      * @param actor         user who trigger this function.
      * @param userTimesheet user which be used to build timehseet to validate
      * @param year            timesheet year
@@ -45,6 +44,7 @@ public interface TimesheetService {
     void validateTimesheet(User actor, User userTimesheet, int year, int week) throws TimesheetException;
 
     /**
+     * Is timesheet validated.
      * @param userTimesheet user used to check timesheet validation state.
      * @param week          timesheet week
      * @param year          timesheet year
@@ -54,6 +54,7 @@ public interface TimesheetService {
 
 
     /**
+     * Get the sum of all imputations by week by user.
      * @param firstDayOfWeek first day of week
      * @param lastDayOfWeek last day of week
      * @param user user used to check timesheet validation state.

@@ -29,11 +29,11 @@ package timeboard.core.model;
 
 //import timeboard.apigenerator.annotation.RPCEntity;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.*;
 
 @Entity
 @Table
@@ -167,11 +167,11 @@ public class User implements Serializable {
     }
 
     @Transient
-    public String getScreenName(){
-        if(this.getFirstName() == null || this.getName() == null){
+    public String getScreenName() {
+        if (this.getFirstName() == null || this.getName() == null) {
             return this.getEmail();
         }
-        return this.getFirstName()+" "+this.getName();
+        return this.getFirstName() + " " + this.getName();
     }
 
 

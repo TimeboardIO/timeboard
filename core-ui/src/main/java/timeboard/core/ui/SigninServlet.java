@@ -27,17 +27,6 @@ package timeboard.core.ui;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
-import timeboard.core.api.TimeboardSessionStore;
-
-import javax.servlet.Servlet;
-import javax.servlet.http.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -45,6 +34,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
 import java.util.Map;
+import javax.servlet.Servlet;
+import javax.servlet.http.*;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.User;
 
 @Component(
         service = Servlet.class,
@@ -76,7 +75,7 @@ public class SigninServlet extends HttpServlet {
 
 
     @Activate
-    private void init(Map<String, String> params){
+    private void init(Map<String, String> params) {
         this.tokenURL = params.get("oauth.token.url");
         this.userInfoURL = params.get("oauth.userinfo.url");
         this.clientID = params.get("oauth.clientid");
@@ -88,15 +87,13 @@ public class SigninServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         final HttpClient client = HttpClient.newHttpClient();
 
-
         try {
-            String oauthCode = req.getParameter("code");
-
             StringBuilder params = new StringBuilder();
             params.append("grant_type").append("=").append("authorization_code");
             params.append("&");
             params.append("client_id").append("=").append(clientID);
             params.append("&");
+            String oauthCode = req.getParameter("code");
             params.append("code").append("=").append(oauthCode);
             params.append("&");
             params.append("redirect_uri").append("=").append(this.redirectURI);

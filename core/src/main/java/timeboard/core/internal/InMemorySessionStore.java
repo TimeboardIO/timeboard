@@ -28,19 +28,18 @@ package timeboard.core.internal;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.log.LogService;
-import timeboard.core.model.User;
-import timeboard.core.api.TimeboardSessionStore;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.log.LogService;
+import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
 
 @Component(
         service = TimeboardSessionStore.class,
@@ -51,13 +50,13 @@ public class InMemorySessionStore implements TimeboardSessionStore {
     @Reference
     private LogService logService;
 
-    private final static Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
+    private static final Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
             .maximumSize(5000)
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .build();
 
     @Activate
-    private void init(){
+    private void init() {
         this.logService.log(LogService.LOG_INFO, String.format("Start session store : %s", this.toString()));
     }
 

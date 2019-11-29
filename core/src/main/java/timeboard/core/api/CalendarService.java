@@ -26,19 +26,18 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
 
 public interface CalendarService {
 
-    boolean importCalendarAsTasksFromICS(User actor, String name, String ICS, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException;
+    boolean importCalendarAsTasksFromIcs(User actor, String name, String ics, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException;
 
-    boolean importCalendarAsImputationsFromICS(User actor,String ICS, AbstractTask task, List<User> userList, double value) throws BusinessException, ParseException, IOException ;
+    boolean importCalendarAsImputationsFromIcs(User actor, String ics, AbstractTask task, List<User> userList, double value) throws BusinessException, ParseException, IOException;
 
     Calendar createOrUpdateCalendar(String name, String remoteId);
 

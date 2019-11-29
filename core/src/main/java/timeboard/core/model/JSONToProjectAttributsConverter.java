@@ -28,12 +28,11 @@ package timeboard.core.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 
 @Converter
 public class JSONToProjectAttributsConverter implements AttributeConverter<Map<String, ProjectAttributValue>, String> {
@@ -50,7 +49,8 @@ public class JSONToProjectAttributsConverter implements AttributeConverter<Map<S
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        return res;    }
+        return res;
+    }
 
     @Override
     public Map<String, ProjectAttributValue> convertToEntityAttribute(String s) {
@@ -60,5 +60,6 @@ public class JSONToProjectAttributsConverter implements AttributeConverter<Map<S
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return attrs;    }
+        return attrs;
+    }
 }

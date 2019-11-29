@@ -27,6 +27,13 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -37,17 +44,9 @@ import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
 import timeboard.core.model.User;
-
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Component(
         service = Servlet.class,
@@ -77,15 +76,15 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         response.setContentType("application/json");
 
-        if(action.matches("getPendingTasks")){
+        if (action.matches("getPendingTasks")) {
             this.getPendingTasks(actor, request, response);
         }else if(action.matches("getTasks")){
             this.getTasks(actor, request, response);
         }else if(action.matches("approveTask")){
             this.approveTask(actor, request, response);
-        }else if(action.matches("denyTask")){
+        } else if (action.matches("denyTask")) {
             this.denyTask(actor, request, response);
-        }else{
+        } else {
             MAPPER.writeValue(response.getWriter(), "Unknown action.");
             return;
         }
@@ -102,26 +101,26 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     private void changeTaskStatus(User actor, HttpServletRequest request, HttpServletResponse response, TaskStatus status) throws IOException, BusinessException {
         final String taskIdStr = request.getParameter("taskId");
         Long taskId = null;
-        if(taskIdStr != null) {
+        if (taskIdStr != null) {
             taskId = Long.parseLong(taskIdStr);
-        }else{
+        } else {
             MAPPER.writeValue(response.getWriter(), "Missing argument taskId.");
             return;
         }
-        if(taskId == null) {
+        if (taskId == null) {
             MAPPER.writeValue(response.getWriter(), "Invalid argument taskId.");
             return;
         }
 
         Task task;
-        try{
+        try {
             task = (Task) this.projectService.getTaskByID(actor, taskId);
             task.setTaskStatus(status);
             this.projectService.updateTask(actor, task);
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
             MAPPER.writeValue(response.getWriter(), "Task is not a project task.");
             return;
-        } catch (Exception e){
+        } catch (Exception e) {
             MAPPER.writeValue(response.getWriter(), "Task id not found.");
             return;
         }
@@ -132,14 +131,14 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
-        if(strProjectID != null){
+        if (strProjectID != null) {
             projectID = Long.parseLong(strProjectID);
-        }else{
+        } else {
             MAPPER.writeValue(response.getWriter(), "Incorrect project argument");
             return;
         }
         final Project project = this.projectService.getProjectByID(actor, projectID);
-        if(project == null){
+        if (project == null) {
             MAPPER.writeValue(response.getWriter(), "Project does not exists or you don't have enough permissions to access it.");
             return;
         }
@@ -147,17 +146,17 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         final Map<Long, UserTasksWrapper> result = new HashMap<>();
 
-        for (Task task : tasks){
-            if(task.getTaskStatus() == TaskStatus.PENDING){
+        for (Task task : tasks) {
+            if (task.getTaskStatus() == TaskStatus.PENDING) {
                 User assignee = task.getAssigned();
-                if(assignee == null){
+                if (assignee == null) {
                     assignee = new User();
                     assignee.setId(0);
                     assignee.setName("");
                     assignee.setFirstName("");
                 }
                 final User finalAssignee = assignee;
-                UserTasksWrapper userWrapper = result.computeIfAbsent(assignee.getId(), k-> new UserTasksWrapper(finalAssignee.getFirstName(), finalAssignee.getName(), finalAssignee.getId()));
+                UserTasksWrapper userWrapper = result.computeIfAbsent(assignee.getId(), k -> new UserTasksWrapper(finalAssignee.getFirstName(), finalAssignee.getName(), finalAssignee.getId()));
                 userWrapper.getTasks()
                         .add(new TaskWrapper(
                                 task.getId(),
@@ -223,6 +222,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     }
 
     public static class UserTasksWrapper{
+
+    public static class UserTasksWrapper {
 
         private final String firstName;
         private final String name;

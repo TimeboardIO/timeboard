@@ -26,10 +26,9 @@ package timeboard.core.model;
  * #L%
  */
 
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.*;
 
 
 @Entity
@@ -47,7 +46,7 @@ public class TaskRevision implements Serializable {
     private Task task;
 
     /**
-     * Current task assigned at revision date
+     * Current task assigned at revision date.
      */
     @OneToOne
     private User assigned;

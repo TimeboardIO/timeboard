@@ -1,8 +1,8 @@
-package timeboard.projects;
+package timeboard.reporting;
 
 /*-
  * #%L
- * projects
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,53 +26,45 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.IOException;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
+import org.osgi.service.component.annotations.*;
+import timeboard.core.api.ProjectExportService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
+
+import javax.servlet.Servlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 @Component(
         service = Servlet.class,
         scope = ServiceScope.PROTOTYPE,
         property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/tasks/validation",
+                "osgi.http.whiteboard.servlet.pattern="+ReportingServlet.URL,
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 )
-public class ProjectsTaskValidationServlet extends TimeboardServlet {
+public class ReportingServlet extends TimeboardServlet {
 
-    @Reference
-    public ProjectService projectService;
+    public static final String URL = "/reporting";
+
+    @Reference(
+            policyOption = ReferencePolicyOption.GREEDY,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            collectionType = CollectionType.SERVICE
+    )
+    private List<ProjectExportService> reportServices;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectsTaskValidationServlet.class.getClassLoader();
+        return ReportingServlet.class.getClassLoader();
     }
-
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
-        long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(actor, id);
-
-        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
-        viewModel.getViewDatas().put("project", project);
-        viewModel.setTemplate("projects:details_project_tasks_validation.html");
-        viewModel.getViewDatas().put("task", false);
-
-
-
-
-    }
+    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+        viewModel.setTemplate("reporting:reporting.html");
+        viewModel.getViewDatas().put("reports", this.reportServices);
+   }
 
 }
