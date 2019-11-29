@@ -26,6 +26,10 @@ package timeboard.core.ui;
  * #L%
  */
 
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.log.LogService;
 import timeboard.core.model.User;
 import timeboard.core.api.TimeboardSessionStore;
 
@@ -36,9 +40,20 @@ import java.util.Optional;
 import java.util.UUID;
 
 
-class HttpSecurityContext {
+@Component(
+        service = HttpSecurityContextService.class,
+        scope = ServiceScope.SINGLETON
+)
+public class HttpSecurityContextService {
 
-    public static UUID  getCurrentSessionID(HttpServletRequest req, TimeboardSessionStore sessionStore) {
+
+    @Reference
+    private LogService logService;
+
+    @Reference
+    private TimeboardSessionStore sessionStore;
+
+    public  UUID  getCurrentSessionID(HttpServletRequest req) {
         UUID u = null;
 
         if(req.getCookies() != null) {
@@ -51,17 +66,20 @@ class HttpSecurityContext {
         return u;
     }
 
-    public static User getCurrentUser(HttpServletRequest req, TimeboardSessionStore sessionStore) {
+    public  User getCurrentUser(HttpServletRequest req) {
         User u = null;
 
         if(req.getCookies() != null) {
             Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
 
             if (sessionCookie.isPresent()) {
-                Optional<TimeboardSessionStore.TimeboardSession> userSession = sessionStore.getSession(UUID.fromString(sessionCookie.get().getValue()));
+                UUID uuid = UUID.fromString(sessionCookie.get().getValue());
+                Optional<TimeboardSessionStore.TimeboardSession> userSession = this.sessionStore.getSession(uuid);
 
                 if (userSession.isPresent()) {
                     u = (User) userSession.get().getPayload().get("user");
+                }else{
+                    this.logService.log(LogService.LOG_INFO, String.format("No session for cookie %s in keystore %s", uuid.toString(), this.sessionStore));
                 }
             }
         }

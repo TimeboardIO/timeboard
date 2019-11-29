@@ -29,6 +29,7 @@ package timeboard.core.ui;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.model.User;
@@ -46,12 +47,14 @@ import java.util.Map;
         service = Filter.class,
         property = {
                 "osgi.http.whiteboard.filter.regex=/*",
+                "osgi.http.whiteboard.filter.name=SecurityFilter",
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)",
                 "oauth.login.url=https://timeboard.auth.eu-west-1.amazoncognito.com/login",
                 "oauth.clientid=changeme",
                 "oauth.redirect.uri=http://localhost:8181/signin",
                 "timeboard.security.newPassword-url=/newPassword"
         },
+        scope = ServiceScope.PROTOTYPE,
         configurationPid = {"timeboard.oauth"}
 )
 public class OAuthSecurityFilter implements Filter {
@@ -62,6 +65,9 @@ public class OAuthSecurityFilter implements Filter {
 
     @Reference
     private TimeboardSessionStore timeboardSessionStore;
+
+    @Reference
+    private HttpSecurityContextService securityContextService;
 
     @Reference
     private LogService logService;
@@ -91,7 +97,7 @@ public class OAuthSecurityFilter implements Filter {
                 req.getServletPath().startsWith("/static")
                         || req.getServletPath().equals("/favicon.ico");
 
-        User user = HttpSecurityContext.getCurrentUser(req, this.timeboardSessionStore);
+        User user = this.securityContextService.getCurrentUser(req);
         boolean isLogged = user != null;
 
         if (!isLogged && !isStatic && !isLogin) {

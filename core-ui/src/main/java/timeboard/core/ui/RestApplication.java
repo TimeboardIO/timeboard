@@ -27,47 +27,17 @@ package timeboard.core.ui;
  */
 
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import timeboard.core.api.TimeboardSessionStore;
-import timeboard.core.model.User;
+import org.osgi.service.component.annotations.ServiceScope;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.Context;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import javax.ws.rs.core.Application;
 
 @Component(
-        service = ContainerRequestFilter.class,
+        service = Application.class,
+        scope = ServiceScope.SINGLETON,
         property = {
-                "osgi.jaxrs.extension=true"
-        },
-        immediate = true
-)
-public class RestFilter implements ContainerRequestFilter {
-
-    @Context
-    private HttpServletRequest req;
-
-    @Reference
-    private HttpSecurityContextService securityContextService;
-
-
-
-    @Override
-    public void filter(ContainerRequestContext containerRequestContext) throws IOException {
-
-        User user = this.securityContextService.getCurrentUser(this.req);
-
-        if(user == null){
-            throw new SecurityException();
+                "osgi.jaxrs.name=.default",
+                "osgi.jaxrs.application.base=/api"
         }
-
-        containerRequestContext.setProperty("actor", user);
-        System.out.println("Filter executed :)");
-    }
+)
+public class RestApplication extends Application {
 }
