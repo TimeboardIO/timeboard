@@ -44,7 +44,7 @@ import timeboard.core.model.User;
                 "osgi.jaxrs.application.select=(osgi.jaxrs.name=.default)"
         }
 )
-@Path("/hello")
+@Path("/reporting")
 @Produces(MediaType.APPLICATION_JSON)
 public class RestAPI {
 
@@ -58,16 +58,11 @@ public class RestAPI {
 
 
     @GET
-    @Path("/get")
-    public String sayHello(@Context HttpServletRequest req) {
+    @Path("/{}")
+    public String export(@Context HttpServletRequest req) {
         User user = (User) req.getAttribute("actor");
         return "{'name': 'Hello '" + user.getScreenName() + "''}";
     }
 
-    @POST
-    @Path("/post")
-    public String sayHelloPost(@Context HttpServletRequest req) {
-        User user = (User) req.getAttribute("actor");
-        return "{'name': 'Hello '" + user.getScreenName() + "''}";
-    }
+
 }
