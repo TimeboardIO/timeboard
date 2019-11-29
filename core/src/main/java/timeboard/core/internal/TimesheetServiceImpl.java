@@ -27,6 +27,7 @@ package timeboard.core.internal;
  */
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.TypedQuery;
 import org.apache.aries.jpa.template.JpaTemplate;
@@ -43,10 +44,6 @@ import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 
-import javax.persistence.TypedQuery;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 
 @Component(
         service = TimesheetService.class
@@ -161,12 +158,11 @@ public class TimesheetServiceImpl implements TimesheetService {
     public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user) {
         return this.jpa.txExpr(entityManager -> {
             TypedQuery<Double> q = entityManager.createQuery(
-                    "SELECT COALESCE(sum(i.value),0) \n" +
-                            "FROM Imputation i\n" +
-                            "WHERE i.user = :user \n" +
-                            "AND i.day > :firstDayOfWeek\n" +
-                            "AND i.day < :lastDayOfWeek"
-                    , Double.class);
+                    "SELECT COALESCE(sum(i.value),0) \n"
+                            + "FROM Imputation i\n"
+                            + "WHERE i.user = :user \n"
+                            + "AND i.day > :firstDayOfWeek\n"
+                            + "AND i.day < :lastDayOfWeek", Double.class);
             q.setParameter("firstDayOfWeek", firstDayOfWeek);
             q.setParameter("lastDayOfWeek", lastDayOfWeek);
             q.setParameter("user", user);

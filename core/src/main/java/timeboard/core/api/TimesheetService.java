@@ -26,10 +26,10 @@ package timeboard.core.api;
  * #L%
  */
 
+import java.util.Date;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.User;
 
-import java.util.Date;
 
 public interface TimesheetService {
 

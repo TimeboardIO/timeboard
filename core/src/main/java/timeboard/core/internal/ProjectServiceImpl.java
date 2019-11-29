@@ -502,7 +502,7 @@ public class ProjectServiceImpl implements ProjectService {
        return tasks;
     }
 
-    private UpdatedTaskResult updateTaskImputation(User actor, Task task, Date day, double val, EntityManager entityManager){
+    private UpdatedTaskResult updateTaskImputation(User actor, Task task, Date day, double val, EntityManager entityManager) {
         Calendar c = Calendar.getInstance();
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
@@ -525,11 +525,12 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         entityManager.merge(task);
-        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((task!= null) ? task.getProject().getName() : "default") +" with value "+ val);
+        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + task.getId()
+                + "(" + day + ") in project " + ((task != null) ? task.getProject().getName() : "default") + " with value " + val);
 
-        if(task != null) { //project task
+        if (task != null) { //project task
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
-        }else{
+        } else {
             return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
         }
     }
@@ -593,7 +594,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList) {
         return this.jpa.txExpr(entityManager -> {
             List<UpdatedTaskResult> result = new ArrayList<>();
-            for(Imputation imputation : imputationsList){
+            for (Imputation imputation : imputationsList) {
                 UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue(), entityManager);
                 result.add(updatedTaskResult);
             }

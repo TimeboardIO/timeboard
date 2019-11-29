@@ -26,16 +26,15 @@ package timeboard.timesheet;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import timeboard.core.model.User;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import timeboard.core.model.User;
 
 @Component(
         service = TimesheetRSAPI.class,
@@ -52,7 +51,7 @@ public class TimesheetRSAPI {
     private HttpServletRequest req;
 
     @Activate
-    private void init(){
+    private void init() {
         System.out.println("Start Timesheet API !");
     }
 
@@ -61,6 +60,6 @@ public class TimesheetRSAPI {
     @Path("/")
     public String sayHello(@Context HttpServletRequest req) {
         User user = (User) req.getAttribute("actor");
-        return "{'name': 'Hello '"+user.getScreenName()+"' from Timesheet'}";
+        return "{'name': 'Hello '" + user.getScreenName() + "' from Timesheet'}";
     }
 }
