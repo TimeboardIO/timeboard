@@ -109,9 +109,23 @@ Vue.component('task-list', {
       },
       approveTask: function(event, task){
         event.target.classList.toggle('loading');
+        $.get("/api/tasks/approve?task="+task.taskID)
+            .then(function(data){
+                 gridData = gridData.filter(function(entry){
+                    entry.taskID = task.taskID;
+                 });
+                 event.target.classList.toggle('loading');
+            });
       },
       denyTask: function(event, task){
         event.target.classList.toggle('loading');
+         $.get("/api/tasks/deny?task="+task.taskID)
+            .then(function(data){
+                 gridData = gridData.filter(function(entry){
+                    entry.taskID = task.taskID;
+                 });
+                 event.target.classList.toggle('loading');
+            });
       }
     }
   });
@@ -219,45 +233,13 @@ var app = new Vue({
                 detachable : true, centered: true
             }).modal('show');
         },
-        approveTask : function(user, task) {
-            let app = this;
-            $.get("/projects/tasks/api?action=approveTask&project="+project+"&taskId="+task.taskID)
-            .then(function(data){
-                if(data == "DONE"){
-                    user.tasks = user.tasks.filter(function (item) {
-                      return item != task;
-                    });
-                    if(user.tasks.length == 0){
-                        app.userTasks = app.userTasks.filter(function (item) {
-                           return item != user;
-                        });
-                     }
-                }
-            });
-        },
-        denyTask : function(user, task) {
-            let app = this;
-            $.get("/projects/tasks/api?action=denyTask&project="+project+"&taskId="+task.taskID)
-            .then(function(data){
-                if(data == "DONE"){
-                    user.tasks = user.tasks.filter(function (item) {
-                      return item != task;
-                    });
-                    if(user.tasks.length == 0){
-                        app.userTasks = app.userTasks.filter(function (item) {
-                           return item != user;
-                        });
-                     }
-                }
-            });
-        }
     }
 });
 
 $(document).ready(function(){
     const project = $("meta[property='tasks']").attr('project');
 
-    $.get("/projects/tasks/api?action=getTasks&project="+project)
+    $.get("/api/tasks?project="+project)
     .then(function(data){
          app.gridData = data;
          $('.ui.dimmer').removeClass('active');

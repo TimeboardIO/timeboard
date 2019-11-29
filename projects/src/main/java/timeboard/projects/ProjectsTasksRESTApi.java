@@ -79,6 +79,8 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         if(action.matches("getPendingTasks")){
             this.getPendingTasks(actor, request, response);
+        }else if(action.matches("getTasks")){
+            this.getTasks(actor, request, response);
         }else if(action.matches("approveTask")){
             this.approveTask(actor, request, response);
         }else if(action.matches("denyTask")){
@@ -174,7 +176,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         response.setContentType("application/json");
         MAPPER.writeValue(response.getWriter(), new ArrayList<>(result.values()));
     }
-    private void getTasks(HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
+    private void getTasks(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -184,7 +186,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
             MAPPER.writeValue(response.getWriter(), "Incorrect project argument");
             return;
         }
-        final User actor = SecurityContext.getCurrentUser(request);
+
         final Project project = this.projectService.getProjectByID(actor, projectID);
         if(project == null){
             MAPPER.writeValue(response.getWriter(), "Project does not exists or you don't have enough permissions to access it.");
