@@ -137,19 +137,21 @@ public class ProjectImportServlet extends TimeboardServlet {
                                         String taskComment = task.getComments();
                                         Date startDate = task.getStartDate();
                                         Date endDate = task.getStopDate();
-                                        double OE = 0;
+                                        double originaEstimate = 0;
                                         Long taskTypeID = null;
                                         User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
                                         String origin = task.getOrigin();
                                         String remotePath = null;
-                                        Long remoteId = task.getID();
+                                        Long remoteId = task.getId();
                                         Milestone milestone = null;
-                                        projectService.createTask(actor, project, taskName, taskComment, startDate, endDate, OE, taskTypeID, assignedUserID, origin, remotePath, String.valueOf(remoteId), milestone);
+                                        projectService.createTask(actor, project, taskName, taskComment,
+                                                startDate, endDate, originaEstimate, taskTypeID, assignedUserID, origin,
+                                                remotePath, String.valueOf(remoteId), milestone);
                                     }
                                 );
 
                                 for (ProjectImportService.RemoteTask remoteTask : updatedTasks) {
-                                    Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getID());
+                                    Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getId());
                                     taskToUpdate.setName(remoteTask.getTitle());
                                     projectService.updateTask(actor, taskToUpdate);
                                 }
@@ -181,7 +183,7 @@ public class ProjectImportServlet extends TimeboardServlet {
     }
 
     private boolean isNewTask(User actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
-        AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getID());
+        AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getId());
         return existingTask == null;
     }
 

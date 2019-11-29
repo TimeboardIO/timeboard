@@ -88,12 +88,12 @@ public class SigninServlet extends HttpServlet {
         final HttpClient client = HttpClient.newHttpClient();
 
         try {
-            String oauthCode = req.getParameter("code");
             StringBuilder params = new StringBuilder();
             params.append("grant_type").append("=").append("authorization_code");
             params.append("&");
             params.append("client_id").append("=").append(clientID);
             params.append("&");
+            String oauthCode = req.getParameter("code");
             params.append("code").append("=").append(oauthCode);
             params.append("&");
             params.append("redirect_uri").append("=").append(this.redirectURI);

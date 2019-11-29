@@ -83,8 +83,6 @@ public class SendSummaryEmail {
         List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
         Map<Long, EmailSummaryModel> projects = new HashMap<>();
 
-        String subject = "[Timeboard] Daily summary";
-
         for (TimeboardEvent event : userNotificationStructure.getNotificationEventList()) {
             if (event instanceof TaskEvent) {
                 Task t = ((TaskEvent) event).getTask();
@@ -104,6 +102,7 @@ public class SendSummaryEmail {
         String message = templateGenerator.getTemplateString("core-ui:mail/summary.html", data);
                 ArrayList<String> list = new ArrayList<>();
                 list.add(userNotificationStructure.getTargetUser().getEmail());
+        String subject = "[Timeboard] Daily summary";
         return new EmailStructure(list, null, subject, message);
     }
 

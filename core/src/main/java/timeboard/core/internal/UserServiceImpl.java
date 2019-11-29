@@ -127,9 +127,9 @@ public final class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchUserByEmail(final String prefix, final Long pID) {
+    public List<User> searchUserByEmail(final String prefix, final Long projectId) {
         return this.jpa.txExpr(entityManager -> {
-            Project project = entityManager.find(Project.class, pID);
+            Project project = entityManager.find(Project.class, projectId);
             List<User> matchedUser = project.getMembers().stream()
                     .filter(projectMembership -> projectMembership
                             .getMember()

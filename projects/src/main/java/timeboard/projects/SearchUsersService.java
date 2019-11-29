@@ -44,7 +44,6 @@ import timeboard.core.model.User;
 
 
 /**
- *
  * search user  : /search?q={search query}.
  * search user in project : /search?projectID={project id}&q={search query}
  */

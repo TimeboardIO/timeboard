@@ -38,8 +38,11 @@ public interface ProjectService {
     String ORIGIN_TIMEBOARD = "timeboard";
 
     /*
-        === Projects ===
-         */
+    === Projects ===
+    */
+
+    Project createProject(User owner, String projectName) throws BusinessException;
+
     List<Project> listProjects(User owner);
 
     Project getProjectByID(User actor, Long projectID) throws BusinessException;
@@ -48,13 +51,9 @@ public interface ProjectService {
 
     Project getProjectByName(User user, String projectArg) throws BusinessException;
 
-    Project createProject(User owner, String projectName) throws BusinessException;
-
-    Project updateProject(User actor, Project project) throws BusinessException;
-
     Project deleteProjectByID(User actor, Project project) throws BusinessException;
 
-    ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException;
+    Project updateProject(User actor, Project project) throws BusinessException;
 
     /**
      * Update a project.
@@ -62,6 +61,8 @@ public interface ProjectService {
      * @param memberships Key : userID, Value : user role for project param
      */
     Project updateProject(User actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException;
+
+    ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException;
 
     void save(User actor, ProjectMembership projectMembership) throws BusinessException;
 
@@ -80,7 +81,7 @@ public interface ProjectService {
     List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
 
     Task createTask(User actor, Project project, String taskName, String taskComment,
-                    Date startDate, Date endDate, double OE, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId, Milestone milestone);
+                    Date startDate, Date endDate, double originalEstimate, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId, Milestone milestone);
 
     void createTasks(User actor, List<Task> taskList);
 

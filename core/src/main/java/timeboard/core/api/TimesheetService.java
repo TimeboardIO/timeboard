@@ -54,7 +54,7 @@ public interface TimesheetService {
 
 
     /**
-     * Get the sum of all imputations by week by user
+     * Get the sum of all imputations by week by user.
      * @param firstDayOfWeek first day of week
      * @param lastDayOfWeek last day of week
      * @param user user used to check timesheet validation state.

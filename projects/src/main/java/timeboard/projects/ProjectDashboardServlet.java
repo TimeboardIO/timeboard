@@ -46,8 +46,8 @@ import timeboard.core.ui.ViewModel;
 
 /**
  * Display project dashboard.
- * <p>
- * ex : /projects/dashboard?projectID=
+ *
+ * <p>ex : /projects/dashboard?projectID=
  */
 @Component(
         service = Servlet.class,

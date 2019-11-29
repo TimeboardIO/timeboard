@@ -41,7 +41,7 @@ import org.thymeleaf.templateresource.ITemplateResource;
 public class OSGITemplateResolver extends AbstractConfigurableTemplateResolver {
 
     @Override
-    protected ITemplateResource computeTemplateResource(IEngineConfiguration iEngineConfiguration, String s, String s1, String s2, String s3, Map<String, Object> map) {
+    protected ITemplateResource computeTemplateResource(IEngineConfiguration engineConfiguration, String s, String s1, String s2, String s3, Map<String, Object> map) {
         BundleContext ctx = FrameworkUtil.getBundle(OSGITemplateResolver.class).getBundleContext();
         String bundleName = "timeboard." + s1.split(":")[0];
         String templateName = this.getPrefix() + s1.split(":")[1];

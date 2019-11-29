@@ -155,7 +155,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                     assignee.setFirstName("");
                 }
                 final User finalAssignee = assignee;
-                UserTasksWrapper userWrapper = result.computeIfAbsent(assignee.getId(), k-> new UserTasksWrapper(finalAssignee.getFirstName(), finalAssignee.getName(), finalAssignee.getId()));
+                UserTasksWrapper userWrapper = result.computeIfAbsent(assignee.getId(), k -> new UserTasksWrapper(finalAssignee.getFirstName(), finalAssignee.getName(), finalAssignee.getId()));
                 userWrapper.getTasks()
                         .add(new TaskWrapper(
                                 task.getId(),
@@ -171,6 +171,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         response.setContentType("application/json");
         MAPPER.writeValue(response.getWriter(), new ArrayList<>(result.values()));
     }
+
     public static class UserTasksWrapper {
 
         private final String firstName;
@@ -216,6 +217,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         private final double originalEstimate;
         private final Date startDate;
         private final Date endDate;
+
         public TaskWrapper(Long taskID, String taskName, String taskComment, double originalEstimate, Date startDate, Date endDate) {
             this.taskID = taskID;
             this.taskName = taskName;

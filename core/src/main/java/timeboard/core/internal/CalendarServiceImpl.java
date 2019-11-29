@@ -174,9 +174,9 @@ public class CalendarServiceImpl implements CalendarService {
             event.setRemotePath(url);
             event.setRemoteId(parsedEvent.getUid().getValue());
 
-            Property rRule = parsedEvent.getProperty(Property.RRULE);
-            if (rRule != null) {
-                this.createRecurringEvents(event, (RRule) rRule, events);
+            Property propertyRRule = parsedEvent.getProperty(Property.RRULE);
+            if (propertyRRule != null) {
+                this.createRecurringEvents(event, (RRule) propertyRRule, events);
             } else {
                 List<Event> eventList = events.computeIfAbsent(event.getRemoteId(), k -> new ArrayList<>());
                 eventList.add(event);

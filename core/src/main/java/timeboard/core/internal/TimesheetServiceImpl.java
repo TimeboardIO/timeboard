@@ -142,7 +142,8 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     public boolean isTimesheetValidated(User userTimesheet, int year, int week) {
         return this.jpa.txExpr(entityManager -> {
-            TypedQuery<ValidatedTimesheet> q = entityManager.createQuery("select vt from ValidatedTimesheet vt where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
+            TypedQuery<ValidatedTimesheet> q = entityManager.createQuery("select vt from ValidatedTimesheet vt "
+                    + "where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
             q.setParameter("week", week);
             q.setParameter("year", year);
             q.setParameter("user", userTimesheet);

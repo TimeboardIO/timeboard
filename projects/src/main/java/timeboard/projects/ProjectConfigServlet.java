@@ -53,8 +53,8 @@ import timeboard.core.ui.ViewModel;
 
 /**
  * Display project details form.
- * <p>
- * ex : /projects/details?id=
+ *
+ * <p>Ex : /projects/details?id=
  */
 @Component(
         service = Servlet.class,
@@ -125,7 +125,6 @@ public class ProjectConfigServlet extends TimeboardServlet {
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
         viewModel.setTemplate("projects:details_project_config.html");
-        Map<String, Object> map = new HashMap<>();
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));
@@ -187,6 +186,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
         this.projectService.updateProject(actor, project, memberships);
 
+        Map<String, Object> map = new HashMap<>();
         prepareTemplateData(actor, project, map);
 
         viewModel.getViewDatas().putAll(map);

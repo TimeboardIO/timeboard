@@ -211,7 +211,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             q.setParameter("project", project);
 
-            Object[] OEandEL = q.getSingleResult();
+            Object[] originalEstimateAndEffortLeft = q.getSingleResult();
 
             TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
                     + "from Task t left outer join t.imputations i "
@@ -221,7 +221,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             final Double effortSpent = effortSpentQuery.getSingleResult();
 
-            return new ProjectDashboard(project.getQuotation(), (Double) OEandEL[0], (Double) OEandEL[1], effortSpent);
+            return new ProjectDashboard(project.getQuotation(), (Double) originalEstimateAndEffortLeft[0], (Double) originalEstimateAndEffortLeft[1], effortSpent);
 
         });
     }
@@ -244,8 +244,6 @@ public class ProjectServiceImpl implements ProjectService {
             //Update existing membership
             List<Long> membershipToRemove = new ArrayList<>();
 
-            List<Long> currentMembers = project.getMembers().stream().map(pm -> pm.getMember().getId()).collect(Collectors.toList());
-            List<Long> membershipToAdd = memberships.keySet().stream().filter(mID -> currentMembers.contains(mID) == false).collect(Collectors.toList());
 
             //Update existing membership
             project.getMembers().forEach(projectMembership -> {
@@ -269,12 +267,22 @@ public class ProjectServiceImpl implements ProjectService {
             });
             entityManager.merge(project);
 
+
             //Add new membership
-            membershipToAdd.forEach((aLong) -> {
+            List<Long> currentMembers = project.getMembers()
+                    .stream()
+                    .map(pm -> pm.getMember().getId())
+                    .collect(Collectors.toList());
+            List<Long> membershipToAdd = memberships.keySet()
+                    .stream()
+                    .filter(membershipId -> currentMembers.contains(membershipId) == false)
+                    .collect(Collectors.toList());
+
+            membershipToAdd.forEach((membershipId) -> {
                 ProjectMembership projectMembership = new ProjectMembership();
                 projectMembership.setProject(project);
-                projectMembership.setRole(memberships.get(aLong));
-                projectMembership.setMember(this.userService.findUserByID(aLong));
+                projectMembership.setRole(memberships.get(membershipId));
+                projectMembership.setMember(this.userService.findUserByID(membershipId));
                 entityManager.persist(projectMembership);
                 project.getMembers().add(projectMembership);
             });
@@ -352,7 +360,7 @@ public class ProjectServiceImpl implements ProjectService {
                            String taskComment,
                            Date startDate,
                            Date endDate,
-                           double OE,
+                           double originalEstimate,
                            Long taskTypeID,
                            User assignedUser,
                            String origin,
@@ -371,8 +379,8 @@ public class ProjectServiceImpl implements ProjectService {
             newTask.setStartDate(startDate);
             newTask.setEndDate(endDate);
             newTask.setComments(taskComment);
-            newTask.setEffortLeft(OE);
-            newTask.setOriginalEstimate(OE);
+            newTask.setEffortLeft(originalEstimate);
+            newTask.setOriginalEstimate(originalEstimate);
             newTask.setTaskStatus(TaskStatus.PENDING);
             newTask.setAssigned(assignedUser);
             if (milestone != null) {
@@ -512,7 +520,8 @@ public class ProjectServiceImpl implements ProjectService {
         List<Imputation> existingImputations = q.getResultList();
 
         if (taskAvailableForImputations) {
-            this.addOrUpdateOrDeleteImputation(existingImputations.isEmpty() ? null : existingImputations.get(0), task, actor, val,c.getTime(), entityManager);
+            this.addOrUpdateOrDeleteImputation(existingImputations.isEmpty() ? null : existingImputations.get(0),
+                    task, actor, val,c.getTime(), entityManager);
         }
 
         entityManager.merge(task);
@@ -606,7 +615,8 @@ public class ProjectServiceImpl implements ProjectService {
             task.setEffortLeft(effortLeft);
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task " + task.getId() + " in project " + task.getProject().getName() + " with value " + effortLeft);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task " + task.getId()
+                    + " in project " + task.getProject().getName() + " with value " + effortLeft);
 
             return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
         });
@@ -807,13 +817,14 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return this.jpa.txExpr(entityManager -> {
-            Map<String, Task> map = new HashMap<>();
             TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.project = :project "
                     + "and t.origin = :origin "
                     + "and t.remotePath = :remotePath ", Task.class);
             q.setParameter("project", project);
             q.setParameter("origin", origin);
             q.setParameter("remotePath", remotePath);
+
+            Map<String, Task> map = new HashMap<>();
             q.getResultList().forEach(task -> {
                 map.put(task.getRemoteId(), task);
             });

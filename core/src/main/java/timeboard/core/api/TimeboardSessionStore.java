@@ -33,7 +33,6 @@ import timeboard.core.model.User;
 public interface TimeboardSessionStore {
 
     /**
-     *
      * Get current session.
      * @param sessionUUID sessionUUID
      * @return session if exist or null

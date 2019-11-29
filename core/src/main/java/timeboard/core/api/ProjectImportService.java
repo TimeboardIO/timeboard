@@ -43,7 +43,7 @@ public interface ProjectImportService {
 
     public static class RemoteTask {
 
-        private Long ID;
+        private Long id;
         private String title;
         private String userName;
         private String comments;
@@ -56,12 +56,12 @@ public interface ProjectImportService {
             return null;
         }
 
-        public Long getID() {
-            return ID;
+        public Long getId() {
+            return id;
         }
 
-        public void setID(Long id) {
-            this.ID = id;
+        public void setId(Long id) {
+            this.id = id;
         }
 
         public void setTitle(String summary) {
