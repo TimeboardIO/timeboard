@@ -78,9 +78,9 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         if (action.matches("getPendingTasks")) {
             this.getPendingTasks(actor, request, response);
-        }else if(action.matches("getTasks")){
+        } else if (action.matches("getTasks")) {
             this.getTasks(actor, request, response);
-        }else if(action.matches("approveTask")){
+        } else if (action.matches("approveTask")) {
             this.approveTask(actor, request, response);
         } else if (action.matches("denyTask")) {
             this.denyTask(actor, request, response);
@@ -91,10 +91,10 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     }
 
     private void approveTask(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
-       this.changeTaskStatus(actor, request, response, TaskStatus.IN_PROGESS);
+        this.changeTaskStatus(actor, request, response, TaskStatus.IN_PROGESS);
     }
 
-    private void denyTask(User actor,HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
+    private void denyTask(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
         this.changeTaskStatus(actor, request, response, TaskStatus.REFUSED);
     }
 
@@ -127,7 +127,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         MAPPER.writeValue(response.getWriter(), "DONE");
     }
 
-    private void getPendingTasks(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
+    private void getPendingTasks(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -167,7 +167,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                                 task.getEndDate(),
                                 assignee.getScreenName(), assignee.getId(),
                                 task.getTaskStatus().name(),
-                                (task.getTaskType() != null ?task.getTaskType().getId() : 0L))
+                                (task.getTaskType() != null ? task.getTaskType().getId() : 0L))
                         );
             }
         }
@@ -175,19 +175,20 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         response.setContentType("application/json");
         MAPPER.writeValue(response.getWriter(), new ArrayList<>(result.values()));
     }
-    private void getTasks(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException  {
+
+    private void getTasks(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
-        if(strProjectID != null){
+        if (strProjectID != null) {
             projectID = Long.parseLong(strProjectID);
-        }else{
+        } else {
             MAPPER.writeValue(response.getWriter(), "Incorrect project argument");
             return;
         }
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
-        if(project == null){
+        if (project == null) {
             MAPPER.writeValue(response.getWriter(), "Project does not exists or you don't have enough permissions to access it.");
             return;
         }
@@ -195,16 +196,16 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
 
         final List<TaskWrapper> result = new ArrayList<>();
 
-        for (Task task : tasks){
-                User assignee = task.getAssigned();
-                if(assignee == null){
-                    assignee = new User();
-                    assignee.setId(0);
-                    assignee.setName("");
-                    assignee.setFirstName("");
-                }
+        for (Task task : tasks) {
+            User assignee = task.getAssigned();
+            if (assignee == null) {
+                assignee = new User();
+                assignee.setId(0);
+                assignee.setName("");
+                assignee.setFirstName("");
+            }
 
-            result. add(new TaskWrapper(
+            result.add(new TaskWrapper(
                     task.getId(),
                     task.getName(),
                     task.getComments(),
@@ -213,7 +214,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
                     task.getEndDate(),
                     assignee.getScreenName(), assignee.getId(),
                     task.getTaskStatus().name(),
-                    (task.getTaskType() != null ?task.getTaskType().getId() : 0L)));
+                    (task.getTaskType() != null ? task.getTaskType().getId() : 0L)));
 
         }
 
@@ -221,111 +222,110 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
         MAPPER.writeValue(response.getWriter(), result.toArray());
     }
 
-    public static class UserTasksWrapper{
+        public static class UserTasksWrapper {
 
-    public static class UserTasksWrapper {
+            private final String firstName;
+            private final String name;
+            private final Long id;
 
-        private final String firstName;
-        private final String name;
-        private final Long id;
+            private final List<TaskWrapper> tasks;
 
-        private final List<TaskWrapper> tasks;
+            public UserTasksWrapper(String firstName, String name, Long id) {
+                this.firstName = firstName;
+                this.name = name;
+                this.id = id;
+                this.tasks = new ArrayList<>();
+            }
 
-        public UserTasksWrapper(String firstName, String name, Long id) {
-            this.firstName = firstName;
-            this.name = name;
-            this.id = id;
-            this.tasks = new ArrayList<>();
+            public String getFirstName() {
+                return firstName;
+            }
+
+            public String getName() {
+                return name;
+            }
+
+            public Long getId() {
+                return id;
+            }
+
+            public List<TaskWrapper> getTasks() {
+                return tasks;
+            }
+
+            @Override
+            public boolean equals(Object o) {
+                return ((o instanceof UserTasksWrapper) && ((UserTasksWrapper) o).getId() == this.id);
+            }
+
         }
 
-        public String getFirstName() {
-            return firstName;
-        }
+        public static class TaskWrapper {
+            private final Long taskID;
+            private final String taskName;
+            private final String taskComments;
+            private final double oE;
+            private final Date startDate;
+            private final Date endDate;
+            private final String assignee;
+            private final Long assigneeID;
 
-        public String getName() {
-            return name;
-        }
+            private final String status;
 
-        public Long getId() {
-            return id;
-        }
+            private final Long type;
 
-        public List<TaskWrapper> getTasks() {
-            return tasks;
-        }
+            public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long type) {
+                this.taskID = taskID;
+                this.taskName = taskName;
+                this.taskComments = taskComments;
+                this.oE = oE;
+                this.startDate = startDate;
+                this.endDate = (endDate != null ? endDate : new Date());
+                this.assignee = assignee;
+                this.status = status;
+                this.type = type;
+                this.assigneeID = assigneeID;
+            }
 
-        @Override
-        public boolean equals(Object o) {
-            return ((o instanceof UserTasksWrapper) && ((UserTasksWrapper) o).getId() == this.id);
+            public String getStartDate() {
+                return DATE_FORMAT.format(startDate);
+            }
+
+            public String getEndDate() {
+                return DATE_FORMAT.format(endDate);
+            }
+
+            public double getoE() {
+                return oE;
+            }
+
+            public Long getTaskID() {
+                return taskID;
+            }
+
+            public String getTaskName() {
+                return taskName;
+            }
+
+            public Long getType() {
+                return type;
+            }
+
+            public Long getAssigneeID() {
+                return assigneeID;
+            }
+
+            public String getAssignee() {
+                return assignee;
+            }
+
+            public String getStatus() {
+                return status;
+            }
+
+            public String getTaskComments() {
+                return taskComments;
+            }
         }
 
     }
-
-    public static class TaskWrapper {
-        private final Long taskID;
-        private final String taskName;
-        private final String taskComments;
-        private final double oE;
-        private final Date startDate;
-        private final Date endDate;
-        private final String assignee;
-        private final Long assigneeID;
-
-        private final String status;
-
-        private final Long type;
-
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double oE, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long type) {
-            this.taskID = taskID;
-            this.taskName = taskName;
-            this.taskComments = taskComments;
-            this.oE = oE;
-            this.startDate = startDate;
-            this.endDate = (endDate != null ? endDate : new Date());
-            this.assignee = assignee;
-            this.status = status;
-            this.type = type;
-            this.assigneeID = assigneeID;
-        }
-
-        public String getStartDate() {
-            return DATE_FORMAT.format(startDate);
-        }
-
-        public String getEndDate() {
-            return DATE_FORMAT.format(endDate);
-        }
-
-        public double getoE() {
-            return oE;
-        }
-
-        public Long getTaskID() {
-            return taskID;
-        }
-
-        public String getTaskName() {
-            return taskName;
-        }
-
-        public Long getType() {
-            return type;
-        }
-
-        public Long getAssigneeID() {
-            return assigneeID;
-        }
-
-        public String getAssignee() {
-            return assignee;
-        }
-        public String getStatus() {
-            return status;
-        }
-
-        public String getTaskComments() {
-            return taskComments;
-        }
-    }
-
-}

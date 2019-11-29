@@ -163,9 +163,9 @@ public class TasksRestAPI {
 
 
     @POST
-    @Consumes("application/json")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
-    public String createTask(TaskWrapper toto) throws Exception {
+    public String createTask(TaskWrapper taskWrapper) throws Exception {
         User actor = (User) req.getAttribute("actor");
         Date startDate = null;
         Date endDate = null;
@@ -224,16 +224,19 @@ public class TasksRestAPI {
 
 
     public static class TaskWrapper implements Serializable {
-        public final Long taskID;
-        public final String taskName;
-        public final String taskComments;
-        public final double originalEstimate;
-        public final Date startDate;
-        public final Date endDate;
-        public final String assignee;
-        public final Long assigneeID;
-        public final String status;
-        public final Long typeID;
+        public Long taskID;
+        public String taskName;
+        public String taskComments;
+        public double originalEstimate;
+        public Date startDate;
+        public Date endDate;
+        public String assignee;
+        public Long assigneeID;
+        public String status;
+        public Long typeID;
+        public Long projectID;
+
+        public TaskWrapper(){}
 
         public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID) {
             this.taskID = taskID;
@@ -241,50 +244,99 @@ public class TasksRestAPI {
             this.taskComments = taskComments;
             this.originalEstimate = originalEstimate;
             this.startDate = startDate;
-            this.endDate = (endDate != null ? endDate : new Date());
+            this.endDate = endDate;
             this.assignee = assignee;
+            this.assigneeID = assigneeID;
             this.status = status;
             this.typeID = typeID;
-            this.assigneeID = assigneeID;
-        }
-
-        public String getStartDate() {
-            return DATE_FORMAT.format(startDate);
-        }
-
-        public String getEndDate() {
-            return DATE_FORMAT.format(endDate);
-        }
-
-        public double getOriginalEstimate() {
-            return originalEstimate;
         }
 
         public Long getTaskID() {
             return taskID;
         }
 
+        public void setTaskID(Long taskID) {
+            this.taskID = taskID;
+        }
+
         public String getTaskName() {
             return taskName;
         }
 
-        public Long getTypeID() {
-            return typeID;
+        public void setTaskName(String taskName) {
+            this.taskName = taskName;
+        }
+
+        public String getTaskComments() {
+            return taskComments;
+        }
+
+        public void setTaskComments(String taskComments) {
+            this.taskComments = taskComments;
+        }
+
+        public double getOriginalEstimate() {
+            return originalEstimate;
+        }
+
+        public void setOriginalEstimate(double originalEstimate) {
+            this.originalEstimate = originalEstimate;
+        }
+
+        public Date getStartDate() {
+            return startDate;
+        }
+
+        public void setStartDate(Date startDate) {
+            this.startDate = startDate;
+        }
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(Date endDate) {
+            this.endDate = endDate;
+        }
+
+        public String getAssignee() {
+            return assignee;
+        }
+
+        public void setAssignee(String assignee) {
+            this.assignee = assignee;
         }
 
         public Long getAssigneeID() {
             return assigneeID;
         }
 
-        public String getAssignee() {
-            return assignee;
+        public void setAssigneeID(Long assigneeID) {
+            this.assigneeID = assigneeID;
         }
+
         public String getStatus() {
             return status;
         }
 
-        public String getTaskComments() {
-            return taskComments;
+        public void setStatus(String status) {
+            this.status = status;
+        }
+
+        public Long getTypeID() {
+            return typeID;
+        }
+
+        public void setTypeID(Long typeID) {
+            this.typeID = typeID;
+        }
+
+        public Long getProjectID() {
+            return projectID;
+        }
+
+        public void setProjectID(Long projectID) {
+            this.projectID = projectID;
         }
     }
 }

@@ -209,11 +209,15 @@ var app = new Vue({
             $('.create-task.modal').modal({
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    var object = {};
                     if(validated){
+
                         $.ajax({
                             method: "POST",
                             url: "/api/tasks",
-                            data: app.newTask,
+                            data: JSON.stringify(app.newTask),
+                            contentType: "application/json",
+                            dataType: "json"
                           }).then(function(data) {
                               if(data == "DONE"){
                                  updateTimesheet();
