@@ -12,6 +12,12 @@
     <artifactId>timesheet</artifactId>
     <dependencies>
         <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <scope>provided</scope>
@@ -52,7 +58,7 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.log</artifactId>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -69,16 +75,7 @@
                 <configuration>
                     <instructions>
                         <Import-Package>
-                            javax.servlet.*,
-                            org.apache.karaf.jaas.config,
-                            org.apache.commons.logging,
-                            !org.springframework,
-                            org.osgi.service.log,
-                            timeboard.core.model,
-                            timeboard.core.ui,
-                            timeboard.core.api,
-                            com.fasterxml.*,
-                            org.xml.sax
+                            *
                         </Import-Package>
                         <Export-Package>
                             timeboard.timesheet

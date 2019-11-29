@@ -491,16 +491,14 @@ public class ProjectServiceImpl implements ProjectService {
        return tasks;
     }
 
-    private UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val, EntityManager entityManager){
+    private UpdatedTaskResult updateTaskImputation(User actor, Task task, Date day, double val, EntityManager entityManager){
         Calendar c = Calendar.getInstance();
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
 
-        // special actions when task is a project task
-        Task projectTask = (task instanceof Task) ? (Task) task : null;
 
         // Task is available for imputations if this is a default task (not a project task) or task status is not pending
-        boolean taskAvailableForImputations = (projectTask == null || projectTask.getTaskStatus() != TaskStatus.PENDING);
+        boolean taskAvailableForImputations = (task == null || task.getTaskStatus() != TaskStatus.PENDING);
 
         //DB Query
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
@@ -515,10 +513,10 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         entityManager.merge(task);
-        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((projectTask!= null) ? projectTask.getProject().getName() : "default") +" with value "+ val);
+        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((task!= null) ? task.getProject().getName() : "default") +" with value "+ val);
 
-        if(projectTask != null) { //project task
-            return new UpdatedTaskResult(projectTask.getProject().getId(), task.getId(), projectTask.getEffortSpent(), projectTask.getEffortLeft(), projectTask.getOriginalEstimate(), projectTask.getRealEffort());
+        if(task != null) { //project task
+            return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
         }else{
             return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
         }
@@ -567,7 +565,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
         public UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val) {
         return this.jpa.txExpr(entityManager -> {
-            UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, task, day, val, entityManager);
+            UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, (Task) task, day, val, entityManager);
             entityManager.flush();
             return updatedTaskResult;
         });
@@ -579,7 +577,7 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             List<UpdatedTaskResult> result = new ArrayList<>();
             for(Imputation imputation : imputationsList){
-                UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, imputation.getTask(), imputation.getDay(), imputation.getValue(), entityManager);
+                UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue(), entityManager);
                 result.add(updatedTaskResult);
             }
             entityManager.flush();

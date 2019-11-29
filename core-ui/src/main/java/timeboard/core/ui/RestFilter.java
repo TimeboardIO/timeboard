@@ -54,12 +54,14 @@ public class RestFilter implements ContainerRequestFilter {
     private HttpServletRequest req;
 
     @Reference
-    private TimeboardSessionStore timeboardSessionStore;
+    private HttpSecurityContextService securityContextService;
+
+
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
 
-        User user = HttpSecurityContext.getCurrentUser(this.req, this.timeboardSessionStore);
+        User user = this.securityContextService.getCurrentUser(this.req);
 
         if(user == null){
             throw new SecurityException();

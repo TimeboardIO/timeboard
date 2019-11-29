@@ -1,4 +1,4 @@
-package timeboard.reporting;
+package timeboard.core.ui;
 
 /*-
  * #%L
@@ -26,50 +26,18 @@ package timeboard.reporting;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import timeboard.core.model.User;
+import org.osgi.service.component.annotations.ServiceScope;
 
-
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Application;
 
 @Component(
-        service = RestAPI.class,
+        service = Application.class,
+        scope = ServiceScope.SINGLETON,
         property = {
-                "osgi.jaxrs.resource=true",
-                "osgi.jaxrs.application.select=(osgi.jaxrs.name=.default)"
+                "osgi.jaxrs.name=.default",
+                "osgi.jaxrs.application.base=/api"
         }
 )
-@Path("/hello")
-@Produces(MediaType.APPLICATION_JSON)
-public class RestAPI {
-
-    @Context
-    private HttpServletRequest req;
-
-    @Activate
-    private void init(){
-        System.out.println("Start reporting rest API !");
-    }
-
-
-    @GET
-    @Path("/get")
-    public String sayHello(@Context HttpServletRequest req) {
-        User user = (User) req.getAttribute("actor");
-        return "{'name': 'Hello '"+user.getScreenName()+"''}";
-    }
-
-    @POST
-    @Path("/post")
-    public String sayHelloPost(@Context HttpServletRequest req) {
-        User user = (User) req.getAttribute("actor");
-        return "{'name': 'Hello '"+user.getScreenName()+"''}";
-    }
+public class RestApplication extends Application {
 }

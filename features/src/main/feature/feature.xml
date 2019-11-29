@@ -62,6 +62,10 @@
 
 
     <feature name="timeboard-core-ui" version="${project.version}">
+        <config name="org.apache.aries.jax.rs.whiteboard.default">
+            default.web=false
+            enabled=true
+        </config>
         <feature>war</feature>
         <feature>timeboard-core</feature>
         <feature>cxf-jaxrs</feature>
@@ -93,10 +97,6 @@
     </feature>
 
     <feature name="timeboard-reporting" version="${project.version}">
-        <config name="org.apache.aries.jax.rs.whiteboard.default">
-            default.web=false
-            enabled=true
-        </config>
         <feature>timeboard-core-ui</feature>
         <bundle start-level="80">mvn:${project.groupId}/reporting/${project.version}</bundle>
     </feature>

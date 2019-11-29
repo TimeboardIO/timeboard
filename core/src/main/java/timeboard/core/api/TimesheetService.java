@@ -29,6 +29,8 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.User;
 
+import java.util.Date;
+
 public interface TimesheetService {
 
     /**
@@ -52,11 +54,11 @@ public interface TimesheetService {
 
 
     /**
-     * @param userTimesheet user used to check timesheet validation state.
-     * @param week          timesheet week
-     * @param year          timesheet year
+     * @param firstDayOfWeek first day of week
+     * @param lastDayOfWeek last day of week
+     * @param user user used to check timesheet validation state.
      * @return the sum of all imputations of the week
      */
-    double getWeekImputationSum(User userTimesheet, int year, int week);
+    double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user);
 
 }

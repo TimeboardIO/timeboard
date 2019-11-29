@@ -56,6 +56,9 @@ public class LogoutServlet extends TimeboardServlet {
     LogService logService;
 
     @Reference
+    private HttpSecurityContextService securityContextService;
+
+    @Reference
     private TimeboardSessionStore sessionStore;
 
 
@@ -67,7 +70,7 @@ public class LogoutServlet extends TimeboardServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        UUID sessionID = HttpSecurityContext.getCurrentSessionID(req, this.sessionStore);
+        UUID sessionID = this.securityContextService.getCurrentSessionID(req);
 
         this.sessionStore.invalidateSession(sessionID);
 

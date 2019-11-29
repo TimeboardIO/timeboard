@@ -73,7 +73,7 @@ public class InMemorySessionStore implements TimeboardSessionStore {
         TimeboardSession session = new TimeboardSession(sessionUUID);
         session.getPayload().put("user", user);
         SESSION_STORE.put(sessionUUID, session);
-        this.logService.log(LogService.LOG_INFO, String.format("Create session from user %s with sessionUUID %s", user.getScreenName(), sessionUUID.toString()));
+        this.logService.log(LogService.LOG_INFO, String.format("Create session from user %s with sessionUUID %s in keystore %s", user.getScreenName(), sessionUUID.toString(), this));
         return session;
     }
 
