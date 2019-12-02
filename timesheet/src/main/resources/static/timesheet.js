@@ -1,7 +1,6 @@
 /**
 * type = imputation | effortLeft
 */
-const axios = require('axios');
 
 const updateTask = function(date, task, type, val){
 
