@@ -31,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
