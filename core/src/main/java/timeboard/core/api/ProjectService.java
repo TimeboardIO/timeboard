@@ -119,7 +119,7 @@ public interface ProjectService {
 
     List<EffortHistory> getTaskEffortLeftHistory(User actor, Task task) throws BusinessException;
 
-    UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double imputation);
+    UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double imputation) throws BusinessException;
 
     List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList);
 

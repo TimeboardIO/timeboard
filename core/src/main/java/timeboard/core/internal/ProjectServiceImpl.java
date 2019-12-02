@@ -502,43 +502,56 @@ public class ProjectServiceImpl implements ProjectService {
        return tasks;
     }
 
-    private UpdatedTaskResult updateTaskImputation(User actor, Task task, Date day, double val){
+    private UpdatedTaskResult updateProjectTaskImputation(User actor, Task task, Date day, double val, Calendar calendar) throws BusinessException {
+        Task projectTask = (Task) this.getTaskByID(actor, task.getId());
+
         return this.jpa.txExpr(entityManager -> {
-            Calendar c = Calendar.getInstance();
-            c.setTime(day);
-            c.set(Calendar.HOUR_OF_DAY, 2);
 
-
-            // Task is available for imputations if this is a default task (not a project task) or task status is not pending
-            boolean taskAvailableForImputations = (task == null || task.getTaskStatus() != TaskStatus.PENDING);
-
-            //DB Query
-            TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
-            q.setParameter("taskID", task.getId());
-            q.setParameter("day", c.getTime());
-
-            // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
-            List<Imputation> existingImputations = q.getResultList();
-
-            if(taskAvailableForImputations){
-                this.addOrUpdateOrDeleteImputation(existingImputations.isEmpty() ? null : existingImputations.get(0), task, actor, val,c.getTime(), entityManager );
+            if( projectTask != null && projectTask.getTaskStatus() != TaskStatus.PENDING){
+                // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
+                Imputation existingImputation = this.getImputationByDayByTask(entityManager, calendar.getTime(), projectTask);
+                this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), entityManager);
             }
 
-            entityManager.merge(task);
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "+task.getId()+"("+day+") in project "+((task!= null) ? task.getProject().getName() : "default") +" with value "+ val);
+            entityManager.merge(projectTask);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask!= null) ? projectTask.getProject().getName() : "default") + " with value " + val);
 
-            if(task != null) { //project task
-                return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
-            }else{
-                return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
-            }
+            return new UpdatedTaskResult(projectTask.getProject().getId(), projectTask.getId(), projectTask.getEffortSpent(), projectTask.getEffortLeft(), projectTask.getOriginalEstimate(), projectTask.getRealEffort());
+
         });
 
     }
 
+    private UpdatedTaskResult updateDefaultTaskImputation(User actor, DefaultTask task, Date day, double val, Calendar calendar) throws BusinessException {
+        Task defaultTask = (Task) this.getTaskByID(actor, task.getId());
 
-    private void addOrUpdateOrDeleteImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
-        Task projectTask = (task instanceof Task) ? (Task) task : null;
+        return this.jpa.txExpr(entityManager -> {
+            if(defaultTask != null){
+                // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
+                Imputation existingImputation = this.getImputationByDayByTask(entityManager, calendar.getTime(), defaultTask);
+                this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), entityManager);
+            }
+
+            entityManager.merge(defaultTask);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
+
+            return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
+        });
+
+    }
+
+    private Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task){
+        TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
+        q.setParameter("taskID", task.getId());
+        q.setParameter("day", day);
+
+        // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
+        return q.getResultList().stream().findFirst().orElse(null);
+    }
+
+
+    private void actionOnImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
+        AbstractTask abstractTask = (task instanceof Task) ? (Task) task : (DefaultTask) task;
 
         if (i == null && (val > 0.0) && (val <= 1.0)) { 
             //No imputation for current task and day
@@ -547,10 +560,14 @@ public class ProjectServiceImpl implements ProjectService {
             i.setTask(task);
             i.setUser(actor);
             i.setValue(val);
-            updateEffortLeftFromImputationValue(projectTask, 0, val);
+            if(abstractTask instanceof Task) {
+                updateEffortLeftFromImputationValue((Task) abstractTask, 0, val);
+            }
             entityManager.persist(i);
         } else  { // There is an existing imputation for this day and task
-            updateEffortLeftFromImputationValue(projectTask, i.getValue(), val);
+            if(abstractTask instanceof Task) {
+                updateEffortLeftFromImputationValue((Task) abstractTask, i.getValue(), val);
+            }
             i.setValue(val);
             if (val == 0) {  //if value equal to 0 then remove imputation
                 entityManager.remove(i);
@@ -561,15 +578,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private void updateEffortLeftFromImputationValue(Task projectTask, double currentImputationValue, double newImputationValue) {
-        if (projectTask == null) {
-            return;
-        }
         double currentEL = projectTask.getEffortLeft();
         double newEL = currentEL; // new effort left
 
-        if (currentEL == 0) {
-            return;
-        }
         double diffValue =  Math.abs(newImputationValue - currentImputationValue);
 
         if (currentImputationValue < newImputationValue) {
@@ -582,12 +593,24 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-        public UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val) {
-        return this.jpa.txExpr(entityManager -> {
-            UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, (Task) task, day, val);
-            entityManager.flush();
-            return updatedTaskResult;
-        });
+    public UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val) throws BusinessException {
+        Calendar c = Calendar.getInstance();
+        c.setTime(day);
+        c.set(Calendar.HOUR_OF_DAY, 2);
+
+        if (task instanceof Task) {
+            UpdatedTaskResult updatedTaskResult = this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
+            return this.jpa.txExpr(entityManager -> {
+                entityManager.flush();
+                return updatedTaskResult;
+            });
+        }else{
+            UpdatedTaskResult updatedDefaultTaskResult = this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
+            return this.jpa.txExpr(entityManager -> {
+                entityManager.flush();
+                return updatedDefaultTaskResult;
+            });
+        }
     }
 
 
@@ -596,7 +619,12 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
             List<UpdatedTaskResult> result = new ArrayList<>();
             for(Imputation imputation : imputationsList){
-                UpdatedTaskResult updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
+                UpdatedTaskResult updatedTaskResult = null;
+                try {
+                    updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
+                } catch (BusinessException e) {
+                    e.printStackTrace();
+                }
                 result.add(updatedTaskResult);
             }
             entityManager.flush();
