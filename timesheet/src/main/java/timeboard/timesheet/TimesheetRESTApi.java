@@ -156,7 +156,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                         task.getName(), task.getComments(),
                         0, 0,0, 0,
                         task.getStartDate(),
-                        task.getEndDate(), TaskStatus.IN_PROGESS.name(), 0L)
+                        task.getEndDate(), TaskStatus.IN_PROGRESS.name(), 0L)
                 );
 
                 days.forEach(dateWrapper -> {

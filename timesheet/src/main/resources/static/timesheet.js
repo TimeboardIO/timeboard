@@ -1,8 +1,6 @@
 /**
 * type = imputation | effortLeft
 */
-const axios = require('axios');
-
 const updateTask = function(date, task, type, val){
 
     return $.post("/timesheet", {
@@ -13,9 +11,20 @@ const updateTask = function(date, task, type, val){
     });
 }
 
+const userID = $("meta[property='timesheet']").attr('userID');
+
+
+const emptyTask =  {
+    taskID: 0, projectID: 0, taskName: "", taskComments: "",
+    startDate:"", endDate:"",
+    originalEstimate: 0, typeID: 0,
+    assignee : "", assigneeID: userID
+}
+
 const timesheetModel = {
-    newTask:  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 },
+    newTask: Object.assign({} , emptyTask),
     formError:"",
+    modalTitle:"",
     week:0,
     year:0,
     sum:0,
@@ -120,12 +129,19 @@ $(document).ready(function(){
             rules: [ { type   : 'empty', prompt : 'Please enter task original estimate in days'  },
              { type   : 'number', prompt : 'Please enter task a number original estimate in days'  } ]
           },
-          taskTypeID: {
-            identifier: 'taskTypeID',
-            rules: [ { type   : 'empty', prompt : 'Please enter task type '  } ]
-          }
+
         }
     };
+
+    Vue.component('task-modal', {
+       template: '#task-modal-template',
+       props: {
+         task: Object,
+         formError: String,
+         modalTitle: String
+       }
+     });
+
 
 
 
@@ -198,41 +214,37 @@ $(document).ready(function(){
                  this.newTask.endDate = task.endDate;
                  this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
+                 this.modalTitle = "Edit task";
             }else{
-                 this.newTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 };
+                 this.modalTitle = "Create task";
+                 Object.assign(this.newTask , emptyTask);
             }
             var keepThis = this;
             $('.create-task.modal').modal({
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     if(validated){
-                    $.post('/timesheet/api/task', app.object)
-                    .then(function (response) {
-                        // Success
-                        console.log(response.data)
-                    },function (response) {
-                        // Error
-                        console.log(response.data)
-                    });
-                        /*$.ajax({
+                        $('.ui.error.message').hide();
+                        $.ajax({
                             method: "POST",
-                            url: "/timesheet/api/task",
-                            data: app.newTask,
-                          }).then(function(data) {
-                              if(data == "DONE"){
-                                 updateTimesheet();
-                                 $('.create-task .ui.form').form('reset');
-                                 $('.create-task.modal').modal('hide');
-                              }else{
-                                $('.ui.error.message').text(data);
+                            url: "/api/tasks",
+                            data: JSON.stringify(app.newTask),
+                            contentType: "application/json",
+                            dataType: "json",
+                            success : function(data, textStatus, jqXHR) {
+                                updateTimesheet();
+                                $('.create-task .ui.form').form('reset');
+                                $('.create-task.modal').modal('hide');
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                $('.ui.error.message').text(jqXHR.responseText);
                                 $('.ui.error.message').show();
-                              }
-
-                          });*/
+                            }
+                        });
                     }
                     return false;
                 },
-                detachable : false
+                detachable : true, centered: true
             }).modal('show');
         }
       }
