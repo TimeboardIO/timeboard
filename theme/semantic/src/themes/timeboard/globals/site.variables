@@ -225,12 +225,10 @@
 
 /*---  Colors  ---*/
 
-/*@red              : #DB2828;*/
 @red              : #C53E43;
 @orange           : #F2711C;
 @yellow           : #FBBD08;
 @olive            : #B5CC18;
-/*@green            : #21BA45;*/
 @green            : #4dc98d;
 @teal             : #00B5AD;
 @blue             : @primaryColor;

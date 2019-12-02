@@ -53,7 +53,7 @@ public class RestAPI {
 
     @Activate
     private void init(){
-        System.out.println("Start rest API !!!");
+        System.out.println("Start reporting rest API !");
     }
 
 
