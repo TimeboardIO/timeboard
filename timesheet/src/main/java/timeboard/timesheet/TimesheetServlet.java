@@ -127,6 +127,7 @@ public class TimesheetServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("week", week);
         viewModel.getViewDatas().put("year", year);
         viewModel.getViewDatas().put("lastWeekValidated", lastWeekValidated);
+        viewModel.getViewDatas().put("userID", actor.getId());
 
 
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());

@@ -6,13 +6,81 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekValidated="${lastWeekValidated}"/>
+    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekValidated="${lastWeekValidated}" th:userID="${userID}"/>
 </head>
 
 <body>
 
 <div layout:fragment="content">
 
+    <!-- Task creation modal -->
+    <script type="text/x-template" id="task-modal-template"  >
+        <div class="ui longer modal create-task ">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ modalTitle }}
+            </div>
+            <div class="content">
+                <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
+                    <div v-bind="formError" class="ui error message"></div>
+                    <div class="field">
+                        <label>Project</label>
+                        <select v-model="task.projectID"  class="select dropdown" name="projectID" >
+                            <option th:each="project: ${projectList}"
+                                    th:text="${project.name}" th:value="${project.id}"
+                            ></option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label>Task Name</label>
+                        <input v-model="task.taskName"  name="taskName" placeholder="Task Name" required type="text">
+                    </div>
+                    <div class="field">
+                        <label>Task Description</label>
+                        <input v-model="task.taskComments" name="taskComments" placeholder="Task Description" type="text">
+                    </div>
+                    <div class=" two fields">
+                        <div class="field">
+                            <label>Task Start Date</label>
+                            <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name"
+                                   required  type="date">
+                        </div>
+                        <div class="field">
+                            <label>Task End Date</label>
+                            <input v-model="task.endDate" name="taskEndDate" placeholder="Task Name" required
+                                   type="date">
+                        </div>
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Task Original Estimate</label>
+                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" required type="number">
+                        </div>
+                        <div class="field">
+                            <label>Task type</label>
+                            <select  v-model="task.typeID" name="taskTypeID" >
+                                <option th:each="type: ${taskTypes}"
+                                        th:text="${type.typeName}" th:value="${type.id}"
+                                ></option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="actions">
+                <div class="ui black deny button">
+                    Cancel
+                </div>
+                <div class="ui positive submit right labeled icon button">
+                    Request
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <!-- Timesheet Vue App view -->
     <div id="timesheet">
         <div class="ui segment timesheet-navigation-controls">
             <div v-if="validated === false" style="left: 1em; position: absolute;" v-bind:data-tooltip="!enableValidateButton()?'Please validate last week and check you have all imputation day total = 1' : false"
@@ -155,70 +223,12 @@
                 </form>
             </fieldset>
         </div>
-        <div class="ui longer modal create-task " style="position: absolute;">
-            <i class="close icon"></i>
-            <div class="header">
-                Create task
-            </div>
-            <div class="content">
-                <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
-                    <div class="field">
-                        <label>Project</label>
-                        <select v-model="newTask.projectID"  class="select dropdown" name="projectID" >
-                            <option th:each="project: ${projectList}"
-                                    th:text="${project.name}" th:value="${project.id}"
-                            ></option>
-                        </select>
-                    </div>
 
-                    <div class="field">
-                        <label>Task Name</label>
-                        <input v-model="newTask.taskName"  name="taskName" placeholder="Task Name" required type="text">
-                    </div>
-                    <div class="field">
-                        <label>Task Description</label>
-                        <input v-model="newTask.taskComments" name="taskComments" placeholder="Task Description" type="text">
-                    </div>
-                    <div class=" two fields">
-                        <div class="field">
-                            <label>Task Start Date</label>
-                            <input v-model="newTask.startDate" name="taskStartDate" placeholder="Task Name"
-                                   required  type="date">
-                        </div>
-                        <div class="field">
-                            <label>Task End Date</label>
-                            <input v-model="newTask.endDate" name="taskEndDate" placeholder="Task Name" required
-                                   type="date">
-                        </div>
-                    </div>
-                    <div class="two fields">
-                        <div class="field">
-                            <label>Task Original Estimate</label>
-                            <input v-model="newTask.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" required type="number">
-                        </div>
-                        <div class="field">
-                            <label>Task type</label>
-                            <select  v-model="newTask.typeID" name="taskTypeID" >
-                                <option th:each="type: ${taskTypes}"
-                                        th:text="${type.typeName}" th:value="${type.id}"
-                                        ></option>
-                            </select>
-                        </div>
-                    </div>
-                    <div v-bind="formError" class="ui error message"></div>
-                </form>
-            </div>
-            <div class="actions">
-                <div class="ui black deny button">
-                    Cancel
-                </div>
-                <div class="ui positive submit right labeled icon button">
-                    Request
-                    <i class="checkmark icon"></i>
-                </div>
-            </div>
-        </div>
-
+        <task-modal
+                :task="newTask"
+                :form-error="formError"
+                :modal-title="modalTitle">
+        </task-modal>
         <script src="/timesheet/static/timesheet.js"></script>
 
     </div>
