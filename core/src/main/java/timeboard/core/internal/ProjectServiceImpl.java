@@ -546,13 +546,13 @@ public class ProjectServiceImpl implements ProjectService {
 
         return this.jpa.txExpr(entityManager -> {
 
-            if( projectTask != null && projectTask.getTaskStatus() != TaskStatus.PENDING){
+            if(projectTask.getTaskStatus() != TaskStatus.PENDING){
                 // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
                 Imputation existingImputation = this.getImputationByDayByTask(entityManager, calendar.getTime(), projectTask);
                 this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), entityManager);
             }
-
             entityManager.merge(projectTask);
+
             this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask!= null) ? projectTask.getProject().getName() : "default") + " with value " + val);
 
             return new UpdatedTaskResult(projectTask.getProject().getId(), projectTask.getId(), projectTask.getEffortSpent(), projectTask.getEffortLeft(), projectTask.getOriginalEstimate(), projectTask.getRealEffort());
@@ -565,11 +565,9 @@ public class ProjectServiceImpl implements ProjectService {
         DefaultTask defaultTask = (DefaultTask) this.getTaskByID(actor, task.getId());
 
         return this.jpa.txExpr(entityManager -> {
-            if(defaultTask != null){
-                // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
-                Imputation existingImputation = this.getImputationByDayByTask(entityManager, calendar.getTime(), defaultTask);
-                this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), entityManager);
-            }
+            // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
+            Imputation existingImputation = this.getImputationByDayByTask(entityManager, calendar.getTime(), defaultTask);
+            this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), entityManager);
 
             entityManager.merge(defaultTask);
             this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
@@ -583,13 +581,11 @@ public class ProjectServiceImpl implements ProjectService {
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
         q.setParameter("taskID", task.getId());
         q.setParameter("day", day);
-
-        // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
 
-    private void actionOnImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
+    private AbstractTask actionOnImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
         AbstractTask abstractTask = (task instanceof Task) ? (Task) task : (DefaultTask) task;
 
         if (i == null) {
@@ -599,15 +595,9 @@ public class ProjectServiceImpl implements ProjectService {
             i.setTask(task);
             i.setUser(actor);
             i.setValue(val);
-            if(abstractTask instanceof Task) {
-                updateEffortLeftFromImputationValue((Task) abstractTask, 0, val);
-            }
             entityManager.persist(i);
         } else  {
             // There is an existing imputation for this day and task
-            if(abstractTask instanceof Task) {
-                updateEffortLeftFromImputationValue((Task) abstractTask, i.getValue(), val);
-            }
             i.setValue(val);
             if (val == 0) {
                 //if value equal to 0 then remove imputation
@@ -617,12 +607,16 @@ public class ProjectServiceImpl implements ProjectService {
                 entityManager.persist(i);
             }
         }
+
+        if(abstractTask instanceof Task) {
+            return updateEffortLeftFromImputationValue((Task) abstractTask, 0, val);
+        }
+        return abstractTask;
     }
 
-    private void updateEffortLeftFromImputationValue(Task projectTask, double currentImputationValue, double newImputationValue) {
+    private Task updateEffortLeftFromImputationValue(Task projectTask, double currentImputationValue, double newImputationValue) {
         double currentEL = projectTask.getEffortLeft();
         double newEL = currentEL; // new effort left
-
         double diffValue =  Math.abs(newImputationValue - currentImputationValue);
 
         if (currentImputationValue < newImputationValue) {
@@ -631,7 +625,9 @@ public class ProjectServiceImpl implements ProjectService {
         if (currentImputationValue > newImputationValue) {
             newEL = currentEL + diffValue;
         }
+
         projectTask.setEffortLeft(Math.max(newEL, 0));
+        return projectTask;
     }
 
 
