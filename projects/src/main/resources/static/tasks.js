@@ -197,7 +197,7 @@ var app = new Vue({
         gridData: [ ],
         newTask: Object.assign({}, emptyTask),
         formError:"",
-        modalTitle:""
+        modalTitle:"Create task"
     },
     methods: {
         showCreateTaskModal: function(projectID, task, event){

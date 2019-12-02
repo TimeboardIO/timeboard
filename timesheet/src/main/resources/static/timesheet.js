@@ -1,8 +1,6 @@
 /**
 * type = imputation | effortLeft
 */
-const axios = require('axios');
-
 const updateTask = function(date, task, type, val){
 
     return $.post("/timesheet", {
@@ -13,9 +11,17 @@ const updateTask = function(date, task, type, val){
     });
 }
 
+const emptyTask =  {
+    taskID: 0, projectID: 0, taskName: "", taskComments: "",
+    startDate:"", endDate:"",
+    originalEstimate: 0, typeID: 0,
+    assignee : "", assigneeID:0
+}
+
 const timesheetModel = {
-    newTask:  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 },
+    newTask: Object.assign({} , emptyTask),
     formError:"",
+    modalTitle:"",
     week:0,
     year:0,
     sum:0,
@@ -127,6 +133,16 @@ $(document).ready(function(){
         }
     };
 
+    Vue.component('task-modal', {
+       template: '#task-modal-template',
+       props: {
+         task: Object,
+         formError: String,
+         modalTitle: String
+       }
+     });
+
+
 
 
     var app = new Vue({
@@ -198,8 +214,10 @@ $(document).ready(function(){
                  this.newTask.endDate = task.endDate;
                  this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
+                 this.modalTitle = "Edit task";
             }else{
-                 this.newTask =  {taskID:0, projectID:0, taskName:"", taskComments:"", startDate:"", endDate:"", originalEstimate:0, typeID:0 };
+                 this.modalTitle = "Create task";
+                 Object.assign(this.newTask , emptyTask);
             }
             var keepThis = this;
             $('.create-task.modal').modal({

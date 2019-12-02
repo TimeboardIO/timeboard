@@ -93,7 +93,7 @@
     <script type="text/x-template" id="task-modal-template"  >
         <div class="ui modal create-task " >
             <i class="close icon"></i>
-            <div  v-bind="modalTitle"  class="header"></div>
+            <div class="header">{{modalTitle}}</div>
             <div class="scrolling content">
                 <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
                     <div class="two fields">
@@ -105,13 +105,10 @@
                             <label>User assigned</label>
                             <div class="ui category search">
                                 <div class="ui icon input">
-
                                     <input class="prompt assigned" placeholder="Search user..."
                                            v-model="task.assignee" type="text"/>
-
                                     <input class="taskAssigned" name="taskAssigned"
                                            v-model="task.assigneeID" type="hidden"/>
-
                                     <i class="search icon"></i>
                                 </div>
                                 <div class="results"></div>
