@@ -240,7 +240,7 @@ var app = new Vue({
                                 $('.create-task.modal').modal('hide');
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
-                                $('.ui.error.message').text(textStatus);
+                                $('.ui.error.message').text(jqXHR.responseText);
                                 $('.ui.error.message').show();
                             }
                         });
