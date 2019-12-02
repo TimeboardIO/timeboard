@@ -22,17 +22,74 @@
             </div>
         <table class="ui celled table">
             <thead>
-            <tr><th style="text-align:center;" v-for="key in columns"
-                    @click="sortBy(key)"
-                    :class="{ active: sortKey == key }" > {{ key | capitalize }}  <i class="icon caret" :class="sortOrders[key] > 0 ? 'up' : 'down'">
-              </i> </th>
-                <th>Actions</th>
+            <tr>
+                <th style="text-align:center;"
+                    @click="sortBy('taskName')"
+                    :class="{ active: sortKey == 'taskName' }" > Name <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('taskComments')"
+                    :class="{ active: sortKey == 'taskComments' }" > Comments <i class="icon caret" :class="sortOrders['taskComments'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('startDate')"
+                    :class="{ active: sortKey == 'startDate' }" > Start Date <i class="icon caret" :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('endDate')"
+                    :class="{ active: sortKey == 'endDate' }" > End date <i class="icon caret" :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('originalEstimate')"
+                    :class="{ active: sortKey == 'originalEstimate' }" > OE <i class="icon caret" :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('assignee')"
+                    :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('status')"
+                    :class="{ active: sortKey == 'status' }" > Status <i class="icon caret" :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th tyle="text-align:center;">Actions</th>
+
             </tr></thead>
             <tbody>
             <tr>
-                <td v-for="key in columns">
+
+
+                <td>
                     <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf(key)].value"  type="text" v-bind:placeholder="key +'..' ">
+                        <input  v-model="filterKey[columns.indexOf('taskName')].value"  type="text" placeholder="Name.. ">
+                        <i class="search icon"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="ui fluid icon input">
+                        <input  v-model="filterKey[columns.indexOf('taskComments')].value"  type="text" placeholder="Comments.. ">
+                        <i class="search icon"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="ui fluid icon input">
+                        <input  v-model="filterKey[columns.indexOf('startDate')].value"  type="text" placeholder="Start date.. ">
+                        <i class="search icon"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="ui fluid icon input">
+                        <input  v-model="filterKey[columns.indexOf('endDate')].value"  type="text" placeholder="End date.. ">
+                        <i class="search icon"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="ui fluid icon input">
+                        <input  v-model="filterKey[columns.indexOf('originalEstimate')].value"  type="text" placeholder="OE.. ">
+                        <i class="search icon"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="ui fluid icon input">
+                        <input  v-model="filterKey[columns.indexOf('assignee')].value"  type="text" placeholder="Assignee.. ">
+                        <i class="search icon"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="ui fluid icon input">
+                        <input  v-model="filterKey[columns.indexOf('status')].value"  type="text" placeholder="Status.. ">
                         <i class="search icon"></i>
                     </div>
                 </td>
