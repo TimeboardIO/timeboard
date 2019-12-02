@@ -129,10 +129,7 @@ $(document).ready(function(){
             rules: [ { type   : 'empty', prompt : 'Please enter task original estimate in days'  },
              { type   : 'number', prompt : 'Please enter task a number original estimate in days'  } ]
           },
-          taskTypeID: {
-            identifier: 'taskTypeID',
-            rules: [ { type   : 'empty', prompt : 'Please enter task type '  } ]
-          }
+
         }
     };
 
