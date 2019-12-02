@@ -64,40 +64,57 @@
                     </div>
                 </td>
                 <td>
-                    <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf('startDate')].value"  type="text" placeholder="Start date.. ">
-                        <i class="search icon"></i>
+                    <div class="ui fluid input">
+                        <input type="date" v-model="filterKey[columns.indexOf('startDate')].value" placeholder="Start date.. ">
                     </div>
                 </td>
                 <td>
-                    <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf('endDate')].value"  type="text" placeholder="End date.. ">
-                        <i class="search icon"></i>
+                    <div class="ui fluid input">
+                        <input type="date" v-model="filterKey[columns.indexOf('endDate')].value" placeholder="End date.. ">
                     </div>
                 </td>
                 <td>
-                    <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf('originalEstimate')].value"  type="text" placeholder="OE.. ">
-                        <i class="search icon"></i>
+                    <div class="ui mini fluid input">
+                        <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.min"  type="text" placeholder="Min">
+                    </div>
+                    <div class="ui mini fluid input">
+                        <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.max"  type="text" placeholder="Max">
                     </div>
                 </td>
                 <td>
-                    <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf('assignee')].value"  type="text" placeholder="Assignee.. ">
-                        <i class="search icon"></i>
+                    <div class="ui fluid category search">
+                        <div class="ui fluid icon input">
+
+                            <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search user..." type="text"/>
+
+                            <input class="taskAssigned" name="taskAssigned"
+                                type="hidden"/>
+
+                            <i class="search icon"></i>
+                        </div>
+                        <div class="results"></div>
                     </div>
                 </td>
                 <td>
-                    <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf('status')].value"  type="text" placeholder="Status.. ">
-                        <i class="search icon"></i>
-                    </div>
+                    <select multiple class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
+                        <option th:each="status: ${allTaskStatus}"
+                                th:text="${status.label}"
+                                th:value="${status}"
+                        ></option>
+                    </select>
                 </td>
                 <td></td>
             </tr>
 
             <tr v-for="entry in filteredTasks">
-                <td  style="text-align:center;" v-for="key in columns">{{entry[key]}}</td>
+                <td  style="text-align:center;" >{{entry['taskName']}}</td>
+                <td  style="text-align:center;" >{{entry['taskComments']}}</td>
+                <td  style="text-align:center;" >{{entry['startDate']}}</td>
+                <td  style="text-align:center;" >{{entry['endDate']}}</td>
+                <td  style="text-align:center;" >{{entry['originalEstimate']}}</td>
+                <td  style="text-align:center;" >{{entry['assignee']}}</td>
+                <td  style="text-align:center;" ><div class="ui primary horizontal label">{{entry['status']}}</div></td>
+
                 <td>
                     <button @click="deleteTask($event, entry)" class="ui negative icon button">
                         <i class="close icon"></i>

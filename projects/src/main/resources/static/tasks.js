@@ -20,14 +20,32 @@ Vue.component('task-list', {
    computed: {
      filteredTasks: function () {
        var sortKey = this.sortKey
-       var filterKey = this.filterKey.filter(function (f) { return f.value != '' });
+       var filterKeys = this.filterKey.filter(function (f) { return f.value != '' && f.value is obect});
        var order = this.sortOrders[sortKey] || 1
        var tasks = this.tasks
        var keepThis = this;
-       if (filterKey.length > 0) {
+       if (filterKeys.length > 0) {
          tasks = tasks.filter(function (row) {
-            return filterKey.some(function(f, i, array){
-               return String(row[f.key]).toLowerCase().indexOf(String(f.value).toLowerCase()) > -1
+            return filterKeys.every(function(f, i, array){
+               var rowValue = String(row[f.key]);
+               var filterValue = String(f.value);
+               if(f.key == 'startDate'){
+                    var rowDate = new Date(rowValue);
+                    var filterDate = new Date(filterValue);
+                    return rowDate.getTime() > filterDate.getTime();
+               }else if(f.key == 'endDate'){
+                     var rowDate = new Date(rowValue);
+                     var filterDate = new Date(filterValue);
+                     return rowDate.getTime() < filterDate.getTime();
+               }else if(f.key == 'originalEstimate'){
+                    return true;
+               /*
+                     var rowDouble = parseFloat(rowValue);
+                     var filterMin =  parseFloat(f.value.min);
+                     var filterMax =  parseFloat(f.value.max);
+                     return rowDouble <= filterMax && rowDouble >= filterMax  ; */
+                }
+               return rowValue.toLowerCase().indexOf(filterValue.toLowerCase()) > -1
             });
          })
        }
@@ -192,7 +210,7 @@ var app = new Vue({
     data: {
         searchQuery: '',
         searchQueries: [{key : 'taskName', value: ''}, {key : 'taskComments', value: ''}, {key : 'startDate', value: ''},
-            {key : 'endDate', value: ''}, {key : 'originalEstimate', value: ''}, {key : 'assignee', value: ''}, {key : 'status', value: ''}],
+            {key : 'endDate', value: ''}, {key : 'originalEstimate', value: {min: '', max: ''} }, {key : 'assignee', value: ''}, {key : 'status', value: ''}],
         gridColumns: ['taskName', 'taskComments', 'startDate', 'endDate', 'originalEstimate', 'assignee', 'status'],
         gridData: [ ],
         newTask: Object.assign({}, emptyTask),
