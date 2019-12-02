@@ -224,33 +224,29 @@ $(document).ready(function(){
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     if(validated){
-                    $.post('/timesheet/api/task', app.object)
-                    .then(function (response) {
-                        // Success
-                        console.log(response.data)
-                    },function (response) {
-                        // Error
-                        console.log(response.data)
-                    });
-                        /*$.ajax({
+                        $.ajax({
                             method: "POST",
-                            url: "/timesheet/api/task",
-                            data: app.newTask,
-                          }).then(function(data) {
-                              if(data == "DONE"){
-                                 updateTimesheet();
-                                 $('.create-task .ui.form').form('reset');
-                                 $('.create-task.modal').modal('hide');
-                              }else{
-                                $('.ui.error.message').text(data);
+                            url: "/api/tasks",
+                            data: JSON.stringify(app.newTask),
+                            contentType: "application/json",
+                            dataType: "json",
+                            success : function(data, textStatus, jqXHR) {
+                                keepThis.gridData = keepThis.gridData.filter(function(el){
+                                    return el.taskID != data.taskID;
+                                });
+                                updateTimesheet();
+                                $('.create-task .ui.form').form('reset');
+                                $('.create-task.modal').modal('hide');
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                $('.ui.error.message').text(textStatus);
                                 $('.ui.error.message').show();
-                              }
-
-                          });*/
+                            }
+                        });
                     }
                     return false;
                 },
-                detachable : false
+                detachable : true, centered: true
             }).modal('show');
         }
       }
