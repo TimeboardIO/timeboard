@@ -98,6 +98,8 @@
             </div>
             <div class="scrolling content">
                 <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
+                    <div v-bind="formError" class="ui error message"></div>
+
                     <div class="two fields">
                         <div class="field">
                             <label>Task Name</label>
@@ -147,7 +149,6 @@
                             </select>
                         </div>
                     </div>
-                    <div v-bind="formError" class="ui error message"></div>
                 </form>
             </div>
             <div class="actions">

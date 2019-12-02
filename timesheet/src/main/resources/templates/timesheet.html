@@ -20,8 +20,9 @@
             <div class="header">
                 {{ modalTitle }}
             </div>
-            <div class="content">
+            <div class="scrolling content">
                 <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
+                    <div v-bind="formError" class="ui error message"></div>
                     <div class="field">
                         <label>Project</label>
                         <select v-model="task.projectID"  class="select dropdown" name="projectID" >
@@ -65,7 +66,6 @@
                             </select>
                         </div>
                     </div>
-                    <div v-bind="formError" class="ui error message"></div>
                 </form>
             </div>
             <div class="actions">
