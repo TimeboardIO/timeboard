@@ -1,6 +1,7 @@
 /**
 * type = imputation | effortLeft
 */
+
 const updateTask = function(date, task, type, val){
 
     return $.post("/timesheet", {

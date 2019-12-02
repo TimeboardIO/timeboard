@@ -51,9 +51,12 @@ Vue.component('task-list', {
        this.sortKey = key
        this.sortOrders[key] = this.sortOrders[key] * -1
      },
-     showCreateTaskModal: function(projectID, task, event){
+     showCreateTaskModal: function(projectID, task, event){ // proxy to vue app
         this.$parent.showCreateTaskModal(projectID, task, event);
      },
+     showGraphModal: function(projectID, task, event){ // proxy to vue app
+        this.$parent.showGraphModal(projectID, task, event);
+      },
      deleteTask: function(event, task){
         keepThis = this;
         event.target.classList.toggle('loading');
@@ -148,6 +151,15 @@ Vue.component('task-modal', {
    }
  });
 
+Vue.component('graph-modal', {
+   template: '#graph-modal-template',
+   props: {
+     task: Object,
+     formError: String,
+     modalTitle: String
+   }
+ });
+
 
 
  const formValidationRules = {
@@ -202,6 +214,67 @@ var app = new Vue({
         modalTitle:"Create task"
     },
     methods: {
+        showGraphModal: function(projectID, task, event){
+            $('.graph.modal').modal({ detachable : true, centered: true }).modal('show');
+            $.ajax({
+                method: "GET",
+                url: "/api/tasks/chart?task="+task.taskID,
+                success : function(data, textStatus, jqXHR) {
+                    var listOfTaskDates = data.listOfTaskDates;
+                    var effortSpentDatasForChart = data.effortSpentDatas;
+                    var realEffortDatasForChart = data.realEffortDatas;
+
+                    var chart = new Chart($("#lineChart"), {
+                      type: 'line',
+                      data: {
+                        labels: listOfTaskDates,
+                        datasets: [{
+                            data: effortSpentDatasForChart,
+                            label: "Effort spent for " + task.taskName,
+                            borderColor: "#3e95cd",
+                            fill: true,
+                            steppedLine: true
+                          },
+                          {
+                            data: realEffortDatasForChart,
+                            label: "Real effort for " + task.taskName,
+                            borderColor: "#ff6384",
+                            fill: true,
+                            steppedLine: true
+                          }
+                        ]
+                      },
+                      options: {
+                        title: {
+                          display: true,
+                          text: 'Task - Real Effort and Effort Spent graph'
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    min: 0
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Number of days'
+                                }
+                            }],
+                            xAxes: [{
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Dates'
+                                }
+                            }],
+                        }
+                      }
+                    });
+
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(data);
+                }
+            });
+        },
         showCreateTaskModal: function(projectID, task, event){
             event.preventDefault();
             if(task){

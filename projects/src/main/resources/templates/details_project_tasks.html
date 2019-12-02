@@ -15,6 +15,7 @@
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
 
+
     <script type="text/x-template" id="task-list-template">
         <div class="dimmable">
             <div class="ui active inverted dimmer">
@@ -47,6 +48,9 @@
                     </button>
                     <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui primary icon button">
                         <i class="edit icon"></i>
+                    </button>
+                    <button v-on:click="showGraphModal(null, entry, $event)" class="ui yellow icon button">
+                        <i class="chart line icon"></i>
                     </button>
                 </td>
             </tr>
@@ -90,6 +94,17 @@
 
     </script>
 
+    <script type="text/x-template" id="graph-modal-template">
+        <div class="ui modal graph " >
+            <i class="close icon"></i>
+            <div class="content">
+                <div class="ui fluid card">
+                    <canvas id="lineChart" width="800" height="450"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </script>
     <script type="text/x-template" id="task-modal-template"  >
         <div class="ui large modal create-task " >
             <i class="close icon"></i>
@@ -202,6 +217,11 @@
                 :form-error="formError"
                 :modal-title="modalTitle">
         </task-modal>
+        <graph-modal
+                :task="newTask"
+                :form-error="formError"
+                :modal-title="modalTitle">
+        </graph-modal>
 
         <script src="/projects/static/tasks.js"></script>
 

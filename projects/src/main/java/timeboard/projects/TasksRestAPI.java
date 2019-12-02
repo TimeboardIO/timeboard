@@ -42,9 +42,10 @@ import javax.ws.rs.core.Response;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component(
         service = TasksRestAPI.class,
@@ -125,6 +126,99 @@ public class TasksRestAPI {
         }
 
     }
+
+    @GET
+    @Path("/chart")
+    public Response getDatasForCharts(@Context HttpServletRequest request) throws BusinessException, JsonProcessingException {
+        TaskGraphWrapper wrapper = new TaskGraphWrapper();
+        User actor = (User) req.getAttribute("actor");
+
+
+        final String taskIdStr = request.getParameter("task");
+        Long taskID = null;
+        if(taskIdStr != null) {
+            taskID = Long.parseLong(taskIdStr);
+        }
+        if(taskID == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+        }
+
+        Task task;
+        try {
+            task = (Task) this.projectService.getTaskByID(actor, taskID);
+        }catch (Exception e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+
+        }
+
+        // Datas for dates (Axis X)
+        String formatLocalDate = "yyyy-MM-dd";
+        String formatDateToDisplay = "dd/MM/yyyy";
+        LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getStartDate()));
+        LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getEndDate()));
+        List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
+                .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
+                .collect(Collectors.toList());
+        wrapper.setListOfTaskDates( listOfTaskDates);
+
+        // Datas for effort spent (Axis Y)
+        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
+        final EffortHistory[] lastEffortSpentSum = {new EffortHistory(task.getStartDate(), 0.0)};
+        Map<Date, Double> effortSpentMap = listOfTaskDates
+                .stream()
+                .map(dateString -> {
+                    try {
+                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .map(date -> effortSpentDB.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effort -> {
+                            lastEffortSpentSum[0] = new EffortHistory(date, effort.getValue());
+                            return lastEffortSpentSum[0];
+                        })
+                        .findFirst().orElse(new EffortHistory(date, lastEffortSpentSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setEffortSpentDatas(effortSpentMap.values());
+
+        // Datas for effort estimate (Axis Y)
+        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
+        final EffortHistory[] lastEffortEstimate = {new EffortHistory(task.getStartDate(), task.getOriginalEstimate())};
+        Map<Date, Double> effortEstimateMap = listOfTaskDates
+                .stream()
+                .map(dateString -> {
+                    try {
+                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .map(date -> effortLeftDB.stream()
+                        .filter(el -> new SimpleDateFormat(formatDateToDisplay).format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effortLeft -> {
+                            lastEffortEstimate[0] = new EffortHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
+                            return lastEffortEstimate[0];
+                        })
+                        .findFirst().orElse(new EffortHistory(date, lastEffortEstimate[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setRealEffortDatas(effortEstimateMap.values());
+
+        return Response.ok().entity(MAPPER.writeValueAsString(wrapper)).build();
+
+    }
+
 
     @GET
     @Path("/approve")
@@ -279,7 +373,30 @@ public class TasksRestAPI {
     }
 
 
-    public static class TaskWrapper implements Serializable {
+    public static class TaskGraphWrapper implements Serializable {
+        public TaskGraphWrapper(){}
+
+        public List<String> listOfTaskDates;
+        public Collection<Double> effortSpentDatas;
+        public Collection<Double> realEffortDatas;
+        
+        public void setListOfTaskDates(List<String> listOfTaskDates) {
+            this.listOfTaskDates = listOfTaskDates;
+        }
+
+        public void setEffortSpentDatas(Collection<Double> effortSpentDatas) {
+            this.effortSpentDatas = effortSpentDatas;
+
+        }
+
+        public void setRealEffortDatas(Collection<Double> realEffortDatas) {
+            this.realEffortDatas = realEffortDatas;
+        }
+    }
+
+
+
+        public static class TaskWrapper implements Serializable {
         public Long taskID;
         public Long projectID;
 
