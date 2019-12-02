@@ -231,9 +231,6 @@ $(document).ready(function(){
                             contentType: "application/json",
                             dataType: "json",
                             success : function(data, textStatus, jqXHR) {
-                                keepThis.gridData = keepThis.gridData.filter(function(el){
-                                    return el.taskID != data.taskID;
-                                });
                                 updateTimesheet();
                                 $('.create-task .ui.form').form('reset');
                                 $('.create-task.modal').modal('hide');
