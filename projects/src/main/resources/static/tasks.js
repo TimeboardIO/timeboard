@@ -182,7 +182,9 @@ Vue.component('task-modal', {
         taskID: 0, projectID: currentProjectID, taskName: "", taskComments: "",
         startDate:"", endDate:"",
         originalEstimate: 0, typeID: 0,
-        assignee : "", assigneeID:0
+        assignee: "", assigneeID: 0,
+        status:"PENDING",
+        milestoneID:0
 }
 
 
@@ -205,16 +207,24 @@ var app = new Vue({
             if(task){
                  this.modalTitle = "Edit task";
                  this.newTask.projectID = projectID;
+                 this.newTask.projectID = currentProjectID;
                  this.newTask.taskID = task.taskID
+
                  this.newTask.taskName = task.taskName;
                  this.newTask.taskComments = task.taskComments;
-                 this.newTask.startDate = task.startDate;
+
                  this.newTask.endDate = task.endDate;
+                 this.newTask.startDate = task.startDate;
+
                  this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
+
                  this.newTask.assignee = task.assignee;
+                 this.newTask.assigneeID = task.assigneeID;
+
                  this.newTask.status = task.status;
-                 this.newTask.projectID = currentProjectID;
+                 this.newTask.milestoneID = task.milestoneID;
+
             }else{
                  this.modalTitle = "Create task";
                  Object.assign(this.newTask , emptyTask);
@@ -225,6 +235,7 @@ var app = new Vue({
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     var object = {};
                     if(validated){
+                        $('.ui.error.message').hide();
                         $.ajax({
                             method: "POST",
                             url: "/api/tasks",
@@ -262,9 +273,6 @@ $(document).ready(function(){
          $('.ui.dimmer').removeClass('active');
     });
 
-
-     $('select.dropdown') .dropdown() ;
-
      $('.ui.search')
         .search({
             apiSettings: {
@@ -278,6 +286,8 @@ $(document).ready(function(){
                 onSelect: function(result, response) {
                     $('.assigned').val(result.screenName);
                     $('.taskAssigned').val(result.id);
+                    app.newTask.assignee = result.screenName;
+                    app.newTask.assigneeID = result.id;
                  },
             minCharacters : 3
         });

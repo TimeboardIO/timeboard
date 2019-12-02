@@ -91,7 +91,7 @@ public class ProjectsTasksRESTApi extends TimeboardServlet {
     }
 
     private void approveTask(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {
-        this.changeTaskStatus(actor, request, response, TaskStatus.IN_PROGESS);
+        this.changeTaskStatus(actor, request, response, TaskStatus.IN_PROGRESS);
     }
 
     private void denyTask(User actor, HttpServletRequest request, HttpServletResponse response) throws IOException, BusinessException {

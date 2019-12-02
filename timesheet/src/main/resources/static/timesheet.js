@@ -11,11 +11,14 @@ const updateTask = function(date, task, type, val){
     });
 }
 
+const userID = $("meta[property='timesheet']").attr('userID');
+
+
 const emptyTask =  {
     taskID: 0, projectID: 0, taskName: "", taskComments: "",
     startDate:"", endDate:"",
     originalEstimate: 0, typeID: 0,
-    assignee : "", assigneeID:0
+    assignee : "", assigneeID: userID
 }
 
 const timesheetModel = {
@@ -224,6 +227,7 @@ $(document).ready(function(){
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     if(validated){
+                        $('.ui.error.message').hide();
                         $.ajax({
                             method: "POST",
                             url: "/api/tasks",

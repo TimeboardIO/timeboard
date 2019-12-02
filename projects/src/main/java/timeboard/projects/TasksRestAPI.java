@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -114,7 +115,8 @@ public class TasksRestAPI {
                         task.getEndDate(),
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
-                        (task.getTaskType() != null ? task.getTaskType().getId() : 0L)));
+                        (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
+                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L)));
 
             }
             return Response.ok().entity(MAPPER.writeValueAsString(result.toArray())).build();
@@ -128,7 +130,7 @@ public class TasksRestAPI {
     @Path("/approve")
     public Response approveTask(@Context HttpServletRequest request) {
         User actor = (User) req.getAttribute("actor");
-        return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGESS);
+        return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGRESS);
     }
 
     @GET
@@ -229,6 +231,14 @@ public class TasksRestAPI {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
+        Long milestoneID = taskWrapper.milestoneID;
+        Milestone milestone = null;
+        try {
+            milestone = this.projectService.getMilestoneById( actor, milestoneID);
+        } catch (Exception e) {
+        }
+
+
         Task task = null;
         Long typeID = taskWrapper.typeID;
 
@@ -239,6 +249,7 @@ public class TasksRestAPI {
 
                 User assignee = userService.findUserByID(taskWrapper.assigneeID);
                 final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
+
                 task.setName(taskWrapper.getTaskName());
                 task.setComments(taskWrapper.getTaskComments());
                 task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
@@ -246,7 +257,8 @@ public class TasksRestAPI {
                 task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
                 task.setAssigned(assignee);
                 task.setTaskType(taskType);
-                task.setTaskStatus(TaskStatus.valueOf(taskWrapper.getStatus()));
+                task.setMilestone(milestone);
+                task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING );
 
                 projectService.updateTask(actor,task);
             }catch (Exception e){
@@ -257,10 +269,11 @@ public class TasksRestAPI {
                 task = projectService.createTask(actor, project,
                         name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
             }catch (Exception e){
-                return Response.status(Response.Status.BAD_REQUEST).header("msg","Error in task creation please verify your inputs and retry").build();
+                return Response.status(Response.Status.BAD_REQUEST).header("msg","Error in task creation please verify your inputs and retry. (" +e.getMessage()+")").build();
             }
         }
 
+        taskWrapper.setTaskID(task.getId());
         return Response.ok().entity(MAPPER.writeValueAsString(taskWrapper)).build();
 
     }
@@ -268,20 +281,27 @@ public class TasksRestAPI {
 
     public static class TaskWrapper implements Serializable {
         public Long taskID;
+        public Long projectID;
+
         public String taskName;
         public String taskComments;
+
         public double originalEstimate;
+
         public String startDate;
         public String endDate;
+
         public String assignee;
         public Long assigneeID;
-        public String status;
+
         public Long typeID;
-        public Long projectID;
+        public String status;
+
+        public Long milestoneID;
 
         public TaskWrapper(){}
 
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID) {
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID, Long milestoneID) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComments = taskComments;
@@ -292,6 +312,15 @@ public class TasksRestAPI {
             this.assigneeID = assigneeID;
             this.status = status;
             this.typeID = typeID;
+            this.milestoneID = milestoneID;
+        }
+
+        public Long getMilestoneID() {
+            return milestoneID;
+        }
+
+        public void setMilestoneID(Long milestoneID) {
+            this.milestoneID = milestoneID;
         }
 
         public Long getTaskID() {
