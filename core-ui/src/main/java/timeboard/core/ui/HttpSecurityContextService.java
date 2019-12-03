@@ -31,26 +31,23 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.model.User;
 
 
 
-@Component(
-        service = HttpSecurityContextService.class,
-        scope = ServiceScope.SINGLETON
-)
+@Component
 public class HttpSecurityContextService {
 
 
-    @Reference
+    @Autowired
     private LogService logService;
 
-    @Reference
+    @Autowired
     private TimeboardSessionStore sessionStore;
 
     public  UUID  getCurrentSessionID(HttpServletRequest req) {

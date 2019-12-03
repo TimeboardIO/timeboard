@@ -1,4 +1,4 @@
-package timeboard.ui;
+package timeboard.home;
 
 /*-
  * #%L
@@ -33,15 +33,17 @@ import java.util.Date;
 import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
-import timeboard.ui.model.Week;
+import timeboard.home.model.Week;
 
 
 @Component(
@@ -54,21 +56,17 @@ import timeboard.ui.model.Week;
                 "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
         }
 )
+@WebServlet(name="HomeServlet", urlPatterns = {"/home"})
 public class HomeServlet extends TimeboardServlet {
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            policy = ReferencePolicy.STATIC,
-            cardinality = ReferenceCardinality.OPTIONAL
-    )
-    private   ProjectService projectService;
+    @Autowired
+    private ProjectService projectService;
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            policy = ReferencePolicy.STATIC,
-            cardinality = ReferenceCardinality.OPTIONAL
-    )
-    private   TimesheetService timesheetService;
+
+    @Autowired
+    private TimesheetService timesheetService;
+
+
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -77,7 +75,7 @@ public class HomeServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("home:home.html");
+        viewModel.setTemplate("home.html");
     }
 
     @Override
@@ -110,7 +108,7 @@ public class HomeServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(user).size());
         viewModel.getViewDatas().put("weeks", weeks);
 
-        viewModel.setTemplate("home:home.html");
+        viewModel.setTemplate("home.html");
     }
 
 

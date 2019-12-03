@@ -28,26 +28,26 @@ package timeboard.core.internal;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
+import org.osgi.service.log.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.TimeboardSessionStore;
+import timeboard.core.model.User;
+
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.log.LogService;
-import timeboard.core.api.TimeboardSessionStore;
-import timeboard.core.model.User;
 
-@Component(
-        service = TimeboardSessionStore.class,
-        scope = ServiceScope.SINGLETON
-)
+@Component
 public class InMemorySessionStore implements TimeboardSessionStore {
 
-    @Reference
+    @Autowired
     private LogService logService;
 
     private static final Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
@@ -55,7 +55,7 @@ public class InMemorySessionStore implements TimeboardSessionStore {
             .expireAfterWrite(30, TimeUnit.MINUTES)
             .build();
 
-    @Activate
+    @PostConstruct
     private void init() {
         this.logService.log(LogService.LOG_INFO, String.format("Start session store : %s", this.toString()));
     }

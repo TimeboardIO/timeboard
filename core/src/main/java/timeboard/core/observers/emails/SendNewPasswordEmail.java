@@ -27,15 +27,16 @@ package timeboard.core.observers.emails;
  */
 
 import io.reactivex.schedulers.Schedulers;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.Executors;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.model.User;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.Executors;
 
 
 

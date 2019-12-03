@@ -26,9 +26,6 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.Base64;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.log.LogService;
@@ -36,11 +33,16 @@ import timeboard.core.api.EncryptionService;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+
 
 @Component(
         service = EncryptionService.class,
         immediate = true
 )
+@org.springframework.stereotype.Component
 public class EncryptionServiceImpl implements EncryptionService {
 
     @Reference

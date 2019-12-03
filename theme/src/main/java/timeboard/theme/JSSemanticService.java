@@ -28,19 +28,17 @@ package timeboard.theme;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.osgi.service.component.annotations.Component;
+import org.springframework.stereotype.Component;
 import timeboard.core.ui.JavascriptService;
 
-@Component(
-        service = JavascriptService.class,
-        immediate = true
-)
+
+@Component
 public class JSSemanticService implements JavascriptService {
 
     @Override
     public List<String> listJavascriptUrls() {
         List<String> js = new ArrayList<>();
-        js.add("/theme/semantic.min.js");
+        js.add("/webjars/semantic/semantic.min.js");
         return js;
     }
 }

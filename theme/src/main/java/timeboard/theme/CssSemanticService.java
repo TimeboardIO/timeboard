@@ -28,19 +28,16 @@ package timeboard.theme;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.osgi.service.component.annotations.Component;
+import org.springframework.stereotype.Component;
 import timeboard.core.ui.CssService;
 
-@Component(
-        service = CssService.class,
-        immediate = true
-)
+@Component
 public class CssSemanticService implements CssService {
 
     @Override
     public List<String> listCSSUrls() {
         List<String> css = new ArrayList<>();
-        css.add("/theme/semantic.min.css");
+        css.add("/webjars/semantic/semantic.min.css");
         return css;
     }
 }

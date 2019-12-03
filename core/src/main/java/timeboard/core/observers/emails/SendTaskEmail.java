@@ -26,11 +26,6 @@ package timeboard.core.observers.emails;
  * #L%
  */
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -39,6 +34,12 @@ import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 
 @Component(

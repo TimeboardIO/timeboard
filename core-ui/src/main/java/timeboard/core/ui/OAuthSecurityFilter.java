@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.Activate;
@@ -38,6 +40,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.model.User;
 
@@ -56,28 +60,40 @@ import timeboard.core.model.User;
         scope = ServiceScope.SINGLETON,
         configurationPid = {"timeboard.oauth"}
 )
+@WebFilter(urlPatterns = {"/*"})
 public class OAuthSecurityFilter implements Filter {
 
 
-    private String loginURL;
+    @Value("${timeboard.oauth.loginURL}")
+    private String loginURLPrefix;
+
+    @Value("${timeboard.oauth.clientId}")
+    private String clientId;
+
+    @Value("${timeboard.oauth.redirect.uri}")
+    private String redirectURI;
 
 
-    @Reference
+    @Autowired
     private TimeboardSessionStore timeboardSessionStore;
 
-    @Reference
+
+    @Autowired
     private HttpSecurityContextService securityContextService;
 
-    @Reference
+
+    @Autowired
     private LogService logService;
 
-    @Activate
-    private void activate(Map<String, String> properties) {
+    private String loginURL;
+
+    @PostConstruct
+    private void activate() {
         this.logService.log(LogService.LOG_INFO, "Security Filter is activated");
         this.loginURL = String.format(
-                properties.get("oauth.login.url") + "?response_type=code&client_id=%s&redirect_uri=%s",
-                properties.get("oauth.clientid"),
-                properties.get("oauth.redirect.uri")
+                this.loginURLPrefix + "?response_type=code&client_id=%s&redirect_uri=%s",
+                this.clientId,
+                this.redirectURI
                 );
     }
 
@@ -94,6 +110,8 @@ public class OAuthSecurityFilter implements Filter {
         boolean isLogin = req.getServletPath().equals(this.loginURL) || req.getServletPath().equals("/signin");
         boolean isStatic =
                 req.getServletPath().startsWith("/static")
+    ||
+        req.getServletPath().startsWith("/webjars")
                         || req.getServletPath().equals("/favicon.ico");
 
         User user = this.securityContextService.getCurrentUser(req);

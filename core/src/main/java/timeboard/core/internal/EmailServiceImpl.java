@@ -26,22 +26,23 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 import org.apache.commons.lang.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ServiceScope;
 import timeboard.core.api.EmailService;
 import timeboard.core.observers.emails.EmailStructure;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Component(
         service = EmailService.class,
@@ -54,6 +55,7 @@ import timeboard.core.observers.emails.EmailStructure;
         },
         configurationPid = "timeboard.security.EmailService"
 )
+@org.springframework.stereotype.Component
 public class EmailServiceImpl implements EmailService {
 
 

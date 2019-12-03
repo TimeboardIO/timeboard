@@ -26,9 +26,10 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.model.User;
+
 import java.io.Serializable;
 import java.util.*;
-import timeboard.core.model.User;
 
 public interface TimeboardSessionStore {
 

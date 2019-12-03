@@ -1,4 +1,4 @@
-package timeboard.ui.model;
+package timeboard.home.model;
 
 /*-
  * #%L

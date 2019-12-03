@@ -26,15 +26,10 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import javax.persistence.TypedQuery;
-import org.apache.aries.jpa.template.JpaTemplate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.TimesheetService;
@@ -44,19 +39,24 @@ import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 
 @Component(
         service = TimesheetService.class
 )
+@org.springframework.stereotype.Component
+@Transactional
 public class TimesheetServiceImpl implements TimesheetService {
 
-    /**
-     * Injected instance of timeboard persistence unit.
-     */
-    @Reference(
-            target = "(osgi.unit.name=timeboard-pu)",
-            scope = ReferenceScope.BUNDLE)
-    private JpaTemplate jpa;
+
+    @Autowired
+    private EntityManager em;
 
     @Reference
     private UserService userService;
@@ -96,7 +96,6 @@ public class TimesheetServiceImpl implements TimesheetService {
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
 
-        boolean allDailyImputationTotalsAreOne = this.jpa.txExpr(entityManager -> {
 
             Boolean result = true;
             c.set(Calendar.WEEK_OF_YEAR, week);
@@ -106,17 +105,16 @@ public class TimesheetServiceImpl implements TimesheetService {
 
             for (int i = 1; i <= 5; i++) {
 
-                TypedQuery<Double> q = entityManager.createQuery("select sum(value) from Imputation i where i.user = :user and i.day = :day ", Double.class);
+                TypedQuery<Double> q = em.createQuery("select sum(value) from Imputation i where i.user = :user and i.day = :day ", Double.class);
                 q.setParameter("user", userTimesheet);
                 q.setParameter("day", c.getTime());
                 final List<Double> resultList = q.getResultList();
                 result &= (resultList.get(0) == 1.0);
                 c.roll(Calendar.DAY_OF_WEEK,1);
             }
-            return result;
+            boolean allDailyImputationTotalsAreOne =  result;
 
-        });
-        if (!allDailyImputationTotalsAreOne) {
+         if (!allDailyImputationTotalsAreOne) {
             throw new TimesheetException("Can not validate this week, all daily imputations totals are not equals to 1");
         }
 
@@ -126,9 +124,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         validatedTimesheet.setYear(year);
         validatedTimesheet.setWeek(week);
 
-        this.jpa.tx(entityManager -> {
-            entityManager.persist(validatedTimesheet);
-        });
+             em.persist(validatedTimesheet);
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService));
 
@@ -138,8 +134,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public boolean isTimesheetValidated(User userTimesheet, int year, int week) {
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery<ValidatedTimesheet> q = entityManager.createQuery("select vt from ValidatedTimesheet vt "
+             TypedQuery<ValidatedTimesheet> q = em.createQuery("select vt from ValidatedTimesheet vt "
                     + "where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
             q.setParameter("week", week);
             q.setParameter("year", year);
@@ -151,13 +146,11 @@ public class TimesheetServiceImpl implements TimesheetService {
             } catch (Exception e) {
                 return false;
             }
-        });
-    }
+     }
 
     @Override
     public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user) {
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery<Double> q = entityManager.createQuery(
+            TypedQuery<Double> q = em.createQuery(
                     "SELECT COALESCE(sum(i.value),0) \n"
                             + "FROM Imputation i\n"
                             + "WHERE i.user = :user \n"
@@ -167,7 +160,6 @@ public class TimesheetServiceImpl implements TimesheetService {
             q.setParameter("lastDayOfWeek", lastDayOfWeek);
             q.setParameter("user", user);
             return q.getSingleResult();
-        });
     }
     
 }

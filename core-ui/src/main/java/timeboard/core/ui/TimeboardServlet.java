@@ -29,6 +29,8 @@ package timeboard.core.ui;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -36,30 +38,38 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import timeboard.core.model.User;
 
 
 public abstract class TimeboardServlet extends HttpServlet {
 
-    private OSGITemplateResolver resolver = new OSGITemplateResolver();
+    private ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+
+    @Autowired
     private NavigationEntryRegistryService navRegistry;
 
+    @Autowired
+    private BrandingService brandingService;
+
+    @Autowired
+    private JavascriptService javascriptService;
+
+    @Autowired
+    private CssService cssService;
+
     protected abstract ClassLoader getTemplateResolutionClassLoader();
+
 
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        try {
-            ServiceReference<NavigationEntryRegistryService> sr = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(NavigationEntryRegistryService.class);
-            this.navRegistry = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(sr);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setPrefix("/templates/");
         resolver.setCacheable(true);
@@ -69,33 +79,15 @@ public abstract class TimeboardServlet extends HttpServlet {
 
 
     private String getAppName() {
-        String appName = "Missing Theme Plugin";
-        ServiceReference<BrandingService> brandingServiceRef = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(BrandingService.class);
-        if (brandingServiceRef != null) {
-            BrandingService brandingService = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(brandingServiceRef);
-            appName = brandingService.appName();
-        }
-        return appName;
+        return this.brandingService.appName();
     }
 
     private List<String> getCssLinkURLs() {
-        List<String> cssURLs = new ArrayList<>();
-        ServiceReference<CssService> cssServiceRef = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(CssService.class);
-        if (cssServiceRef != null) {
-            CssService cssService = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(cssServiceRef);
-            cssURLs.addAll(cssService.listCSSUrls());
-        }
-        return cssURLs;
+        return this.cssService.listCSSUrls();
     }
 
     private List<String> getJavascriptURLs() {
-        List<String> jsURLs = new ArrayList<>();
-        ServiceReference<JavascriptService> jsServiceRef = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getServiceReference(JavascriptService.class);
-        if (jsServiceRef != null) {
-            JavascriptService jsService = FrameworkUtil.getBundle(TimeboardServlet.class).getBundleContext().getService(jsServiceRef);
-            jsURLs.addAll(jsService.listJavascriptUrls());
-        }
-        return jsURLs;
+       return this.javascriptService.listJavascriptUrls();
     }
 
     @Override

@@ -65,13 +65,13 @@ public class TimesheetServlet extends TimeboardServlet {
             cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,
             policyOption = ReferencePolicyOption.GREEDY)
-    private volatile ProjectService projectService;
+    private  ProjectService projectService;
 
     @Reference(
             cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC,
             policyOption = ReferencePolicyOption.GREEDY)
-    private volatile TimesheetService timesheetService;
+    private  TimesheetService timesheetService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {

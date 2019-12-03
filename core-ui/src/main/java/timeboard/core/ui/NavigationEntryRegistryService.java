@@ -29,11 +29,13 @@ package timeboard.core.ui;
 import java.util.Comparator;
 import java.util.List;
 import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Component(
         service = NavigationEntryRegistryService.class,
         immediate = true
 )
+@org.springframework.stereotype.Component
 public class NavigationEntryRegistryService {
 
     @Reference(
@@ -41,7 +43,8 @@ public class NavigationEntryRegistryService {
             policy = ReferencePolicy.DYNAMIC,
             cardinality = ReferenceCardinality.MULTIPLE
     )
-    private volatile List<NavigationExtPoint> entries;
+    @Autowired(required = false)
+    private List<NavigationExtPoint> entries;
 
     public List<NavigationExtPoint> getEntries() {
         this.entries.sort(Comparator.comparing(o -> ((Integer) o.getNavigationWeight())));

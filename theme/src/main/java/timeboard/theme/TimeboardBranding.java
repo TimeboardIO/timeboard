@@ -26,29 +26,18 @@ package timeboard.theme;
  * #L%
  */
 
-import java.util.Map;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import timeboard.core.ui.BrandingService;
 
 
-@Component(
-        service = BrandingService.class,
-        scope = ServiceScope.SINGLETON,
-        property = {
-                "timeboard.name=Timeboards"
-        },
-        configurationPid = "timeboard.theme.TimeboardBranding"
-)
+
+@Component
 public class TimeboardBranding implements BrandingService {
 
+    @Value("${timeboard.appName}")
     private String name;
 
-    @Activate
-    private void init(Map<String, String> conf) {
-        this.name = conf.get("timeboard.name");
-    }
 
     @Override
     public String appName() {

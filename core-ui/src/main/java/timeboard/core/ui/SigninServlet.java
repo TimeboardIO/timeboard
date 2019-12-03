@@ -35,11 +35,14 @@ import java.net.http.HttpResponse;
 import java.util.Base64;
 import java.util.Map;
 import javax.servlet.Servlet;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -58,30 +61,31 @@ import timeboard.core.model.User;
         },
         configurationPid = {"timeboard.oauth"}
 )
+@WebServlet(name = "SigninServlet", urlPatterns = "/signin")
 public class SigninServlet extends HttpServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    @Value("${timeboard.oauth.token.url}")
     private String tokenURL;
+
+    @Value("${timeboard.oauth.userinfo.url}")
     private String userInfoURL;
+
+    @Value("${timeboard.oauth.clientId}")
     private String clientID;
+
+    @Value("${timeboard.oauth.secretId}")
     private String secretID;
+
+    @Value("${timeboard.oauth.redirect.uri}")
     private String redirectURI;
 
-    @Reference
+    @Autowired
     private UserService userService;
 
-    @Reference
+    @Autowired
     private TimeboardSessionStore timeboardSessionStore;
 
-
-    @Activate
-    private void init(Map<String, String> params) {
-        this.tokenURL = params.get("oauth.token.url");
-        this.userInfoURL = params.get("oauth.userinfo.url");
-        this.clientID = params.get("oauth.clientid");
-        this.secretID = params.get("oauth.secretid");
-        this.redirectURI = params.get("oauth.redirect.uri");
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
