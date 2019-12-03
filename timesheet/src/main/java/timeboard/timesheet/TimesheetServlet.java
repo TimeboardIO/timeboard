@@ -159,7 +159,6 @@ public class TimesheetServlet extends TimeboardServlet {
             response.setStatus(500);
         }
 
-
     }
 
 

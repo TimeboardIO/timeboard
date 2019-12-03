@@ -2,7 +2,7 @@ package timeboard.timesheet;
 
 /*-
  * #%L
- * kanban-project-plugin
+ * reporting
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.timesheet;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,10 +40,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
+import timeboard.core.api.UpdatedTaskResult;
+import timeboard.core.model.AbstractTask;
+import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
 import timeboard.core.model.User;
-import timeboard.core.ui.TimeboardServlet;
 
+import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ScheduledExecutorService;
 
 
 @WebServlet(name = "TimesheetRESTApi", urlPatterns = "/timesheet/api")
@@ -58,31 +65,27 @@ public class TimesheetRESTApi extends TimeboardServlet {
     @Autowired
     private TimesheetService timesheetService;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return TimesheetRESTApi.class.getClassLoader();
+
+    @Context
+    private HttpServletRequest req;
+
+    @Activate
+    private void init() {
+        System.out.println("Start Timesheet API !");
     }
 
 
-    private Date findStartDate(Calendar c, int week, int year) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        return c.getTime();
-    }
-
-    private Date findEndDate(Calendar c, int week, int year) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        return c.getTime();
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    @GET
+    @Path("/")
+    public Response getTimesheetData(@Context HttpServletRequest request) throws JsonProcessingException {
+        User currentUser = (User) req.getAttribute("actor");
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
 
-        final User currentUser = getActorFromRequestAttributes(request);
+
         boolean validated = false;
 
         final Calendar c = Calendar.getInstance();
@@ -111,7 +114,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         //Get tasks for current week
         if (this.projectService != null) {
-            this.projectService.listTasksByProject(getActorFromRequestAttributes(request), ds, de).stream().forEach(projectTasks -> {
+            this.projectService.listTasksByProject(currentUser, ds, de).stream().forEach(projectTasks -> {
                 List<TaskWrapper> tasks = new ArrayList<>();
 
                 projectTasks.getTasks().stream().forEach(task -> {
@@ -127,7 +130,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                             task.getEndDate(),
                             task.getTaskStatus().name(),
                             task.getTaskType() != null ? task.getTaskType().getId() : 0)
-                            );
+                    );
 
                     days.forEach(dateWrapper -> {
                         double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
@@ -163,7 +166,7 @@ public class TimesheetRESTApi extends TimeboardServlet {
                     (long) 0,
                     "Default Tasks",
                     tasks));
-            }
+        }
 
         if (this.timesheetService != null) {
             validated = this.timesheetService.isTimesheetValidated(currentUser, year, week);
@@ -172,12 +175,88 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         Timesheet ts = new Timesheet(validated, year, week, days, projects, imputations);
 
-        response.setContentType("application/json");
-        MAPPER.writeValue(response.getWriter(), ts);
+        return Response.ok().entity(MAPPER.writeValueAsString(ts)).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/")
+    public Response updateDataFromTimesheet(UpdateRequest request) throws JsonProcessingException {
+
+        try {
+            final User actor = (User) req.getAttribute("actor");
+
+           // String type = request.getParameter("type");
+
+            Long taskID = request.task;//Long.parseLong(taskStr);
+            AbstractTask task = this.projectService.getTaskByID(actor, taskID);
+
+            UpdatedTaskResult updatedTask = null;
+
+            if (request.type.equals("imputation")) {
+                Date day = DATE_FORMAT.parse(request.day);
+                //double imputation = Double.parseDouble(imputationStr);
+                updatedTask = this.projectService.updateTaskImputation(actor, task, day, request.imputation);
+            }
+
+            if (request.type.equals("effortLeft")) {
+                //double effortLeft = Double.parseDouble(imputationStr);
+                updatedTask = this.projectService.updateTaskEffortLeft(actor, (Task) task, request.imputation);
+            }
+
+           return Response.ok().entity(MAPPER.writeValueAsString(updatedTask)).build();
+
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
     }
 
 
-    public static class Timesheet {
+
+    @GET
+    @Path("/validate")
+    public Response doPost(@Context HttpServletRequest request) {
+
+        final User actor = (User) req.getAttribute("actor");
+
+        final int week = Integer.parseInt(request.getParameter("week"));
+        final int year = Integer.parseInt(request.getParameter("year"));
+
+        try{
+            this.timesheetService.validateTimesheet(actor, actor, year, week);
+            return Response.status(201).build();
+        }catch (Exception e){ // TimesheetException
+            return Response.status(412).build();
+        }
+    }
+
+
+
+    private Date findStartDate(Calendar c, int week, int year) {
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        return c.getTime();
+    }
+
+    private Date findEndDate(Calendar c, int week, int year) {
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        return c.getTime();
+    }
+
+    public static class UpdateRequest implements Serializable {
+        public String type;
+        public String day;
+        public long task;
+        public double imputation;
+
+        public UpdateRequest(){
+
+
+        };
+    }
+
+
+
+        public static class Timesheet {
 
         private final boolean validated;
         private final int year;
@@ -235,7 +314,6 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         }
     }
-
 
     public static class DateWrapper {
 
