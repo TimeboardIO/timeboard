@@ -1004,4 +1004,9 @@ public class ProjectServiceImpl implements ProjectService {
             return taskType;
         });
     }
+
+    @Override
+    public boolean isProjectOwner(User user, Project project) {
+        return (new ActorIsProjectOwner()).isSatisfied(user, project);
+    }
 }
