@@ -216,19 +216,26 @@ public class TimesheetRestAPI {
         }
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
+
+
+    @GET
     @Path("/validate")
-    protected Response doPost(@FormParam("week") int week, @FormParam("year") int year) {
+    public Response doPost(@Context HttpServletRequest request) {
 
         final User actor = (User) req.getAttribute("actor");
+
+        final int week = Integer.parseInt(request.getParameter("week"));
+        final int year = Integer.parseInt(request.getParameter("year"));
+
         try{
             this.timesheetService.validateTimesheet(actor, actor, year, week);
-            return Response.status(412).build();
+            return Response.status(201).build();
         }catch (Exception e){ // TimesheetException
             return Response.status(412).build();
         }
     }
+
+
 
     private Date findStartDate(Calendar c, int week, int year) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
