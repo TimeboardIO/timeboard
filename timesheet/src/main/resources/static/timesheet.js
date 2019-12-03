@@ -3,13 +3,19 @@
 */
 
 const updateTask = function(date, task, type, val){
-
-    return $.post("/timesheet", {
-        'type':type,
-        'day':date,
-        'task':task,
-        'imputation':val
+    return $.ajax({
+        method: "POST",
+        url: "api/timesheet",
+        data: JSON.stringify({
+            'type': type,
+            'day': date,
+            'task': task,
+            'imputation': val
+        }),
+        contentType: "application/json",
+        dataType: "json",
     });
+    return result;
 }
 
 const userID = $("meta[property='timesheet']").attr('userID');
@@ -151,7 +157,7 @@ $(document).ready(function(){
       data: timesheetModel,
       methods: {
         validateMyWeek: function(event){
-            $.post('/timesheet/validate', {
+            $.post('api/timesheet/validate', {
                 'week': app.week,
                 'year': app.year
             }).then(function(){
@@ -253,7 +259,7 @@ $(document).ready(function(){
 
     var updateTimesheet = function(){
         $('.ui.dimmer').addClass('active');
-        $.get("/timesheet/api?week="+week+"&year="+year)
+        $.get("/api/timesheet?week="+week+"&year="+year)
         .then(function(data){
             app.week = data.week;
             app.year = data.year;
