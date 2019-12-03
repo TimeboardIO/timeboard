@@ -32,6 +32,8 @@ import timeboard.account.AccountConfiguration;
 import timeboard.core.CoreConfiguration;
 import timeboard.core.ui.CoreUIConfiguration;
 import timeboard.home.HomeConfiguration;
+import timeboard.plugin.project.export.xls.ExcelPluginConfiguration;
+import timeboard.plugin.project.imp.jira.JiraPluginConfiguration;
 import timeboard.projects.ProjectsConfiguration;
 import timeboard.reporting.ReportingConfiguration;
 import timeboard.theme.ThemeConfiguration;
@@ -39,14 +41,8 @@ import timeboard.timesheet.TimesheetConfiguration;
 
 @Configuration
 @Import({
-        ThemeConfiguration.class,
-        CoreConfiguration.class,
-        CoreUIConfiguration.class,
-        HomeConfiguration.class,
-        AccountConfiguration.class,
-        ReportingConfiguration.class,
-        TimesheetConfiguration.class,
-        ProjectsConfiguration.class
+        JiraPluginConfiguration.class,
+        ExcelPluginConfiguration.class
 })
-public class ModulesConfiguration {
+public class PluginsConfiguration {
 }

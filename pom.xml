@@ -19,6 +19,8 @@
             <module>account</module>
             <module>reporting</module>
             <module>webapp</module>
+            <module>plugins/project-jira-import-plugin</module>
+            <module>plugins/project-xls-export-plugin</module>
     </modules>
     <dependencies>
         <dependency>

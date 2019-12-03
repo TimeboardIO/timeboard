@@ -55,7 +55,7 @@ public class ReportingServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        viewModel.setTemplate("reporting:reporting.html");
+        viewModel.setTemplate("reporting.html");
         viewModel.getViewDatas().put("reports", this.reportServices);
    }
 
