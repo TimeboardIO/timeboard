@@ -35,6 +35,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
@@ -52,13 +53,11 @@ import timeboard.core.ui.ViewModel;
 )
 public class AccountServlet extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     private UserService userService;
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectImportService> projectImportServlets;
 

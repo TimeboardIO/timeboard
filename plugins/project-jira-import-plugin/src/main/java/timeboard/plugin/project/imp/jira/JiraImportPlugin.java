@@ -31,6 +31,7 @@ import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -56,7 +57,7 @@ public class JiraImportPlugin implements ProjectImportService {
     private static final String JIRA_PROJECT_KEY = "jira.project";
     private static final String JIRA_SERVICE_NAME = "JIRA";
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
     @Override

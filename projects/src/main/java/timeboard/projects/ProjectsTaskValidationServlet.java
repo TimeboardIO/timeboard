@@ -26,14 +26,7 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.IOException;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
@@ -41,17 +34,17 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/tasks/validation",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+
+@WebServlet(name = "ProjectsTaskValidationServlet", urlPatterns = "/projects/tasks/validation")
 public class ProjectsTaskValidationServlet extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     public ProjectService projectService;
 
     @Override
@@ -67,7 +60,7 @@ public class ProjectsTaskValidationServlet extends TimeboardServlet {
 
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("project", project);
-        viewModel.setTemplate("projects:details_project_tasks_validation.html");
+        viewModel.setTemplate("details_project_tasks_validation.html");
         viewModel.getViewDatas().put("task", false);
 
 

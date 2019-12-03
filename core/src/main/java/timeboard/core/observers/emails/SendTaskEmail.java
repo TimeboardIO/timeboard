@@ -29,6 +29,7 @@ package timeboard.core.observers.emails;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EmailService;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
@@ -49,7 +50,7 @@ import java.util.List;
 //TODO keep this class ?
 public class SendTaskEmail {
 
-    @Reference
+    @Autowired
     EmailService emailService;
 
     @Activate

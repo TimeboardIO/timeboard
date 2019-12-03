@@ -31,7 +31,6 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

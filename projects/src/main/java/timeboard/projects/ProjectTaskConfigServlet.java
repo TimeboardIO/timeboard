@@ -26,6 +26,18 @@ package timeboard.projects;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
+import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.ViewModel;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,36 +48,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/tasks/config",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+@WebServlet(name = "ProjectTaskConfigServlet", urlPatterns = "/projects/tasks/config")
 public class ProjectTaskConfigServlet extends TimeboardServlet {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    @Reference
+    @Autowired
     public ProjectService projectService;
 
-    @Reference
+    @Autowired
     public UserService userService;
 
 
@@ -88,7 +81,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
 
-        viewModel.setTemplate("projects:details_project_tasks_config.html");
+        viewModel.setTemplate("details_project_tasks_config.html");
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
@@ -192,7 +185,7 @@ public class ProjectTaskConfigServlet extends TimeboardServlet {
         } catch (Exception e) {
             viewModel.getErrors().add(e);
         } finally {
-            viewModel.setTemplate("projects:details_project_tasks_config.html");
+            viewModel.setTemplate("details_project_tasks_config.html");
 
             viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
             viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());

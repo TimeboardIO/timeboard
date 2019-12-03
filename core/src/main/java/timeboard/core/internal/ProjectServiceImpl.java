@@ -66,6 +66,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
+    @Transactional
     public Project createProject(User owner, String projectName) throws BusinessException {
         Project newProject = new Project();
         newProject.setName(projectName);

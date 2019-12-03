@@ -27,39 +27,21 @@ package timeboard.reporting;
  */
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
+
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.model.User;
 
-@Component(
-        service = RestAPI.class,
-        property = {
-                "osgi.jaxrs.resource=true",
-                "osgi.jaxrs.application.select=(osgi.jaxrs.name=.default)"
-        }
-)
-@Path("/reporting")
-@Produces(MediaType.APPLICATION_JSON)
+
+@Component
+@RequestMapping(value = "/reporting",produces =  {MediaType.APPLICATION_JSON_VALUE})
 public class RestAPI {
 
-    @Context
-    private HttpServletRequest req;
 
-    @Activate
-    private void init(){
-        System.out.println("Start reporting rest API !");
-    }
-
-
-    @GET
-    @Path("/{}")
-    public String export(@Context HttpServletRequest req) {
+    @GetMapping
+    public String export(HttpServletRequest req) {
         User user = (User) req.getAttribute("actor");
         return "{'name': 'Hello '" + user.getScreenName() + "''}";
     }

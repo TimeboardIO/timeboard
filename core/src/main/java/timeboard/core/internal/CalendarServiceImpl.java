@@ -68,11 +68,10 @@ public class CalendarServiceImpl implements CalendarService {
     @Autowired
     private EntityManager em;
 
-    @Reference
     @Autowired
     private ProjectService projectService;
 
-    @Reference
+    @Autowired
     private LogService logService;
 
     private static final String CALENDAR_ORIGIN_KEY = "calendar";

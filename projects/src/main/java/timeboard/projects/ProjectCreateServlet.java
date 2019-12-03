@@ -26,35 +26,27 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/create",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+@WebServlet(name = "ProjectCreateServlet", urlPatterns = "/projects/create")
 public class ProjectCreateServlet extends TimeboardServlet {
 
 
-    @Reference
+    @Autowired
     public ProjectService projectService;
 
     @Override
@@ -64,7 +56,7 @@ public class ProjectCreateServlet extends TimeboardServlet {
 
     @Override
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects:create_project.html");
+        viewModel.setTemplate("create_project.html");
         Map<String, Object> result = new HashMap<>();
         result.put("projectName", request.getParameter("projectName"));
 
@@ -81,7 +73,7 @@ public class ProjectCreateServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects:create_project.html");
+        viewModel.setTemplate("create_project.html");
 
     }
 

@@ -30,6 +30,7 @@ import io.reactivex.schedulers.Schedulers;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.internal.TemplateGenerator;
@@ -56,7 +57,7 @@ import java.util.concurrent.TimeUnit;
 )
 public class SendSummaryEmail {
 
-    @Reference
+    @Autowired
     private EmailService emailService;
 
     private TemplateGenerator templateGenerator = new TemplateGenerator();

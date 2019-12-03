@@ -26,32 +26,24 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.IOException;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.User;
-
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+
+@WebServlet(name = "ProjectListServlet", urlPatterns = "/projects")
 public class ProjectListServlet extends TimeboardServlet {
 
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
     @Override
@@ -61,7 +53,7 @@ public class ProjectListServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects:projects.html");
+        viewModel.setTemplate("projects.html");
         viewModel.getViewDatas().put("projects", this.projectService.listProjects(actor));
     }
 }

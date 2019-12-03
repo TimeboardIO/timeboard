@@ -28,21 +28,12 @@ package timeboard.core.ui;
 
 import java.util.Comparator;
 import java.util.List;
-import org.osgi.service.component.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Component(
-        service = NavigationEntryRegistryService.class,
-        immediate = true
-)
 @org.springframework.stereotype.Component
 public class NavigationEntryRegistryService {
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            policy = ReferencePolicy.DYNAMIC,
-            cardinality = ReferenceCardinality.MULTIPLE
-    )
+
     @Autowired(required = false)
     private List<NavigationExtPoint> entries;
 

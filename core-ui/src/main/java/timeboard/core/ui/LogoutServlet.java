@@ -32,31 +32,24 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.TimeboardSessionStore;
 
 
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/logout",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+@Component
 public class LogoutServlet extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     LogService logService;
 
-    @Reference
+    @Autowired
     private HttpSecurityContextService securityContextService;
 
-    @Reference
+    @Autowired
     private TimeboardSessionStore sessionStore;
 
 

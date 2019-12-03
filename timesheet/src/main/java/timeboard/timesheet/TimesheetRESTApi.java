@@ -32,12 +32,12 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import javax.servlet.Servlet;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.TaskStatus;
@@ -45,23 +45,17 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 
 
-@Component(
-        service = Servlet.class,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/timesheet/api",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
 
-)
+@WebServlet(name = "TimesheetRESTApi", urlPatterns = "/timesheet/api")
 public class TimesheetRESTApi extends TimeboardServlet {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    @Autowired
     private ProjectService projectService;
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    @Autowired
     private TimesheetService timesheetService;
 
     @Override

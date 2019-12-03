@@ -35,10 +35,6 @@ import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.log.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,20 +42,7 @@ import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.model.User;
 
 
-@Component(
-        service = Filter.class,
-        property = {
-                "osgi.http.whiteboard.filter.regex=/*",
-                "osgi.http.whiteboard.filter.name=SecurityFilter",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)",
-                "oauth.login.url=https://timeboard.auth.eu-west-1.amazoncognito.com/login",
-                "oauth.clientid=changeme",
-                "oauth.redirect.uri=http://localhost:8181/signin",
-                "timeboard.security.newPassword-url=/newPassword"
-        },
-        scope = ServiceScope.SINGLETON,
-        configurationPid = {"timeboard.oauth"}
-)
+
 @WebFilter(urlPatterns = {"/*"})
 public class OAuthSecurityFilter implements Filter {
 

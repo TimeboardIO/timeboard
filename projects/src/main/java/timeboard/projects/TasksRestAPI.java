@@ -28,17 +28,21 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -48,52 +52,38 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component(
-        service = TasksRestAPI.class,
-        property = {
-                "osgi.jaxrs.resource=true",
-                "osgi.jaxrs.application.select=(osgi.jaxrs.name=.default)"
-        }
-)
-@Path("/tasks")
-@Produces(MediaType.APPLICATION_JSON)
+@Component
+@RestController
+@RequestMapping(value = "/api/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TasksRestAPI {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Context
-    private HttpServletRequest req;
 
-    @Activate
-    private void init(){
-        System.out.println("Start Tasks rest API !");
-    }
-
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    @Autowired
     private ProjectService projectService;
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    @Autowired
     private UserService userService;
 
-    @GET
-    @Path("/")
-    public Response getTasks(@Context HttpServletRequest request) throws JsonProcessingException {
-        User actor = (User) req.getAttribute("actor");
+    @GetMapping("/")
+    public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
+        User actor = (User) request.getAttribute("actor");
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
         if(strProjectID != null){
             projectID = Long.parseLong(strProjectID);
         }else{
-            return Response.status(Response.Status.BAD_REQUEST).entity("Incorrect project argument").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
         }
 
         try {
             final Project project = this.projectService.getProjectByID(actor, projectID);
             if (project == null) {
-                return Response.status(Response.Status.FORBIDDEN).entity("Project does not exists or you don't have enough permissions to access it.").build();
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
             }
             final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
 
@@ -121,18 +111,17 @@ public class TasksRestAPI {
                         (task.getMilestone() != null ? task.getMilestone().getId() : 0L)));
 
             }
-            return Response.ok().entity(MAPPER.writeValueAsString(result.toArray())).build();
+            return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(result.toArray()));
         }catch (BusinessException e){
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
     }
 
-    @GET
-    @Path("/chart")
-    public Response getDatasForCharts(@Context HttpServletRequest request) throws BusinessException, JsonProcessingException {
+    @GetMapping("/chart")
+    public ResponseEntity getDatasForCharts(HttpServletRequest request) throws BusinessException, JsonProcessingException {
         TaskGraphWrapper wrapper = new TaskGraphWrapper();
-        User actor = (User) req.getAttribute("actor");
+        User actor = (User) request.getAttribute("actor");
 
 
         final String taskIdStr = request.getParameter("task");
@@ -141,14 +130,14 @@ public class TasksRestAPI {
             taskID = Long.parseLong(taskIdStr);
         }
         if(taskID == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
 
         Task task;
         try {
             task = (Task) this.projectService.getTaskByID(actor, taskID);
         }catch (Exception e){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
 
         }
 
@@ -216,36 +205,34 @@ public class TasksRestAPI {
                 ));
         wrapper.setRealEffortDatas(effortEstimateMap.values());
 
-        return Response.ok().entity(MAPPER.writeValueAsString(wrapper)).build();
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
 
     }
 
 
-    @GET
-    @Path("/approve")
-    public Response approveTask(@Context HttpServletRequest request) {
-        User actor = (User) req.getAttribute("actor");
+    @GetMapping("/approve")
+    public ResponseEntity approveTask(HttpServletRequest request) {
+        User actor = (User) request.getAttribute("actor");
         return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGRESS);
     }
 
-    @GET
-    @Path("/deny")
-    public Response denyTask(@Context HttpServletRequest request){
-        User actor = (User) req.getAttribute("actor");
+    @GetMapping("/deny")
+    public ResponseEntity denyTask(HttpServletRequest request){
+        User actor = (User) request.getAttribute("actor");
 
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
-    private Response changeTaskStatus(User actor, HttpServletRequest request,  TaskStatus status){
+    private ResponseEntity changeTaskStatus(User actor, HttpServletRequest request,  TaskStatus status){
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
         if(taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
         }else{
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing argument taskId.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
         }
         if(taskID == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
 
         Task task;
@@ -254,18 +241,17 @@ public class TasksRestAPI {
             task.setTaskStatus(status);
             this.projectService.updateTask(actor, task);
         } catch (ClassCastException e){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Task is not a project task.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");
         } catch (Exception e){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Task id not found.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task id not found.");
         }
 
-        return Response.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GET
-    @Path("/delete")
-    public Response deleteTask(@Context HttpServletRequest request){
-        User actor = (User) req.getAttribute("actor");
+    @GetMapping("/delete")
+    public ResponseEntity deleteTask(HttpServletRequest request){
+        User actor = (User) request.getAttribute("actor");
 
 
         final String taskIdStr = request.getParameter("task");
@@ -273,28 +259,26 @@ public class TasksRestAPI {
         if(taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
         }else{
-            return Response.status(Response.Status.BAD_REQUEST).entity("Missing argument taskId.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
         }
         if(taskID == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
 
         try {
             projectService.deleteTaskByID(actor, taskID);
         } catch (Exception e){
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        return Response.ok().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/")
-    public Response createTask(TaskWrapper taskWrapper) throws JsonProcessingException {
-        User actor = (User) req.getAttribute("actor");
+    @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity createTask(HttpServletRequest request, TaskWrapper taskWrapper) throws JsonProcessingException {
+        User actor = (User) request.getAttribute("actor");
         Date startDate = null;
         Date endDate = null;
         try{
@@ -302,11 +286,11 @@ public class TasksRestAPI {
             endDate = DATE_FORMAT.parse(taskWrapper.endDate);
 
         }catch(Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Incorrect date format").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect date format");
         }
 
         if(startDate.getTime()>endDate.getTime()){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Start date must be before end date ").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date ");
         }
 
         String name = taskWrapper.taskName;
@@ -315,7 +299,7 @@ public class TasksRestAPI {
 
         double oe = taskWrapper.originalEstimate;
         if(oe <= 0.0){
-            return Response.status(Response.Status.BAD_REQUEST).entity("Original original estimate must be positive ").build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Original original estimate must be positive ");
         }
 
         Long projectID = taskWrapper.projectID;
@@ -323,7 +307,7 @@ public class TasksRestAPI {
         try {
             project = this.projectService.getProjectByID(actor, projectID);
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
         Long milestoneID = taskWrapper.milestoneID;
@@ -357,19 +341,19 @@ public class TasksRestAPI {
 
                 projectService.updateTask(actor,task);
             }catch (Exception e){
-                return Response.status(Response.Status.BAD_REQUEST).entity("Error in task creation please verify your inputs and retry").build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
             }
         }else{
             try{
                 task = projectService.createTask(actor, project,
                         name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
             }catch (Exception e){
-                return Response.status(Response.Status.BAD_REQUEST).header("msg","Error in task creation please verify your inputs and retry. (" +e.getMessage()+")").build();
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("msg","Error in task creation please verify your inputs and retry. (" +e.getMessage()+")").build();
             }
         }
 
         taskWrapper.setTaskID(task.getId());
-        return Response.ok().entity(MAPPER.writeValueAsString(taskWrapper)).build();
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
     }
 

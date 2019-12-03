@@ -31,6 +31,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
@@ -59,13 +60,13 @@ public class GithubImportPlugin implements ProjectImportService {
 
     private static final List<String> GITHUB_USER_FIELDS = new ArrayList<>();
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
-    @Reference
+    @Autowired
     private UserService userService;
 
-    @Reference
+    @Autowired
     public EncryptionService encryptionService;
 
 

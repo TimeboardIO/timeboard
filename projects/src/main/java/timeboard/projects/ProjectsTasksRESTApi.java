@@ -27,17 +27,7 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
@@ -47,22 +37,24 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-@Component(
-        service = Servlet.class,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/tasks/api",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
 
-)
+
+@WebServlet(name = "ProjectsTasksRESTApi", urlPatterns = "/projects/tasks/api")
 public class ProjectsTasksRESTApi extends TimeboardServlet {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policyOption = ReferencePolicyOption.GREEDY)
+    @Autowired
     private ProjectService projectService;
 
     @Override

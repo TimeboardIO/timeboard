@@ -31,6 +31,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -48,7 +49,7 @@ import java.io.OutputStream;
 public class XlsExportPlugin implements ProjectExportService {
 
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
     @Override

@@ -33,6 +33,7 @@ import timeboard.core.ui.CoreUIConfiguration;
 import timeboard.home.HomeConfiguration;
 import timeboard.projects.ProjectsConfiguration;
 import timeboard.theme.ThemeConfiguration;
+import timeboard.timesheet.TimehseetConfiguration;
 
 @Configuration
 @Import({
@@ -41,6 +42,7 @@ import timeboard.theme.ThemeConfiguration;
         CoreUIConfiguration.class,
         OSGIStubConfiguration.class,
         HomeConfiguration.class,
+        TimehseetConfiguration.class,
         ProjectsConfiguration.class
 })
 public class ModuleConfiguration {

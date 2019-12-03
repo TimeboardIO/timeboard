@@ -37,10 +37,6 @@ import java.util.Map;
 import javax.servlet.Servlet;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import timeboard.core.api.TimeboardSessionStore;
@@ -48,19 +44,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "oauth.token.url=https://timeboard.auth.eu-west-1.amazoncognito.com/oauth2/token",
-                "oauth.userinfo.url=https://timeboard.auth.eu-west-1.amazoncognito.com/oauth2/userInfo",
-                "oauth.clientid=changeme",
-                "oauth.secretid=changeme",
-                "osgi.http.whiteboard.servlet.pattern=/signin",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        },
-        configurationPid = {"timeboard.oauth"}
-)
+
 @WebServlet(name = "SigninServlet", urlPatterns = "/signin")
 public class SigninServlet extends HttpServlet {
 
@@ -132,7 +116,7 @@ public class SigninServlet extends HttpServlet {
 
             final Cookie sessionCookie = new Cookie("timeboard", session.getSessionUUID().toString());
             resp.addCookie(sessionCookie);
-            resp.sendRedirect("/");
+            resp.sendRedirect("/home");
 
         } catch (InterruptedException | BusinessException e) {
             e.printStackTrace();
