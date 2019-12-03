@@ -109,7 +109,7 @@ Vue.component('pending-task-list', {
     computed: {
         filteredTasks: function () {
             var sortKey = this.sortKey
-            var filterKey = this.filterKey.filter(function (f) { return f.value != '' });
+            var filterKey = [];
             filterKey.push({ key: 'status', value: 'PENDING' });
             var order = this.sortOrders[sortKey] || 1 ;
             var tasks = this.tasks;
@@ -253,13 +253,13 @@ var app = new Vue({
                         data: {
                             labels: listOfTaskDates,
                             datasets: [{
-                                data: effortSpentDatasForChart,
+                                data: effortSpentDataForChart,
                                 label: "Effort spent for " + task.taskName,
                                 borderColor: "#3e95cd",
                                 fill: true,
                                 steppedLine: true
                             } , {
-                                data: realEffortDatasForChart,
+                                data: realEffortDataForChart,
                                 label: "Real effort for " + task.taskName,
                                 borderColor: "#ff6384",
                                 fill: true,

@@ -8,7 +8,14 @@
 <head>
     <title>Project Tasks details</title>
     <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
-
+    <style>
+        .ellipsis {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 15em;
+        }
+</style>
 </head>
 <body>
 
@@ -20,113 +27,105 @@
             <div class="ui active inverted dimmer">
                 <div class="ui loader"></div>
             </div>
-        <table class="ui celled table">
-            <thead>
-            <tr>
-                <th style="text-align:center;"
-                    @click="sortBy('taskName')"
-                    :class="{ active: sortKey == 'taskName' }" > Name <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
-                <th style="text-align:center;"
-                    @click="sortBy('taskComments')"
-                    :class="{ active: sortKey == 'taskComments' }" > Comments <i class="icon caret" :class="sortOrders['taskComments'] > 0 ? 'up' : 'down'"> </i> </th>
-                <th style="text-align:center;"
-                    @click="sortBy('startDate')"
-                    :class="{ active: sortKey == 'startDate' }" > Start Date <i class="icon caret" :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i> </th>
-                <th style="text-align:center;"
-                    @click="sortBy('endDate')"
-                    :class="{ active: sortKey == 'endDate' }" > End date <i class="icon caret" :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i> </th>
-                <th style="text-align:center;"
-                    @click="sortBy('originalEstimate')"
-                    :class="{ active: sortKey == 'originalEstimate' }" > OE <i class="icon caret" :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i> </th>
-                <th style="text-align:center;"
-                    @click="sortBy('assignee')"
-                    :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
-                <th style="text-align:center;"
-                    @click="sortBy('status')"
-                    :class="{ active: sortKey == 'status' }" > Status <i class="icon caret" :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i> </th>
-                <th tyle="text-align:center;">Actions</th>
+            <table class="ui celled table">
+                <thead>
+                <tr>
+                    <th  colspan="2" style="text-align:center;"
+                        @click="sortBy('taskName')"
+                        :class="{ active: sortKey == 'taskName' }" > Task <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
 
-            </tr></thead>
-            <tbody>
-            <tr>
-                <td>
-                    <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf('taskName')].value"  type="text" placeholder="Name.. ">
-                        <i class="search icon"></i>
-                    </div>
-                </td>
-                <td>
-                    <div class="ui fluid icon input">
-                        <input  v-model="filterKey[columns.indexOf('taskComments')].value"  type="text" placeholder="Comments.. ">
-                        <i class="search icon"></i>
-                    </div>
-                </td>
-                <td>
-                    <div class="ui fluid input">
-                        <input type="date" v-model="filterKey[columns.indexOf('startDate')].value" placeholder="Start date.. ">
-                    </div>
-                </td>
-                <td>
-                    <div class="ui fluid input">
-                        <input type="date" v-model="filterKey[columns.indexOf('endDate')].value" placeholder="End date.. ">
-                    </div>
-                </td>
-                <td>
-                    <div class="ui mini fluid input">
-                        <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.min"  type="text" placeholder="Min">
-                    </div>
-                    <div class="ui mini fluid input">
-                        <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.max"  type="text" placeholder="Max">
-                    </div>
-                </td>
-                <td>
-                    <div class="ui fluid category search">
+                    <th style="text-align:center;"
+                        @click="sortBy('startDate')"
+                        :class="{ active: sortKey == 'startDate' }" > Start Date <i class="icon caret" :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                    <th style="text-align:center;"
+                        @click="sortBy('endDate')"
+                        :class="{ active: sortKey == 'endDate' }" > End date <i class="icon caret" :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                    <th style="text-align:center;"
+                        @click="sortBy('originalEstimate')"
+                        :class="{ active: sortKey == 'originalEstimate' }" > OE <i class="icon caret" :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i> </th>
+                    <th style="text-align:center;"
+                        @click="sortBy('assignee')"
+                        :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
+                    <th style="text-align:center;"
+                        @click="sortBy('status')"
+                        :class="{ active: sortKey == 'status' }" > Status <i class="icon caret" :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i> </th>
+                    <th style="text-align:center;">Actions</th>
+
+                </tr></thead>
+                <tbody>
+                <tr>
+                    <td  colspan="2" >
                         <div class="ui fluid icon input">
-
-                            <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search user..." type="text"/>
-
-                            <input class="taskAssigned" name="taskAssigned"
-                                type="hidden"/>
-
+                            <input  v-model="filterKey[columns.indexOf('taskName')].value"  type="text" placeholder="Name.. ">
                             <i class="search icon"></i>
                         </div>
-                        <div class="results"></div>
-                    </div>
-                </td>
-                <td>
-                    <select class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
-                        <option th:each="status: ${allTaskStatus}"
-                                th:text="${status.label}"
-                                th:value="${status}"
-                        ></option>
-                    </select>
-                </td>
-                <td></td>
-            </tr>
+                    </td>
 
-            <tr v-for="entry in filteredTasks">
-                <td  style="text-align:center;" >{{entry['taskName']}}</td>
-                <td  style="text-align:center;" >{{entry['taskComments']}}</td>
-                <td  style="text-align:center;" >{{entry['startDate']}}</td>
-                <td  style="text-align:center;" >{{entry['endDate']}}</td>
-                <td  style="text-align:center;" >{{entry['originalEstimate']}}</td>
-                <td  style="text-align:center;" >{{entry['assignee']}}</td>
-                <td  style="text-align:center;" ><div class="ui primary horizontal label">{{entry['status']}}</div></td>
+                    <td>
+                        <div class="ui fluid input">
+                            <input type="date" v-model="filterKey[columns.indexOf('startDate')].value" placeholder="Start date.. ">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="ui fluid input">
+                            <input type="date" v-model="filterKey[columns.indexOf('endDate')].value" placeholder="End date.. ">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="ui mini fluid input">
+                            <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.min"  type="text" placeholder="Min">
+                        </div>
+                        <div class="ui mini fluid input">
+                            <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.max"  type="text" placeholder="Max">
+                        </div>
+                    </td>
+                    <td>
+                        <div class="ui fluid category search">
+                            <div class="ui fluid icon input">
 
-                <td>
-                    <button @click="deleteTask($event, entry)" class="ui negative icon button">
-                        <i class="close icon"></i>
-                    </button>
-                    <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui primary icon button">
-                        <i class="edit icon"></i>
-                    </button>
-                    <button v-on:click="showGraphModal(null, entry, $event)" class="ui yellow icon button">
-                        <i class="chart line icon"></i>
-                    </button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                                <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search user..." type="text"/>
+
+                                <input class="taskAssigned" name="taskAssigned"
+                                       type="hidden"/>
+
+                                <i class="search icon"></i>
+                            </div>
+                            <div class="results"></div>
+                        </div>
+                    </td>
+                    <td>
+                        <select class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
+                            <option th:each="status: ${allTaskStatus}"
+                                    th:text="${status.label}"
+                                    th:value="${status}"
+                            ></option>
+                        </select>
+                    </td>
+                    <td></td>
+                </tr>
+
+                <tr v-for="entry in filteredTasks">
+                    <td colspan="2" >{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
+                    <td  style="text-align: center;" >{{entry['startDate']}}</td>
+                    <td  style="text-align: center;" >{{entry['endDate']}}</td>
+                    <td  style="text-align: center;" >{{entry['originalEstimate']}}</td>
+                    <td  style="text-align: center;" >{{entry['assignee']}}</td>
+                    <td  style="text-align: center;" ><div class="ui primary horizontal label">{{entry['status']}}</div></td>
+
+                    <td style="text-align:center;" >
+                        <button @click="deleteTask($event, entry)" class="ui negative icon button">
+                            <i class="close icon"></i>
+                        </button>
+                        <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui primary icon button">
+                            <i class="edit icon"></i>
+                        </button>
+                        <button v-on:click="showGraphModal(null, entry, $event)" class="ui yellow icon button">
+                            <i class="chart line icon"></i>
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </script>
     <script type="text/x-template" id="pending-task-list-template"  >
@@ -139,16 +138,33 @@
                 </th>
             </tr>
             <tr>
-                <th style="text-align:center;" v-for="key in columns" v-if="key != 'status'"
-                    @click="sortBy(key)"
-                    :class="{ active: sortKey == key }" > {{ key | capitalize }}  <i class="icon caret" :class="sortOrders[key] > 0 ? 'up' : 'down'">
-              </i> </th>
-                <th>Actions</th>
+                <th  colspan="2" style="text-align:center;"
+                     @click="sortBy('taskName')"
+                     :class="{ active: sortKey == 'taskName' }" > Task <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
+
+                <th style="text-align:center;"
+                    @click="sortBy('startDate')"
+                    :class="{ active: sortKey == 'startDate' }" > Start Date <i class="icon caret" :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('endDate')"
+                    :class="{ active: sortKey == 'endDate' }" > End date <i class="icon caret" :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('originalEstimate')"
+                    :class="{ active: sortKey == 'originalEstimate' }" > OE <i class="icon caret" :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('assignee')"
+                    :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
+
+                <th style="text-align:center;" >Actions</th>
             </tr></thead>
             <tbody>
 
             <tr v-for="entry in filteredTasks" >
-                <td style="text-align:center;" v-for="key in columns" v-if="key != 'status'">{{entry[key]}}</td>
+                <td colspan="2" >{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
+                <td  style="text-align: center;" >{{entry['startDate']}}</td>
+                <td  style="text-align: center;" >{{entry['endDate']}}</td>
+                <td  style="text-align: center;" >{{entry['originalEstimate']}}</td>
+                <td  style="text-align: center;" >{{entry['assignee']}}</td>
                 <td style="text-align:center;">
                     <button  @click="approveTask($event, entry)" class="ui positive icon button">
                         Approve
@@ -240,7 +256,7 @@
                                 <option th:each="status: ${allTaskStatus}"
                                         th:text="${status.label}"
                                         th:value="${status}"
-                                        ></option>
+                                ></option>
                             </select>
                         </div>
                         <div class="field">
@@ -250,7 +266,7 @@
                                         th:each="milestone: ${allProjectMilestones}"
                                         th:text="${milestone.name}"
                                         th:value="${milestone.id}"
-                                      ></option>
+                                ></option>
                             </select>
                         </div>
                     </div>
@@ -298,7 +314,7 @@
         <script src="/projects/static/tasks.js"></script>
 
 
-</div>
+    </div>
 
 </div>
 
