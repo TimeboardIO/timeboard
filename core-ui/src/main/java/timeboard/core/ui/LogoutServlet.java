@@ -26,30 +26,23 @@ package timeboard.core.ui;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.UUID;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import timeboard.core.api.TimeboardSessionStore;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
 
 
-@Component
+@WebServlet(name = "logout", urlPatterns = "/logout")
 public class LogoutServlet extends TimeboardServlet {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogoutServlet.class);
 
-    @Autowired
-    private HttpSecurityContextService securityContextService;
-
-    @Autowired
-    private TimeboardSessionStore sessionStore;
 
 
     @Override
@@ -60,9 +53,7 @@ public class LogoutServlet extends TimeboardServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        UUID sessionID = this.securityContextService.getCurrentSessionID(req);
-
-        this.sessionStore.invalidateSession(sessionID);
+        req.getSession().invalidate();
 
         LOGGER.info("Logout : " + req.getSession().getAttribute("username"));
 

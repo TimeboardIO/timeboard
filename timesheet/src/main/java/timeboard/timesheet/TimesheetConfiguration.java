@@ -1,8 +1,8 @@
-package timeboard.core.api;
+package timeboard.timesheet;
 
 /*-
  * #%L
- * security
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,48 +26,12 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.model.User;
+import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-import java.io.Serializable;
-import java.util.*;
-
-public interface TimeboardSessionStore {
-
-    /**
-     * Get current session.
-     * @param sessionUUID sessionUUID
-     * @return session if exist or null
-     */
-    Optional<TimeboardSession> getSession(UUID sessionUUID);
-
-    TimeboardSession createSession(User user);
-
-    void invalidateSession(UUID uuid);
-
-    List<TimeboardSession> listSessions();
-
-    class TimeboardSession implements Serializable {
-        private final UUID sessionUUID;
-        private final Date createDate;
-        private final Map<String, Object> payload = new HashMap<>();
-
-        public TimeboardSession(UUID sessionUUID) {
-            this.sessionUUID = sessionUUID;
-            this.createDate = new Date();
-        }
-
-        public Date getCreateDate() {
-            return createDate;
-        }
-
-        public UUID getSessionUUID() {
-            return sessionUUID;
-        }
-
-        public Map<String, Object> getPayload() {
-            return payload;
-        }
-
-    }
-
+@Configuration
+@ComponentScan("timeboard.timesheet")
+@ServletComponentScan("timeboard.timesheet")
+public class TimesheetConfiguration {
 }

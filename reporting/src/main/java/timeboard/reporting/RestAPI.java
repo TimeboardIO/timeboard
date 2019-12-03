@@ -26,13 +26,13 @@ package timeboard.reporting;
  * #L%
  */
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.model.User;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @Component

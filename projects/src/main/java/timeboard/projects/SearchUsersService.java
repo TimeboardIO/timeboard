@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

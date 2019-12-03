@@ -30,7 +30,6 @@ import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.Task;
 import net.sf.mpxj.mpx.MPXWriter;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;

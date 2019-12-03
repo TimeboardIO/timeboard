@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.internal.InMemorySessionStore;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

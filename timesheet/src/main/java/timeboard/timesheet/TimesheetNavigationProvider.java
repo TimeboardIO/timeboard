@@ -26,10 +26,11 @@ package timeboard.timesheet;
  * #L%
  */
 
-import java.util.Calendar;
-import java.util.Date;
 import org.springframework.stereotype.Component;
 import timeboard.core.ui.NavigationExtPoint;
+
+import java.util.Calendar;
+import java.util.Date;
 
 
 @Component

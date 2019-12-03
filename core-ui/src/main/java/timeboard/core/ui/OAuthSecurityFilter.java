@@ -26,21 +26,20 @@ package timeboard.core.ui;
  * #L%
  */
 
-import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import timeboard.core.model.User;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import timeboard.core.api.TimeboardSessionStore;
-import timeboard.core.model.User;
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 
 
@@ -58,10 +57,6 @@ public class OAuthSecurityFilter implements Filter {
 
     @Value("${timeboard.oauth.redirect.uri}")
     private String redirectURI;
-
-
-    @Autowired
-    private TimeboardSessionStore timeboardSessionStore;
 
 
     @Autowired

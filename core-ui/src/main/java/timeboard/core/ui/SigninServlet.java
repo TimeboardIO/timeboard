@@ -27,6 +27,16 @@ package timeboard.core.ui;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.User;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -34,15 +44,6 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Base64;
 import java.util.Map;
-import javax.servlet.Servlet;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import timeboard.core.api.TimeboardSessionStore;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
 
 
 @WebServlet(name = "SigninServlet", urlPatterns = "/signin")
@@ -66,9 +67,6 @@ public class SigninServlet extends HttpServlet {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private TimeboardSessionStore timeboardSessionStore;
 
 
     @Override
@@ -112,10 +110,9 @@ public class SigninServlet extends HttpServlet {
 
             final User user = this.userService.userProvisionning(userInfoMap.get("sub"), userInfoMap.get("email"));
 
-            final TimeboardSessionStore.TimeboardSession session = this.timeboardSessionStore.createSession(user);
 
-            final Cookie sessionCookie = new Cookie("timeboard", session.getSessionUUID().toString());
-            resp.addCookie(sessionCookie);
+            req.getSession(true).setAttribute("user", user);
+
             resp.sendRedirect("/home");
 
         } catch (InterruptedException | BusinessException e) {

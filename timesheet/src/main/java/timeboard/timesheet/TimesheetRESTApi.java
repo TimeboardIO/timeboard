@@ -26,18 +26,14 @@ package timeboard.timesheet;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import javax.servlet.Servlet;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
@@ -45,16 +41,21 @@ import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
 import timeboard.core.model.User;
+import timeboard.core.ui.TimeboardServlet;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.concurrent.ScheduledExecutorService;
 
 
-@WebServlet(name = "TimesheetRESTApi", urlPatterns = "/timesheet/api")
-public class TimesheetRESTApi extends TimeboardServlet {
+@Component
+@RestController
+@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
+public class TimesheetRESTApi {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -66,24 +67,18 @@ public class TimesheetRESTApi extends TimeboardServlet {
     private TimesheetService timesheetService;
 
 
-    @Context
-    private HttpServletRequest req;
-
-    @Activate
+    @PostConstruct
     private void init() {
         System.out.println("Start Timesheet API !");
     }
 
 
-    @GET
-    @Path("/")
-    public Response getTimesheetData(@Context HttpServletRequest request) throws JsonProcessingException {
-        User currentUser = (User) req.getAttribute("actor");
+    @GetMapping(value = "/timesheet")
+    public ResponseEntity getTimesheetData(HttpServletRequest request, @RequestParam("week") int week, @RequestParam("year") int year ) throws JsonProcessingException {
+        User currentUser = (User) request.getAttribute("actor");
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
-        final int week = Integer.parseInt(request.getParameter("week"));
-        final int year = Integer.parseInt(request.getParameter("year"));
 
 
         boolean validated = false;
@@ -175,13 +170,11 @@ public class TimesheetRESTApi extends TimeboardServlet {
 
         Timesheet ts = new Timesheet(validated, year, week, days, projects, imputations);
 
-        return Response.ok().entity(MAPPER.writeValueAsString(ts)).build();
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
     }
 
-    @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/")
-    public Response updateDataFromTimesheet(UpdateRequest request) throws JsonProcessingException {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateDataFromTimesheet(HttpServletRequest req, @RequestBody UpdateRequest request) throws JsonProcessingException {
 
         try {
             final User actor = (User) req.getAttribute("actor");
@@ -204,29 +197,28 @@ public class TimesheetRESTApi extends TimeboardServlet {
                 updatedTask = this.projectService.updateTaskEffortLeft(actor, (Task) task, request.imputation);
             }
 
-           return Response.ok().entity(MAPPER.writeValueAsString(updatedTask)).build();
+           return ResponseEntity.ok().body(MAPPER.writeValueAsString(updatedTask));
 
         } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
 
 
-    @GET
-    @Path("/validate")
-    public Response doPost(@Context HttpServletRequest request) {
+    @GetMapping("/validate")
+    public ResponseEntity doPost(HttpServletRequest request) {
 
-        final User actor = (User) req.getAttribute("actor");
+        final User actor = (User) request.getAttribute("actor");
 
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
 
         try{
             this.timesheetService.validateTimesheet(actor, actor, year, week);
-            return Response.status(201).build();
+            return ResponseEntity.status(201).build();
         }catch (Exception e){ // TimesheetException
-            return Response.status(412).build();
+            return ResponseEntity.status(412).build();
         }
     }
 

@@ -26,9 +26,10 @@ package timeboard.core.ui;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Comparator;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @org.springframework.stereotype.Component
 public class NavigationEntryRegistryService {

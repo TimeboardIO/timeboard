@@ -30,7 +30,6 @@ import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.ProjectImportService;

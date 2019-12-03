@@ -26,17 +26,12 @@ package timeboard.core.ui;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.model.User;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 
@@ -44,38 +39,14 @@ import timeboard.core.model.User;
 public class HttpSecurityContextService {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpSecurityContextService.class);
 
-
-    @Autowired
-    private TimeboardSessionStore sessionStore;
-
-    public  UUID  getCurrentSessionID(HttpServletRequest req) {
-        UUID u = null;
-
-        if (req.getCookies() != null) {
-            Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
-
-            if (sessionCookie.isPresent()) {
-                u = UUID.fromString(sessionCookie.get().getValue());
-            }
-        }
-        return u;
-    }
-
     public  User getCurrentUser(HttpServletRequest req) {
         User u = null;
 
         if (req.getCookies() != null) {
-            Optional<Cookie> sessionCookie = Arrays.asList((req).getCookies()).stream().filter(c -> c.getName().equals("timeboard")).findFirst();
 
-            if (sessionCookie.isPresent()) {
-                UUID uuid = UUID.fromString(sessionCookie.get().getValue());
-                Optional<TimeboardSessionStore.TimeboardSession> userSession = this.sessionStore.getSession(uuid);
+            if (req.getSession() != null && req.getSession().getAttribute("user") != null) {
 
-                if (userSession.isPresent()) {
-                    u = (User) userSession.get().getPayload().get("user");
-                } else {
-                    LOGGER.info(String.format("No session for cookie %s in keystore %s", uuid.toString(), this.sessionStore));
-                }
+                     u = (User) req.getSession().getAttribute("user");
             }
         }
         return u;

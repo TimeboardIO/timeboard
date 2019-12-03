@@ -27,20 +27,7 @@ package timeboard.timesheet;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import javax.servlet.Servlet;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;
@@ -50,6 +37,16 @@ import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
+
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 
 

@@ -26,10 +26,11 @@ package timeboard.theme;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Component;
 import timeboard.core.ui.CssService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class CssSemanticService implements CssService {

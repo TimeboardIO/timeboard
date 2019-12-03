@@ -26,7 +26,6 @@ package timeboard.theme;
  * #L%
  */
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
 
 

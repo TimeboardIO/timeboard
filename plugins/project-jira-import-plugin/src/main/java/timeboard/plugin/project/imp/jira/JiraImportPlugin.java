@@ -30,7 +30,6 @@ import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;

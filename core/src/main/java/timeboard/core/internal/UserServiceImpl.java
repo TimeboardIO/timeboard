@@ -35,7 +35,6 @@ import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
-import timeboard.core.observers.logs.LogTasksComponent;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;

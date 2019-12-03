@@ -26,8 +26,9 @@ package timeboard.timesheet;
  * #L%
  */
 
-import javax.servlet.http.HttpServlet;
 import org.springframework.stereotype.Component;
+
+import javax.servlet.http.HttpServlet;
 
 
 @Component
