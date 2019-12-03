@@ -39,7 +39,7 @@ public enum TaskStatus {
         this.label = label;
     }
 
-    String getLabel() {
+    public String getLabel() {
         return this.label;
     }
 

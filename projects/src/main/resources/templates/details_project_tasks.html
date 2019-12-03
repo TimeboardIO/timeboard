@@ -47,6 +47,12 @@
                         @click="sortBy('assignee')"
                         :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
+                        @click="sortBy('milestoneID')"
+                        :class="{ active: sortKey == 'milestoneID' }" > Milestone <i class="icon caret" :class="sortOrders['milestoneID'] > 0 ? 'up' : 'down'"> </i> </th>
+                    <th style="text-align:center;"
+                        @click="sortBy('typeID')"
+                        :class="{ active: sortKey == 'typeID' }" > Type <i class="icon caret" :class="sortOrders['typeID'] > 0 ? 'up' : 'down'"> </i> </th>
+                    <th style="text-align:center;"
                         @click="sortBy('status')"
                         :class="{ active: sortKey == 'status' }" > Status <i class="icon caret" :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;">Actions</th>
@@ -94,6 +100,23 @@
                         </div>
                     </td>
                     <td>
+                        <select class="ui multiple selection fluid dropdown" v-model="filterKey[columns.indexOf('milestoneID')].value" name="taskMilestoneId">
+                            <option
+                                    th:each="milestone: ${allProjectMilestones}"
+                                    th:text="${milestone.name}"
+                                    th:value="${milestone.id}"
+                            ></option>
+                        </select>
+                    </td>
+                    <td>
+                        <select class="ui type multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('typeID')].value" name="taskTypeID" >
+                            <option th:each="type: ${taskTypes}"
+                                    th:text="${type.typeName}"
+                                    th:value="${type.id}"
+                            ></option>
+                        </select>
+                    </td>
+                    <td>
                         <select class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
                             <option th:each="status: ${allTaskStatus}"
                                     th:text="${status.label}"
@@ -110,16 +133,20 @@
                     <td  style="text-align: center;" >{{entry['endDate']}}</td>
                     <td  style="text-align: center;" >{{entry['originalEstimate']}}</td>
                     <td  style="text-align: center;" >{{entry['assignee']}}</td>
-                    <td  style="text-align: center;" ><div class="ui primary horizontal label">{{entry['status']}}</div></td>
+                    <td  style="text-align: center;" ><i>{{entry['milestoneName']}}</i></td>
+                    <td  colspan="2" style="text-align: center;" >
+                        <div class="ui blue green horizontal label">{{entry['typeName']}}</div>
+                        <div class="ui small primary horizontal label">{{entry['statusName']}}</div>
+                    </td>
 
                     <td style="text-align:center;" >
-                        <button @click="deleteTask($event, entry)" class="ui negative icon button">
+                        <button @click="deleteTask($event, entry)" class="ui tiny negative icon button">
                             <i class="close icon"></i>
                         </button>
-                        <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui primary icon button">
+                        <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui tiny primary icon button">
                             <i class="edit icon"></i>
                         </button>
-                        <button v-on:click="showGraphModal(null, entry, $event)" class="ui yellow icon button">
+                        <button v-on:click="showGraphModal(null, entry, $event)" class="ui tiny yellow icon button">
                             <i class="chart line icon"></i>
                         </button>
                     </td>

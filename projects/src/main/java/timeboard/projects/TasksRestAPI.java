@@ -118,7 +118,11 @@ public class TasksRestAPI {
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L)));
+                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L),
+                        (task.getMilestone() != null ? task.getMilestone().getName() : ""),
+                        task.getTaskStatus().getLabel(),
+                        (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
+                        ));
 
             }
             return Response.ok().entity(MAPPER.writeValueAsString(result.toArray())).build();
@@ -413,14 +417,23 @@ public class TasksRestAPI {
         public Long assigneeID;
 
         public Long typeID;
+        public String typeName;
+
         public String status;
+        public String statusName;
 
         public Long milestoneID;
+        public String milestoneName;
+
 
         public TaskWrapper(){}
 
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID, Long milestoneID) {
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate,
+                           Date startDate, Date endDate, String assignee, Long assigneeID,
+                           String status, Long typeID, Long milestoneID, String milestoneName, String statusName, String typeName) {
+
             this.taskID = taskID;
+
             this.taskName = taskName;
             this.taskComments = taskComments;
             this.originalEstimate = originalEstimate;
@@ -430,7 +443,11 @@ public class TasksRestAPI {
             this.assigneeID = assigneeID;
             this.status = status;
             this.typeID = typeID;
+
             this.milestoneID = milestoneID;
+            this.milestoneName = milestoneName;
+            this.statusName = statusName;
+            this.typeName = typeName;
         }
 
         public Long getMilestoneID() {

@@ -212,12 +212,20 @@ const formValidationRules = {
 
 // Empty task initalisation
 const emptyTask =  {
-    taskID: 0, projectID: currentProjectID, taskName: "", taskComments: "",
+    taskID: 0,
+    projectID: currentProjectID,
+    taskName: "",
+    taskComments: "",
     startDate:"", endDate:"",
-    originalEstimate: 0, typeID: 0,
-    assignee: "", assigneeID: 0,
+    originalEstimate: 0,
+    typeID: 0,
+    typeName: '',
+    assignee: "",
+    assigneeID: 0,
     status:"PENDING",
-    milestoneID:0
+    statusName: '',
+    milestoneID: '',
+    milestoneName: '',
 }
 
 // VUEJS MAIN APP
@@ -228,8 +236,8 @@ var app = new Vue({
         searchQuery: '',
         searchQueries: [ { key : 'taskName', value: '' }, { key : 'taskComments', value: '' }, {key : 'startDate', value: '' },
                          { key : 'endDate', value: '' }, { key : 'originalEstimate', value: { min: '', max: '' } },
-                         { key : 'assignee', value: '' }, { key : 'status', value: '' } ],
-        gridColumns: ['taskName', 'taskComments', 'startDate', 'endDate', 'originalEstimate', 'assignee', 'status'],
+                         { key : 'assignee', value: '' }, { key : 'status', value: '' }, { key : 'milestoneID', value: '' }, { key : 'typeID', value: '' } ],
+        gridColumns: ['taskName', 'taskComments', 'startDate', 'endDate', 'originalEstimate', 'assignee', 'status', 'milestoneID', 'typeID'],
         gridData: [],
         newTask: Object.assign({}, emptyTask),
         formError: "",
@@ -310,6 +318,10 @@ var app = new Vue({
 
                  this.newTask.status = task.status;
                  this.newTask.milestoneID = task.milestoneID;
+
+                 this.newTask.milestoneName = task.milestoneName;
+                 this.newTask.typeName = task.typeName;
+                 this.newTask.statusName = task.statusName;
 
             }else{
                  this.modalTitle = "Create task";
