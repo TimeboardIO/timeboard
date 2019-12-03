@@ -527,17 +527,9 @@ public class ProjectServiceImpl implements ProjectService {
         c.set(Calendar.HOUR_OF_DAY, 2);
 
         if (task instanceof Task) {
-            UpdatedTaskResult updatedProjectTaskResult = this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
-            return this.jpa.txExpr(entityManager -> {
-                entityManager.flush();
-                return updatedProjectTaskResult;
-            });
+            return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
         }else{
-            UpdatedTaskResult updatedDefaultTaskResult = this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
-            return this.jpa.txExpr(entityManager -> {
-                entityManager.flush();
-                return updatedDefaultTaskResult;
-            });
+            return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
         }
     }
 
@@ -547,16 +539,21 @@ public class ProjectServiceImpl implements ProjectService {
         return this.jpa.txExpr(entityManager -> {
 
             if(projectTask.getTaskStatus() != TaskStatus.PENDING){
-                // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
                 Imputation existingImputation = this.getImputationByDayByTask(entityManager, calendar.getTime(), projectTask);
-                this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), entityManager);
+                double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
+
+                Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), entityManager);
+                Task updatedTask = entityManager.find(Task.class, projectTask.getId());
+                double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
+                updatedTask.setEffortLeft(newEffortLeft);
+
+                entityManager.merge(updatedTask);
+                entityManager.flush();
+
+                this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + updatedTask.getId() + " (" + day + ") in project " + ((updatedTask!= null) ? updatedTask.getProject().getName() : "default") + " with value " + val);
+                return new UpdatedTaskResult(updatedTask.getProject().getId(), updatedTask.getId(), updatedTask.getEffortSpent(), updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(), updatedTask.getRealEffort());
             }
-            entityManager.merge(projectTask);
-
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask!= null) ? projectTask.getProject().getName() : "default") + " with value " + val);
-
-            return new UpdatedTaskResult(projectTask.getProject().getId(), projectTask.getId(), projectTask.getEffortSpent(), projectTask.getEffortLeft(), projectTask.getOriginalEstimate(), projectTask.getRealEffort());
-
+            return null;
         });
 
     }
@@ -570,8 +567,9 @@ public class ProjectServiceImpl implements ProjectService {
             this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), entityManager);
 
             entityManager.merge(defaultTask);
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
+            entityManager.flush();
 
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
             return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
         });
 
@@ -585,49 +583,44 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-    private AbstractTask actionOnImputation(Imputation i, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
-        AbstractTask abstractTask = (task instanceof Task) ? (Task) task : (DefaultTask) task;
+    private Imputation actionOnImputation(Imputation imputation, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
 
-        if (i == null) {
+        if (imputation == null) {
             //No imputation for current task and day
-            i = new Imputation();
-            i.setDay(date);
-            i.setTask(task);
-            i.setUser(actor);
-            i.setValue(val);
-            entityManager.persist(i);
+            imputation = new Imputation();
+            imputation.setDay(date);
+            imputation.setTask(task);
+            imputation.setUser(actor);
+            imputation.setValue(val);
+            entityManager.persist(imputation);
         } else  {
             // There is an existing imputation for this day and task
-            i.setValue(val);
+            imputation.setValue(val);
             if (val == 0) {
                 //if value equal to 0 then remove imputation
-                entityManager.remove(i);
+                entityManager.remove(imputation);
             } else {
                 // else save new value
-                entityManager.persist(i);
+                entityManager.persist(imputation);
             }
         }
+        entityManager.flush();
 
-        if(abstractTask instanceof Task) {
-            return updateEffortLeftFromImputationValue((Task) abstractTask, 0, val);
-        }
-        return abstractTask;
+        return imputation;
     }
 
-    private Task updateEffortLeftFromImputationValue(Task projectTask, double currentImputationValue, double newImputationValue) {
-        double currentEL = projectTask.getEffortLeft();
-        double newEL = currentEL; // new effort left
+    private double updateEffortLeftFromImputationValue(double currentEffortLeft, double currentImputationValue, double newImputationValue) {
+        double newEL = currentEffortLeft; // new effort left
         double diffValue =  Math.abs(newImputationValue - currentImputationValue);
 
         if (currentImputationValue < newImputationValue) {
-            newEL = currentEL - diffValue;
+            newEL = currentEffortLeft - diffValue;
         }
         if (currentImputationValue > newImputationValue) {
-            newEL = currentEL + diffValue;
+            newEL = currentEffortLeft + diffValue;
         }
 
-        projectTask.setEffortLeft(Math.max(newEL, 0));
-        return projectTask;
+        return Math.max(newEL, 0);
     }
 
 
@@ -641,6 +634,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return this.jpa.txExpr(entityManager -> {
             task.setEffortLeft(effortLeft);
+            entityManager.merge(task);
             entityManager.flush();
 
             this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task " + task.getId()
