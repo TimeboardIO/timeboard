@@ -28,28 +28,25 @@ package timeboard.core.api;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
+import org.springframework.stereotype.Component;
 import timeboard.core.internal.events.TaskEvent;
 import timeboard.core.internal.events.TimeboardEvent;
 import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.User;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 
 
-@Component(
-        service = TimeboardSubjects.class,
-        immediate = true
-)
+@Component
 public class TimeboardSubjects {
 
     public static PublishSubject<TaskEvent> TASK_EVENTS =  PublishSubject.create();
     public static PublishSubject<TimesheetEvent> TIMESHEET_EVENTS =  PublishSubject.create();
     public static Observable<TimeboardEvent> TIMEBOARD_EVENTS =  PublishSubject.create();
 
-    @Activate
+    @PostConstruct
     void activate() {
          //Merge all Timeboard app events
          TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TASK_EVENTS);

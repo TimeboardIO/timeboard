@@ -29,13 +29,14 @@ package timeboard.core.ui;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.servlet.*;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.log.LogService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import timeboard.core.api.TimeboardSessionStore;
@@ -45,6 +46,8 @@ import timeboard.core.model.User;
 
 @WebFilter(urlPatterns = {"/*"})
 public class OAuthSecurityFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthSecurityFilter.class);
 
 
     @Value("${timeboard.oauth.loginURL}")
@@ -65,14 +68,11 @@ public class OAuthSecurityFilter implements Filter {
     private HttpSecurityContextService securityContextService;
 
 
-    @Autowired
-    private LogService logService;
-
     private String loginURL;
 
     @PostConstruct
     private void activate() {
-        this.logService.log(LogService.LOG_INFO, "Security Filter is activated");
+        LOGGER.info("Security Filter is activated");
         this.loginURL = String.format(
                 this.loginURLPrefix + "?response_type=code&client_id=%s&redirect_uri=%s",
                 this.clientId,

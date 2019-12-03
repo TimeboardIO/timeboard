@@ -27,10 +27,8 @@ package timeboard.core.observers.emails;
  */
 
 import io.reactivex.schedulers.Schedulers;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.internal.TemplateGenerator;
@@ -43,6 +41,7 @@ import timeboard.core.model.Task;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,10 +50,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
-@Component(
-        service = SendSummaryEmail.class,
-        immediate = true
-)
+
+@Component
 public class SendSummaryEmail {
 
     @Autowired
@@ -62,7 +59,7 @@ public class SendSummaryEmail {
 
     private TemplateGenerator templateGenerator = new TemplateGenerator();
 
-    @Activate
+    @PostConstruct
     public void activate() {
         TimeboardSubjects.TIMEBOARD_EVENTS // Listen for all timeboard app events
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10))) // Observe on 10 threads

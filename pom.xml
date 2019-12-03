@@ -9,7 +9,16 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>webapp</module>
+            <module>core</module>
+            <module>theme</module>
+            <module>core-ui</module>
+            <module>home</module>
+            <module>projects</module>
+            <module>timesheet</module>
+            <module>sample-data</module>
+            <module>account</module>
+            <module>reporting</module>
+            <module>webapp</module>
     </modules>
     <dependencies>
         <dependency>
@@ -187,40 +196,7 @@
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <profile>
-            <id>core</id>
-            <modules>
-                <module>core</module>
-                <module>theme</module>
-                <module>core-ui</module>
-                <module>home</module>
-                <module>account</module>
-                <module>reporting</module>
-                <module>features</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>full</id>
-            <modules>
-                <module>core</module>
-                <module>theme</module>
-                <module>core-ui</module>
-                <module>home</module>
-                <module>projects</module>
-                <module>timesheet</module>
-                <module>features</module>
-                <module>sample-data</module>
-                <module>shell</module>
-                <module>account</module>
-                <module>reporting</module>
-                <module>plugins/project-xls-export-plugin</module>
-                <module>plugins/project-msp-export-plugin</module>
-                <module>plugins/project-github-import-plugin</module>
-                <module>plugins/project-jira-import-plugin</module>
-            </modules>
-        </profile>
-    </profiles>
+
 
     <build>
         <pluginManagement>

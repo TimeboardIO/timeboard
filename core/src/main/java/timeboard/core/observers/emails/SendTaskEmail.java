@@ -26,16 +26,15 @@ package timeboard.core.observers.emails;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
 
+import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,17 +42,14 @@ import java.util.Date;
 import java.util.List;
 
 
-@Component(
-        service = SendTaskEmail.class,
-        immediate = true
-)
+@Component
 //TODO keep this class ?
 public class SendTaskEmail {
 
     @Autowired
     EmailService emailService;
 
-    @Activate
+    @PostConstruct
     public void activate(){
 
        /* TimeboardSubjects.CREATE_TASK

@@ -38,8 +38,8 @@ import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Uid;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.CalendarService;
 import timeboard.core.api.ProjectService;
@@ -57,13 +57,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.*;
 
-@org.osgi.service.component.annotations.Component(
-        service = CalendarService.class
-)
 
 @org.springframework.stereotype.Component
 public class CalendarServiceImpl implements CalendarService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CalendarServiceImpl.class);
 
     @Autowired
     private EntityManager em;
@@ -71,8 +69,6 @@ public class CalendarServiceImpl implements CalendarService {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private LogService logService;
 
     private static final String CALENDAR_ORIGIN_KEY = "calendar";
 
@@ -188,7 +184,7 @@ public class CalendarServiceImpl implements CalendarService {
             }
         }
 
-        this.logService.log(LogService.LOG_INFO, "Import successful ");
+        LOGGER.info("Import successful ");
 
         return events;
     }
@@ -403,7 +399,7 @@ public class CalendarServiceImpl implements CalendarService {
             em.remove(calendar);
             em.flush();
 
-        this.logService.log(LogService.LOG_INFO, "Calendar " + calendarID + " deleted by " + actor.getName());
+        LOGGER.info("Calendar " + calendarID + " deleted by " + actor.getName());
 
     }
 

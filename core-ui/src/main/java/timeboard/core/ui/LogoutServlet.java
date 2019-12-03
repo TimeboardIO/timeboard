@@ -28,11 +28,11 @@ package timeboard.core.ui;
 
 import java.io.IOException;
 import java.util.UUID;
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.TimeboardSessionStore;
@@ -43,8 +43,7 @@ import timeboard.core.api.TimeboardSessionStore;
 @Component
 public class LogoutServlet extends TimeboardServlet {
 
-    @Autowired
-    LogService logService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogoutServlet.class);
 
     @Autowired
     private HttpSecurityContextService securityContextService;
@@ -65,7 +64,7 @@ public class LogoutServlet extends TimeboardServlet {
 
         this.sessionStore.invalidateSession(sessionID);
 
-        this.logService.log(LogService.LOG_INFO, "Logout : " + req.getSession().getAttribute("username"));
+        LOGGER.info("Logout : " + req.getSession().getAttribute("username"));
 
         resp.sendRedirect("/");
     }

@@ -26,8 +26,8 @@ package timeboard.core.internal;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
@@ -55,8 +55,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class ProjectServiceImpl implements ProjectService {
 
-    @Autowired
-    private LogService logService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
     @Autowired
     private UserService userService;
@@ -76,7 +75,7 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectMembership ownerMembership = new ProjectMembership(newProject, owner, ProjectRole.OWNER);
         em.persist(ownerMembership);
 
-        this.logService.log(LogService.LOG_INFO, "Project " + projectName + " created by user " + owner.getId());
+        LOGGER.info("Project " + projectName + " created by user " + owner.getId());
 
         return newProject;
     }
@@ -146,7 +145,7 @@ public class ProjectServiceImpl implements ProjectService {
         em.remove(project);
         em.flush();
 
-        this.logService.log(LogService.LOG_INFO, "Project " + project.getName() + " deleted");
+        LOGGER.info("Project " + project.getName() + " deleted");
         return project;
     }
 
@@ -162,7 +161,7 @@ public class ProjectServiceImpl implements ProjectService {
         em.merge(project);
         em.flush();
 
-        this.logService.log(LogService.LOG_INFO, "Project " + project.getName() + " updated");
+        LOGGER.info("Project " + project.getName() + " updated");
         return project;
     }
 
@@ -259,7 +258,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         em.flush();
 
-        this.logService.log(LogService.LOG_INFO, "Project " + project.getName() + " updated");
+        LOGGER.info("Project " + project.getName() + " updated");
         return project;
     }
 
@@ -275,7 +274,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         em.persist(projectMembership);
 
-        this.logService.log(LogService.LOG_INFO, "User " + projectMembership.getMember().getName() + " add to project " + projectMembership.getProject().getName());
+        LOGGER.info("User " + projectMembership.getMember().getName() + " add to project " + projectMembership.getProject().getName());
 
     }
 
@@ -353,7 +352,7 @@ public class ProjectServiceImpl implements ProjectService {
         em.flush();
 
         TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
-        this.logService.log(LogService.LOG_INFO, "Task " + taskName + " created by " + actor.getName() + " in project " + project.getName());
+        LOGGER.info("Task " + taskName + " created by " + actor.getName() + " in project " + project.getName());
 
         return newTask;
     }
@@ -371,9 +370,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void createTasks(final User actor, final List<Task> taskList) {
         for (Task newTask : taskList) {  //TODO create task here
-            this.logService.log(LogService.LOG_DEBUG, "User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
+           LOGGER.info("User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
         }
-        this.logService.log(LogService.LOG_INFO, "User " + actor + " created " + taskList.size() + " tasks ");
+        LOGGER.info("User " + actor + " created " + taskList.size() + " tasks ");
 
         em.flush();
 
@@ -384,7 +383,7 @@ public class ProjectServiceImpl implements ProjectService {
         for (Task task : taskList) {
             em.merge(task);
         }
-        this.logService.log(LogService.LOG_INFO, "User " + actor + " updated " + taskList.size() + " tasks ");
+        LOGGER.info("User " + actor + " updated " + taskList.size() + " tasks ");
         em.flush();
 
         taskList.stream().forEach(task -> {
@@ -398,7 +397,7 @@ public class ProjectServiceImpl implements ProjectService {
         for (Task task : taskList) {
             em.merge(task);
         }
-        this.logService.log(LogService.LOG_WARNING, "User " + actor + " deleted " + taskList.size() + " tasks ");
+        LOGGER.info("User " + actor + " deleted " + taskList.size() + " tasks ");
         em.flush();
     }
 
@@ -487,7 +486,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         em.merge(projectTask);
 
-        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
+        LOGGER.info("User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
 
         return new UpdatedTaskResult(projectTask.getProject().getId(), projectTask.getId(), projectTask.getEffortSpent(), projectTask.getEffortLeft(), projectTask.getOriginalEstimate(), projectTask.getRealEffort());
 
@@ -502,7 +501,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), em);
 
         em.merge(defaultTask);
-        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
+        LOGGER.info("User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
 
         return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
 
@@ -573,7 +572,7 @@ public class ProjectServiceImpl implements ProjectService {
         task.setEffortLeft(effortLeft);
         em.flush();
 
-        this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated effort left for task " + task.getId()
+        LOGGER.info("User " + actor.getName() + " updated effort left for task " + task.getId()
                 + " in project " + task.getProject().getName() + " with value " + effortLeft);
 
         return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
@@ -665,7 +664,7 @@ public class ProjectServiceImpl implements ProjectService {
         TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
 
 
-        this.logService.log(LogService.LOG_INFO, "Task " + taskID + " deleted by " + actor.getName());
+        LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
 
     }
 
@@ -722,7 +721,7 @@ public class ProjectServiceImpl implements ProjectService {
     public DefaultTask createDefaultTask(DefaultTask task) throws BusinessException {
         try {
             em.persist(task);
-                this.logService.log(LogService.LOG_INFO, "Default task " + task.getName() + " is created.");
+                LOGGER.info("Default task " + task.getName() + " is created.");
                 return task;
          } catch (Exception e) {
             throw new BusinessException(e);
@@ -735,7 +734,7 @@ public class ProjectServiceImpl implements ProjectService {
              em.merge(task);
             em.flush();
 
-            this.logService.log(LogService.LOG_INFO, "Milestone " + task.getName() + " updated");
+            LOGGER.info("Milestone " + task.getName() + " updated");
             return task;
 
     }
@@ -812,7 +811,7 @@ public class ProjectServiceImpl implements ProjectService {
         newMilestone.setProject(project);
 
         em.persist(newMilestone);
-        this.logService.log(LogService.LOG_INFO, "Milestone " + newMilestone);
+        LOGGER.info("Milestone " + newMilestone);
 
         return newMilestone;
 
@@ -829,7 +828,7 @@ public class ProjectServiceImpl implements ProjectService {
         em.merge(milestone);
         em.flush();
 
-        this.logService.log(LogService.LOG_INFO, "Milestone " + milestone.getName() + " updated");
+        LOGGER.info("Milestone " + milestone.getName() + " updated");
         return milestone;
     }
 
@@ -849,7 +848,7 @@ public class ProjectServiceImpl implements ProjectService {
         em.remove(milestone);
         em.flush();
 
-        this.logService.log(LogService.LOG_INFO, "Milestone " + milestoneID + " deleted by " + actor.getName());
+        LOGGER.info("Milestone " + milestoneID + " deleted by " + actor.getName());
     }
 
     @Override

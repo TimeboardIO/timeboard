@@ -26,10 +26,10 @@ package timeboard.core.internal;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.TimesheetService;
@@ -47,25 +47,22 @@ import java.util.Date;
 import java.util.List;
 
 
-@Component(
-        service = TimesheetService.class
-)
-@org.springframework.stereotype.Component
+
+@Component
 @Transactional
 public class TimesheetServiceImpl implements TimesheetService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimesheetServiceImpl.class);
 
     @Autowired
     private EntityManager em;
 
-    @Reference
+    @Autowired
     private UserService userService;
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
-    @Reference
-    private LogService logService;
 
     @Override
     public void validateTimesheet(User actor, User userTimesheet, int year, int week) throws TimesheetException {
@@ -128,7 +125,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService));
 
-        this.logService.log(LogService.LOG_INFO, "Week " + week + " validated for user" + userTimesheet.getName() + " by user " + actor.getName());
+        LOGGER.info("Week " + week + " validated for user" + userTimesheet.getName() + " by user " + actor.getName());
 
     }
 

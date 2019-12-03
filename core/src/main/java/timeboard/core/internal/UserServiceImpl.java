@@ -27,13 +27,15 @@ package timeboard.core.internal;
  */
 
 import org.mindrot.jbcrypt.BCrypt;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
+import timeboard.core.observers.logs.LogTasksComponent;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
@@ -47,22 +49,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserServiceImpl implements UserService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     private EntityManager em;
-
-    @Autowired
-    private LogService logService;
-
-    public UserServiceImpl() {
-
-    }
 
     @Override
     public List<User> createUsers(List<User> users) {
              users.forEach(user -> {
                 em.persist(user);
-                this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
+                 LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
             });
             return users;
      }
@@ -71,7 +67,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(value = Transactional.TxType.REQUIRES_NEW)
     public User createUser(final User user) throws BusinessException {
         this.em.persist(user);
-        this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
+        LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
         this.em.flush();
         return user;
      }
@@ -87,7 +83,7 @@ public class UserServiceImpl implements UserService {
                 u.setExternalIDs(user.getExternalIDs());
             }
             em.flush();
-            this.logService.log(LogService.LOG_INFO, "User " + user.getEmail() + " updated.");
+            LOGGER.info("User " + user.getEmail() + " updated.");
             return user;
 
     }

@@ -68,7 +68,7 @@ public class TasksRestAPI {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
         User actor = (User) request.getAttribute("actor");
 

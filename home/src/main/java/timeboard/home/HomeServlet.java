@@ -36,7 +36,6 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
@@ -46,16 +45,7 @@ import timeboard.core.ui.ViewModel;
 import timeboard.home.model.Week;
 
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
 
-        property = {
-                "service.ranking=0",
-                "osgi.http.whiteboard.servlet.pattern=/",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
 @WebServlet(name="HomeServlet", urlPatterns = {"/home"})
 public class HomeServlet extends TimeboardServlet {
 

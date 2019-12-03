@@ -31,7 +31,8 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.TimeboardSessionStore;
@@ -41,10 +42,8 @@ import timeboard.core.model.User;
 
 @Component
 public class HttpSecurityContextService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(HttpSecurityContextService.class);
 
-
-    @Autowired
-    private LogService logService;
 
     @Autowired
     private TimeboardSessionStore sessionStore;
@@ -75,7 +74,7 @@ public class HttpSecurityContextService {
                 if (userSession.isPresent()) {
                     u = (User) userSession.get().getPayload().get("user");
                 } else {
-                    this.logService.log(LogService.LOG_INFO, String.format("No session for cookie %s in keystore %s", uuid.toString(), this.sessionStore));
+                    LOGGER.info(String.format("No session for cookie %s in keystore %s", uuid.toString(), this.sessionStore));
                 }
             }
         }

@@ -28,11 +28,8 @@ package timeboard.core.internal;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.log.LogService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.TimeboardSessionStore;
 import timeboard.core.model.User;
@@ -46,9 +43,8 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class InMemorySessionStore implements TimeboardSessionStore {
+    private static final Logger LOGGER = LoggerFactory.getLogger(InMemorySessionStore.class);
 
-    @Autowired
-    private LogService logService;
 
     private static final Cache<UUID, TimeboardSession> SESSION_STORE = CacheBuilder.newBuilder()
             .maximumSize(5000)
@@ -57,7 +53,7 @@ public class InMemorySessionStore implements TimeboardSessionStore {
 
     @PostConstruct
     private void init() {
-        this.logService.log(LogService.LOG_INFO, String.format("Start session store : %s", this.toString()));
+        LOGGER.info(String.format("Start session store : %s", this.toString()));
     }
 
     @Override
@@ -72,14 +68,14 @@ public class InMemorySessionStore implements TimeboardSessionStore {
         TimeboardSession session = new TimeboardSession(sessionUUID);
         session.getPayload().put("user", user);
         SESSION_STORE.put(sessionUUID, session);
-        this.logService.log(LogService.LOG_INFO, String.format("Create session from user %s with sessionUUID %s in keystore %s", user.getScreenName(), sessionUUID.toString(), this));
+        LOGGER.info(String.format("Create session from user %s with sessionUUID %s in keystore %s", user.getScreenName(), sessionUUID.toString(), this));
         return session;
     }
 
     @Override
     public void invalidateSession(UUID uuid) {
         SESSION_STORE.invalidate(uuid);
-        this.logService.log(LogService.LOG_INFO, String.format("Invalidate session %s", uuid));
+        LOGGER.info(String.format("Invalidate session %s", uuid));
     }
 
     @Override
