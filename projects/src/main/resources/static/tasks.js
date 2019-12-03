@@ -69,9 +69,12 @@ Vue.component('task-list', {
        this.sortKey = key
        this.sortOrders[key] = this.sortOrders[key] * -1
      },
-     showCreateTaskModal: function(projectID, task, event){
+     showCreateTaskModal: function(projectID, task, event){ // proxy to vue app
         this.$parent.showCreateTaskModal(projectID, task, event);
      },
+     showGraphModal: function(projectID, task, event){ // proxy to vue app
+        this.$parent.showGraphModal(projectID, task, event);
+      },
      deleteTask: function(event, task){
         keepThis = this;
         event.target.classList.toggle('loading');
@@ -166,6 +169,15 @@ Vue.component('task-modal', {
    }
  });
 
+Vue.component('graph-modal', {
+   template: '#graph-modal-template',
+   props: {
+     task: Object,
+     formError: String,
+     modalTitle: String
+   }
+ });
+
 
 
  const formValidationRules = {
@@ -200,7 +212,9 @@ Vue.component('task-modal', {
         taskID: 0, projectID: currentProjectID, taskName: "", taskComments: "",
         startDate:"", endDate:"",
         originalEstimate: 0, typeID: 0,
-        assignee : "", assigneeID:0
+        assignee: "", assigneeID: 0,
+        status:"PENDING",
+        milestoneID:0
 }
 
 
@@ -215,24 +229,93 @@ var app = new Vue({
         gridData: [ ],
         newTask: Object.assign({}, emptyTask),
         formError:"",
-        modalTitle:""
+        modalTitle:"Create task"
     },
     methods: {
+        showGraphModal: function(projectID, task, event){
+            $('.graph.modal').modal({ detachable : true, centered: true }).modal('show');
+            $.ajax({
+                method: "GET",
+                url: "/api/tasks/chart?task="+task.taskID,
+                success : function(data, textStatus, jqXHR) {
+                    var listOfTaskDates = data.listOfTaskDates;
+                    var effortSpentDatasForChart = data.effortSpentDatas;
+                    var realEffortDatasForChart = data.realEffortDatas;
+
+                    var chart = new Chart($("#lineChart"), {
+                      type: 'line',
+                      data: {
+                        labels: listOfTaskDates,
+                        datasets: [{
+                            data: effortSpentDatasForChart,
+                            label: "Effort spent for " + task.taskName,
+                            borderColor: "#3e95cd",
+                            fill: true,
+                            steppedLine: true
+                          },
+                          {
+                            data: realEffortDatasForChart,
+                            label: "Real effort for " + task.taskName,
+                            borderColor: "#ff6384",
+                            fill: true,
+                            steppedLine: true
+                          }
+                        ]
+                      },
+                      options: {
+                        title: {
+                          display: true,
+                          text: 'Task - Real Effort and Effort Spent graph'
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    min: 0
+                                },
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Number of days'
+                                }
+                            }],
+                            xAxes: [{
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Dates'
+                                }
+                            }],
+                        }
+                      }
+                    });
+
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.log(data);
+                }
+            });
+        },
         showCreateTaskModal: function(projectID, task, event){
             event.preventDefault();
             if(task){
                  this.modalTitle = "Edit task";
                  this.newTask.projectID = projectID;
+                 this.newTask.projectID = currentProjectID;
                  this.newTask.taskID = task.taskID
+
                  this.newTask.taskName = task.taskName;
                  this.newTask.taskComments = task.taskComments;
-                 this.newTask.startDate = task.startDate;
+
                  this.newTask.endDate = task.endDate;
+                 this.newTask.startDate = task.startDate;
+
                  this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
+
                  this.newTask.assignee = task.assignee;
+                 this.newTask.assigneeID = task.assigneeID;
+
                  this.newTask.status = task.status;
-                 this.newTask.projectID = currentProjectID;
+                 this.newTask.milestoneID = task.milestoneID;
+
             }else{
                  this.modalTitle = "Create task";
                  Object.assign(this.newTask , emptyTask);
@@ -243,6 +326,7 @@ var app = new Vue({
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     var object = {};
                     if(validated){
+                        $('.ui.error.message').hide();
                         $.ajax({
                             method: "POST",
                             url: "/api/tasks",
@@ -258,7 +342,7 @@ var app = new Vue({
                                 $('.create-task.modal').modal('hide');
                             },
                             error: function(jqXHR, textStatus, errorThrown) {
-                                $('.ui.error.message').text(textStatus);
+                                $('.ui.error.message').text(jqXHR.responseText);
                                 $('.ui.error.message').show();
                             }
                         });
@@ -280,9 +364,6 @@ $(document).ready(function(){
          $('.ui.dimmer').removeClass('active');
     });
 
-
-     $('select.dropdown') .dropdown() ;
-
      $('.ui.search')
         .search({
             apiSettings: {
@@ -296,6 +377,8 @@ $(document).ready(function(){
                 onSelect: function(result, response) {
                     $('.assigned').val(result.screenName);
                     $('.taskAssigned').val(result.id);
+                    app.newTask.assignee = result.screenName;
+                    app.newTask.assigneeID = result.id;
                  },
             minCharacters : 3
         });

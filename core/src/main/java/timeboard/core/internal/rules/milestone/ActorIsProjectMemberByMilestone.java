@@ -46,7 +46,6 @@ public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {
         Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()
-                                && projectMembership.getRole().equals(ProjectRole.OWNER)
                 )
                 .findFirst();
         return userOptional.isPresent();

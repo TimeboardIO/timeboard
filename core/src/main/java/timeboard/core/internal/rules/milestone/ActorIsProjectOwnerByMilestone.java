@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.internal.rules.milestone;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,23 +26,30 @@ package timeboard.core.model;
  * #L%
  */
 
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Milestone;
+import timeboard.core.model.ProjectMembership;
+import timeboard.core.model.ProjectRole;
+import timeboard.core.model.User;
 
-public enum TaskStatus {
-    PENDING("En attente"),
-    IN_PROGRESS("En cours"),
-    DONE("Réalisée"),
-    REFUSED("Refusée");
+import java.util.Optional;
 
-    public final String label;
 
-    private TaskStatus(String label) {
-        this.label = label;
+public class ActorIsProjectOwnerByMilestone implements Rule<Milestone> {
+
+    @Override
+    public String ruleDescription() {
+        return "User is not project Owner";
     }
 
-    String getLabel() {
-        return this.label;
+    @Override
+    public boolean isSatisfied(User u, Milestone thing) {
+        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+                .filter(projectMembership ->
+                        projectMembership.getMember().getId() == u.getId()
+                                && projectMembership.getRole().equals(ProjectRole.OWNER)
+                )
+                .findFirst();
+        return userOptional.isPresent();
     }
-
 }
-
-

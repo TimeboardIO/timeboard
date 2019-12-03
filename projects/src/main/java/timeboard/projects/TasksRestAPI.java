@@ -26,6 +26,7 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectService;
@@ -34,18 +35,17 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.io.IOException;
+import javax.ws.rs.core.Response;
 import java.io.Serializable;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component(
         service = TasksRestAPI.class,
@@ -78,7 +78,7 @@ public class TasksRestAPI {
 
     @GET
     @Path("/")
-    public String getTasks(@Context HttpServletRequest request) throws Exception {
+    public Response getTasks(@Context HttpServletRequest request) throws JsonProcessingException {
         User actor = (User) req.getAttribute("actor");
 
         final String strProjectID = request.getParameter("project");
@@ -86,67 +86,165 @@ public class TasksRestAPI {
         if(strProjectID != null){
             projectID = Long.parseLong(strProjectID);
         }else{
-            throw new Exception("Incorrect project argument");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Incorrect project argument").build();
         }
 
-        final Project project = this.projectService.getProjectByID(actor, projectID);
-        if(project == null){
-            throw new Exception("Project does not exists or you don't have enough permissions to access it.");
-        }
-        final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
-
-        final List<TaskWrapper> result = new ArrayList<>();
-
-        for (Task task : tasks){
-            User assignee = task.getAssigned();
-            if(assignee == null){
-                assignee = new User();
-                assignee.setId(0);
-                assignee.setName("");
-                assignee.setFirstName("");
+        try {
+            final Project project = this.projectService.getProjectByID(actor, projectID);
+            if (project == null) {
+                return Response.status(Response.Status.FORBIDDEN).entity("Project does not exists or you don't have enough permissions to access it.").build();
             }
+            final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
 
-            result. add(new TaskWrapper(
-                    task.getId(),
-                    task.getName(),
-                    task.getComments(),
-                    task.getOriginalEstimate(),
-                    task.getStartDate(),
-                    task.getEndDate(),
-                    assignee.getScreenName(), assignee.getId(),
-                    task.getTaskStatus().name(),
-                    (task.getTaskType() != null ?task.getTaskType().getId() : 0L)));
+            final List<TaskWrapper> result = new ArrayList<>();
 
+            for (Task task : tasks) {
+                User assignee = task.getAssigned();
+                if (assignee == null) {
+                    assignee = new User();
+                    assignee.setId(0);
+                    assignee.setName("");
+                    assignee.setFirstName("");
+                }
+
+                result.add(new TaskWrapper(
+                        task.getId(),
+                        task.getName(),
+                        task.getComments(),
+                        task.getOriginalEstimate(),
+                        task.getStartDate(),
+                        task.getEndDate(),
+                        assignee.getScreenName(), assignee.getId(),
+                        task.getTaskStatus().name(),
+                        (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
+                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L)));
+
+            }
+            return Response.ok().entity(MAPPER.writeValueAsString(result.toArray())).build();
+        }catch (BusinessException e){
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return MAPPER.writeValueAsString(result.toArray());
     }
 
     @GET
-    @Path("/approve")
-    public String approveTask(@Context HttpServletRequest request) throws Exception {
+    @Path("/chart")
+    public Response getDatasForCharts(@Context HttpServletRequest request) throws BusinessException, JsonProcessingException {
+        TaskGraphWrapper wrapper = new TaskGraphWrapper();
         User actor = (User) req.getAttribute("actor");
-        return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGESS);
+
+
+        final String taskIdStr = request.getParameter("task");
+        Long taskID = null;
+        if(taskIdStr != null) {
+            taskID = Long.parseLong(taskIdStr);
+        }
+        if(taskID == null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+        }
+
+        Task task;
+        try {
+            task = (Task) this.projectService.getTaskByID(actor, taskID);
+        }catch (Exception e){
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
+
+        }
+
+        // Datas for dates (Axis X)
+        String formatLocalDate = "yyyy-MM-dd";
+        String formatDateToDisplay = "dd/MM/yyyy";
+        LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getStartDate()));
+        LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getEndDate()));
+        List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
+                .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
+                .collect(Collectors.toList());
+        wrapper.setListOfTaskDates( listOfTaskDates);
+
+        // Datas for effort spent (Axis Y)
+        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
+        final EffortHistory[] lastEffortSpentSum = {new EffortHistory(task.getStartDate(), 0.0)};
+        Map<Date, Double> effortSpentMap = listOfTaskDates
+                .stream()
+                .map(dateString -> {
+                    try {
+                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .map(date -> effortSpentDB.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effort -> {
+                            lastEffortSpentSum[0] = new EffortHistory(date, effort.getValue());
+                            return lastEffortSpentSum[0];
+                        })
+                        .findFirst().orElse(new EffortHistory(date, lastEffortSpentSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setEffortSpentDatas(effortSpentMap.values());
+
+        // Datas for effort estimate (Axis Y)
+        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
+        final EffortHistory[] lastEffortEstimate = {new EffortHistory(task.getStartDate(), task.getOriginalEstimate())};
+        Map<Date, Double> effortEstimateMap = listOfTaskDates
+                .stream()
+                .map(dateString -> {
+                    try {
+                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                })
+                .map(date -> effortLeftDB.stream()
+                        .filter(el -> new SimpleDateFormat(formatDateToDisplay).format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effortLeft -> {
+                            lastEffortEstimate[0] = new EffortHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
+                            return lastEffortEstimate[0];
+                        })
+                        .findFirst().orElse(new EffortHistory(date, lastEffortEstimate[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setRealEffortDatas(effortEstimateMap.values());
+
+        return Response.ok().entity(MAPPER.writeValueAsString(wrapper)).build();
+
+    }
+
+
+    @GET
+    @Path("/approve")
+    public Response approveTask(@Context HttpServletRequest request) {
+        User actor = (User) req.getAttribute("actor");
+        return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGRESS);
     }
 
     @GET
     @Path("/deny")
-    public String denyTask(@Context HttpServletRequest request) throws Exception {
+    public Response denyTask(@Context HttpServletRequest request){
         User actor = (User) req.getAttribute("actor");
 
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
-    private String changeTaskStatus(User actor, HttpServletRequest request,  TaskStatus status) throws Exception{
+    private Response changeTaskStatus(User actor, HttpServletRequest request,  TaskStatus status){
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
         if(taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
         }else{
-            throw new Exception("Missing argument taskId.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing argument taskId.").build();
         }
         if(taskID == null) {
-            throw new Exception("Invalid argument taskId.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
         }
 
         Task task;
@@ -155,16 +253,17 @@ public class TasksRestAPI {
             task.setTaskStatus(status);
             this.projectService.updateTask(actor, task);
         } catch (ClassCastException e){
-            throw new Exception("Task is not a project task.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Task is not a project task.").build();
         } catch (Exception e){
-            throw new Exception("Task id not found.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Task id not found.").build();
         }
-        return MAPPER.writeValueAsString("DONE");
+
+        return Response.ok().build();
     }
 
     @GET
     @Path("/delete")
-    public String deleteTask(@Context HttpServletRequest request) throws Exception {
+    public Response deleteTask(@Context HttpServletRequest request){
         User actor = (User) req.getAttribute("actor");
 
 
@@ -173,19 +272,19 @@ public class TasksRestAPI {
         if(taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
         }else{
-            throw new Exception("Missing argument taskId.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Missing argument taskId.").build();
         }
         if(taskID == null) {
-            throw new Exception("Invalid argument taskId.");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid argument taskId.").build();
         }
 
         try {
             projectService.deleteTaskByID(actor, taskID);
         } catch (Exception e){
-            throw new Exception( e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
 
-        return MAPPER.writeValueAsString("DONE");
+        return Response.ok().build();
     }
 
 
@@ -193,7 +292,7 @@ public class TasksRestAPI {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/")
-    public String createTask(TaskWrapper taskWrapper) throws Exception {
+    public Response createTask(TaskWrapper taskWrapper) throws JsonProcessingException {
         User actor = (User) req.getAttribute("actor");
         Date startDate = null;
         Date endDate = null;
@@ -202,11 +301,11 @@ public class TasksRestAPI {
             endDate = DATE_FORMAT.parse(taskWrapper.endDate);
 
         }catch(Exception e) {
-            throw new Exception("Incorrect date format");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Incorrect date format").build();
         }
 
         if(startDate.getTime()>endDate.getTime()){
-            throw new Exception("Start date must be before end date ");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Start date must be before end date ").build();
         }
 
         String name = taskWrapper.taskName;
@@ -215,7 +314,7 @@ public class TasksRestAPI {
 
         double oe = taskWrapper.originalEstimate;
         if(oe <= 0.0){
-            throw new Exception( "Original original estimate must be positive ");
+            return Response.status(Response.Status.BAD_REQUEST).entity("Original original estimate must be positive ").build();
         }
 
         Long projectID = taskWrapper.projectID;
@@ -223,8 +322,16 @@ public class TasksRestAPI {
         try {
             project = this.projectService.getProjectByID(actor, projectID);
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
+
+        Long milestoneID = taskWrapper.milestoneID;
+        Milestone milestone = null;
+        try {
+            milestone = this.projectService.getMilestoneById( actor, milestoneID);
+        } catch (Exception e) {
+        }
+
 
         Task task = null;
         Long typeID = taskWrapper.typeID;
@@ -236,6 +343,7 @@ public class TasksRestAPI {
 
                 User assignee = userService.findUserByID(taskWrapper.assigneeID);
                 final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
+
                 task.setName(taskWrapper.getTaskName());
                 task.setComments(taskWrapper.getTaskComments());
                 task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
@@ -243,42 +351,74 @@ public class TasksRestAPI {
                 task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
                 task.setAssigned(assignee);
                 task.setTaskType(taskType);
-                task.setTaskStatus(TaskStatus.valueOf(taskWrapper.getStatus()));
+                task.setMilestone(milestone);
+                task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING );
 
                 projectService.updateTask(actor,task);
             }catch (Exception e){
-                throw new Exception("Error in task creation please verify your inputs and retry");
+                return Response.status(Response.Status.BAD_REQUEST).entity("Error in task creation please verify your inputs and retry").build();
             }
         }else{
             try{
                 task = projectService.createTask(actor, project,
                         name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
             }catch (Exception e){
-                throw new Exception("Error in task creation please verify your inputs and retry");
+                return Response.status(Response.Status.BAD_REQUEST).header("msg","Error in task creation please verify your inputs and retry. (" +e.getMessage()+")").build();
             }
         }
 
-        return MAPPER.writeValueAsString(taskWrapper);
+        taskWrapper.setTaskID(task.getId());
+        return Response.ok().entity(MAPPER.writeValueAsString(taskWrapper)).build();
 
     }
 
 
-    public static class TaskWrapper implements Serializable {
+    public static class TaskGraphWrapper implements Serializable {
+        public TaskGraphWrapper(){}
+
+        public List<String> listOfTaskDates;
+        public Collection<Double> effortSpentDatas;
+        public Collection<Double> realEffortDatas;
+        
+        public void setListOfTaskDates(List<String> listOfTaskDates) {
+            this.listOfTaskDates = listOfTaskDates;
+        }
+
+        public void setEffortSpentDatas(Collection<Double> effortSpentDatas) {
+            this.effortSpentDatas = effortSpentDatas;
+
+        }
+
+        public void setRealEffortDatas(Collection<Double> realEffortDatas) {
+            this.realEffortDatas = realEffortDatas;
+        }
+    }
+
+
+
+        public static class TaskWrapper implements Serializable {
         public Long taskID;
+        public Long projectID;
+
         public String taskName;
         public String taskComments;
+
         public double originalEstimate;
+
         public String startDate;
         public String endDate;
+
         public String assignee;
         public Long assigneeID;
-        public String status;
+
         public Long typeID;
-        public Long projectID;
+        public String status;
+
+        public Long milestoneID;
 
         public TaskWrapper(){}
 
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID) {
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID, Long milestoneID) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComments = taskComments;
@@ -289,6 +429,15 @@ public class TasksRestAPI {
             this.assigneeID = assigneeID;
             this.status = status;
             this.typeID = typeID;
+            this.milestoneID = milestoneID;
+        }
+
+        public Long getMilestoneID() {
+            return milestoneID;
+        }
+
+        public void setMilestoneID(Long milestoneID) {
+            this.milestoneID = milestoneID;
         }
 
         public Long getTaskID() {

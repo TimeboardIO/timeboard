@@ -64,7 +64,7 @@ public abstract class AbstractTask implements Serializable {
     private String remoteId;
 
 
-    @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
+    @OneToMany(targetEntity = Imputation.class, mappedBy = "task", fetch = FetchType.EAGER)
     private Set<Imputation> imputations;
 
     public AbstractTask() {

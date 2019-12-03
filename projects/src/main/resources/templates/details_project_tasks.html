@@ -15,6 +15,7 @@
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
 
+
     <script type="text/x-template" id="task-list-template">
         <div class="dimmable">
             <div class="ui active inverted dimmer">
@@ -122,6 +123,9 @@
                     <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui primary icon button">
                         <i class="edit icon"></i>
                     </button>
+                    <button v-on:click="showGraphModal(null, entry, $event)" class="ui yellow icon button">
+                        <i class="chart line icon"></i>
+                    </button>
                 </td>
             </tr>
             </tbody>
@@ -164,12 +168,27 @@
 
     </script>
 
-    <script type="text/x-template" id="task-modal-template"  >
-        <div class="ui modal create-task " >
+    <script type="text/x-template" id="graph-modal-template">
+        <div class="ui modal graph " >
             <i class="close icon"></i>
-            <div  v-bind="modalTitle"  class="header"></div>
-            <div class="scrolling content">
+            <div class="content">
+                <div class="ui fluid card">
+                    <canvas id="lineChart" width="800" height="450"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </script>
+    <script type="text/x-template" id="task-modal-template"  >
+        <div class="ui large modal create-task " >
+            <i class="close icon"></i>
+            <div class="header">
+                {{ modalTitle }}
+            </div>
+            <div class="content">
                 <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
+                    <div v-bind="formError" class="ui error message"></div>
+
                     <div class="two fields">
                         <div class="field">
                             <label>Task Name</label>
@@ -179,13 +198,10 @@
                             <label>User assigned</label>
                             <div class="ui category search">
                                 <div class="ui icon input">
-
                                     <input class="prompt assigned" placeholder="Search user..."
                                            v-model="task.assignee" type="text"/>
-
                                     <input class="taskAssigned" name="taskAssigned"
                                            v-model="task.assigneeID" type="hidden"/>
-
                                     <i class="search icon"></i>
                                 </div>
                                 <div class="results"></div>
@@ -194,7 +210,7 @@
                     </div>
                     <div class="field">
                         <label>Task Description</label>
-                        <input v-model="task.taskComments" name="taskComments" placeholder="Task Description" type="text">
+                        <textarea v-model="task.taskComments" name="taskComments" placeholder="Task Description" rows="1"></textarea>
                     </div>
                     <div class=" two fields">
                         <div class="field">
@@ -208,21 +224,39 @@
                                    type="date">
                         </div>
                     </div>
-                    <div class="two fields">
+                    <div class="four fields">
                         <div class="field">
                             <label>Task Original Estimate</label>
                             <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" required type="number">
                         </div>
                         <div class="field">
                             <label>Task type</label>
-                            <select  v-model="task.typeID" name="taskTypeID" >
+                            <select class="ui type dropdown"  v-model="task.typeID" name="taskTypeID" >
                                 <option th:each="type: ${taskTypes}"
                                         th:text="${type.typeName}" th:value="${type.id}"
                                 ></option>
                             </select>
                         </div>
+                        <div class="field">
+                            <label>Task status</label>
+                            <select class="ui status dropdown" v-model="task.status" name="taskStatus" v-bind:class="{disabled: (task.taskID == 0)}">
+                                <option th:each="status: ${allTaskStatus}"
+                                        th:text="${status.label}"
+                                        th:value="${status}"
+                                        ></option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Milestone assigned</label>
+                            <select class="ui milestone dropdown" v-model="task.milestoneID" name="taskMilestoneId">
+                                <option
+                                        th:each="milestone: ${allProjectMilestones}"
+                                        th:text="${milestone.name}"
+                                        th:value="${milestone.id}"
+                                      ></option>
+                            </select>
+                        </div>
                     </div>
-                    <div v-bind="formError" class="ui error message"></div>
                 </form>
             </div>
             <div class="actions">
@@ -257,6 +291,11 @@
                 :form-error="formError"
                 :modal-title="modalTitle">
         </task-modal>
+        <graph-modal
+                :task="newTask"
+                :form-error="formError"
+                :modal-title="modalTitle">
+        </graph-modal>
 
         <script src="/projects/static/tasks.js"></script>
 
