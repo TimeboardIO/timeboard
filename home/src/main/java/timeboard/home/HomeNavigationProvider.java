@@ -40,7 +40,7 @@ public class HomeNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationPath() {
-        return "/home";
+        return "/";
     }
 
     @Override

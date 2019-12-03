@@ -28,10 +28,15 @@ package timeboard.core.ui;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 
 import javax.servlet.RequestDispatcher;
@@ -57,6 +62,9 @@ public abstract class TimeboardServlet extends HttpServlet {
 
     @Autowired
     private JavascriptService javascriptService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private CssService cssService;
@@ -120,7 +128,8 @@ public abstract class TimeboardServlet extends HttpServlet {
     }
 
     protected User getActorFromRequestAttributes(HttpServletRequest request) {
-        return (User) request.getAttribute("actor");
+        OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return this.userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
     }
 
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
@@ -142,6 +151,9 @@ public abstract class TimeboardServlet extends HttpServlet {
 
 
     protected void doService(HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws ServletException, IOException {
+
+        response.setContentType(MediaType.TEXT_HTML_VALUE);
+
         response.setCharacterEncoding(resolver.getCharacterEncoding());
         viewModel.getViewDatas().put("user", getActorFromRequestAttributes(request));
 
