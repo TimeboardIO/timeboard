@@ -15,7 +15,6 @@
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
 
-
     <script type="text/x-template" id="task-list-template">
         <div class="dimmable">
             <div class="ui active inverted dimmer">
@@ -50,8 +49,6 @@
             </tr></thead>
             <tbody>
             <tr>
-
-
                 <td>
                     <div class="ui fluid icon input">
                         <input  v-model="filterKey[columns.indexOf('taskName')].value"  type="text" placeholder="Name.. ">
@@ -97,7 +94,7 @@
                     </div>
                 </td>
                 <td>
-                    <select multiple class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
+                    <select class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
                         <option th:each="status: ${allTaskStatus}"
                                 th:text="${status.label}"
                                 th:value="${status}"
@@ -275,6 +272,7 @@
         <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task icon button">
             New Task <i class="plus icon"></i>
         </button>
+
         <pending-task-list
                 :tasks="gridData"
                 :columns="gridColumns"

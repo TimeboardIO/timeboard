@@ -27,7 +27,6 @@ package timeboard.projects;
  */
 
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -93,7 +92,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("project", project);
     }
-    
+
     public static class TaskForm {
         private Long taskID;
         private String taskName;
@@ -122,7 +121,6 @@ public class ProjectTaskListServlet extends TimeboardServlet {
             taskComment = task.getComments();
             taskStatus = task.getTaskStatus();
             taskStatus = TaskStatus.PENDING;
-
 
         }
 
