@@ -16,10 +16,20 @@ const userID = $("meta[property='timesheet']").attr('userID');
 
 
 const emptyTask =  {
-    taskID: 0, projectID: 0, taskName: "", taskComments: "",
+    taskID: 0,
+    projectID: currentProjectID,
+    taskName: "",
+    taskComments: "",
     startDate:"", endDate:"",
-    originalEstimate: 0, typeID: 0,
-    assignee : "", assigneeID: userID
+    originalEstimate: 0,
+    typeID: 0,
+    typeName: '',
+    assignee: "",
+    assigneeID: 0,
+    status:"PENDING",
+    statusName: '',
+    milestoneID: '',
+    milestoneName: '',
 }
 
 const timesheetModel = {
