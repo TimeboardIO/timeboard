@@ -28,8 +28,10 @@ package timeboard.account;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +39,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.UserException;
+import timeboard.core.model.TaskColumns;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -71,42 +75,66 @@ public class AccountServlet extends TimeboardServlet {
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         String submitButton = request.getParameter("formType");
-        if (submitButton.matches("account")) {
-           //Account modification
-           String fistName = request.getParameter("firstName");
-           String name = request.getParameter("name");
-           String email = request.getParameter("email");
 
-            actor.setFirstName(fistName);
-            actor.setName(name);
-            actor.setEmail(email);
+        switch (submitButton) {
 
-           try {
-              User u = userService.updateUser(actor);
-               viewModel.getViewDatas().put("message", "User account changed successfully !");
-           } catch (Exception e) {
-               viewModel.getViewDatas().put("error", "Error while updating user information.");
-           }
-        } else if (submitButton.matches("external")) {
-            
-            Enumeration<String> params1 = request.getParameterNames();
-            while (params1.hasMoreElements()) {
-                String param = params1.nextElement();
-                if (param.startsWith("attr-")) {
-                    String key = param.substring(5, param.length());
-                    String value = request.getParameter(param);
-                    actor.getExternalIDs().put(key, value);
+            case "account":
+               //Account modification
+               String fistName = request.getParameter("firstName");
+               String name = request.getParameter("name");
+               String email = request.getParameter("email");
+
+                actor.setFirstName(fistName);
+                actor.setName(name);
+                actor.setEmail(email);
+
+               try {
+                  User u = userService.updateUser(actor);
+                   viewModel.getViewDatas().put("message", "User account changed successfully !");
+               } catch (Exception e) {
+                   viewModel.getViewDatas().put("error", "Error while updating user information.");
+               }
+               break;
+
+            case "external":
+                Enumeration<String> params1 = request.getParameterNames();
+                while (params1.hasMoreElements()) {
+                    String param = params1.nextElement();
+                    if (param.startsWith("attr-")) {
+                        String key = param.substring(5, param.length());
+                        String value = request.getParameter(param);
+                        actor.getExternalIDs().put(key, value);
+                    }
                 }
-            }
-            try {
-                User u = userService.updateUser(actor);
-                viewModel.getViewDatas().put("message", "External tools updated successfully !");
-            } catch (Exception e) {
-                viewModel.getViewDatas().put("error", "Error while external tools");
-            }
+                try {
+                    User u = userService.updateUser(actor);
+                    viewModel.getViewDatas().put("message", "External tools updated successfully !");
+                } catch (Exception e) {
+                    viewModel.getViewDatas().put("error", "Error while external tools");
+                }
+                break;
+
+            case "column":
+                String[] selectedColumnsString = request.getParameterValues("columnSelected");
+                try {
+                    List<TaskColumns> selectedColumns = Arrays.stream(selectedColumnsString).map(col -> TaskColumns.valueOf(col)).collect(Collectors.toList());
+                    User u = updateColumnPreferencesUser(actor, selectedColumns);
+                    viewModel.getViewDatas().put("message", "Task columns preferences updated successfully !");
+                } catch (Exception e) {
+                    viewModel.getViewDatas().put("error", "Error while updating Task columns preferences");
+                }
+                break;
+
+            default:
         }
         loadPage(viewModel, actor);
 
+    }
+
+    private User updateColumnPreferencesUser(User actor, List<TaskColumns> selectedColumns) throws UserException {
+        actor.setTaskColumnsPreferences(selectedColumns);
+        User newUser = userService.updateUser(actor);
+        return newUser;
     }
 
     @Override
@@ -122,8 +150,10 @@ public class AccountServlet extends TimeboardServlet {
         projectImportServlets.forEach(service -> {
             fieldNames.add(service.getServiceName());
         });
-
         viewModel.getViewDatas().put("externalTools", fieldNames);
+
+        List<String> taskColumsNames = Arrays.stream(TaskColumns.values()).map(col -> col.getLabel()).collect(Collectors.toList());
+        viewModel.getViewDatas().put("allTaskColumns", taskColumsNames);
 
         viewModel.setTemplate("account:account.html");
     }

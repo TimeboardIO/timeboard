@@ -32,6 +32,7 @@ package timeboard.core.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.persistence.*;
 
@@ -74,6 +75,8 @@ public class User implements Serializable {
     @Convert(converter = JSONToMapStringConverter.class)
     @Lob
     private Map<String, String> externalIDs;
+
+    private List<TaskColumns> taskColumnsPreferences;
 
 
     public User() {
@@ -164,6 +167,14 @@ public class User implements Serializable {
 
     public void setValidateOwnImputation(boolean validateOwnImputation) {
         this.validateOwnImputation = validateOwnImputation;
+    }
+
+    public List<TaskColumns> getTaskColumnsPreferences() {
+        return taskColumnsPreferences;
+    }
+
+    public void setTaskColumnsPreferences(List<TaskColumns> taskColumnsPreferences) {
+        this.taskColumnsPreferences = taskColumnsPreferences;
     }
 
     @Transient

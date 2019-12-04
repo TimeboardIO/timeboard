@@ -122,6 +122,41 @@
                 </form>
             </div>
         </div>
+
+        <div class="card">
+            <div class="content">
+                <h4 class="ui dividing header">Column Preferences For Task</h4>
+
+                <form id="columnPreferences" action="" class="ui form password" enctype="application/x-www-form-urlencoded" method="post">
+
+                    <div class="field">
+
+                        <table class="ui unstackable table">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Column Name For Task</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="col : ${allTaskColumns}">
+                                <td>
+                                    <input type="checkbox" name="columnSelected" th:value="${col}" th:checked="false"/>
+                                </td>
+                                <td>
+                                    <a th:text="${col}"></a>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <input name="formType" type="hidden" value="column">
+                        <div name="submitButton" class="ui submit positive button " value="column" >Save</div>
+                        <div class="ui error message"></div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     <script src="/account/static/account.js"></script>

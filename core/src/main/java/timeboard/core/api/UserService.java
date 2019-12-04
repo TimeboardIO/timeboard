@@ -29,6 +29,7 @@ package timeboard.core.api;
 import java.util.List;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
+import timeboard.core.model.TaskColumns;
 import timeboard.core.model.User;
 
 /**
