@@ -14,7 +14,7 @@ script:
   - mkdir build
   - cp webapp/target/webapp-1.0-SNAPSHOT-spring-boot.jar ./temp/
   - cp -r scripts/aws/* ./temp
-  - zip -r -j ./build/timeboard.zip ./temp/*
+  - zip -r -j ./build/timeboard.$TRAVIS_COMMIT.zip ./temp/*
 
 
 
