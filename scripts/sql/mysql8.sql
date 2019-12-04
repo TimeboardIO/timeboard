@@ -127,6 +127,7 @@
         imputationFutur bit not null,
         name varchar(255),
         remoteSubject varchar(255),
+        taskColumnsPreferences TEXT,
         validateOwnImputation bit not null,
         primary key (id)
     ) engine=InnoDB;

@@ -141,10 +141,10 @@
                             <tbody>
                             <tr th:each="col : ${allTaskColumns}">
                                 <td>
-                                    <input type="checkbox" name="columnSelected" th:value="${col}" th:checked="false"/>
+                                    <input type="checkbox" name="columnSelected" th:value="${col.label}" th:checked="${userTaskColumns.contains(col)}"/>
                                 </td>
                                 <td>
-                                    <a th:text="${col}"></a>
+                                    <a th:text="${col.label}"></a>
                                 </td>
                             </tr>
                             </tbody>

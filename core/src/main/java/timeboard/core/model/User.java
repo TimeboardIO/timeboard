@@ -76,6 +76,9 @@ public class User implements Serializable {
     @Lob
     private Map<String, String> externalIDs;
 
+    @Column(columnDefinition = "TEXT")
+    @Convert(converter = JSONToListColumnsConverter.class)
+    @Lob
     private List<TaskColumns> taskColumnsPreferences;
 
 

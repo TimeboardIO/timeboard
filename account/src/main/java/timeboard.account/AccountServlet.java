@@ -117,8 +117,7 @@ public class AccountServlet extends TimeboardServlet {
             case "column":
                 String[] selectedColumnsString = request.getParameterValues("columnSelected");
                 try {
-                    List<TaskColumns> selectedColumns = Arrays.stream(selectedColumnsString).map(col -> TaskColumns.valueOf(col)).collect(Collectors.toList());
-                    User u = updateColumnPreferencesUser(actor, selectedColumns);
+                    User u = updateColumnPreferencesUser(actor, Arrays.asList(selectedColumnsString));
                     viewModel.getViewDatas().put("message", "Task columns preferences updated successfully !");
                 } catch (Exception e) {
                     viewModel.getViewDatas().put("error", "Error while updating Task columns preferences");
@@ -131,7 +130,8 @@ public class AccountServlet extends TimeboardServlet {
 
     }
 
-    private User updateColumnPreferencesUser(User actor, List<TaskColumns> selectedColumns) throws UserException {
+    private User updateColumnPreferencesUser(User actor, List<String> selectedColumnsString) throws UserException {
+        List<TaskColumns> selectedColumns = selectedColumnsString.stream().map(col -> TaskColumns.valueOf(col)).collect(Collectors.toList());
         actor.setTaskColumnsPreferences(selectedColumns);
         User newUser = userService.updateUser(actor);
         return newUser;
@@ -141,7 +141,7 @@ public class AccountServlet extends TimeboardServlet {
     protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         loadPage(viewModel, actor);
     }
-    
+
     private void loadPage(ViewModel viewModel, User user) {
         viewModel.getViewDatas().put("user", user);
 
@@ -152,8 +152,11 @@ public class AccountServlet extends TimeboardServlet {
         });
         viewModel.getViewDatas().put("externalTools", fieldNames);
 
-        List<String> taskColumsNames = Arrays.stream(TaskColumns.values()).map(col -> col.getLabel()).collect(Collectors.toList());
-        viewModel.getViewDatas().put("allTaskColumns", taskColumsNames);
+        List<TaskColumns> allTaskColumns = Arrays.asList(TaskColumns.values());
+        viewModel.getViewDatas().put("allTaskColumns", allTaskColumns);
+
+        List<TaskColumns> userTaskColumns = user.getTaskColumnsPreferences();
+        viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
 
         viewModel.setTemplate("account:account.html");
     }
