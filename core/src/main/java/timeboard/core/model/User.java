@@ -172,7 +172,7 @@ public class User implements Serializable {
     }
 
     public List<TaskColumns> getTaskColumnsPreferences() {
-        return taskColumnsPreferences;
+        return taskColumnsPreferences != null ? taskColumnsPreferences : new ArrayList<>() ;
     }
 
     public void setTaskColumnsPreferences(List<TaskColumns> taskColumnsPreferences) {

@@ -27,7 +27,10 @@ package timeboard.projects;
  */
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -81,6 +84,11 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
         viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
 
+        List<TaskColumns> userTaskColumns = actor.getTaskColumnsPreferences();
+        // TODO CSZ: A supprimer, pour test:
+        userTaskColumns.add(TaskColumns.TASK_NAME);
+        List<String> userTaskColumnsString = userTaskColumns.stream().map(col -> col.getLabel()).collect(Collectors.toList());
+        viewModel.getViewDatas().put("userTaskColumns", userTaskColumnsString);
     }
 
     @Override
