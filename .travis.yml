@@ -9,14 +9,7 @@ before_install:
   - nvm install $NODE_VERSION
 
 script:
-  - mvn clean install -P full
-  - mkdir temp
-  - mkdir build
-  - cp webapp/target/webapp-1.0-SNAPSHOT-spring-boot.jar ./temp/
-  - cp -r scripts/aws/ ./temp
-  - cd ./temp && zip ../build/timeboard.$TRAVIS_COMMIT.zip -r * .[^.]* && cd ..
-
-
+  - sh eb.sh
 
 deploy:
   - provider: s3
