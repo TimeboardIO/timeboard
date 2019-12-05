@@ -30,10 +30,7 @@ package timeboard.core.model;
 //import timeboard.apigenerator.annotation.RPCEntity;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.persistence.*;
 
 @Entity
@@ -84,6 +81,7 @@ public class User implements Serializable {
 
     public User() {
         this.externalIDs = new HashMap<>();
+        this.taskColumnsPreferences = new ArrayList<>();
     }
 
 
@@ -96,6 +94,7 @@ public class User implements Serializable {
         this.accountCreationTime = accountCreationTime;
         this.beginWorkDate = beginWorkDate;
         this.externalIDs = new HashMap<>();
+        this.taskColumnsPreferences = new ArrayList<>();
     }
 
     public long getId() {
