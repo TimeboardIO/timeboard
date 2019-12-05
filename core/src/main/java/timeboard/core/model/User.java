@@ -73,15 +73,8 @@ public class User implements Serializable {
     @Lob
     private Map<String, String> externalIDs;
 
-    @Column(columnDefinition = "TEXT")
-    @Convert(converter = JSONToListColumnsConverter.class)
-    @Lob
-    private List<TaskColumns> taskColumnsPreferences;
-
-
     public User() {
         this.externalIDs = new HashMap<>();
-        this.taskColumnsPreferences = new ArrayList<>();
     }
 
 
@@ -94,7 +87,6 @@ public class User implements Serializable {
         this.accountCreationTime = accountCreationTime;
         this.beginWorkDate = beginWorkDate;
         this.externalIDs = new HashMap<>();
-        this.taskColumnsPreferences = new ArrayList<>();
     }
 
     public long getId() {
@@ -169,14 +161,6 @@ public class User implements Serializable {
 
     public void setValidateOwnImputation(boolean validateOwnImputation) {
         this.validateOwnImputation = validateOwnImputation;
-    }
-
-    public List<TaskColumns> getTaskColumnsPreferences() {
-        return taskColumnsPreferences != null ? taskColumnsPreferences : new ArrayList<>() ;
-    }
-
-    public void setTaskColumnsPreferences(List<TaskColumns> taskColumnsPreferences) {
-        this.taskColumnsPreferences = taskColumnsPreferences;
     }
 
     @Transient

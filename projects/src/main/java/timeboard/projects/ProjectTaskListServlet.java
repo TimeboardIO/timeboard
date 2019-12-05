@@ -83,12 +83,6 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
         viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
         viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
-
-        List<TaskColumns> userTaskColumns = actor.getTaskColumnsPreferences();
-        // TODO CSZ: A supprimer, pour test:
-        userTaskColumns.add(TaskColumns.TASK_NAME);
-        List<String> userTaskColumnsString = userTaskColumns.stream().map(col -> col.getLabel()).collect(Collectors.toList());
-        viewModel.getViewDatas().put("userTaskColumns", userTaskColumnsString);
     }
 
     @Override

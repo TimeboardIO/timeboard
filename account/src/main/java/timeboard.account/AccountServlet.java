@@ -40,7 +40,6 @@ import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.UserException;
-import timeboard.core.model.TaskColumns;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -117,7 +116,7 @@ public class AccountServlet extends TimeboardServlet {
             case "column":
                 String[] selectedColumnsString = request.getParameterValues("columnSelected");
                 try {
-                    User u = updateColumnPreferencesUser(actor, Arrays.asList(selectedColumnsString));
+                    //TODO CSZ: MAJ table DatatableConfig
                     viewModel.getViewDatas().put("message", "Task columns preferences updated successfully !");
                 } catch (Exception e) {
                     viewModel.getViewDatas().put("error", "Error while updating Task columns preferences");
@@ -128,13 +127,6 @@ public class AccountServlet extends TimeboardServlet {
         }
         loadPage(viewModel, actor);
 
-    }
-
-    private User updateColumnPreferencesUser(User actor, List<String> selectedColumnsString) throws UserException {
-        List<TaskColumns> selectedColumns = selectedColumnsString.stream().map(col -> TaskColumns.valueOf(col)).collect(Collectors.toList());
-        actor.setTaskColumnsPreferences(selectedColumns);
-        User newUser = userService.updateUser(actor);
-        return newUser;
     }
 
     @Override
@@ -152,11 +144,11 @@ public class AccountServlet extends TimeboardServlet {
         });
         viewModel.getViewDatas().put("externalTools", fieldNames);
 
-        List<TaskColumns> allTaskColumns = Arrays.asList(TaskColumns.values());
-        viewModel.getViewDatas().put("allTaskColumns", allTaskColumns);
+        // TODO CSZ: get all column
+        viewModel.getViewDatas().put("allTaskColumns", new ArrayList<>());
 
-        List<TaskColumns> userTaskColumns = user.getTaskColumnsPreferences();
-        viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
+        // TODO CSZ: get user column to display
+        viewModel.getViewDatas().put("userTaskColumns", new ArrayList<>());
 
         viewModel.setTemplate("account:account.html");
     }

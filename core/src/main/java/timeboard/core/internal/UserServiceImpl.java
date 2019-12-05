@@ -42,7 +42,6 @@ import org.osgi.service.log.LogService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
-import timeboard.core.model.TaskColumns;
 import timeboard.core.model.User;
 
 
@@ -104,7 +103,6 @@ public final class UserServiceImpl implements UserService {
                 u.setFirstName(user.getFirstName());
                 u.setName(user.getName());
                 u.setEmail(user.getEmail());
-                u.setTaskColumnsPreferences(user.getTaskColumnsPreferences());
                 u.setExternalIDs(user.getExternalIDs());
             }
             entityManager.flush();
