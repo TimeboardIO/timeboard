@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import timeboard.account.AccountConfiguration;
 import timeboard.core.CoreConfiguration;
+import timeboard.core.model.User;
 import timeboard.core.ui.CoreUIConfiguration;
 import timeboard.home.HomeConfiguration;
 import timeboard.plugin.project.export.xls.ExcelPluginConfiguration;
@@ -39,10 +40,15 @@ import timeboard.reporting.ReportingConfiguration;
 import timeboard.theme.ThemeConfiguration;
 import timeboard.timesheet.TimesheetConfiguration;
 
+import java.util.Arrays;
+
 @Configuration
 @Import({
         JiraPluginConfiguration.class,
         ExcelPluginConfiguration.class
 })
 public class PluginsConfiguration {
+
+
+
 }
