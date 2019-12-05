@@ -41,6 +41,7 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.internal.events.TimesheetEvent;
+import timeboard.core.model.Project;
 import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 
@@ -167,6 +168,26 @@ public class TimesheetServiceImpl implements TimesheetService {
             q.setParameter("lastDayOfWeek", lastDayOfWeek);
             q.setParameter("user", user);
             return q.getSingleResult();
+        });
+    }
+
+
+    @Override
+    public List<Double> getProjectImputationSumForDate(Date startDate, Date endDate, User user, Project project) {
+        return this.jpa.txExpr(entityManager -> {
+            TypedQuery<Double> q = entityManager.createQuery(
+                    "SELECT COALESCE(sum(i.value),0) \n"
+                            + "FROM Imputation i JOIN Task t\n"
+                            + "WHERE i.user = :user \n"
+                            + "AND i.day >= :startDate\n"
+                            + "AND i.day <= :endDate\n"
+                            + "AND t.project <= :project\n"
+                            + "GROUP BY i.day", Double.class);
+            q.setParameter("project", project);
+            q.setParameter("startDate", startDate);
+            q.setParameter("endDate", endDate);
+            q.setParameter("user", user);
+            return q.getResultList();
         });
     }
     

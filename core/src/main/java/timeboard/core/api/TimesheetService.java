@@ -27,7 +27,10 @@ package timeboard.core.api;
  */
 
 import java.util.Date;
+import java.util.List;
+
 import timeboard.core.api.exceptions.TimesheetException;
+import timeboard.core.model.Project;
 import timeboard.core.model.User;
 
 
@@ -62,4 +65,5 @@ public interface TimesheetService {
      */
     double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user);
 
+    List<Double> getProjectImputationSumForDate(Date startDate, Date endDate, User user, Project project);
 }

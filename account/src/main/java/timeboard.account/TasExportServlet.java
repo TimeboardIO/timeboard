@@ -29,6 +29,7 @@ package timeboard.account;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -46,6 +47,7 @@ import org.apache.poi.ss.usermodel.IndexedColors;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
+import timeboard.core.model.TASData;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -79,7 +81,8 @@ public class TasExportServlet extends TimeboardServlet {
     @Override
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
-        try{
+        try {
+
             int month = Integer.parseInt(request.getParameter("month"));
             int year = Integer.parseInt(request.getParameter("year"));
 
@@ -88,59 +91,28 @@ public class TasExportServlet extends TimeboardServlet {
 
             try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
                 final String mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                final HSSFWorkbook wb = new HSSFWorkbook(new FileInputStream("../timeboard/account/src/main/resources/templates/template-TAS_fr.xls")); //TODO FIXME add a relative path in karaf !! This won't work in production !!
-                HSSFSheet sheet = wb.getSheet("Feuil1");
-
-                Calendar start = Calendar.getInstance();
-                start.set(year, month-1, 1, 2, 0);
-                Calendar end = Calendar.getInstance();
-                end.set(year, month, 1, 2, 0);
+                InputStream inputStream = TasExportServlet.class.getClassLoader().getResourceAsStream("/resources/templates/template-TAS_fr.xls");
 
 
-                HSSFPalette palette = wb.getCustomPalette();
-                //replacing the standard red with freebsd.org red
-                HSSFColor yellow = palette.findSimilarColor(255, 255, 153);
-                HSSFColor lightYellow = palette.findSimilarColor(255, 255, 204);
-
-                this.setCell(sheet, 6, 5, actor.getName());
-                this.setCell(sheet, 7, 5, actor.getFirstName());
-
-                this.setCell(sheet, 7, 10, month+"");
-                this.setCell(sheet, 8, 10, year+"");
-
-                int i = 0;
-                for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
-
-
-                    Calendar currentDateCalendar = Calendar.getInstance();
-                    currentDateCalendar.setTime(date);
-                    HSSFCell cell = sheet.getRow(14 + i).getCell(1);
-                    HSSFCellStyle cellStyle = cell.getCellStyle();
-                    cellStyle.setFillForegroundColor(lightYellow.getIndex());
-                    if (currentDateCalendar.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY || currentDateCalendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY ) {
-                    }
-                    this.setCell(sheet, 14 + i,1, new SimpleDateFormat("EEEE", Locale.ENGLISH).format(date).toLowerCase());
-
-
-                    i++;
-                }
-
-                wb.write(buf);
 
                 String filename = "TAS_"+year+"_"+month+"_"+actor.getScreenName().replaceAll("'| |", "")+"_"+new Date().getTime();
                 String sheetName = "TAS_"+year+"_"+month+"_"+actor.getScreenName().replaceAll("'| |", "");
                 response.setContentLengthLong(buf.toByteArray().length);
                 response.setHeader("Expires:", "0");
                 response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".xls");
-                response.setContentType(mimeType);
 
-                response.getOutputStream().write(buf.toByteArray());
+
+                TASData data = userService.generateTasData(actor, month, year);
+                ExcelTASReport tasReport = new ExcelTASReport(response.getOutputStream());
+
+
+                response.setContentType(mimeType);
+                //response.getOutputStream().write(buf.toByteArray());
                 response.getOutputStream().flush();
 
-               // response.setStatus(201);
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
@@ -149,21 +121,6 @@ public class TasExportServlet extends TimeboardServlet {
 
     }
 
-    public void setCell(HSSFSheet sheet, int row, int cell, String value){
-        HSSFRow headerRow = sheet.getRow(row);
-        headerRow.getCell(cell).setCellValue(value);
-    }
 
 }
 
-
-                /*
-                int rowNum = 1;
-                for (Task task : this.projectService.listProjectTasks(actor, project)) {
-
-                    HSSFRow taskRow = sheet.createRow(rowNum);
-
-                    taskRow.createCell(0).setCellValue(task.getName());
-                    taskRow.createCell(1).setCellValue(task.getOriginalEstimate());
-                    rowNum++;
-                }*/

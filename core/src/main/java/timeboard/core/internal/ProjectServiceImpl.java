@@ -1004,4 +1004,30 @@ public class ProjectServiceImpl implements ProjectService {
             return taskType;
         });
     }
+
+
+    @Override
+    public TASData generateTasData(User user, Project p, int month, int year) {
+        TASData data = new TASData();
+        data.setBusinessCode("");
+        data.setMatriculeID(user.getEmail());
+        data.setFirstName(user.getFirstName());
+        data.setName(user.getName());
+        data.setMonth(month);
+        data.setYear(year);
+
+
+        Calendar start = Calendar.getInstance();
+        start.set(year, month-1, 1, 2, 0);
+        Calendar end = Calendar.getInstance();
+        end.set(year, month, 1, 2, 0);
+
+        int i = 0;
+        for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
+
+            i++;
+        }
+
+        return null;
+    }
 }

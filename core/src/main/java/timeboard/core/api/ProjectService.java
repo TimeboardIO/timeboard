@@ -192,4 +192,8 @@ public interface ProjectService {
     List<TaskType> listTaskType();
 
     TaskType findTaskTypeByID(Long taskTypeID);
+
+    TASData generateTasData(User user, Project project, int month, int year);
+
+
 }

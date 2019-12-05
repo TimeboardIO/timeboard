@@ -26,6 +26,7 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,9 +40,11 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
+import timeboard.core.model.TASData;
 import timeboard.core.model.User;
 
 
@@ -62,6 +65,9 @@ public final class UserServiceImpl implements UserService {
     @Reference
     private LogService logService;
 
+    @Reference
+    private ProjectService projectService;
+
     public UserServiceImpl() {
 
     }
@@ -81,6 +87,8 @@ public final class UserServiceImpl implements UserService {
             return users;
         });
     }
+
+
 
     @Override
     public User createUser(final User user) throws BusinessException {
