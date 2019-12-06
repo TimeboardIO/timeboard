@@ -26,14 +26,24 @@ package timeboard.core.api;
  * #L%
  */
 
-import java.util.List;
+import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.User;
+
+import java.util.ArrayList;
 
 /**
  * Service for datatable configs.
  */
 public interface DataTableService {
 
-    boolean columnChecker(Long uuid, Long actorId, String columnName);
+    boolean checkColumnDisplayed(String tableId, User actor, String colName);
+
+    boolean checkColumnDisplayedFromDB(String tableId, User actor, String colName);
+
+    boolean columnChecker(String tableId, User actor, String columnName);
+
+    DataTableConfig findTableConfigByUserAndTable(String tableId, User actor);
+
+    DataTableConfig addOrUpdateTableConfig(String tableId, User actor, ArrayList<String> columnsNamesList);
 
 }

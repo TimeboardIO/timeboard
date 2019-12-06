@@ -7,6 +7,14 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table DataTableConfig (
+       id bigint not null,
+        columns tinyblob,
+        tableInstanceId varchar(255),
+        user_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table DefaultTask (
        id bigint not null,
         comments varchar(500),
@@ -22,6 +30,8 @@
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
+
+    insert into hibernate_sequence values ( 1 );
 
     insert into hibernate_sequence values ( 1 );
 
@@ -145,6 +155,11 @@
 
     alter table User 
        add constraint UK_ku4ibpw23c8xcgjt4sov3w3kv unique (remoteSubject);
+
+    alter table DataTableConfig 
+       add constraint FKor8rqcglt3u263qt792tdnpt9 
+       foreign key (user_id) 
+       references User (id);
 
     alter table Imputation 
        add constraint FKpv054mew449mf2m7itp50r57b 

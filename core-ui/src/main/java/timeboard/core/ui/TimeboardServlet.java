@@ -36,11 +36,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.osgi.service.component.annotations.Reference;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
+import timeboard.core.api.DataTableService;
 import timeboard.core.model.User;
 
 
@@ -50,6 +52,9 @@ public abstract class TimeboardServlet extends HttpServlet {
     private NavigationEntryRegistryService navRegistry;
 
     protected abstract ClassLoader getTemplateResolutionClassLoader();
+
+    @Reference
+    private DataTableService dataTableService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -185,6 +190,9 @@ public abstract class TimeboardServlet extends HttpServlet {
         ctx.setVariable("javascripts", this.getJavascriptURLs());
 
         ctx.setVariable("CSSs", this.getCssLinkURLs());
+
+        // Use instance of DataTablaService
+        ctx.setVariable("dataTableService", this.dataTableService);
 
         String templateName = viewModel.getTemplate();
         String result = engine.process(templateName, ctx);

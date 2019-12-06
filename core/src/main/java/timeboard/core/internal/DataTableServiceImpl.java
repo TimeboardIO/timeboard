@@ -26,26 +26,18 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import org.apache.aries.jpa.template.JpaTemplate;
-import org.mindrot.jbcrypt.BCrypt;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.log.LogService;
 import timeboard.core.api.DataTableService;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
+import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.User;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 
 @Component(
@@ -54,24 +46,86 @@ import javax.persistence.TypedQuery;
 )
 public final class DataTableServiceImpl implements DataTableService {
 
-    private String[] defaultCols = {"taskName", "projectName", "milestoneName"};
+    /**
+     * Injected instance of timeboard persistence unit.
+     */
+    @Reference(
+            target = "(osgi.unit.name=timeboard-pu)",
+            scope = ReferenceScope.BUNDLE)
+    private JpaTemplate jpa;
 
-    boolean check(String colName, User actor){
+    @Reference
+    private LogService logService;
+
+    public DataTableServiceImpl() {
+
+    }
+
+    public DataTableServiceImpl(JpaTemplate jpaTemplate, LogService logService) {
+        this.jpa = jpaTemplate;
+        this.logService = logService;
+    }
+
+    private String[] defaultCols = {"taskName"};
+
+    @Override
+    public boolean checkColumnDisplayed(String tableId, User actor, String colName){
 
         boolean isDefault = Arrays.stream(defaultCols)
                 .map(s -> s.equals(colName))
                 .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2);
 
-        return isDefault || checkFromDB(colName, actor);
+        return isDefault || checkColumnDisplayedFromDB(tableId, actor, colName);
     }
-
-    private boolean checkFromDB(String colName, User actor) {
-        return false;
-    }
-
 
     @Override
-    public boolean columnChecker(Long uuid, Long actorId, String columnName) {
-        return false;
+    public boolean checkColumnDisplayedFromDB(String tableId, User actor, String colName) {
+        return columnChecker(tableId, actor, colName);
     }
+
+    @Override
+    public boolean columnChecker(String tableId, User actor, String columnName) {
+        DataTableConfig tableConfig = findTableConfigByUserAndTable(tableId, actor);
+        if(tableConfig == null){
+            return false;
+        }
+        return Arrays.asList(tableConfig.getColumns()).contains(columnName);
+    }
+
+    @Override
+    public DataTableConfig findTableConfigByUserAndTable(String tableId, User actor) {
+        return jpa.txExpr(entityManager -> {
+            TypedQuery<DataTableConfig> q = entityManager
+                    .createQuery("select d from DataTableConfig d where d.user=:user and d.tableInstanceId=:tableId", DataTableConfig.class);
+            q.setParameter("user", actor);
+            q.setParameter("tableId", tableId);
+            try {
+                return q.getSingleResult();
+            } catch (NoResultException e) {
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public DataTableConfig addOrUpdateTableConfig(String tableId, User actor, ArrayList<String> columnsNamesList) {
+        return this.jpa.txExpr(entityManager -> {
+            DataTableConfig datatableConfig = this.findTableConfigByUserAndTable(tableId, actor);
+            if (datatableConfig != null) {
+                datatableConfig.setUser(actor);
+                datatableConfig.setTableInstanceId(tableId);
+                datatableConfig.setColumns(columnsNamesList);
+            }else{
+                datatableConfig = new DataTableConfig();
+                datatableConfig.setUser(actor);
+                datatableConfig.setTableInstanceId(tableId);
+                datatableConfig.setColumns(columnsNamesList);
+                entityManager.persist(datatableConfig);
+            }
+            entityManager.flush();
+            this.logService.log(LogService.LOG_INFO, "DataTableConfig " + datatableConfig.getUser() + "/" + datatableConfig.getTableInstanceId() +" updated.");
+            return datatableConfig;
+        });
+    }
+
 }

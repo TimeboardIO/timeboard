@@ -141,17 +141,17 @@
                             <tbody>
                             <tr th:each="col : ${allTaskColumns}">
                                 <td>
-                                    <input type="checkbox" name="columnSelected" th:value="${col.label}" th:checked="${userTaskColumns.contains(col)}"/>
+                                    <input type="checkbox" name="columnSelected" th:value="${col}" th:checked="${userTaskColumns.contains(col)}"/>
                                 </td>
                                 <td>
-                                    <a th:text="${col.label}"></a>
+                                    <a th:text="${col}"></a>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
 
-                        <input name="formType" type="hidden" value="column">
-                        <div name="submitButton" class="ui submit positive button " value="column" >Save</div>
+                        <input name="formType" type="hidden" value="columnTask">
+                        <div name="submitButton" class="ui submit positive button " value="columnTask" >Save</div>
                         <div class="ui error message"></div>
                     </div>
                 </form>

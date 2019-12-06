@@ -31,15 +31,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
+import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.UserException;
+import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -55,8 +55,15 @@ import timeboard.core.ui.ViewModel;
 )
 public class AccountServlet extends TimeboardServlet {
 
+    private static String TABLE_TASK_ID = "tableTask";
+    private static ArrayList<String> ALL_COLUMNS_TABLE_TASK = new ArrayList<>
+            (Arrays.asList("taskName", "taskComments","startDate","endDate","originalEstimate","assignee","status","milestoneID","typeID"));
+
     @Reference
     private UserService userService;
+
+    @Reference
+    private DataTableService dataTableService;
 
     @Reference(
             policyOption = ReferencePolicyOption.GREEDY,
@@ -113,10 +120,10 @@ public class AccountServlet extends TimeboardServlet {
                 }
                 break;
 
-            case "column":
-                String[] selectedColumnsString = request.getParameterValues("columnSelected");
+            case "columnTask":
+                ArrayList<String> selectedColumnsString = (ArrayList<String>) Arrays.asList(request.getParameterValues("columnSelected"));
                 try {
-                    //TODO CSZ: MAJ table DatatableConfig
+                    this.dataTableService.addOrUpdateTableConfig(TABLE_TASK_ID, actor, selectedColumnsString);
                     viewModel.getViewDatas().put("message", "Task columns preferences updated successfully !");
                 } catch (Exception e) {
                     viewModel.getViewDatas().put("error", "Error while updating Task columns preferences");
@@ -144,11 +151,10 @@ public class AccountServlet extends TimeboardServlet {
         });
         viewModel.getViewDatas().put("externalTools", fieldNames);
 
-        // TODO CSZ: get all column
-        viewModel.getViewDatas().put("allTaskColumns", new ArrayList<>());
-
-        // TODO CSZ: get user column to display
-        viewModel.getViewDatas().put("userTaskColumns", new ArrayList<>());
+        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(TABLE_TASK_ID, user);
+        ArrayList<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
+        viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
+        viewModel.getViewDatas().put("allTaskColumns", ALL_COLUMNS_TABLE_TASK);
 
         viewModel.setTemplate("account:account.html");
     }

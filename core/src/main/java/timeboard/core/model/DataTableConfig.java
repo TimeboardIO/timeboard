@@ -27,28 +27,32 @@ package timeboard.core.model;
  */
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import javax.persistence.*;
 
 @Entity
-@PrimaryKeyJoinColumn(name = "id")
-public class DatatableConfig implements Serializable {
+public class DataTableConfig implements Serializable {
 
-    private Long userId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToOne
+    private User user;
 
     private String tableInstanceId;
 
-    private String[] columns;
+    private ArrayList<String> columns;
 
-    public DatatableConfig() {
+    public DataTableConfig() {
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getTableInstanceId() {
@@ -59,11 +63,12 @@ public class DatatableConfig implements Serializable {
         this.tableInstanceId = tableInstanceId;
     }
 
-    public String[] getColumns() {
+    public ArrayList<String> getColumns() {
         return columns;
     }
 
-    public void setColumns(String[] columns) {
+    public void setColumns(ArrayList<String> columns) {
         this.columns = columns;
     }
+
 }
