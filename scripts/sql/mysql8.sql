@@ -9,10 +9,14 @@
 
     create table DataTableConfig (
        id bigint not null,
-        columns tinyblob,
         tableInstanceId varchar(255),
         user_id bigint,
         primary key (id)
+    ) engine=InnoDB;
+
+    create table DataTableConfig_columns (
+       DataTableConfig_id bigint not null,
+        columns varchar(255)
     ) engine=InnoDB;
 
     create table DefaultTask (
@@ -160,6 +164,11 @@
        add constraint FKor8rqcglt3u263qt792tdnpt9 
        foreign key (user_id) 
        references User (id);
+
+    alter table DataTableConfig_columns 
+       add constraint FK8qwyjho6c0e0ckvebujyixc03 
+       foreign key (DataTableConfig_id) 
+       references DataTableConfig (id);
 
     alter table Imputation 
        add constraint FKpv054mew449mf2m7itp50r57b 

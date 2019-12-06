@@ -27,7 +27,7 @@ package timeboard.core.model;
  */
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.*;
 
 @Entity
@@ -40,9 +40,12 @@ public class DataTableConfig implements Serializable {
     @ManyToOne
     private User user;
 
+    @Column
     private String tableInstanceId;
 
-    private ArrayList<String> columns;
+    @Column
+    @ElementCollection(targetClass=String.class)
+    private List<String> columns;
 
     public DataTableConfig() {
     }
@@ -63,11 +66,11 @@ public class DataTableConfig implements Serializable {
         this.tableInstanceId = tableInstanceId;
     }
 
-    public ArrayList<String> getColumns() {
+    public List<String> getColumns() {
         return columns;
     }
 
-    public void setColumns(ArrayList<String> columns) {
+    public void setColumns(List<String> columns) {
         this.columns = columns;
     }
 

@@ -56,8 +56,8 @@ import timeboard.core.ui.ViewModel;
 public class AccountServlet extends TimeboardServlet {
 
     private static String TABLE_TASK_ID = "tableTask";
-    private static ArrayList<String> ALL_COLUMNS_TABLE_TASK = new ArrayList<>
-            (Arrays.asList("taskName", "taskComments","startDate","endDate","originalEstimate","assignee","status","milestoneID","typeID"));
+    private static List<String> ALL_COLUMNS_TABLE_TASK = Arrays.asList(
+            "taskName", "taskComments","startDate","endDate","originalEstimate","assignee","status","milestoneID","typeID");
 
     @Reference
     private UserService userService;
@@ -152,7 +152,7 @@ public class AccountServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("externalTools", fieldNames);
 
         DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(TABLE_TASK_ID, user);
-        ArrayList<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
+        List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
         viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
         viewModel.getViewDatas().put("allTaskColumns", ALL_COLUMNS_TABLE_TASK);
 

@@ -26,7 +26,7 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Arrays;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
@@ -80,16 +80,11 @@ public final class DataTableServiceImpl implements DataTableService {
 
     @Override
     public boolean checkColumnDisplayedFromDB(String tableId, User actor, String colName) {
-        return columnChecker(tableId, actor, colName);
-    }
-
-    @Override
-    public boolean columnChecker(String tableId, User actor, String columnName) {
         DataTableConfig tableConfig = findTableConfigByUserAndTable(tableId, actor);
         if(tableConfig == null){
             return false;
         }
-        return Arrays.asList(tableConfig.getColumns()).contains(columnName);
+        return Arrays.asList(tableConfig.getColumns()).contains(colName);
     }
 
     @Override
@@ -108,7 +103,7 @@ public final class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public DataTableConfig addOrUpdateTableConfig(String tableId, User actor, ArrayList<String> columnsNamesList) {
+    public DataTableConfig addOrUpdateTableConfig(String tableId, User actor, List<String> columnsNamesList) {
         return this.jpa.txExpr(entityManager -> {
             DataTableConfig datatableConfig = this.findTableConfigByUserAndTable(tableId, actor);
             if (datatableConfig != null) {
