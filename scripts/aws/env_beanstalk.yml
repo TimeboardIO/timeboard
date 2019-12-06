@@ -20,32 +20,25 @@ Resources:
       VpcId:
         Ref: TimeboardVPC
   InternetRoute:
-      Type: AWS::EC2::Route
-      DependsOn: InternetGW
-      Properties:
-        RouteTableId:
-          Ref: RouteTable
-        DestinationCidrBlock: 0.0.0.0/0
-        GatewayId:
-          Ref: InternetGW
+    Type: AWS::EC2::Route
+    DependsOn: InternetGW
+    Properties:
+      RouteTableId:
+        Ref: RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGW
   GWAttachment:
-      Type: 'AWS::EC2::VPCGatewayAttachment'
-      Properties:
-        VpcId: !Ref TimeboardVPC
-        InternetGatewayId: !Ref InternetGW
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref TimeboardVPC
+      InternetGatewayId: !Ref InternetGW
   TimeboardVPC:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsSupport: 'true'
       EnableDnsHostnames: 'true'
-  PublicSubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: TimeboardVPC
-      CidrBlock: 10.0.10.0/24
-      AvailabilityZone: 'eu-west-1a'
   DBSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
@@ -60,13 +53,20 @@ Resources:
         Ref: TimeboardVPC
       CidrBlock: 10.0.30.0/24
       AvailabilityZone: 'eu-west-1b'
-  SubnetRouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
+  EC2Subnet:
+    Type: AWS::EC2::Subnet
     Properties:
-      SubnetId:
-        Ref: PublicSubnet
-      RouteTableId:
-        Ref: RouteTable
+      VpcId:
+        Ref: TimeboardVPC
+      CidrBlock: 10.0.40.0/24
+      AvailabilityZone: 'eu-west-1a'
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: TimeboardVPC
+      CidrBlock: 10.0.10.0/24
+      AvailabilityZone: 'eu-west-1a'
   RootRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -219,6 +219,16 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_PASSWORD'
           Value: !Ref 'DBPassword'
+        - Namespace: 'aws:ec2:vpc'
+          OptionName: 'VPCId'
+          Value: !Ref 'TimeboardVPC'
+        - Namespace: 'aws:ec2:vpc'
+          OptionName: Subnets
+          Value: !Ref EC2Subnet
+        - Namespace: 'aws:ec2:vpc'
+          OptionName: 'ELBSubnets'
+          Value: !Ref PublicSubnet
+
   WebAppDNSRecord:
     Type: AWS::Route53::RecordSet
     Properties:

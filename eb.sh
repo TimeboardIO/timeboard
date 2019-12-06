@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+mvn clean install
 mkdir -p build
 mkdir -p temp
 cp webapp/target/webapp-1.0-SNAPSHOT-spring-boot.jar temp/
