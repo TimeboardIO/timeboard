@@ -10,6 +10,12 @@ Parameters:
     Type: 'String'
   TimeboardDNSName:
     Type: 'String'
+  TimeboardSSLArn:
+    Type: 'String'
+  OAuthClientID:
+    Type: 'String'
+  OAuthSecretID:
+    Type: 'String'
 Resources:
   InternetGW:
     Type: 'AWS::EC2::InternetGateway'
@@ -60,6 +66,12 @@ Resources:
         Ref: TimeboardVPC
       CidrBlock: 10.0.40.0/24
       AvailabilityZone: 'eu-west-1a'
+      MapPublicIpOnLaunch: true
+  Ec2SubnetRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref EC2Subnet
   PublicSubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -67,6 +79,11 @@ Resources:
         Ref: TimeboardVPC
       CidrBlock: 10.0.10.0/24
       AvailabilityZone: 'eu-west-1a'
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: 
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref PublicSubnet    
   RootRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -95,7 +112,35 @@ Resources:
       Path: '/'
       Roles:
         - Ref: RootRole
-  EC2WebAppSecurityGroup:
+  WebAppSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId:
+        Ref: TimeboardVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 5000
+          ToPort: 5000
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+  EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow http to client host
@@ -141,7 +186,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 3306
           ToPort: 3306
-          SourceSecurityGroupId: !Ref EC2WebAppSecurityGroup
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
       SecurityGroupEgress:
         - IpProtocol: tcp
           FromPort: 3306
@@ -187,7 +232,7 @@ Resources:
   WebAppBT:
     Type: AWS::ElasticBeanstalk::Application
     Properties: 
-      ApplicationName: 'TimeboardWebapp'
+      ApplicationName: 'TimeboardApplication'
       Description: 'AWS Elastic Beanstalk Timeboard Application'
   WebAppEnvBT:
     Type: AWS::ElasticBeanstalk::Environment
@@ -202,14 +247,14 @@ Resources:
           OptionName: 'SERVER_PORT'
           Value: '5000'
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: 'SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_COGNITO_CLIENT-ID'
-          Value: 'Change Me'
+          OptionName: 'OAUTH_CLIENTID'
+          Value: !Ref OAuthClientID
         - Namespace: 'aws:elasticbeanstalk:application:environment'
-          OptionName: 'SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_COGNITO_CLIENT-SECRET'
-          Value: 'Change Me'   
+          OptionName: 'OAUTH_SECRETID'
+          Value: !Ref OAuthSecretID 
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'APP_URL'
-          Value: !Ref 'TimeboardDNSName'
+          Value: !Join [ '', [ 'https://', !Ref 'TimeboardDNSName' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_URL'
           Value: 'jdbc:mysql://db.pierremellet.net:3306/timeboard?createDatabaseIfNotExist=true'
@@ -219,6 +264,9 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_PASSWORD'
           Value: !Ref 'DBPassword'
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT'
+          Value: 'org.hibernate.dialect.MySQL8Dialect'
         - Namespace: 'aws:ec2:vpc'
           OptionName: 'VPCId'
           Value: !Ref 'TimeboardVPC'
@@ -227,7 +275,30 @@ Resources:
           Value: !Ref EC2Subnet
         - Namespace: 'aws:ec2:vpc'
           OptionName: 'ELBSubnets'
-          Value: !Ref PublicSubnet
+          Value: !Ref 'PublicSubnet'
+        - Namespace: 'aws:ec2:vpc'
+          OptionName: 'AssociatePublicIpAddress'
+          Value: true
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: 'IamInstanceProfile'
+          Value: !Ref 'EC2WebAppInstanceProfile'
+        - Namespace: 'aws:autoscaling:launchconfiguration'
+          OptionName: 'SecurityGroups'
+          Value: !Ref 'EC2SecurityGroup'  
+        - Namespace: 'aws:elb:listener:443'
+          OptionName: 'InstanceProtocol'
+          Value: 'HTTP'
+        - Namespace: 'aws:elb:listener:443'
+          OptionName: 'ListenerProtocol'
+          Value: 'HTTPS'
+        - Namespace: 'aws:elb:listener:443'
+          OptionName: 'SSLCertificateId'
+          Value: !Ref 'TimeboardSSLArn'
+        - Namespace: 'aws:elb:listener:443'
+          OptionName: 'InstancePort'
+          Value: '80'
+          
+
 
   WebAppDNSRecord:
     Type: AWS::Route53::RecordSet
