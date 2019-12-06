@@ -26,12 +26,13 @@ package timeboard.core.internal.rules.task;
  * #L%
  */
 
-import java.util.Optional;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.ProjectMembership;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
+
+import java.util.Optional;
 
 
 public class ActorIsProjectOwnerbyTask implements Rule<Task> {

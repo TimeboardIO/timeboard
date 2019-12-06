@@ -28,16 +28,7 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
@@ -50,40 +41,39 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 /**
  * Display project details form.
  *
  * <p>Ex : /projects/details?id=
  */
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/config",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+@WebServlet(name = "ProjectConfigServlet", urlPatterns = "/projects/config")
 public class ProjectConfigServlet extends TimeboardServlet {
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectExportService> projectExportServices;
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectImportService> projectImportServices;
 
-    @Reference
+    @Autowired
     public ProjectService projectService;
 
-    @Reference
+    @Autowired
     public EncryptionService encryptionService;
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -111,7 +101,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
     protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
 
 
-        viewModel.setTemplate("projects:details_project_config.html");
+        viewModel.setTemplate("details_project_config.html");
         long id = Long.parseLong(request.getParameter("projectID"));
 
         Project project = this.projectService.getProjectByIdWithAllMembers(actor, id);
@@ -124,7 +114,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
     @Override
     protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
-        viewModel.setTemplate("projects:details_project_config.html");
+        viewModel.setTemplate("details_project_config.html");
 
         //Extract project
         long id = Long.parseLong(request.getParameter("projectID"));

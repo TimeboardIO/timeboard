@@ -26,110 +26,82 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import org.apache.aries.jpa.template.JpaTemplate;
 import org.mindrot.jbcrypt.BCrypt;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceScope;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
 
+import javax.persistence.*;
+import javax.transaction.Transactional;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Component(
-        service = UserService.class,
-        immediate = true
-)
-public final class UserServiceImpl implements UserService {
 
-    /**
-     * Injected instance of timeboard persistence unit.
-     */
-    @Reference(
-            target = "(osgi.unit.name=timeboard-pu)",
-            scope = ReferenceScope.BUNDLE)
-    private JpaTemplate jpa;
 
-    @Reference
-    private LogService logService;
+@Component
+@Transactional
+public class UserServiceImpl implements UserService {
 
-    public UserServiceImpl() {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    }
-
-    public UserServiceImpl(JpaTemplate jpaTemplate, LogService logService) {
-        this.jpa = jpaTemplate;
-        this.logService = logService;
-    }
+    @Autowired
+    private EntityManager em;
 
     @Override
     public List<User> createUsers(List<User> users) {
-        return this.jpa.txExpr(entityManager -> {
-            users.forEach(user -> {
-                entityManager.persist(user);
-                this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
+             users.forEach(user -> {
+                em.persist(user);
+                 LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
             });
             return users;
-        });
-    }
+     }
 
     @Override
+    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
     public User createUser(final User user) throws BusinessException {
-
-
-        return this.jpa.txExpr(entityManager -> {
-            entityManager.persist(user);
-            this.logService.log(LogService.LOG_INFO, "User " + user.getFirstName() + " " + user.getName() + " created");
-            entityManager.flush();
-            return user;
-        });
-    }
+        this.em.persist(user);
+        LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
+        this.em.flush();
+        return user;
+     }
 
 
     @Override
     public User updateUser(User user) {
-        return this.jpa.txExpr(entityManager -> {
-            User u = this.findUserByID(user.getId());
+             User u = this.findUserByID(user.getId());
             if (u != null) {
                 u.setFirstName(user.getFirstName());
                 u.setName(user.getName());
                 u.setEmail(user.getEmail());
                 u.setExternalIDs(user.getExternalIDs());
             }
-            entityManager.flush();
-            this.logService.log(LogService.LOG_INFO, "User " + user.getEmail() + " updated.");
+            em.flush();
+            LOGGER.info("User " + user.getEmail() + " updated.");
             return user;
-        });
 
     }
 
 
     @Override
     public List<User> searchUserByEmail(final String prefix) {
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager
+             TypedQuery<User> q = em
                     .createQuery(
                             "select u from User u "
                                     + "where u.email LIKE CONCAT('%',:prefix,'%')",
                             User.class);
             q.setParameter("prefix", prefix);
             return q.getResultList();
-        });
-    }
+     }
 
     @Override
     public List<User> searchUserByEmail(final String prefix, final Long projectId) {
-        return this.jpa.txExpr(entityManager -> {
-            Project project = entityManager.find(Project.class, projectId);
+             Project project = em.find(Project.class, projectId);
             List<User> matchedUser = project.getMembers().stream()
                     .filter(projectMembership -> projectMembership
                             .getMember()
@@ -137,8 +109,7 @@ public final class UserServiceImpl implements UserService {
                     .map(projectMembership -> projectMembership.getMember())
                     .collect(Collectors.toList());
             return matchedUser;
-        });
-    }
+     }
 
 
     @Override
@@ -146,8 +117,7 @@ public final class UserServiceImpl implements UserService {
         if (userID == null) {
             return null;
         }
-        return jpa.txExpr(entityManager -> entityManager
-                .find(User.class, userID));
+        return em.find(User.class, userID);
     }
 
     @Override
@@ -155,8 +125,7 @@ public final class UserServiceImpl implements UserService {
         if (email == null) {
             return null;
         }
-        return jpa.txExpr(entityManager -> {
-            TypedQuery<User> q = entityManager.createQuery("from User u where u.email=:email", User.class);
+             TypedQuery<User> q = em.createQuery("from User u where u.email=:email", User.class);
             q.setParameter("email", email);
             User user;
             try {
@@ -165,20 +134,17 @@ public final class UserServiceImpl implements UserService {
                 user = null;
             }
             return user;
-        });
-    }
+     }
 
     @Override
     public User findUserBySubject(String remoteSubject) {
         User u;
         try {
-            u = this.jpa.txExpr(entityManager -> {
-                Query q = entityManager
+                 Query q = em
                         .createQuery("select u from User u where u.remoteSubject = :sub", User.class);
                 q.setParameter("sub", remoteSubject);
                 return (User) q.getSingleResult();
-            });
-        } catch (NoResultException | NonUniqueResultException e) {
+         } catch (NoResultException | NonUniqueResultException e) {
             u = null;
         }
         return u;
@@ -189,15 +155,13 @@ public final class UserServiceImpl implements UserService {
     public User findUserByExternalID(String origin, String userExternalID) {
         User u;
         try {
-            u = this.jpa.txExpr(entityManager -> {
-                Query q = entityManager // MYSQL native for JSON queries
+                 Query q = em // MYSQL native for JSON queries
                         .createNativeQuery("select * from User "
                                 + "where JSON_EXTRACT(externalIDs, '$." + origin + "')"
                                 + " = ?", User.class);
                 q.setParameter(1, userExternalID);
                 return (User) q.getSingleResult();
-            });
-        } catch (javax.persistence.NoResultException e) {
+         } catch (javax.persistence.NoResultException e) {
             u = null;
         }
         return u;

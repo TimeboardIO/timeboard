@@ -26,12 +26,12 @@ package timeboard.core.internal.rules.milestone;
  * #L%
  */
 
-import java.util.Optional;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Milestone;
 import timeboard.core.model.ProjectMembership;
-import timeboard.core.model.ProjectRole;
 import timeboard.core.model.User;
+
+import java.util.Optional;
 
 
 public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {

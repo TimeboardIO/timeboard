@@ -26,17 +26,10 @@ package timeboard.theme;
  * #L%
  */
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServlet;
-import org.osgi.service.component.annotations.Component;
 
 
-@Component(
-        service = Servlet.class,
-        property = {
-                "osgi.http.whiteboard.resource.pattern=/theme/*",
-                "osgi.http.whiteboard.resource.prefix=/static"}
-)
+
 public class StaticRessourcesServlet extends HttpServlet {
 
 

@@ -26,33 +26,25 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.IOException;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
-
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/milestones",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+
+@WebServlet(name = "ProjectMilestoneListServlet", urlPatterns = "/projects/milestones")
 public class ProjectMilestoneListServlet extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     public ProjectService projectService;
 
 
@@ -66,7 +58,7 @@ public class ProjectMilestoneListServlet extends TimeboardServlet {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);
 
-        viewModel.setTemplate("projects:details_project_milestones.html");
+        viewModel.setTemplate("details_project_milestones.html");
         viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
         viewModel.getViewDatas().put("project", project);
 
@@ -77,7 +69,7 @@ public class ProjectMilestoneListServlet extends TimeboardServlet {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);
 
-        viewModel.setTemplate("projects:details_project_milestones.html");
+        viewModel.setTemplate("details_project_milestones.html");
         viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
         viewModel.getViewDatas().put("project", project);
     }

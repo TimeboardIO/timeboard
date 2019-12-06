@@ -26,12 +26,13 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
 
 public interface ProjectService {
 

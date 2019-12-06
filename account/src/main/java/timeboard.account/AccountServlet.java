@@ -26,39 +26,32 @@ package timeboard.account;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/account",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+
+@WebServlet(name = "AccountServlet", urlPatterns = "/account")
 public class AccountServlet extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     private UserService userService;
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectImportService> projectImportServlets;
 
@@ -119,13 +112,15 @@ public class AccountServlet extends TimeboardServlet {
 
         List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list
-        projectImportServlets.forEach(service -> {
-            fieldNames.add(service.getServiceName());
-        });
+        if(projectImportServlets != null) {
+            projectImportServlets.forEach(service -> {
+                fieldNames.add(service.getServiceName());
+            });
+        }
 
         viewModel.getViewDatas().put("externalTools", fieldNames);
 
-        viewModel.setTemplate("account:account.html");
+        viewModel.setTemplate("account.html");
     }
 
 }

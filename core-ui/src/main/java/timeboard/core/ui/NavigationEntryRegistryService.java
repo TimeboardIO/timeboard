@@ -26,22 +26,17 @@ package timeboard.core.ui;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.Comparator;
 import java.util.List;
-import org.osgi.service.component.annotations.*;
 
-@Component(
-        service = NavigationEntryRegistryService.class,
-        immediate = true
-)
+@org.springframework.stereotype.Component
 public class NavigationEntryRegistryService {
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            policy = ReferencePolicy.DYNAMIC,
-            cardinality = ReferenceCardinality.MULTIPLE
-    )
-    private volatile List<NavigationExtPoint> entries;
+
+    @Autowired(required = false)
+    private List<NavigationExtPoint> entries;
 
     public List<NavigationExtPoint> getEntries() {
         this.entries.sort(Comparator.comparing(o -> ((Integer) o.getNavigationWeight())));

@@ -26,17 +26,12 @@ package timeboard.timesheet;
  * #L%
  */
 
-import javax.servlet.Servlet;
+import org.springframework.stereotype.Component;
+
 import javax.servlet.http.HttpServlet;
-import org.osgi.service.component.annotations.Component;
 
 
-@Component(
-        service = Servlet.class,
-        property = {
-                "osgi.http.whiteboard.resource.pattern=/timesheet/static/*",
-                "osgi.http.whiteboard.resource.prefix=/static"}
-)
+@Component
 public class StaticRessourcesServlet extends HttpServlet {
 
 

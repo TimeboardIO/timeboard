@@ -27,29 +27,28 @@ package timeboard.core.observers.emails;
  */
 
 import io.reactivex.schedulers.Schedulers;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.Executors;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.model.User;
 
+import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.Executors;
 
 
-@Component(
-        service = SendNewPasswordEmail.class,
-        immediate = true
-)
+
+
+@Component
 //TODO keep this useless class ?
 public class SendNewPasswordEmail {
 
-    @Reference
+    @Autowired
     EmailService emailService;
 
-    @Activate
+    @PostConstruct
     public void activate() {
 
         TimeboardSubjects.GENERATE_PASSWORD

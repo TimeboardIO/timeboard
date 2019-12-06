@@ -26,11 +26,12 @@ package timeboard.core.internal.events;
  * #L%
  */
 
+import timeboard.core.model.User;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import timeboard.core.model.User;
 
 public class TimeboardEvent  implements Serializable {
 

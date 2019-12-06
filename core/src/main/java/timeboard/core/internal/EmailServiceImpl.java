@@ -26,47 +26,34 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.EmailService;
+import timeboard.core.observers.emails.EmailStructure;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import org.apache.commons.lang.StringUtils;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.EmailService;
-import timeboard.core.observers.emails.EmailStructure;
+import java.util.List;
+import java.util.Properties;
+import java.util.stream.Collectors;
 
-@Component(
-        service = EmailService.class,
-        scope = ServiceScope.SINGLETON,
-        property = {
-                "timeboard.mail.fromEmail=timeboard@tsc-nantes.com",
-                "timeboard.mail.host=10.10.0.48",
-                "timeboard.mail.port=25"
 
-        },
-        configurationPid = "timeboard.security.EmailService"
-)
+@Component
 public class EmailServiceImpl implements EmailService {
 
 
+    @Value("${timeboard.mail.fromEmail}")
     private String fromEmail;
+    @Value("${timeboard.mail.host}")
     private String host;
+    @Value("${timeboard.mail.port}")
     private String port;
 
-    @Activate
-    private void init(Map<String, String> conf) {
-        this.fromEmail = conf.get("timeboard.mail.fromEmail");
-        this.host = conf.get("timeboard.mail.host");
-        this.port = conf.get("timeboard.mail.port");
-    }
 
     @Override
     public void sendMessage(EmailStructure emailStructure) throws MessagingException {

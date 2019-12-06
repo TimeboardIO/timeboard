@@ -26,15 +26,14 @@ package timeboard.timesheet;
  * #L%
  */
 
-import java.util.Calendar;
-import java.util.Date;
-import org.osgi.service.component.annotations.Component;
+import org.springframework.stereotype.Component;
 import timeboard.core.ui.NavigationExtPoint;
 
+import java.util.Calendar;
+import java.util.Date;
 
-@Component(
-        service = NavigationExtPoint.class
-)
+
+@Component
 public class TimesheetNavigationProvider implements NavigationExtPoint {
 
     @Override

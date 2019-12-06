@@ -26,17 +26,13 @@ package timeboard.projects;
  * #L%
  */
 
-import javax.servlet.Servlet;
+
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
-import org.osgi.service.component.annotations.Component;
 
 
-@Component(
-        service = Servlet.class,
-        property = {
-                "osgi.http.whiteboard.resource.pattern=/projects/static/*",
-                "osgi.http.whiteboard.resource.prefix=/static"}
-)
+
+@WebServlet(name = "StaticRessourcesServlet", urlPatterns = "/projects/static/*")
 public class StaticRessourcesServlet extends HttpServlet {
 
 

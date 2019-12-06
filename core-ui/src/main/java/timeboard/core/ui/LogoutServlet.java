@@ -26,38 +26,23 @@ package timeboard.core.ui;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.UUID;
-import javax.servlet.Servlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import org.osgi.service.log.LogService;
-import timeboard.core.api.TimeboardSessionStore;
+import java.io.IOException;
 
 
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/logout",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+@WebServlet(name = "logout", urlPatterns = "/logout")
 public class LogoutServlet extends TimeboardServlet {
 
-    @Reference
-    LogService logService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogoutServlet.class);
 
-    @Reference
-    private HttpSecurityContextService securityContextService;
-
-    @Reference
-    private TimeboardSessionStore sessionStore;
 
 
     @Override
@@ -68,11 +53,9 @@ public class LogoutServlet extends TimeboardServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        UUID sessionID = this.securityContextService.getCurrentSessionID(req);
+        req.getSession().invalidate();
 
-        this.sessionStore.invalidateSession(sessionID);
-
-        this.logService.log(LogService.LOG_INFO, "Logout : " + req.getSession().getAttribute("username"));
+        LOGGER.info("Logout : " + req.getSession().getAttribute("username"));
 
         resp.sendRedirect("/");
     }
