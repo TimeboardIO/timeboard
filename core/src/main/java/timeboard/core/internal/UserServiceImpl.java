@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
      }
 
     @Override
-    @Transactional(value = Transactional.TxType.REQUIRES_NEW)
+    @Transactional
     public User createUser(final User user) throws BusinessException {
         this.em.persist(user);
         LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
@@ -168,6 +168,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User userProvisionning(String sub, String email) throws BusinessException {
 
         User user = this.findUserBySubject(sub);
