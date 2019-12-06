@@ -71,7 +71,7 @@ public class TasksRestAPI {
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
-        if(strProjectID != null){
+        if (strProjectID != null) {
             projectID = Long.parseLong(strProjectID);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
@@ -105,7 +105,11 @@ public class TasksRestAPI {
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L)));
+                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L),
+                        (task.getMilestone() != null ? task.getMilestone().getName() : ""),
+                        task.getTaskStatus().getLabel(),
+                        (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
+                        ));
 
             }
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(result.toArray()));
@@ -173,7 +177,7 @@ public class TasksRestAPI {
                         e -> e.getValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
-        wrapper.setEffortSpentDatas(effortSpentMap.values());
+        wrapper.setEffortSpentData(effortSpentMap.values());
 
         // Datas for effort estimate (Axis Y)
         List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
@@ -200,7 +204,7 @@ public class TasksRestAPI {
                         e -> e.getValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
-        wrapper.setRealEffortDatas(effortEstimateMap.values());
+        wrapper.setRealEffortData(effortEstimateMap.values());
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
 
@@ -250,10 +254,9 @@ public class TasksRestAPI {
     public ResponseEntity deleteTask(HttpServletRequest request){
         User actor = (User) request.getAttribute("actor");
 
-
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
-        if(taskIdStr != null) {
+        if (taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
@@ -278,7 +281,7 @@ public class TasksRestAPI {
         User actor = (User) request.getAttribute("actor");
         Date startDate = null;
         Date endDate = null;
-        try{
+        try {
             startDate = DATE_FORMAT.parse(taskWrapper.startDate);
             endDate = DATE_FORMAT.parse(taskWrapper.endDate);
 
@@ -292,8 +295,9 @@ public class TasksRestAPI {
 
         String name = taskWrapper.taskName;
         String comment = taskWrapper.taskComments;
-        if(comment == null) comment = "";
-
+        if (comment == null) {
+            comment = "";
+        }
         double oe = taskWrapper.originalEstimate;
         if(oe <= 0.0){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Original original estimate must be positive ");
@@ -310,7 +314,7 @@ public class TasksRestAPI {
         Long milestoneID = taskWrapper.milestoneID;
         Milestone milestone = null;
         try {
-            milestone = this.projectService.getMilestoneById( actor, milestoneID);
+            milestone = this.projectService.getMilestoneById(actor, milestoneID);
         } catch (Exception e) {
         }
 
@@ -319,8 +323,8 @@ public class TasksRestAPI {
         Long typeID = taskWrapper.typeID;
 
         Long taskID =taskWrapper.taskID;
-        if(!(taskID != null && taskID == 0 )){
-            try{
+        if (!(taskID != null && taskID == 0 )) {
+            try {
                 task = (Task) projectService.getTaskByID(actor, taskID);
 
                 User assignee = userService.findUserByID(taskWrapper.assigneeID);
@@ -334,14 +338,14 @@ public class TasksRestAPI {
                 task.setAssigned(assignee);
                 task.setTaskType(taskType);
                 task.setMilestone(milestone);
-                task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING );
+                task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
                 projectService.updateTask(actor,task);
             }catch (Exception e){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
             }
-        }else{
-            try{
+        } else {
+            try {
                 task = projectService.createTask(actor, project,
                         name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
             }catch (Exception e){
@@ -356,23 +360,23 @@ public class TasksRestAPI {
 
 
     public static class TaskGraphWrapper implements Serializable {
-        public TaskGraphWrapper(){}
+        public TaskGraphWrapper() {}
 
         public List<String> listOfTaskDates;
-        public Collection<Double> effortSpentDatas;
-        public Collection<Double> realEffortDatas;
+        public Collection<Double> effortSpentData;
+        public Collection<Double> realEffortData;
         
         public void setListOfTaskDates(List<String> listOfTaskDates) {
             this.listOfTaskDates = listOfTaskDates;
         }
 
-        public void setEffortSpentDatas(Collection<Double> effortSpentDatas) {
-            this.effortSpentDatas = effortSpentDatas;
+        public void setEffortSpentData(Collection<Double> effortSpentData) {
+            this.effortSpentData = effortSpentData;
 
         }
 
-        public void setRealEffortDatas(Collection<Double> realEffortDatas) {
-            this.realEffortDatas = realEffortDatas;
+        public void setRealEffortData(Collection<Double> realEffortData) {
+            this.realEffortData = realEffortData;
         }
     }
 
@@ -394,14 +398,23 @@ public class TasksRestAPI {
         public Long assigneeID;
 
         public Long typeID;
+        public String typeName;
+
         public String status;
+        public String statusName;
 
         public Long milestoneID;
+        public String milestoneName;
+
 
         public TaskWrapper(){}
 
-        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate, Date startDate, Date endDate, String assignee, Long assigneeID, String status, Long typeID, Long milestoneID) {
+        public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate,
+                           Date startDate, Date endDate, String assignee, Long assigneeID,
+                           String status, Long typeID, Long milestoneID, String milestoneName, String statusName, String typeName) {
+
             this.taskID = taskID;
+
             this.taskName = taskName;
             this.taskComments = taskComments;
             this.originalEstimate = originalEstimate;
@@ -411,7 +424,11 @@ public class TasksRestAPI {
             this.assigneeID = assigneeID;
             this.status = status;
             this.typeID = typeID;
+
             this.milestoneID = milestoneID;
+            this.milestoneName = milestoneName;
+            this.statusName = statusName;
+            this.typeName = typeName;
         }
 
         public Long getMilestoneID() {
