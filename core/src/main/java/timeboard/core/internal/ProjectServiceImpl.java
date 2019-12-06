@@ -26,12 +26,14 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import org.apache.aries.jpa.template.JpaTemplate;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
@@ -56,17 +58,50 @@ import timeboard.core.model.*;
 )
 public class ProjectServiceImpl implements ProjectService {
 
+    private static final String VACATION_TASK_NAME = "Congés";
+
     @Reference
     private LogService logService;
 
     @Reference
     private UserService userService;
 
+    @Reference
+    private TimesheetService timesheetService;
+
     @Reference(target = "(osgi.unit.name=timeboard-pu)", scope = ReferenceScope.BUNDLE)
     private JpaTemplate jpa;
 
+    private DefaultTask vacationTask;
+
     public ProjectServiceImpl() {
 
+    }
+
+    @Activate
+    public void init() {
+        vacationTask = (DefaultTask) this.getTasksByName(VACATION_TASK_NAME);
+
+        if (vacationTask == null) {
+
+            // Initialize default task in DB
+            vacationTask = new DefaultTask();
+            Calendar c = Calendar.getInstance();
+
+            c.set(1,Calendar.JANUARY,1);
+            vacationTask.setStartDate(c.getTime());
+
+            c.set(9999,Calendar.DECEMBER,31);
+            vacationTask.setEndDate(c.getTime());
+
+            vacationTask.setName(VACATION_TASK_NAME);
+
+            try {
+                this.createDefaultTask(vacationTask);
+            } catch (BusinessException e) {
+                // Handle JPA Exception
+            }
+        }
     }
 
     public ProjectServiceImpl(JpaTemplate jpa) {
@@ -192,42 +227,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException {
-        RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMember());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
-
-
-        return jpa.txExpr(em -> {
-
-            TypedQuery<Object[]> q = em.createQuery("select "
-                    + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
-                    + "COALESCE(sum(t.effortLeft),0) as effortLeft "
-                    + "from Task t "
-                    + "where t.project = :project ", Object[].class);
-
-            q.setParameter("project", project);
-
-            Object[] originalEstimateAndEffortLeft = q.getSingleResult();
-
-            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
-                    + "from Task t left outer join t.imputations i "
-                    + "where t.project = :project ", Double.class);
-
-            effortSpentQuery.setParameter("project", project);
-
-            final Double effortSpent = effortSpentQuery.getSingleResult();
-
-            return new ProjectDashboard(project.getQuotation(), (Double) originalEstimateAndEffortLeft[0], (Double) originalEstimateAndEffortLeft[1], effortSpent);
-
-        });
-    }
-
-
-    @Override
     public Project updateProject(User actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
@@ -294,6 +293,42 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
     }
+
+    @Override
+    public ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
+
+        return jpa.txExpr(em -> {
+
+            TypedQuery<Object[]> q = em.createQuery("select "
+                    + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
+                    + "COALESCE(sum(t.effortLeft),0) as effortLeft "
+                    + "from Task t "
+                    + "where t.project = :project ", Object[].class);
+
+            q.setParameter("project", project);
+
+            Object[] originalEstimateAndEffortLeft = q.getSingleResult();
+
+            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
+                    + "from Task t left outer join t.imputations i "
+                    + "where t.project = :project ", Double.class);
+
+            effortSpentQuery.setParameter("project", project);
+
+            final Double effortSpent = effortSpentQuery.getSingleResult();
+
+            return new ProjectDashboard(project.getQuotation(), (Double) originalEstimateAndEffortLeft[0], (Double) originalEstimateAndEffortLeft[1], effortSpent);
+
+        });
+    }
+
 
     @Override
     public void save(User actor, ProjectMembership projectMembership) throws BusinessException {
@@ -474,6 +509,35 @@ public class ProjectServiceImpl implements ProjectService {
         return task;
     }
 
+    private AbstractTask getTasksByName(String name) {
+
+        final AbstractTask[] task = new AbstractTask[1];
+        try {
+            this.jpa.tx(entityManager -> {
+
+                TypedQuery<Task> query = entityManager.createQuery("select distinct t from Task t left join fetch t.imputations  where t.name = :name", Task.class);
+                query.setParameter("name", name);
+
+                task[0] = query.getSingleResult();
+            });
+        } catch (Exception e) {
+            // handle JPA Exceptions
+        }
+
+        try {
+            this.jpa.tx(entityManager -> {
+                TypedQuery<DefaultTask> query = entityManager.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
+                query.setParameter("name", name);
+                task[0] = query.getSingleResult();
+            });
+        } catch (Exception e) {
+            //handle JPA Exceptions
+        }
+
+        return task[0];
+
+    }
+
     public List<AbstractTask> getTasksByName(User user, String name) {
 
         final List<AbstractTask> tasks =  new ArrayList<>();
@@ -506,7 +570,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList) {
         return this.jpa.txExpr(entityManager -> {
             List<UpdatedTaskResult> result = new ArrayList<>();
-            for(Imputation imputation : imputationsList){
+            for (Imputation imputation : imputationsList) {
                 UpdatedTaskResult updatedTaskResult = null;
                 try {
                     updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
@@ -528,7 +592,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (task instanceof Task) {
             return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
-        }else{
+        } else {
             return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
         }
     }
@@ -538,7 +602,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return this.jpa.txExpr(entityManager -> {
 
-            if(projectTask.getTaskStatus() != TaskStatus.PENDING){
+            if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
                 Imputation existingImputation = this.getImputationByDayByTask(entityManager, calendar.getTime(), projectTask);
                 double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
@@ -550,8 +614,11 @@ public class ProjectServiceImpl implements ProjectService {
                 entityManager.merge(updatedTask);
                 entityManager.flush();
 
-                this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task " + updatedTask.getId() + " (" + day + ") in project " + ((updatedTask!= null) ? updatedTask.getProject().getName() : "default") + " with value " + val);
-                return new UpdatedTaskResult(updatedTask.getProject().getId(), updatedTask.getId(), updatedTask.getEffortSpent(), updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(), updatedTask.getRealEffort());
+                this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for task "
+                        + updatedTask.getId() + " (" + day + ") in project " + ((updatedTask != null) ? updatedTask.getProject().getName() : "default")
+                        + " with value " + val);
+                return new UpdatedTaskResult(updatedTask.getProject().getId(), updatedTask.getId(),
+                        updatedTask.getEffortSpent(), updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(), updatedTask.getRealEffort());
             }
             return null;
         });
@@ -569,13 +636,14 @@ public class ProjectServiceImpl implements ProjectService {
             entityManager.merge(defaultTask);
             entityManager.flush();
 
-            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
+            this.logService.log(LogService.LOG_INFO, "User " + actor.getName() + " updated imputations for default task "
+                    + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
             return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
         });
 
     }
 
-    private Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task){
+    private Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task) {
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
         q.setParameter("taskID", task.getId());
         q.setParameter("day", day);
@@ -692,9 +760,7 @@ public class ProjectServiceImpl implements ProjectService {
                 rebalanced.get(task.getProject()).add(task);
             });
 
-            rebalanced.forEach((project, ts) -> {
-                projectTasks.add(new ProjectTasks(project, ts));
-            });
+            rebalanced.forEach((project, ts) -> projectTasks.add(new ProjectTasks(project, ts)));
 
         });
         return projectTasks;
@@ -711,7 +777,6 @@ public class ProjectServiceImpl implements ProjectService {
                                     + "and t.startDate <= :de ", DefaultTask.class);
             q.setParameter("ds", ds);
             q.setParameter("de", de);
-            List<DefaultTask> tasks = q.getResultList();
 
            return q.getResultList();
 
@@ -847,9 +912,7 @@ public class ProjectServiceImpl implements ProjectService {
             q.setParameter("remotePath", remotePath);
 
             Map<String, Task> map = new HashMap<>();
-            q.getResultList().forEach(task -> {
-                map.put(task.getRemoteId(), task);
-            });
+            q.getResultList().forEach(task -> map.put(task.getRemoteId(), task));
             return map;
         });
 
@@ -1007,27 +1070,55 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public TASData generateTasData(User user, Project p, int month, int year) {
+    public TASData generateTasData(User user, Project project, int month, int year) {
+
         TASData data = new TASData();
-        data.setBusinessCode("");
+
+        data.setBusinessCode(project.getName());
         data.setMatriculeID(user.getEmail());
         data.setFirstName(user.getFirstName());
         data.setName(user.getName());
         data.setMonth(month);
         data.setYear(year);
 
-
         Calendar start = Calendar.getInstance();
-        start.set(year, month-1, 1, 2, 0);
+        start.set(year, month - 1, 1, 2, 0);
         Calendar end = Calendar.getInstance();
         end.set(year, month, 1, 2, 0);
 
-        int i = 0;
-        for (Date date = start.getTime(); start.before(end); start.add(Calendar.DATE, 1), date = start.getTime()) {
+        Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(), user, vacationTask);
+        Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(), user, project);
+        Map<Integer, Double> otherProjectImputations = new HashMap<>();
+        List<Integer> dayMonthNums = new ArrayList<>();
+        List<String> dayMonthNames = new ArrayList<>();
 
-            i++;
+        // rolling days in month
+        for (int i = start.get(Calendar.DAY_OF_MONTH); start.before(end); start.add(Calendar.DATE, 1), i = start.get(Calendar.DAY_OF_MONTH)) {
+
+            dayMonthNums.add(i);
+            dayMonthNames.add(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(start).toLowerCase());
+
+            Double vacationI = vacationImputations.get(i);
+            Double projectI = projectImputations.get(i);
+            double otherProjectI;
+
+            vacationI = (vacationI == null) ? 0.0 : vacationI; //handling no imputation
+            projectI = (projectI == null) ? 0.0 : projectI;
+
+            otherProjectI = 1 - projectI - vacationI; //other project imputation
+
+            otherProjectImputations.put(i, otherProjectI);
+            vacationImputations.put(i, vacationI);
+            projectImputations.put(i, projectI);
         }
 
-        return null;
+        data.setDayMonthNames(dayMonthNames);
+        data.setDayMonthNums(dayMonthNums);
+
+        data.setOffDays(vacationImputations);
+        data.setWorkedDays(projectImputations);
+        data.setOtherDays(otherProjectImputations);
+
+        return data;
     }
 }

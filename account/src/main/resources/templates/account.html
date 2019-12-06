@@ -145,6 +145,12 @@
 
                                 </select>
                             </div>
+                            <div class="field">
+                                <label>Month</label>
+                                <select name="projectID">
+                                    <option th:each="project : ${projects}" th:value="${project.id}" th:text="${project.name}" ></option>
+                                </select>
+                            </div>
                         </div>
 
                         <input name="formType" type="hidden" value="account">

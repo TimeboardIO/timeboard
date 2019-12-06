@@ -1,5 +1,31 @@
 package timeboard.core.model;
 
+/*-
+ * #%L
+ * core
+ * %%
+ * Copyright (C) 2019 Timeboard
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +41,9 @@ public class TASData {
 
     private List<String> dayMonthNames;
     private List<Integer> dayMonthNums;
-    private Map<Integer, BigDecimal> workedDays;
-    private Map<Integer, BigDecimal> offDays;
-    private Map<Integer, BigDecimal> otherDays;
+    private Map<Integer, Double> workedDays;
+    private Map<Integer, Double> offDays;
+    private Map<Integer, Double> otherDays;
     private Map<Integer, String> comments;
 
     public String getMatriculeID() {
@@ -84,27 +110,27 @@ public class TASData {
         this.dayMonthNums = dayMonthNums;
     }
 
-    public Map<Integer, BigDecimal> getWorkedDays() {
+    public Map<Integer, Double> getWorkedDays() {
         return this.workedDays;
     }
 
-    public void setWorkedDays(final Map<Integer, BigDecimal> workedDays) {
+    public void setWorkedDays(final Map<Integer, Double> workedDays) {
         this.workedDays = workedDays;
     }
 
-    public Map<Integer, BigDecimal> getOffDays() {
+    public Map<Integer, Double> getOffDays() {
         return this.offDays;
     }
 
-    public void setOffDays(final Map<Integer, BigDecimal> offDays) {
+    public void setOffDays(final Map<Integer, Double> offDays) {
         this.offDays = offDays;
     }
 
-    public Map<Integer, BigDecimal> getOtherDays() {
+    public Map<Integer, Double> getOtherDays() {
         return this.otherDays;
     }
 
-    public void setOtherDays(final Map<Integer, BigDecimal> otherDays) {
+    public void setOtherDays(final Map<Integer, Double> otherDays) {
         this.otherDays = otherDays;
     }
 

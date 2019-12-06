@@ -36,7 +36,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.model.Project;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -54,6 +56,9 @@ public class AccountServlet extends TimeboardServlet {
 
     @Reference
     private UserService userService;
+
+    @Reference
+    private ProjectService projectService;
 
     @Reference(
             policyOption = ReferencePolicyOption.GREEDY,
@@ -117,6 +122,8 @@ public class AccountServlet extends TimeboardServlet {
     private void loadPage(ViewModel viewModel, User user) {
         viewModel.getViewDatas().put("user", user);
 
+        List<Project> projects = projectService.listProjects(user);
+
         List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list
         projectImportServlets.forEach(service -> {
@@ -124,6 +131,7 @@ public class AccountServlet extends TimeboardServlet {
         });
 
         viewModel.getViewDatas().put("externalTools", fieldNames);
+        viewModel.getViewDatas().put("projects", projects);
 
         viewModel.setTemplate("account:account.html");
     }

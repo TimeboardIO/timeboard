@@ -46,7 +46,9 @@ import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.osgi.service.component.annotations.*;
 import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
@@ -64,7 +66,7 @@ import timeboard.core.ui.ViewModel;
 public class TasExportServlet extends TimeboardServlet {
 
     @Reference
-    private UserService userService;
+    private ProjectService projectService;
 
     @Reference(
             policyOption = ReferencePolicyOption.GREEDY,
@@ -85,6 +87,7 @@ public class TasExportServlet extends TimeboardServlet {
 
             int month = Integer.parseInt(request.getParameter("month"));
             int year = Integer.parseInt(request.getParameter("year"));
+            Long projectID = Long.parseLong(request.getParameter("projectID"));
 
             Calendar cal = Calendar.getInstance();
             cal.set(year, month-1, 1, 2, 0);
@@ -101,8 +104,10 @@ public class TasExportServlet extends TimeboardServlet {
                 response.setHeader("Expires:", "0");
                 response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".xls");
 
+                Project project = projectService.getProjectByID(actor, projectID);
 
-                TASData data = userService.generateTasData(actor, month, year);
+                TASData data = projectService.generateTasData(actor, project, month, year);
+
                 ExcelTASReport tasReport = new ExcelTASReport(response.getOutputStream());
 
 
