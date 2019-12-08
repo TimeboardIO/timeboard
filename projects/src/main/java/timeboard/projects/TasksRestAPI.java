@@ -38,6 +38,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
+import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -65,9 +66,14 @@ public class TasksRestAPI {
     @Autowired
     private UserService userService;
 
+
+    @Autowired
+    private UserInfo userInfo;
+
+
     @GetMapping
     public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
-        User actor = (User) request.getAttribute("actor");
+        User actor = this.userInfo.getCurrentUser();
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -122,7 +128,7 @@ public class TasksRestAPI {
     @GetMapping("/chart")
     public ResponseEntity getDatasForCharts(HttpServletRequest request) throws BusinessException, JsonProcessingException {
         TaskGraphWrapper wrapper = new TaskGraphWrapper();
-        User actor = (User) request.getAttribute("actor");
+        User actor = this.userInfo.getCurrentUser();
 
 
         final String taskIdStr = request.getParameter("task");
@@ -213,13 +219,13 @@ public class TasksRestAPI {
 
     @GetMapping("/approve")
     public ResponseEntity approveTask(HttpServletRequest request) {
-        User actor = (User) request.getAttribute("actor");
+        User actor = this.userInfo.getCurrentUser();
         return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGRESS);
     }
 
     @GetMapping("/deny")
     public ResponseEntity denyTask(HttpServletRequest request){
-        User actor = (User) request.getAttribute("actor");
+        User actor = this.userInfo.getCurrentUser();
 
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
@@ -252,7 +258,7 @@ public class TasksRestAPI {
 
     @GetMapping("/delete")
     public ResponseEntity deleteTask(HttpServletRequest request){
-        User actor = (User) request.getAttribute("actor");
+        User actor = this.userInfo.getCurrentUser();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -278,7 +284,7 @@ public class TasksRestAPI {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createTask(HttpServletRequest request, @RequestBody TaskWrapper taskWrapper) throws JsonProcessingException {
-        User actor = (User) request.getAttribute("actor");
+        User actor = this.userInfo.getCurrentUser();
         Date startDate = null;
         Date endDate = null;
         try {

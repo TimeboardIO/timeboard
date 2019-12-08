@@ -67,7 +67,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
 
-        viewModel.setTemplate("projects:details_project_tasks.html");
+        viewModel.setTemplate("details_project_tasks.html");
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
