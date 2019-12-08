@@ -60,6 +60,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private UserService userService;
 
+
     @Autowired
     private EntityManager em;
 
@@ -67,6 +68,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public Project createProject(User owner, String projectName) throws BusinessException {
+        em.merge(owner);
         Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
@@ -76,7 +78,6 @@ public class ProjectServiceImpl implements ProjectService {
         em.persist(ownerMembership);
 
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
-
         return newProject;
     }
 

@@ -26,16 +26,80 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.WebRequestInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import timeboard.core.api.UserService;
+import timeboard.core.model.User;
+import timeboard.core.ui.BrandingService;
+import timeboard.core.ui.CssService;
+import timeboard.core.ui.JavascriptService;
+import timeboard.core.ui.NavigationEntryRegistryService;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private NavigationEntryRegistryService navRegistry;
+
+    @Autowired
+    private BrandingService brandingService;
+
+    @Autowired
+    private JavascriptService javascriptService;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private CssService cssService;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addWebRequestInterceptor(new WebRequestInterceptor() {
+
+            @Override
+            public void preHandle(WebRequest webRequest) throws Exception {
+
+            }
+
+            @Override
+            public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
+
+                if(modelMap != null) {
+                    modelMap.put("user", getActorFromRequestAttributes(webRequest));
+                    modelMap.put("navs", navRegistry.getEntries());
+                    modelMap.put("appName", brandingService.appName());
+                    modelMap.put("javascripts", javascriptService.listJavascriptUrls());
+                    modelMap.put("CSSs", cssService.listCSSUrls());
+                }
+
+            }
+
+            @Override
+            public void afterCompletion(WebRequest webRequest, Exception e) throws Exception {
+
+            }
+
+            protected User getActorFromRequestAttributes(WebRequest request) {
+                System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+                OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+                return userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
+            }
+        });
+    }
 }
