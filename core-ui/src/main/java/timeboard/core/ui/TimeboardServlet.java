@@ -28,6 +28,7 @@ package timeboard.core.ui;
 
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -57,8 +58,8 @@ public abstract class TimeboardServlet extends HttpServlet {
     @Autowired
     private NavigationEntryRegistryService navRegistry;
 
-    @Autowired
-    private BrandingService brandingService;
+    @Value("${timeboard.appName}")
+    private String appName;
 
     @Autowired
     private JavascriptService javascriptService;
@@ -85,7 +86,7 @@ public abstract class TimeboardServlet extends HttpServlet {
 
 
     private String getAppName() {
-        return this.brandingService.appName();
+        return this.appName;
     }
 
     private List<String> getCssLinkURLs() {

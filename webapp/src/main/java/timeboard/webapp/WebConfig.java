@@ -27,6 +27,7 @@ package timeboard.webapp;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -38,7 +39,6 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
-import timeboard.core.ui.BrandingService;
 import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
@@ -51,8 +51,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private NavigationEntryRegistryService navRegistry;
 
-    @Autowired
-    private BrandingService brandingService;
+    @Value("${timeboard.appName}")
+    private String appName;
 
     @Autowired
     private JavascriptService javascriptService;
@@ -83,7 +83,7 @@ public class WebConfig implements WebMvcConfigurer {
                 if(modelMap != null) {
                     modelMap.put("user", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());
-                    modelMap.put("appName", brandingService.appName());
+                    modelMap.put("appName", appName);
                     modelMap.put("javascripts", javascriptService.listJavascriptUrls());
                     modelMap.put("CSSs", cssService.listCSSUrls());
                 }
