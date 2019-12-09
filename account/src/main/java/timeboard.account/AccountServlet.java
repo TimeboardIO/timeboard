@@ -110,7 +110,7 @@ public class AccountServlet extends TimeboardServlet {
                 break;
 
             case "columnTask":
-                List<String> selectedColumnsString = Arrays.asList(request.getParameterValues("columnSelected"));
+                List<String> selectedColumnsString = request.getParameterValues("columnSelected") != null ? Arrays.asList(request.getParameterValues("columnSelected")) : new ArrayList<>();
                 try {
                     this.dataTableService.addOrUpdateTableConfig(this.dataTableService.TABLE_TASK_ID, actor, selectedColumnsString);
                     viewModel.getViewDatas().put("message", "Task columns preferences updated successfully !");
