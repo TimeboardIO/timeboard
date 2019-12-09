@@ -26,13 +26,10 @@ package timeboard.reporting;
  * #L%
  */
 
-import org.osgi.service.component.annotations.Component;
+import org.springframework.stereotype.Component;
 import timeboard.core.ui.NavigationExtPoint;
 
-@Component(
-        service = NavigationExtPoint.class,
-        immediate = true
-)
+@Component
 public class ReportingNavigationProvider implements NavigationExtPoint {
 
     @Override

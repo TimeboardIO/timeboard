@@ -26,9 +26,10 @@ package timeboard.projects;
  * #L%
  */
 
+import timeboard.core.model.User;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import timeboard.core.model.User;
 
 public class ProjectImportBackgroundTasks {
 

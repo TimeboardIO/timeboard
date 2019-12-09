@@ -27,16 +27,7 @@ package timeboard.timesheet;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import javax.servlet.Servlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;
@@ -47,31 +38,29 @@ import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
-@Component(
-        service = Servlet.class,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/timesheet",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
 
-)
+
+@WebServlet(name = "TimesheetServlet", urlPatterns = "/timesheet")
 public class TimesheetServlet extends TimeboardServlet {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Reference(
-            cardinality = ReferenceCardinality.OPTIONAL,
-            policy = ReferencePolicy.DYNAMIC,
-            policyOption = ReferencePolicyOption.GREEDY)
-    private volatile ProjectService projectService;
+    @Autowired
+    private  ProjectService projectService;
 
-    @Reference(
-            cardinality = ReferenceCardinality.OPTIONAL,
-            policy = ReferencePolicy.DYNAMIC,
-            policyOption = ReferencePolicyOption.GREEDY)
-    private volatile TimesheetService timesheetService;
+    @Autowired
+    private  TimesheetService timesheetService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
@@ -134,7 +123,7 @@ public class TimesheetServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("projectList", this.projectService.listProjects(getActorFromRequestAttributes(request)));
 
 
-        viewModel.setTemplate("timesheet:timesheet.html");
+        viewModel.setTemplate("timesheet.html");
     }
 
     @Override

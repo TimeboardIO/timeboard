@@ -27,49 +27,41 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
+import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.ViewModel;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.*;
-import timeboard.core.api.ProjectImportService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
 
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/import",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+@WebServlet(name = "ProjectImportServlet", urlPatterns = "/projects/import")
 public class ProjectImportServlet extends TimeboardServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
-    @Reference
+    @Autowired
     private UserService userService;
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectImportService> projectImportServlets;
 

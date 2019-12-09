@@ -27,38 +27,31 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import timeboard.core.api.UserService;
+import timeboard.core.model.User;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.UserService;
-import timeboard.core.model.User;
 
 
 /**
  * search user  : /search?q={search query}.
  * search user in project : /search?projectID={project id}&q={search query}
  */
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/search",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+@WebServlet(name = "SearchUsersService", urlPatterns = "/search")
 public class SearchUsersService extends HttpServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    @Reference
+    @Autowired
     private UserService userService;
 
     @Override

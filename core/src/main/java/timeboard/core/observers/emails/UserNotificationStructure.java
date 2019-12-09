@@ -26,10 +26,11 @@ package timeboard.core.observers.emails;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
 import timeboard.core.internal.events.TimeboardEvent;
 import timeboard.core.model.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class UserNotificationStructure {

@@ -29,8 +29,8 @@ package timeboard.plugin.project.export.xls;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -41,14 +41,12 @@ import timeboard.core.model.User;
 import java.io.IOException;
 import java.io.OutputStream;
 
-@Component(
-        service = ProjectExportService.class,
-        immediate = true
-)
+
+@Component
 public class XlsExportPlugin implements ProjectExportService {
 
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
     @Override

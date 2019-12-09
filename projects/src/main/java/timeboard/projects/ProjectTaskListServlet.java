@@ -26,32 +26,25 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.Date;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/tasks",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Date;
+
+
+@WebServlet(name = "ProjectTaskListServlet", urlPatterns = "/projects/tasks")
 public class ProjectTaskListServlet extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     public ProjectService projectService;
 
 
@@ -74,7 +67,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
 
-        viewModel.setTemplate("projects:details_project_tasks.html");
+        viewModel.setTemplate("details_project_tasks.html");
         viewModel.getViewDatas().put("project", project);
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
@@ -88,7 +81,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);
 
-        viewModel.setTemplate("projects:details_project_tasks.html");
+        viewModel.setTemplate("details_project_tasks.html");
         viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
         viewModel.getViewDatas().put("project", project);
     }

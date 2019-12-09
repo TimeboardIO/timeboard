@@ -26,43 +26,35 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
-
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/export",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+
+@WebServlet(name = "ProjectExportServlet", urlPatterns = "/projects/export")
 public class ProjectExportServlet  extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectExportService> projectExportServices;
 

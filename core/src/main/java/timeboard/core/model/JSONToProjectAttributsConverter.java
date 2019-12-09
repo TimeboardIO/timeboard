@@ -28,11 +28,12 @@ package timeboard.core.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.persistence.AttributeConverter;
+import javax.persistence.Converter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 
 @Converter
 public class JSONToProjectAttributsConverter implements AttributeConverter<Map<String, ProjectAttributValue>, String> {

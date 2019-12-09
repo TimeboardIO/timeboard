@@ -26,33 +26,25 @@ package timeboard.reporting;
  * #L%
  */
 
-import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-import javax.servlet.Servlet;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern="+ReportingServlet.URL,
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+
+@WebServlet(name = "ReportingServlet", urlPatterns = {ReportingServlet.URL})
 public class ReportingServlet extends TimeboardServlet {
 
     public static final String URL = "/reporting";
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectExportService> reportServices;
 
@@ -63,7 +55,7 @@ public class ReportingServlet extends TimeboardServlet {
 
     @Override
     protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        viewModel.setTemplate("reporting:reporting.html");
+        viewModel.setTemplate("reporting.html");
         viewModel.getViewDatas().put("reports", this.reportServices);
    }
 

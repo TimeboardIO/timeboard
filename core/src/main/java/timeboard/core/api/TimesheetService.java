@@ -26,14 +26,12 @@ package timeboard.core.api;
  * #L%
  */
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Project;
 import timeboard.core.model.User;
+
+import java.util.Date;
 
 
 public interface TimesheetService {

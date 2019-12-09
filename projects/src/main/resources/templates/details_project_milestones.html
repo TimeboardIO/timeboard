@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{projects:details_project_layout.html(tab='third')}"
+<html layout:decorate="~{details_project_layout.html(tab='third')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 
@@ -35,9 +35,9 @@
                 </tbody>
             </table>
         </div>
-        <div class="twelve wide column" id="details" th:insert="projects:details_project_milestones_config.html :: milestone-config">
+        <div class="twelve wide column" id="details" th:insert="details_project_milestones_config.html :: milestone-config">
         </div>
-        <div class="right floated twelve wide column" id="tasksLinks" th:insert="projects:details_project_milestones_config_links.html :: milestone-config-links">
+        <div class="right floated twelve wide column" id="tasksLinks" th:insert="details_project_milestones_config_links.html :: milestone-config-links">
         </div>
     </div>
 </div>
