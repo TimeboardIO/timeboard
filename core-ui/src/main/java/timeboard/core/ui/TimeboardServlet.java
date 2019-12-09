@@ -36,6 +36,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import timeboard.core.api.DataTableService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 
@@ -71,6 +72,8 @@ public abstract class TimeboardServlet extends HttpServlet {
 
     protected abstract ClassLoader getTemplateResolutionClassLoader();
 
+    @Autowired
+    private DataTableService dataTableService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -187,6 +190,9 @@ public abstract class TimeboardServlet extends HttpServlet {
         ctx.setVariable("javascripts", this.getJavascriptURLs());
 
         ctx.setVariable("CSSs", this.getCssLinkURLs());
+
+        // Use instance of DataTablaService
+        ctx.setVariable("dataTableService", this.dataTableService);
 
         String templateName = viewModel.getTemplate();
         String result = engine.process(templateName, ctx);
