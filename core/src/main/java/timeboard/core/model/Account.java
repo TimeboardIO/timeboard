@@ -63,12 +63,8 @@ public class Account implements Serializable {
     @Column(nullable = true, unique = true)
     private String remoteSubject;
 
-    @Column(nullable = false)
-    private boolean imputationFutur = false;
-
-    @Column(nullable = false)
-    private boolean validateOwnImputation = false;
-
+    @Column
+    private Boolean organisation = false;
 
     @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToMapStringConverter.class)
@@ -78,12 +74,13 @@ public class Account implements Serializable {
 
     public Account() {
         this.externalIDs = new HashMap<>();
+        this.organisation = false;
     }
 
 
     public Account(final String name, final String firstName,
                    final String email, final Date accountCreationTime, final Date beginWorkDate) {
-
+        super();
         this.name = name;
         this.firstName = firstName;
         this.email = email;
@@ -148,22 +145,12 @@ public class Account implements Serializable {
         this.email = email;
     }
 
-
-    public boolean isImputationFutur() {
-        return imputationFutur;
+    public boolean isOrganisation() {
+        return organisation;
     }
 
-    public void setImputationFutur(boolean imputationFutur) {
-        this.imputationFutur = imputationFutur;
-    }
-
-
-    public boolean isValidateOwnImputation() {
-        return validateOwnImputation;
-    }
-
-    public void setValidateOwnImputation(boolean validateOwnImputation) {
-        this.validateOwnImputation = validateOwnImputation;
+    public void setOrganisation(Boolean organisation) {
+        this.organisation = organisation;
     }
 
     @Transient
