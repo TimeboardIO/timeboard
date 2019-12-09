@@ -62,6 +62,8 @@ public class UserServiceImpl implements UserService {
             return accounts;
      }
 
+
+
     @Override
     @Transactional
     public Account createUser(final Account account) throws BusinessException {
@@ -184,9 +186,8 @@ public class UserServiceImpl implements UserService {
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
-
+  /*
     private boolean checkPassword(String password, String hash) {
-        return BCrypt.checkpw(password, hash);
-    }
-
+        return BCrypt.checkpfw(password, hash);
+    }*/
 }

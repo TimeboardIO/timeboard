@@ -29,8 +29,10 @@ package timeboard.account;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 import timeboard.core.model.DataTableConfig;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -44,7 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-
+import java.text.DateFormatSymbols;
 
 
 @WebServlet(name = "AccountServlet", urlPatterns = "/account")
@@ -52,6 +54,9 @@ public class AccountServlet extends TimeboardServlet {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private ProjectService projectService;
 
     @Autowired(
             required = false
@@ -130,8 +135,10 @@ public class AccountServlet extends TimeboardServlet {
         loadPage(viewModel, actor);
     }
     
-    private void loadPage(ViewModel viewModel, Account account) {
-        viewModel.getViewDatas().put("user", account);
+    private void loadPage(ViewModel viewModel, Account actor) {
+        viewModel.getViewDatas().put("account", actor);
+
+        List<Project> projects = projectService.listProjects(actor);
 
         List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list
@@ -141,13 +148,28 @@ public class AccountServlet extends TimeboardServlet {
             });
         }
 
-        viewModel.getViewDatas().put("externalTools", fieldNames);
+        Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
+        Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
+        Calendar end = Calendar.getInstance();
+        end.setTime(actor.getBeginWorkDate());
+        Calendar start = Calendar.getInstance();
+        start.setTime(new Date());
+        DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
+        dfs.getLocalPatternChars();
+        String[] months = dfs.getMonths();
+        for (int i = start.get(Calendar.MONTH); start.after(end); start.add(Calendar.MONTH, -1), i = start.get(Calendar.DAY_OF_MONTH)) {
+            yearsSinceHiring.add(start.get(Calendar.YEAR));
+            if(monthsSinceHiring.size() < 12) monthsSinceHiring.put(start.get(Calendar.MONTH), months[start.get(Calendar.MONTH)]);
+        }
 
+        viewModel.getViewDatas().put("externalTools", fieldNames);
+        viewModel.getViewDatas().put("projects", projects);
+        viewModel.getViewDatas().put("yearsSinceHiring", yearsSinceHiring);
+        viewModel.getViewDatas().put("monthsSinceHiring", monthsSinceHiring);
         DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(this.dataTableService.TABLE_TASK_ID, account);
         List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
         viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
         viewModel.getViewDatas().put("allTaskColumns", this.dataTableService.ALL_COLUMNS_TABLE_TASK);
-
         viewModel.setTemplate("account.html");
     }
 

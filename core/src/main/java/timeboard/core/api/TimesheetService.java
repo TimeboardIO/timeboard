@@ -27,9 +27,12 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.TimesheetException;
+import timeboard.core.model.AbstractTask;
+import timeboard.core.model.Project;
 import timeboard.core.model.Account;
 
 import java.util.Date;
+import java.util.Map;
 
 
 public interface TimesheetService {
@@ -63,4 +66,7 @@ public interface TimesheetService {
      */
     double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, Account account);
 
+    Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, Account user, Project project);
+
+    Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, Account user, AbstractTask task);
 }
