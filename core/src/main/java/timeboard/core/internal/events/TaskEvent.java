@@ -26,11 +26,12 @@ package timeboard.core.internal.events;
  * #L%
  */
 
-import java.util.Date;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
 import timeboard.core.model.User;
+
+import java.util.Date;
 
 
 public class TaskEvent extends TimeboardEvent {

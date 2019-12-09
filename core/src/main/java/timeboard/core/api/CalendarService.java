@@ -26,12 +26,13 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
 
 public interface CalendarService {
 

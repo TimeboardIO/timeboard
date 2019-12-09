@@ -29,9 +29,11 @@ package timeboard.core.model;
 
 //import timeboard.apigenerator.annotation.RPCEntity;
 
-import java.io.Serializable;
-import java.util.*;
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Table

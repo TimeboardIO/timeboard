@@ -26,38 +26,30 @@ package timeboard.projects;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
+import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.ViewModel;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
 
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/milestones/config-links",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+@WebServlet(name = "ProjectMilestoneConfigLinksServlet", urlPatterns = "/projects/milestones/config-links")
 public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
-    @Reference
+    @Autowired
     public ProjectService projectService;
 
 
@@ -92,7 +84,7 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
         } catch (Exception e) {
             viewModel.getErrors().add(e);
         } finally {
-            viewModel.setTemplate("projects:details_project_milestones_config_links.html");
+            viewModel.setTemplate("details_project_milestones_config_links.html");
 
             viewModel.getViewDatas().put("project", project);
             viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));

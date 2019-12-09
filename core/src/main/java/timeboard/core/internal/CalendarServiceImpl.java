@@ -26,13 +26,6 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Calendar;
-import javax.persistence.TypedQuery;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Component;
@@ -45,10 +38,9 @@ import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.RRule;
 import net.fortuna.ical4j.model.property.Summary;
 import net.fortuna.ical4j.model.property.Uid;
-import org.apache.aries.jpa.template.JpaTemplate;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceScope;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.CalendarService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -56,21 +48,30 @@ import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.model.*;
 
-@org.osgi.service.component.annotations.Component(
-        service = CalendarService.class
-)
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.*;
+
+
+@org.springframework.stereotype.Component
 public class CalendarServiceImpl implements CalendarService {
 
-    @Reference(target = "(osgi.unit.name=timeboard-pu)", scope = ReferenceScope.BUNDLE)
-    private JpaTemplate jpa;
+    private static final Logger LOGGER = LoggerFactory.getLogger(CalendarServiceImpl.class);
 
-    @Reference
+    @Autowired
+    private EntityManager em;
+
+    @Autowired
     private ProjectService projectService;
 
-    @Reference
-    private LogService logService;
 
     private static final String CALENDAR_ORIGIN_KEY = "calendar";
+
 
     @Override
     public boolean importCalendarAsImputationsFromIcs(User actor, String url, AbstractTask task, List<User> userList,
@@ -183,7 +184,7 @@ public class CalendarServiceImpl implements CalendarService {
             }
         }
 
-        this.logService.log(LogService.LOG_INFO, "Import successful ");
+        LOGGER.info("Import successful ");
 
         return events;
     }
@@ -306,11 +307,10 @@ public class CalendarServiceImpl implements CalendarService {
         timeboard.core.model.Calendar calendar = null;
 
         try {
-             calendar = this.jpa.txExpr(entityManager -> {
-                TypedQuery<timeboard.core.model.Calendar> q = entityManager.createQuery("select c from Calendar c where c.remoteId = :remoteId", timeboard.core.model.Calendar.class);
+                 TypedQuery<timeboard.core.model.Calendar> q = em.createQuery("select c from Calendar c where c.remoteId = :remoteId", timeboard.core.model.Calendar.class);
                 q.setParameter("remoteId", remoteId);
-                return q.getSingleResult();
-            });
+                calendar = q.getSingleResult();
+
         } catch (Exception e) {
             // calendar not already exist
         }
@@ -318,54 +318,43 @@ public class CalendarServiceImpl implements CalendarService {
             timeboard.core.model.Calendar newCalendar = new timeboard.core.model.Calendar();
             newCalendar.setRemoteId(remoteId);
             newCalendar.setName(name);
-            calendar = this.jpa.txExpr(entityManager -> {
-                entityManager.persist(newCalendar);
+                 em.persist(newCalendar);
                 return newCalendar;
-            });
-        } else { // update
+         } else { // update
             final timeboard.core.model.Calendar toUpdateCalendar = calendar;
             toUpdateCalendar.setName(name);
             toUpdateCalendar.setRemoteId(remoteId);
-            calendar = this.jpa.txExpr(entityManager -> {
-                entityManager.merge(toUpdateCalendar);
+                 em.merge(toUpdateCalendar);
                 return toUpdateCalendar;
-            });
-        }
+         }
 
 
-        return calendar;
-    }
+     }
 
     @Override
     public List<timeboard.core.model.Calendar> listCalendars() {
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery<timeboard.core.model.Calendar> q = entityManager.createQuery("select c from Calendar c", timeboard.core.model.Calendar.class);
+             TypedQuery<timeboard.core.model.Calendar> q = em.createQuery("select c from Calendar c", timeboard.core.model.Calendar.class);
             return q.getResultList();
-        });
-    }
+     }
 
     @Override
     public List<DefaultTask> findExistingEvents(String remotePath, String remoteId) {
-        return this.jpa.txExpr(entityManager -> {
-            TypedQuery<DefaultTask> q = entityManager.createQuery("select d from DefaultTask d where d.remotePath = :remotePath and d.remoteId = :remoteId", DefaultTask.class);
+             TypedQuery<DefaultTask> q = em.createQuery("select d from DefaultTask d where d.remotePath = :remotePath and d.remoteId = :remoteId", DefaultTask.class);
             q.setParameter("remotePath", remotePath);
             q.setParameter("remoteId", remoteId);
             q.setParameter("origin", CALENDAR_ORIGIN_KEY);
             return q.getResultList();
-        });
-    }
+     }
 
     @Override
     public Map<String, List<Task>> findAllEventAsTask(timeboard.core.model.Calendar calendar, Project project) {
         Map<String, List<Task>> idToEventList = new HashMap<>();
         try {
-            List<Task> eventList = this.jpa.txExpr(entityManager -> {
-                TypedQuery<Task> q = entityManager.createQuery("select t from Task t where t.remotePath = :remotePath and t.origin = :origin and t.project = :project", Task.class);
+                 TypedQuery<Task> q = em.createQuery("select t from Task t where t.remotePath = :remotePath and t.origin = :origin and t.project = :project", Task.class);
                 q.setParameter("remotePath", calendar.getRemoteId());
                 q.setParameter("origin", CALENDAR_ORIGIN_KEY);
                 q.setParameter("project", project);
-                return q.getResultList();
-            });
+                List<Task> eventList = q.getResultList();
 
             for (Task event : eventList) {
                 List<Task> currentList = idToEventList.get(event.getRemoteId());
@@ -385,39 +374,32 @@ public class CalendarServiceImpl implements CalendarService {
     public void deleteCalendarById(User actor, Long calendarID) throws BusinessException {
         RuleSet<timeboard.core.model.Calendar> ruleSet = new RuleSet<>();
 
-        BusinessException exp = this.jpa.txExpr(entityManager -> {
-            timeboard.core.model.Calendar calendar = entityManager.find(timeboard.core.model.Calendar.class, calendarID);
+             timeboard.core.model.Calendar calendar = em.find(timeboard.core.model.Calendar.class, calendarID);
 
             Set<Rule> wrongRules = ruleSet.evaluate(actor, calendar);
             if (!wrongRules.isEmpty()) {
-                return new BusinessException(wrongRules);
+                throw new BusinessException(wrongRules);
             }
 
-            TypedQuery<DefaultTask> query = entityManager.createQuery("select e from DefaultTask where e.remotePath = :remotePath", DefaultTask.class);
+            TypedQuery<DefaultTask> query = em.createQuery("select e from DefaultTask where e.remotePath = :remotePath", DefaultTask.class);
             query.setParameter("remotePath", calendar.getRemoteId());
             try {
                 List<DefaultTask> eventList = query.getResultList();
                 for (DefaultTask event : eventList) {
                     for (Imputation i : event.getImputations()) {
-                        entityManager.remove(i); //remove all imputation for this event
+                        em.remove(i); //remove all imputation for this event
                     }
-                    entityManager.remove(event);
+                    em.remove(event);
                 }
 
             } catch (Exception e) {
                 // no event to delete
             }
 
-            entityManager.remove(calendar);
-            entityManager.flush();
-            return null;
-        });
+            em.remove(calendar);
+            em.flush();
 
-        if (exp != null) {
-            throw exp;
-        }
-
-        this.logService.log(LogService.LOG_INFO, "Calendar " + calendarID + " deleted by " + actor.getName());
+        LOGGER.info("Calendar " + calendarID + " deleted by " + actor.getName());
 
     }
 

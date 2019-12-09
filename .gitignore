@@ -6,3 +6,5 @@ target/
 .DS_Store
 webui/src/main/resources/www/
 /theme/src/main/resources/static/
+build/
+temp/

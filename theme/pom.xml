@@ -6,7 +6,7 @@
 
     <groupId>timeboard</groupId>
     <artifactId>theme</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
 
     <parent>
         <groupId>timeboard</groupId>
@@ -22,8 +22,13 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.component.annotations</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

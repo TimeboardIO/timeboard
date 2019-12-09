@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{core-ui:layouts/general.html(path='/timesheet')}"
+<html layout:decorate="~{layouts/general.html(path='/timesheet')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
       xmlns:v-on="http://www.w3.org/1999/xhtml">
@@ -229,7 +229,7 @@
                 :form-error="formError"
                 :modal-title="modalTitle">
         </task-modal>
-        <script src="/timesheet/static/timesheet.js"></script>
+        <script src="timesheet.js"></script>
 
     </div>
 </div>

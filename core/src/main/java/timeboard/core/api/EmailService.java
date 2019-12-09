@@ -26,8 +26,9 @@ package timeboard.core.api;
  * #L%
  */
 
-import javax.mail.MessagingException;
 import timeboard.core.observers.emails.EmailStructure;
+
+import javax.mail.MessagingException;
 
 public interface EmailService {
 

@@ -26,9 +26,10 @@ package timeboard.core.api;
  * #L%
  */
 
-import java.util.List;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
+
+import java.util.List;
 
 
 public class ProjectTasks {

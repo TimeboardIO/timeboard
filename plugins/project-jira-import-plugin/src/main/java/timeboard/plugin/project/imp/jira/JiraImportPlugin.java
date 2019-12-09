@@ -29,8 +29,8 @@ package timeboard.plugin.project.imp.jira;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -45,10 +45,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-@Component(
-        service = ProjectImportService.class,
-        immediate = true
-)
+@Component
 public class JiraImportPlugin implements ProjectImportService {
 
     private static final String JIRA_USERNAME_KEY = "jira.username";
@@ -56,7 +53,7 @@ public class JiraImportPlugin implements ProjectImportService {
     private static final String JIRA_PROJECT_KEY = "jira.project";
     private static final String JIRA_SERVICE_NAME = "JIRA";
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
     @Override

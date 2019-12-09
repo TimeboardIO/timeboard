@@ -26,10 +26,11 @@ package timeboard.core.api;
  * #L%
  */
 
-import java.util.List;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.User;
+
+import java.util.List;
 
 /**
  * Service for users and accounts management.

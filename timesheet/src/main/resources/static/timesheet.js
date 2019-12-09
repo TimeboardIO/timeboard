@@ -22,7 +22,7 @@ const userID = $("meta[property='timesheet']").attr('userID');
 
 const emptyTask =  {
     taskID: 0,
-    projectID: currentProjectID,
+    projectID: 0,
     taskName: "",
     taskComments: "",
     startDate:"", endDate:"",

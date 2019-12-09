@@ -26,25 +26,23 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.Base64;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
-@Component(
-        service = EncryptionService.class,
-        immediate = true
-)
+
+@Component
 public class EncryptionServiceImpl implements EncryptionService {
 
-    @Reference
-    private LogService logService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(EncryptionServiceImpl.class);
+
 
     private static final String SECRET_KEY = "738F26A3C1971235"; //TODO replace by a configuration
 
@@ -75,15 +73,5 @@ public class EncryptionServiceImpl implements EncryptionService {
         }
     }
 
-    /*
-    public static void main(String[] args) {
-        String key = "test";
-        EncryptionService encryptionService = new EncryptionServiceImpl();
-        key = encryptionService.encryptAttribute(key);
-        Project p = new Project();
-        p.getAttributes().put("TEST", new ProjectAttributValue(key, true));
-        System.out.println(key);
-        key = encryptionService.getProjectAttribute(p, "TEST");
-        System.out.println(key);
-    }*/
+
 }

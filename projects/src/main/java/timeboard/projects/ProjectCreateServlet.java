@@ -26,63 +26,42 @@ package timeboard.projects;
  * #L%
  */
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.User;
-import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.UserInfo;
 import timeboard.core.ui.ViewModel;
 
-
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/projects/create",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
-public class ProjectCreateServlet extends TimeboardServlet {
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 
-    @Reference
+@Controller
+public class ProjectCreateServlet {
+
+    @Autowired
     public ProjectService projectService;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectCreateServlet.class.getClassLoader();
+    @Autowired
+    public UserInfo userInfo;
+
+    @PostMapping("/projects/create")
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+        final User actor = this.userInfo.getCurrentUser();
+        this.projectService.createProject(actor, request.getParameter("projectName"));
+        return "redirect:/projects";
     }
 
-    @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects:create_project.html");
-        Map<String, Object> result = new HashMap<>();
-        result.put("projectName", request.getParameter("projectName"));
-
-
-        try {
-            this.projectService.createProject(actor, result.get("projectName").toString());
-            response.sendRedirect("/projects");
-        } catch (BusinessException e) {
-            result.put("error", "Project " + result.get("projectName").toString() + " already exist");
-        }
-
-        viewModel.getViewDatas().putAll(result);
-    }
-
-    @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects:create_project.html");
-
+    @GetMapping("/projects/create")
+    protected String createFrom(Model moldel, User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        return "create_project.html";
     }
 
 }
