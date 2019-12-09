@@ -31,35 +31,35 @@
                 <thead>
                 <tr>
                     <th  colspan="2" style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'taskName')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}"
                         @click="sortBy('taskName')"
                         :class="{ active: sortKey == 'taskName' }" > Task <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'startDate')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}"
                         @click="sortBy('startDate')"
                         :class="{ active: sortKey == 'startDate' }" > Start Date <i class="icon caret" :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'endDate')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}"
                         @click="sortBy('endDate')"
                         :class="{ active: sortKey == 'endDate' }" > End date <i class="icon caret" :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'originalEstimate')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}"
                         @click="sortBy('originalEstimate')"
                         :class="{ active: sortKey == 'originalEstimate' }" > OE <i class="icon caret" :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'assignee')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}"
                         @click="sortBy('assignee')"
                         :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'milestoneID')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}"
                         @click="sortBy('milestoneID')"
                         :class="{ active: sortKey == 'milestoneID' }" > Milestone <i class="icon caret" :class="sortOrders['milestoneID'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'typeID')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}"
                         @click="sortBy('typeID')"
                         :class="{ active: sortKey == 'typeID' }" > Type <i class="icon caret" :class="sortOrders['typeID'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;"
-                        th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'status')}"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}"
                         @click="sortBy('status')"
                         :class="{ active: sortKey == 'status' }" > Status <i class="icon caret" :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i> </th>
                     <th style="text-align:center;" th:if="${isProjectOwner}">Actions</th>
@@ -67,24 +67,24 @@
                 </tr></thead>
                 <tbody>
                 <tr>
-                    <td colspan="2" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'taskName')}">
+                    <td colspan="2" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">
                         <div class="ui fluid icon input">
                             <input  v-model="filterKey[columns.indexOf('taskName')].value"  type="text" placeholder="Name.. ">
                             <i class="search icon"></i>
                         </div>
                     </td>
 
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'startDate')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}">
                         <div class="ui fluid input">
                             <input type="date" v-model="filterKey[columns.indexOf('startDate')].value" placeholder="Start date.. ">
                         </div>
                     </td>
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'endDate')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}">
                         <div class="ui fluid input">
                             <input type="date" v-model="filterKey[columns.indexOf('endDate')].value" placeholder="End date.. ">
                         </div>
                     </td>
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'originalEstimate')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}">
                         <div class="ui mini fluid input">
                             <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.min"  type="text" placeholder="Min">
                         </div>
@@ -92,7 +92,7 @@
                             <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.max"  type="text" placeholder="Max">
                         </div>
                     </td>
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'assignee')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}">
                         <div class="ui fluid category search">
                             <div class="ui fluid icon input">
 
@@ -106,7 +106,7 @@
                             <div class="results"></div>
                         </div>
                     </td>
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'milestoneID')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}">
                         <select class="ui multiple selection fluid dropdown" v-model="filterKey[columns.indexOf('milestoneID')].value" name="taskMilestoneId">
                             <option
                                     th:each="milestone: ${allProjectMilestones}"
@@ -115,7 +115,7 @@
                             ></option>
                         </select>
                     </td>
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'typeID')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}">
                         <select class="ui type multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('typeID')].value" name="taskTypeID" >
                             <option th:each="type: ${taskTypes}"
                                     th:text="${type.typeName}"
@@ -123,7 +123,7 @@
                             ></option>
                         </select>
                     </td>
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'status')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
                         <select class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
                             <option th:each="status: ${allTaskStatus}"
                                     th:text="${status.label}"
@@ -135,15 +135,15 @@
                 </tr>
 
                 <tr v-for="entry in filteredTasks">
-                    <td colspan="2" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'taskName')}">{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'startDate')}">{{entry['startDate']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'endDate')}">{{entry['endDate']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'originalEstimate')}">{{entry['originalEstimate']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'assignee')}">{{entry['assignee']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'milestoneID')}"><i>{{entry['milestoneName']}}</i></td>
-                    <td  colspan="2" style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'typeID') || dataTableService.checkColumnDisplayed('tableTask', user, 'status')}">
-                        <div class="ui blue green horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'typeID')}">{{entry['typeName']}}</div>
-                        <div class="ui small primary horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'status')}">{{entry['statusName']}}</div>
+                    <td colspan="2" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
+                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}">{{entry['startDate']}}</td>
+                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}">{{entry['endDate']}}</td>
+                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}">{{entry['originalEstimate']}}</td>
+                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}">{{entry['assignee']}}</td>
+                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}"><i>{{entry['milestoneName']}}</i></td>
+                    <td  colspan="2" style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID') || dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
+                        <div class="ui blue green horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}">{{entry['typeName']}}</div>
+                        <div class="ui small primary horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">{{entry['statusName']}}</div>
                     </td>
 
                     <td style="text-align:center;" th:if="${isProjectOwner}">
