@@ -30,8 +30,8 @@
         <div class="card">
             <div class="extra content">
                 <div class="ui top large primary attached label">
-                    <h4><i class="icon user blue"></i>
-                    <i th:text="${user.firstName} + ' ' + ${user.name}"></i></h4>
+                    <h4><i class="icon account blue"></i>
+                    <i th:text="${account.firstName} + ' ' + ${account.name}"></i></h4>
                 </div>
                 <br/>
             </div>
@@ -42,13 +42,13 @@
                     <div class="item">
                         <i class="clock outline icon"></i>
                         <div class="content">
-                            Member since  <i th:text="${user.accountCreationTime}"></i>
+                            Member since  <i th:text="${account.accountCreationTime}"></i>
                         </div>
                     </div>
                     <div class="item">
                         <i class="mail icon"></i>
                         <div class="content">
-                            <a th:href="'mailto:' + ${user.email}" th:text="${user.email}" ></a>
+                            <a th:href="'mailto:' + ${account.email}" th:text="${account.email}" ></a>
                         </div>
                     </div>
 
@@ -66,17 +66,17 @@
                         <label>Name</label>
                         <div class="two fields">
                             <div class="field">
-                                <input type="text" name="firstName" placeholder="First Name" th:value="${user.firstName}">
+                                <input type="text" name="firstName" placeholder="First Name" th:value="${account.firstName}">
                             </div>
                             <div class="field">
-                                <input type="text" name="name" placeholder="Last Name" th:value="${user.name}">
+                                <input type="text" name="name" placeholder="Last Name" th:value="${account.name}">
                             </div>
                         </div>
                         <div class="two fields">
 
                             <div class="field">
                                 <label>E-mail</label>
-                                <input type="email" name="email" placeholder="john@mygroup.io" th:value="${user.email}">
+                                <input type="email" name="email" placeholder="john@mygroup.io" th:value="${account.email}">
                             </div>
                         </div>
 
@@ -109,8 +109,8 @@
                             <tr th:each="element :  ${externalTools}" th:attr="data-key=${element}" >
                                 <td th:text="${element}">  <i class="github icon"> </i> Github</td>
                                 <td>
-                                    <input th:if="${user.externalIDs != null}" type="text" th:value="${user.externalIDs.containsKey(element)} ? ${user.externalIDs.get(element)} : '' "  th:name="'attr-'+${element}"  />
-                                    <input th:if="${user.externalIDs == null}" type="text" th:name="'attr-'+${element}" />
+                                    <input th:if="${account.externalIDs != null}" type="text" th:value="${account.externalIDs.containsKey(element)} ? ${account.externalIDs.get(element)} : '' "  th:name="'attr-'+${element}"  />
+                                    <input th:if="${account.externalIDs == null}" type="text" th:name="'attr-'+${element}" />
                                 </td>
                             </tr>
                             </tbody>

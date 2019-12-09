@@ -71,14 +71,14 @@ public class ProjectImportServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handlePost(Account actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         requestDispatcher.forward(req, resp);
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handleGet(Account actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
@@ -131,13 +131,13 @@ public class ProjectImportServlet extends TimeboardServlet {
                                         Date endDate = task.getStopDate();
                                         double originaEstimate = 0;
                                         Long taskTypeID = null;
-                                        User assignedUserID = this.userService.findUserByID(task.getLocalUserID());
+                                        Account assignedAccountID = this.userService.findUserByID(task.getLocalUserID());
                                         String origin = task.getOrigin();
                                         String remotePath = null;
                                         Long remoteId = task.getId();
                                         Milestone milestone = null;
                                         projectService.createTask(actor, project, taskName, taskComment,
-                                                startDate, endDate, originaEstimate, taskTypeID, assignedUserID, origin,
+                                                startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
                                                 remotePath, String.valueOf(remoteId), milestone);
                                     }
                                 );
@@ -170,19 +170,19 @@ public class ProjectImportServlet extends TimeboardServlet {
 
 
 
-    private boolean isUpdated(User actor,long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
+    private boolean isUpdated(Account actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
         return !this.isNewTask(actor, projectID, task);
     }
 
-    private boolean isNewTask(User actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
+    private boolean isNewTask(Account actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
         AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getId());
         return existingTask == null;
     }
 
     private void mergeAssignee(UserService userService, String externalID, ProjectImportService.RemoteTask task) {
-        final User remoteUser = userService.findUserByExternalID(externalID, task.getUserName());
-        if (remoteUser != null) {
-            task.setLocalUserID(remoteUser.getId());
+        final Account remoteAccount = userService.findUserByExternalID(externalID, task.getUserName());
+        if (remoteAccount != null) {
+            task.setLocalUserID(remoteAccount.getId());
         }
     }
 

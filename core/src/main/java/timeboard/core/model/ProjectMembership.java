@@ -36,7 +36,7 @@ public class ProjectMembership {
     private Long membershipID;
 
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private User member;
+    private Account member;
 
     @OneToOne()
     private Project project;
@@ -49,7 +49,7 @@ public class ProjectMembership {
     }
 
 
-    public ProjectMembership(Project project, User owner, ProjectRole role) {
+    public ProjectMembership(Project project, Account owner, ProjectRole role) {
         this.member = owner;
         this.role = role;
         this.project = project;
@@ -63,11 +63,11 @@ public class ProjectMembership {
         this.membershipID = membershipID;
     }
 
-    public User getMember() {
+    public Account getMember() {
         return member;
     }
 
-    public void setMember(User member) {
+    public void setMember(Account member) {
         this.member = member;
     }
 

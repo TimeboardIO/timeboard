@@ -152,10 +152,10 @@ public abstract class AbstractTask implements Serializable {
     }
 
     @Transient
-    public double findTaskImputationValueByDate(Date date, User user) {
+    public double findTaskImputationValueByDate(Date date, Account account) {
         Optional<Imputation> imputationOptional = this.getImputations().stream()
                 .filter(imputation -> areDateSameDay(date,imputation.getDay()))
-                .filter(imputation -> (imputation.getUser().getId() == user.getId()))
+                .filter(imputation -> (imputation.getAccount().getId() == account.getId()))
                 .findFirst();
         if (imputationOptional.isPresent()) {
             return imputationOptional.get().getValue();

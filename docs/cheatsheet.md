@@ -17,9 +17,9 @@
 
     [KRONOPS_HOME]/etc/org.ops4j.datasource-timeboard-core-ds.cfg
 
-## How to create new users ?
+## How to create new accounts ?
 
-    timeboard:add-user
+    timeboard:add-account
 
 ## How to display active http endpoints ?
 

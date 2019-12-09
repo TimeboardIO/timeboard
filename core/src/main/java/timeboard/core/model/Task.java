@@ -59,7 +59,7 @@ public class Task extends AbstractTask implements Serializable {
     private Milestone milestone;
 
     @OneToOne
-    private User assigned;
+    private Account assigned;
 
 
     public Task() {
@@ -84,11 +84,11 @@ public class Task extends AbstractTask implements Serializable {
         this.taskStatus = taskStatus;
     }
 
-    public User getAssigned() {
+    public Account getAssigned() {
         return assigned;
     }
 
-    public void setAssigned(User assigned) {
+    public void setAssigned(Account assigned) {
         this.assigned = assigned;
     }
 

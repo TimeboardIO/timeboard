@@ -38,12 +38,10 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import timeboard.core.api.UserService;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
-
-import javax.servlet.http.HttpServletRequest;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -95,7 +93,7 @@ public class WebConfig implements WebMvcConfigurer {
 
             }
 
-            protected User getActorFromRequestAttributes(WebRequest request) {
+            protected Account getActorFromRequestAttributes(WebRequest request) {
                 System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
                 OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
                 return userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));

@@ -51,7 +51,7 @@ public class Imputation implements Serializable {
     private AbstractTask task;
 
     @OneToOne
-    private User user;
+    private Account account;
 
     public long getId() {
         return id;
@@ -85,11 +85,11 @@ public class Imputation implements Serializable {
         this.task = task;
     }
 
-    public User getUser() {
-        return user;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

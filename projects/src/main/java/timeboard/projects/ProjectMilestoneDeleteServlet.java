@@ -29,7 +29,7 @@ package timeboard.projects;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -55,7 +55,7 @@ public class ProjectMilestoneDeleteServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
         long projectID = Long.parseLong(request.getParameter("projectID"));
 

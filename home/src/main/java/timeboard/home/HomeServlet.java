@@ -29,7 +29,7 @@ package timeboard.home;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.home.model.Week;
@@ -64,29 +64,29 @@ public class HomeServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("home.html");
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         //load previous weeks data
         Date d = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
         List<Week> weeks = new ArrayList<>();
-        User user = actor;
+        Account account = actor;
         int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                boolean weekIsValidated = timesheetService.isTimesheetValidated(user, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
+                boolean weekIsValidated = timesheetService.isTimesheetValidated(account, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
                 calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
                 Date firstDayOfWeek = calendar.getTime();
                 calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
                 Date lastDayOfWeek = calendar.getTime();
-                Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, user);
+                Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, account);
 
                 Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsValidated);
                 weeks.add(week);
@@ -94,8 +94,8 @@ public class HomeServlet extends TimeboardServlet {
             }
         }
 
-        viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(user).size());
-        viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(user).size());
+        viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(account).size());
+        viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(account).size());
         viewModel.getViewDatas().put("weeks", weeks);
 
         viewModel.setTemplate("home.html");

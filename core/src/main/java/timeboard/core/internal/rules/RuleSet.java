@@ -26,7 +26,7 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +39,7 @@ public class RuleSet<T> {
         this.rules.add(r);
     }
 
-    public Set<Rule> evaluate(User actor, T o) {
+    public Set<Rule> evaluate(Account actor, T o) {
         Set<Rule> noSatisfiedRules = new HashSet<>();
         for (Rule r : this.rules) {
             if (!r.isSatisfied(actor, o)) {
