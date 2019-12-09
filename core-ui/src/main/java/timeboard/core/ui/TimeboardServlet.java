@@ -158,7 +158,7 @@ public abstract class TimeboardServlet extends HttpServlet {
         response.setContentType(MediaType.TEXT_HTML_VALUE);
 
         response.setCharacterEncoding(resolver.getCharacterEncoding());
-        viewModel.getViewDatas().put("user", getActorFromRequestAttributes(request));
+        viewModel.getViewDatas().put("account", getActorFromRequestAttributes(request));
 
         TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
