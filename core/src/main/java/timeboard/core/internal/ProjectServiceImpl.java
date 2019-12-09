@@ -29,7 +29,6 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -451,7 +450,6 @@ public class ProjectServiceImpl implements ProjectService {
         return task;
     }
 
-    public List<AbstractTask> getTasksByName(Account account, String name) {
     private AbstractTask getTasksByName(String name) {
 
         final List<AbstractTask> tasks = new ArrayList<>();
@@ -480,7 +478,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    public List<AbstractTask> getTasksByName(User user, String name) {
+    public List<AbstractTask> getTasksByName(Account account, String name) {
 
         final List<AbstractTask> tasks = new ArrayList<>();
         try {
@@ -961,7 +959,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public TASData generateTasData(User user, Project project, int month, int year) {
+    public TASData generateTasData(Account user, Project project, int month, int year) {
 
         TASData data = new TASData();
 

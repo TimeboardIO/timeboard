@@ -38,9 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
+import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
-import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -58,7 +58,7 @@ public class TasExportServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+        protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         try {
 

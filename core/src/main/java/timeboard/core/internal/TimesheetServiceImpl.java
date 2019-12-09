@@ -38,7 +38,6 @@ import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Project;
-import timeboard.core.model.User;
 import timeboard.core.model.Account;
 import timeboard.core.model.ValidatedTimesheet;
 
@@ -162,7 +161,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, User user, Project project) {
+    public Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, Account user, Project project) {
         TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
         "SELECT DAY(day), COALESCE(sum(i.value),0) \n"
                 + "FROM imputation i JOIN task t ON i.task_id = t.id \n"
@@ -190,7 +189,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, User user, AbstractTask task) {
+    public Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, Account user, AbstractTask task) {
         TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
         "SELECT DAY(day), COALESCE(i.value,0) \n"
                 + "FROM imputation i\n"

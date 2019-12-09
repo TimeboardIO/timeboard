@@ -31,6 +31,7 @@ import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -111,10 +112,10 @@ public class AccountServlet extends TimeboardServlet {
         loadPage(viewModel, actor);
     }
     
-    private void loadPage(ViewModel viewModel, Account account) {
-        viewModel.getViewDatas().put("user", account);
+    private void loadPage(ViewModel viewModel, Account actor) {
+        viewModel.getViewDatas().put("account", actor);
 
-        List<Project> projects = projectService.listProjects(user);
+        List<Project> projects = projectService.listProjects(actor);
 
         List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list

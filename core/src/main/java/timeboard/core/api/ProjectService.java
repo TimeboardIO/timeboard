@@ -197,8 +197,8 @@ public interface ProjectService {
     /*
      == Rule ==
      */
-    boolean isProjectOwner(User user, Project project);
-    TASData generateTasData(User user, Project project, int month, int year);
+    boolean isProjectOwner(Account user, Project project);
+    TASData generateTasData(Account user, Project project, int month, int year);
 
 
 
