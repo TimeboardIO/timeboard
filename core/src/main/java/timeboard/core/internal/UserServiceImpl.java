@@ -188,4 +188,5 @@ public class UserServiceImpl implements UserService {
     private boolean checkPassword(String password, String hash) {
         return BCrypt.checkpw(password, hash);
     }
+
 }
