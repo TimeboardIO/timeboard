@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.DataTableService;
+import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
-import timeboard.core.model.User;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.util.Arrays;
@@ -52,7 +52,7 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public boolean checkColumnDisplayed(String tableId, User actor, String colName){
+    public boolean checkColumnDisplayed(String tableId, Account actor, String colName){
 
         boolean isDefault = Arrays.stream(defaultCols)
                 .map(s -> s.equals(colName))
@@ -62,7 +62,7 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public boolean checkColumnDisplayedFromDB(String tableId, User actor, String colName) {
+    public boolean checkColumnDisplayedFromDB(String tableId, Account actor, String colName) {
         DataTableConfig tableConfig = findTableConfigByUserAndTable(tableId, actor);
         if(tableConfig == null){
             return false;
@@ -71,7 +71,7 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public DataTableConfig findTableConfigByUserAndTable(String tableId, User actor) {
+    public DataTableConfig findTableConfigByUserAndTable(String tableId, Account actor) {
         TypedQuery<DataTableConfig> q = this.em
                 .createQuery("select d from DataTableConfig d where d.user=:user and d.tableInstanceId=:tableId", DataTableConfig.class);
         q.setParameter("user", actor);
@@ -84,7 +84,7 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public DataTableConfig addOrUpdateTableConfig(String tableId, User actor, List<String> columnsNamesList) {
+    public DataTableConfig addOrUpdateTableConfig(String tableId, Account actor, List<String> columnsNamesList) {
             DataTableConfig datatableConfig = this.findTableConfigByUserAndTable(tableId, actor);
             if (datatableConfig != null) {
                 datatableConfig.setUser(actor);

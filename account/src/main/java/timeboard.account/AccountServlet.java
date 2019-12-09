@@ -32,7 +32,6 @@ import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
-import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -85,7 +84,7 @@ public class AccountServlet extends TimeboardServlet {
                 actor.setEmail(email);
 
                try {
-                  User u = userService.updateUser(actor);
+                   Account u = userService.updateUser(actor);
                    viewModel.getViewDatas().put("message", "User account changed successfully !");
                } catch (Exception e) {
                    viewModel.getViewDatas().put("error", "Error while updating user information.");
@@ -103,7 +102,7 @@ public class AccountServlet extends TimeboardServlet {
                     }
                 }
                 try {
-                    User u = userService.updateUser(actor);
+                    Account u = userService.updateUser(actor);
                     viewModel.getViewDatas().put("message", "External tools updated successfully !");
                 } catch (Exception e) {
                     viewModel.getViewDatas().put("error", "Error while external tools");
@@ -144,7 +143,7 @@ public class AccountServlet extends TimeboardServlet {
 
         viewModel.getViewDatas().put("externalTools", fieldNames);
 
-        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(this.dataTableService.TABLE_TASK_ID, user);
+        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(this.dataTableService.TABLE_TASK_ID, account);
         List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
         viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
         viewModel.getViewDatas().put("allTaskColumns", this.dataTableService.ALL_COLUMNS_TABLE_TASK);

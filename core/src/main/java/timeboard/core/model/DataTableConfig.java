@@ -38,7 +38,7 @@ public class DataTableConfig implements Serializable {
     private Long id;
 
     @ManyToOne
-    private User user;
+    private Account user;
 
     @Column
     private String tableInstanceId;
@@ -50,11 +50,11 @@ public class DataTableConfig implements Serializable {
     public DataTableConfig() {
     }
 
-    public User getUser() {
+    public Account getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(Account user) {
         this.user = user;
     }
 

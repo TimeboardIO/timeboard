@@ -29,7 +29,7 @@ package timeboard.core.api;
 import java.util.Arrays;
 import java.util.List;
 import timeboard.core.model.DataTableConfig;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 /**
  * Service for datatable configs.
@@ -42,12 +42,12 @@ public interface DataTableService {
 
     public String[] defaultCols = {"taskName"};
 
-    boolean checkColumnDisplayed(String tableId, User actor, String colName);
+    boolean checkColumnDisplayed(String tableId, Account actor, String colName);
 
-    boolean checkColumnDisplayedFromDB(String tableId, User actor, String colName);
+    boolean checkColumnDisplayedFromDB(String tableId, Account actor, String colName);
     
-    DataTableConfig findTableConfigByUserAndTable(String tableId, User actor);
+    DataTableConfig findTableConfigByUserAndTable(String tableId, Account actor);
 
-    DataTableConfig addOrUpdateTableConfig(String tableId, User actor, List<String> columnsNamesList);
+    DataTableConfig addOrUpdateTableConfig(String tableId, Account actor, List<String> columnsNamesList);
 
 }
