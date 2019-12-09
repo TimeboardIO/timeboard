@@ -890,4 +890,9 @@ public class ProjectServiceImpl implements ProjectService {
         em.persist(taskType);
         return taskType;
     }
+
+    @Override
+    public boolean isProjectOwner(User user, Project project) {
+        return (new ActorIsProjectOwner()).isSatisfied(user, project);
+    }
 }

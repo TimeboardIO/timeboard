@@ -193,4 +193,10 @@ public interface ProjectService {
     List<TaskType> listTaskType();
 
     TaskType findTaskTypeByID(Long taskTypeID);
+
+
+    /*
+     == Rule ==
+     */
+    boolean isProjectOwner(User user, Project project);
 }
