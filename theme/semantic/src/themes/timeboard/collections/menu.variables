@@ -30,3 +30,7 @@
 
 @secondaryPointingHeaderColor: @darkTextColor;
 @secondaryVerticalPointingItemMargin: 0em -@secondaryPointingBorderWidth 0em 0em;
+
+@maxHeight: (@itemVerticalPadding * 2) + 1em;
+
+
