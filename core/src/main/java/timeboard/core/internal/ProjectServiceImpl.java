@@ -44,9 +44,11 @@ import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -61,15 +63,28 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private UserService userService;
 
-    @Reference(target = "(osgi.unit.name=timeboard-pu)", scope = ReferenceScope.BUNDLE)
-    private JpaTemplate jpa;
+    @Autowired
+    private TimesheetService timesheetService;
 
     @Autowired
     private EntityManager em;
 
+    private DefaultTask vacationTask;
 
-    public ProjectServiceImpl(JpaTemplate jpa) {
-     this.jpa = jpa;
+    @PostConstruct
+    public void init(){
+        //TODO change when avcation model totaly implemented
+        AbstractTask taskFromDB = this.getTasksByName(VACATION_TASK_NAME);
+        if (taskFromDB == null) {
+            DefaultTask t = new DefaultTask();
+            try {
+                vacationTask = this.createDefaultTask(t);
+            } catch (BusinessException e) {
+                LOGGER.error("Error in vacation task singleton instantiation.");
+            }
+        } else {
+            vacationTask = (DefaultTask) taskFromDB;
+        }
     }
 
     @Override
@@ -270,41 +285,6 @@ public class ProjectServiceImpl implements ProjectService {
         return project;
     }
 
-    @Override
-    public ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException {
-        RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMember());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
-
-
-        return jpa.txExpr(em -> {
-
-            TypedQuery<Object[]> q = em.createQuery("select "
-                    + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
-                    + "COALESCE(sum(t.effortLeft),0) as effortLeft "
-                    + "from Task t "
-                    + "where t.project = :project ", Object[].class);
-
-            q.setParameter("project", project);
-
-            Object[] originalEstimateAndEffortLeft = q.getSingleResult();
-
-            TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
-                    + "from Task t left outer join t.imputations i "
-                    + "where t.project = :project ", Double.class);
-
-            effortSpentQuery.setParameter("project", project);
-
-            final Double effortSpent = effortSpentQuery.getSingleResult();
-
-            return new ProjectDashboard(project.getQuotation(), (Double) originalEstimateAndEffortLeft[0], (Double) originalEstimateAndEffortLeft[1], effortSpent);
-
-        });
-    }
-
 
     @Override
     public void save(User actor, ProjectMembership projectMembership) throws BusinessException {
@@ -463,30 +443,29 @@ public class ProjectServiceImpl implements ProjectService {
 
     private AbstractTask getTasksByName(String name) {
 
-        final AbstractTask[] task = new AbstractTask[1];
+        final List<AbstractTask> tasks = new ArrayList<>();
         try {
-            this.jpa.tx(entityManager -> {
 
-                TypedQuery<Task> query = entityManager.createQuery("select distinct t from Task t left join fetch t.imputations  where t.name = :name", Task.class);
-                query.setParameter("name", name);
+            TypedQuery<Task> query = em.createQuery("select distinct t from Task t left join fetch t.imputations  where t.name = :name", Task.class);
+            query.setParameter("name", name);
 
-                task[0] = query.getSingleResult();
-            });
+            tasks.addAll(query.getResultList());
+
         } catch (Exception e) {
             // handle JPA Exceptions
         }
 
         try {
-            this.jpa.tx(entityManager -> {
-                TypedQuery<DefaultTask> query = entityManager.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
-                query.setParameter("name", name);
-                task[0] = query.getSingleResult();
-            });
+            TypedQuery<DefaultTask> query = em.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
+            query.setParameter("name", name);
+            tasks.addAll(query.getResultList());
         } catch (Exception e) {
             //handle JPA Exceptions
         }
 
-        return task[0];
+        if(tasks.isEmpty()) return null;
+
+        return tasks.get(0);
 
     }
 
@@ -691,20 +670,10 @@ public class ProjectServiceImpl implements ProjectService {
             rebalanced.get(task.getProject()).add(task);
         });
 
-            //rebalance task by project
-            final Map<Project, List<Task>> rebalanced = new HashMap<>();
-            tasks.forEach(task -> {
-                if (!rebalanced.containsKey(task.getProject())) {
-                    rebalanced.put(task.getProject(), new ArrayList<>());
-                }
-                rebalanced.get(task.getProject()).add(task);
-            });
-
             rebalanced.forEach((project, ts) -> {
                 projectTasks.add(new ProjectTasks(project, ts));
             });
 
-        });
 
         return projectTasks;
     }

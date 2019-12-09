@@ -27,51 +27,34 @@ package timeboard.account;
  */
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.osgi.service.component.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-@Component(
-        service = Servlet.class,
-        scope = ServiceScope.PROTOTYPE,
-        property = {
-                "osgi.http.whiteboard.servlet.pattern=/account/exportTAS",
-                "osgi.http.whiteboard.context.select=(osgi.http.whiteboard.context.name=timeboard)"
-        }
-)
+@WebServlet(name = "TasExportServlet", urlPatterns = "/account/exportTAS")
 //TIME ATTACHMENT SHEET
 public class TasExportServlet extends TimeboardServlet {
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
-    @Reference(
-            policyOption = ReferencePolicyOption.GREEDY,
-            cardinality = ReferenceCardinality.MULTIPLE,
-            collectionType = CollectionType.SERVICE
+    @Autowired(
+            required = false
     )
     private List<ProjectImportService> projectImportServlets;
 

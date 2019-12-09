@@ -52,6 +52,9 @@ public class AccountServlet extends TimeboardServlet {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ProjectService projectService;
+
     @Autowired(
             required = false
     )

@@ -44,10 +44,7 @@ import timeboard.core.model.ValidatedTimesheet;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
+import java.util.*;
 
 
 @Component
@@ -96,24 +93,24 @@ public class TimesheetServiceImpl implements TimesheetService {
         c.set(Calendar.YEAR, year);
 
 
-            Boolean result = true;
-            c.set(Calendar.WEEK_OF_YEAR, week);
-            c.set(Calendar.YEAR, year);
-            c.setFirstDayOfWeek(Calendar.MONDAY);
-            c.set(Calendar.DAY_OF_WEEK, 2);
+        Boolean result = true;
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.YEAR, year);
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.set(Calendar.DAY_OF_WEEK, 2);
 
-            for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 5; i++) {
 
-                TypedQuery<Double> q = em.createQuery("select sum(value) from Imputation i where i.user = :user and i.day = :day ", Double.class);
-                q.setParameter("user", userTimesheet);
-                q.setParameter("day", c.getTime());
-                final List<Double> resultList = q.getResultList();
-                result &= (resultList.get(0) == 1.0);
-                c.roll(Calendar.DAY_OF_WEEK,1);
-            }
-            boolean allDailyImputationTotalsAreOne =  result;
+            TypedQuery<Double> q = em.createQuery("select sum(value) from Imputation i where i.user = :user and i.day = :day ", Double.class);
+            q.setParameter("user", userTimesheet);
+            q.setParameter("day", c.getTime());
+            final List<Double> resultList = q.getResultList();
+            result &= (resultList.get(0) == 1.0);
+            c.roll(Calendar.DAY_OF_WEEK, 1);
+        }
+        boolean allDailyImputationTotalsAreOne = result;
 
-         if (!allDailyImputationTotalsAreOne) {
+        if (!allDailyImputationTotalsAreOne) {
             throw new TimesheetException("Can not validate this week, all daily imputations totals are not equals to 1");
         }
 
@@ -123,7 +120,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         validatedTimesheet.setYear(year);
         validatedTimesheet.setWeek(week);
 
-             em.persist(validatedTimesheet);
+        em.persist(validatedTimesheet);
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService));
 
@@ -133,81 +130,51 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public boolean isTimesheetValidated(User userTimesheet, int year, int week) {
-             TypedQuery<ValidatedTimesheet> q = em.createQuery("select vt from ValidatedTimesheet vt "
-                    + "where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
-            q.setParameter("week", week);
-            q.setParameter("year", year);
-            q.setParameter("user", userTimesheet);
+        TypedQuery<ValidatedTimesheet> q = em.createQuery("select vt from ValidatedTimesheet vt "
+                + "where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", userTimesheet);
 
-            try {
-                q.getSingleResult();
-                return true;
-            } catch (Exception e) {
-                return false;
-            }
-     }
+        try {
+            q.getSingleResult();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     @Override
     public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, User user) {
-            TypedQuery<Double> q = em.createQuery(
-                    "SELECT COALESCE(sum(i.value),0) \n"
-                            + "FROM Imputation i\n"
-                            + "WHERE i.user = :user \n"
-                            + "AND i.day > :firstDayOfWeek\n"
-                            + "AND i.day < :lastDayOfWeek", Double.class);
-            q.setParameter("firstDayOfWeek", firstDayOfWeek);
-            q.setParameter("lastDayOfWeek", lastDayOfWeek);
-            q.setParameter("user", user);
-            return q.getSingleResult();
+        TypedQuery<Double> q = em.createQuery(
+                "SELECT COALESCE(sum(i.value),0) \n"
+                        + "FROM Imputation i\n"
+                        + "WHERE i.user = :user \n"
+                        + "AND i.day > :firstDayOfWeek\n"
+                        + "AND i.day < :lastDayOfWeek", Double.class);
+        q.setParameter("firstDayOfWeek", firstDayOfWeek);
+        q.setParameter("lastDayOfWeek", lastDayOfWeek);
+        q.setParameter("user", user);
+        return q.getSingleResult();
     }
 
 
     @Override
     public Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, User user, Project project) {
-        List<Object[]> dayImputations = this.jpa.txExpr(entityManager -> {
-            TypedQuery<Object[]> q = entityManager.createQuery(
-                    "SELECT DAY(day), COALESCE(sum(i.value),0) \n"
-                            + "FROM Imputation i JOIN Task t\n"
-                            + "WHERE i.user = :user \n"
-                            + "AND i.day >= :startDate\n"
-                            + "AND i.day <= :endDate\n"
-                            + "AND t.project <= :project\n"
-                            + "GROUP BY i.day", Object[].class);
-            q.setParameter("project", project);
-            q.setParameter("startDate", startDate);
-            q.setParameter("endDate", endDate);
-            q.setParameter("user", user);
-            return q.getResultList();
-        });
+        TypedQuery<Object[]> q = em.createQuery(
+        "SELECT DAY(day), COALESCE(sum(i.value),0) \n"
+                + "FROM Imputation i JOIN Task t\n"
+                + "WHERE i.user = :user \n"
+                + "AND i.day >= :startDate\n"
+                + "AND i.day <= :endDate\n"
+                + "AND t.project <= :project\n"
+                + "GROUP BY i.day", Object[].class);
+        q.setParameter("project", project);
+        q.setParameter("startDate", startDate);
+        q.setParameter("endDate", endDate);
+        q.setParameter("user", user);
+        List<Object[]> dayImputations = q.getResultList();
 
-        Map<Integer, Double> result = new HashMap<>();
-        for (Object[] o : dayImputations){
-            int day = (int) o[0];
-            double value = (double) o[0];
-            result.put(day, value);
-        }
-
-    return result;
-
-    }
-
-    @Override
-    public Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, User user, AbstractTask task) {
-        List<Object[]> dayImputations =  this.jpa.txExpr(entityManager -> {
-            TypedQuery<Object[]> q = entityManager.createQuery(
-                    "SELECT DAY(day), COALESCE(i.value,0) \n"
-                            + "FROM Imputation i\n"
-                            + "WHERE i.user = :user \n"
-                            + "AND i.day >= :startDate\n"
-                            + "AND i.day <= :endDate\n"
-                            + "AND i.task <= :task\n"
-                            + "GROUP BY i.day", Object[].class);
-            q.setParameter("task", task);
-            q.setParameter("startDate", startDate);
-            q.setParameter("endDate", endDate);
-            q.setParameter("user", user);
-            return q.getResultList();
-        });
 
         Map<Integer, Double> result = new HashMap<>();
         for (Object[] o : dayImputations) {
@@ -220,8 +187,33 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     }
 
+    @Override
+    public Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, User user, AbstractTask task) {
+        TypedQuery<Object[]> q = em.createQuery(
+        "SELECT DAY(day), COALESCE(i.value,0) \n"
+                + "FROM Imputation i\n"
+                + "WHERE i.user = :user \n"
+                + "AND i.day >= :startDate\n"
+                + "AND i.day <= :endDate\n"
+                + "AND i.task <= :task\n"
+                + "GROUP BY i.day", Object[].class);
+        q.setParameter("task", task);
+        q.setParameter("startDate", startDate);
+        q.setParameter("endDate", endDate);
+        q.setParameter("user", user);
+        List<Object[]> dayImputations =  q.getResultList();
 
 
+        Map<Integer, Double> result = new HashMap<>();
+        for (Object[] o : dayImputations) {
+            int day = (int) o[0];
+            double value = (double) o[0];
+            result.put(day, value);
+        }
+
+        return result;
+
+    }
 
 
 }
