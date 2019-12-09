@@ -36,9 +36,9 @@ import timeboard.core.internal.events.TaskEvent;
 import timeboard.core.internal.events.TimeboardEvent;
 import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.events.TimesheetEvent;
+import timeboard.core.model.Account;
 import timeboard.core.model.EmailSummaryModel;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
 import timeboard.core.model.ValidatedTimesheet;
 
 import javax.annotation.PostConstruct;
@@ -100,7 +100,7 @@ public class SendSummaryEmail {
 
         String message = templateGenerator.getTemplateString("core-ui:mail/summary.html", data);
                 ArrayList<String> list = new ArrayList<>();
-                list.add(userNotificationStructure.getTargetUser().getEmail());
+                list.add(userNotificationStructure.getTargetAccount().getEmail());
         String subject = "[Timeboard] Daily summary";
         return new EmailStructure(list, null, subject, message);
     }
@@ -115,11 +115,11 @@ public class SendSummaryEmail {
         HashMap<Long, UserNotificationStructure> dataList = new HashMap<>();
 
         for (TimeboardEvent event : events) {
-            for (User user : event.getUsersToNotify()) {
-                dataList.computeIfAbsent(user.getId(), t -> new UserNotificationStructure(user)).notify(event);
+            for (Account account : event.getUsersToNotify()) {
+                dataList.computeIfAbsent(account.getId(), t -> new UserNotificationStructure(account)).notify(event);
             }
-            for (User user : event.getUsersToInform()) {
-                dataList.computeIfAbsent(user.getId(), t -> new UserNotificationStructure(user)).inform(event);
+            for (Account account : event.getUsersToInform()) {
+                dataList.computeIfAbsent(account.getId(), t -> new UserNotificationStructure(account)).inform(event);
             }
         }
         return new ArrayList<>(dataList.values());

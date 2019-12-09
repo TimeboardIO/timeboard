@@ -38,7 +38,7 @@
         <class>timeboard.core.model.Project</class>
         <class>timeboard.core.model.Milestone</class>
         <class>timeboard.core.model.MilestoneType</class>
-        <class>timeboard.core.model.User</class>
+        <class>timeboard.core.model.Account</class>
         <class>timeboard.core.model.Imputation</class>
         <class>timeboard.core.model.ProjectMembership</class>
         <class>timeboard.core.model.ProjectRole</class>
@@ -47,7 +47,7 @@
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>
             <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:mem:timeboard;sql.syntax_mys=true"/>
-            <property name="javax.persistence.jdbc.user" value="sa"/>
+            <property name="javax.persistence.jdbc.account" value="sa"/>
             <property name="javax.persistence.jdbc.password" value=""/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
             <property name="hibernate.hbm2ddl.auto" value="create-drop"/>

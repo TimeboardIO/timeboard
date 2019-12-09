@@ -28,7 +28,7 @@ package timeboard.core.api;
 
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import java.util.Date;
 import java.util.List;
@@ -40,7 +40,7 @@ public interface ProjectImportService {
     List<String> getRequiredUserFields();
 
 
-    List<RemoteTask> getRemoteTasks(User currentUser, long projectID) throws BusinessException;
+    List<RemoteTask> getRemoteTasks(Account currentAccount, long projectID) throws BusinessException;
 
     public static class RemoteTask {
 

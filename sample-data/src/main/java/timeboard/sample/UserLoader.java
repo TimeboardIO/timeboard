@@ -28,7 +28,7 @@ package timeboard.sample;
 
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,13 +43,13 @@ public class UserLoader {
         this.userService = userService;
     }
 
-    public List<User> load(int nbUsers) throws BusinessException {
-        List<User> userSaved = new ArrayList<>();
+    public List<Account> load(int nbUsers) throws BusinessException {
+        List<Account> accountSaved = new ArrayList<>();
 
-        List<User> usersToSave = new ArrayList<>();
+        List<Account> usersToSave = new ArrayList<>();
         // On créé "nbUsers" utilisateurs
         for (int i = 0; i < nbUsers; i++) {
-            User u = new User();
+            Account u = new Account();
             u.setName("timeboard" + i);
             u.setEmail("user" + i + "@timeboard.com");
             u.setImputationFutur(true);
@@ -60,11 +60,11 @@ public class UserLoader {
             System.out.println("Stage user : "+u.getName());
         }
 
-            userSaved = this.userService.createUsers(usersToSave);
+            accountSaved = this.userService.createUsers(usersToSave);
             System.out.println("Save "+usersToSave.size()+" users");
 
 
-        return userSaved;
+        return accountSaved;
 
     }
 

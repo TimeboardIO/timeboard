@@ -38,13 +38,11 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.model.AbstractTask;
+import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
-import timeboard.core.model.User;
-import timeboard.core.ui.TimeboardServlet;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -75,7 +73,7 @@ public class TimesheetRESTApi {
 
     @GetMapping(value = "/timesheet")
     public ResponseEntity getTimesheetData(HttpServletRequest request, @RequestParam("week") int week, @RequestParam("year") int year ) throws JsonProcessingException {
-        User currentUser = (User) request.getAttribute("actor");
+        Account currentAccount = (Account) request.getAttribute("actor");
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
@@ -109,7 +107,7 @@ public class TimesheetRESTApi {
 
         //Get tasks for current week
         if (this.projectService != null) {
-            this.projectService.listTasksByProject(currentUser, ds, de).stream().forEach(projectTasks -> {
+            this.projectService.listTasksByProject(currentAccount, ds, de).stream().forEach(projectTasks -> {
                 List<TaskWrapper> tasks = new ArrayList<>();
 
                 projectTasks.getTasks().stream().forEach(task -> {
@@ -128,7 +126,7 @@ public class TimesheetRESTApi {
                     );
 
                     days.forEach(dateWrapper -> {
-                        double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
+                        double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
                         imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                     });
                 });
@@ -152,7 +150,7 @@ public class TimesheetRESTApi {
                 );
 
                 days.forEach(dateWrapper -> {
-                    double i = task.findTaskImputationValueByDate(dateWrapper.date, currentUser);
+                    double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
                     imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                 });
 
@@ -164,7 +162,7 @@ public class TimesheetRESTApi {
         }
 
         if (this.timesheetService != null) {
-            validated = this.timesheetService.isTimesheetValidated(currentUser, year, week);
+            validated = this.timesheetService.isTimesheetValidated(currentAccount, year, week);
         }
 
 
@@ -177,7 +175,7 @@ public class TimesheetRESTApi {
     public ResponseEntity updateDataFromTimesheet(HttpServletRequest req, @RequestBody UpdateRequest request) throws JsonProcessingException {
 
         try {
-            final User actor = (User) req.getAttribute("actor");
+            final Account actor = (Account) req.getAttribute("actor");
 
            // String type = request.getParameter("type");
 
@@ -209,7 +207,7 @@ public class TimesheetRESTApi {
     @GetMapping("/validate")
     public ResponseEntity doPost(HttpServletRequest request) {
 
-        final User actor = (User) request.getAttribute("actor");
+        final Account actor = (Account) request.getAttribute("actor");
 
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));

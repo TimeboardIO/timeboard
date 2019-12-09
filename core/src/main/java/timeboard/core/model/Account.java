@@ -37,7 +37,7 @@ import java.util.Map;
 
 @Entity
 @Table
-public class User implements Serializable {
+public class Account implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -75,13 +75,14 @@ public class User implements Serializable {
     @Lob
     private Map<String, String> externalIDs;
 
-    public User() {
+
+    public Account() {
         this.externalIDs = new HashMap<>();
     }
 
 
-    public User(final String name, final String firstName,
-                final String email, final Date accountCreationTime, final Date beginWorkDate) {
+    public Account(final String name, final String firstName,
+                   final String email, final Date accountCreationTime, final Date beginWorkDate) {
 
         this.name = name;
         this.firstName = firstName;

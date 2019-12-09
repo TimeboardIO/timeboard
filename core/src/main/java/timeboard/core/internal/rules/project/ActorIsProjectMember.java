@@ -27,9 +27,9 @@ package timeboard.core.internal.rules.project;
  */
 
 import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectMembership;
-import timeboard.core.model.User;
 
 import java.util.Optional;
 
@@ -42,7 +42,7 @@ public class ActorIsProjectMember implements Rule<Project> {
     }
 
     @Override
-    public boolean isSatisfied(User u, Project thing) {
+    public boolean isSatisfied(Account u, Project thing) {
         Optional<ProjectMembership> userOptional = thing.getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()

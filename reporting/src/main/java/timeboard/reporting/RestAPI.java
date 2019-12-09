@@ -30,7 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -42,8 +42,8 @@ public class RestAPI {
 
     @GetMapping
     public String export(HttpServletRequest req) {
-        User user = (User) req.getAttribute("actor");
-        return "{'name': 'Hello '" + user.getScreenName() + "''}";
+        Account account = (Account) req.getAttribute("actor");
+        return "{'name': 'Hello '" + account.getScreenName() + "''}";
     }
 
 

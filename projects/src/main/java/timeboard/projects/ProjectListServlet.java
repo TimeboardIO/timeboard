@@ -28,7 +28,7 @@ package timeboard.projects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectService;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -52,7 +52,7 @@ public class ProjectListServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("projects.html");
         viewModel.getViewDatas().put("projects", this.projectService.listProjects(actor));
     }

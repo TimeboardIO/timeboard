@@ -42,59 +42,59 @@ public interface ProjectService {
     === Projects ===
     */
 
-    Project createProject(User owner, String projectName) throws BusinessException;
+    Project createProject(Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(User owner);
+    List<Project> listProjects(Account owner);
 
-    Project getProjectByID(User actor, Long projectID) throws BusinessException;
+    Project getProjectByID(Account actor, Long projectID) throws BusinessException;
 
-    Project getProjectByIdWithAllMembers(User actor, Long projectId) throws BusinessException;
+    Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
 
-    Project getProjectByName(User user, String projectArg) throws BusinessException;
+    Project getProjectByName(Account account, String projectArg) throws BusinessException;
 
-    Project deleteProjectByID(User actor, Project project) throws BusinessException;
+    Project deleteProjectByID(Account actor, Project project) throws BusinessException;
 
-    Project updateProject(User actor, Project project) throws BusinessException;
+    Project updateProject(Account actor, Project project) throws BusinessException;
 
     /**
      * Update a project.
      * @param project
      * @param memberships Key : userID, Value : user role for project param
      */
-    Project updateProject(User actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException;
+    Project updateProject(Account actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException;
 
-    ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException;
+    ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException;
 
-    void save(User actor, ProjectMembership projectMembership) throws BusinessException;
+    void save(Account actor, ProjectMembership projectMembership) throws BusinessException;
 
     /*
      == Tasks ==
      */
 
-    List<Task> listUserTasks(User user);
+    List<Task> listUserTasks(Account account);
 
-    List<Task> listProjectTasks(User user, Project project) throws BusinessException;
+    List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
 
-    AbstractTask getTaskByID(User user, long id) throws BusinessException;
+    AbstractTask getTaskByID(Account account, long id) throws BusinessException;
 
-    List<AbstractTask> getTasksByName(User actor, String name);
+    List<AbstractTask> getTasksByName(Account actor, String name);
 
-    List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de);
+    List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de);
 
-    Task createTask(User actor, Project project, String taskName, String taskComment,
-                    Date startDate, Date endDate, double originalEstimate, Long taskTypeID, User assignedUserID, String origin, String remotePath, String remoteId, Milestone milestone);
+    Task createTask(Account actor, Project project, String taskName, String taskComment,
+                    Date startDate, Date endDate, double originalEstimate, Long taskTypeID, Account assignedAccountID, String origin, String remotePath, String remoteId, Milestone milestone);
 
-    void createTasks(User actor, List<Task> taskList);
+    void createTasks(Account actor, List<Task> taskList);
 
-    Task updateTask(User actor, Task task);
+    Task updateTask(Account actor, Task task);
 
-    void updateTasks(User actor, List<Task> taskList);
+    void updateTasks(Account actor, List<Task> taskList);
 
-    UpdatedTaskResult updateTaskEffortLeft(User actor, Task task, double effortLeft) throws BusinessException;
+    UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
-    void deleteTaskByID(User actor, long taskID) throws BusinessException;
+    void deleteTaskByID(Account actor, long taskID) throws BusinessException;
 
-    void deleteTasks(User actor, List<Task> taskList);
+    void deleteTasks(Account actor, List<Task> taskList);
 
     /**
      * Search existing task from specific origin.
@@ -103,9 +103,9 @@ public interface ProjectService {
      * @param remotePath string key of source characteristics (owner, repository, ...)
      * @return list of task corresponding to the origin
      */
-    Map<String, Task> searchExistingTasksFromOrigin(User actor, Project project, String origin, String remotePath) throws BusinessException;
+    Map<String, Task> searchExistingTasksFromOrigin(Account actor, Project project, String origin, String remotePath) throws BusinessException;
 
-    List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID);
+    List<TaskRevision> findAllTaskRevisionByTaskID(Account actor, Long taskID);
 
 
 
@@ -116,13 +116,13 @@ public interface ProjectService {
      * Return effort spent for a task.
      * @return List all effort spent for a task.
      */
-    List<EffortHistory> getEffortSpentByTaskAndPeriod(User actor, Task task, Date startTaskDate, Date endTaskDate) throws BusinessException;
+    List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor, Task task, Date startTaskDate, Date endTaskDate) throws BusinessException;
 
-    List<EffortHistory> getTaskEffortLeftHistory(User actor, Task task) throws BusinessException;
+    List<EffortHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
 
-    UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double imputation) throws BusinessException;
+    UpdatedTaskResult updateTaskImputation(Account actor, AbstractTask task, Date day, double imputation) throws BusinessException;
 
-    List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList);
+    List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList);
 
 
 
@@ -153,36 +153,36 @@ public interface ProjectService {
      * @param project project
      * @return List milestones
      */
-    List<Milestone> listProjectMilestones(User actor, Project project) throws BusinessException;
+    List<Milestone> listProjectMilestones(Account actor, Project project) throws BusinessException;
 
     /**
      * Search milestone by id.
      * @param id milestone's id
      * @return Milestone
      */
-    Milestone getMilestoneById(User actor, long id) throws BusinessException;
+    Milestone getMilestoneById(Account actor, long id) throws BusinessException;
 
     /**
      * Create a milestone.
      * @return Milestone
      */
-    Milestone createMilestone(User actor, String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) throws BusinessException;
+    Milestone createMilestone(Account actor, String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) throws BusinessException;
 
     /**
      * Update a milestone.
      * @return Milestone
      */
-    Milestone updateMilestone(User actor, Milestone milestone) throws BusinessException;
+    Milestone updateMilestone(Account actor, Milestone milestone) throws BusinessException;
 
     /**
      * Delete a milestone.
      * @param milestoneID
      */
-    void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException;
+    void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException;
 
-    List<Task> listTasksByMilestone(User actor, Milestone milestone) throws BusinessException;
+    List<Task> listTasksByMilestone(Account actor, Milestone milestone) throws BusinessException;
 
-    Milestone addTasksToMilestone(User actor, Milestone currentMilestone, List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
+    Milestone addTasksToMilestone(Account actor, Milestone currentMilestone, List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
     TaskType createTaskType(String name);
 
@@ -193,4 +193,10 @@ public interface ProjectService {
     List<TaskType> listTaskType();
 
     TaskType findTaskTypeByID(Long taskTypeID);
+
+
+    /*
+     == Rule ==
+     */
+    boolean isProjectOwner(Account account, Project project);
 }

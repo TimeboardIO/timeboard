@@ -73,7 +73,7 @@ public class TasksRestAPI {
 
     @GetMapping
     public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
-        User actor = this.userInfo.getCurrentUser();
+        Account actor = this.userInfo.getCurrentAccount();
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -93,9 +93,9 @@ public class TasksRestAPI {
             final List<TaskWrapper> result = new ArrayList<>();
 
             for (Task task : tasks) {
-                User assignee = task.getAssigned();
+                Account assignee = task.getAssigned();
                 if (assignee == null) {
-                    assignee = new User();
+                    assignee = new Account();
                     assignee.setId(0);
                     assignee.setName("");
                     assignee.setFirstName("");
@@ -128,7 +128,7 @@ public class TasksRestAPI {
     @GetMapping("/chart")
     public ResponseEntity getDatasForCharts(HttpServletRequest request) throws BusinessException, JsonProcessingException {
         TaskGraphWrapper wrapper = new TaskGraphWrapper();
-        User actor = this.userInfo.getCurrentUser();
+        Account actor = this.userInfo.getCurrentAccount();
 
 
         final String taskIdStr = request.getParameter("task");
@@ -219,18 +219,18 @@ public class TasksRestAPI {
 
     @GetMapping("/approve")
     public ResponseEntity approveTask(HttpServletRequest request) {
-        User actor = this.userInfo.getCurrentUser();
+        Account actor = this.userInfo.getCurrentAccount();
         return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGRESS);
     }
 
     @GetMapping("/deny")
     public ResponseEntity denyTask(HttpServletRequest request){
-        User actor = this.userInfo.getCurrentUser();
+        Account actor = this.userInfo.getCurrentAccount();
 
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
-    private ResponseEntity changeTaskStatus(User actor, HttpServletRequest request,  TaskStatus status){
+    private ResponseEntity changeTaskStatus(Account actor, HttpServletRequest request, TaskStatus status){
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
         if(taskIdStr != null) {
@@ -258,7 +258,7 @@ public class TasksRestAPI {
 
     @GetMapping("/delete")
     public ResponseEntity deleteTask(HttpServletRequest request){
-        User actor = this.userInfo.getCurrentUser();
+        Account actor = this.userInfo.getCurrentAccount();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -284,7 +284,7 @@ public class TasksRestAPI {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createTask(HttpServletRequest request, @RequestBody TaskWrapper taskWrapper) throws JsonProcessingException {
-        User actor = this.userInfo.getCurrentUser();
+        Account actor = this.userInfo.getCurrentAccount();
         Date startDate = null;
         Date endDate = null;
         try {
@@ -333,7 +333,7 @@ public class TasksRestAPI {
             try {
                 task = (Task) projectService.getTaskByID(actor, taskID);
 
-                User assignee = userService.findUserByID(taskWrapper.assigneeID);
+                Account assignee = userService.findUserByID(taskWrapper.assigneeID);
                 final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
 
                 task.setName(taskWrapper.getTaskName());

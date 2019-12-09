@@ -29,7 +29,7 @@ package timeboard.projects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.UserService;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -63,14 +63,14 @@ public class SearchUsersService extends HttpServlet {
             projectID = Long.parseLong(req.getParameter("projectID"));
         }
 
-        List<User> users = new ArrayList<>();
+        List<Account> accounts = new ArrayList<>();
 
         if (projectID != null) {
-            users.addAll(this.userService.searchUserByEmail(query, projectID));
+            accounts.addAll(this.userService.searchUserByEmail(query, projectID));
         } else {
-            users.addAll(this.userService.searchUserByEmail(query));
+            accounts.addAll(this.userService.searchUserByEmail(query));
         }
-        SearchResult searchResult = new SearchResult(users.size(), users);
+        SearchResult searchResult = new SearchResult(accounts.size(), accounts);
 
         MAPPER.writeValue(resp.getWriter(), searchResult);
     }

@@ -62,7 +62,7 @@
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'status')}"
                         @click="sortBy('status')"
                         :class="{ active: sortKey == 'status' }" > Status <i class="icon caret" :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i> </th>
-                    <th style="text-align:center;">Actions</th>
+                    <th style="text-align:center;" th:if="${isProjectOwner}">Actions</th>
 
                 </tr></thead>
                 <tbody>
@@ -96,7 +96,7 @@
                         <div class="ui fluid category search">
                             <div class="ui fluid icon input">
 
-                                <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search user..." type="text"/>
+                                <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search account..." type="text"/>
 
                                 <input class="taskAssigned" name="taskAssigned"
                                        type="hidden"/>
@@ -146,7 +146,7 @@
                         <div class="ui small primary horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', user, 'status')}">{{entry['statusName']}}</div>
                     </td>
 
-                    <td style="text-align:center;" >
+                    <td style="text-align:center;" th:if="${isProjectOwner}">
                         <button @click="deleteTask($event, entry)" class="ui tiny negative icon button">
                             <i class="close icon"></i>
                         </button>
@@ -189,7 +189,7 @@
                     @click="sortBy('assignee')"
                     :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
 
-                <th style="text-align:center;" >Actions</th>
+                <th style="text-align:center;" th:if="${isProjectOwner}" >Actions</th>
             </tr></thead>
             <tbody>
 
@@ -199,7 +199,7 @@
                 <td  style="text-align: center;" >{{entry['endDate']}}</td>
                 <td  style="text-align: center;" >{{entry['originalEstimate']}}</td>
                 <td  style="text-align: center;" >{{entry['assignee']}}</td>
-                <td style="text-align:center;">
+                <td style="text-align:center;" th:if="${isProjectOwner}">
                     <button  @click="approveTask($event, entry)" class="ui positive icon button">
                         Approve
                         <i class="check icon"></i>
@@ -245,7 +245,7 @@
                             <label>User assigned</label>
                             <div class="ui category search">
                                 <div class="ui icon input">
-                                    <input class="prompt assigned" placeholder="Search user..."
+                                    <input class="prompt assigned" placeholder="Search account..."
                                            v-model="task.assignee" type="text"/>
                                     <input class="taskAssigned" name="taskAssigned"
                                            v-model="task.assigneeID" type="hidden"/>
@@ -319,7 +319,7 @@
     </script>
 
     <div id="tasksList">
-        <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task icon button">
+        <button th:if="${isProjectOwner}" v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task icon button">
             New Task <i class="plus icon"></i>
         </button>
 

@@ -253,7 +253,7 @@
                         </table>
                         <table th:if="${validatedTimesheets.size() > 0}" class="col380" align="left" border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 800px;">
                             <tr> <td style="font-size:30px" class=" title bodycopy "><b>Timesheet Validations</b></td></tr>
-                            <tr> <td style="text-align:center;" class=" bodycopy borderbottom">Those users validated there timesheets</td></tr>
+                            <tr> <td style="text-align:center;" class=" bodycopy borderbottom">Those accounts validated there timesheets</td></tr>
                             <tr  th:each="ts : ${validatedTimesheets}">
                                 <td class="borderbottom">
                                     <table width="100%" border="0" cellspacing="2" cellpadding="4">
@@ -265,10 +265,10 @@
                                                         <td><b>User</b></td>
                                                     </tr>
                                                     <tr>
-                                                        <td th:text="${ts.user.firstName}">John </td>
+                                                        <td th:text="${ts.account.firstName}">John </td>
                                                     </tr>
                                                     <tr>
-                                                        <td th:text="${ts.user.name}">Doe</td>
+                                                        <td th:text="${ts.account.name}">Doe</td>
                                                     </tr>
                                                 </table>
 

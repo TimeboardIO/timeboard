@@ -28,7 +28,7 @@ package timeboard.core.internal.rules.milestone;
 
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Milestone;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 public class MilestoneHasNoTask implements Rule<Milestone> {
 
@@ -38,7 +38,7 @@ public class MilestoneHasNoTask implements Rule<Milestone> {
     }
 
     @Override
-    public boolean isSatisfied(User u, Milestone thing) {
+    public boolean isSatisfied(Account u, Milestone thing) {
         return thing.getTasks().isEmpty();
     }
 }

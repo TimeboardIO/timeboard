@@ -39,7 +39,7 @@
     Border Radius
 --------------------*/
 
-/* See Power-user section below
+/* See Power-account section below
    for explanation of @px variables
 */
 @relativeBorderRadius: @relative4px;

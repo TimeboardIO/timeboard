@@ -33,8 +33,8 @@ import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.model.AbstractTask;
+import timeboard.core.model.Account;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -93,7 +93,7 @@ public class TimesheetServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
@@ -130,7 +130,7 @@ public class TimesheetServlet extends TimeboardServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         try {
-            final User actor = getActorFromRequestAttributes(request);
+            final Account actor = getActorFromRequestAttributes(request);
             String type = request.getParameter("type");
             Long taskID = Long.parseLong(request.getParameter("task"));
             AbstractTask task = this.projectService.getTaskByID(actor, taskID);

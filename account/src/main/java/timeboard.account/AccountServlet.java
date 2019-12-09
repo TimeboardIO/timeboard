@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
+import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.User;
 import timeboard.core.ui.TimeboardServlet;
@@ -67,7 +68,7 @@ public class AccountServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         String submitButton = request.getParameter("formType");
 
@@ -126,12 +127,12 @@ public class AccountServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         loadPage(viewModel, actor);
     }
-
-    private void loadPage(ViewModel viewModel, User user) {
-        viewModel.getViewDatas().put("user", user);
+    
+    private void loadPage(ViewModel viewModel, Account account) {
+        viewModel.getViewDatas().put("user", account);
 
         List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list

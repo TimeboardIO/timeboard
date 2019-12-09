@@ -30,7 +30,6 @@ import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.thymeleaf.TemplateEngine;
@@ -39,7 +38,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.UserService;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -131,15 +130,15 @@ public abstract class TimeboardServlet extends HttpServlet {
         doService(request, response, viewModel);
     }
 
-    protected User getActorFromRequestAttributes(HttpServletRequest request) {
+    protected Account getActorFromRequestAttributes(HttpServletRequest request) {
         OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         return this.userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
     }
 
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
     }
 
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, final ViewModel viewModel) throws Exception {
     }
 
 
