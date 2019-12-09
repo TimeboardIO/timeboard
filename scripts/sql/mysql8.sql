@@ -6,10 +6,18 @@
         email varchar(255) not null,
         externalIDs TEXT,
         firstName varchar(255),
-        imputationFutur bit not null,
         name varchar(255),
+        organisation bit,
         remoteSubject varchar(255),
-        validateOwnImputation bit not null,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table AccountHierarchy (
+       id bigint not null,
+        endDate datetime(6),
+        startDate datetime(6) not null,
+        child_id bigint,
+        parent_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -18,6 +26,16 @@
         name varchar(50),
         remoteId varchar(100),
         targetType varchar(25),
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table CostByCategory (
+       id bigint not null,
+        costPerDay double precision not null,
+        costPerHour double precision not null,
+        endDate date,
+        startDate date not null,
+        account_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -36,6 +54,10 @@
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
+
+    insert into hibernate_sequence values ( 1 );
+
+    insert into hibernate_sequence values ( 1 );
 
     insert into hibernate_sequence values ( 1 );
 
@@ -143,8 +165,26 @@
     alter table Account 
        add constraint UK_l1aov0mnvpvcmg0ctq466ejwm unique (remoteSubject);
 
+    alter table AccountHierarchy 
+       add constraint UK75obucy8vq03aqtehoj542edh unique (parent_id, child_id);
+
     alter table Imputation 
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
+
+    alter table AccountHierarchy 
+       add constraint FKpuy6qn63d17dvpcvnfn3786fd 
+       foreign key (child_id) 
+       references Account (id);
+
+    alter table AccountHierarchy 
+       add constraint FKl0m9ft4q7f7poxa8vgc1gxpdp 
+       foreign key (parent_id) 
+       references Account (id);
+
+    alter table CostByCategory 
+       add constraint FKpeelsy07hkv1baei6fv1oo7s2 
+       foreign key (account_id) 
+       references Account (id);
 
     alter table Imputation 
        add constraint FKicayo4omi1a8krucb5t7kipva 
