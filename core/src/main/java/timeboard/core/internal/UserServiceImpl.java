@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     public List<Account> searchUserByEmail(final String prefix) {
              TypedQuery<Account> q = em
                     .createQuery(
-                            "select u from User u "
+                            "select u from Account u "
                                     + "where u.email LIKE CONCAT('%',:prefix,'%')",
                             Account.class);
             q.setParameter("prefix", prefix);
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
         if (email == null) {
             return null;
         }
-             TypedQuery<Account> q = em.createQuery("from User u where u.email=:email", Account.class);
+             TypedQuery<Account> q = em.createQuery("from Account u where u.email=:email", Account.class);
             q.setParameter("email", email);
             Account account;
             try {
@@ -141,7 +141,7 @@ public class UserServiceImpl implements UserService {
         Account u;
         try {
                  Query q = em
-                        .createQuery("select u from User u where u.remoteSubject = :sub", Account.class);
+                        .createQuery("select u from Account u where u.remoteSubject = :sub", Account.class);
                 q.setParameter("sub", remoteSubject);
                 return (Account) q.getSingleResult();
          } catch (NoResultException | NonUniqueResultException e) {
@@ -156,7 +156,7 @@ public class UserServiceImpl implements UserService {
         Account u;
         try {
                  Query q = em // MYSQL native for JSON queries
-                        .createNativeQuery("select * from User "
+                        .createNativeQuery("select * from Account "
                                 + "where JSON_EXTRACT(externalIDs, '$." + origin + "')"
                                 + " = ?", Account.class);
                 q.setParameter(1, userExternalID);
