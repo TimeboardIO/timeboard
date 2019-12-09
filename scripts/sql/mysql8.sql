@@ -38,7 +38,7 @@
         account_id bigint,
         primary key (id)
     ) engine=InnoDB;
-
+ 
     create table DataTableConfig (
        id bigint not null,
         tableInstanceId varchar(255),
@@ -50,7 +50,7 @@
        DataTableConfig_id bigint not null,
         columns varchar(255)
     ) engine=InnoDB;
-
+ 
     create table DefaultTask (
        id bigint not null,
         comments varchar(500),
@@ -66,8 +66,6 @@
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
-
-    insert into hibernate_sequence values ( 1 );
 
     insert into hibernate_sequence values ( 1 );
 
@@ -190,10 +188,6 @@
        foreign key (child_id) 
        references Account (id);
 
-    alter table AccountHierarchy 
-       add constraint FKl0m9ft4q7f7poxa8vgc1gxpdp 
-       foreign key (parent_id) 
-       references Account (id);
 
     alter table CostByCategory 
        add constraint FKpeelsy07hkv1baei6fv1oo7s2 
@@ -210,6 +204,7 @@
        foreign key (DataTableConfig_id) 
        references DataTableConfig (id);
 
+ 
     alter table Imputation 
        add constraint FKicayo4omi1a8krucb5t7kipva 
        foreign key (account_id) 

@@ -1,0 +1,33 @@
+.menu .toc{
+    display: none!important;
+}
+
+.side > .item.header, .side > .right{
+    display: none!important;
+}
+
+.side{
+    padding-top: 1em;
+}
+
+@media screen and (max-width: 1000px) {
+
+    .main > .item > .title{
+        display: none!important;
+    }
+    .main > .item.header > *{
+        font-size: 1em!important;
+    }
+
+}
+
+@media screen and (max-width: 640px) {
+
+    .main > .item.header, .main > .item.nav{
+        display: none!important;
+    }
+
+    .menu .toc{
+        display: block!important;
+    }
+}
