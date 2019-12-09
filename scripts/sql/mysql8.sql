@@ -1,9 +1,41 @@
 
+    create table Account (
+       id bigint not null,
+        accountCreationTime date not null,
+        beginWorkDate date not null,
+        email varchar(255) not null,
+        externalIDs TEXT,
+        firstName varchar(255),
+        name varchar(255),
+        organisation bit,
+        remoteSubject varchar(255),
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table AccountHierarchy (
+       id bigint not null,
+        endDate datetime(6),
+        startDate datetime(6) not null,
+        child_id bigint,
+        parent_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Calendar (
        id bigint not null,
         name varchar(50),
         remoteId varchar(100),
         targetType varchar(25),
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table CostByCategory (
+       id bigint not null,
+        costPerDay double precision not null,
+        costPerHour double precision not null,
+        endDate date,
+        startDate date not null,
+        account_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -57,12 +89,16 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         day date,
         value double precision,
+        account_id bigint,
         task_id bigint,
-        user_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -131,39 +167,43 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table User (
-       id bigint not null,
-        accountCreationTime date not null,
-        beginWorkDate date not null,
-        email varchar(255) not null,
-        externalIDs TEXT,
-        firstName varchar(255),
-        imputationFutur bit not null,
-        name varchar(255),
-        remoteSubject varchar(255),
-        validateOwnImputation bit not null,
-        primary key (id)
-    ) engine=InnoDB;
-
     create table ValidatedTimesheet (
        id bigint not null,
         week integer,
         year integer,
-        user_id bigint,
+        account_id bigint,
         validatedBy_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
+    alter table Account 
+       add constraint UK_l1aov0mnvpvcmg0ctq466ejwm unique (remoteSubject);
+
+    alter table AccountHierarchy 
+       add constraint UK75obucy8vq03aqtehoj542edh unique (parent_id, child_id);
+
     alter table Imputation 
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
-    alter table User 
-       add constraint UK_ku4ibpw23c8xcgjt4sov3w3kv unique (remoteSubject);
+    alter table AccountHierarchy 
+       add constraint FKpuy6qn63d17dvpcvnfn3786fd 
+       foreign key (child_id) 
+       references Account (id);
+
+    alter table AccountHierarchy 
+       add constraint FKl0m9ft4q7f7poxa8vgc1gxpdp 
+       foreign key (parent_id) 
+       references Account (id);
+
+    alter table CostByCategory 
+       add constraint FKpeelsy07hkv1baei6fv1oo7s2 
+       foreign key (account_id) 
+       references Account (id);
 
     alter table DataTableConfig 
-       add constraint FKor8rqcglt3u263qt792tdnpt9 
+       add constraint FKmyycwm902xvsapnqmv1y3r4gj 
        foreign key (user_id) 
-       references User (id);
+       references Account (id);
 
     alter table DataTableConfig_columns 
        add constraint FK8qwyjho6c0e0ckvebujyixc03 
@@ -171,9 +211,9 @@
        references DataTableConfig (id);
 
     alter table Imputation 
-       add constraint FKpv054mew449mf2m7itp50r57b 
-       foreign key (user_id) 
-       references User (id);
+       add constraint FKicayo4omi1a8krucb5t7kipva 
+       foreign key (account_id) 
+       references Account (id);
 
     alter table Milestone 
        add constraint FK4y2imlhl4and4511uh6lhnaiy 
@@ -181,9 +221,9 @@
        references Project (id);
 
     alter table ProjectMembership 
-       add constraint FKh59cv9s56u3sdi0ki6axsxf09 
+       add constraint FK3wl3q3i14wuy156wafo33wlas 
        foreign key (member_id) 
-       references User (id);
+       references Account (id);
 
     alter table ProjectMembership 
        add constraint FKapg94jqua2lbkjdb0kofxtnln 
@@ -191,9 +231,9 @@
        references Project (id);
 
     alter table Task 
-       add constraint FKc44lafqphn0ecv9phdfate2kb 
+       add constraint FK26uly7piek733vu0rvs6tkusr 
        foreign key (assigned_id) 
-       references User (id);
+       references Account (id);
 
     alter table Task 
        add constraint FKjl7lj35hlsnb3n8x2kyk9w5lx 
@@ -211,9 +251,9 @@
        references TaskType (id);
 
     alter table TaskRevision 
-       add constraint FKp9ssbxu7c3w7fr3jukkget1ne 
+       add constraint FKtiitw2jkye656vww7or0ufx99 
        foreign key (assigned_id) 
-       references User (id);
+       references Account (id);
 
     alter table TaskRevision 
        add constraint FKpsj9t1js8flo735q3nx3o0c6d 
@@ -221,11 +261,11 @@
        references Task (id);
 
     alter table ValidatedTimesheet 
-       add constraint FKf4lmab2846nt5smlforv45yj3 
-       foreign key (user_id) 
-       references User (id);
+       add constraint FKfwotsv2gieci2khm1c1aub4uf 
+       foreign key (account_id) 
+       references Account (id);
 
     alter table ValidatedTimesheet 
-       add constraint FK7ffrinnv0q59rfi7a1dkjvh26 
+       add constraint FKmw6nt99jgsyfqvnfhpr799tg0 
        foreign key (validatedBy_id) 
-       references User (id);
+       references Account (id);

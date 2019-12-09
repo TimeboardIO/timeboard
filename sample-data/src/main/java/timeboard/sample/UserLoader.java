@@ -52,7 +52,6 @@ public class UserLoader {
             Account u = new Account();
             u.setName("timeboard" + i);
             u.setEmail("user" + i + "@timeboard.com");
-            u.setImputationFutur(true);
             u.setBeginWorkDate(new Date());
             u.setFirstName("User" + i);
             u.setAccountCreationTime(new Date());
