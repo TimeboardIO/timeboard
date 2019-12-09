@@ -977,6 +977,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(), user, vacationTask);
         Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(), user, project);
+        Map<Integer, String> comments = new HashMap<>();
         Map<Integer, Double> otherProjectImputations = new HashMap<>();
         List<Integer> dayMonthNums = new ArrayList<>();
         List<String> dayMonthNames = new ArrayList<>();
@@ -999,6 +1000,7 @@ public class ProjectServiceImpl implements ProjectService {
             otherProjectImputations.put(i, otherProjectI);
             vacationImputations.put(i, vacationI);
             projectImputations.put(i, projectI);
+            comments.put(i,"");
         }
 
         data.setDayMonthNames(dayMonthNames);
@@ -1007,6 +1009,7 @@ public class ProjectServiceImpl implements ProjectService {
         data.setOffDays(vacationImputations);
         data.setWorkedDays(projectImputations);
         data.setOtherDays(otherProjectImputations);
+        data.setComments(comments);
 
         return data;
     }

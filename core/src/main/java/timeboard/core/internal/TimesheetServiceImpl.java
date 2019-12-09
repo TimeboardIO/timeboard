@@ -164,8 +164,8 @@ public class TimesheetServiceImpl implements TimesheetService {
     public Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, Account user, Project project) {
         TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
         "SELECT DAY(day), COALESCE(sum(i.value),0) \n"
-                + "FROM imputation i JOIN task t ON i.task_id = t.id \n"
-                + "WHERE i.user_id = :user \n"
+                + "FROM Imputation i JOIN Task t ON i.task_id = t.id \n"
+                + "WHERE i.account_id = :user \n"
                 + "AND i.day >= :startDate\n"
                 + "AND i.day <= :endDate\n"
                 + "AND t.project_id = :project\n"
@@ -176,12 +176,9 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("user", user.getId());
         List<Object[]> dayImputations = q.getResultList();
 
-
         Map<Integer, Double> result = new HashMap<>();
         for (Object[] o : dayImputations) {
-            int day = (int) o[0];
-            double value = (double) o[1];
-            result.put(day, value);
+            result.put((int) o[0], (double) o[1]);
         }
 
         return result;
@@ -192,8 +189,8 @@ public class TimesheetServiceImpl implements TimesheetService {
     public Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, Account user, AbstractTask task) {
         TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
         "SELECT DAY(day), COALESCE(i.value,0) \n"
-                + "FROM imputation i\n"
-                + "WHERE i.user_id = :user \n"
+                + "FROM Imputation i\n"
+                + "WHERE i.account_id = :user \n"
                 + "AND i.day >= :startDate\n"
                 + "AND i.day <= :endDate\n"
                 + "AND i.task_id = :task\n"
@@ -205,6 +202,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         List<Object[]> dayImputations =  q.getResultList();
 
         Map<Integer, Double> result = new HashMap<>();
+
         for (Object[] o : dayImputations) {
             result.put((int) o[0],(double) o[1]);
         }

@@ -70,27 +70,24 @@ public class TasExportServlet extends TimeboardServlet {
             cal.set(year, month-1, 1, 2, 0);
 
             try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+                final Project project = projectService.getProjectByID(actor, projectID);
+                final TASData data = projectService.generateTasData(actor, project, month, year);
+                final ExcelTASReport tasReport = new ExcelTASReport(buf);;
+                tasReport.generateFAT(data);
+
                 final String mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                InputStream inputStream = TasExportServlet.class.getClassLoader().getResourceAsStream("/resources/templates/template-TAS_fr.xls");
-
-
-
-                String filename = "TAS_"+year+"_"+month+"_"+actor.getScreenName().replaceAll("'| |", "")+"_"+new Date().getTime();
-                String sheetName = "TAS_"+year+"_"+month+"_"+actor.getScreenName().replaceAll("'| |", "");
+                final String filename = "TAS_"+year+"_"+month+"_"+actor.getScreenName().replaceAll("'| |", "")+"_"+new Date().getTime();
                 response.setContentLengthLong(buf.toByteArray().length);
                 response.setHeader("Expires:", "0");
                 response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".xls");
-
-                Project project = projectService.getProjectByID(actor, projectID);
-
-                TASData data = projectService.generateTasData(actor, project, month, year);
-
-                ExcelTASReport tasReport = new ExcelTASReport(response.getOutputStream());
-
-
                 response.setContentType(mimeType);
-                //response.getOutputStream().write(buf.toByteArray());
+
+
+
+
+                response.getOutputStream().write(buf.toByteArray());
                 response.getOutputStream().flush();
+                response.setStatus(201);
 
             }
 

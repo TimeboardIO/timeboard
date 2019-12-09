@@ -39,7 +39,7 @@ import timeboard.core.model.TASData;
 
 public class ExcelTASReport extends AbstractExcelReport {
 
-    private static final String TEMPLATE_FILE = "/resources/templates/template-TAS_fr.xls";
+    private static final String TEMPLATE_FILE = "template-TAS_fr.xls";
 
     private static final int START_ROW_DAYS = 14;
 
@@ -58,6 +58,7 @@ public class ExcelTASReport extends AbstractExcelReport {
     private static final int BUSINESS_CODE = 8;
     private static final int MATRICULE_NAME_FIRSTNAME_COLUMN = 5;
     private static final int LAST_COLUMN = 11;
+
     private static final int MONTH_DAY_COUNT = 31;
 
     public ExcelTASReport(final OutputStream reportFile) {
@@ -66,7 +67,7 @@ public class ExcelTASReport extends AbstractExcelReport {
 
     public void generateFAT(final TASData tasData) throws IOException {
         this.format = true;
-        try (InputStream templatePath = this.getClass().getResourceAsStream(TEMPLATE_FILE)) {
+        try (InputStream templatePath = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE_FILE)) {
 
             final POIFSFileSystem fs = new POIFSFileSystem(templatePath);
             this.wb = new HSSFWorkbook(fs, true);
@@ -94,7 +95,7 @@ public class ExcelTASReport extends AbstractExcelReport {
             for (int i = 0; i < tasData.getDayMonthNames().size(); i++) {
 
                 this.sheet.getRow(START_ROW_DAYS + i).getCell(DAY_NAME_COLLUMN).setCellValue(dayMonthName.get(i));
-                // Les clés des maps commencent à 1 (jour dans le mois) et non pas 0
+                // Map keys start at 1 (day in the month) and not 0
                 if (mapWorkedDAys.containsKey(i + 1)) {
                     this.sheet.getRow(START_ROW_DAYS + i).getCell(WORKED_DAY_COLUMN)
                             .setCellValue(mapWorkedDAys.get(i + 1).doubleValue());
@@ -120,10 +121,10 @@ public class ExcelTASReport extends AbstractExcelReport {
                 calendarSunday.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
                 String currentDayName = tasData.getDayMonthNames().get(i);
-                if (currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(calendarSaturday).toLowerCase())
-                        || currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(calendarSunday).toLowerCase())) {
+                if (currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(calendarSaturday.getTime()).toLowerCase())
+                        || currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(calendarSunday.getTime()).toLowerCase())) {
                     for (int j = DAY_NAME_COLLUMN; j <= LAST_COLUMN; j++) {
-                        // On recopie le style de la première ligne, qui est prédéfinie de la bonne façon
+                        // We copy the style of the first line, which is predefined in the right way
                         this.sheet.getRow(START_ROW_DAYS + i).getCell(j)
                                 .setCellStyle(this.sheet.getRow(START_ROW_DAYS).getCell(j).getCellStyle());
                     }
@@ -143,6 +144,7 @@ public class ExcelTASReport extends AbstractExcelReport {
             this.sheet.getRow(SUMS_ROW).getCell(OTHER_DAY_COLUMN).setCellFormula("SUM(F15:F45)");
 
             this.save();
+
 
         }
     }
