@@ -50,10 +50,6 @@ import java.util.List;
 @WebServlet(name = "AccountServlet", urlPatterns = "/account")
 public class AccountServlet extends TimeboardServlet {
 
-    private static String TABLE_TASK_ID = "tableTask";
-    private static List<String> ALL_COLUMNS_TABLE_TASK = Arrays.asList(
-            "taskName", "taskComments","startDate","endDate","originalEstimate","assignee","status","milestoneID","typeID");
-
     @Autowired
     private UserService userService;
 
@@ -114,9 +110,9 @@ public class AccountServlet extends TimeboardServlet {
                 break;
 
             case "columnTask":
-                ArrayList<String> selectedColumnsString = (ArrayList<String>) Arrays.asList(request.getParameterValues("columnSelected"));
+                List<String> selectedColumnsString = Arrays.asList(request.getParameterValues("columnSelected"));
                 try {
-                    this.dataTableService.addOrUpdateTableConfig(TABLE_TASK_ID, actor, selectedColumnsString);
+                    this.dataTableService.addOrUpdateTableConfig(this.dataTableService.TABLE_TASK_ID, actor, selectedColumnsString);
                     viewModel.getViewDatas().put("message", "Task columns preferences updated successfully !");
                 } catch (Exception e) {
                     viewModel.getViewDatas().put("error", "Error while updating Task columns preferences");
@@ -147,10 +143,10 @@ public class AccountServlet extends TimeboardServlet {
 
         viewModel.getViewDatas().put("externalTools", fieldNames);
 
-        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(TABLE_TASK_ID, user);
+        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(this.dataTableService.TABLE_TASK_ID, user);
         List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
         viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
-        viewModel.getViewDatas().put("allTaskColumns", ALL_COLUMNS_TABLE_TASK);
+        viewModel.getViewDatas().put("allTaskColumns", this.dataTableService.ALL_COLUMNS_TABLE_TASK);
 
         viewModel.setTemplate("account.html");
     }

@@ -26,6 +26,7 @@ package timeboard.core.api;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
 import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.User;
@@ -34,6 +35,12 @@ import timeboard.core.model.User;
  * Service for datatable configs.
  */
 public interface DataTableService {
+
+    public static String TABLE_TASK_ID = "tableTask";
+    public static List<String> ALL_COLUMNS_TABLE_TASK = Arrays.asList(
+            /*"taskName", "taskComments",*/"startDate","endDate","originalEstimate","assignee","status","milestoneID","typeID");
+
+    public String[] defaultCols = {"taskName"};
 
     boolean checkColumnDisplayed(String tableId, User actor, String colName);
 

@@ -44,7 +44,7 @@ public class DataTableConfig implements Serializable {
     private String tableInstanceId;
 
     @Column
-    @ElementCollection(targetClass=String.class)
+    @ElementCollection(targetClass=String.class, fetch = FetchType.EAGER)
     private List<String> columns;
 
     public DataTableConfig() {

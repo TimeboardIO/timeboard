@@ -43,8 +43,6 @@ import java.util.List;
 @Transactional
 public class DataTableServiceImpl implements DataTableService {
 
-    private String[] defaultCols = {"taskName"};
-
     private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
@@ -69,7 +67,7 @@ public class DataTableServiceImpl implements DataTableService {
         if(tableConfig == null){
             return false;
         }
-        return Arrays.asList(tableConfig.getColumns()).contains(colName);
+        return tableConfig.getColumns().contains(colName);
     }
 
     @Override
