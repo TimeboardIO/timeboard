@@ -73,6 +73,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
         viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
         viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
+        viewModel.getViewDatas().put("isProjectOwner", this.projectService.isProjectOwner(actor, project));
 
     }
 
