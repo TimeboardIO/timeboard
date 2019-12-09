@@ -31,14 +31,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
@@ -53,10 +51,6 @@ public class TasExportServlet extends TimeboardServlet {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired(
-            required = false
-    )
-    private List<ProjectImportService> projectImportServlets;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {

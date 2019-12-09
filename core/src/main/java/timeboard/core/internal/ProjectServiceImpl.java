@@ -29,7 +29,11 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.thymeleaf.context.Context;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.events.TaskEvent;
@@ -44,7 +48,6 @@ import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
@@ -71,15 +74,22 @@ public class ProjectServiceImpl implements ProjectService {
 
     private DefaultTask vacationTask;
 
-    @PostConstruct
-    public void init(){
-        //TODO change when avcation model totaly implemented
+    @Transactional
+    @EventListener()
+    protected void init(ContextRefreshedEvent ctx){
+        //TODO change when vacation model totally implemented
+
         AbstractTask taskFromDB = this.getTasksByName(VACATION_TASK_NAME);
         if (taskFromDB == null) {
-            DefaultTask t = new DefaultTask();
+            DefaultTask task = new DefaultTask();
+            task.setName(VACATION_TASK_NAME);
+            task.setStartDate(new Date());
+            task.setEndDate(new Date(new Date().getTime()+999999999999L));
+            task.setOrigin("timeboard");
             try {
-                vacationTask = this.createDefaultTask(t);
-            } catch (BusinessException e) {
+                em.persist(task);
+                vacationTask = task;
+            } catch (Exception e) {
                 LOGGER.error("Error in vacation task singleton instantiation.");
             }
         } else {
@@ -394,7 +404,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void createTasks(final User actor, final List<Task> taskList) {
         for (Task newTask : taskList) {  //TODO create task here
-           LOGGER.info("User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
+            LOGGER.info("User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
         }
         LOGGER.info("User " + actor + " created " + taskList.size() + " tasks ");
 
@@ -527,22 +537,22 @@ public class ProjectServiceImpl implements ProjectService {
         Task projectTask = (Task) this.getTaskByID(actor, task.getId());
 
 
-            if(projectTask.getTaskStatus() != TaskStatus.PENDING) {
-                Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask);
-                double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
+        if(projectTask.getTaskStatus() != TaskStatus.PENDING) {
+            Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask);
+            double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
-                Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), em);
-                Task updatedTask = em.find(Task.class, projectTask.getId());
-                double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
-                updatedTask.setEffortLeft(newEffortLeft);
-                LOGGER.info("User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
+            Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), em);
+            Task updatedTask = em.find(Task.class, projectTask.getId());
+            double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
+            updatedTask.setEffortLeft(newEffortLeft);
+            LOGGER.info("User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
 
-                em.merge(updatedTask);
-                em.flush();
+            em.merge(updatedTask);
+            em.flush();
 
-                return new UpdatedTaskResult(updatedTask.getProject().getId(), updatedTask.getId(), updatedTask.getEffortSpent(), updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(), updatedTask.getRealEffort());
-            }
-            return null;
+            return new UpdatedTaskResult(updatedTask.getProject().getId(), updatedTask.getId(), updatedTask.getEffortSpent(), updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(), updatedTask.getRealEffort());
+        }
+        return null;
     }
 
     private UpdatedTaskResult updateDefaultTaskImputation(User actor, DefaultTask task, Date day, double val, Calendar calendar) throws BusinessException {
@@ -670,9 +680,9 @@ public class ProjectServiceImpl implements ProjectService {
             rebalanced.get(task.getProject()).add(task);
         });
 
-            rebalanced.forEach((project, ts) -> {
-                projectTasks.add(new ProjectTasks(project, ts));
-            });
+        rebalanced.forEach((project, ts) -> {
+            projectTasks.add(new ProjectTasks(project, ts));
+        });
 
 
         return projectTasks;
@@ -726,18 +736,18 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-             TypedQuery<Object[]> query = (TypedQuery<Object[]>) em.createNativeQuery("select "
-                    + "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue "
-                    + "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
-            query.setParameter("taskId", task.getId());
-            query.setParameter("startTaskDate", startTaskDate);
-            query.setParameter("endTaskDate", endTaskDate);
+        TypedQuery<Object[]> query = (TypedQuery<Object[]>) em.createNativeQuery("select "
+                + "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue "
+                + "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
+        query.setParameter("taskId", task.getId());
+        query.setParameter("startTaskDate", startTaskDate);
+        query.setParameter("endTaskDate", endTaskDate);
 
-            return query.getResultList()
-                    .stream()
-                    .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
-                    .collect(Collectors.toList());
-     }
+        return query.getResultList()
+                .stream()
+                .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
+                .collect(Collectors.toList());
+    }
 
 
     @Override
@@ -749,30 +759,30 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-             TypedQuery<Object[]> query = (TypedQuery<Object[]>) em.createNativeQuery("select "
-                    + "tr.revisionDate as date, tr.effortLeft as effortLeft  "
-                    + "from TaskRevision tr "
-                    + "where tr.task_id = :taskId and tr.id IN ( "
-                    + "SELECT MAX(trBis.id) "
-                    + "FROM TaskRevision trBis "
-                    + "GROUP BY trBis.task_id, DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")"
-                    + ");");
+        TypedQuery<Object[]> query = (TypedQuery<Object[]>) em.createNativeQuery("select "
+                + "tr.revisionDate as date, tr.effortLeft as effortLeft  "
+                + "from TaskRevision tr "
+                + "where tr.task_id = :taskId and tr.id IN ( "
+                + "SELECT MAX(trBis.id) "
+                + "FROM TaskRevision trBis "
+                + "GROUP BY trBis.task_id, DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")"
+                + ");");
 
-            query.setParameter("taskId", task.getId());
+        query.setParameter("taskId", task.getId());
 
-            return query.getResultList()
-                    .stream()
-                    .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
-                    .collect(Collectors.toList());
-     }
+        return query.getResultList()
+                .stream()
+                .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
+                .collect(Collectors.toList());
+    }
 
     @Override
     public DefaultTask createDefaultTask(DefaultTask task) throws BusinessException {
         try {
             em.persist(task);
-                LOGGER.info("Default task " + task.getName() + " is created.");
-                return task;
-         } catch (Exception e) {
+            LOGGER.info("Default task " + task.getName() + " is created.");
+            return task;
+        } catch (Exception e) {
             throw new BusinessException(e);
         }
     }
@@ -780,11 +790,11 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public DefaultTask updateDefaultTask(DefaultTask task) {
 
-             em.merge(task);
-            em.flush();
+        em.merge(task);
+        em.flush();
 
-            LOGGER.info("Milestone " + task.getName() + " updated");
-            return task;
+        LOGGER.info("Milestone " + task.getName() + " updated");
+        return task;
 
     }
 
@@ -971,7 +981,7 @@ public class ProjectServiceImpl implements ProjectService {
         for (int i = start.get(Calendar.DAY_OF_MONTH); start.before(end); start.add(Calendar.DATE, 1), i = start.get(Calendar.DAY_OF_MONTH)) {
 
             dayMonthNums.add(i);
-            dayMonthNames.add(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(start).toLowerCase());
+            dayMonthNames.add(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(start.getTime()).toLowerCase());
 
             Double vacationI = vacationImputations.get(i);
             Double projectI = projectImputations.get(i);
