@@ -40,10 +40,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-
+import java.text.DateFormatSymbols;
+import java.util.*;
 
 
 @WebServlet(name = "AccountServlet", urlPatterns = "/account")
@@ -125,9 +123,24 @@ public class AccountServlet extends TimeboardServlet {
             });
         }
 
+        Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
+        Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
+        Calendar end = Calendar.getInstance();
+        end.setTime(actor.getBeginWorkDate());
+        Calendar start = Calendar.getInstance();
+        start.setTime(new Date());
+        DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
+        dfs.getLocalPatternChars();
+        String[] months = dfs.getMonths();
+        for (int i = start.get(Calendar.MONTH); start.after(end); start.add(Calendar.MONTH, -1), i = start.get(Calendar.DAY_OF_MONTH)) {
+            yearsSinceHiring.add(start.get(Calendar.YEAR));
+            if(monthsSinceHiring.size() < 12) monthsSinceHiring.put(start.get(Calendar.MONTH), months[start.get(Calendar.MONTH)]);
+        }
+
         viewModel.getViewDatas().put("externalTools", fieldNames);
         viewModel.getViewDatas().put("projects", projects);
-
+        viewModel.getViewDatas().put("yearsSinceHiring", yearsSinceHiring);
+        viewModel.getViewDatas().put("monthsSinceHiring", monthsSinceHiring);
         viewModel.setTemplate("account.html");
     }
 

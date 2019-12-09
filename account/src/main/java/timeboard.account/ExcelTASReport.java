@@ -76,7 +76,7 @@ public class ExcelTASReport extends AbstractExcelReport {
             // Updating the year
             this.sheet.getRow(YEAR_ROW).getCell(YEAR_MONTH_COLUMN).setCellValue(tasData.getYear());
             // Updating the month
-            this.sheet.getRow(MONTH_ROW).getCell(YEAR_MONTH_COLUMN).setCellValue(tasData.getMonth());
+            this.sheet.getRow(MONTH_ROW).getCell(YEAR_MONTH_COLUMN).setCellValue("1/"+tasData.getMonth()+"/"+tasData.getYear());
             // Updating matriculeID
             this.sheet.getRow(MATRICULE_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
                     .setCellValue(tasData.getMatriculeID());

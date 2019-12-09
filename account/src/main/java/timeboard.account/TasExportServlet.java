@@ -81,10 +81,6 @@ public class TasExportServlet extends TimeboardServlet {
                 response.setHeader("Expires:", "0");
                 response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".xls");
                 response.setContentType(mimeType);
-
-
-
-
                 response.getOutputStream().write(buf.toByteArray());
                 response.getOutputStream().flush();
                 response.setStatus(201);

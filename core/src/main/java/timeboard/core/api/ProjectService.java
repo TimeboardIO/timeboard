@@ -194,11 +194,12 @@ public interface ProjectService {
 
     TaskType findTaskTypeByID(Long taskTypeID);
 
+    TASData generateTasData(Account user, Project project, int month, int year);
+
     /*
      == Rule ==
      */
     boolean isProjectOwner(Account user, Project project);
-    TASData generateTasData(Account user, Project project, int month, int year);
 
 
 

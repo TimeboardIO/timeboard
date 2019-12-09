@@ -133,15 +133,14 @@
                             <div class="field">
                                 <label>Month</label>
                                 <select name="month">
-                                    <option value="12">December</option>
-                                    <option value="11">November</option>
-                                    <option value="10">October</option>
+                                    <option th:each="month : ${monthsSinceHiring}" th:value="${month.key}" th:text="${month.value}">December</option>
+
                                 </select>
                             </div>
                             <div class="field">
                                 <label>Year</label>
                                 <select name="year">
-                                    <option value="2019">2019</option>
+                                    <option th:each="year : ${yearsSinceHiring}" th:value="${year}" th:text="${year}">2019</option>
 
                                 </select>
                             </div>
