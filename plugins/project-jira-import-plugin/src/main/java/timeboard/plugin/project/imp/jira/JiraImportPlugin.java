@@ -35,7 +35,7 @@ import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import java.io.IOException;
 import java.net.URI;
@@ -78,12 +78,12 @@ public class JiraImportPlugin implements ProjectImportService {
     }
 
     @Override
-    public List<RemoteTask> getRemoteTasks(User currentUser, long projectID) throws BusinessException {
+    public List<RemoteTask> getRemoteTasks(Account currentAccount, long projectID) throws BusinessException {
 
         List<RemoteTask> remoteTaskList = new ArrayList<>();
         try {
 
-            final Project project = this.projectService.getProjectByID(currentUser, projectID);
+            final Project project = this.projectService.getProjectByID(currentAccount, projectID);
             final JiraRestClient client = getJiraRestClient(project);
 
             client.getSearchClient().searchJql(

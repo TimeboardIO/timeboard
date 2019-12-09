@@ -45,14 +45,14 @@ public class TimesheetEvent extends TimeboardEvent {
 
         this.timesheet = timesheet;
 
-        List<Project> projects = projectService.listProjects(timesheet.getUser());
+        List<Project> projects = projectService.listProjects(timesheet.getAccount());
 
         projects.stream().forEach(project -> project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == ProjectRole.OWNER)
                 .forEach(member -> this.usersToNotify.add(member.getMember())));
 
-        usersToInform.add(timesheet.getUser());
+        usersToInform.add(timesheet.getAccount());
     }
 
 

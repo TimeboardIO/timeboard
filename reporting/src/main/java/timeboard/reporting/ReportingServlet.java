@@ -28,7 +28,7 @@ package timeboard.reporting;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectExportService;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -54,7 +54,7 @@ public class ReportingServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
         viewModel.setTemplate("reporting.html");
         viewModel.getViewDatas().put("reports", this.reportServices);
    }

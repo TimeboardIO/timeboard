@@ -873,7 +873,7 @@ i.icon.unfold.less:before { content: '\e5d6'}
 i.icon.unfold.more:before { content: '\e5d7'}
 i.icon.update:before { content: '\e923'}
 i.icon.usb:before { content: '\e1e0'}
-i.icon.verified.user:before { content: '\e8e8'}
+i.icon.verified.account:before { content: '\e8e8'}
 i.icon.vertical.align.bottom:before { content: '\e258'}
 i.icon.vertical.align.center:before { content: '\e259'}
 i.icon.vertical.align.top:before { content: '\e25a'}

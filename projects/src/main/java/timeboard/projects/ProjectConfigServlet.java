@@ -37,7 +37,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.ProjectRole;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -84,7 +84,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
     }
 
 
-    private void prepareTemplateData(User actor, Project project, Map<String, Object> map) throws JsonProcessingException, BusinessException {
+    private void prepareTemplateData(Account actor, Project project, Map<String, Object> map) throws JsonProcessingException, BusinessException {
 
         map.put("project", project);
         map.put("members", project.getMembers());
@@ -98,7 +98,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
 
 
         viewModel.setTemplate("details_project_config.html");
@@ -112,7 +112,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
         viewModel.setTemplate("details_project_config.html");
 

@@ -29,10 +29,10 @@ package timeboard.core.observers.emails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
+import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectRole;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
 
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
@@ -58,17 +58,17 @@ public class SendTaskEmail {
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));*/
     }
 
-    public EmailStructure sendEmailCreatingTask(User creator, Task newTaskDB) {
+    public EmailStructure sendEmailCreatingTask(Account creator, Task newTaskDB) {
         List<String> to = new ArrayList<>();
         Project project = newTaskDB.getProject();
-        User assignedUser = newTaskDB.getAssigned();
+        Account assignedAccount = newTaskDB.getAssigned();
 
         project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == ProjectRole.OWNER)
                 .forEach(member -> to.add(member.getMember().getEmail()));
 
-        List<String> cc = Arrays.asList(assignedUser.getEmail(), creator.getEmail());
+        List<String> cc = Arrays.asList(assignedAccount.getEmail(), creator.getEmail());
 
         String subject = "Mail de création d'une tâche";
         String message = "Bonjour,\n"

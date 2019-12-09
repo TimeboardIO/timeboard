@@ -27,10 +27,10 @@ package timeboard.core.internal.rules.milestone;
  */
 
 import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Account;
 import timeboard.core.model.Milestone;
 import timeboard.core.model.ProjectMembership;
 import timeboard.core.model.ProjectRole;
-import timeboard.core.model.User;
 
 import java.util.Optional;
 
@@ -43,7 +43,7 @@ public class ActorIsProjectOwnerByMilestone implements Rule<Milestone> {
     }
 
     @Override
-    public boolean isSatisfied(User u, Milestone thing) {
+    public boolean isSatisfied(Account u, Milestone thing) {
         Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()

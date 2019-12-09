@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 import timeboard.core.internal.events.TaskEvent;
 import timeboard.core.internal.events.TimeboardEvent;
 import timeboard.core.internal.events.TimesheetEvent;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -54,6 +54,6 @@ public class TimeboardSubjects {
     }
 
     //TODO keep this subject ?
-    public static PublishSubject<Map<User, String>> GENERATE_PASSWORD = PublishSubject.create();
+    public static PublishSubject<Map<Account, String>> GENERATE_PASSWORD = PublishSubject.create();
 
 }

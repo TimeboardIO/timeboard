@@ -151,7 +151,7 @@ public class Project implements Serializable {
         this.milestones = milestones;
     }
 
-    public boolean isMember(User actor) {
+    public boolean isMember(Account actor) {
         //TODO check if actor is member of current project
         return true;
     }

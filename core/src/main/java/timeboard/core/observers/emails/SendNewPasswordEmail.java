@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import javax.annotation.PostConstruct;
 import java.text.SimpleDateFormat;
@@ -57,15 +57,15 @@ public class SendNewPasswordEmail {
                 .subscribe(emailStructure -> this.emailService.sendMessage(emailStructure));
     }
 
-    public EmailStructure sendEmailNewPassword(Map<User, String> userPasswordMap) {
-        User user = (User) userPasswordMap.keySet().toArray()[0];
-        String password = userPasswordMap.get(user);
+    public EmailStructure sendEmailNewPassword(Map<Account, String> userPasswordMap) {
+        Account account = (Account) userPasswordMap.keySet().toArray()[0];
+        String password = userPasswordMap.get(account);
 
-        List<String> to = Arrays.asList(user.getEmail());
+        List<String> to = Arrays.asList(account.getEmail());
         List<String> cc = new ArrayList<>();
         String subject = "Réinitialisation du mot de passe";
         String message = "Voici pour l'identifiant suivant, le nouveau mot de passe:\n\n "
-                + "Login: " + user.getEmail() + "\nMot de passe: " + password;
+                + "Login: " + account.getEmail() + "\nMot de passe: " + password;
 
         return new EmailStructure(to, cc, subject, message);
     }

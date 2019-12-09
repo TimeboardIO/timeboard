@@ -34,10 +34,10 @@ import org.osgi.service.component.annotations.Reference;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Account;
 import timeboard.core.model.Imputation;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class LauncherLoader {
 
         // Launch the creation of sample datas
         try {
-            List<User> usersSaved = new UserLoader(this.userService).load(nbUsers);
+            List<Account> usersSaved = new UserLoader(this.userService).load(nbUsers);
             List<Project> projectsSaved = new ProjectLoader(this.projectService, this.userService).load(usersSaved, nbProjectsByUsers);
             List<Task> tasksSaved = new TaskLoader(this.projectService, this.userService).load(usersSaved, projectsSaved, nbProjectsByUsers, nbTasksByProjects);
             List<Imputation> imputationsSaved = new ImputationLoader(this.projectService, this.userService).load(usersSaved, tasksSaved, nbProjectsByUsers, nbTasksByProjects, nbImputationsByTasks);

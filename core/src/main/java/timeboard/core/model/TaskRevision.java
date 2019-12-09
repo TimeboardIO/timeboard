@@ -49,7 +49,7 @@ public class TaskRevision implements Serializable {
      * Current task assigned at revision date.
      */
     @OneToOne
-    private User assigned;
+    private Account assigned;
 
     @Column(nullable = false)
     private double originalEstimate;
@@ -67,7 +67,7 @@ public class TaskRevision implements Serializable {
     }
 
 
-    public TaskRevision(Date revisionDate, Task task, User assigned, double originalEstimate, double effortLeft, double effortSpent, double realEffort) {
+    public TaskRevision(Date revisionDate, Task task, Account assigned, double originalEstimate, double effortLeft, double effortSpent, double realEffort) {
         this.revisionDate = revisionDate;
         this.task = task;
         this.assigned = assigned;
@@ -101,11 +101,11 @@ public class TaskRevision implements Serializable {
         this.task = task;
     }
 
-    public User getAssigned() {
+    public Account getAssigned() {
         return assigned;
     }
 
-    public void setAssigned(User assigned) {
+    public void setAssigned(Account assigned) {
         this.assigned = assigned;
     }
 

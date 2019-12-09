@@ -33,8 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.model.User;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
@@ -54,96 +54,96 @@ public class UserServiceImpl implements UserService {
     private EntityManager em;
 
     @Override
-    public List<User> createUsers(List<User> users) {
-             users.forEach(user -> {
+    public List<Account> createUsers(List<Account> accounts) {
+             accounts.forEach(user -> {
                 em.persist(user);
                  LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
             });
-            return users;
+            return accounts;
      }
 
     @Override
     @Transactional
-    public User createUser(final User user) throws BusinessException {
-        this.em.persist(user);
-        LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
+    public Account createUser(final Account account) throws BusinessException {
+        this.em.persist(account);
+        LOGGER.info("User " + account.getFirstName() + " " + account.getName() + " created");
         this.em.flush();
-        return user;
+        return account;
      }
 
 
     @Override
-    public User updateUser(User user) {
-             User u = this.findUserByID(user.getId());
+    public Account updateUser(Account account) {
+             Account u = this.findUserByID(account.getId());
             if (u != null) {
-                u.setFirstName(user.getFirstName());
-                u.setName(user.getName());
-                u.setEmail(user.getEmail());
-                u.setExternalIDs(user.getExternalIDs());
+                u.setFirstName(account.getFirstName());
+                u.setName(account.getName());
+                u.setEmail(account.getEmail());
+                u.setExternalIDs(account.getExternalIDs());
             }
             em.flush();
-            LOGGER.info("User " + user.getEmail() + " updated.");
-            return user;
+            LOGGER.info("User " + account.getEmail() + " updated.");
+            return account;
 
     }
 
 
     @Override
-    public List<User> searchUserByEmail(final String prefix) {
-             TypedQuery<User> q = em
+    public List<Account> searchUserByEmail(final String prefix) {
+             TypedQuery<Account> q = em
                     .createQuery(
                             "select u from User u "
                                     + "where u.email LIKE CONCAT('%',:prefix,'%')",
-                            User.class);
+                            Account.class);
             q.setParameter("prefix", prefix);
             return q.getResultList();
      }
 
     @Override
-    public List<User> searchUserByEmail(final String prefix, final Long projectId) {
+    public List<Account> searchUserByEmail(final String prefix, final Long projectId) {
              Project project = em.find(Project.class, projectId);
-            List<User> matchedUser = project.getMembers().stream()
+            List<Account> matchedAccount = project.getMembers().stream()
                     .filter(projectMembership -> projectMembership
                             .getMember()
                             .getEmail().startsWith(prefix))
                     .map(projectMembership -> projectMembership.getMember())
                     .collect(Collectors.toList());
-            return matchedUser;
+            return matchedAccount;
      }
 
 
     @Override
-    public User findUserByID(final Long userID) {
+    public Account findUserByID(final Long userID) {
         if (userID == null) {
             return null;
         }
-        return em.find(User.class, userID);
+        return em.find(Account.class, userID);
     }
 
     @Override
-    public User findUserByEmail(String email) {
+    public Account findUserByEmail(String email) {
         if (email == null) {
             return null;
         }
-             TypedQuery<User> q = em.createQuery("from User u where u.email=:email", User.class);
+             TypedQuery<Account> q = em.createQuery("from User u where u.email=:email", Account.class);
             q.setParameter("email", email);
-            User user;
+            Account account;
             try {
-                user = q.getSingleResult();
+                account = q.getSingleResult();
             } catch (NoResultException e) {
-                user = null;
+                account = null;
             }
-            return user;
+            return account;
      }
 
     @Override
-    public User findUserBySubject(String remoteSubject) {
-        User u;
+    public Account findUserBySubject(String remoteSubject) {
+        Account u;
         try {
                  Query q = em
-                        .createQuery("select u from User u where u.remoteSubject = :sub", User.class);
+                        .createQuery("select u from User u where u.remoteSubject = :sub", Account.class);
                 q.setParameter("sub", remoteSubject);
-                return (User) q.getSingleResult();
+                return (Account) q.getSingleResult();
          } catch (NoResultException | NonUniqueResultException e) {
             u = null;
         }
@@ -152,15 +152,15 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public User findUserByExternalID(String origin, String userExternalID) {
-        User u;
+    public Account findUserByExternalID(String origin, String userExternalID) {
+        Account u;
         try {
                  Query q = em // MYSQL native for JSON queries
                         .createNativeQuery("select * from User "
                                 + "where JSON_EXTRACT(externalIDs, '$." + origin + "')"
-                                + " = ?", User.class);
+                                + " = ?", Account.class);
                 q.setParameter(1, userExternalID);
-                return (User) q.getSingleResult();
+                return (Account) q.getSingleResult();
          } catch (javax.persistence.NoResultException e) {
             u = null;
         }
@@ -169,16 +169,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User userProvisionning(String sub, String email) throws BusinessException {
+    public Account userProvisionning(String sub, String email) throws BusinessException {
 
-        User user = this.findUserBySubject(sub);
-        if (user == null) {
+        Account account = this.findUserBySubject(sub);
+        if (account == null) {
             //Create user
-            user = new User(null, null, email, new Date(), new Date());
-            user.setRemoteSubject(sub);
-            user = this.createUser(user);
+            account = new Account(null, null, email, new Date(), new Date());
+            account.setRemoteSubject(sub);
+            account = this.createUser(account);
         }
-        return user;
+        return account;
     }
 
     private String hashPassword(String password) {

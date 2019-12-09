@@ -59,11 +59,11 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel){
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel){
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
@@ -93,7 +93,7 @@ public class ProjectMilestoneConfigLinksServlet extends TimeboardServlet {
         }
     }
 
-    private Milestone addTasksToMilestone(User actor, Milestone currentMilestone, HttpServletRequest request) throws BusinessException {
+    private Milestone addTasksToMilestone(Account actor, Milestone currentMilestone, HttpServletRequest request) throws BusinessException {
         String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
         List<Task> selectedTasks = Arrays
                 .stream(selectedTaskIdsString)

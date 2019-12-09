@@ -36,9 +36,9 @@ import java.util.Map;
 
 public interface CalendarService {
 
-    boolean importCalendarAsTasksFromIcs(User actor, String name, String ics, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException;
+    boolean importCalendarAsTasksFromIcs(Account actor, String name, String ics, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException;
 
-    boolean importCalendarAsImputationsFromIcs(User actor, String ics, AbstractTask task, List<User> userList, double value) throws BusinessException, ParseException, IOException;
+    boolean importCalendarAsImputationsFromIcs(Account actor, String ics, AbstractTask task, List<Account> accountList, double value) throws BusinessException, ParseException, IOException;
 
     Calendar createOrUpdateCalendar(String name, String remoteId);
 
@@ -48,7 +48,7 @@ public interface CalendarService {
 
     Map<String, List<Task>> findAllEventAsTask(Calendar calendar, Project project);
 
-    void deleteCalendarById(User actor, Long calendarID) throws BusinessException;
+    void deleteCalendarById(Account actor, Long calendarID) throws BusinessException;
 
 
 

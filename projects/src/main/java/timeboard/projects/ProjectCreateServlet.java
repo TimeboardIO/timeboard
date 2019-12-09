@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
 import timeboard.core.ui.ViewModel;
 
@@ -54,13 +54,13 @@ public class ProjectCreateServlet {
 
     @PostMapping("/projects/create")
     protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
-        final User actor = this.userInfo.getCurrentUser();
+        final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
         return "redirect:/projects";
     }
 
     @GetMapping("/projects/create")
-    protected String createFrom(Model moldel, User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected String createFrom(Model moldel, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         return "create_project.html";
     }
 
