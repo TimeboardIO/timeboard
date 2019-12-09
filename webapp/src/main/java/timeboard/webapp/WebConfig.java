@@ -79,7 +79,7 @@ public class WebConfig implements WebMvcConfigurer {
             public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
 
                 if(modelMap != null) {
-                    modelMap.put("user", getActorFromRequestAttributes(webRequest));
+                    modelMap.put("account", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());
                     modelMap.put("appName", appName);
                     modelMap.put("javascripts", javascriptService.listJavascriptUrls());
