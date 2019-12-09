@@ -42,10 +42,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 import java.text.DateFormatSymbols;
 
 
@@ -166,7 +163,7 @@ public class AccountServlet extends TimeboardServlet {
         viewModel.getViewDatas().put("projects", projects);
         viewModel.getViewDatas().put("yearsSinceHiring", yearsSinceHiring);
         viewModel.getViewDatas().put("monthsSinceHiring", monthsSinceHiring);
-        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(this.dataTableService.TABLE_TASK_ID, account);
+        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(this.dataTableService.TABLE_TASK_ID, actor);
         List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
         viewModel.getViewDatas().put("userTaskColumns", userTaskColumns);
         viewModel.getViewDatas().put("allTaskColumns", this.dataTableService.ALL_COLUMNS_TABLE_TASK);
