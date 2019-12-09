@@ -31,6 +31,7 @@ import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
 import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ public interface UserService {
      * @param remoteSubject prefix used to search user
      * @return list of users
      */
-     User findUserBySubject(String remoteSubject);
+     Account findUserBySubject(String remoteSubject);
 
 
     /**
@@ -53,7 +54,7 @@ public interface UserService {
      * @param prefix prefix used to search user
      * @return list of users
      */
-    List<User> searchUserByEmail(String prefix);
+    List<Account> searchUserByEmail(String prefix);
 
     /**
      * Search user where name start with prefix, limit to project with
@@ -63,7 +64,7 @@ public interface UserService {
      * @param projectID project primary key
      * @return list of users
      */
-    List<User> searchUserByEmail(String prefix, Long projectID);
+    List<Account> searchUserByEmail(String prefix, Long projectID);
 
 
     /**
@@ -72,7 +73,7 @@ public interface UserService {
      * @param userID user primary key
      * @return user instance or null if not exist
      */
-    User findUserByID(Long userID);
+    Account findUserByID(Long userID);
 
     /**
      * Find user by email.
@@ -80,22 +81,22 @@ public interface UserService {
      * @param email user email
      * @return user instance or null if not exist
      */
-    User findUserByEmail(String email);
+    Account findUserByEmail(String email);
 
     /**
      * Update user.
      *
-     * @param user to update
+     * @param account to update
      * @return user will with primary key
      * @throws BusinessException user does not exist
      */
-    User updateUser(User user) throws UserException;
+    Account updateUser(Account account) throws UserException;
 
-    User createUser(final User user) throws BusinessException;
+    Account createUser(final Account account) throws BusinessException;
 
-    User findUserByExternalID(String origin, String userExternalID);
+    Account findUserByExternalID(String origin, String userExternalID);
 
-    User userProvisionning(String sub, String email) throws BusinessException;
+    Account userProvisionning(String sub, String email) throws BusinessException;
 
-    List<User> createUsers(List<User> usersList);
+    List<Account> createUsers(List<Account> usersList);
 }

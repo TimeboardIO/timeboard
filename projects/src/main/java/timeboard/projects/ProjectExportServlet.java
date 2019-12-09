@@ -31,7 +31,7 @@ import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -65,7 +65,7 @@ public class ProjectExportServlet  extends TimeboardServlet {
 
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handleGet(Account actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));

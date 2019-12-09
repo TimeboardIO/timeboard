@@ -29,7 +29,7 @@ All Timeboard runtime dependencies can be found in Karaf [feature.xml](../featur
 
 - Core : business logic
 - Core-ui : runtime framework for web ui
-- Home : landing page, display graphs and user activities
+- Home : landing page, display graphs and account activities
 - Projects : projects, tasks and clusters setup pages
 - Timesheet : page used to note effort spent on projects
 - Security : brind software security (filters, login form)
@@ -39,7 +39,7 @@ All Timeboard runtime dependencies can be found in Karaf [feature.xml](../featur
 
 ### Actor
 
-Any logged user to Timeboard is an actor
+Any logged account to Timeboard is an actor
 
 ### Project
 

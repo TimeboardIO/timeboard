@@ -28,9 +28,9 @@ package timeboard.sample;
 
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,11 +47,11 @@ public class TaskLoader {
         this.userService = userService;
     }
 
-    public List<Task> load(List<User> usersSaved, List<Project> projectsSaved, int nbProjectsByUsers, int nbTasksByProjects) {
+    public List<Task> load(List<Account> usersSaved, List<Project> projectsSaved, int nbProjectsByUsers, int nbTasksByProjects) {
         List<Task> tasksSaved = new ArrayList<>();
         for (int i = 0; i < projectsSaved.size(); i++) {
 
-            User owner = usersSaved.get(i/nbProjectsByUsers); // car 1 user possède "nbProjectsByUsers" projects
+            Account owner = usersSaved.get(i/nbProjectsByUsers); // car 1 user possède "nbProjectsByUsers" projects
             Project project = projectsSaved.get(i);
 
             if(owner != null && project != null) {

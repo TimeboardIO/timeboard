@@ -99,7 +99,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public Project createProject(User owner, String projectName) throws BusinessException {
+    public Project createProject(Account owner, String projectName) throws BusinessException {
         em.merge(owner);
         Project newProject = new Project();
         newProject.setName(projectName);
@@ -115,14 +115,14 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public List<Project> listProjects(User user) {
+    public List<Project> listProjects(Account account) {
         TypedQuery<Project> query = em.createQuery("select p from Project p join fetch p.members m where m.member = :user", Project.class);
-        query.setParameter("user", user);
+        query.setParameter("user", account);
         return query.getResultList();
     }
 
     @Override
-    public Project getProjectByID(User actor, Long projectId) {
+    public Project getProjectByID(Account actor, Long projectId) {
         Project data = em.createQuery("select p from Project p join fetch p.members m where p.id = :projectID and  m.member = :user", Project.class)
                 .setParameter("user", actor)
                 .setParameter("projectID", projectId)
@@ -131,7 +131,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectByIdWithAllMembers(User actor, Long projectId) throws BusinessException {
+    public Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException {
         Project project = em.createQuery("select p from Project p where p.id = :projectId", Project.class)
                 .setParameter("projectId", projectId)
                 .getSingleResult();
@@ -147,7 +147,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectByName(User actor, String projectName) throws BusinessException {
+    public Project getProjectByName(Account actor, String projectName) throws BusinessException {
 
         Project data = em.createQuery("select p from Project p where p.name = :name", Project.class)
                 .setParameter("name", projectName)
@@ -167,7 +167,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project deleteProjectByID(User actor, Project project) throws BusinessException {
+    public Project deleteProjectByID(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -183,7 +183,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project updateProject(User actor, Project project) throws BusinessException {
+    public Project updateProject(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -199,7 +199,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDashboard projectDashboard(User actor, Project project) throws BusinessException {
+    public ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -232,7 +232,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Project updateProject(User actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException {
+    public Project updateProject(Account actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
@@ -297,7 +297,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public void save(User actor, ProjectMembership projectMembership) throws BusinessException {
+    public void save(Account actor, ProjectMembership projectMembership) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
@@ -316,7 +316,7 @@ public class ProjectServiceImpl implements ProjectService {
     /* -- TASKS -- */
 
     @Override
-    public List<Task> listProjectTasks(User actor, Project project) throws BusinessException {
+    public List<Task> listProjectTasks(Account actor, Project project) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
@@ -332,9 +332,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Task> listUserTasks(User user) {
+    public List<Task> listUserTasks(Account account) {
         TypedQuery<Task> q = em.createQuery("select t from Task t where t.assigned = :user", Task.class);
-        q.setParameter("user", user);
+        q.setParameter("user", account);
         return q.getResultList();
 
     }
@@ -347,7 +347,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Task createTask(User actor,
+    public Task createTask(Account actor,
                            Project project,
                            String taskName,
                            String taskComment,
@@ -355,7 +355,7 @@ public class ProjectServiceImpl implements ProjectService {
                            Date endDate,
                            double originalEstimate,
                            Long taskTypeID,
-                           User assignedUser,
+                           Account assignedAccount,
                            String origin,
                            String remotePath,
                            String remoteId,
@@ -374,7 +374,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setEffortLeft(originalEstimate);
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(TaskStatus.PENDING);
-        newTask.setAssigned(assignedUser);
+        newTask.setAssigned(assignedAccount);
         if (milestone != null) {
             em.merge(milestone);
         }
@@ -392,7 +392,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Task updateTask(User actor, final Task task) {
+    public Task updateTask(Account actor, final Task task) {
         //TODO check actor permissions
         if (task.getProject().isMember(actor)) {
             em.merge(task);
@@ -402,7 +402,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void createTasks(final User actor, final List<Task> taskList) {
+    public void createTasks(final Account actor, final List<Task> taskList) {
         for (Task newTask : taskList) {  //TODO create task here
             LOGGER.info("User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
         }
@@ -413,7 +413,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void updateTasks(User actor, List<Task> taskList) {
+    public void updateTasks(Account actor, List<Task> taskList) {
         for (Task task : taskList) {
             em.merge(task);
         }
@@ -427,7 +427,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteTasks(User actor, List<Task> taskList) {
+    public void deleteTasks(Account actor, List<Task> taskList) {
         for (Task task : taskList) {
             em.merge(task);
         }
@@ -437,12 +437,12 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public AbstractTask getTaskByID(User user, long id) throws BusinessException {
+    public AbstractTask getTaskByID(Account account, long id) throws BusinessException {
         AbstractTask task = em.find(AbstractTask.class, id);
         if (task instanceof Task) {
             RuleSet<Task> ruleSet = new RuleSet<>();
             ruleSet.addRule(new ActorIsProjectMemberbyTask());
-            Set<Rule> wrongRules = ruleSet.evaluate(user, (Task) task);
+            Set<Rule> wrongRules = ruleSet.evaluate(account, (Task) task);
             if (!wrongRules.isEmpty()) {
                 throw new BusinessException(wrongRules);
             }
@@ -451,6 +451,7 @@ public class ProjectServiceImpl implements ProjectService {
         return task;
     }
 
+    public List<AbstractTask> getTasksByName(Account account, String name) {
     private AbstractTask getTasksByName(String name) {
 
         final List<AbstractTask> tasks = new ArrayList<>();
@@ -505,7 +506,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<UpdatedTaskResult> updateTaskImputations(User actor, List<Imputation> imputationsList) {
+    public List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList) {
         List<UpdatedTaskResult> result = new ArrayList<>();
         for (Imputation imputation : imputationsList) {
             UpdatedTaskResult updatedTaskResult = null;
@@ -521,7 +522,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public UpdatedTaskResult updateTaskImputation(User actor, AbstractTask task, Date day, double val) throws BusinessException {
+    public UpdatedTaskResult updateTaskImputation(Account actor, AbstractTask task, Date day, double val) throws BusinessException {
         Calendar c = Calendar.getInstance();
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
@@ -533,7 +534,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    private UpdatedTaskResult updateProjectTaskImputation(User actor, Task task, Date day, double val, Calendar calendar) throws BusinessException {
+    private UpdatedTaskResult updateProjectTaskImputation(Account actor, Task task, Date day, double val, Calendar calendar) throws BusinessException {
         Task projectTask = (Task) this.getTaskByID(actor, task.getId());
 
 
@@ -555,7 +556,7 @@ public class ProjectServiceImpl implements ProjectService {
         return null;
     }
 
-    private UpdatedTaskResult updateDefaultTaskImputation(User actor, DefaultTask task, Date day, double val, Calendar calendar) throws BusinessException {
+    private UpdatedTaskResult updateDefaultTaskImputation(Account actor, DefaultTask task, Date day, double val, Calendar calendar) throws BusinessException {
         DefaultTask defaultTask = (DefaultTask) this.getTaskByID(actor, task.getId());
 
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
@@ -577,14 +578,14 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-    private Imputation actionOnImputation(Imputation imputation, AbstractTask task, User actor, double val, Date date, EntityManager entityManager) {
+    private Imputation actionOnImputation(Imputation imputation, AbstractTask task, Account actor, double val, Date date, EntityManager entityManager) {
 
         if (imputation == null) {
             //No imputation for current task and day
             imputation = new Imputation();
             imputation.setDay(date);
             imputation.setTask(task);
-            imputation.setUser(actor);
+            imputation.setAccount(actor);
             imputation.setValue(val);
             entityManager.persist(imputation);
         } else  {
@@ -619,7 +620,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public UpdatedTaskResult updateTaskEffortLeft(User actor, Task task, double effortLeft) throws BusinessException {
+    public UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException {
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
@@ -645,7 +646,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<TaskRevision> findAllTaskRevisionByTaskID(User actor, Long taskID) {
+    public List<TaskRevision> findAllTaskRevisionByTaskID(Account actor, Long taskID) {
         TypedQuery<TaskRevision> q = em
                 .createQuery("select t from TaskRevision t left join fetch t.task where "
                         + "t.task.id = :taskID"
@@ -657,7 +658,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public List<ProjectTasks> listTasksByProject(User actor, Date ds, Date de) {
+    public List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de) {
         final List<ProjectTasks> projectTasks = new ArrayList<>();
 
 
@@ -705,7 +706,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteTaskByID(User actor, long taskID) throws BusinessException {
+    public void deleteTaskByID(Account actor, long taskID) throws BusinessException {
 
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new TaskHasNoImputation());
@@ -728,7 +729,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortHistory> getEffortSpentByTaskAndPeriod(User actor, Task task, Date startTaskDate, Date endTaskDate) throws BusinessException {
+    public List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor, Task task, Date startTaskDate, Date endTaskDate) throws BusinessException {
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
@@ -751,7 +752,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public List<EffortHistory> getTaskEffortLeftHistory(User actor, Task task) throws BusinessException {
+    public List<EffortHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException {
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
@@ -799,7 +800,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Map<String, Task> searchExistingTasksFromOrigin(User actor, Project project, String origin, String remotePath) throws BusinessException {
+    public Map<String, Task> searchExistingTasksFromOrigin(Account actor, Project project, String origin, String remotePath) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
@@ -824,7 +825,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Milestone> listProjectMilestones(User actor, Project project) throws BusinessException {
+    public List<Milestone> listProjectMilestones(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -838,12 +839,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone getMilestoneById(User user, long id) throws BusinessException {
+    public Milestone getMilestoneById(Account account, long id) throws BusinessException {
 
         Milestone milestone = em.find(Milestone.class, id);
         RuleSet<Milestone> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
-        Set<Rule> wrongRules = ruleSet.evaluate(user, milestone);
+        Set<Rule> wrongRules = ruleSet.evaluate(account, milestone);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
@@ -851,7 +852,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone createMilestone(User actor, String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) throws BusinessException {
+    public Milestone createMilestone(Account actor, String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
@@ -877,7 +878,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone updateMilestone(User actor, Milestone milestone) throws BusinessException {
+    public Milestone updateMilestone(Account actor, Milestone milestone) throws BusinessException {
         RuleSet<Milestone> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
@@ -892,7 +893,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteMilestoneByID(User actor, long milestoneID) throws BusinessException {
+    public void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException {
         RuleSet<Milestone> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
         ruleSet.addRule(new MilestoneHasNoTask());
@@ -911,7 +912,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Task> listTasksByMilestone(User actor, Milestone milestone) throws BusinessException {
+    public List<Task> listTasksByMilestone(Account actor, Milestone milestone) throws BusinessException {
         RuleSet<Milestone> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
@@ -924,7 +925,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone addTasksToMilestone(User actor, Milestone m, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
+    public Milestone addTasksToMilestone(Account actor, Milestone m, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
         RuleSet<Milestone> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, m);
@@ -954,8 +955,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public boolean isProjectOwner(User user, Project project) {
-        return (new ActorIsProjectOwner()).isSatisfied(user, project);
+    public boolean isProjectOwner(Account account, Project project) {
+        return (new ActorIsProjectOwner()).isSatisfied(account, project);
     }
 
 

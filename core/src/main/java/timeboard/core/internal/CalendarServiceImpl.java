@@ -74,7 +74,7 @@ public class CalendarServiceImpl implements CalendarService {
 
 
     @Override
-    public boolean importCalendarAsImputationsFromIcs(User actor, String url, AbstractTask task, List<User> userList,
+    public boolean importCalendarAsImputationsFromIcs(Account actor, String url, AbstractTask task, List<Account> accountList,
                                                       double value) throws BusinessException, ParseException, IOException {
 
         /* -- Events -- */
@@ -86,14 +86,14 @@ public class CalendarServiceImpl implements CalendarService {
         for (List<Event> newEventList : newEvents.values()) {
             for (Event event : newEventList) {
                 if (existingEventList == null || existingEventList.isEmpty()) { // no existing events for this id
-                    imputationsToUpdate.addAll(this.eventToImputation(event, task, userList, value)); // so create it
+                    imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value)); // so create it
                 } else { //  one or many events exist for this id
                     Imputation timeboardImputation = this.getImputationByStartDate(existingEventList, event.getStartDate());
                     if (timeboardImputation != null) { // event and task match (id & date), so update it
-                        imputationsToUpdate.addAll(this.eventToImputation(event, task, userList, value));// convert event to imputation
+                        imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));// convert event to imputation
                         existingEventList.remove(timeboardImputation); // remove  to retrieve orphan at the end
                     } else { // no matching imputation found, so create it
-                        imputationsToUpdate.addAll(this.eventToImputation(event, task, userList, value));
+                        imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));
                     }
                 }
             }
@@ -104,7 +104,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public boolean importCalendarAsTasksFromIcs(User actor, String name, String url, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException  {
+    public boolean importCalendarAsTasksFromIcs(Account actor, String name, String url, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException  {
 
         /* -- Calendar -- */
         final timeboard.core.model.Calendar timeboardCalendar = this.createOrUpdateCalendar(name, url);
@@ -244,11 +244,11 @@ public class CalendarServiceImpl implements CalendarService {
 
     }
 
-    private List<Imputation> eventToImputation(Event event, AbstractTask task, List<User> userList, double value) {
+    private List<Imputation> eventToImputation(Event event, AbstractTask task, List<Account> accountList, double value) {
         List<Imputation> result = new ArrayList<>();
-        for (User user : userList) {
+        for (Account account : accountList) {
             Imputation imputation =  new Imputation();
-            imputation.setUser(user);
+            imputation.setAccount(account);
             imputation.setTask(task);
             imputation.setDay(event.getStartDate());
             imputation.setValue(value);
@@ -371,7 +371,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public void deleteCalendarById(User actor, Long calendarID) throws BusinessException {
+    public void deleteCalendarById(Account actor, Long calendarID) throws BusinessException {
         RuleSet<timeboard.core.model.Calendar> ruleSet = new RuleSet<>();
 
              timeboard.core.model.Calendar calendar = em.find(timeboard.core.model.Calendar.class, calendarID);

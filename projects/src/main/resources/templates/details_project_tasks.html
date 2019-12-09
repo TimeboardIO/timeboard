@@ -89,7 +89,7 @@
                         <div class="ui fluid category search">
                             <div class="ui fluid icon input">
 
-                                <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search user..." type="text"/>
+                                <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search account..." type="text"/>
 
                                 <input class="taskAssigned" name="taskAssigned"
                                        type="hidden"/>
@@ -238,7 +238,7 @@
                             <label>User assigned</label>
                             <div class="ui category search">
                                 <div class="ui icon input">
-                                    <input class="prompt assigned" placeholder="Search user..."
+                                    <input class="prompt assigned" placeholder="Search account..."
                                            v-model="task.assignee" type="text"/>
                                     <input class="taskAssigned" name="taskAssigned"
                                            v-model="task.assigneeID" type="hidden"/>

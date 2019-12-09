@@ -30,8 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
-import timeboard.core.model.Project;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -66,7 +65,7 @@ public class AccountServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         String submitButton = request.getParameter("formType");
         if (submitButton.matches("account")) {
@@ -80,7 +79,7 @@ public class AccountServlet extends TimeboardServlet {
             actor.setEmail(email);
 
            try {
-              User u = userService.updateUser(actor);
+              Account u = userService.updateUser(actor);
                viewModel.getViewDatas().put("message", "User account changed successfully !");
            } catch (Exception e) {
                viewModel.getViewDatas().put("error", "Error while updating user information.");
@@ -97,7 +96,7 @@ public class AccountServlet extends TimeboardServlet {
                 }
             }
             try {
-                User u = userService.updateUser(actor);
+                Account u = userService.updateUser(actor);
                 viewModel.getViewDatas().put("message", "External tools updated successfully !");
             } catch (Exception e) {
                 viewModel.getViewDatas().put("error", "Error while external tools");
@@ -108,12 +107,12 @@ public class AccountServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         loadPage(viewModel, actor);
     }
     
-    private void loadPage(ViewModel viewModel, User user) {
-        viewModel.getViewDatas().put("user", user);
+    private void loadPage(ViewModel viewModel, Account account) {
+        viewModel.getViewDatas().put("user", account);
 
         List<Project> projects = projectService.listProjects(user);
 

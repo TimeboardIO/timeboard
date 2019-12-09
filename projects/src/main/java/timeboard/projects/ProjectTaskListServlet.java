@@ -54,7 +54,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         Task task = new Task();
         if (request.getParameter("taskID") != null) {
@@ -78,7 +78,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);
 
@@ -96,7 +96,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
         private Double originalEstimate;
         private Long assignedUserID;
         private Long taskTypeID;
-        private User assignedUser;
+        private Account assignedAccount;
 
         private TaskType taskType;
         private TaskStatus taskStatus;
@@ -110,7 +110,7 @@ public class ProjectTaskListServlet extends TimeboardServlet {
             originalEstimate = task.getOriginalEstimate();
             startDate = task.getStartDate();
             endDate = task.getEndDate();
-            assignedUser = task.getAssigned();
+            assignedAccount = task.getAssigned();
             taskName = task.getName();
             taskComment = task.getComments();
             taskStatus = task.getTaskStatus();
@@ -170,12 +170,12 @@ public class ProjectTaskListServlet extends TimeboardServlet {
             this.taskType = taskType;
         }
 
-        public User getAssignedUser() {
-            return assignedUser;
+        public Account getAssignedAccount() {
+            return assignedAccount;
         }
 
-        public void setAssignedUser(User assignedUser) {
-            this.assignedUser = assignedUser;
+        public void setAssignedAccount(Account assignedAccount) {
+            this.assignedAccount = assignedAccount;
         }
 
         public TaskStatus getTaskStatus() {

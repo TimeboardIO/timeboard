@@ -30,7 +30,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +47,10 @@ public class ProjectLoader {
     }
 
 
-    public List<Project> load(List<User> usersSaved, int nbProjectsByUsers) throws BusinessException {
+    public List<Project> load(List<Account> usersSaved, int nbProjectsByUsers) throws BusinessException {
         List<Project> projectsSaved = new ArrayList<>();
         for (int i = 0; i < usersSaved.size(); i++) {
-            User owner = usersSaved.get(i);
+            Account owner = usersSaved.get(i);
 
             if(owner != null) {
                 for (int j = 0; j < nbProjectsByUsers; j++) {

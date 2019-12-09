@@ -34,9 +34,9 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -60,7 +60,7 @@ public class XlsExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(User actor, long projectID, OutputStream output) throws IOException, BusinessException {
+    public void export(Account actor, long projectID, OutputStream output) throws IOException, BusinessException {
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
 

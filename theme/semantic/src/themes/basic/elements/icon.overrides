@@ -130,10 +130,10 @@ i.icon.top.list:before { content: '🏆'; } /* '\1f3c6' */
 i.icon.trash:before { content: '\e729'; } /* '' */
 i.icon.twitter:before { content: '\f303'; } /* '' */
 i.icon.upload:before { content: '\e711'; } /* '' */
-i.icon.user.add:before { content: '\e700'; } /* '' */
-i.icon.user:before { content: '👤'; } /* '\1f464' */
+i.icon.account.add:before { content: '\e700'; } /* '' */
+i.icon.account:before { content: '👤'; } /* '\1f464' */
 i.icon.community:before { content: '\e814'; } /* '' */
-i.icon.users:before { content: '👥'; } /* '\1f465' */
+i.icon.accounts:before { content: '👥'; } /* '\1f465' */
 i.icon.id:before { content: '\e722'; } /* '' */
 i.icon.url:before { content: '🔗'; } /* '\1f517' */
 i.icon.zoom.in:before { content: '\e750'; } /* '' */

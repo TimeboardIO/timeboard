@@ -26,7 +26,7 @@ package timeboard.core.internal.events;
  * #L%
  */
 
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -37,8 +37,8 @@ public class TimeboardEvent  implements Serializable {
 
     protected Date eventDate;
 
-    protected List<User> usersToNotify;
-    protected List<User> usersToInform;
+    protected List<Account> usersToNotify;
+    protected List<Account> usersToInform;
 
     public Date getEventDate() {
         return eventDate;
@@ -50,11 +50,11 @@ public class TimeboardEvent  implements Serializable {
         usersToInform = new ArrayList<>();
     }
 
-    public List<User> getUsersToNotify() {
+    public List<Account> getUsersToNotify() {
         return usersToNotify;
     }
 
-    public List<User> getUsersToInform() {
+    public List<Account> getUsersToInform() {
         return usersToInform;
     }
 

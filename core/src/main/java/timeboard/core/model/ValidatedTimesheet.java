@@ -35,11 +35,11 @@ public class ValidatedTimesheet {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @OneToOne(targetEntity = User.class)
-    private User validatedBy;
+    @OneToOne(targetEntity = Account.class)
+    private Account validatedBy;
 
-    @OneToOne(targetEntity = User.class)
-    private User user;
+    @OneToOne(targetEntity = Account.class)
+    private Account account;
 
     @Column
     private int year;
@@ -55,11 +55,11 @@ public class ValidatedTimesheet {
         this.id = id;
     }
 
-    public User getValidatedBy() {
+    public Account getValidatedBy() {
         return validatedBy;
     }
 
-    public void setValidatedBy(User validatedBy) {
+    public void setValidatedBy(Account validatedBy) {
         this.validatedBy = validatedBy;
     }
 
@@ -79,11 +79,11 @@ public class ValidatedTimesheet {
         this.week = w;
     }
 
-    public User getUser() {
-        return user;
+    public Account getAccount() {
+        return account;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

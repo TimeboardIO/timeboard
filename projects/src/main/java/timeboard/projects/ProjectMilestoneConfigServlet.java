@@ -58,7 +58,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handleGet(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         if (request.getParameter("milestoneID") != null) {
             // Update case
             long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
@@ -91,7 +91,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
     }
 
     @Override
-    protected void handlePost(User actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel)
+    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel)
             throws ServletException, IOException, BusinessException, ParseException {
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
@@ -116,7 +116,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
 
     }
 
-    private Milestone createMilestone(User actor, Project project, HttpServletRequest request) throws ParseException, BusinessException {
+    private Milestone createMilestone(Account actor, Project project, HttpServletRequest request) throws ParseException, BusinessException {
         String name = request.getParameter("milestoneName");
         Date date = new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime() + (2 * 60 * 60 * 1000) + 1);
         MilestoneType type = request.getParameter("milestoneType") != null ? MilestoneType.valueOf(request.getParameter("milestoneType")) : MilestoneType.DELIVERY;
@@ -126,7 +126,7 @@ public class ProjectMilestoneConfigServlet extends TimeboardServlet {
         return this.projectService.createMilestone(actor, name, date, type, attributes, tasks, project);
     }
 
-    private Milestone updateMilestone(User actor, Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException, BusinessException {
+    private Milestone updateMilestone(Account actor, Milestone currentMilestone, Project project, HttpServletRequest request) throws ParseException, BusinessException {
 
         currentMilestone.setName(request.getParameter("milestoneName"));
         currentMilestone.setDate(new Date(DATE_FORMAT.parse(request.getParameter("milestoneDate")).getTime() + (2 * 60 * 60 * 1000) + 1));

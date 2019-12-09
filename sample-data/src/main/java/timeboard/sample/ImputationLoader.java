@@ -29,9 +29,9 @@ package timeboard.sample;
 
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.model.Account;
 import timeboard.core.model.Imputation;
 import timeboard.core.model.Task;
-import timeboard.core.model.User;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -47,13 +47,13 @@ public class ImputationLoader {
         this.userService = userService;
     }
 
-    public List<Imputation> load(List<User> usersSaved, List<Task> tasksSaved, int nbProjectsByUsers, int nbTasksByProjects, int nbImputationsByTasks){
+    public List<Imputation> load(List<Account> usersSaved, List<Task> tasksSaved, int nbProjectsByUsers, int nbTasksByProjects, int nbImputationsByTasks){
         List<Imputation> imputationsSaved = new ArrayList<>();
         Map<String, Double> mapDateSumImput = new HashMap<String, Double>();
 
         for (int i = 0; i < tasksSaved.size(); i++) {
 
-            User actor = usersSaved.get(i/(nbProjectsByUsers*nbTasksByProjects)); // car 1 user possède "nbProjectsByUsers" projects possédant chacun "nbTasksByProjects" tâches
+            Account actor = usersSaved.get(i/(nbProjectsByUsers*nbTasksByProjects)); // car 1 user possède "nbProjectsByUsers" projects possédant chacun "nbTasksByProjects" tâches
             Task task = tasksSaved.get(i);
 
             if(actor != null) {

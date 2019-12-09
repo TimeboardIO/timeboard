@@ -32,7 +32,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 import timeboard.core.api.UserService;
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 @Component
 @SessionScope
@@ -41,13 +41,13 @@ public class UserInfo {
     @Autowired
     private UserService userService;
 
-    private User user;
+    private Account account;
 
-    public User getCurrentUser() {
-        if (user == null) {
+    public Account getCurrentAccount() {
+        if (account == null) {
             OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            user = userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
+            account = userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
         }
-        return user;
+        return account;
     }
 }

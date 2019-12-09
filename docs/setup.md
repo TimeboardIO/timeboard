@@ -91,7 +91,7 @@ Open your web browser and got to
     
 Congratulation, you have access to Timeboard login page !
 
-### Last job : Load dataset OR create user account
+### Last job : Load dataset OR create account account
 
 ##### Load dataset (only once)
 
@@ -101,12 +101,12 @@ Congratulation, you have access to Timeboard login page !
     bundle:resolve sample-data
     bundle:start sample-data
 
-##### Create a user account
+##### Create a account account
 
 Timeboard database is empty at first startup
-In order to create your first user, you must use Apache Karaf Shell 
+In order to create your first account, you must use Apache Karaf Shell 
 
-    timeboard:add-user -u timeboard -p pwd -e timeboard@localhost.com
+    timeboard:add-account -u timeboard -p pwd -e timeboard@localhost.com
         
 Now, you can login into Timeboard with 
 
