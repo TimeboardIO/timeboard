@@ -37,6 +37,7 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import timeboard.core.api.DataTableService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.User;
 
@@ -72,7 +73,7 @@ public abstract class TimeboardServlet extends HttpServlet {
 
     protected abstract ClassLoader getTemplateResolutionClassLoader();
 
-    @Reference
+    @Autowired
     private DataTableService dataTableService;
 
     @Override

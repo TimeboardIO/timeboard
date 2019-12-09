@@ -27,6 +27,7 @@ package timeboard.account;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.DataTableConfig;
@@ -40,6 +41,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -57,11 +59,11 @@ public class AccountServlet extends TimeboardServlet {
 
     @Autowired(
             required = false
-
-    @Reference
-    private DataTableService dataTableService;
     )
     private List<ProjectImportService> projectImportServlets;
+
+    @Autowired
+    private DataTableService dataTableService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {

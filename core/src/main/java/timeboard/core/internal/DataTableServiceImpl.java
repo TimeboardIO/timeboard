@@ -26,47 +26,32 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.List;
-import java.util.Arrays;
-import javax.persistence.NoResultException;
-import javax.persistence.TypedQuery;
-import org.apache.aries.jpa.template.JpaTemplate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceScope;
-import org.osgi.service.log.LogService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.DataTableService;
 import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.User;
+import javax.persistence.*;
+import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
 
 
-@Component(
-        service = DataTableService.class,
-        immediate = true
-)
-public final class DataTableServiceImpl implements DataTableService {
-
-    /**
-     * Injected instance of timeboard persistence unit.
-     */
-    @Reference(
-            target = "(osgi.unit.name=timeboard-pu)",
-            scope = ReferenceScope.BUNDLE)
-    private JpaTemplate jpa;
-
-    @Reference
-    private LogService logService;
-
-    public DataTableServiceImpl() {
-
-    }
-
-    public DataTableServiceImpl(JpaTemplate jpaTemplate, LogService logService) {
-        this.jpa = jpaTemplate;
-        this.logService = logService;
-    }
+@Component
+@Transactional
+public class DataTableServiceImpl implements DataTableService {
 
     private String[] defaultCols = {"taskName"};
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+
+    @Autowired
+    private EntityManager em;
+
+    public DataTableServiceImpl() {
+    }
 
     @Override
     public boolean checkColumnDisplayed(String tableId, User actor, String colName){
@@ -89,22 +74,19 @@ public final class DataTableServiceImpl implements DataTableService {
 
     @Override
     public DataTableConfig findTableConfigByUserAndTable(String tableId, User actor) {
-        return jpa.txExpr(entityManager -> {
-            TypedQuery<DataTableConfig> q = entityManager
-                    .createQuery("select d from DataTableConfig d where d.user=:user and d.tableInstanceId=:tableId", DataTableConfig.class);
-            q.setParameter("user", actor);
-            q.setParameter("tableId", tableId);
-            try {
-                return q.getSingleResult();
-            } catch (NoResultException e) {
-                return null;
-            }
-        });
+        TypedQuery<DataTableConfig> q = this.em
+                .createQuery("select d from DataTableConfig d where d.user=:user and d.tableInstanceId=:tableId", DataTableConfig.class);
+        q.setParameter("user", actor);
+        q.setParameter("tableId", tableId);
+        try {
+            return q.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Override
     public DataTableConfig addOrUpdateTableConfig(String tableId, User actor, List<String> columnsNamesList) {
-        return this.jpa.txExpr(entityManager -> {
             DataTableConfig datatableConfig = this.findTableConfigByUserAndTable(tableId, actor);
             if (datatableConfig != null) {
                 datatableConfig.setUser(actor);
@@ -115,12 +97,11 @@ public final class DataTableServiceImpl implements DataTableService {
                 datatableConfig.setUser(actor);
                 datatableConfig.setTableInstanceId(tableId);
                 datatableConfig.setColumns(columnsNamesList);
-                entityManager.persist(datatableConfig);
+                this.em.persist(datatableConfig);
             }
-            entityManager.flush();
-            this.logService.log(LogService.LOG_INFO, "DataTableConfig " + datatableConfig.getUser() + "/" + datatableConfig.getTableInstanceId() +" updated.");
+            this.em.flush();
+            LOGGER.info("DataTableConfig " + datatableConfig.getUser() + "/" + datatableConfig.getTableInstanceId() +" updated.");
             return datatableConfig;
-        });
     }
 
 }
