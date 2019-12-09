@@ -102,7 +102,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
             for (int i = 1; i <= 5; i++) {
 
-                TypedQuery<Double> q = em.createQuery("select sum(value) from Imputation i where i.user = :user and i.day = :day ", Double.class);
+                TypedQuery<Double> q = em.createQuery("select sum(value) from Imputation i where i.account = :user and i.day = :day ", Double.class);
                 q.setParameter("user", accountTimesheet);
                 q.setParameter("day", c.getTime());
                 final List<Double> resultList = q.getResultList();
@@ -132,7 +132,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     public boolean isTimesheetValidated(Account accountTimesheet, int year, int week) {
              TypedQuery<ValidatedTimesheet> q = em.createQuery("select vt from ValidatedTimesheet vt "
-                    + "where vt.user = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
+                    + "where vt.account = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
             q.setParameter("week", week);
             q.setParameter("year", year);
             q.setParameter("user", accountTimesheet);
@@ -150,7 +150,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             TypedQuery<Double> q = em.createQuery(
                     "SELECT COALESCE(sum(i.value),0) \n"
                             + "FROM Imputation i\n"
-                            + "WHERE i.user = :user \n"
+                            + "WHERE i.account = :user \n"
                             + "AND i.day > :firstDayOfWeek\n"
                             + "AND i.day < :lastDayOfWeek", Double.class);
             q.setParameter("firstDayOfWeek", firstDayOfWeek);
