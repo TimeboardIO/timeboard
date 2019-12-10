@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
+    <style rel="stylesheet">
+        .box{
+            position: fixed;
+            margin: 0 auto;
+            text-align: center;
+            font-family: sans-serif;
+            left : 0px;
+            right: 0px;
+            top : 20%;
+            padding: 2em;
+            color : white;
+        }
+
+        .title{
+            font-size: 5em;
+            text-shadow: -1px -1px 3px #333, 1px -1px 3px #333, -1px 1px 3px #333, 1px 1px 3px #333;
+        }
+
+        .link{
+            padding: 1em;
+            background-color: royalblue;
+            color: white;
+            text-transform: none;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+
+        .background{
+            background-image: url('http://localhost:8080/onboarding/bg.jpg');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-origin: content-box;
+            background-clip: content-box;
+            background-size: cover;
+            position:fixed;
+            top:0px;
+            left:0px;
+            right: 0px;
+            bottom: 0px;
+        }
+        @media screen and (max-width: 640px) {
+            .title {
+                font-size : 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="box">
+        <h1 class="title">Timeboard</h1>
+        <a class="link" th:href="@{/home}">Go to timeboard</a>
+    </div>
+</body>
+</html>

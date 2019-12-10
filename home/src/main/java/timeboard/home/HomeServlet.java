@@ -46,7 +46,7 @@ import java.util.List;
 
 
 
-@WebServlet(name="HomeServlet", urlPatterns = {""})
+@WebServlet(name="HomeServlet", urlPatterns = {"/home"})
 public class HomeServlet extends TimeboardServlet {
 
     @Autowired
