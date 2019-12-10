@@ -35,7 +35,7 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
-import timeboard.core.model.*;
+import timeboard.core.model.Or;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -88,10 +88,10 @@ public class OrganizationConfigServlet extends TimeboardServlet {
     protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
         viewModel.setTemplate("details_Organization_config.html");
-/*
+
         //Extract organization
         long id = Long.parseLong(request.getParameter("organizationID"));
-        Organization organization = this.OrganizationService.getOrganizationByIdWithAllMembers(actor, id);
+        Account organization = this.OrganizationService.getOrganizationByIdWithAllMembers(actor, id);
         organization.setName(request.getParameter("OrganizationName"));
         organization.setComments(request.getParameter("OrganizationDescription"));
         organization.setQuotation(Double.parseDouble(request.getParameter("OrganizationQuotation")));
@@ -153,5 +153,5 @@ public class OrganizationConfigServlet extends TimeboardServlet {
         prepareTemplateData(actor, organization, map);
 
         viewModel.getViewDatas().putAll(map);
-    */}
+    }
 }
