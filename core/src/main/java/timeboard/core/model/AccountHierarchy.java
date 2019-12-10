@@ -33,7 +33,7 @@ import java.util.Date;
 
 @Entity
 @Table(uniqueConstraints={
-        @UniqueConstraint(columnNames = {"parent_id", "child_id"})
+        @UniqueConstraint(columnNames = {"organization_id", "member_id"})
 })
 public class AccountHierarchy {
 
