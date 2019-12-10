@@ -41,6 +41,7 @@ import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
+import timeboard.core.ui.UserInfo;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -64,6 +65,8 @@ public class TimesheetRESTApi {
     @Autowired
     private TimesheetService timesheetService;
 
+    @Autowired
+    private UserInfo userInfo;
 
     @PostConstruct
     private void init() {
@@ -73,7 +76,7 @@ public class TimesheetRESTApi {
 
     @GetMapping(value = "/timesheet")
     public ResponseEntity getTimesheetData(HttpServletRequest request, @RequestParam("week") int week, @RequestParam("year") int year ) throws JsonProcessingException {
-        Account currentAccount = (Account) request.getAttribute("actor");
+        Account currentAccount = this.userInfo.getCurrentAccount();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
@@ -171,11 +174,11 @@ public class TimesheetRESTApi {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
     }
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/timesheet", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateDataFromTimesheet(HttpServletRequest req, @RequestBody UpdateRequest request) throws JsonProcessingException {
 
         try {
-            final Account actor = (Account) req.getAttribute("actor");
+            final Account actor = this.userInfo.getCurrentAccount();
 
            // String type = request.getParameter("type");
 
@@ -202,12 +205,10 @@ public class TimesheetRESTApi {
         }
     }
 
-
-
     @GetMapping("/validate")
     public ResponseEntity doPost(HttpServletRequest request) {
 
-        final Account actor = (Account) request.getAttribute("actor");
+        final Account actor = this.userInfo.getCurrentAccount();
 
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
@@ -219,7 +220,6 @@ public class TimesheetRESTApi {
             return ResponseEntity.status(412).build();
         }
     }
-
 
 
     private Date findStartDate(Calendar c, int week, int year) {
