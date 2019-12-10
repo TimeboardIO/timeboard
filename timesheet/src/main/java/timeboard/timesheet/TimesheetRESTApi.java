@@ -67,12 +67,7 @@ public class TimesheetRESTApi {
 
     @Autowired
     private UserInfo userInfo;
-
-    @PostConstruct
-    private void init() {
-        System.out.println("Start Timesheet API !");
-    }
-
+  
 
     @GetMapping(value = "/timesheet")
     public ResponseEntity getTimesheetData(HttpServletRequest request, @RequestParam("week") int week, @RequestParam("year") int year ) throws JsonProcessingException {

@@ -425,7 +425,9 @@ public class TasksRestAPI {
             this.taskComments = taskComments;
             this.originalEstimate = originalEstimate;
             this.startDate = DATE_FORMAT.format(startDate);
-            this.endDate = DATE_FORMAT.format(endDate);
+            if(endDate != null) {
+                this.endDate = DATE_FORMAT.format(endDate);
+            }
             this.assignee = assignee;
             this.assigneeID = assigneeID;
             this.status = status;

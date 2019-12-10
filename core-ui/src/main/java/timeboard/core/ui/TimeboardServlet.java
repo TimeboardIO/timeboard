@@ -124,7 +124,6 @@ public abstract class TimeboardServlet extends HttpServlet {
             this.handlePost(getActorFromRequestAttributes(request), request, response, viewModel);
         } catch (Exception e) {
             viewModel.getErrors().add(e);
-            System.out.println(e.getMessage());
             e.printStackTrace(System.err);
         }
         doService(request, response, viewModel);

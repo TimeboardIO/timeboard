@@ -97,7 +97,6 @@ public class WebConfig implements WebMvcConfigurer {
             }
 
             protected Account getActorFromRequestAttributes(WebRequest request) {
-                System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
                 OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
                 return userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
             }
