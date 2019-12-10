@@ -26,7 +26,9 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.security.Principal;
@@ -34,9 +36,13 @@ import java.security.Principal;
 @Controller
 public class OnboardingController {
 
+    @Value("${timeboard.appName}")
+    private String applicationName;
+
     @GetMapping("/")
-    public String onboarding(Principal p){
+    public String onboarding(Principal p, Model m){
         if(p == null){
+            m.addAttribute("applicationName", applicationName);
             return "onboarding";
         }else{
             return "redirect:/home";
