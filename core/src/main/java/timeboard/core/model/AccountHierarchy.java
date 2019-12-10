@@ -33,7 +33,7 @@ import java.util.Date;
 
 @Entity
 @Table(uniqueConstraints={
-        @UniqueConstraint(columnNames = {"parent_id", "child_id"})
+        @UniqueConstraint(columnNames = {"organization_id", "member_id"})
 })
 public class AccountHierarchy {
 
@@ -66,7 +66,7 @@ public class AccountHierarchy {
     }
 
     public void setOrganization(Account organization) throws BusinessException {
-        if(this.member != null && this.organization.getId() == this.member.getId()){
+        if(this.member != null && organization.getId() == this.member.getId()){
             throw  new BusinessException("An parent account can't refer to itself");
         }
         this.organization = organization;
@@ -77,7 +77,7 @@ public class AccountHierarchy {
     }
 
     public void setMember(Account member) throws BusinessException {
-        if(this.organization != null && this.member.getId() == this.organization.getId()){
+        if(this.organization != null && member.getId() == this.organization.getId()){
             throw  new BusinessException("An child account can't refer to itself");
         }
         this.member = member;

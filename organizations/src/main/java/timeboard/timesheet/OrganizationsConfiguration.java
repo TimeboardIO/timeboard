@@ -1,8 +1,8 @@
-package timeboard.webapp;
+package timeboard.timesheet;
 
 /*-
  * #%L
- * webapp
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,29 +26,12 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import timeboard.account.AccountConfiguration;
-import timeboard.core.CoreConfiguration;
-import timeboard.core.ui.CoreUIConfiguration;
-import timeboard.home.HomeConfiguration;
-import timeboard.projects.ProjectsConfiguration;
-import timeboard.reporting.ReportingConfiguration;
-import timeboard.theme.ThemeConfiguration;
-import timeboard.timesheet.OrganizationsConfiguration;
-import timeboard.timesheet.TimesheetConfiguration;
 
 @Configuration
-@Import({
-        ThemeConfiguration.class,
-        CoreConfiguration.class,
-        CoreUIConfiguration.class,
-        HomeConfiguration.class,
-        AccountConfiguration.class,
-        ReportingConfiguration.class,
-        TimesheetConfiguration.class,
-        ProjectsConfiguration.class,
-        OrganizationsConfiguration.class
-})
-public class ModulesConfiguration {
+@ComponentScan("timeboard.organizations")
+@ServletComponentScan("timeboard.organizations")
+public class OrganizationsConfiguration {
 }

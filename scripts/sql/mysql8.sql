@@ -16,8 +16,8 @@
        id bigint not null,
         endDate datetime(6),
         startDate datetime(6) not null,
-        child_id bigint,
-        parent_id bigint,
+        member_id bigint,
+        organization_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -180,19 +180,19 @@
        add constraint UK_l1aov0mnvpvcmg0ctq466ejwm unique (remoteSubject);
 
     alter table AccountHierarchy 
-       add constraint UK75obucy8vq03aqtehoj542edh unique (parent_id, child_id);
+       add constraint UK76o95xmqbunfiuaal3c86h3oc unique (organization_id, member_id);
 
     alter table Imputation 
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
     alter table AccountHierarchy 
-       add constraint FKpuy6qn63d17dvpcvnfn3786fd 
-       foreign key (child_id) 
+       add constraint FKsiqpllhiyu6kby8mpjhr5u6bb 
+       foreign key (member_id) 
        references Account (id);
 
     alter table AccountHierarchy 
-       add constraint FKl0m9ft4q7f7poxa8vgc1gxpdp 
-       foreign key (parent_id) 
+       add constraint FKqlc8oegowh9hvnyvgdckpw6uv 
+       foreign key (organization_id) 
        references Account (id);
 
     alter table CostByCategory 
