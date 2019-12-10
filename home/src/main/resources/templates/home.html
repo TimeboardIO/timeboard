@@ -4,6 +4,17 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 
+<head>
+    <style>
+
+    /* Table styles on Medium and Large screen  */
+    @media (max-width: 768px) {
+      .mobile.hide {
+        display: none !important;
+      }
+    }
+    </style>
+</head>
 <body>
 
 
@@ -11,7 +22,7 @@
 
     <div class="ui segment">
 
-        <div class="ui two column  grid" >
+        <div class="ui two column grid doubling" >
 
             <div class="column center aligned">
                 <div class="ui segment basic middle aligned center aligned grid" >
@@ -43,15 +54,15 @@
 
             <div class="column center aligned">
                 <table class="ui table">
-                    <thead>
+                    <thead class="mobile hide">
                     <tr class="center aligned">
                         <th class="six wide">Week</th>
                         <th class="four wide">Days</th>
                         <th class="two wide">Validated</th>
                     </tr>
                     </thead>
-                    <tbody th:each="week : ${weeks}">
-                    <tr class="center aligned">
+                    <tbody >
+                    <tr th:each="week : ${weeks}" class="center aligned">
                         <td data-label="Week" >
                             <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} " th:text="${'Week '+week.number}"></a>
                         </td>
