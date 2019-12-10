@@ -52,7 +52,7 @@ public interface ProjectService {
 
     Project getProjectByName(Account account, String projectArg) throws BusinessException;
 
-    Project deleteProjectByID(Account actor, Project project) throws BusinessException;
+    Project archiveProjectByID(Account actor, Project project) throws BusinessException;
 
     Project updateProject(Account actor, Project project) throws BusinessException;
 

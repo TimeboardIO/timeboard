@@ -32,6 +32,11 @@ import java.util.*;
 
 
 @Entity
+@NamedQueries(
+        {
+                @NamedQuery(name = "ListUserProjects", query = "select p from Project p join fetch p.members m where (p.enable = true or p.enable is null) and m.member = :user")
+        }
+)
 public class Project implements Serializable {
 
     @Id
@@ -63,6 +68,8 @@ public class Project implements Serializable {
     )
     private Set<ProjectMembership> members;
 
+    @Column(nullable = true)
+    private Boolean enable;
 
     @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Task> tasks;
@@ -71,8 +78,9 @@ public class Project implements Serializable {
     private Set<Milestone> milestones;
 
     public Project() {
-        members = new HashSet<>();
-        tasks = new HashSet<>();
+        this.enable = true;
+        this.members = new HashSet<>();
+        this.tasks = new HashSet<>();
         this.attributes = new HashMap<>();
     }
 
@@ -149,6 +157,14 @@ public class Project implements Serializable {
 
     public void setMilestones(Set<Milestone> milestones) {
         this.milestones = milestones;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     public boolean isMember(Account actor) {

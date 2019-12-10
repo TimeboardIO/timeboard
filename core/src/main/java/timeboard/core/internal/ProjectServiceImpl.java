@@ -115,7 +115,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> listProjects(Account account) {
-        TypedQuery<Project> query = em.createQuery("select p from Project p join fetch p.members m where m.member = :user", Project.class);
+        TypedQuery<Project> query = em.createNamedQuery("ListUserProjects", Project.class);
         query.setParameter("user", account);
         return query.getResultList();
     }
@@ -166,18 +166,18 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project deleteProjectByID(Account actor, Project project) throws BusinessException {
+    public Project archiveProjectByID(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
-
-        em.remove(project);
+        em.merge(project);
+        project.setEnable(false);
         em.flush();
 
-        LOGGER.info("Project " + project.getName() + " deleted");
+        LOGGER.info("Project " + project.getName() + " archived by " + actor.getName());
         return project;
     }
 
@@ -432,6 +432,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
         LOGGER.info("User " + actor + " deleted " + taskList.size() + " tasks ");
         em.flush();
+
     }
 
 
