@@ -98,7 +98,7 @@ public class SendSummaryEmail {
         data.put("projects", projects.values());
         data.put("validatedTimesheets", validatedTimesheets);
 
-        String message = templateGenerator.getTemplateString("core-ui:mail/summary.html", data);
+        String message = templateGenerator.getTemplateString("mail/summary.html", data);
                 ArrayList<String> list = new ArrayList<>();
                 list.add(userNotificationStructure.getTargetAccount().getEmail());
         String subject = "[Timeboard] Daily summary";

@@ -53,7 +53,7 @@ import java.util.*;
 
 @Component
 @RestController
-@RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/timesheet", produces = MediaType.APPLICATION_JSON_VALUE)
 public class TimesheetRESTApi {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
@@ -69,7 +69,7 @@ public class TimesheetRESTApi {
     private UserInfo userInfo;
 
 
-    @GetMapping(value = "/timesheet")
+    @GetMapping
     public ResponseEntity getTimesheetData(HttpServletRequest request, @RequestParam("week") int week, @RequestParam("year") int year ) throws JsonProcessingException {
         Account currentAccount = this.userInfo.getCurrentAccount();
 
@@ -169,7 +169,7 @@ public class TimesheetRESTApi {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
     }
 
-    @PostMapping(value = "/timesheet", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateDataFromTimesheet(HttpServletRequest req, @RequestBody UpdateRequest request) throws JsonProcessingException {
 
         try {
@@ -201,7 +201,7 @@ public class TimesheetRESTApi {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity doPost(HttpServletRequest request) {
+    public ResponseEntity validateTimesheet(HttpServletRequest request) {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
