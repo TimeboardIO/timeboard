@@ -151,8 +151,8 @@ public class TimesheetServiceImpl implements TimesheetService {
                     "SELECT COALESCE(sum(i.value),0) \n"
                             + "FROM Imputation i\n"
                             + "WHERE i.account = :user \n"
-                            + "AND i.day > :firstDayOfWeek\n"
-                            + "AND i.day < :lastDayOfWeek", Double.class);
+                            + "AND i.day >= :firstDayOfWeek\n"
+                            + "AND i.day <= :lastDayOfWeek", Double.class);
             q.setParameter("firstDayOfWeek", firstDayOfWeek);
             q.setParameter("lastDayOfWeek", lastDayOfWeek);
             q.setParameter("user", account);
