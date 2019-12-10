@@ -36,7 +36,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectAttributValue;
-import timeboard.core.model.ProjectRole;
+import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Account;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
@@ -88,8 +88,8 @@ public class ProjectConfigServlet extends TimeboardServlet {
 
         map.put("project", project);
         map.put("members", project.getMembers());
-        map.put("roles", ProjectRole.values());
-        map.put("rolesForNewMember", OBJECT_MAPPER.writeValueAsString(ProjectRole.values()));
+        map.put("roles", MembershipRole.values());
+        map.put("rolesForNewMember", OBJECT_MAPPER.writeValueAsString(MembershipRole.values()));
         map.put("exports", this.projectExportServices);
         map.put("imports", this.projectImportServices);
         map.put("tasks", this.projectService.listProjectTasks(actor, project));
@@ -159,7 +159,7 @@ public class ProjectConfigServlet extends TimeboardServlet {
         }
 
         //Extract memberships from request
-        Map<Long, ProjectRole> memberships = new HashMap<>();
+        Map<Long, MembershipRole> memberships = new HashMap<>();
         Enumeration<String> params = request.getParameterNames();
         while (params.hasMoreElements()) {
             String param = params.nextElement();
@@ -167,9 +167,9 @@ public class ProjectConfigServlet extends TimeboardServlet {
                 String key = param.substring(param.indexOf('[') + 1, param.indexOf(']'));
                 String value = request.getParameter(param);
                 if (!value.isEmpty()) {
-                    memberships.put(Long.parseLong(key), ProjectRole.valueOf(value));
+                    memberships.put(Long.parseLong(key), MembershipRole.valueOf(value));
                 } else {
-                    memberships.put(Long.parseLong(key), ProjectRole.CONTRIBUTOR);
+                    memberships.put(Long.parseLong(key), MembershipRole.CONTRIBUTOR);
                 }
             }
         }

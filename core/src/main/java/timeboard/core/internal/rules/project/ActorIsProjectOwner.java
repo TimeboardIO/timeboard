@@ -30,7 +30,7 @@ import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectMembership;
-import timeboard.core.model.ProjectRole;
+import timeboard.core.model.MembershipRole;
 
 import java.util.Optional;
 
@@ -47,7 +47,7 @@ public class ActorIsProjectOwner implements Rule<Project> {
         Optional<ProjectMembership> userOptional = thing.getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()
-                                && projectMembership.getRole().equals(ProjectRole.OWNER)
+                                && projectMembership.getRole().equals(MembershipRole.OWNER)
                 )
                 .findFirst();
         return userOptional.isPresent();

@@ -61,7 +61,7 @@ public interface ProjectService {
      * @param project
      * @param memberships Key : userID, Value : user role for project param
      */
-    Project updateProject(Account actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException;
+    Project updateProject(Account actor, Project project, Map<Long, MembershipRole> memberships) throws BusinessException;
 
     ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException;
 

@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.model.ProjectRole;
+import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Task;
 
 import javax.annotation.PostConstruct;
@@ -65,7 +65,7 @@ public class SendTaskEmail {
 
         project.getMembers()
                 .stream()
-                .filter(member -> member.getRole() == ProjectRole.OWNER)
+                .filter(member -> member.getRole() == MembershipRole.OWNER)
                 .forEach(member -> to.add(member.getMember().getEmail()));
 
         List<String> cc = Arrays.asList(assignedAccount.getEmail(), creator.getEmail());

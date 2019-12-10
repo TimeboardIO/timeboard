@@ -43,13 +43,13 @@ public class ProjectMembership {
 
     @Column()
     @Enumerated(EnumType.STRING)
-    private ProjectRole role;
+    private MembershipRole role;
 
     public ProjectMembership() {
     }
 
 
-    public ProjectMembership(Project project, Account owner, ProjectRole role) {
+    public ProjectMembership(Project project, Account owner, MembershipRole role) {
         this.member = owner;
         this.role = role;
         this.project = project;
@@ -79,11 +79,11 @@ public class ProjectMembership {
         this.project = project;
     }
 
-    public ProjectRole getRole() {
+    public MembershipRole getRole() {
         return role;
     }
 
-    public void setRole(ProjectRole role) {
+    public void setRole(MembershipRole role) {
         this.role = role;
     }
 }

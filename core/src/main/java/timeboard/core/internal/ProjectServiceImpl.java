@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.thymeleaf.context.Context;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.events.TaskEvent;
@@ -105,7 +104,7 @@ public class ProjectServiceImpl implements ProjectService {
         newProject.setStartDate(new Date());
         em.persist(newProject);
 
-        ProjectMembership ownerMembership = new ProjectMembership(newProject, owner, ProjectRole.OWNER);
+        ProjectMembership ownerMembership = new ProjectMembership(newProject, owner, MembershipRole.OWNER);
         em.persist(ownerMembership);
 
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
@@ -231,7 +230,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Project updateProject(Account actor, Project project, Map<Long, ProjectRole> memberships) throws BusinessException {
+    public Project updateProject(Account actor, Project project, Map<Long, MembershipRole> memberships) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());

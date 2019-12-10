@@ -26,7 +26,7 @@ package timeboard.core.model;
  * #L%
  */
 
-public enum ProjectRole {
+public enum MembershipRole {
     OWNER,
     CONTRIBUTOR
 }

@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules.task;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -26,30 +26,17 @@ package timeboard.core.internal.rules.task;
  * #L%
  */
 
-import timeboard.core.internal.rules.Rule;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
-import timeboard.core.model.ProjectMembership;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Task;
 
-import java.util.Optional;
+import java.util.List;
 
+/**
+ * Service for organizations management.
+ */
+public interface OrganizationService {
 
-public class ActorIsProjectOwnerbyTask implements Rule<Task> {
+    Account createOrganization(final Account actor, final Account organization) throws BusinessException;
 
-    @Override
-    public String ruleDescription() {
-        return "User is not project owner";
-    }
-
-    @Override
-    public boolean isSatisfied(Account u, Task thing) {
-        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
-                .filter(projectMembership ->
-                        projectMembership.getMember().getId() == u.getId()
-                                && projectMembership.getRole().equals(MembershipRole.OWNER)
-                )
-                .findFirst();
-        return userOptional.isPresent();
-    }
 }
