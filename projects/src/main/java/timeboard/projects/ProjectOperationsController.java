@@ -26,22 +26,41 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.ProjectExportService;
+import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
+import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
+import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
+import java.util.*;
 
 
 @Controller
 public class ProjectOperationsController {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    @Autowired(
+            required = false
+    )
+    private List<ProjectExportService> projectExportServices;
+
+    @Autowired(
+            required = false
+    )
+    private List<ProjectImportService> projectImportServices;
 
     @Autowired
     private ProjectService projectService;
@@ -49,13 +68,190 @@ public class ProjectOperationsController {
     @Autowired
     private UserInfo userInfo;
 
-    @GetMapping("/projects/delete")
-    protected String handleGet(@RequestParam Long projectID) throws ServletException, IOException, BusinessException {
-
-        Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
-        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
-
+    @PostMapping("/projects/create")
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+        final Account actor = this.userInfo.getCurrentAccount();
+        this.projectService.createProject(actor, request.getParameter("projectName"));
         return "redirect:/projects";
+    }
+
+    @GetMapping("/projects/create")
+    protected String createFrom() throws ServletException, IOException {
+        return "create_project";
+    }
+
+    @GetMapping("/projects/{projectID}/setup")
+    protected String configProject(@PathVariable long projectID, Model model) throws BusinessException, JsonProcessingException {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Map<String, Object> map = new HashMap<>();
+        this.prepareTemplateData(actor, project, map);
+        model.addAllAttributes(map);
+        return "details_project_config";
+    }
+
+    @PostMapping("/projects/{projectID}/setup/members")
+    protected String updateProjectMembers(@PathVariable long projectID, @ModelAttribute ProjectMembersForm projectMembersForm) throws Exception {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        project.setMembers(new HashSet<>(projectMembersForm.getMemberships()));
+        this.projectService.updateProject(actor, project);
+        return "redirect:/projects/"+projectID+"/setup";
+    }
+
+    @PostMapping("/projects/{projectID}/setup/informations")
+    protected String updateProjectConfiguration(@PathVariable long projectID, @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
+
+        final Account actor = this.userInfo.getCurrentAccount();
+
+        Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        project.setName(projectConfigForm.getName());
+        project.setComments(projectConfigForm.getComments());
+        project.setQuotation(projectConfigForm.getQuotation());
+
+        this.projectService.updateProject(actor, project);
+
+        /*
+        //Extract project configuration
+        project.getAttributes().clear();
+
+        //new attributes
+        String newAttrKey = request.getParameter("newAttrKey");
+        String newAttrValue = request.getParameter("newAttrValue");
+        Boolean newAttrEncrypted = false;
+        if (request.getParameter("newAttrEncrypted") != null && request.getParameter("newAttrEncrypted").equals("on")) {
+            newAttrEncrypted = true;
+        }
+
+        if (!newAttrKey.isEmpty()) {
+            if (newAttrEncrypted) {
+                newAttrValue = this.encryptionService.encryptAttribute(newAttrValue);
+            }
+            project.getAttributes().put(newAttrKey, new ProjectAttributValue(newAttrValue, newAttrEncrypted));
+        }
+
+        //Attribute update
+        Enumeration<String> params1 = request.getParameterNames();
+        while (params1.hasMoreElements()) {
+            String param = params1.nextElement();
+            if (param.startsWith("attr-")) {
+                String key = param.substring(5, param.length());
+                String value = request.getParameter(param);
+                project.getAttributes().put(key, new ProjectAttributValue(value));
+            }
+            if (param.startsWith("attrenc-")) {
+                String key = param.substring(8, param.length());
+                String encrypted = request.getParameter(param);
+                project.getAttributes().get(key).setEncrypted(true);
+                // project.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
+            }
+        }
+
+        //Extract memberships from request
+        Map<Long, MembershipRole> memberships = new HashMap<>();
+        Enumeration<String> params = request.getParameterNames();
+        while (params.hasMoreElements()) {
+            String param = params.nextElement();
+            if (param.startsWith("members")) {
+                String key = param.substring(param.indexOf('[') + 1, param.indexOf(']'));
+                String value = request.getParameter(param);
+                if (!value.isEmpty()) {
+                    memberships.put(Long.parseLong(key), MembershipRole.valueOf(value));
+                } else {
+                    memberships.put(Long.parseLong(key), MembershipRole.CONTRIBUTOR);
+                }
+            }
+        }
+
+        this.projectService.updateProject(actor, project, memberships);
+
+        Map<String, Object> map = new HashMap<>();
+        prepareTemplateData(actor, project, map);
+
+        viewModel.getViewDatas().putAll(map);
+*/
+        return "redirect:/projects/"+projectID+"/setup";
+    }
+
+
+    @GetMapping("/projects/{projectID}/delete")
+    protected String handleGet(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
+        final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
+        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
+        return "redirect:/projects";
+    }
+
+    private void prepareTemplateData(final Account actor, final Project project, final Map<String, Object> map) throws BusinessException, JsonProcessingException {
+        final ProjectConfigForm pcf = new ProjectConfigForm();
+        pcf.setName(project.getName());
+        pcf.setComments(project.getComments());
+        pcf.setQuotation(project.getQuotation());
+
+        final ProjectMembersForm pmf = new ProjectMembersForm();
+        pmf.setMemberships(new ArrayList<>(project.getMembers()));
+
+        map.put("project", project);
+        map.put("projectConfigForm", pcf);
+        map.put("projectMembersForm", pmf);
+
+        /*
+        map.put("project", project);
+        map.put("members", project.getMembers());
+        map.put("roles", MembershipRole.values());
+        map.put("rolesForNewMember", OBJECT_MAPPER.writeValueAsString(MembershipRole.values()));
+        map.put("exports", this.projectExportServices);
+        map.put("imports", this.projectImportServices);
+        map.put("tasks", this.projectService.listProjectTasks(actor, project));*/
+    }
+
+    public static class ProjectMembersForm{
+
+        private  List<ProjectMembership> memberships = new ArrayList<>();
+
+        public MembershipRole[] getRoles(){
+            return MembershipRole.values();
+        }
+
+        public List<ProjectMembership> getMemberships() {
+            return memberships;
+        }
+
+        public void setMemberships(List<ProjectMembership> memberships) {
+            this.memberships = memberships;
+        }
+    }
+
+    public static class ProjectConfigForm{
+
+        private String name;
+        private double quotation;
+        private String comments;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public double getQuotation() {
+            return quotation;
+        }
+
+        public void setQuotation(double quotation) {
+            this.quotation = quotation;
+        }
+
+        public String getComments() {
+            return comments;
+        }
+
+        public void setComments(String comments) {
+            this.comments = comments;
+        }
+
+
     }
 
 
