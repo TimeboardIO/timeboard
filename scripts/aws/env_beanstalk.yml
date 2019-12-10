@@ -10,6 +10,8 @@ Parameters:
     Type: 'String'
   TimeboardDNSName:
     Type: 'String'
+  DatabaseDNSName:
+    Type: 'String'
   TimeboardSSLArn:
     Type: 'String'
   OAuthClientID:
@@ -224,7 +226,7 @@ Resources:
     Properties:
       HostedZoneId: !Ref 'Route53HostedZone'
       Comment: DNS name for timeboard
-      Name: 'db.pierremellet.net'
+      Name: !Ref 'DatabaseDNSName'
       Type: CNAME
       TTL: '900'
       ResourceRecords:
@@ -257,7 +259,7 @@ Resources:
           Value: !Join [ '', [ 'https://', !Ref 'TimeboardDNSName' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_URL'
-          Value: 'jdbc:mysql://db.pierremellet.net:3306/timeboard?createDatabaseIfNotExist=true'
+          Value: !Join [ '', [ 'jdbc:mysql://', !Ref 'DatabaseDNSName', '/timeboard?createDatabaseIfNotExist=true' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_USERNAME'
           Value: !Ref 'DBUser'
