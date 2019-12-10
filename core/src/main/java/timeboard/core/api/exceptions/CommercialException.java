@@ -1,37 +1,28 @@
 package timeboard.core.api.exceptions;
 
-import timeboard.core.internal.rules.Rule;
-
-import java.util.HashSet;
-import java.util.Set;
-
 public class CommercialException  extends Exception {
 
-    private final Set<Rule> triggeredRules = new HashSet<>();
+    private String errCause;
+    private String errMsg;
 
-    public CommercialException(Exception e) {
-        super(e);
+    public String getErrCode() {
+        return errCause;
     }
 
-    public CommercialException(String err) {
-        super(err);
+    public void setErrCode(String errCode) {
+        this.errCause = errCode;
     }
 
-    public CommercialException(Set<Rule> wrongRules) {
-        this.triggeredRules.addAll(wrongRules);
+    public String getErrMsg() {
+        return errMsg;
     }
 
-    @Override
-    public String getMessage() {
-        if (this.triggeredRules.isEmpty()) {
-            return super.getMessage();
-        } else {
-            StringBuilder builder = new StringBuilder();
-            this.triggeredRules.forEach(rule -> {
-                builder.append(rule.ruleDescription());
-                builder.append("\n");
-            });
-            return builder.toString();
-        }
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
+
+    public CommercialException(String errCode, String errMsg) {
+        this.errCause = errCode;
+        this.errMsg = errMsg;
     }
 }

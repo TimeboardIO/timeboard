@@ -27,7 +27,7 @@ public class BusinessPolicyEvaluator  {
     public boolean checkProjectByUserLimit(Account actor) throws CommercialException {
         int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
-            throw new CommercialException("Limit reached :\n" +
+            throw new CommercialException("Limit reached",
                 "Project's creation impossible for " + actor.getScreenName() + "!\n" +
                 "Too many projects in this account !");
         }
@@ -37,7 +37,7 @@ public class BusinessPolicyEvaluator  {
     public boolean checkTaskByProjectLimit(Account actor, Project project) throws CommercialException {
         int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
-            throw new CommercialException("Limit reached :\n" +
+            throw new CommercialException("Limit reached",
                 "Task's creation impossible for " + actor.getScreenName() + "!\n" +
                 "Too many task in project " + project.getName() + "in this account !");
         }
