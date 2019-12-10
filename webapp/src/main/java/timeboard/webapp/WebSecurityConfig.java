@@ -26,6 +26,7 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -37,14 +38,28 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Value("${cognito.logout}")
+    private String logoutEndpoint;
+
+
+    @Value("${app.url}")
+    private String appLogout;
+
+
+    @Value("${oauth.clientid}")
+    private String clientid;
+
+
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
+        final String logoutURL = String.format("%s?client_id=%s&logout_uri=%s", this.logoutEndpoint, this.clientid, this.appLogout);
+
         http.authorizeRequests()
                 .antMatchers("/", "/onboarding/**").permitAll()
                 .anyRequest().authenticated()
                 .and().oauth2Login()
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/ ")
+                .and().logout().logoutUrl("/logout").logoutSuccessUrl(logoutURL)
                 .and().csrf().disable();
     }
 
