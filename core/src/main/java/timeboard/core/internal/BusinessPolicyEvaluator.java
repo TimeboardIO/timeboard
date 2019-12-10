@@ -24,22 +24,24 @@ public class BusinessPolicyEvaluator  {
     @Value("${timeboard.tasks.project.limit}")
     private int limitTasksByProject;
 
-    public void checkProjectByUserLimit(Account actor) throws CommercialException {
+    public boolean checkProjectByUserLimit(Account actor) throws CommercialException {
         int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
             throw new CommercialException("Limit reached :\n" +
                 "Project's creation impossible for " + actor.getScreenName() + "!\n" +
                 "Too many projects in this account !");
         }
+        return true;
     }
 
-    public void checkTaskByProjectLimit(Account actor, Project project) throws CommercialException {
-        int numberTasksByProject = this.getNumberProjectsByUser(actor);
+    public boolean checkTaskByProjectLimit(Account actor, Project project) throws CommercialException {
+        int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
             throw new CommercialException("Limit reached :\n" +
                 "Task's creation impossible for " + actor.getScreenName() + "!\n" +
                 "Too many task in project " + project.getName() + "in this account !");
         }
+        return true;
     }
 
     private int getNumberProjectsByUser(Account account) {

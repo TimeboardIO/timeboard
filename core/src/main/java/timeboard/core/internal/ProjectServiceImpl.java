@@ -98,7 +98,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("@bpe.checkProjectByUserLimit(owner)")
+    @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
     public Project createProject(Account owner, String projectName) throws BusinessException {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
@@ -348,7 +348,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("@bpe.checkTaskByProjectLimit(actor, project)")
+    @PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
     public Task createTask(Account actor,
                            Project project,
                            String taskName,
