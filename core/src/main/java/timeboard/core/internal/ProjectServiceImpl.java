@@ -103,12 +103,10 @@ public class ProjectServiceImpl implements ProjectService {
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
         em.persist(newProject);
-        em.flush();
 
-        em.flush();
         ProjectMembership ownerMembership = new ProjectMembership(newProject, owner, MembershipRole.OWNER);
-        //em.merge(ownerMembership);
         em.persist(ownerMembership);
+
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
         return newProject;
     }
