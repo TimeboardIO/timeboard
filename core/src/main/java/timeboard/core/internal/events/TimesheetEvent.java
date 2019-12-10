@@ -28,7 +28,7 @@ package timeboard.core.internal.events;
 
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Project;
-import timeboard.core.model.ProjectRole;
+import timeboard.core.model.MembershipRole;
 import timeboard.core.model.ValidatedTimesheet;
 
 import java.util.Date;
@@ -49,7 +49,7 @@ public class TimesheetEvent extends TimeboardEvent {
 
         projects.stream().forEach(project -> project.getMembers()
                 .stream()
-                .filter(member -> member.getRole() == ProjectRole.OWNER)
+                .filter(member -> member.getRole() == MembershipRole.OWNER)
                 .forEach(member -> this.usersToNotify.add(member.getMember())));
 
         usersToInform.add(timesheet.getAccount());

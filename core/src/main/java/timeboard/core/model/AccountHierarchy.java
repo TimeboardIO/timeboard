@@ -42,10 +42,10 @@ public class AccountHierarchy {
     private long id;
 
     @ManyToOne(targetEntity = Account.class)
-    private Account parent;
+    private Account organization;
 
     @ManyToOne(targetEntity = Account.class)
-    private Account child;
+    private Account member;
 
     @Column(nullable = false)
     private Date startDate;
@@ -61,26 +61,26 @@ public class AccountHierarchy {
         this.id = id;
     }
 
-    public Account getParent() {
-        return parent;
+    public Account getOrganization() {
+        return organization;
     }
 
-    public void setParent(Account parent) throws BusinessException {
-        if(this.child != null && this.parent.getId() == this.child.getId()){
+    public void setOrganization(Account organization) throws BusinessException {
+        if(this.member != null && this.organization.getId() == this.member.getId()){
             throw  new BusinessException("An parent account can't refer to itself");
         }
-        this.parent = parent;
+        this.organization = organization;
     }
 
-    public Account getChild() {
-        return child;
+    public Account getMember() {
+        return member;
     }
 
-    public void setChild(Account child) throws BusinessException {
-        if(this.parent != null && this.child.getId() == this.parent.getId()){
+    public void setMember(Account member) throws BusinessException {
+        if(this.organization != null && this.member.getId() == this.organization.getId()){
             throw  new BusinessException("An child account can't refer to itself");
         }
-        this.child = child;
+        this.member = member;
     }
 
     public Date getStartDate() {

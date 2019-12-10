@@ -41,7 +41,7 @@
         <class>timeboard.core.model.Account</class>
         <class>timeboard.core.model.Imputation</class>
         <class>timeboard.core.model.ProjectMembership</class>
-        <class>timeboard.core.model.ProjectRole</class>
+        <class>timeboard.core.model.MembershipRole</class>
         <class>timeboard.core.model.ValidatedTimesheet</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
         <properties>
