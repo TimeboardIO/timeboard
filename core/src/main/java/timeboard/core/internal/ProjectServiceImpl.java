@@ -107,6 +107,7 @@ public class ProjectServiceImpl implements ProjectService {
         em.flush();
         ProjectMembership ownerMembership = new ProjectMembership(newProject, ownerAccount, MembershipRole.OWNER);
         em.persist(ownerMembership);
+
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
         return newProject;
     }
