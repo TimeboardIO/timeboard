@@ -35,7 +35,7 @@ public class ProjectMembership {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long membershipID;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     private Account member;
 
     @OneToOne()

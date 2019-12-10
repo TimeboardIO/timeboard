@@ -98,13 +98,14 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public Project createProject(Account owner, String projectName) throws BusinessException {
-        em.merge(owner);
+        Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
         em.persist(newProject);
 
-        ProjectMembership ownerMembership = new ProjectMembership(newProject, owner, MembershipRole.OWNER);
+        em.flush();
+        ProjectMembership ownerMembership = new ProjectMembership(newProject, ownerAccount, MembershipRole.OWNER);
         em.persist(ownerMembership);
 
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
