@@ -27,42 +27,35 @@ package timeboard.projects;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
 
-@WebServlet(name = "ProjectDeleteServlet", urlPatterns = "/projects/delete")
-public class ProjectDeleteServlet extends TimeboardServlet {
-
+@Controller
+public class ProjectOperationsController {
 
     @Autowired
-    public ProjectService projectService;
+    private ProjectService projectService;
 
+    @Autowired
+    private UserInfo userInfo;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectDeleteServlet.class.getClassLoader();
-    }
+    @GetMapping("/projects/delete")
+    protected String handleGet(@RequestParam Long projectID) throws ServletException, IOException, BusinessException {
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+        Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
+        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
 
-        long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(actor, projectID);
-        this.projectService.deleteProjectByID(actor, project);
-
-        response.sendRedirect("/projects");
+        return "redirect:/projects";
     }
 
 
