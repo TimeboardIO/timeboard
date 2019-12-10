@@ -81,9 +81,12 @@ public class WebConfig implements WebMvcConfigurer {
                 if(modelMap != null && webRequest.getUserPrincipal() != null)  {
                     modelMap.put("account", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());
-                    modelMap.put("appName", appName);
                     modelMap.put("javascripts", javascriptService.listJavascriptUrls());
                     modelMap.put("CSSs", cssService.listCSSUrls());
+                }
+
+                if(modelMap != null){
+                    modelMap.put("appName", appName);
                 }
 
             }

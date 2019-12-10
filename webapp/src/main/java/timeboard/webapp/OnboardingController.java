@@ -36,13 +36,9 @@ import java.security.Principal;
 @Controller
 public class OnboardingController {
 
-    @Value("${timeboard.appName}")
-    private String applicationName;
-
     @GetMapping("/")
     public String onboarding(Principal p, Model m){
-        if(p == null){
-            m.addAttribute("applicationName", applicationName);
+        if(p == null){ 
             return "onboarding";
         }else{
             return "redirect:/home";
