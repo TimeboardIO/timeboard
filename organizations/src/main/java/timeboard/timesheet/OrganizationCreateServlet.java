@@ -61,7 +61,7 @@ public class OrganizationCreateServlet  {
     @Autowired
     public UserInfo userInfo;
 
-    @PostMapping("/orga/create")
+    @PostMapping("/org/create")
     protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
@@ -71,8 +71,8 @@ public class OrganizationCreateServlet  {
         return "redirect:/home";
     }
 
-    @GetMapping("/orga/create")
+    @GetMapping("/org/create")
     protected String createFrom(Model model, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        return "create_orga.html";
+        return "create_org.html";
     }
 }

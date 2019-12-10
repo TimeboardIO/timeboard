@@ -39,4 +39,11 @@ public interface OrganizationService {
 
     Account createOrganization(final Account actor, final Account organization) throws BusinessException;
 
+    Account getOrganizationByID(Account actor, long id);
+
+    Account updateOrganization(Account actor, Account organization);
+
+    List<Account> getParents(Account organization);
+
+    List<Account> getMembers(Account organization);
 }

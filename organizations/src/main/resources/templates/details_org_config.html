@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/organizations')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="ui segment">
+        <h4 class="ui dividing header">Organization</h4>
+
+        <div class="ui center aligned segment">
+            <div th:each="parent : ${parents}"  th:text="${parent.name}" class="ui button"></div>
+            <div th:text="${organization.name}" class="ui horizontal divider" >Name</div>
+            <div th:each="member : ${members}" th:text="${member.screenName}" class="teal ui button"></div>
+        </div>
+        <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+            <div class="field">
+                <label>Organization Name</label>
+                <input name="organizationName" placeholder="Organization Name" required type="text">
+            </div>
+            <button class="ui button" type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

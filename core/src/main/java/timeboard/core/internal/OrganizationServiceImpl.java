@@ -37,7 +37,9 @@ import timeboard.core.model.AccountHierarchy;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 @Component
@@ -65,5 +67,37 @@ public class OrganizationServiceImpl implements OrganizationService {
         LOGGER.info("User " + actor.getFirstName() + " " + actor.getName() + " created organization "+organization.getName());
         this.em.flush();
         return organization;
+    }
+
+    @Override
+    public Account getOrganizationByID(Account actor, long id) {
+        Account data = em.createQuery("select o from Account o  where o.id = :orgID", Account.class)
+                .setParameter("orgID", id)
+                .getSingleResult();
+        return data;
+    }
+
+    @Override
+    public Account updateOrganization(Account actor, Account organization) {
+
+        em.merge(organization);
+        em.flush();
+
+        LOGGER.info("Project " + organization.getName() + " updated");
+        return organization;
+    }
+
+    @Override
+    public List<Account> getParents(Account organization) {
+        return this.em.createQuery("select o from AccountHierarchy h join h.member m join h.organization o where m = :member", Account.class)
+                .setParameter("member", organization).getResultList();
+    }
+
+    @Override
+    public List<Account> getMembers(Account organization) {
+        if(!organization.isOrganisation()) return new ArrayList<>();
+        return this.em.createQuery("select m from AccountHierarchy h join h.member m join h.organization o where o = :org", Account.class)
+                .setParameter("org", organization).getResultList();
+
     }
 }

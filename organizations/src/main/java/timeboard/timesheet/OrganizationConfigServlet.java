@@ -26,7 +26,6 @@ package timeboard.timesheet;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EncryptionService;
@@ -35,7 +34,6 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Or;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -55,11 +53,11 @@ import java.util.Map;
  *
  * <p>Ex : /orga/config?id=
  */
-@WebServlet(name = "OrganizationConfigServlet", urlPatterns = "/orga/config")
+@WebServlet(name = "OrganizationConfigServlet", urlPatterns = "/org/config")
 public class OrganizationConfigServlet extends TimeboardServlet {
 
     @Autowired
-    public OrganizationService OrganizationService;
+    public OrganizationService organizationService;
 
     @Autowired
     public EncryptionService encryptionService;
@@ -71,87 +69,37 @@ public class OrganizationConfigServlet extends TimeboardServlet {
         return OrganizationConfigServlet.class.getClassLoader();
     }
 
-
-
-
     @Override
     protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
 
 
-        viewModel.setTemplate("details_organization_config.html");
-        long id = Long.parseLong(request.getParameter("organizationID"));
+        viewModel.setTemplate("details_org_config.html");
+        long id = Long.parseLong(request.getParameter("orgID"));
 
-        viewModel.getViewDatas().put("", null);
+        Account organization = this.organizationService.getOrganizationByID(actor, id);
+
+        List<Account> parents = this.organizationService.getParents(organization);
+        List<Account> members = this.organizationService.getMembers(organization);
+
+        viewModel.getViewDatas().put("parents", parents);
+        viewModel.getViewDatas().put("members", members);
+        viewModel.getViewDatas().put("organization", organization);
+
     }
 
     @Override
     protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
-        viewModel.setTemplate("details_Organization_config.html");
+        viewModel.setTemplate("details_org_config.html");
 
         //Extract organization
         long id = Long.parseLong(request.getParameter("organizationID"));
-        Account organization = this.OrganizationService.getOrganizationByIdWithAllMembers(actor, id);
+        Account organization = this.organizationService.getOrganizationByID(actor, id);
+
         organization.setName(request.getParameter("OrganizationName"));
-        organization.setComments(request.getParameter("OrganizationDescription"));
-        organization.setQuotation(Double.parseDouble(request.getParameter("OrganizationQuotation")));
 
-        //Extract organization configuration
-        organization.getAttributes().clear();
 
-        //new attributes
-        String newAttrKey = request.getParameter("newAttrKey");
-        String newAttrValue = request.getParameter("newAttrValue");
-        Boolean newAttrEncrypted = false;
-        if (request.getParameter("newAttrEncrypted") != null && request.getParameter("newAttrEncrypted").equals("on")) {
-            newAttrEncrypted = true;
-        }
+        this.organizationService.updateOrganization(actor, organization);
 
-        if (!newAttrKey.isEmpty()) {
-            if (newAttrEncrypted) {
-                newAttrValue = this.encryptionService.encryptAttribute(newAttrValue);
-            }
-            organization.getAttributes().put(newAttrKey, new OrganizationAttributValue(newAttrValue, newAttrEncrypted));
-        }
-
-        //Attribute update
-        Enumeration<String> params1 = request.getParameterNames();
-        while (params1.hasMoreElements()) {
-            String param = params1.nextElement();
-            if (param.startsWith("attr-")) {
-                String key = param.substring(5, param.length());
-                String value = request.getParameter(param);
-                organization.getAttributes().put(key, new OrganizationAttributValue(value));
-            }
-            if (param.startsWith("attrenc-")) {
-                String key = param.substring(8, param.length());
-                String encrypted = request.getParameter(param);
-                organization.getAttributes().get(key).setEncrypted(true);
-                // organization.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
-            }
-        }
-
-        //Extract memberships from request
-        Map<Long, MembershipRole> memberships = new HashMap<>();
-        Enumeration<String> params = request.getParameterNames();
-        while (params.hasMoreElements()) {
-            String param = params.nextElement();
-            if (param.startsWith("members")) {
-                String key = param.substring(param.indexOf('[') + 1, param.indexOf(']'));
-                String value = request.getParameter(param);
-                if (!value.isEmpty()) {
-                    memberships.put(Long.parseLong(key), MembershipRole.valueOf(value));
-                } else {
-                    memberships.put(Long.parseLong(key), MembershipRole.CONTRIBUTOR);
-                }
-            }
-        }
-
-        this.OrganizationService.updateOrganization(actor, organization, memberships);
-
-        Map<String, Object> map = new HashMap<>();
-        prepareTemplateData(actor, organization, map);
-
-        viewModel.getViewDatas().putAll(map);
     }
 }
