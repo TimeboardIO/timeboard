@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{details_project_layout.html(tab='five')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">Project tags</title>
+    <meta name="projectID" th:content="${project.id}" />
+</head>
+<body>
+
+
+<div layout:fragment="placeholder">
+    <h1>Tags</h1>
+</div>
+
+</body>
+</html>
