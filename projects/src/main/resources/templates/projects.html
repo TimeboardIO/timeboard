@@ -26,6 +26,7 @@
         }
 
 
+
     </style>
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
@@ -47,31 +48,31 @@
 
         <div class="ui five stackable cards">
             <div class="ui card" th:each="project : ${projects}">
-                    <div class="image">
-                        <a th:href="@{/projects/tasks/config(projectID=${project.id})}">
-                        <div  class="badge" style="text-transform: capitalize;"
+                <div class="image">
+                    <a th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">
+                        <div class="badge" style="text-transform: capitalize;"
                              th:style="'background-color:'+${project.getColor()}"
                              th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">
                         </div>
-                        </a>
-                    </div>
-                    <div class="content">
-                        <a class="header" th:text="${project.name}"></a>
-                        <div class="meta">
-                            <div>
-                                <i class="account icon"></i>
-                                [[${project.members.size()}]] Members
-                            </div>
-                        </div>
-                        <div class="description" th:text="${project.comments}">
+                    </a>
+                </div>
+                <div class="content">
+                    <a class="header" th:text="${project.name}"></a>
+                    <div class="meta">
+                        <div>
+                            <i class="account icon"></i>
+                            [[${project.members.size()}]] Members
                         </div>
                     </div>
-                    <div class="extra content">
-                        <a class="ui positive button" th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
-                        <a class="negative ui basic button"
-                           th:href="@{/projects/delete(projectID=${project.id})}">Archive</a>
+                    <div class="description" th:text="${project.comments}">
                     </div>
                 </div>
+                <div class="extra content">
+                    <a class="ui positive button" th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
+                    <a class="negative ui basic button"
+                       th:href="@{/projects/{projectID}/delete(projectID=${project.id})}">Archive</a>
+                </div>
+            </div>
         </div>
     </div>
 
