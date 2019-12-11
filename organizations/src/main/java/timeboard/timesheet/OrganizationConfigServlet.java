@@ -92,9 +92,8 @@ public class OrganizationConfigServlet extends TimeboardServlet {
         long id = Long.parseLong(request.getParameter("organizationID"));
         Account organization = this.organizationService.getOrganizationByID(actor, id);
 
-        organization.setName(request.getParameter("OrganizationName"));
-
-
+        organization.setName(request.getParameter("organizationName"));
+        
         this.organizationService.updateOrganization(actor, organization);
 
     }

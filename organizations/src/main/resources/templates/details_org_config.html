@@ -15,24 +15,86 @@
             <label>Organization Name</label>
             <input name="organizationName" placeholder="Organization Name" required type="text" th:value="${organization.name}">
         </div>
-        <div class=" two fields">
-            <div class="field">
-                <label>Creation Date</label>
-                <input  th:value="${organization.startDate}" name="orgStartDate" placeholder="Task Name"
-                       required  type="date">
-            </div>
-            <div class="field">
-                <label>Closure Date</label>
-                <input  th:value="${organization.endDate}" name="orgEndDate" placeholder="Task Name" required
-                       type="date">
-            </div>
-        </div>
         <button class="ui primary create-task icon button" type="submit" >
             Save config <i class="cog icon"></i>
         </button>
 
-        <h4 class="ui dividing header">Task types</h4>
     </form>
+
+        <div class="ui stackable two column grid">
+            <div class="column">
+                <table class="ui tablet unstackable table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Task type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-key="Enhancement">
+                        <td>enhancement</td>
+                        <td>
+                            <div class="ui negative basic button delete" data-key="project.color">
+                                <i class="remove alternate icon"></i>
+                                Remove
+                            </div>
+                        </td>
+
+                    </tr>
+                    <tr data-key="bug">
+                        <td>Bug</td>
+                        <td>
+                            <div class="ui negative basic button delete" data-key="project.color">
+                                <i class="remove alternate icon"></i>
+                                Remove
+                            </div>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="newAttrKey" placeholder="new conf key">
+                        </td>
+                        <td></td>
+                    </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+            <div class="column">
+                <table class="ui tablet unstackable table">
+                    <thead>
+                    <tr>
+                        <th colspan="2">Task category</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-key="project.color">
+                        <td>?? </td>
+
+                        <td>
+                            <div class="ui negative basic button delete" data-key="project.color">
+                                <i class="remove alternate icon"></i>
+                                Remove
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" name="newAttrKey" placeholder="new conf key">
+                        </td>
+                        <td>
+                            <div class="ui positive basic button add" data-key="project.color">
+                                <i class="plus alternate icon"></i>
+                                Add
+                            </div>
+                        </td>
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
 </div>
 
