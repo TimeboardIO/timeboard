@@ -6,7 +6,7 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta property="organization" th:orgID="${organization.id}"/>
+    <meta property="organization" th:orgID="${organization.id}" th:baseURL="@{${'/org/'+tab}}"/>
 </head>
 <body>
 
@@ -23,13 +23,14 @@
             <div class="results"></div>
         </div>
     </div>
+    <h4 class="ui dividing header">Organization Members</h4>
 
     <div class="ui center aligned segment">
         <a th:each="parent : ${parents}"  th:text="${parent.screenName}" class="ui button" th:href="@{${'/org/'+tab}(orgID=${parent.id})}"></a>
         <a th:text="${organization.screenName}" class="ui horizontal divider" >Name</a>
-        <a th:each="member : ${members}" th:if="${member.isOrganization == true}" th:href="@{${'/org/'+tab}(orgID=${member.id})}" th:text="${member.screenName}" class="primary ui button"></a>
+        <a v-for="member  in members " v-if="member.isOrganization == true" v-bind:href="baseURL+'?orgID='+member.id" class="primary ui button">{{member.screenName}}</a>
     </div>
-    <h4 class="ui dividing header">Members</h4>
+    <h4 class="ui dividing header">User Members</h4>
 
     <table class="ui celled table">
         <thead>

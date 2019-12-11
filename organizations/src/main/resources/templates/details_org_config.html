@@ -18,12 +18,12 @@
         <div class=" two fields">
             <div class="field">
                 <label>Creation Date</label>
-                <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name"
+                <input  th:value="${organization.startDate}" name="orgStartDate" placeholder="Task Name"
                        required  type="date">
             </div>
             <div class="field">
                 <label>Closure Date</label>
-                <input v-model="task.endDate" name="taskEndDate" placeholder="Task Name" required
+                <input  th:value="${organization.endDate}" name="orgEndDate" placeholder="Task Name" required
                        type="date">
             </div>
         </div>
