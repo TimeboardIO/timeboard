@@ -134,72 +134,13 @@ public class ProjectOperationsController {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
-        Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.setName(projectConfigForm.getName());
         project.setComments(projectConfigForm.getComments());
         project.setQuotation(projectConfigForm.getQuotation());
 
         this.projectService.updateProject(actor, project);
 
-        /*
-        //Extract project configuration
-        project.getAttributes().clear();
-
-        //new attributes
-        String newAttrKey = request.getParameter("newAttrKey");
-        String newAttrValue = request.getParameter("newAttrValue");
-        Boolean newAttrEncrypted = false;
-        if (request.getParameter("newAttrEncrypted") != null && request.getParameter("newAttrEncrypted").equals("on")) {
-            newAttrEncrypted = true;
-        }
-
-        if (!newAttrKey.isEmpty()) {
-            if (newAttrEncrypted) {
-                newAttrValue = this.encryptionService.encryptAttribute(newAttrValue);
-            }
-            project.getAttributes().put(newAttrKey, new ProjectAttributValue(newAttrValue, newAttrEncrypted));
-        }
-
-        //Attribute update
-        Enumeration<String> params1 = request.getParameterNames();
-        while (params1.hasMoreElements()) {
-            String param = params1.nextElement();
-            if (param.startsWith("attr-")) {
-                String key = param.substring(5, param.length());
-                String value = request.getParameter(param);
-                project.getAttributes().put(key, new ProjectAttributValue(value));
-            }
-            if (param.startsWith("attrenc-")) {
-                String key = param.substring(8, param.length());
-                String encrypted = request.getParameter(param);
-                project.getAttributes().get(key).setEncrypted(true);
-                // project.getAttributes().get(key).setEncrypted(Boolean.getBoolean(encrypted));
-            }
-        }
-
-        //Extract memberships from request
-        Map<Long, MembershipRole> memberships = new HashMap<>();
-        Enumeration<String> params = request.getParameterNames();
-        while (params.hasMoreElements()) {
-            String param = params.nextElement();
-            if (param.startsWith("members")) {
-                String key = param.substring(param.indexOf('[') + 1, param.indexOf(']'));
-                String value = request.getParameter(param);
-                if (!value.isEmpty()) {
-                    memberships.put(Long.parseLong(key), MembershipRole.valueOf(value));
-                } else {
-                    memberships.put(Long.parseLong(key), MembershipRole.CONTRIBUTOR);
-                }
-            }
-        }
-
-        this.projectService.updateProject(actor, project, memberships);
-
-        Map<String, Object> map = new HashMap<>();
-        prepareTemplateData(actor, project, map);
-
-        viewModel.getViewDatas().putAll(map);
-*/
         return "redirect:/projects/"+projectID+"/setup";
     }
 
@@ -224,15 +165,7 @@ public class ProjectOperationsController {
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());
-
-        /*
-        map.put("project", project);
-        map.put("members", project.getMembers());
-        map.put("roles", MembershipRole.values());
-        map.put("rolesForNewMember", OBJECT_MAPPER.writeValueAsString(MembershipRole.values()));
-        map.put("exports", this.projectExportServices);
-        map.put("imports", this.projectImportServices);
-        map.put("tasks", this.projectService.listProjectTasks(actor, project));*/
+ 
     }
 
     public static class ProjectMembersForm{
