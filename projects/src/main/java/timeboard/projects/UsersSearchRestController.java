@@ -28,6 +28,9 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 
@@ -47,15 +50,16 @@ import java.util.List;
  * search user in project : /search?projectID={project id}&q={search query}
  */
 
-@WebServlet(name = "SearchUsersService", urlPatterns = "/search")
-public class SearchUsersService extends HttpServlet {
+@RestController
+@RequestMapping("/search")
+public class UsersSearchRestController  {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     @Autowired
     private UserService userService;
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    @GetMapping
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String query = req.getParameter("q");
 
         Long projectID = null;

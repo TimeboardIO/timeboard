@@ -67,7 +67,7 @@ public class ProjectImportServlet extends TimeboardServlet {
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectExportServlet.class.getClassLoader();
+        return ProjectImportServlet.class.getClassLoader();
     }
 
     @Override

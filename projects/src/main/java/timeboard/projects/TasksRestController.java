@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 @Component
 @RestController
 @RequestMapping(value = "/api/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-public class TasksRestAPI {
+public class TasksRestController {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 

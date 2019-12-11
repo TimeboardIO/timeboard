@@ -27,10 +27,18 @@ package timeboard.projects;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.ui.UserInfo;
 import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
@@ -41,43 +49,68 @@ import java.io.IOException;
 import java.util.Date;
 
 
-@WebServlet(name = "ProjectTaskListServlet", urlPatterns = "/projects/tasks")
-public class ProjectTaskListServlet extends TimeboardServlet {
+
+@Controller
+@RequestMapping("/projects/{projectID}")
+public class ProjectTasksController extends TimeboardServlet {
 
     @Autowired
     public ProjectService projectService;
 
+    @Autowired
+    public UserInfo userInfo;
+
+    @Autowired
+    public DataTableService dataTableService;
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectTaskListServlet.class.getClassLoader();
+        return ProjectTasksController.class.getClassLoader();
     }
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    @GetMapping("/tasks")
+    protected String listTasks(@PathVariable Long projectID,  Model viewModel) throws ServletException, IOException, BusinessException {
+
+        final Account actor = this.userInfo.getCurrentAccount();
 
         Task task = new Task();
-        if (request.getParameter("taskID") != null) {
-            // Update case
-            long taskID = Long.parseLong(request.getParameter("taskID"));
-            task = (Task) this.projectService.getTaskByID(actor, taskID);
-        }
-        viewModel.getViewDatas().put("task", new TaskForm(task));
 
-        long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(actor, projectID);
+        viewModel.addAttribute("task", new TaskForm(task));
 
-        viewModel.setTemplate("details_project_tasks.html");
-        viewModel.getViewDatas().put("project", project);
-        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
-        viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
-        viewModel.getViewDatas().put("allTaskStatus", TaskStatus.values());
-        viewModel.getViewDatas().put("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
-        viewModel.getViewDatas().put("isProjectOwner", this.projectService.isProjectOwner(actor, project));
+        final Project project = this.projectService.getProjectByID(actor, projectID);
 
+        fillModel(viewModel, actor, project);
+
+        return "details_project_tasks";
     }
 
-    @Override
+    private void fillModel(Model viewModel, Account actor, Project project) throws BusinessException {
+        viewModel.addAttribute("project", project);
+        viewModel.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
+        viewModel.addAttribute("taskTypes", this.projectService.listTaskType());
+        viewModel.addAttribute("allTaskStatus", TaskStatus.values());
+        viewModel.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
+        viewModel.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
+        viewModel.addAttribute("dataTableService", this.dataTableService);
+    }
+
+    @GetMapping("/tasks/{taskID}")
+    protected String editTasks(@PathVariable Long projectID,  @PathVariable Long taskID,  Model viewModel) throws ServletException, IOException, BusinessException {
+
+        final Account actor = this.userInfo.getCurrentAccount();
+
+        final Task task = (Task) this.projectService.getTaskByID(actor, taskID);
+
+        viewModel.addAttribute("task", new TaskForm(task));
+
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+
+        fillModel(viewModel, actor, project);
+
+        return "details_project_tasks";
+    }
+
+    @PostMapping("/tasks")
     protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);

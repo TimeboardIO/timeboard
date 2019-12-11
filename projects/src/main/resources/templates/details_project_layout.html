@@ -13,11 +13,11 @@
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
            th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
-           th:href="@{/projects/tasks(projectID=${project.id})}">Tasks</a>
+           th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}">Tasks</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
-           th:href="@{/projects/milestones(projectID=${project.id})}">Milestones</a>
+           th:href="@{/projects/{projectID}/milestones(projectID=${project.id})}">Milestones</a>
         <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
-           th:href="@{/projects/dashboard(projectID=${project.id})}">Dashboard</a>
+           th:href="@{/projects/{projectID}/dashboard(projectID=${project.id})}">Dashboard</a>
         <div class="right menu">
             <a style="font-weight: bold;" th:text="${project.name}" class="ui item primary">
             </a>

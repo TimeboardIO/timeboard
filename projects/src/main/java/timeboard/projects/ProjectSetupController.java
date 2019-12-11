@@ -51,7 +51,8 @@ import java.util.*;
 
 
 @Controller
-public class ProjectOperationsController {
+@RequestMapping("/projects/{projectID}/setup")
+public class ProjectSetupController {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -74,19 +75,8 @@ public class ProjectOperationsController {
     @Autowired
     private UserInfo userInfo;
 
-    @PostMapping("/projects/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
-        this.projectService.createProject(actor, request.getParameter("projectName"));
-        return "redirect:/projects";
-    }
 
-    @GetMapping("/projects/create")
-    protected String createFrom() throws ServletException, IOException {
-        return "create_project";
-    }
-
-    @GetMapping("/projects/{projectID}/setup")
+    @GetMapping
     protected String configProject(@PathVariable long projectID, Model model) throws BusinessException, JsonProcessingException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
@@ -96,7 +86,7 @@ public class ProjectOperationsController {
         return "details_project_config";
     }
 
-    @PostMapping("/projects/{projectID}/setup/memberships")
+    @PostMapping("/memberships")
     @ResponseBody
     protected ResponseEntity updateProjectMembers(@PathVariable long projectID, HttpServletRequest request) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
@@ -107,7 +97,7 @@ public class ProjectOperationsController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PatchMapping("/projects/{projectID}/setup/memberships/{membershipID}/{role}")
+    @PatchMapping("/memberships/{membershipID}/{role}")
     protected ResponseEntity updateProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID,  @PathVariable MembershipRole role) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
@@ -118,7 +108,7 @@ public class ProjectOperationsController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @DeleteMapping("/projects/{projectID}/setup/memberships/{membershipID}")
+    @DeleteMapping("/memberships/{membershipID}")
     protected ResponseEntity deleteProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
@@ -129,7 +119,7 @@ public class ProjectOperationsController {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PostMapping("/projects/{projectID}/setup/informations")
+    @PostMapping("/informations")
     protected String updateProjectConfiguration(@PathVariable long projectID, @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
 
         final Account actor = this.userInfo.getCurrentAccount();
@@ -142,14 +132,6 @@ public class ProjectOperationsController {
         this.projectService.updateProject(actor, project);
 
         return "redirect:/projects/"+projectID+"/setup";
-    }
-
-
-    @GetMapping("/projects/{projectID}/delete")
-    protected String handleGet(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
-        final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
-        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
-        return "redirect:/projects";
     }
 
     private void prepareTemplateData(final Account actor, final Project project, final Map<String, Object> map) throws BusinessException, JsonProcessingException {
@@ -165,7 +147,7 @@ public class ProjectOperationsController {
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());
- 
+
     }
 
     public static class ProjectMembersForm{
