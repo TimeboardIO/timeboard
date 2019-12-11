@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{details_org_layout.html(tab='second')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<div layout:fragment="placeholder">
+
+
+        <button class="ui primary create-task icon button">
+            Edit config <i class="cog icon"></i>
+        </button>
+        <button class="ui primary create-task icon button">
+            Add member
+            <i class="icons">
+                <i class="user icon"></i>
+                <i class="bottom right corner add icon"></i>
+            </i>
+        </button>
+        <h4 class="ui dividing header">Members</h4>
+
+        <table class="ui celled table">
+            <thead>
+                <tr>
+                    <th>First Name</th>
+                    <th>Role</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="member : ${members}" th:if="${member.isOrganization == false}" >
+                    <td th:text="${member.screenName}">John</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+</div>
+
+</body>
+</html>

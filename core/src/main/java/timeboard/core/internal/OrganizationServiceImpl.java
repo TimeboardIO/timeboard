@@ -61,7 +61,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         ah.setStartDate(new Date());
         this.em.persist(ah);
 
-        organization.setOrganisation(true);
+        organization.setIsOrganization(true);
         this.em.persist(organization);
 
         LOGGER.info("User " + actor.getFirstName() + " " + actor.getName() + " created organization "+organization.getName());
@@ -95,7 +95,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<Account> getMembers(Account organization) {
-        if(!organization.isOrganisation()) return new ArrayList<>();
+        if(!organization.getIsOrganization()) return new ArrayList<>();
         return this.em.createQuery("select m from AccountHierarchy h join h.member m join h.organization o where o = :org", Account.class)
                 .setParameter("org", organization).getResultList();
 

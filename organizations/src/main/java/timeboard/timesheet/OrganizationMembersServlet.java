@@ -29,7 +29,6 @@ package timeboard.timesheet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EncryptionService;
-
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
@@ -49,8 +48,8 @@ import java.util.List;
  *
  * <p>Ex : /org/config?id=
  */
-@WebServlet(name = "OrganizationConfigServlet", urlPatterns = "/org/config")
-public class OrganizationConfigServlet extends TimeboardServlet {
+@WebServlet(name = "OrganizationMembersServlet", urlPatterns = "/org/members")
+public class OrganizationMembersServlet extends TimeboardServlet {
 
     @Autowired
     public OrganizationService organizationService;
@@ -62,14 +61,13 @@ public class OrganizationConfigServlet extends TimeboardServlet {
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return OrganizationConfigServlet.class.getClassLoader();
+        return OrganizationMembersServlet.class.getClassLoader();
     }
 
     @Override
     protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
 
-
-        viewModel.setTemplate("details_org_config.html");
+        viewModel.setTemplate("details_org_members.html");
         long id = Long.parseLong(request.getParameter("orgID"));
 
         Account organization = this.organizationService.getOrganizationByID(actor, id);

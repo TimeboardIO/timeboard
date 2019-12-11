@@ -25,14 +25,14 @@
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
                     <a class="item"><i class="sign-out icon"></i> Switch organisation</a>
-                    <a th:href="@{/orga/create}" class="item"><i class="edit icon"></i> Create Organisation</a>
+                    <a th:href="@{/org/create}" class="item"><i class="edit icon"></i> Create Organisation</a>
                     <a class="item"><i class="globe icon"></i> Organisation members</a>
                     <a class="item"><i class="settings icon"></i> Organisation Setup</a>
                 </div>
             </div>
             <div class="ui dropdown item" tabindex="0">
                 <i class="user icon"></i>
-                <div class="title" th:text="${account.email}"></div>
+                <div class="title" th:text="${account.screenName}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
                     <a th:href="@{/account}" class="item"><i class="edit icon"></i> Setup</a>

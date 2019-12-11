@@ -1,30 +1,45 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{layouts/general.html(path='/organizations')}"
+<html layout:decorate="~{details_org_layout.html(tab='first')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <body>
 
-<div layout:fragment="content">
+<div layout:fragment="placeholder">
 
-    <div class="ui segment">
-        <h4 class="ui dividing header">Organization</h4>
+    <button class="ui primary create-task icon button">
+        Edit config <i class="cog icon"></i>
+    </button>
+    <button class="ui primary create-task icon button">
+        Add member
+        <i class="icons">
+            <i class="user icon"></i>
+            <i class="bottom right corner add icon"></i>
+        </i>
+    </button>
 
-        <div class="ui center aligned segment">
-            <div th:each="parent : ${parents}"  th:text="${parent.name}" class="ui button"></div>
-            <div th:text="${organization.name}" class="ui horizontal divider" >Name</div>
-            <div th:each="member : ${members}" th:text="${member.screenName}" class="teal ui button"></div>
+    <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+        <div class="field">
+            <label>Organization Name</label>
+            <input name="organizationName" placeholder="Organization Name" required type="text">
         </div>
-        <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+        <div class=" two fields">
             <div class="field">
-                <label>Organization Name</label>
-                <input name="organizationName" placeholder="Organization Name" required type="text">
+                <label>Creation Date</label>
+                <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name"
+                       required  type="date">
             </div>
-            <button class="ui button" type="submit">Submit</button>
-        </form>
-    </div>
+            <div class="field">
+                <label>Closure Date</label>
+                <input v-model="task.endDate" name="taskEndDate" placeholder="Task Name" required
+                       type="date">
+            </div>
+        </div>
+        <button class="ui positive button" type="submit">Save</button>
+    </form>
+
 </div>
 
 </body>
