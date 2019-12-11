@@ -11,7 +11,13 @@ var app = new Vue({
         removeMember: function(e, member){
             $.get("/api/org/members/remove?orgID="+currentOrgID+"&memberID="+member.id)
             .done(function(data){
-                delete app.members[app.members.indexOf(member)];
+                var copy = [];
+                for (var i = 0; i < app.members.length; i++) {
+                    if(app.members[i].id != member.id){
+                        copy.push(app.members[i]);
+                    }
+                }
+                app.members = copy;
             });
         },
         addMember: function(memberID){
