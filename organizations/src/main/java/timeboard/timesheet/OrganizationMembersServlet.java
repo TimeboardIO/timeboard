@@ -32,6 +32,7 @@ import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.MembershipRole;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -76,24 +77,9 @@ public class OrganizationMembersServlet extends TimeboardServlet {
         List<Account> members = this.organizationService.getMembers(actor, organization);
 
         viewModel.getViewDatas().put("parents", parents);
+        viewModel.getViewDatas().put("roles", MembershipRole.values());
         viewModel.getViewDatas().put("members", members);
         viewModel.getViewDatas().put("organization", organization);
-
-    }
-
-    @Override
-    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-
-        viewModel.setTemplate("details_org_config.html");
-
-        //Extract organization
-        long id = Long.parseLong(request.getParameter("organizationID"));
-        Account organization = this.organizationService.getOrganizationByID(actor, id);
-
-        organization.setName(request.getParameter("OrganizationName"));
-
-
-        this.organizationService.updateOrganization(actor, organization);
 
     }
 }

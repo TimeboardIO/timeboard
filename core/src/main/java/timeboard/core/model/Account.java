@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table
@@ -71,6 +72,15 @@ public class Account implements Serializable {
     @Lob
     private Map<String, String> externalIDs;
 
+
+
+    @OneToMany(targetEntity = AccountHierarchy.class,
+            mappedBy = "organization",
+            orphanRemoval = true,
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.EAGER
+    )
+    private Set<AccountHierarchy> members;
 
     public Account() {
         this.externalIDs = new HashMap<>();
@@ -152,6 +162,11 @@ public class Account implements Serializable {
     public void setIsOrganization(Boolean isOrganization) {
         this.isOrganization = isOrganization;
     }
+
+    public Set<AccountHierarchy> getMembers() {
+        return members;
+    }
+
 
     @Transient
     public String getScreenName() {

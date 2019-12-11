@@ -29,6 +29,8 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
+import timeboard.core.model.AccountHierarchy;
+import timeboard.core.model.MembershipRole;
 
 import java.util.List;
 
@@ -47,5 +49,9 @@ public interface OrganizationService {
 
     List<Account> getMembers(final Account actor, Account organization);
 
-    void removeMember(Account actor, Account organization, Account member);
+    AccountHierarchy removeMember(Account actor, Account organization, Account member) throws BusinessException;
+
+    AccountHierarchy addMember(Account actor, Account organization, Account member) throws BusinessException;
+
+    AccountHierarchy updateMemberRole(Account actor, Account organization, Account member, MembershipRole role) throws BusinessException;
 }

@@ -34,6 +34,7 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.AccountHierarchy;
+import timeboard.core.model.MembershipRole;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
@@ -51,13 +52,13 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private EntityManager em;
 
-
     @Override
     public Account createOrganization(Account actor, Account organization) throws BusinessException {
 
         AccountHierarchy ah = new AccountHierarchy();
         ah.setMember(actor);
         ah.setOrganization(organization);
+        ah.setRole(MembershipRole.OWNER);
         ah.setStartDate(new Date());
         this.em.persist(ah);
 
@@ -88,8 +89,51 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public void removeMember(Account actor, Account organization, Account member) {
+    public AccountHierarchy addMember(final Account actor, Account organization, Account member) throws BusinessException {
+        AccountHierarchy ah = new AccountHierarchy();
 
+        ah.setMember(member);
+        ah.setOrganization(organization);
+        ah.setRole(MembershipRole.CONTRIBUTOR);
+        ah.setStartDate(new Date());
+        this.em.persist(ah);
+        em.flush();
+
+        return ah;
+    }
+
+    @Override
+    public AccountHierarchy removeMember(final Account actor, Account organization, Account member) throws BusinessException{
+
+        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h where h.member = :member and h.organization = :organization", AccountHierarchy.class)
+                .setParameter("member", member)
+                .setParameter("organization", organization)
+                .getSingleResult();
+
+        if(ah.getRole() == MembershipRole.OWNER){
+            throw new BusinessException("Can not remove an organization owner");
+        }
+        em.remove(ah);
+        organization.getMembers().remove(ah);
+        em.merge(organization);
+        em.flush();
+
+        return ah;
+    }
+
+
+    @Override
+    public AccountHierarchy updateMemberRole(final Account actor, Account organization, Account member, MembershipRole role) {
+        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h where h.member = :member and h.organization = :organization", AccountHierarchy.class)
+                .setParameter("member", member)
+                .setParameter("organization", organization)
+                .getSingleResult();
+
+        ah.setRole(role);
+        em.merge(ah);
+        em.flush();
+
+        return ah;
     }
 
     @Override

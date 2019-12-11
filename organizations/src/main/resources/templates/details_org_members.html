@@ -14,14 +14,21 @@
 
     <div class="field">
         <div class="ui category search">
-            <div class="ui action input">
+            <div class="ui labeled right input">
+                <div class="ui label">
+                    Add member <i class="plus icon"></i>
+                </div>
                 <input class="prompt" placeholder="Search account..." type="text">
-                <a class="ui icon button primary "> Add member <i class="plus icon"></i> </a>
             </div>
             <div class="results"></div>
         </div>
     </div>
 
+    <div class="ui center aligned segment">
+        <a th:each="parent : ${parents}"  th:text="${parent.screenName}" class="ui button" th:href="@{${'/org/'+tab}(orgID=${parent.id})}"></a>
+        <a th:text="${organization.screenName}" class="ui horizontal divider" >Name</a>
+        <a th:each="member : ${members}" th:if="${member.isOrganization == true}" th:href="@{${'/org/'+tab}(orgID=${member.id})}" th:text="${member.screenName}" class="primary ui button"></a>
+    </div>
     <h4 class="ui dividing header">Members</h4>
 
     <table class="ui celled table">
@@ -35,8 +42,18 @@
         <tbody>
             <tr v-for="member in members" v-if="member.isOrganization == false" >
                 <td >{{member.screenName}}</td>
-                <td></td>
-                <td></td>
+                <td>
+                    <select v-model="member.role"  @change="updateRole($event, member)">
+                        <option th:each="role : ${roles}"
+                            th:text="${role}"
+                            th:value="${role}"></option>
+                    </select>
+                </td>
+                <td>
+                    <button @click="removeMember($event, member)" class="ui tiny negative icon button">
+                        Remove <i class="close icon"></i>
+                    </button>
+                </td>
             </tr>
         </tbody>
     </table>

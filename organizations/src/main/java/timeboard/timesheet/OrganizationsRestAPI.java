@@ -88,27 +88,102 @@ public class OrganizationsRestAPI {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
         }
 
-        final List<Account> members = this.organizationService.getMembers(actor, organization);
+        //final List<Account> members = this.organizationService.getMembers(actor, organization);
 
+        final Set<AccountHierarchy> members = organization.getMembers();
         final List<MemberWrapper> result = new ArrayList<>();
 
-        for (Account member : members) {
+        for (AccountHierarchy member : members) {
 
             result.add(new MemberWrapper(
-                    member.getId(),
-                    member.getScreenName(),
-                    member.getIsOrganization(),
-                    ""
+                    member.getMember().getId(),
+                    member.getMember().getScreenName(),
+                    member.getMember().getIsOrganization(),
+                    (member.getRole() != null ? member.getRole().name() : "")
                     ));
-
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(result.toArray()));
 
     }
 
+    @GetMapping("/members/add")
+    public ResponseEntity addMember(HttpServletRequest request) throws JsonProcessingException {
+        Account actor = this.userInfo.getCurrentAccount();
+
+        final String strOrgID = request.getParameter("orgID");
+        Long orgID = null;
+        if (strOrgID != null) {
+            orgID = Long.parseLong(strOrgID);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
+        }
+        final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
+
+        final String strMemberID = request.getParameter("memberID");
+        Long memberID = null;
+        if (strOrgID != null) {
+            memberID = Long.parseLong(strMemberID);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
+        }
+
+        final Account member = this.organizationService.getOrganizationByID(actor,  memberID);
+
+        try {
+            organizationService.addMember(actor, organization, member);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(member)));
+    }
+
+
+
+    @GetMapping("/members/updateRole")
+    public ResponseEntity updateMemberRole(HttpServletRequest request) throws JsonProcessingException {
+        Account actor = this.userInfo.getCurrentAccount();
+
+        final String strOrgID = request.getParameter("orgID");
+        Long orgID = null;
+        if (strOrgID != null) {
+            orgID = Long.parseLong(strOrgID);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
+        }
+        final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
+
+        final String strMemberID = request.getParameter("memberID");
+        Long memberID = null;
+        if (strMemberID != null) {
+            memberID = Long.parseLong(strMemberID);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
+        }
+        final Account member = this.organizationService.getOrganizationByID(actor,  memberID);
+
+
+        final String strRole = request.getParameter("role");
+        MembershipRole role = null;
+        if (strRole != null) {
+            role = MembershipRole.valueOf(strRole);
+        }else{
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
+        }
+
+        try {
+            organizationService.updateMemberRole(actor, organization, member, role);
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(member)));
+    }
+
+
     @GetMapping("/members/remove")
-    public ResponseEntity remove(HttpServletRequest request){
+    public ResponseEntity removeMember(HttpServletRequest request){
         Account actor = this.userInfo.getCurrentAccount();
 
         final String strOrgID = request.getParameter("orgID");
@@ -139,21 +214,27 @@ public class OrganizationsRestAPI {
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-        public static class MemberWrapper implements Serializable {
+    public static class MemberWrapper implements Serializable {
 
-            public Long orgID;
-            public String screenName;
-            public boolean isOrganization;
-            public String role;
+        public Long orgID;
+        public String screenName;
+        public boolean isOrganization;
+        public String role;
 
-            public MemberWrapper(){}
+        public MemberWrapper(){}
+        public MemberWrapper(Account member){
+            this.orgID = member.getId();
+            this.screenName = member.getScreenName();
+            this.isOrganization = member.getIsOrganization();
+            this.role = role;
+        }
 
-            public MemberWrapper(Long orgID, String screenName, boolean isOrganization, String role) {
-                this.orgID = orgID;
-                this.screenName = screenName;
-                this.isOrganization = isOrganization;
-                this.role = role;
-            }
+        public MemberWrapper(Long orgID, String screenName, boolean isOrganization, String role) {
+            this.orgID = orgID;
+            this.screenName = screenName;
+            this.isOrganization = isOrganization;
+            this.role = role;
+        }
 
     }
 }
