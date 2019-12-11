@@ -42,12 +42,10 @@ import timeboard.core.ui.UserInfo;
 import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
-
 
 
 @Controller
@@ -69,7 +67,7 @@ public class ProjectTasksController extends TimeboardServlet {
     }
 
     @GetMapping("/tasks")
-    protected String listTasks(@PathVariable Long projectID,  Model viewModel) throws ServletException, IOException, BusinessException {
+    protected String listTasks(@PathVariable Long projectID, Model viewModel) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -95,7 +93,7 @@ public class ProjectTasksController extends TimeboardServlet {
     }
 
     @GetMapping("/tasks/{taskID}")
-    protected String editTasks(@PathVariable Long projectID,  @PathVariable Long taskID,  Model viewModel) throws ServletException, IOException, BusinessException {
+    protected String editTasks(@PathVariable Long projectID, @PathVariable Long taskID, Model viewModel) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 

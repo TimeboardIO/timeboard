@@ -39,15 +39,17 @@ import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Project;
+import timeboard.core.model.ProjectMembership;
 import timeboard.core.ui.UserInfo;
-import timeboard.core.ui.ViewModel;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 @Controller
@@ -98,7 +100,7 @@ public class ProjectSetupController {
     }
 
     @PatchMapping("/memberships/{membershipID}/{role}")
-    protected ResponseEntity updateProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID,  @PathVariable MembershipRole role) throws Exception {
+    protected ResponseEntity updateProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID, @PathVariable MembershipRole role) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.getMembers().stream()
@@ -131,7 +133,7 @@ public class ProjectSetupController {
 
         this.projectService.updateProject(actor, project);
 
-        return "redirect:/projects/"+projectID+"/setup";
+        return "redirect:/projects/" + projectID + "/setup";
     }
 
     private void prepareTemplateData(final Account actor, final Project project, final Map<String, Object> map) throws BusinessException, JsonProcessingException {
@@ -150,11 +152,11 @@ public class ProjectSetupController {
 
     }
 
-    public static class ProjectMembersForm{
+    public static class ProjectMembersForm {
 
-        private  List<ProjectMembership> memberships = new ArrayList<>();
+        private List<ProjectMembership> memberships = new ArrayList<>();
 
-        public MembershipRole[] getRoles(){
+        public MembershipRole[] getRoles() {
             return MembershipRole.values();
         }
 
@@ -167,7 +169,7 @@ public class ProjectSetupController {
         }
     }
 
-    public static class ProjectConfigForm{
+    public static class ProjectConfigForm {
 
         private String name;
         private double quotation;

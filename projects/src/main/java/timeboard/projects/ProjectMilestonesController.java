@@ -5,7 +5,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -17,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -81,7 +79,6 @@ public class ProjectMilestonesController {
     }
 
 
-
     private Map<String, String> getCurrentMilestoneAttributes(HttpServletRequest request) {
         Map<String, String> attributes = new HashMap<>();
 
@@ -94,7 +91,7 @@ public class ProjectMilestonesController {
         while (paramNames.hasMoreElements()) {
             String param = paramNames.nextElement();
             if (param.startsWith("attr-")) {
-                String key = param.substring(5, param.length());
+                String key = param.substring(5);
                 String value = request.getParameter(param);
                 attributes.put(key, value);
             }
@@ -118,9 +115,9 @@ public class ProjectMilestonesController {
 
         try {
 
-                 Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
-                currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
-                currentMilestone = addTasksToMilestone(actor, currentMilestone, request);
+            Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
+            currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
+            currentMilestone = addTasksToMilestone(actor, currentMilestone, request);
 
 
             viewModel.getViewDatas().put("milestone", currentMilestone);

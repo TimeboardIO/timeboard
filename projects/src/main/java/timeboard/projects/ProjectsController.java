@@ -27,33 +27,61 @@ package timeboard.projects;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.ui.TimeboardServlet;
+import timeboard.core.model.Project;
+import timeboard.core.ui.UserInfo;
 import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-@WebServlet(name = "ProjectListServlet", urlPatterns = "/projects")
-public class ProjectListServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/projects")
+public class ProjectsController {
 
 
     @Autowired
     private ProjectService projectService;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectListServlet.class.getClassLoader();
+    @Autowired
+    private UserInfo userInfo;
+
+    @GetMapping
+    protected String handleGet(Model viewModel) {
+        final Account actor = this.userInfo.getCurrentAccount();
+        viewModel.addAttribute("projects", this.projectService.listProjects(actor));
+        return "projects";
     }
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects.html");
-        viewModel.getViewDatas().put("projects", this.projectService.listProjects(actor));
+    @PostMapping("/create")
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+        final Account actor = this.userInfo.getCurrentAccount();
+        this.projectService.createProject(actor, request.getParameter("projectName"));
+        return "redirect:/projects";
     }
+
+    @GetMapping("/create")
+    protected String createFrom() throws ServletException, IOException {
+        return "create_project";
+    }
+
+    @GetMapping("/{projectID}/delete")
+    protected String deleteProject(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
+        final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
+        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
+        return "redirect:/projects";
+    }
+
+
 }
