@@ -333,20 +333,22 @@ public class TasksRestAPI {
             try {
                 task = (Task) projectService.getTaskByID(actor, taskID);
 
-                Account assignee = userService.findUserByID(taskWrapper.assigneeID);
-                final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
-
+                if(taskWrapper.assigneeID > 0) {
+                    final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
+                    task.setAssigned(assignee);
+                }
                 task.setName(taskWrapper.getTaskName());
                 task.setComments(taskWrapper.getTaskComments());
                 task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
                 task.setStartDate(DATE_FORMAT.parse(taskWrapper.getStartDate()));
                 task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
-                task.setAssigned(assignee);
+                final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
                 task.setTaskType(taskType);
                 task.setMilestone(milestone);
                 task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
                 projectService.updateTask(actor,task);
+
             }catch (Exception e){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
             }

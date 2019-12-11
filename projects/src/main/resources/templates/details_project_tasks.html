@@ -30,7 +30,7 @@
             <table class="ui celled table">
                 <thead>
                 <tr>
-                    <th  colspan="2" style="text-align:center;"
+                    <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}"
                         @click="sortBy('taskName')"
                         :class="{ active: sortKey == 'taskName' }" > Task <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
@@ -67,7 +67,7 @@
                 </tr></thead>
                 <tbody>
                 <tr>
-                    <td colspan="2" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">
                         <div class="ui fluid icon input">
                             <input  v-model="filterKey[columns.indexOf('taskName')].value"  type="text" placeholder="Name.. ">
                             <i class="search icon"></i>
@@ -135,13 +135,13 @@
                 </tr>
 
                 <tr v-for="entry in filteredTasks">
-                    <td colspan="2" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
                     <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}">{{entry['startDate']}}</td>
                     <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}">{{entry['endDate']}}</td>
                     <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}">{{entry['originalEstimate']}}</td>
                     <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}">{{entry['assignee']}}</td>
                     <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}"><i>{{entry['milestoneName']}}</i></td>
-                    <td  colspan="2" style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID') || dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
+                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID') || dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
                         <div class="ui blue green horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}">{{entry['typeName']}}</div>
                         <div class="ui small primary horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">{{entry['statusName']}}</div>
                     </td>
@@ -172,7 +172,7 @@
                 </th>
             </tr>
             <tr>
-                <th  colspan="2" style="text-align:center;"
+                <th  style="text-align:center;"
                      @click="sortBy('taskName')"
                      :class="{ active: sortKey == 'taskName' }" > Task <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
 
@@ -194,7 +194,7 @@
             <tbody>
 
             <tr v-for="entry in filteredTasks" >
-                <td colspan="2" >{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
+                <td >{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
                 <td  style="text-align: center;" >{{entry['startDate']}}</td>
                 <td  style="text-align: center;" >{{entry['endDate']}}</td>
                 <td  style="text-align: center;" >{{entry['originalEstimate']}}</td>
