@@ -60,7 +60,7 @@ public class ProjectCreateServlet {
     }
 
     @GetMapping("/projects/create")
-    protected String createFrom(Model moldel, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected String createFrom(Model model, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         return "create_project.html";
     }
 
