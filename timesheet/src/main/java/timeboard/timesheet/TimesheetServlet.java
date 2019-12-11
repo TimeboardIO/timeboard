@@ -50,7 +50,7 @@ import java.util.List;
 
 
 
-@WebServlet(name = "TimesheetServlet", urlPatterns = "/timesheet")
+@WebServlet(name = "TimesheetServlet", urlPatterns = "/org/{orgId}/timesheet")
 public class TimesheetServlet extends TimeboardServlet {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

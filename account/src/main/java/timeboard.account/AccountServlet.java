@@ -46,7 +46,7 @@ import java.util.*;
 import java.text.DateFormatSymbols;
 
 
-@WebServlet(name = "AccountServlet", urlPatterns = "/account")
+@WebServlet(name = "AccountServlet", urlPatterns = "/org/{orgId}/account")
 public class AccountServlet extends TimeboardServlet {
 
     @Autowired

@@ -44,7 +44,7 @@ import timeboard.core.model.TASData;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-@WebServlet(name = "TasExportServlet", urlPatterns = "/account/exportTAS")
+@WebServlet(name = "TasExportServlet", urlPatterns = "/org/{orgId}/account/exportTAS")
 //TIME ATTACHMENT SHEET
 public class TasExportServlet extends TimeboardServlet {
 

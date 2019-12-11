@@ -49,7 +49,7 @@ import java.util.Date;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}")
+@RequestMapping("/org/{orgId}/projects/{projectID}")
 public class ProjectTasksController extends TimeboardServlet {
 
     @Autowired

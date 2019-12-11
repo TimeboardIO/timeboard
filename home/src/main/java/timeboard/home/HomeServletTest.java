@@ -34,20 +34,19 @@ import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.home.model.Week;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 
-
-@WebServlet(name="HomeServlet", urlPatterns = {"/org/${orgId}/home"})
-public class HomeServlet extends TimeboardServlet {
+@WebServlet(name="HomeServletTest", urlPatterns = {"/home"})
+public class HomeServletTest extends TimeboardServlet {
 
     @Autowired
     private ProjectService projectService;
@@ -60,7 +59,7 @@ public class HomeServlet extends TimeboardServlet {
 
     @Override
     protected ClassLoader getTemplateResolutionClassLoader() {
-        return HomeServlet.class.getClassLoader();
+        return HomeServletTest.class.getClassLoader();
     }
 
     @Override
@@ -71,34 +70,8 @@ public class HomeServlet extends TimeboardServlet {
     @Override
     protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
-        //load previous weeks data
-        Date d = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(d);
-        List<Week> weeks = new ArrayList<>();
-        Account account = actor;
-        int weeksToDisplay = 3; // actual week and the two previous ones
-        if (this.timesheetService != null) {
-            for (int i = 0; i < weeksToDisplay; i++) {
-                boolean weekIsValidated = timesheetService.isTimesheetValidated(account, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
-
-                calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
-                Date firstDayOfWeek = calendar.getTime();
-                calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
-                Date lastDayOfWeek = calendar.getTime();
-                Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, account);
-
-                Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsValidated);
-                weeks.add(week);
-                calendar.roll(Calendar.WEEK_OF_YEAR, -1);
-            }
-        }
-
-        viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(account).size());
-        viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(account).size());
-        viewModel.getViewDatas().put("weeks", weeks);
-
-        viewModel.setTemplate("home.html");
+        Long orgId = actor.getId();
+        response.sendRedirect("/org/"+orgId+"/home");
     }
 
 

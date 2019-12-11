@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Optional;
 
 
-@WebServlet(name = "ProjectImportServlet", urlPatterns = "/projects/import")
+@WebServlet(name = "ProjectImportServlet", urlPatterns = "/org/{orgId}/projects/import")
 public class ProjectImportServlet extends TimeboardServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
