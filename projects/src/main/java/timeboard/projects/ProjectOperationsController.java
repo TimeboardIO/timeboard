@@ -29,12 +29,15 @@ package timeboard.projects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
@@ -66,6 +69,9 @@ public class ProjectOperationsController {
     private ProjectService projectService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
     private UserInfo userInfo;
 
     @PostMapping("/projects/create")
@@ -90,13 +96,37 @@ public class ProjectOperationsController {
         return "details_project_config";
     }
 
-    @PostMapping("/projects/{projectID}/setup/members")
-    protected String updateProjectMembers(@PathVariable long projectID, @ModelAttribute ProjectMembersForm projectMembersForm) throws Exception {
+    @PostMapping("/projects/{projectID}/setup/memberships")
+    @ResponseBody
+    protected ResponseEntity updateProjectMembers(@PathVariable long projectID, HttpServletRequest request) throws Exception {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        project.getMembers().add(new ProjectMembership(project, targetMember, MembershipRole.CONTRIBUTOR));
+        this.projectService.updateProject(actor, project);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PatchMapping("/projects/{projectID}/setup/memberships/{membershipID}/{role}")
+    protected ResponseEntity updateProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID,  @PathVariable MembershipRole role) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
-        project.setMembers(new HashSet<>(projectMembersForm.getMemberships()));
+        project.getMembers().stream()
+                .filter(projectMembership -> projectMembership.getMembershipID() == membershipID)
+                .forEach(projectMembership -> projectMembership.setRole(role));
         this.projectService.updateProject(actor, project);
-        return "redirect:/projects/"+projectID+"/setup";
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @DeleteMapping("/projects/{projectID}/setup/memberships/{membershipID}")
+    protected ResponseEntity deleteProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID) throws Exception {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        project.getMembers().removeIf(projectMembership -> {
+            return projectMembership.getMembershipID() == membershipID && projectMembership.getMember().getId() != actor.getId();
+        });
+        this.projectService.updateProject(actor, project);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/projects/{projectID}/setup/informations")
@@ -193,6 +223,7 @@ public class ProjectOperationsController {
         map.put("project", project);
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
+        map.put("roles", MembershipRole.values());
 
         /*
         map.put("project", project);

@@ -49,7 +49,7 @@
         <div class="ui five stackable cards">
             <div class="ui card" th:each="project : ${projects}">
                 <div class="image">
-                    <a th:href="@{/projects/tasks/config(projectID=${project.id})}">
+                    <a th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">
                         <div class="badge" style="text-transform: capitalize;"
                              th:style="'background-color:'+${project.getColor()}"
                              th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">
