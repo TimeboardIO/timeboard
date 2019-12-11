@@ -21,8 +21,8 @@ public class CommercialException  extends Exception {
         this.errMsg = errMsg;
     }
 
-    public CommercialException(String errCode, String errMsg) {
-        this.errCause = errCode;
+    public CommercialException(String errCause, String errMsg) {
+        this.errCause = errCause;
         this.errMsg = errMsg;
     }
 }
