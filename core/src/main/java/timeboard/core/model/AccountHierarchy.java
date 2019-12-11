@@ -53,6 +53,10 @@ public class AccountHierarchy {
     @Column
     private Date endDate;
 
+    @Column()
+    @Enumerated(EnumType.STRING)
+    private MembershipRole role;
+
     public long getId() {
         return id;
     }
@@ -98,4 +102,14 @@ public class AccountHierarchy {
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
+
+
+    public MembershipRole getRole() {
+        return role;
+    }
+
+    public void setRole(MembershipRole role) {
+        this.role = role;
+    }
+
 }

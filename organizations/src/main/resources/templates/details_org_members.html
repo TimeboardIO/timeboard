@@ -1,43 +1,47 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{details_org_layout.html(tab='second')}"
+<html layout:decorate="~{details_org_layout.html(tab='members')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
+<head>
+    <meta property="organization" th:orgID="${organization.id}"/>
+</head>
 <body>
 
-<div layout:fragment="placeholder">
+<div layout:fragment="placeholder" id="members">
 
+    <div class="field">
+        <div class="ui category search">
+            <div class="ui action input">
+                <input class="prompt" placeholder="Search account..." type="text">
+                <a class="ui icon button primary "> Add member <i class="plus icon"></i> </a>
+            </div>
+            <div class="results"></div>
+        </div>
+    </div>
 
-        <button class="ui primary create-task icon button">
-            Edit config <i class="cog icon"></i>
-        </button>
-        <button class="ui primary create-task icon button">
-            Add member
-            <i class="icons">
-                <i class="user icon"></i>
-                <i class="bottom right corner add icon"></i>
-            </i>
-        </button>
-        <h4 class="ui dividing header">Members</h4>
+    <h4 class="ui dividing header">Members</h4>
 
-        <table class="ui celled table">
-            <thead>
-                <tr>
-                    <th>First Name</th>
-                    <th>Role</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="member : ${members}" th:if="${member.isOrganization == false}" >
-                    <td th:text="${member.screenName}">John</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-            </tbody>
-        </table>
+    <table class="ui celled table">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Role</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="member in members" v-if="member.isOrganization == false" >
+                <td >{{member.screenName}}</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="/js/org_members.js"></script>
 
 </div>
 

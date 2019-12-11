@@ -10,20 +10,15 @@
 <div layout:fragment="content">
 
     <div class="ui center aligned segment">
-        <a th:each="parent : ${parents}"  th:text="${parent.screenName}" class="ui button" th:href="@{/org/config(orgID=${parent.id})}"></a>
+        <a th:each="parent : ${parents}"  th:text="${parent.screenName}" class="ui button" th:href="@{${'/org/'+tab}(orgID=${parent.id})}"></a>
         <a th:text="${organization.screenName}" class="ui horizontal divider" >Name</a>
-        <a th:each="member : ${members}" th:if="${member.isOrganization == true}" th:href="@{/org/config(orgID=${member.id})}" th:text="${member.screenName}" class="primary ui button"></a>
+        <a th:each="member : ${members}" th:if="${member.isOrganization == true}" th:href="@{${'/org/'+tab}(orgID=${member.id})}" th:text="${member.screenName}" class="primary ui button"></a>
     </div>
     <div class="ui attached pointing menu">
-        <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
+        <a class="item" th:classappend="${tab} == 'config'  ? 'active':''"
            th:href="@{/org/config(orgID=${organization.id})}">Setup</a>
-        <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
+        <a class="item" th:classappend="${tab} == 'members'  ? 'active':''"
            th:href="@{/org/members(orgID=${organization.id})}">Members</a>
-        
-        <div class="right menu">
-            <a style="font-weight: bold;" th:text="${organization.name}" class="ui item primary">
-            </a>
-        </div>
     </div>
     <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
 

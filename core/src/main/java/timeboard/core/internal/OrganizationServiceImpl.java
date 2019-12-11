@@ -88,13 +88,18 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public List<Account> getParents(Account organization) {
+    public void removeMember(Account actor, Account organization, Account member) {
+
+    }
+
+    @Override
+    public List<Account> getParents(Account actor, Account organization) {
         return this.em.createQuery("select o from AccountHierarchy h join h.member m join h.organization o where m = :member", Account.class)
                 .setParameter("member", organization).getResultList();
     }
 
     @Override
-    public List<Account> getMembers(Account organization) {
+    public List<Account> getMembers(Account actor, Account organization) {
         if(!organization.getIsOrganization()) return new ArrayList<>();
         return this.em.createQuery("select m from AccountHierarchy h join h.member m join h.organization o where o = :org", Account.class)
                 .setParameter("org", organization).getResultList();
