@@ -28,10 +28,7 @@
       -ms-flex: 0 0 auto;
           flex: 0 0 auto;
   border-radius: 0.28571429rem;
-  -webkit-user-select: text;
-     -moz-user-select: text;
-      -ms-user-select: text;
-          user-select: text;
+  account-select: text;
   will-change: top, left, margin, transform, opacity;
 }
 .ui.modal > :first-child:not(.icon),

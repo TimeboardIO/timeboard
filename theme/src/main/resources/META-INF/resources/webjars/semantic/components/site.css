@@ -305,6 +305,9 @@ ui.input.error > input {
   color: white !important;
   font-weight: bold !important;
 }
+.text.primary {
+  color: #3d6488;
+}
 
 
 /*******************************

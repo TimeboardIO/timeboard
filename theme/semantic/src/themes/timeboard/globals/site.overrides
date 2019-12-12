@@ -131,6 +131,6 @@ ui.input.error > input {
     }
 }
 
-
-
-
+.text.primary {
+  color: @primaryColor;
+}
