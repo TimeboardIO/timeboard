@@ -48,7 +48,7 @@ import java.io.IOException;
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}/dashboard")
+@RequestMapping("/org/{orgID}/projects/{projectID}/dashboard")
 public class ProjectDashboardController {
 
     @Autowired
@@ -59,16 +59,16 @@ public class ProjectDashboardController {
 
 
     @GetMapping
-    protected String handleGet(@PathVariable Long projectID, HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException {
+    protected String handleGet(@PathVariable Long projectID, HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
         final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
 
-        viewModel.addAttribute("project", project);
-        viewModel.addAttribute("dashboard", dashboard);
+        model.addAttribute("project", project);
+        model.addAttribute("dashboard", dashboard);
 
-        return "details_project_dashboard";
+        return "details_project_dashboard.html";
     }
 
 }

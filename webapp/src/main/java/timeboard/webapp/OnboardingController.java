@@ -26,22 +26,28 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import timeboard.core.ui.UserInfo;
 
 import java.security.Principal;
 
 @Controller
 public class OnboardingController {
 
+    @Autowired
+    public UserInfo userInfo;
+
     @GetMapping("/")
     public String onboarding(Principal p, Model m){
         if(p == null){ 
             return "onboarding";
         }else{
-            return "redirect:/home";
+            Long orgId = userInfo.getCurrentAccount().getId();
+            return "redirect:/org/" + orgId + "/home";
         }
 
     }

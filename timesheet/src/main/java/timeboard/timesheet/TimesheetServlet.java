@@ -28,6 +28,11 @@ package timeboard.timesheet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;
@@ -35,10 +40,8 @@ import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
@@ -50,8 +53,9 @@ import java.util.List;
 
 
 
-@WebServlet(name = "TimesheetServlet", urlPatterns = "/timesheet")
-public class TimesheetServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/timesheet")
+public class TimesheetServlet {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -62,11 +66,8 @@ public class TimesheetServlet extends TimeboardServlet {
     @Autowired
     private  TimesheetService timesheetService;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return TimesheetServlet.class.getClassLoader();
-    }
-
+    @Autowired
+    private UserInfo userInfo;
 
     private int findLastWeekYear(Calendar c, int week, int year) {
         c.set(Calendar.YEAR, year);
@@ -92,8 +93,8 @@ public class TimesheetServlet extends TimeboardServlet {
         return c.getTime();
     }
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+    @GetMapping
+    protected String handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
@@ -111,26 +112,26 @@ public class TimesheetServlet extends TimeboardServlet {
         final Date de = findEndDate(c, week, year);
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
-        final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(getActorFromRequestAttributes(request), lastWeekYear, lastWeek);
+        final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(this.userInfo.getCurrentAccount(), lastWeekYear, lastWeek);
 
-        viewModel.getViewDatas().put("week", week);
-        viewModel.getViewDatas().put("year", year);
-        viewModel.getViewDatas().put("lastWeekValidated", lastWeekValidated);
-        viewModel.getViewDatas().put("userID", actor.getId());
-
-
-        viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
-        viewModel.getViewDatas().put("projectList", this.projectService.listProjects(getActorFromRequestAttributes(request)));
+        model.addAttribute("week", week);
+        model.addAttribute("year", year);
+        model.addAttribute("lastWeekValidated", lastWeekValidated);
+        model.addAttribute("userID", actor.getId());
 
 
-        viewModel.setTemplate("timesheet.html");
+        model.addAttribute("taskTypes", this.projectService.listTaskType());
+        model.addAttribute("projectList", this.projectService.listProjects(this.userInfo.getCurrentAccount()));
+
+
+        return "timesheet.html";
     }
 
-    @Override
+    @PostMapping
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
         try {
-            final Account actor = getActorFromRequestAttributes(request);
+            final Account actor = this.userInfo.getCurrentAccount();
             String type = request.getParameter("type");
             Long taskID = Long.parseLong(request.getParameter("task"));
             AbstractTask task = this.projectService.getTaskByID(actor, taskID);
