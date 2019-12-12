@@ -891,7 +891,11 @@ ui.input.error > input {
 }
 
 .text.primary {
-  color: #3d6488;
+  color: #3d6488 !important;
+}
+
+.text.bold {
+  font-: #3d6488 !important;
 }
 
 /*******************************
