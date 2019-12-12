@@ -59,7 +59,7 @@ public class ProjectTasksController {
     @Autowired
     public DataTableService dataTableService;
 
-    @GetMapping("/org/{orgID}/tasks")
+    @GetMapping("/tasks")
     protected String listTasks(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
@@ -85,7 +85,7 @@ public class ProjectTasksController {
         model.addAttribute("dataTableService", this.dataTableService);
     }
 
-    @GetMapping("/org/{orgID}/tasks/{taskID}")
+    @GetMapping("/tasks/{taskID}")
     protected String editTasks(@PathVariable Long projectID, @PathVariable Long taskID, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
@@ -101,7 +101,7 @@ public class ProjectTasksController {
         return "details_project_tasks.html";
     }
 
-    @PostMapping("/org/{orgID}/tasks")
+    @PostMapping("/tasks")
     protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
         Account actor = this.userInfo.getCurrentAccount();
 

@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.observers.emails;
 
 /*-
  * #%L
@@ -27,6 +27,7 @@ package timeboard.core.model;
  */
 
 import timeboard.core.internal.events.TaskEvent;
+import timeboard.core.model.Project;
 
 import java.util.ArrayList;
 import java.util.List;
