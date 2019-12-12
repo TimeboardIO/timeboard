@@ -32,7 +32,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -46,7 +45,7 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}/tags")
+@RequestMapping("/org/{orgID}/projects/{projectID}/tags")
 public class ProjectTagsController {
 
     @Autowired

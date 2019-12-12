@@ -28,8 +28,8 @@ package timeboard.core.internal.rules.task;
 
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Account;
-import timeboard.core.model.ProjectMembership;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.ProjectMembership;
 import timeboard.core.model.Task;
 
 import java.util.Optional;

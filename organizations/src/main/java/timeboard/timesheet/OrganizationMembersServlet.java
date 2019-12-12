@@ -26,20 +26,20 @@ package timeboard.timesheet;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import timeboard.core.api.EncryptionService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -49,35 +49,27 @@ import java.util.List;
  *
  * <p>Ex : /org/config?id=
  */
-@WebServlet(name = "OrganizationMembersServlet", urlPatterns = "/org/members")
-public class OrganizationMembersServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/members")
+public class OrganizationMembersServlet  {
 
     @Autowired
     public OrganizationService organizationService;
 
     @Autowired
-    public EncryptionService encryptionService;
+    private UserInfo userInfo;
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    @GetMapping
+    protected String handleGet(@PathVariable Long orgID, HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return OrganizationMembersServlet.class.getClassLoader();
-    }
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Account organization = this.organizationService.getOrganizationByID(actor, orgID);
+        final List<Account> members = this.organizationService.getMembers(actor, organization);
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
+        viewModel.addAttribute("roles", MembershipRole.values());
+        viewModel.addAttribute("members", members);
+        viewModel.addAttribute("organization", organization);
 
-        viewModel.setTemplate("details_org_members.html");
-        long id = Long.parseLong(request.getParameter("orgID"));
-
-        Account organization = this.organizationService.getOrganizationByID(actor, id);
-
-        List<Account> members = this.organizationService.getMembers(actor, organization);
-
-        viewModel.getViewDatas().put("roles", MembershipRole.values());
-        viewModel.getViewDatas().put("members", members);
-        viewModel.getViewDatas().put("organization", organization);
-
+        return "details_org_members";
     }
 }

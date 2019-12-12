@@ -26,10 +26,11 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.model.Account;
+import timeboard.core.model.DataTableConfig;
+
 import java.util.Arrays;
 import java.util.List;
-import timeboard.core.model.DataTableConfig;
-import timeboard.core.model.Account;
 
 /**
  * Service for datatable configs.

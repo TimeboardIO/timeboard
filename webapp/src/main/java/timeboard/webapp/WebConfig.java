@@ -87,7 +87,7 @@ public class WebConfig implements WebMvcConfigurer {
 
                     String url = ((DispatcherServletWebRequest) webRequest).getRequest().getRequestURI();
                     if(url.contains("/org/")) {
-                        modelMap.put("orgID", url.split("/")[2]);
+                            modelMap.put("orgID", url.split("/")[2]);
                     }
                     modelMap.put("account", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());

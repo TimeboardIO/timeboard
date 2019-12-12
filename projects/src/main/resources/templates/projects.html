@@ -49,7 +49,7 @@
         <div class="ui five stackable cards">
             <div class="ui card" th:each="project : ${projects}">
                 <div class="image">
-                    <a th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id})}">
+                    <a th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id},orgID=${orgID})}">
                         <div class="badge" style="text-transform: capitalize;"
                              th:style="'background-color:'+${project.getColor()}"
                              th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">
@@ -68,9 +68,9 @@
                     </div>
                 </div>
                 <div class="extra content">
-                    <a class="ui positive button" th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
+                    <a class="ui positive button" th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id},orgID=${orgID})}">Setup</a>
                     <a class="negative ui basic button"
-                       th:href="@{/org/{orgID}/projects/{projectID}/delete(projectID=${project.id})}">Archive</a>
+                       th:href="@{/org/{orgID}/projects/{projectID}/delete(projectID=${project.id},orgID=${orgID})}">Archive</a>
                 </div>
             </div>
         </div>

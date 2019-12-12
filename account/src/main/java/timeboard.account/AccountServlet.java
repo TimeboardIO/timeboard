@@ -37,16 +37,16 @@ import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 import timeboard.core.model.DataTableConfig;
+import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
 import java.text.DateFormatSymbols;
+import java.util.*;
 
 
 @Controller

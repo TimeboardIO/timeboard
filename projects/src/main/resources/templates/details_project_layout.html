@@ -12,15 +12,15 @@
     <div class="ui attached pointing menu">
         <a class="item" ><span class="primary bold text" th:text="${project.name}"></span></a>
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
-           th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
+           th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id},orgID=${orgID})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
-           th:href="@{/org/{orgID}/projects/{projectID}/tasks(projectID=${project.id})}">Tasks</a>
+           th:href="@{/org/{orgID}/projects/{projectID}/tasks(projectID=${project.id},orgID=${orgID})}">Tasks</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
-           th:href="@{/org/{orgID}/projects/{projectID}/milestones(projectID=${project.id})}">Milestones</a>
+           th:href="@{/org/{orgID}/projects/{projectID}/milestones(projectID=${project.id},orgID=${orgID})}">Milestones</a>
         <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
-           th:href="@{/org/{orgID}/projects/{projectID}/dashboard(projectID=${project.id})}">Dashboard</a>
+           th:href="@{/org/{orgID}/projects/{projectID}/dashboard(projectID=${project.id},orgID=${orgID})}">Dashboard</a>
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"
-           th:href="@{/org/{orgID}/projects/{projectID}/tags(projectID=${project.id})}">Tags</a>
+           th:href="@{/org/{orgID}/projects/{projectID}/tags(projectID=${project.id},orgID=${orgID})}">Tags</a>
         <div class="right menu">
             <a style="font-weight: bold;" th:text="${project.name}" class="ui item primary">
             </a>

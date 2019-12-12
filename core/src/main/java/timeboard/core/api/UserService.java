@@ -30,7 +30,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
 
-import java.util.Collection;
 import java.util.List;
 
 /**

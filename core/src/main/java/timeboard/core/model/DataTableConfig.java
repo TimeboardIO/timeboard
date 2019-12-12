@@ -26,9 +26,9 @@ package timeboard.core.model;
  * #L%
  */
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-import javax.persistence.*;
 
 @Entity
 public class DataTableConfig implements Serializable {

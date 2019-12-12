@@ -28,23 +28,23 @@ package timeboard.timesheet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.EncryptionService;
-
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DefaultTask;
 import timeboard.core.model.TaskType;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -54,8 +54,12 @@ import java.util.List;
  *
  * <p>Ex : /org/config?id=
  */
-@WebServlet(name = "OrganizationConfigServlet", urlPatterns = "/org/config")
-public class OrganizationConfigServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/config")
+public class OrganizationConfigServlet  {
+
+    @Autowired
+    private UserInfo userInfo;
 
     @Autowired
     public OrganizationService organizationService;
@@ -68,31 +72,29 @@ public class OrganizationConfigServlet extends TimeboardServlet {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return OrganizationConfigServlet.class.getClassLoader();
-    }
+    @GetMapping
+    protected String handleGet(HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
+        final Account actor = this.userInfo.getCurrentAccount();
 
-
-        viewModel.setTemplate("details_org_config.html");
         long id = Long.parseLong(request.getParameter("orgID"));
 
-        Account organization = this.organizationService.getOrganizationByID(actor, id);
+        final Account organization = this.organizationService.getOrganizationByID(actor, id);
 
-        List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
-        List<TaskType> taskTypes = this.projectService.listTaskType();
+        final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
+        final List<TaskType> taskTypes = this.projectService.listTaskType();
 
-        viewModel.getViewDatas().put("taskTypes", taskTypes);
-        viewModel.getViewDatas().put("defaultTasks", defaultTasks);
-        viewModel.getViewDatas().put("organization", organization);
+        viewModel.addAttribute("taskTypes", taskTypes);
+        viewModel.addAttribute("defaultTasks", defaultTasks);
+        viewModel.addAttribute("organization", organization);
+
+        return "details_org_config";
 
     }
 
-    @Override
-    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+    @PostMapping
+    protected String handlePost( HttpServletRequest request, Model viewModel) throws Exception {
+        final Account actor = this.userInfo.getCurrentAccount();
 
         String action = request.getParameter("action");
         long id = Long.parseLong(request.getParameter("orgID"));
@@ -121,7 +123,6 @@ public class OrganizationConfigServlet extends TimeboardServlet {
         }
 
         //Extract organization
-        this.handleGet(actor, request, response, viewModel);
-
+        return this.handleGet(request, viewModel);
     }
 }

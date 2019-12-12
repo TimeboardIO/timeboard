@@ -28,7 +28,6 @@ package timeboard.core.internal.rules.task;
 
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Task;
 import timeboard.core.model.Account;
 
 public class TaskHasNoImputation implements Rule<AbstractTask> {

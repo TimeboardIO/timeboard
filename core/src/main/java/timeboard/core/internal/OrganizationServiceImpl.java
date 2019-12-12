@@ -36,7 +36,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.AccountHierarchy;
 import timeboard.core.model.MembershipRole;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;

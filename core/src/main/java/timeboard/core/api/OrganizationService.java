@@ -27,7 +27,6 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
 import timeboard.core.model.AccountHierarchy;
 import timeboard.core.model.MembershipRole;

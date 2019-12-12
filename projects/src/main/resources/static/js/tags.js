@@ -28,7 +28,7 @@ $(document).ready(function () {
                 $.ajax({
                     type: "POST",
                     dataType: "json",
-                    url: "/projects/" + projectID + "/tags",
+                    url: "projects/" + projectID + "/tags",
                     data: {
                         "tagKey": "New Tag",
                         "tagValue": "New Value"
@@ -44,7 +44,7 @@ $(document).ready(function () {
                     type: "PATCH",
                     dataType: "json",
                     data: row,
-                    url: "/projects/" + projectID + "/tags/" + row.id,
+                    url: "projects/" + projectID + "/tags/" + row.id,
                     success: function (d) {
                         self.table.data = d;
                     }
@@ -55,7 +55,7 @@ $(document).ready(function () {
                 $.ajax({
                     type: "DELETE",
                     dataType: "json",
-                    url: "/projects/" + projectID + "/tags/" + row.id,
+                    url: "projects/" + projectID + "/tags/" + row.id,
                     success: function (d) {
                         self.table.data = d;
                     }
@@ -67,7 +67,7 @@ $(document).ready(function () {
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: "/projects/" + projectID + "/tags/list",
+                url: "projects/" + projectID + "/tags/list",
                 success: function (d) {
                     self.table.data = d;
                 }
