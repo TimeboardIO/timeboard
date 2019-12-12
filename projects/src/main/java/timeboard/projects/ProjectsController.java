@@ -47,7 +47,7 @@ import java.io.IOException;
 
 
 @Controller
-@RequestMapping("/projects")
+@RequestMapping("/org/{orgId}/projects")
 public class ProjectsController {
 
 

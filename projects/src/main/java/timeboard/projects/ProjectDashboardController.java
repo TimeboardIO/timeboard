@@ -48,7 +48,7 @@ import java.io.IOException;
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}/dashboard")
+@RequestMapping("/org/{orgId}/projects/{projectID}/dashboard")
 public class ProjectDashboardController {
 
     @Autowired

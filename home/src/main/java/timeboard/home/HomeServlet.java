@@ -27,6 +27,10 @@ package timeboard.home;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
@@ -46,29 +50,22 @@ import java.util.List;
 
 
 
-@WebServlet(name="HomeServlet", urlPatterns = {"/org/${orgId}/home"})
-public class HomeServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/home")
+public class HomeServlet {
 
     @Autowired
     private ProjectService projectService;
 
-
     @Autowired
     private TimesheetService timesheetService;
 
-
-
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return HomeServlet.class.getClassLoader();
-    }
-
-    @Override
+    @PostMapping
     protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         viewModel.setTemplate("home.html");
     }
 
-    @Override
+    @GetMapping
     protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         //load previous weeks data

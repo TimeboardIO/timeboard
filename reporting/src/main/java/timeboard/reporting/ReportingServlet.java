@@ -39,6 +39,7 @@ import java.util.List;
 
 
 @WebServlet(name = "ReportingServlet", urlPatterns = {ReportingServlet.URL})
+
 public class ReportingServlet extends TimeboardServlet {
 
     public static final String URL = "/reporting";

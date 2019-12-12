@@ -36,7 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 
 @Component
-@RequestMapping(value = "/reporting",produces =  {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "/org/{orgId}/reporting",produces =  {MediaType.APPLICATION_JSON_VALUE})
 public class RestAPI {
 
 
