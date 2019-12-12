@@ -28,6 +28,7 @@ package timeboard.timesheet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -45,7 +46,7 @@ import java.io.IOException;
 import java.util.Date;
 
 @Controller
-@RequestMapping("/org/{orgID}/orga")
+@RequestMapping("/org/{orgID}/org")
 public class OrganizationCreateServlet  {
     @Autowired
     public OrganizationService organizationService;
@@ -53,8 +54,8 @@ public class OrganizationCreateServlet  {
     @Autowired
     public UserInfo userInfo;
 
-    @PostMapping("/org/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    @PostMapping("create")
+    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
         organization.setRemoteSubject("Timeboard/Organization/"+System.nanoTime());
@@ -63,8 +64,8 @@ public class OrganizationCreateServlet  {
         return "redirect:/org/" + orgID + "/home";
     }
 
-    @GetMapping("/org/create")
-    protected String createFrom(Model model, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    @GetMapping("create")
+    protected String createFrom(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
         return "create_org.html";
     }
 }
