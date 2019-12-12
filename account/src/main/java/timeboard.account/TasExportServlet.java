@@ -36,13 +36,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 
 //TIME ATTACHMENT SHEET
 @Controller
@@ -52,11 +54,14 @@ public class TasExportServlet{
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private UserInfo userInfo;
+
     @PostMapping
-        protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
 
         try {
-
+            Account actor = this.userInfo.getCurrentAccount();
             int month = Integer.parseInt(request.getParameter("month"));
             int year = Integer.parseInt(request.getParameter("year"));
             Long projectID = Long.parseLong(request.getParameter("projectID"));
@@ -86,8 +91,7 @@ public class TasExportServlet{
             System.out.println(e.getMessage());
         }
 
-        response.sendRedirect("/account");
-
+        return ("/org/" + orgID + "/account");
 
     }
 

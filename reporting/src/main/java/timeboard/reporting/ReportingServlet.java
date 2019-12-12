@@ -28,11 +28,10 @@ package timeboard.reporting;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectExportService;
-import timeboard.core.model.Account;
-import timeboard.core.ui.ViewModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,9 +48,9 @@ public class ReportingServlet {
     private List<ProjectExportService> reportServices;
 
     @GetMapping
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        viewModel.setTemplate("reporting.html");
-        viewModel.getViewDatas().put("reports", this.reportServices);
+    protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+        model.addAttribute("reports", this.reportServices);
+        return "reporting.html";
    }
 
 }

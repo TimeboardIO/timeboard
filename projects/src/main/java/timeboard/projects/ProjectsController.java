@@ -38,7 +38,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
-import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -58,29 +57,29 @@ public class ProjectsController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(Model viewModel) {
+    protected String handleGet(Model model) {
         final Account actor = this.userInfo.getCurrentAccount();
-        viewModel.addAttribute("projects", this.projectService.listProjects(actor));
-        return "projects";
+        model.addAttribute("projects", this.projectService.listProjects(actor));
+        return "projects.html";
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
-        return "redirect:/projects";
+        return "redirect:/org/" + orgID + "/projects";
     }
 
     @GetMapping("/create")
     protected String createFrom() throws ServletException, IOException {
-        return "create_project";
+        return "create_project.html";
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
+    protected String deleteProject(@PathVariable Long orgID, @PathVariable long projectID) throws ServletException, IOException, BusinessException {
         final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
         this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
-        return "redirect:/projects";
+        return "redirect:/org/" + orgID + "/projects";
     }
 
 

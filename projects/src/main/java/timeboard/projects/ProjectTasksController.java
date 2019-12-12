@@ -39,7 +39,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.UserInfo;
-import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -67,55 +66,57 @@ public class ProjectTasksController extends TimeboardServlet {
     }
 
     @GetMapping("/org/{orgID}/tasks")
-    protected String listTasks(@PathVariable Long projectID, Model viewModel) throws ServletException, IOException, BusinessException {
+    protected String listTasks(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
         Task task = new Task();
 
-        viewModel.addAttribute("task", new TaskForm(task));
+        model.addAttribute("task", new TaskForm(task));
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        fillModel(viewModel, actor, project);
+        fillModel(model, actor, project);
 
-        return "details_project_tasks";
+        return "details_project_tasks.html";
     }
 
-    private void fillModel(Model viewModel, Account actor, Project project) throws BusinessException {
-        viewModel.addAttribute("project", project);
-        viewModel.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
-        viewModel.addAttribute("taskTypes", this.projectService.listTaskType());
-        viewModel.addAttribute("allTaskStatus", TaskStatus.values());
-        viewModel.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
-        viewModel.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
-        viewModel.addAttribute("dataTableService", this.dataTableService);
+    private void fillModel(Model model, Account actor, Project project) throws BusinessException {
+        model.addAttribute("project", project);
+        model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
+        model.addAttribute("taskTypes", this.projectService.listTaskType());
+        model.addAttribute("allTaskStatus", TaskStatus.values());
+        model.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
+        model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
+        model.addAttribute("dataTableService", this.dataTableService);
     }
 
     @GetMapping("/org/{orgID}/tasks/{taskID}")
-    protected String editTasks(@PathVariable Long projectID, @PathVariable Long taskID, Model viewModel) throws ServletException, IOException, BusinessException {
+    protected String editTasks(@PathVariable Long projectID, @PathVariable Long taskID, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
         final Task task = (Task) this.projectService.getTaskByID(actor, taskID);
 
-        viewModel.addAttribute("task", new TaskForm(task));
+        model.addAttribute("task", new TaskForm(task));
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        fillModel(viewModel, actor, project);
+        fillModel(model, actor, project);
 
-        return "details_project_tasks";
+        return "details_project_tasks.html";
     }
 
     @PostMapping("/org/{orgID}/tasks")
-    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
+        Account actor = this.userInfo.getCurrentAccount();
+
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);
 
-        viewModel.setTemplate("details_project_tasks.html");
-        viewModel.getViewDatas().put("tasks", this.projectService.listProjectTasks(actor, project));
-        viewModel.getViewDatas().put("project", project);
+        model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
+        model.addAttribute("project", project);
+        return "details_project_tasks.html";
     }
 
     public static class TaskForm {

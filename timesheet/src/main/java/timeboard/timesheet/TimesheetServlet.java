@@ -29,6 +29,7 @@ package timeboard.timesheet;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,7 +41,6 @@ import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 import timeboard.core.ui.UserInfo;
-import timeboard.core.ui.ViewModel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -94,7 +94,7 @@ public class TimesheetServlet {
     }
 
     @GetMapping
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
+    protected String handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
@@ -114,17 +114,17 @@ public class TimesheetServlet {
         final int lastWeekYear = findLastWeekYear(c, week, year);
         final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(this.userInfo.getCurrentAccount(), lastWeekYear, lastWeek);
 
-        viewModel.getViewDatas().put("week", week);
-        viewModel.getViewDatas().put("year", year);
-        viewModel.getViewDatas().put("lastWeekValidated", lastWeekValidated);
-        viewModel.getViewDatas().put("userID", actor.getId());
+        model.addAttribute("week", week);
+        model.addAttribute("year", year);
+        model.addAttribute("lastWeekValidated", lastWeekValidated);
+        model.addAttribute("userID", actor.getId());
 
 
-        viewModel.getViewDatas().put("taskTypes", this.projectService.listTaskType());
-        viewModel.getViewDatas().put("projectList", this.projectService.listProjects(this.userInfo.getCurrentAccount()));
+        model.addAttribute("taskTypes", this.projectService.listTaskType());
+        model.addAttribute("projectList", this.projectService.listProjects(this.userInfo.getCurrentAccount()));
 
 
-        viewModel.setTemplate("timesheet.html");
+        return "timesheet.html";
     }
 
     @PostMapping

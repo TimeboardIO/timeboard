@@ -28,14 +28,14 @@ package timeboard.timesheet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
-import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.Date;
 
 @Controller
+@RequestMapping("/org/{orgID}/orga")
 public class OrganizationCreateServlet  {
     @Autowired
     public OrganizationService organizationService;
@@ -51,18 +52,18 @@ public class OrganizationCreateServlet  {
     @Autowired
     public UserInfo userInfo;
 
-    @PostMapping("/orga/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    @PostMapping("/create")
+    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
         organization.setRemoteSubject("Timeboard/Organization");
         organization.setName(request.getParameter("organizationName"));
         this.organizationService.createOrganization(actor, organization);
-        return "redirect:/home";
+        return "redirect:/org/" + orgID + "/home";
     }
 
-    @GetMapping("/orga/create")
-    protected String createFrom(Model model, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    @GetMapping("/create")
+    protected String createFrom(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         return "create_orga.html";
     }
 }

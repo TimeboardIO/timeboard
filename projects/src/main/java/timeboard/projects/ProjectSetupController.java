@@ -85,7 +85,7 @@ public class ProjectSetupController {
         final Map<String, Object> map = new HashMap<>();
         this.prepareTemplateData(actor, project, map);
         model.addAllAttributes(map);
-        return "details_project_config";
+        return "details_project_config.html";
     }
 
     @PostMapping("/memberships")
@@ -122,7 +122,7 @@ public class ProjectSetupController {
     }
 
     @PostMapping("/informations")
-    protected String updateProjectConfiguration(@PathVariable long projectID, @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
+    protected String updateProjectConfiguration(@PathVariable Long orgID, @PathVariable long projectID, @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -133,7 +133,7 @@ public class ProjectSetupController {
 
         this.projectService.updateProject(actor, project);
 
-        return "redirect:/projects/" + projectID + "/setup";
+        return "redirect:/org/" + orgID + "/projects/" + projectID + "/setup";
     }
 
     private void prepareTemplateData(final Account actor, final Project project, final Map<String, Object> map) throws BusinessException, JsonProcessingException {

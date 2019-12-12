@@ -28,13 +28,14 @@ package timeboard.home;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 import timeboard.home.model.Week;
 
 import javax.servlet.ServletException;
@@ -58,20 +59,23 @@ public class HomeServlet {
     @Autowired
     private TimesheetService timesheetService;
 
+    @Autowired
+    private UserInfo userInfo;
+
     @PostMapping
-    protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("home.html");
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        return "home.html";
     }
 
     @GetMapping
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
 
         //load previous weeks data
         Date d = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
         List<Week> weeks = new ArrayList<>();
-        Account account = actor;
+        Account account = this.userInfo.getCurrentAccount();
         int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
@@ -89,11 +93,11 @@ public class HomeServlet {
             }
         }
 
-        viewModel.getViewDatas().put("nb_projects", this.projectService.listProjects(account).size());
-        viewModel.getViewDatas().put("nb_tasks", this.projectService.listUserTasks(account).size());
-        viewModel.getViewDatas().put("weeks", weeks);
+        model.addAttribute("nb_projects", this.projectService.listProjects(account).size());
+        model.addAttribute("nb_tasks", this.projectService.listUserTasks(account).size());
+        model.addAttribute("weeks", weeks);
 
-        viewModel.setTemplate("home.html");
+        return "home.html";
     }
 
 

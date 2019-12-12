@@ -59,17 +59,14 @@ public class TasksRestController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-
     @Autowired
     private ProjectService projectService;
 
     @Autowired
     private UserService userService;
 
-
     @Autowired
     private UserInfo userInfo;
-
 
     @GetMapping
     public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
@@ -226,7 +223,6 @@ public class TasksRestController {
     @GetMapping("/deny")
     public ResponseEntity denyTask(HttpServletRequest request) {
         Account actor = this.userInfo.getCurrentAccount();
-
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
