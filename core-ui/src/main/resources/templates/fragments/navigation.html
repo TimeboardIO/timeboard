@@ -10,7 +10,7 @@
         </div>
 
         <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}"
-           th:href="${nav.getNavigationPath()+'?'+nav.getNavigationParams()}">
+           th:href="${orgID} + '' + nav.getNavigationPath() + '?' + nav.getNavigationParams()}">
             <i th:class="${nav.getNavigationLogo()}+' icon'"></i>
             <div class="title" th:text="${nav.getNavigationLabel()}"></div>
         </a>

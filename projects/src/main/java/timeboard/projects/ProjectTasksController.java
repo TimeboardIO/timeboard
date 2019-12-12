@@ -37,7 +37,6 @@ import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
@@ -49,7 +48,7 @@ import java.util.Date;
 
 @Controller
 @RequestMapping("/org/{orgID}/projects/{projectID}")
-public class ProjectTasksController extends TimeboardServlet {
+public class ProjectTasksController {
 
     @Autowired
     public ProjectService projectService;
@@ -59,11 +58,6 @@ public class ProjectTasksController extends TimeboardServlet {
 
     @Autowired
     public DataTableService dataTableService;
-
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectTasksController.class.getClassLoader();
-    }
 
     @GetMapping("/org/{orgID}/tasks")
     protected String listTasks(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
