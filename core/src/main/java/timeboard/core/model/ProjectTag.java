@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,21 +27,32 @@ package timeboard.core.model;
  */
 
 import javax.persistence.*;
+import java.io.Serializable;
+import java.util.*;
+
 
 @Entity
-public class TaskType {
-
+public class ProjectTag implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
-    private String typeName;
+    @Column(nullable = false)
+    private String tagKey;
 
-    @Column
-    private boolean enable = true;
+    @Column(nullable = false)
+    private String tagValue;
 
-    public TaskType() {
+    @ManyToOne(targetEntity = Project.class, fetch = FetchType.LAZY)
+    private Project project;
+
+    public ProjectTag() {
+    }
+
+    public ProjectTag(String tagKey, String tagValue, Project project) {
+        this.tagKey = tagKey;
+        this.tagValue = tagValue;
+        this.project = project;
     }
 
     public Long getId() {
@@ -52,19 +63,27 @@ public class TaskType {
         this.id = id;
     }
 
-    public String getTypeName() {
-        return typeName;
+    public String getTagKey() {
+        return tagKey;
     }
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
+    public void setTagKey(String tagKey) {
+        this.tagKey = tagKey;
     }
 
-    public boolean isEnable() {
-        return enable;
+    public String getTagValue() {
+        return tagValue;
     }
 
-    public void setEnable(boolean active) {
-        this.enable = active;
+    public void setTagValue(String tagValue) {
+        this.tagValue = tagValue;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

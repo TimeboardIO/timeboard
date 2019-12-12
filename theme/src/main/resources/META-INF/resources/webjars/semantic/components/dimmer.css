@@ -45,20 +45,14 @@
   -webkit-box-pack: center;
       -ms-flex-pack: center;
           justify-content: center;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  account-select: none;
   will-change: opacity;
   z-index: 1000;
 }
 
 /* Dimmer Content */
 .ui.dimmer > .content {
-  -webkit-user-select: text;
-     -moz-user-select: text;
-      -ms-user-select: text;
-          user-select: text;
+  account-select: text;
   color: #FFFFFF;
 }
 

@@ -6,8 +6,8 @@
         email varchar(255) not null,
         externalIDs TEXT,
         firstName varchar(255),
+        isOrganization bit,
         name varchar(255),
-        organisation bit,
         remoteSubject varchar(255),
         primary key (id)
     ) engine=InnoDB;
@@ -15,6 +15,7 @@
     create table AccountHierarchy (
        id bigint not null,
         endDate datetime(6),
+        role varchar(255),
         startDate datetime(6) not null,
         member_id bigint,
         organization_id bigint,
@@ -93,6 +94,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         day date,
@@ -131,6 +134,14 @@
         primary key (membershipID)
     ) engine=InnoDB;
 
+    create table ProjectTag (
+       id bigint not null,
+        tagKey varchar(255) not null,
+        tagValue varchar(255) not null,
+        project_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Task (
        id bigint not null,
         comments varchar(500),
@@ -164,6 +175,7 @@
 
     create table TaskType (
        id bigint not null,
+        enable bit,
         typeName varchar(255),
         primary key (id)
     ) engine=InnoDB;
@@ -228,6 +240,11 @@
 
     alter table ProjectMembership 
        add constraint FKapg94jqua2lbkjdb0kofxtnln 
+       foreign key (project_id) 
+       references Project (id);
+
+    alter table ProjectTag 
+       add constraint FKflkgw7xvdg8kc0gnjsj950con 
        foreign key (project_id) 
        references Project (id);
 

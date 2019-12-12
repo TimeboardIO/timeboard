@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/org')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+
+<body>
+
+<div layout:fragment="content">
+
+    <div class="ui attached pointing menu">
+            <a class="item" ><span class="primary bold text" th:text="${organization.screenName}"></span></a>
+
+        <a class="item" th:classappend="${tab} == 'config'  ? 'active':''"
+           th:href="@{/org/config(orgID=${organization.id})}">Setup</a>
+        <a class="item" th:classappend="${tab} == 'members'  ? 'active':''"
+           th:href="@{/org/members(orgID=${organization.id})}">Members</a>
+    </div>
+    <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
+
+    </div>
+
+
+</div>
+
+</body>
+</html>
