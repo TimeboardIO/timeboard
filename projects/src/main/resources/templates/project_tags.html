@@ -7,12 +7,26 @@
 <head>
     <title layout:fragment="title">Project tags</title>
     <meta name="projectID" th:content="${project.id}" />
+    <script type="text/javascript" src="/js/tags.js" ></script>
 </head>
 <body>
 
 
 <div layout:fragment="placeholder">
     <h1>Tags</h1>
+
+    <div id="components-demo">
+        <data-table v-bind:config="table">
+            <template v-slot:hello="{ data }">
+                <b>{{data}}</b>
+            </template>
+            <template v-slot:world="{ data }">
+                <button class="btn btn-primary">{{data}}</button>
+            </template>
+        </data-table>
+        <create-tag-btn></create-tag-btn>
+    </div>
+
 </div>
 
 </body>
