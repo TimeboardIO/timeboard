@@ -38,6 +38,9 @@ public class TaskType {
     @Column
     private String typeName;
 
+    @Column
+    private boolean enable = true;
+
     public TaskType() {
     }
 
@@ -55,5 +58,13 @@ public class TaskType {
 
     public void setTypeName(String typeName) {
         this.typeName = typeName;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean active) {
+        this.enable = active;
     }
 }

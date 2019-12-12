@@ -38,8 +38,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -64,26 +63,58 @@ public class UsersSearchRestController {
             projectID = Long.parseLong(req.getParameter("projectID"));
         }
 
-        List<Account> accounts = new ArrayList<>();
+        Set<Account> accounts = new HashSet<>();
 
         if (projectID != null) {
             accounts.addAll(this.userService.searchUserByEmail(query, projectID));
         } else {
             accounts.addAll(this.userService.searchUserByEmail(query));
+            accounts.addAll(this.userService.searchUserByName(query));
         }
-        SearchResult searchResult = new SearchResult(accounts.size(), accounts);
+        SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
-        MAPPER.writeValue(resp.getWriter(), searchResult);
+        MAPPER.writeValue(resp.getWriter(), searchResults);
     }
 
-    public static class SearchResult {
+    public static class SearchResult implements Serializable{
+        private Long id;
+
+        public SearchResult(Account a) {
+            this.id = a.getId();
+            this.screenName = a.getScreenName();
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getScreenName() {
+            return screenName;
+        }
+
+        public void setScreenName(String screenName) {
+            this.screenName = screenName;
+        }
+
+        private String screenName;
+
+    }
+    public static class SearchResults {
 
         private Integer count;
-        private List<? extends Serializable> items;
+        private Collection<SearchResult> items;
 
-        public SearchResult(Integer count, List<? extends Serializable> items) {
+        public SearchResults(Integer count, Collection<Account> items) {
             this.count = count;
-            this.items = items;
+            this.items = new ArrayList<>();
+
+            for (Account a : items){
+                this.items.add(new SearchResult(a));
+            }
         }
 
         public Integer getCount() {
@@ -94,11 +125,11 @@ public class UsersSearchRestController {
             this.count = count;
         }
 
-        public List<? extends Serializable> getItems() {
+        public Collection<SearchResult> getItems() {
             return items;
         }
 
-        public void setItems(List<? extends Serializable> items) {
+        public void setItems(List<SearchResult> items) {
             this.items = items;
         }
     }

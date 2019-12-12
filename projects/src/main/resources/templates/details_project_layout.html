@@ -10,6 +10,7 @@
 <div layout:fragment="content">
 
     <div class="ui attached pointing menu">
+        <a class="item" ><span class="primary bold text" th:text="${project.name}"></span></a>
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
            th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"

@@ -30,6 +30,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -52,6 +53,8 @@ public interface UserService {
      * @return list of users
      */
     List<Account> searchUserByEmail(String prefix);
+
+    List<Account> searchUserByName(String query);
 
     /**
      * Search user where name start with prefix, limit to project with

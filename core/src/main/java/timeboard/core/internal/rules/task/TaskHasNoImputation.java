@@ -27,10 +27,11 @@ package timeboard.core.internal.rules.task;
  */
 
 import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Task;
 import timeboard.core.model.Account;
 
-public class TaskHasNoImputation implements Rule<Task> {
+public class TaskHasNoImputation implements Rule<AbstractTask> {
 
     @Override
     public String ruleDescription() {
@@ -38,7 +39,7 @@ public class TaskHasNoImputation implements Rule<Task> {
     }
 
     @Override
-    public boolean isSatisfied(Account u, Task thing) {
+    public boolean isSatisfied(Account u, AbstractTask thing) {
         return thing.getImputations().isEmpty();
     }
 }

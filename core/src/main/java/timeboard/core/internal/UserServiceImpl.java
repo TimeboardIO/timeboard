@@ -101,6 +101,17 @@ public class UserServiceImpl implements UserService {
             return q.getResultList();
      }
 
+     @Override
+    public List<Account> searchUserByName(final String prefix) {
+             TypedQuery<Account> q = em
+                    .createQuery(
+                            "select u from Account u "
+                                    + "where u.name LIKE CONCAT('%',:prefix,'%') or u.firstName LIKE CONCAT('%',:prefix,'%')",
+                            Account.class);
+            q.setParameter("prefix", prefix);
+            return q.getResultList();
+     }
+
     @Override
     public List<Account> searchUserByEmail(final String prefix, final Long projectId) {
              Project project = em.find(Project.class, projectId);

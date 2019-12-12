@@ -2,7 +2,7 @@ package timeboard.timesheet;
 
 /*-
  * #%L
- * kanban-project-plugin
+ * webui
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,44 +26,58 @@ package timeboard.timesheet;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import timeboard.core.api.*;
+import timeboard.core.api.EncryptionService;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.ui.UserInfo;
+import timeboard.core.model.MembershipRole;
+import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
-import java.util.Date;
 
-@Controller
-public class OrganizationCreateServlet  {
+/**
+ * Display Organization details form.
+ *
+ * <p>Ex : /org/config?id=
+ */
+@WebServlet(name = "OrganizationMembersServlet", urlPatterns = "/org/members")
+public class OrganizationMembersServlet extends TimeboardServlet {
+
     @Autowired
     public OrganizationService organizationService;
 
     @Autowired
-    public UserInfo userInfo;
+    public EncryptionService encryptionService;
 
-    @PostMapping("/org/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
-        Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
-        organization.setRemoteSubject("Timeboard/Organization/"+System.nanoTime());
-        organization.setName(request.getParameter("organizationName"));
-        this.organizationService.createOrganization(actor, organization);
-        return "redirect:/home";
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    @Override
+    protected ClassLoader getTemplateResolutionClassLoader() {
+        return OrganizationMembersServlet.class.getClassLoader();
     }
 
-    @GetMapping("/org/create")
-    protected String createFrom(Model model, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        return "create_org.html";
+    @Override
+    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException  {
+
+        viewModel.setTemplate("details_org_members.html");
+        long id = Long.parseLong(request.getParameter("orgID"));
+
+        Account organization = this.organizationService.getOrganizationByID(actor, id);
+
+        List<Account> members = this.organizationService.getMembers(actor, organization);
+
+        viewModel.getViewDatas().put("roles", MembershipRole.values());
+        viewModel.getViewDatas().put("members", members);
+        viewModel.getViewDatas().put("organization", organization);
+
     }
 }

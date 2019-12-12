@@ -342,7 +342,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<TaskType> listTaskType() {
-        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt", TaskType.class);
+        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true", TaskType.class);
         return q.getResultList();
     }
 
@@ -694,12 +694,11 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<DefaultTask> listDefaultTasks(Date ds, Date de) {
-
-
         TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
-                        + "t.endDate >= :ds "
-                        + "and t.startDate <= :de ", DefaultTask.class);
+                        + "t.endDate > :ds "
+                        + "and t.startDate <= :de "
+                        + "and t.startDate < t.endDate", DefaultTask.class);
         q.setParameter("ds", ds);
         q.setParameter("de", de);
         List<DefaultTask> tasks = q.getResultList();
@@ -781,9 +780,17 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DefaultTask createDefaultTask(DefaultTask task) throws BusinessException {
+    public DefaultTask createDefaultTask(Account actor, String name) throws BusinessException {
         try {
+            DefaultTask task = new DefaultTask();
+            task.setStartDate(new Date());
+            Calendar c = Calendar.getInstance();
+            c.set(9999,Calendar.DECEMBER,31);
+            task.setEndDate(c.getTime());
+            task.setOrigin(actor.getScreenName() + "/" + System.nanoTime());
+            task.setName(name);
             em.persist(task);
+            em.flush();
             LOGGER.info("Default task " + task.getName() + " is created.");
             return task;
         } catch (Exception e) {
@@ -791,15 +798,17 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+
     @Override
-    public DefaultTask updateDefaultTask(DefaultTask task) {
+    public void disableDefaultTaskByID(Account actor, long taskID) throws BusinessException {
+
+        DefaultTask task = em.find(DefaultTask.class, taskID);
+        task.setEndDate(new Date());
 
         em.merge(task);
         em.flush();
 
-        LOGGER.info("Milestone " + task.getName() + " updated");
-        return task;
-
+        LOGGER.info("Default Task " + taskID + " deleted by " + actor.getName());
     }
 
     @Override
@@ -950,12 +959,27 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public TaskType createTaskType(String name) {
+    public TaskType createTaskType(Account actor, String name) {
         TaskType taskType = new TaskType();
         taskType.setTypeName(name);
         em.persist(taskType);
+        em.flush();
+        LOGGER.info("User " + actor.getScreenName() + " create task type " + name);
+
         return taskType;
     }
+
+    @Override
+    public void disableTaskType(Account actor, TaskType type) {
+
+        type.setEnable(false);
+
+        em.merge(type);
+        em.flush();
+        LOGGER.info("User " + actor.getScreenName() + " disable task type " + type.getTypeName());
+
+    }
+
 
     @Override
     public boolean isProjectOwner(Account account, Project project) {

@@ -6,8 +6,8 @@
         email varchar(255) not null,
         externalIDs TEXT,
         firstName varchar(255),
+        isOrganization bit,
         name varchar(255),
-        organisation bit,
         remoteSubject varchar(255),
         primary key (id)
     ) engine=InnoDB;
@@ -15,6 +15,7 @@
     create table AccountHierarchy (
        id bigint not null,
         endDate datetime(6),
+        role varchar(255),
         startDate datetime(6) not null,
         member_id bigint,
         organization_id bigint,
@@ -174,6 +175,7 @@
 
     create table TaskType (
        id bigint not null,
+        enable bit,
         typeName varchar(255),
         primary key (id)
     ) engine=InnoDB;

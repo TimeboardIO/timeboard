@@ -894,10 +894,7 @@
 }
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th.sorted:hover {
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  account-select: none;
 }
 .ui.sortable.table thead th:after {
   display: none;

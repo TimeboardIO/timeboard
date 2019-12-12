@@ -253,10 +253,7 @@
 /* Selectable Label */
 .ui.checkbox input.hidden + label {
   cursor: pointer;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
+  account-select: none;
 }
 
 

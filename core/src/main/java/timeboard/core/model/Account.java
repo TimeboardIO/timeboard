@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Table
@@ -64,7 +65,7 @@ public class Account implements Serializable {
     private String remoteSubject;
 
     @Column
-    private Boolean organisation = false;
+    private Boolean isOrganization = false;
 
     @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToMapStringConverter.class)
@@ -72,9 +73,18 @@ public class Account implements Serializable {
     private Map<String, String> externalIDs;
 
 
+
+    @OneToMany(targetEntity = AccountHierarchy.class,
+            mappedBy = "organization",
+            orphanRemoval = true,
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.EAGER
+    )
+    private Set<AccountHierarchy> members;
+
     public Account() {
         this.externalIDs = new HashMap<>();
-        this.organisation = false;
+        this.isOrganization = false;
     }
 
 
@@ -145,20 +155,30 @@ public class Account implements Serializable {
         this.email = email;
     }
 
-    public boolean isOrganisation() {
-        return organisation;
+    public boolean getIsOrganization() {
+        return isOrganization;
     }
 
-    public void setOrganisation(Boolean organisation) {
-        this.organisation = organisation;
+    public void setIsOrganization(Boolean isOrganization) {
+        this.isOrganization = isOrganization;
     }
+
+    public Set<AccountHierarchy> getMembers() {
+        return members;
+    }
+
 
     @Transient
     public String getScreenName() {
-        if (this.getFirstName() == null || this.getName() == null) {
+        if (this.getFirstName() == null && this.getName() == null) {
             return this.getEmail();
+        } else if(this.getFirstName() == null){
+            return this.getName();
+        } else if(this.getName() == null){
+            return this.getFirstName();
+        } else {
+            return this.getFirstName() + " " + this.getName();
         }
-        return this.getFirstName() + " " + this.getName();
     }
 
 
