@@ -66,7 +66,7 @@ public class CostByCategory {
     }
 
     public void setAccount(Account account) throws BusinessException {
-        if(account.isOrganisation()){
+        if(account.getIsOrganization()){
             throw new BusinessException("Cost By Category can't be atteched to an Organsation account");
         }
         this.account = account;
