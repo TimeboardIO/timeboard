@@ -49,7 +49,7 @@ import java.util.Date;
 
 
 @Controller
-@RequestMapping("/org/{orgId}/projects/{projectID}")
+@RequestMapping("/org/{orgID}/projects/{projectID}")
 public class ProjectTasksController extends TimeboardServlet {
 
     @Autowired
@@ -66,7 +66,7 @@ public class ProjectTasksController extends TimeboardServlet {
         return ProjectTasksController.class.getClassLoader();
     }
 
-    @GetMapping("/org/{orgId}/tasks")
+    @GetMapping("/org/{orgID}/tasks")
     protected String listTasks(@PathVariable Long projectID, Model viewModel) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
@@ -92,7 +92,7 @@ public class ProjectTasksController extends TimeboardServlet {
         viewModel.addAttribute("dataTableService", this.dataTableService);
     }
 
-    @GetMapping("/org/{orgId}/tasks/{taskID}")
+    @GetMapping("/org/{orgID}/tasks/{taskID}")
     protected String editTasks(@PathVariable Long projectID, @PathVariable Long taskID, Model viewModel) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
@@ -108,7 +108,7 @@ public class ProjectTasksController extends TimeboardServlet {
         return "details_project_tasks";
     }
 
-    @PostMapping("/org/{orgId}/tasks")
+    @PostMapping("/org/{orgID}/tasks")
     protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);

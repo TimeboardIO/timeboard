@@ -34,12 +34,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
-import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 import timeboard.home.model.Week;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

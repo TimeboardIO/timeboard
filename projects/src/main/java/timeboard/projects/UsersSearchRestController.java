@@ -48,7 +48,7 @@ import java.util.List;
  */
 
 @RestController
-@RequestMapping("/org/{orgId}/search")
+@RequestMapping("/org/{orgID}/search")
 public class UsersSearchRestController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();

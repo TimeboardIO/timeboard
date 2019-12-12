@@ -53,7 +53,7 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/org/{orgId}/projects/{projectID}/setup")
+@RequestMapping("/org/{orgID}/projects/{projectID}/setup")
 public class ProjectSetupController {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();

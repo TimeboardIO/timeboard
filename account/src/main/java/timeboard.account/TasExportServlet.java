@@ -28,36 +28,31 @@ package timeboard.account;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
-import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
-@WebServlet(name = "TasExportServlet", urlPatterns = "/org/{orgId}/account/exportTAS")
 //TIME ATTACHMENT SHEET
-public class TasExportServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/account/exportTAS")
+public class TasExportServlet{
 
     @Autowired
     private ProjectService projectService;
 
-
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return TasExportServlet.class.getClassLoader();
-    }
-
-    @Override
+    @PostMapping
         protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         try {

@@ -28,17 +28,19 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -49,8 +51,9 @@ import java.util.List;
 import java.util.Optional;
 
 
-@WebServlet(name = "ProjectImportServlet", urlPatterns = "/org/{orgId}/projects/import")
-public class ProjectImportServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/projects/import")
+public class ProjectImportServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -65,19 +68,15 @@ public class ProjectImportServlet extends TimeboardServlet {
     )
     private List<ProjectImportService> projectImportServlets;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectImportServlet.class.getClassLoader();
-    }
 
-    @Override
+    @PostMapping
     protected void handlePost(Account actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         requestDispatcher.forward(req, resp);
     }
 
-    @Override
+    @GetMapping
     protected void handleGet(Account actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
 
         final String type = req.getParameter("type");

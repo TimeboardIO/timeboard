@@ -46,7 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/org/{orgId}/projects/{projectID}/milestones")
+@RequestMapping("/org/{orgID}/projects/{projectID}/milestones")
 public class ProjectMilestonesController {
 
     @Autowired

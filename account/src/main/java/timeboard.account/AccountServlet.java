@@ -27,6 +27,10 @@ package timeboard.account;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
@@ -34,11 +38,9 @@ import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.DataTableConfig;
-import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -46,8 +48,9 @@ import java.util.*;
 import java.text.DateFormatSymbols;
 
 
-@WebServlet(name = "AccountServlet", urlPatterns = "/org/{orgId}/account")
-public class AccountServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/account")
+public class AccountServlet {
 
     @Autowired
     private UserService userService;
@@ -63,12 +66,7 @@ public class AccountServlet extends TimeboardServlet {
     @Autowired
     private DataTableService dataTableService;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return AccountServlet.class.getClassLoader();
-    }
-
-    @Override
+    @PostMapping
     protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
 
         String submitButton = request.getParameter("formType");
@@ -127,7 +125,7 @@ public class AccountServlet extends TimeboardServlet {
 
     }
 
-    @Override
+    @GetMapping
     protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
         loadPage(viewModel, actor);
     }
