@@ -94,6 +94,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         day date,
@@ -130,6 +132,14 @@
         member_id bigint,
         project_id bigint,
         primary key (membershipID)
+    ) engine=InnoDB;
+
+    create table ProjectTag (
+       id bigint not null,
+        tagKey varchar(255) not null,
+        tagValue varchar(255) not null,
+        project_id bigint,
+        primary key (id)
     ) engine=InnoDB;
 
     create table Task (
@@ -230,6 +240,11 @@
 
     alter table ProjectMembership 
        add constraint FKapg94jqua2lbkjdb0kofxtnln 
+       foreign key (project_id) 
+       references Project (id);
+
+    alter table ProjectTag 
+       add constraint FKflkgw7xvdg8kc0gnjsj950con 
        foreign key (project_id) 
        references Project (id);
 
