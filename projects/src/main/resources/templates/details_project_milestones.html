@@ -26,12 +26,12 @@
                 <tbody>
                 <tr>
                     <td>
-                        <a class="ui button" th:href="@{/projects/milestones/config(projectID=${project.id})}">Create Milestone</a>
+                        <a class="ui button" th:href="@{/org/{orgID}/projects/milestones/config(projectID=${project.id})}">Create Milestone</a>
                     </td>
                 </tr>
                 <tr th:each="milestone : ${milestones}">
                     <td>
-                        <a th:href="@{/projects/milestones/config(projectID=${project.id}, milestoneID=${milestone.id})}"
+                        <a th:href="@{/org/{orgID}/projects/milestones/config(projectID=${project.id}, milestoneID=${milestone.id})}"
                            th:text="${milestone.name}"></a>
                     </td>
                 </tr>

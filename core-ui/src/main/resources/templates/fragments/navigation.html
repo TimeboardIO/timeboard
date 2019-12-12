@@ -10,7 +10,7 @@
         </div>
 
         <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}"
-           th:href="${orgID} + '' + nav.getNavigationPath() + '?' + nav.getNavigationParams()}">
+           th:href="${'/org/' + orgID + '' + nav.getNavigationPath() + '?' + nav.getNavigationParams()}">
             <i th:class="${nav.getNavigationLogo()}+' icon'"></i>
             <div class="title" th:text="${nav.getNavigationLabel()}"></div>
         </a>
@@ -25,7 +25,7 @@
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
                     <a class="item"><i class="sign-out icon"></i> Switch organisation</a>
-                    <a th:href="@{/orga/create}" class="item"><i class="edit icon"></i> Create Organisation</a>
+                    <a th:href="@{/org/{orgID}/orga/create}" class="item"><i class="edit icon"></i> Create Organisation</a>
                     <a class="item"><i class="globe icon"></i> Organisation members</a>
                     <a class="item"><i class="settings icon"></i> Organisation Setup</a>
                 </div>
@@ -35,7 +35,7 @@
                 <div class="title" th:text="${account.email}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
-                    <a th:href="@{/account}" class="item"><i class="edit icon"></i> Setup</a>
+                    <a th:href="@{/org/{orgID}/account}" class="item"><i class="edit icon"></i> Setup</a>
                     <a th:href="@{/logout}" class="item"><i class="sign out alternate icon"></i> Logout</a>
                 </div>
             </div>

@@ -37,6 +37,7 @@ import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.handler.DispatcherServletWebRequest;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
@@ -84,7 +85,11 @@ public class WebConfig implements WebMvcConfigurer {
             public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
 
                 if(modelMap != null && webRequest.getUserPrincipal() != null)  {
-                    modelMap.put("orgID", );
+
+                    String url = ((DispatcherServletWebRequest) webRequest).getRequest().getRequestURI();
+                    if(url.contains("/org/")) {
+                        modelMap.put("orgID", url.split("/")[2]);
+                    }
                     modelMap.put("account", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());
                     modelMap.put("javascripts", javascriptService.listJavascriptUrls());
