@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Component
 @Transactional
 public class OrganizationServiceImpl implements OrganizationService {
@@ -90,6 +91,15 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public AccountHierarchy addMember(final Account actor, Account organization, Account member) throws BusinessException {
+
+        List<AccountHierarchy> existingAH = em.createQuery("select h from AccountHierarchy h join h.organization o " +
+                "where h.member = :member and h.organization = :organization " +
+                "and o.isOrganization = true", AccountHierarchy.class)
+                .setParameter("member", member)
+                .setParameter("organization", organization)
+                .getResultList();
+        if (!existingAH.isEmpty()) throw new BusinessException("Organization "+organization.getScreenName()+" already have a parent");
+
         AccountHierarchy ah = new AccountHierarchy();
 
         ah.setMember(member);

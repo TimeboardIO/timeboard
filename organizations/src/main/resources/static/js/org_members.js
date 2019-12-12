@@ -1,7 +1,7 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
-var app = new Vue({
+let app = new Vue({
 
     el: '#members',
     data: {
@@ -11,9 +11,9 @@ var app = new Vue({
         removeMember: function(e, member){
             $.get("/api/org/members/remove?orgID="+currentOrgID+"&memberID="+member.id)
             .done(function(data){
-                var copy = [];
-                for (var i = 0; i < app.members.length; i++) {
-                    if(app.members[i].id != member.id){
+                let copy = [];
+                for (let i = 0; i < app.members.length; i++) {
+                    if(app.members[i].id !== member.id){
                         copy.push(app.members[i]);
                     }
                 }

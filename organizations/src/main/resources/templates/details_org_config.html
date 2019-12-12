@@ -11,14 +11,16 @@
 
     <h4 class="ui dividing header">Global</h4>
     <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+        <input name="orgID" required th:value="${organization.id}" type="hidden">
+        <input name="action" required value="CONFIG" type="hidden">
+
         <div class="field">
             <label>Organization Name</label>
             <input name="organizationName" placeholder="Organization Name" required type="text" th:value="${organization.name}">
         </div>
-        <button class="ui primary create-task icon button" type="submit" >
+        <button class="ui primary  right align icon button" type="submit" >
             Save config <i class="cog icon"></i>
         </button>
-
     </form>
 
         <div class="ui stackable two column grid">
@@ -30,31 +32,36 @@
                         </tr>
                     </thead>
                     <tbody>
-                    <tr data-key="Enhancement">
-                        <td>enhancement</td>
+                    <tr th:each="type : ${taskTypes}" th:data-key="${type.id}">
+                        <td th:text="${type.typeName}"></td>
                         <td>
-                            <div class="ui negative basic button delete" data-key="project.color">
-                                <i class="remove alternate icon"></i>
-                                Remove
-                            </div>
-                        </td>
+                            <form action="" method="POST">
+                                <input name="orgID" required th:value="${organization.id}" type="hidden">
+                                <input name="action" required value="DELETE_TYPE" type="hidden">
+                                <input name="typeID" required th:value="${type.id}" type="hidden">
 
-                    </tr>
-                    <tr data-key="bug">
-                        <td>Bug</td>
-                        <td>
-                            <div class="ui negative basic button delete" data-key="project.color">
-                                <i class="remove alternate icon"></i>
-                                Remove
-                            </div>
+                                <button class="ui negative basic button delete" type="submit" th:data-key="${type.id}">
+                                    <i class="remove alternate icon"></i>
+                                    Remove
+                                </button>
+                            </form>
                         </td>
 
                     </tr>
                     <tr>
-                        <td>
-                            <input type="text" name="newAttrKey" placeholder="new conf key">
-                        </td>
-                        <td></td>
+                        <form action="" method="POST">
+                            <input name="orgID" required th:value="${organization.id}" type="hidden">
+                            <input name="action" required value="NEW_TYPE" type="hidden">
+                            <td>
+                                <input type="text" name="newTaskType" placeholder="New task type">
+                            </td>
+                            <td>
+                                <button class="ui positive basic button add"  type="submit">
+                                    <i class="plus alternate icon"></i>
+                                    Add
+                                </button>
+                            </td>
+                        </form>
                     </tr>
 
                     </tbody>
@@ -65,30 +72,38 @@
                 <table class="ui tablet unstackable table">
                     <thead>
                     <tr>
-                        <th colspan="2">Task category</th>
+                        <th colspan="2">Default tasks</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr data-key="project.color">
-                        <td>?? </td>
-
+                    <tr th:each="task : ${defaultTasks}" th:data-key="${task.id}">
+                        <td th:text="${task.name}"></td>
                         <td>
-                            <div class="ui negative basic button delete" data-key="project.color">
-                                <i class="remove alternate icon"></i>
-                                Remove
-                            </div>
+                            <form action="" method="POST">
+                                <input name="orgID" required th:value="${organization.id}" type="hidden">
+                                <input name="taskID" required th:value="${task.id}" type="hidden">
+                                <input name="action" required value="DELETE_TASK" type="hidden">
+                                <button class="ui negative basic button delete"  type="submit" th:data-key="${task.id}">
+                                    <i class="remove alternate icon"></i>
+                                    Remove
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     <tr>
-                        <td>
-                            <input type="text" name="newAttrKey" placeholder="new conf key">
-                        </td>
-                        <td>
-                            <div class="ui positive basic button add" data-key="project.color">
-                                <i class="plus alternate icon"></i>
-                                Add
-                            </div>
-                        </td>
+                        <form action="" method="POST">
+                            <input name="orgID" required th:value="${organization.id}" type="hidden">
+                            <input name="action" required value="NEW_TASK" type="hidden">
+                            <td>
+                                <input type="text" name="newDefaultTask" placeholder="New default task">
+                            </td>
+                            <td>
+                                <button class="ui positive basic button add"  type="submit">
+                                    <i class="plus alternate icon"></i>
+                                    Add
+                                </button>
+                            </td>
+                        </form>
                     </tr>
 
                     </tbody>

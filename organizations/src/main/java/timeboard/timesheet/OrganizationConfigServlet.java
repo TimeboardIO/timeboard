@@ -31,8 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.EncryptionService;
 
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.DefaultTask;
+import timeboard.core.model.TaskType;
 import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.ViewModel;
 
@@ -41,6 +44,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -54,6 +59,9 @@ public class OrganizationConfigServlet extends TimeboardServlet {
 
     @Autowired
     public OrganizationService organizationService;
+
+    @Autowired
+    public ProjectService projectService;
 
     @Autowired
     public EncryptionService encryptionService;
@@ -74,11 +82,11 @@ public class OrganizationConfigServlet extends TimeboardServlet {
 
         Account organization = this.organizationService.getOrganizationByID(actor, id);
 
-        List<Account> parents = this.organizationService.getParents(actor, organization);
-        List<Account> members = this.organizationService.getMembers(actor, organization);
+        List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
+        List<TaskType> taskTypes = this.projectService.listTaskType();
 
-        viewModel.getViewDatas().put("parents", parents);
-        viewModel.getViewDatas().put("members", members);
+        viewModel.getViewDatas().put("taskTypes", taskTypes);
+        viewModel.getViewDatas().put("defaultTasks", defaultTasks);
         viewModel.getViewDatas().put("organization", organization);
 
     }
@@ -86,15 +94,34 @@ public class OrganizationConfigServlet extends TimeboardServlet {
     @Override
     protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
 
-        viewModel.setTemplate("details_org_config.html");
-
-        //Extract organization
-        long id = Long.parseLong(request.getParameter("organizationID"));
+        String action = request.getParameter("action");
+        long id = Long.parseLong(request.getParameter("orgID"));
         Account organization = this.organizationService.getOrganizationByID(actor, id);
 
-        organization.setName(request.getParameter("organizationName"));
-        
-        this.organizationService.updateOrganization(actor, organization);
+        switch (action) {
+            case "CONFIG":
+                organization.setName(request.getParameter("organizationName"));
+                this.organizationService.updateOrganization(actor, organization);
+                break;
+            case "NEW_TASK":
+                this.projectService.createDefaultTask(actor, request.getParameter("newDefaultTask"));
+                break;
+            case "NEW_TYPE":
+                this.projectService.createTaskType(actor, request.getParameter("newTaskType"));
+                break;
+            case "DELETE_TYPE":
+                long typeID = Long.parseLong(request.getParameter("typeID"));
+                TaskType first = this.projectService.listTaskType().stream().filter(taskType -> taskType.getId() == typeID).findFirst().get();
+                this.projectService.disableTaskType(actor, first);
+                break;
+            case "DELETE_TASK":
+                long taskID = Long.parseLong(request.getParameter("taskID"));
+                this.projectService.disableDefaultTaskByID(actor,taskID);
+                break;
+        }
+
+        //Extract organization
+        this.handleGet(actor, request, response, viewModel);
 
     }
 }

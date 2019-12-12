@@ -73,10 +73,8 @@ public class OrganizationMembersServlet extends TimeboardServlet {
 
         Account organization = this.organizationService.getOrganizationByID(actor, id);
 
-        List<Account> parents = this.organizationService.getParents(actor, organization);
         List<Account> members = this.organizationService.getMembers(actor, organization);
 
-        viewModel.getViewDatas().put("parents", parents);
         viewModel.getViewDatas().put("roles", MembershipRole.values());
         viewModel.getViewDatas().put("members", members);
         viewModel.getViewDatas().put("organization", organization);

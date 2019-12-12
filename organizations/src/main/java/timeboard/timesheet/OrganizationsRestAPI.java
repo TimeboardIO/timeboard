@@ -122,7 +122,7 @@ public class OrganizationsRestAPI {
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
-        if (strOrgID != null) {
+        if (strMemberID != null) {
             memberID = Long.parseLong(strMemberID);
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
@@ -131,12 +131,13 @@ public class OrganizationsRestAPI {
         final Account member = this.organizationService.getOrganizationByID(actor,  memberID);
 
         try {
-            organizationService.addMember(actor, organization, member);
+           AccountHierarchy ah = organizationService.addMember(actor, organization, member);
+            return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(ah)));
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(member)));
+
     }
 
 
@@ -149,7 +150,7 @@ public class OrganizationsRestAPI {
         Long orgID = null;
         if (strOrgID != null) {
             orgID = Long.parseLong(strOrgID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
         final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
@@ -158,7 +159,7 @@ public class OrganizationsRestAPI {
         Long memberID = null;
         if (strMemberID != null) {
             memberID = Long.parseLong(strMemberID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
         final Account member = this.organizationService.getOrganizationByID(actor,  memberID);
@@ -168,17 +169,17 @@ public class OrganizationsRestAPI {
         MembershipRole role = null;
         if (strRole != null) {
             role = MembershipRole.valueOf(strRole);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
 
         try {
-            organizationService.updateMemberRole(actor, organization, member, role);
-        } catch (Exception e){
+            AccountHierarchy ah = organizationService.updateMemberRole(actor, organization, member, role);
+            return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(ah)));
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(member)));
     }
 
 
@@ -190,7 +191,7 @@ public class OrganizationsRestAPI {
         Long orgID = null;
         if (strOrgID != null) {
             orgID = Long.parseLong(strOrgID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
         final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
@@ -199,7 +200,7 @@ public class OrganizationsRestAPI {
         Long memberID = null;
         if (strOrgID != null) {
             memberID = Long.parseLong(strMemberID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
 
@@ -222,11 +223,11 @@ public class OrganizationsRestAPI {
         public String role;
 
         public MemberWrapper(){}
-        public MemberWrapper(Account member){
-            this.orgID = member.getId();
-            this.screenName = member.getScreenName();
-            this.isOrganization = member.getIsOrganization();
-            this.role = role;
+        public MemberWrapper(AccountHierarchy h){
+            this.orgID = h.getMember().getId();
+            this.screenName = h.getMember().getScreenName();
+            this.isOrganization = h.getMember().getIsOrganization();
+            this.role = h.getRole().name();
         }
 
         public MemberWrapper(Long orgID, String screenName, boolean isOrganization, String role) {
