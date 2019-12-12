@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
@@ -97,6 +98,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
     public Project createProject(Account owner, String projectName) throws BusinessException {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
@@ -346,6 +348,8 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
+    @Transactional
+    @PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
     public Task createTask(Account actor,
                            Project project,
                            String taskName,

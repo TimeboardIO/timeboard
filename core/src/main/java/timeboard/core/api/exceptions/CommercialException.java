@@ -1,8 +1,8 @@
-package timeboard.projects;
+package timeboard.core.api.exceptions;
 
 /*-
  * #%L
- * webui
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,37 +26,29 @@ package timeboard.projects;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
-import timeboard.core.ui.UserInfo;
+public class CommercialException  extends Exception {
 
-import javax.servlet.ServletException;
-import java.io.IOException;
+    private String errCause;
+    private String errMsg;
 
-
-
-@Controller
-public class ProjectOperationsController {
-
-    @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private UserInfo userInfo;
-
-    @GetMapping("/projects/delete")
-    protected String handleGet(@RequestParam Long projectID) throws ServletException, IOException, BusinessException {
-
-        Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
-        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
-
-        return "redirect:/projects";
+    public String getErrCode() {
+        return errCause;
     }
 
+    public void setErrCode(String errCode) {
+        this.errCause = errCode;
+    }
 
+    public String getErrMsg() {
+        return errMsg;
+    }
+
+    public void setErrMsg(String errMsg) {
+        this.errMsg = errMsg;
+    }
+
+    public CommercialException(String errCause, String errMsg) {
+        this.errCause = errCause;
+        this.errMsg = errMsg;
+    }
 }

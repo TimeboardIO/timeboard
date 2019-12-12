@@ -116,6 +116,7 @@
        id bigint not null,
         attributes TEXT,
         comments varchar(500),
+        enable bit,
         name varchar(50),
         quotation double precision,
         startDate date,

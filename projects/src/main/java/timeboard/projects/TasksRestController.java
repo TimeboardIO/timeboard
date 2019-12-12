@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 @Component
 @RestController
 @RequestMapping(value = "/api/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-public class TasksRestAPI {
+public class TasksRestController {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -79,7 +79,7 @@ public class TasksRestAPI {
         Long projectID = null;
         if (strProjectID != null) {
             projectID = Long.parseLong(strProjectID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
         }
 
@@ -115,11 +115,11 @@ public class TasksRestAPI {
                         (task.getMilestone() != null ? task.getMilestone().getName() : ""),
                         task.getTaskStatus().getLabel(),
                         (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
-                        ));
+                ));
 
             }
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(result.toArray()));
-        }catch (BusinessException e){
+        } catch (BusinessException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
@@ -133,17 +133,17 @@ public class TasksRestAPI {
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
-        if(taskIdStr != null) {
+        if (taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
         }
-        if(taskID == null) {
+        if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
 
         Task task;
         try {
             task = (Task) this.projectService.getTaskByID(actor, taskID);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
 
         }
@@ -156,7 +156,7 @@ public class TasksRestAPI {
         List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
                 .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
                 .collect(Collectors.toList());
-        wrapper.setListOfTaskDates( listOfTaskDates);
+        wrapper.setListOfTaskDates(listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
         List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
@@ -220,36 +220,36 @@ public class TasksRestAPI {
     @GetMapping("/approve")
     public ResponseEntity approveTask(HttpServletRequest request) {
         Account actor = this.userInfo.getCurrentAccount();
-        return this.changeTaskStatus(actor, request,  TaskStatus.IN_PROGRESS);
+        return this.changeTaskStatus(actor, request, TaskStatus.IN_PROGRESS);
     }
 
     @GetMapping("/deny")
-    public ResponseEntity denyTask(HttpServletRequest request){
+    public ResponseEntity denyTask(HttpServletRequest request) {
         Account actor = this.userInfo.getCurrentAccount();
 
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
-    private ResponseEntity changeTaskStatus(Account actor, HttpServletRequest request, TaskStatus status){
+    private ResponseEntity changeTaskStatus(Account actor, HttpServletRequest request, TaskStatus status) {
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
-        if(taskIdStr != null) {
+        if (taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
         }
-        if(taskID == null) {
+        if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
 
         Task task;
-        try{
+        try {
             task = (Task) this.projectService.getTaskByID(actor, taskID);
             task.setTaskStatus(status);
             this.projectService.updateTask(actor, task);
-        } catch (ClassCastException e){
+        } catch (ClassCastException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task id not found.");
         }
 
@@ -257,29 +257,28 @@ public class TasksRestAPI {
     }
 
     @GetMapping("/delete")
-    public ResponseEntity deleteTask(HttpServletRequest request){
+    public ResponseEntity deleteTask(HttpServletRequest request) {
         Account actor = this.userInfo.getCurrentAccount();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
         if (taskIdStr != null) {
             taskID = Long.parseLong(taskIdStr);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
         }
-        if(taskID == null) {
+        if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
 
         try {
             projectService.deleteTaskByID(actor, taskID);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
-
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -291,11 +290,11 @@ public class TasksRestAPI {
             startDate = DATE_FORMAT.parse(taskWrapper.startDate);
             endDate = DATE_FORMAT.parse(taskWrapper.endDate);
 
-        }catch(Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect date format");
         }
 
-        if(startDate.getTime()>endDate.getTime()){
+        if (startDate.getTime() > endDate.getTime()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date ");
         }
 
@@ -305,7 +304,7 @@ public class TasksRestAPI {
             comment = "";
         }
         double oe = taskWrapper.originalEstimate;
-        if(oe <= 0.0){
+        if (oe <= 0.0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Original original estimate must be positive ");
         }
 
@@ -328,12 +327,12 @@ public class TasksRestAPI {
         Task task = null;
         Long typeID = taskWrapper.typeID;
 
-        Long taskID =taskWrapper.taskID;
-        if (!(taskID != null && taskID == 0 )) {
+        Long taskID = taskWrapper.taskID;
+        if (!(taskID != null && taskID == 0)) {
             try {
                 task = (Task) projectService.getTaskByID(actor, taskID);
 
-                if(taskWrapper.assigneeID > 0) {
+                if (taskWrapper.assigneeID > 0) {
                     final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
                     task.setAssigned(assignee);
                 }
@@ -347,17 +346,17 @@ public class TasksRestAPI {
                 task.setMilestone(milestone);
                 task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
-                projectService.updateTask(actor,task);
+                projectService.updateTask(actor, task);
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
             }
         } else {
             try {
                 task = projectService.createTask(actor, project,
-                        name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null,null,null );
-            }catch (Exception e){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("msg","Error in task creation please verify your inputs and retry. (" +e.getMessage()+")").build();
+                        name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null, null, null);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("msg", "Error in task creation please verify your inputs and retry. (" + e.getMessage() + ")").build();
             }
         }
 
@@ -368,12 +367,12 @@ public class TasksRestAPI {
 
 
     public static class TaskGraphWrapper implements Serializable {
-        public TaskGraphWrapper() {}
-
         public List<String> listOfTaskDates;
         public Collection<Double> effortSpentData;
         public Collection<Double> realEffortData;
-        
+        public TaskGraphWrapper() {
+        }
+
         public void setListOfTaskDates(List<String> listOfTaskDates) {
             this.listOfTaskDates = listOfTaskDates;
         }
@@ -389,8 +388,7 @@ public class TasksRestAPI {
     }
 
 
-
-        public static class TaskWrapper implements Serializable {
+    public static class TaskWrapper implements Serializable {
         public Long taskID;
         public Long projectID;
 
@@ -415,7 +413,8 @@ public class TasksRestAPI {
         public String milestoneName;
 
 
-        public TaskWrapper(){}
+        public TaskWrapper() {
+        }
 
         public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate,
                            Date startDate, Date endDate, String assignee, Long assigneeID,
@@ -427,7 +426,7 @@ public class TasksRestAPI {
             this.taskComments = taskComments;
             this.originalEstimate = originalEstimate;
             this.startDate = DATE_FORMAT.format(startDate);
-            if(endDate != null) {
+            if (endDate != null) {
                 this.endDate = DATE_FORMAT.format(endDate);
             }
             this.assignee = assignee;
@@ -526,7 +525,7 @@ public class TasksRestAPI {
         }
 
         public String getEndDate() {
-           return this.endDate;
+            return this.endDate;
         }
     }
 }

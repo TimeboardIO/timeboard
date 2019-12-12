@@ -30,10 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 import timeboard.core.ui.ViewModel;
 
@@ -44,24 +47,41 @@ import java.io.IOException;
 
 
 @Controller
-public class ProjectCreateServlet {
+@RequestMapping("/projects")
+public class ProjectsController {
+
 
     @Autowired
-    public ProjectService projectService;
+    private ProjectService projectService;
 
     @Autowired
-    public UserInfo userInfo;
+    private UserInfo userInfo;
 
-    @PostMapping("/projects/create")
+    @GetMapping
+    protected String handleGet(Model viewModel) {
+        final Account actor = this.userInfo.getCurrentAccount();
+        viewModel.addAttribute("projects", this.projectService.listProjects(actor));
+        return "projects";
+    }
+
+    @PostMapping("/create")
     protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
         return "redirect:/projects";
     }
 
-    @GetMapping("/projects/create")
-    protected String createFrom(Model moldel, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        return "create_project.html";
+    @GetMapping("/create")
+    protected String createFrom() throws ServletException, IOException {
+        return "create_project";
     }
+
+    @GetMapping("/{projectID}/delete")
+    protected String deleteProject(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
+        final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
+        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
+        return "redirect:/projects";
+    }
+
 
 }

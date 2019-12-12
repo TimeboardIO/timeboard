@@ -27,33 +27,48 @@ package timeboard.projects;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.model.Project;
+import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 
-@WebServlet(name = "ProjectListServlet", urlPatterns = "/projects")
-public class ProjectListServlet extends TimeboardServlet {
-
+/**
+ * Display project dashboard.
+ */
+@Controller
+@RequestMapping("/projects/{projectID}/dashboard")
+public class ProjectDashboardController {
 
     @Autowired
-    private ProjectService projectService;
+    public ProjectService projectService;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectListServlet.class.getClassLoader();
+    @Autowired
+    public UserInfo userInfo;
+
+
+    @GetMapping
+    protected String handleGet(@PathVariable Long projectID, HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException {
+
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
+
+        viewModel.addAttribute("project", project);
+        viewModel.addAttribute("dashboard", dashboard);
+
+        return "details_project_dashboard";
     }
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        viewModel.setTemplate("projects.html");
-        viewModel.getViewDatas().put("projects", this.projectService.listProjects(actor));
-    }
 }
