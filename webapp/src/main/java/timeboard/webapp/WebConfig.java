@@ -77,7 +77,6 @@ public class WebConfig implements WebMvcConfigurer {
 
             @Override
             public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
-
                 if(modelMap != null && webRequest.getUserPrincipal() != null)  {
                     modelMap.put("account", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());

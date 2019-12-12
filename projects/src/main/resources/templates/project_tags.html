@@ -2,7 +2,8 @@
 
 <html layout:decorate="~{details_project_layout.html(tab='five')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
     <title layout:fragment="title">Project tags</title>
@@ -13,19 +14,34 @@
 
 
 <div layout:fragment="placeholder">
-    <h1>Tags</h1>
-
     <div id="components-demo">
+
+        <button v-on:click="addTag" class="ui primary icon button">
+            New Tag <i class="plus icon"></i>
+        </button>
+
         <data-table v-bind:config="table">
-            <template v-slot:hello="{ data }">
-                <b>{{data}}</b>
+            <template v-slot:tagkey="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.tagKey" />
+                </div>
             </template>
-            <template v-slot:world="{ data }">
-                <button class="btn btn-primary">{{data}}</button>
+            <template v-slot:tagvalue="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.tagValue" />
+                </div>
+            </template>
+            <template v-slot:tagactions="{row}">
+                <button class="ui negative basic button">
+                    <i class="remove alternate icon" v-on:click="removeTag(row)"></i>
+                    Remove
+                </button>
             </template>
         </data-table>
-        <create-tag-btn></create-tag-btn>
+
     </div>
+
+
 
 </div>
 
