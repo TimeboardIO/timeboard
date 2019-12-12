@@ -9,19 +9,20 @@
 
 <div layout:fragment="placeholder">
 
-    <h4 class="ui dividing header">Global</h4>
-    <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
-        <input name="orgID" required th:value="${organization.id}" type="hidden">
-        <input name="action" required value="CONFIG" type="hidden">
+    <div class="ui segment">
+        <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+            <input name="orgID" required th:value="${organization.id}" type="hidden">
+            <input name="action" required value="CONFIG" type="hidden">
 
-        <div class="field">
-            <label>Organization Name</label>
-            <input name="organizationName" placeholder="Organization Name" required type="text" th:value="${organization.name}">
-        </div>
-        <button class="ui primary  right align icon button" type="submit" >
-            Save config <i class="cog icon"></i>
-        </button>
-    </form>
+            <div class="field">
+                <label>Organization Name</label>
+                <input name="organizationName" placeholder="Organization Name" required type="text" th:value="${organization.name}">
+            </div>
+            <button class="ui primary  right align icon button" type="submit" >
+                Save config <i class="cog icon"></i>
+            </button>
+        </form>
+    </div>
 
         <div class="ui stackable two column grid">
             <div class="column">

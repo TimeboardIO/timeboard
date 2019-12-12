@@ -165,6 +165,7 @@
 
     create table TaskType (
        id bigint not null,
+        enable bit,
         typeName varchar(255),
         primary key (id)
     ) engine=InnoDB;

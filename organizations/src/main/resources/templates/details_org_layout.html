@@ -10,6 +10,8 @@
 <div layout:fragment="content">
 
     <div class="ui attached pointing menu">
+            <a class="red item" th:text="${organization.screenName}"></a>
+
         <a class="item" th:classappend="${tab} == 'config'  ? 'active':''"
            th:href="@{/org/config(orgID=${organization.id})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'members'  ? 'active':''"
