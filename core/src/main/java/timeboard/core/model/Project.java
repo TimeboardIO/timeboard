@@ -77,7 +77,7 @@ public class Project implements Serializable {
     @OneToMany(targetEntity = Milestone.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Milestone> milestones;
 
-    @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectTag> tags;
 
 

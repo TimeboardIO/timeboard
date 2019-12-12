@@ -67,20 +67,43 @@ public class ProjectTagsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> listTags(@PathVariable Long projectID, Model model) throws BusinessException {
+    public ResponseEntity<List<ProjectTagWrapper>> listTags(@PathVariable Long projectID) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
         return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new ProjectTagWrapper(projectTag)).collect(Collectors.toList()));
     }
 
-    @PostMapping()
-    public ResponseEntity createTag(@PathVariable Long projectID, @ModelAttribute ProjectTag tag) throws BusinessException {
+    @DeleteMapping(value="/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectTagWrapper>> deleteTag(@PathVariable Long projectID, @PathVariable Long tagID) throws BusinessException {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        project.getTags().removeIf(projectTag -> projectTag.getId() == tagID);
+        this.projectService.updateProject(actor, project);
+        return this.listTags(projectID);
+    }
+
+    @PatchMapping(value="/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectTagWrapper>> patchTag(@PathVariable Long projectID, @PathVariable Long tagID, @ModelAttribute ProjectTag tag) throws BusinessException {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        project.getTags().stream()
+                .filter(projectTag -> projectTag.getId() == tagID)
+                .forEach(projectTag -> {
+                    projectTag.setTagKey(tag.getTagKey());
+                    projectTag.setTagValue(tag.getTagValue());
+                });
+        this.projectService.updateProject(actor, project);
+        return this.listTags(projectID);
+    }
+
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectTagWrapper>> createTag(@PathVariable Long projectID, @ModelAttribute ProjectTag tag) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
         tag.setProject(project);
         project.getTags().add(tag);
         this.projectService.updateProject(actor, project);
-        return ResponseEntity.ok().build();
+        return this.listTags(projectID);
     }
 
     public static class ProjectTagWrapper{

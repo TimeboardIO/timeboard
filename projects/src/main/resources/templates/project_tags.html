@@ -32,9 +32,13 @@
                 </div>
             </template>
             <template v-slot:tagactions="{row}">
-                <button class="ui negative basic button">
-                    <i class="remove alternate icon" v-on:click="removeTag(row)"></i>
+                <button class="ui negative basic button" v-on:click="removeTag(row)">
+                    <i class="remove alternate icon"></i>
                     Remove
+                </button>
+                <button class="ui positive basic button" v-on:click="updateTag(row)">
+                    <i class="add alternate icon"></i>
+                    Update
                 </button>
             </template>
         </data-table>
