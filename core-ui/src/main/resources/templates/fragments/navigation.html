@@ -30,7 +30,7 @@
                         <a> Switch organisation</a>
                         <div class="menu transition hidden">
                             <a class="item" th:each="org: ${orgList}" th:text="${org.screenName}"
-                               th:onclick="'switchOrg('+${org.id}+')'"></a>
+                               th:href="@{/org/{newOrgId}/home/(newOrgId=${org.id})}"></a>
                         </div>
                     </div>
                     <a th:href="@{/org/{orgID}/org/create(orgID=${orgID})}" class="item"><i class="edit icon"></i> Create Organisation</a>
@@ -54,18 +54,6 @@
           .dropdown({
             clearable: true
           });
-
-          var switchOrg = function(orgId){
-            return $.ajax( {
-                method: "POST",
-                url: "/api/org/switch",
-                data: JSON.stringify( {
-                    'orgId': orgId
-                }),
-                contentType: "application/json",
-                dataType: "json",
-            });
-        }
     </script>
 </div>
 </body>

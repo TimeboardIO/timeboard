@@ -67,12 +67,6 @@ public class OrganizationsRestAPI {
     @Autowired
     private UserInfo userInfo;
 
-    @PostMapping(value="/switch", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String switchOrganization(HttpServletRequest req, @RequestBody Long orgId) throws JsonProcessingException {
-        return "redirect:/org/" + orgId + "/home";
-
-    }
-
     @GetMapping("/members")
     public ResponseEntity getMembers(HttpServletRequest request) throws JsonProcessingException {
         Account actor = this.userInfo.getCurrentAccount();
