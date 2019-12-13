@@ -49,7 +49,7 @@ import java.util.Date;
 //TIME ATTACHMENT SHEET
 @Controller
 @RequestMapping("/org/{orgID}/account/exportTAS")
-public class TasExportServlet{
+public class TasExportController {
 
     @Autowired
     private ProjectService projectService;

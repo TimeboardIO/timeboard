@@ -54,7 +54,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping("/org/{orgID}/projects/import")
-public class ProjectImportServlet {
+public class ProjectImportController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -70,7 +70,7 @@ public class ProjectImportServlet {
     @Autowired(
             required = false
     )
-    private List<ProjectImportService> projectImportServlets;
+    private List<ProjectImportService> projectImportServices;
 
 
     @PostMapping
@@ -91,7 +91,7 @@ public class ProjectImportServlet {
 
         ImportResponse importResponse = new ImportResponse();
 
-        final Optional<ProjectImportService> optionalService = this.projectImportServlets.stream()
+        final Optional<ProjectImportService> optionalService = this.projectImportServices.stream()
                 .filter(projectImportService -> projectImportService.getServiceName().equals(type))
                 .findFirst();
 

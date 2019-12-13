@@ -27,13 +27,11 @@ package timeboard.home;
  */
 
 
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.home")
-@ServletComponentScan(basePackages = "timeboard.home")
 public class HomeConfiguration {
 
 
