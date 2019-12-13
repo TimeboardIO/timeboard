@@ -27,38 +27,52 @@ package timeboard.webapp;
  */
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Value("${cognito.logout}")
-    private String logoutEndpoint;
+@ConditionalOnProperty(name = "timeboard.uitest", havingValue = "true")
+public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
-    @Value("${app.url}")
-    private String appLogout;
-
-
-    @Value("${oauth.clientid}")
-    private String clientid;
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
-        final String logoutURL = String.format("%s?client_id=%s&logout_uri=%s", this.logoutEndpoint, this.clientid, this.appLogout);
+      http.csrf().disable()
 
-        http.authorizeRequests()
-                .antMatchers("/", "/onboarding/**").permitAll()
-                .anyRequest().authenticated()
-                .and().oauth2Login()
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl(logoutURL)
-                .and().csrf().disable();
+              .authorizeRequests()
+              .antMatchers("/", "/onboarding/**").permitAll()
+              .anyRequest().authenticated()
+              .and()
+              .formLogin();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+
+        auth.inMemoryAuthentication()
+                .passwordEncoder(encoder)
+                .withUser("user")
+                .password(encoder.encode("password"))
+                .roles("USER")
+                .and()
+                .withUser("manager")
+                .password(encoder.encode("password"))
+                .credentialsExpired(true)
+                .accountExpired(true)
+                .accountLocked(true)
+                .authorities("WRITE_PRIVILEGES", "READ_PRIVILEGES")
+                .roles("MANAGER");
     }
 
 }

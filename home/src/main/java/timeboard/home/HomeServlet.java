@@ -42,6 +42,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -68,7 +69,9 @@ public class HomeServlet {
     }
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+    protected String handleGet(Principal principal, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+
+        System.out.println(principal);
 
         //load previous weeks data
         Date d = new Date();

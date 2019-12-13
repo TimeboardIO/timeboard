@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,52 +26,17 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
-import java.io.Serializable;
-import java.util.List;
+public class ThreadLocalStorage {
 
-@Entity
-public class DataTableConfig extends OrgEntity implements Serializable {
+    private static ThreadLocal<Long> currentOrganizationID = new ThreadLocal<>();
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
 
-    @ManyToOne
-    private Account user;
-
-    @Column
-    private String tableInstanceId;
-
-    @Column
-    @ElementCollection(targetClass=String.class, fetch = FetchType.EAGER)
-    private List<String> columns;
-
-    public DataTableConfig() {
+    public static void setCurrentOrganizationID(Long tenantName) {
+        currentOrganizationID.set(tenantName);
     }
 
-    public Account getUser() {
-        return user;
-    }
-
-    public void setUser(Account user) {
-        this.user = user;
-    }
-
-    public String getTableInstanceId() {
-        return tableInstanceId;
-    }
-
-    public void setTableInstanceId(String tableInstanceId) {
-        this.tableInstanceId = tableInstanceId;
-    }
-
-    public List<String> getColumns() {
-        return columns;
-    }
-
-    public void setColumns(List<String> columns) {
-        this.columns = columns;
+    public static Long getCurrentOrganizationID() {
+        return currentOrganizationID.get();
     }
 
 }

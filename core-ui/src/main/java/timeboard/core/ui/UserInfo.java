@@ -27,6 +27,8 @@ package timeboard.core.ui;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -45,8 +47,18 @@ public class UserInfo {
 
     public Account getCurrentAccount() {
         if (account == null) {
-            OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-            account = userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
+
+            Authentication token = SecurityContextHolder.getContext().getAuthentication();
+
+            if(token instanceof UsernamePasswordAuthenticationToken){
+                account =  userService.findUserBySubject(((UsernamePasswordAuthenticationToken) token).getName());
+            }
+
+            if(token instanceof OAuth2AuthenticationToken){
+                account =  userService.findUserBySubject((String)((OAuth2AuthenticationToken) token).getPrincipal().getAttributes().get("sub"));
+            }
+
+
         }
         return account;
     }

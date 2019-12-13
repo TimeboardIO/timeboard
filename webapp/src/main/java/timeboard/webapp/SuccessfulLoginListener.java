@@ -26,14 +26,17 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.ui.UserInfo;
 
 import java.util.Map;
 
@@ -43,14 +46,24 @@ public class SuccessfulLoginListener {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserInfo userInfo;
+
     @EventListener
     public void doSomething(InteractiveAuthenticationSuccessEvent event) throws BusinessException {
 
-        Map<String, Object> userAttributes = ((OAuth2AuthenticationToken) event.getSource()).getPrincipal().getAttributes();
-        Account account = this.userService.findUserBySubject((String) userAttributes.get("sub"));
+        final Account account = this.userInfo.getCurrentAccount();
 
         if(account == null){
-            this.userService.userProvisionning((String)userAttributes.get("sub"), (String)userAttributes.get("email"));
+            if(event.getSource() instanceof OAuth2AuthenticationToken) {
+                final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) event.getSource();
+                this.userService.userProvisionning((String) token.getPrincipal().getAttributes().get("sub"), (String) token.getPrincipal().getAttributes().get("email"));
+            }
+
+            if(event.getSource() instanceof UsernamePasswordAuthenticationToken) {
+                final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) event.getSource();
+                this.userService.userProvisionning(token.getName(), token.getName());
+            }
         }
     }
 }
