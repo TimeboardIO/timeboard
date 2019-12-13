@@ -50,7 +50,7 @@ import java.util.List;
  * <p>Ex : /org/config?id=
  */
 @Controller
-@RequestMapping("/org/{orgID}/members")
+@RequestMapping("/org/{orgID}/org/members")
 public class OrganizationMembersServlet  {
 
     @Autowired

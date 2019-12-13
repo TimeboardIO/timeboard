@@ -55,7 +55,7 @@ import java.util.List;
  * <p>Ex : /org/config?id=
  */
 @Controller
-@RequestMapping("/org/{orgID}/config")
+@RequestMapping("/org/{orgID}/org/config")
 public class OrganizationConfigServlet  {
 
     @Autowired
@@ -73,7 +73,7 @@ public class OrganizationConfigServlet  {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
+    protected String handleGet(HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException  {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -84,9 +84,9 @@ public class OrganizationConfigServlet  {
         final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
         final List<TaskType> taskTypes = this.projectService.listTaskType();
 
-        viewModel.addAttribute("taskTypes", taskTypes);
-        viewModel.addAttribute("defaultTasks", defaultTasks);
-        viewModel.addAttribute("organization", organization);
+        model.addAttribute("taskTypes", taskTypes);
+        model.addAttribute("defaultTasks", defaultTasks);
+        model.addAttribute("organization", organization);
 
         return "details_org_config";
 

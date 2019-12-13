@@ -42,12 +42,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.DispatcherServletWebRequest;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ThreadLocalStorage;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
 import timeboard.core.ui.UserInfo;
+
+import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
@@ -73,6 +76,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private UserInfo userInfo;
 
+    @Autowired
+    private OrganizationService organizationService;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
@@ -97,7 +103,12 @@ public class WebConfig implements WebMvcConfigurer {
 
                     String url = getURL((DispatcherServletWebRequest) webRequest);
                     if(url.contains("/org/")) {
-                        modelMap.put("orgID", ThreadLocalStorage.getCurrentOrganizationID());
+                        String orgId = url.split("/")[2];
+                        modelMap.put("orgID", orgId);
+                        modelMap.put("orgName", organizationService.getOrganizationByID(getActorFromRequestAttributes(webRequest), Long.valueOf(orgId)).getScreenOrgName());
+                        List<Account> orgListChoice = organizationService.getParents(getActorFromRequestAttributes(webRequest), getActorFromRequestAttributes(webRequest));
+                        orgListChoice.add(getActorFromRequestAttributes(webRequest));
+                        modelMap.put("orgList", orgListChoice);
                     }
                     modelMap.put("account", userInfo.getCurrentAccount());
                     modelMap.put("navs", navRegistry.getEntries());
