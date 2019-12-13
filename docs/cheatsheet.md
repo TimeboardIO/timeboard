@@ -1,11 +1,7 @@
 # Timeboard Cheats
 
-## Where is my database configuration ?
-
-    [KRONOPS_HOME]/etc/org.ops4j.datasource-timeboard-core-ds.cfg
-
     
-## How to not redeploy everythings ?
+## How to get current user from swing controller ?
 
 This command auto redeploy new installed maven artifacts 
     

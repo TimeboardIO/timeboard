@@ -8,14 +8,7 @@ class Calendar {
 }
 
 class AbstractTask {
-    -Long id
-    -String name
-    -String description
-    -Date startDate
-    -Date endDate
-    +String origin
-    +String remotePath
-    +String remoteId
+
 }
 
 AbstractTask <|-- DefaultTask

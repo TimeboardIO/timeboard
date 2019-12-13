@@ -15,7 +15,7 @@
 ###Normalized JSON data objects
 
 
-|   TaskWrapper |           |
+|   TaskWrapper | |
 |--------|-----------|
 | long   | taskID    |
 | long   | projectID |
