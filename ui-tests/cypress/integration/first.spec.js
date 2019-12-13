@@ -1,6 +1,6 @@
 describe('Post Resource', function() {
     it('Creating a New Post', function() {
-        cy.visit('https://dev.mytimeboard.net/')     // 1.
+        cy.visit('http://localhost:8080')     // 1.
 
         cy.get('a.link') // 2.
             .click()   // 3.
