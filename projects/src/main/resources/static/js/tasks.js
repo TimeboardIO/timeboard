@@ -378,7 +378,7 @@ $(document).ready(function(){
     $('.ui.search')
     .search({
         apiSettings: {
-            url: '/search?q={query}&projectID='+currentProjectID+''
+            url: '/api/search?q={query}&projectID='+currentProjectID+''
         },
         fields: {
             results : 'items',
