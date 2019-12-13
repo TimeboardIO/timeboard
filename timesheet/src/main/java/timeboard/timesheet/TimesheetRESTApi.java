@@ -43,7 +43,6 @@ import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
 import timeboard.core.ui.UserInfo;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;

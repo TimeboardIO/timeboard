@@ -890,6 +890,14 @@ ui.input.error > input {
   font-weight: bold !important;
 }
 
+.text.primary {
+  color: #3d6488 !important;
+}
+
+.text.bold {
+  font-: #3d6488 !important;
+}
+
 /*******************************
          Site Overrides
 *******************************/
@@ -931,10 +939,7 @@ ui.input.error > input {
   border-radius: 0.21428571em;
   -webkit-box-shadow: 0px 0px 0px 1px #DCDDDE inset, 0px 0px 0px 0px transparent;
   box-shadow: 0px 0px 0px 1px #DCDDDE inset, 0px 0px 0px 0px transparent;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
   -webkit-transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease, background 0.3s ease, -webkit-box-shadow 0.3s ease;
   transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease, background 0.3s ease, -webkit-box-shadow 0.3s ease;
   transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
@@ -5494,10 +5499,7 @@ ui.input.error > input {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: rgba(0, 0, 0, 0.85);
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
@@ -11529,31 +11531,31 @@ i.icon.usb:before {
   content: "\f287";
 }
 
-i.icon.user:before {
+i.icon.account:before {
   content: "\f007";
 }
 
-i.icon.user.circle:before {
+i.icon.account.circle:before {
   content: "\f2bd";
 }
 
-i.icon.user.md:before {
+i.icon.account.md:before {
   content: "\f0f0";
 }
 
-i.icon.user.plus:before {
+i.icon.account.plus:before {
   content: "\f234";
 }
 
-i.icon.user.secret:before {
+i.icon.account.secret:before {
   content: "\f21b";
 }
 
-i.icon.user.times:before {
+i.icon.account.times:before {
   content: "\f235";
 }
 
-i.icon.users:before {
+i.icon.accounts:before {
   content: "\f0c0";
 }
 
@@ -11799,7 +11801,7 @@ i.icon.unordered.list:before {
   content: "\f0ca";
 }
 
-i.icon.user.doctor:before {
+i.icon.account.doctor:before {
   content: "\f0f0";
 }
 
@@ -11863,7 +11865,7 @@ i.icon.add.to.cart:before {
   content: "\f217";
 }
 
-i.icon.add.user:before {
+i.icon.add.account:before {
   content: "\f234";
 }
 
@@ -12587,7 +12589,7 @@ i.icon.remove.from.calendar:before {
   content: "\f272";
 }
 
-i.icon.remove.user:before {
+i.icon.remove.account:before {
   content: "\f235";
 }
 
@@ -12843,19 +12845,19 @@ i.icon.usd:before {
   content: "\f155";
 }
 
-i.icon.user.cancel:before {
+i.icon.account.cancel:before {
   content: "\f235";
 }
 
-i.icon.user.close:before {
+i.icon.account.close:before {
   content: "\f235";
 }
 
-i.icon.user.delete:before {
+i.icon.account.delete:before {
   content: "\f235";
 }
 
-i.icon.user.x:before {
+i.icon.account.x:before {
   content: "\f235";
 }
 
@@ -13600,11 +13602,11 @@ i.icon.trash.alternate.outline:before {
   content: "\f2ed";
 }
 
-i.icon.user.outline:before {
+i.icon.account.outline:before {
   content: "\f007";
 }
 
-i.icon.user.circle.outline:before {
+i.icon.account.circle.outline:before {
   content: "\f2bd";
 }
 
@@ -16938,10 +16940,7 @@ ul.ui.list li,
 ul.ui.list li:before,
 .ui.bulleted.list .list > .item:before,
 .ui.bulleted.list > .item:before {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
   pointer-events: none;
   position: absolute;
   top: auto;
@@ -17018,10 +17017,7 @@ ol.ui.list li:before,
   position: absolute;
   top: auto;
   left: auto;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
   pointer-events: none;
   margin-left: -1.25rem;
   counter-increment: ordered;
@@ -23903,10 +23899,7 @@ ol.ui.horizontal.list li:before,
   -webkit-box-flex: 0;
   -ms-flex: 0 0 auto;
   flex: 0 0 auto;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
   background: none;
   padding: 1.14285714em 1.14285714em;
   text-transform: none;
@@ -23941,10 +23934,7 @@ ol.ui.horizontal.list li:before,
 .ui.menu .text.item > *,
 .ui.menu .item > a:not(.ui),
 .ui.menu .item > p:only-child {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+  account-select: text;
   line-height: 1.3;
 }
 
@@ -27698,10 +27688,7 @@ Floated Menu / Item
 
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th.sorted:hover {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
 }
 
 .ui.sortable.table thead th:after {
@@ -29812,14 +29799,14 @@ a.ui.card:hover,
       User
 ---------------*/
 
-.ui.feed > .event > .content .user {
+.ui.feed > .event > .content .account {
   display: inline-block;
   font-weight: bold;
   margin-right: 0em;
   vertical-align: baseline;
 }
 
-.ui.feed > .event > .content .user img {
+.ui.feed > .event > .content .account img {
   margin: -0.25em 0.25em 0em 0em;
   width: auto;
   height: 10em;
@@ -31647,10 +31634,7 @@ a.ui.card:hover,
 
 .ui.checkbox input.hidden + label {
   cursor: pointer;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
 }
 
 /*******************************
@@ -32106,10 +32090,7 @@ a.ui.card:hover,
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
   will-change: opacity;
   z-index: 1000;
 }
@@ -32117,10 +32098,7 @@ a.ui.card:hover,
 /* Dimmer Content */
 
 .ui.dimmer > .content {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+  account-select: text;
   color: #FFFFFF;
 }
 
@@ -33039,10 +33017,7 @@ select.ui.dropdown {
 /* Selection Label */
 
 .ui.multiple.dropdown > .label {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+  account-select: none;
   display: inline-block;
   vertical-align: top;
   white-space: normal;
@@ -34176,10 +34151,7 @@ select.ui.dropdown {
   -ms-flex: 0 0 auto;
   flex: 0 0 auto;
   border-radius: 0.28571429rem;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+  account-select: text;
   will-change: top, left, margin, transform, opacity;
 }
 
@@ -37202,10 +37174,7 @@ a.ui.nag {
   height: 100%;
   display: table;
   text-align: center;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
+  account-select: text;
 }
 
 .ui.cube.shape .side > .content > div {

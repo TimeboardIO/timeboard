@@ -27,8 +27,8 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Task;
 import timeboard.core.model.Account;
+import timeboard.core.model.Task;
 
 import java.util.Date;
 import java.util.List;

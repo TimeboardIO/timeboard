@@ -1,8 +1,8 @@
-package timeboard.core.ui;
+package timeboard.core.model;
 
 /*-
  * #%L
- * core-ui
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,41 +26,63 @@ package timeboard.core.ui;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.persistence.*;
+import java.io.Serializable;
 
-public class ViewModel {
 
-    private final List<Exception> errors;
-    private final Map<String, Object> viewDatas;
-    private String template;
+@Entity
+public class ProjectTag implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
-    public ViewModel() {
-        this.errors = new ArrayList<>();
-        this.viewDatas = new HashMap<>();
+    @Column(nullable = false)
+    private String tagKey;
+
+    @Column(nullable = false)
+    private String tagValue;
+
+    @ManyToOne(targetEntity = Project.class, fetch = FetchType.LAZY)
+    private Project project;
+
+    public ProjectTag() {
     }
 
-    public ViewModel(String template) {
-        this.errors = new ArrayList<>();
-        this.viewDatas = new HashMap<>();
-        this.template = template;
+    public ProjectTag(String tagKey, String tagValue, Project project) {
+        this.tagKey = tagKey;
+        this.tagValue = tagValue;
+        this.project = project;
     }
 
-    public List<Exception> getErrors() {
-        return errors;
+    public Long getId() {
+        return id;
     }
 
-    public Map<String, Object> getViewDatas() {
-        return viewDatas;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public String getTemplate() {
-        return template;
+    public String getTagKey() {
+        return tagKey;
     }
 
-    public void setTemplate(String template) {
-        this.template = template;
+    public void setTagKey(String tagKey) {
+        this.tagKey = tagKey;
+    }
+
+    public String getTagValue() {
+        return tagValue;
+    }
+
+    public void setTagValue(String tagValue) {
+        this.tagValue = tagValue;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

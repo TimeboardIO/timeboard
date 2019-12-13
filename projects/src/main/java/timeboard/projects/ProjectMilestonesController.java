@@ -36,7 +36,6 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
-import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +45,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{projectID}/milestones")
+@RequestMapping("/org/{orgID}/projects/{projectID}/milestones")
 public class ProjectMilestonesController {
 
     @Autowired
@@ -56,51 +55,51 @@ public class ProjectMilestonesController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String listMilestones(@PathVariable Long projectID, Model viewModel) throws ServletException, IOException, BusinessException {
+    protected String listMilestones(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        viewModel.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
-        viewModel.addAttribute("project", project);
+        model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
+        model.addAttribute("project", project);
 
-        return "details_project_milestones";
+        return "details_project_milestones.html";
     }
 
     @GetMapping("/{milestoneID/delete")
-    protected String deleteMilestone(@PathVariable Long projetID, @PathVariable Long milestoneID) throws ServletException, IOException, BusinessException {
+    protected String deleteMilestone(@PathVariable Long orgID, @PathVariable Long projetID, @PathVariable Long milestoneID) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.deleteMilestoneByID(actor, milestoneID);
 
-        return "redirect:/projects/" + projetID + "/milestones";
+        return "redirect:/org/" + orgID + "/projects/" + projetID + "/milestones";
     }
 
     @GetMapping("/{milestoneID}/setup")
-    protected String setupMilestone(@PathVariable Long projectID, @PathVariable Long milestoneID, Model viewModel) throws BusinessException {
+    protected String setupMilestone(@PathVariable Long projectID, @PathVariable Long milestoneID, Model model) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
 
         Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
-        viewModel.addAttribute("milestone", milestone);
-        viewModel.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, milestone));
+        model.addAttribute("milestone", milestone);
+        model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, milestone));
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
-        fillModelWithMilestones(viewModel, actor, project);
+        fillModelWithMilestones(model, actor, project);
 
-        return "details_project_milestones_config";
+        return "details_project_milestones_config.html";
     }
 
 
     @GetMapping("/create")
-    protected String createMilestoneView(@PathVariable Long projectID, Model viewModel) throws BusinessException {
+    protected String createMilestoneView(@PathVariable Long projectID, Model model) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
 
-        viewModel.addAttribute("milestone", new Milestone());
+        model.addAttribute("milestone", new Milestone());
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
-        fillModelWithMilestones(viewModel, actor, project);
+        fillModelWithMilestones(model, actor, project);
 
-        return "details_project_milestones_config";
+        return "details_project_milestones_config.html";
 
     }
 
@@ -125,15 +124,15 @@ public class ProjectMilestonesController {
         return attributes;
     }
 
-    private void fillModelWithMilestones(Model viewModel, Account actor, Project project) throws BusinessException {
-        viewModel.addAttribute("project", project);
-        viewModel.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
-        viewModel.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
-        viewModel.addAttribute("allMilestoneTypes", MilestoneType.values());
+    private void fillModelWithMilestones(Model model, Account actor, Project project) throws BusinessException {
+        model.addAttribute("project", project);
+        model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
+        model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
+        model.addAttribute("allMilestoneTypes", MilestoneType.values());
     }
 
 
-    protected void createConfigLinks(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    protected String createConfigLinks(Account actor, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
@@ -146,19 +145,19 @@ public class ProjectMilestonesController {
             currentMilestone = addTasksToMilestone(actor, currentMilestone, request);
 
 
-            viewModel.getViewDatas().put("milestone", currentMilestone);
+            model.addAttribute("milestone", currentMilestone);
 
-            viewModel.getViewDatas().put("allProjectTasks", this.projectService.listProjectTasks(actor, project));
+            model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
 
         } catch (Exception e) {
-            viewModel.getErrors().add(e);
+            model.addAttribute("error", e);
         } finally {
-            viewModel.setTemplate("details_project_milestones_config_links.html");
 
-            viewModel.getViewDatas().put("project", project);
-            viewModel.getViewDatas().put("milestones", this.projectService.listProjectMilestones(actor, project));
-            viewModel.getViewDatas().put("allMilestoneTypes", MilestoneType.values());
-            viewModel.getViewDatas().put("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, currentMilestone));
+            model.addAttribute("project", project);
+            model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
+            model.addAttribute("allMilestoneTypes", MilestoneType.values());
+            model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, currentMilestone));
+            return "details_project_milestones_config_links.html";
         }
     }
 

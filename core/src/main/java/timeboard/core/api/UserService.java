@@ -53,6 +53,8 @@ public interface UserService {
      */
     List<Account> searchUserByEmail(String prefix);
 
+    List<Account> searchUserByName(String query);
+
     /**
      * Search user where name start with prefix, limit to project with
      * primary Key projectID.

@@ -27,8 +27,8 @@ package timeboard.core.internal.events;
  */
 
 import timeboard.core.api.ProjectService;
-import timeboard.core.model.Project;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Project;
 import timeboard.core.model.ValidatedTimesheet;
 
 import java.util.Date;

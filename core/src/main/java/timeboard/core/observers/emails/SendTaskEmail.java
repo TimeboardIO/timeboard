@@ -30,8 +30,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 
 import javax.annotation.PostConstruct;

@@ -39,13 +39,12 @@ th, td {
 h1.ui.header,
 .ui.huge.header {
   font-weight: normal;
-  color : @primaryColor;
+  color: @primaryColor;
 }
 
-h2.ui.header,
-.ui.large.header {
+h2.ui.header, .ui.large.header {
   font-weight: normal;
-  color : @primaryColor;
+  color: @primaryColor;
 
 }
 
@@ -131,6 +130,11 @@ ui.input.error > input {
     }
 }
 
+.text.primary {
+  color: @primaryColor !important;
+}
 
-
+.text.bold {
+  font-: @primaryColor !important;
+}
 

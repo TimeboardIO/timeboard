@@ -77,6 +77,10 @@ public class Project implements Serializable {
     @OneToMany(targetEntity = Milestone.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Milestone> milestones;
 
+    @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectTag> tags;
+
+
     public Project() {
         this.enable = true;
         this.members = new HashSet<>();
@@ -157,6 +161,14 @@ public class Project implements Serializable {
 
     public void setMilestones(Set<Milestone> milestones) {
         this.milestones = milestones;
+    }
+
+    public List<ProjectTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<ProjectTag> tags) {
+        this.tags = tags;
     }
 
     public boolean isEnable() {

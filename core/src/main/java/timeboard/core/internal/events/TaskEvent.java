@@ -26,10 +26,10 @@ package timeboard.core.internal.events;
  * #L%
  */
 
-import timeboard.core.model.Project;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Task;
 import timeboard.core.model.Account;
+import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
 
 import java.util.Date;
 

@@ -34,8 +34,8 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Project;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 
 import java.io.IOException;
 import java.net.URI;

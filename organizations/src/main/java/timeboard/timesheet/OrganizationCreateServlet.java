@@ -26,34 +26,26 @@ package timeboard.timesheet;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import timeboard.core.api.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
-import timeboard.core.model.Task;
-import timeboard.core.ui.TimeboardServlet;
 import timeboard.core.ui.UserInfo;
-import timeboard.core.ui.ViewModel;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 @Controller
+@RequestMapping("/org/{orgID}/org")
 public class OrganizationCreateServlet  {
     @Autowired
     public OrganizationService organizationService;
@@ -61,18 +53,18 @@ public class OrganizationCreateServlet  {
     @Autowired
     public UserInfo userInfo;
 
-    @PostMapping("/orga/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    @PostMapping("create")
+    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
-        organization.setRemoteSubject("Timeboard/Organization");
+        organization.setRemoteSubject("Timeboard/Organization/"+System.nanoTime());
         organization.setName(request.getParameter("organizationName"));
         this.organizationService.createOrganization(actor, organization);
-        return "redirect:/home";
+        return "redirect:/org/" + orgID + "/home";
     }
 
-    @GetMapping("/orga/create")
-    protected String createFrom(Model model, Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
-        return "create_orga.html";
+    @GetMapping("create")
+    protected String createFrom(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+        return "create_org.html";
     }
 }

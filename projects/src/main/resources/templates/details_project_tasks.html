@@ -7,7 +7,7 @@
 
 <head>
     <title>Project Tasks details</title>
-    <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
+    <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id},orgID=${orgID})}"/>
     <style>
         .ellipsis {
             text-overflow: ellipsis;

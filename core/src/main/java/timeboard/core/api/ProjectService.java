@@ -135,14 +135,15 @@ public interface ProjectService {
      * Create a default task.
      * @return DefaultTask
      */
-    DefaultTask createDefaultTask(DefaultTask task) throws BusinessException;
+    DefaultTask createDefaultTask(Account actor, String task) throws BusinessException;
 
     /**
-     * Update a default task.
-     * @return DefaultTask
+     * default tasks can not be deleted, so they are set disabled and hidden from UI
+     * @param actor
+     * @param taskID
+     * @throws BusinessException
      */
-    DefaultTask updateDefaultTask(DefaultTask dataEvent);
-
+    void disableDefaultTaskByID(Account actor, long taskID) throws BusinessException;
 
 
     /*
@@ -184,7 +185,9 @@ public interface ProjectService {
 
     Milestone addTasksToMilestone(Account actor, Milestone currentMilestone, List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
-    TaskType createTaskType(String name);
+    TaskType createTaskType(Account actor, String name);
+
+    void disableTaskType(Account actor, TaskType type);
 
     /**
      * Return task types.
@@ -195,13 +198,10 @@ public interface ProjectService {
     TaskType findTaskTypeByID(Long taskTypeID);
 
     TASData generateTasData(Account user, Project project, int month, int year);
-
     /*
      == Rule ==
      */
+
     boolean isProjectOwner(Account user, Project project);
-
-
-
 
 }

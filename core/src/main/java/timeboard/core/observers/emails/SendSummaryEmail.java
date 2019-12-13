@@ -37,7 +37,6 @@ import timeboard.core.internal.events.TimeboardEvent;
 import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.Account;
-import timeboard.core.model.EmailSummaryModel;
 import timeboard.core.model.Task;
 import timeboard.core.model.ValidatedTimesheet;
 

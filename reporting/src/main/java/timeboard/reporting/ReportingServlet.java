@@ -27,36 +27,30 @@ package timeboard.reporting;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectExportService;
-import timeboard.core.model.Account;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
 
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 
-@WebServlet(name = "ReportingServlet", urlPatterns = {ReportingServlet.URL})
-public class ReportingServlet extends TimeboardServlet {
-
-    public static final String URL = "/reporting";
+@Controller
+@RequestMapping("/org/{orgID}/reporting")
+public class ReportingServlet {
 
     @Autowired(
             required = false
     )
     private List<ProjectExportService> reportServices;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ReportingServlet.class.getClassLoader();
-    }
-
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws Exception {
-        viewModel.setTemplate("reporting.html");
-        viewModel.getViewDatas().put("reports", this.reportServices);
+    @GetMapping
+    protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+        model.addAttribute("reports", this.reportServices);
+        return "reporting.html";
    }
 
 }

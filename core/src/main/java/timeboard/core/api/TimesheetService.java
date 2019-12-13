@@ -28,8 +28,8 @@ package timeboard.core.api;
 
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Project;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 
 import java.util.Date;
 import java.util.Map;

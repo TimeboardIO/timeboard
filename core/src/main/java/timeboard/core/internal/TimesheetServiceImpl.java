@@ -37,14 +37,13 @@ import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.internal.events.TimesheetEvent;
 import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Project;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 import timeboard.core.model.ValidatedTimesheet;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.io.Serializable;
 import java.util.*;
 
 

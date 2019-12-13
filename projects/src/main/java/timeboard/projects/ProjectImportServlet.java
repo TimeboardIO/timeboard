@@ -28,17 +28,20 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -49,8 +52,9 @@ import java.util.List;
 import java.util.Optional;
 
 
-@WebServlet(name = "ProjectImportServlet", urlPatterns = "/projects/import")
-public class ProjectImportServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/projects/import")
+public class ProjectImportServlet {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -60,26 +64,26 @@ public class ProjectImportServlet extends TimeboardServlet {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserInfo userInfo;
+
     @Autowired(
             required = false
     )
     private List<ProjectImportService> projectImportServlets;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return ProjectImportServlet.class.getClassLoader();
-    }
 
-    @Override
-    protected void handlePost(Account actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    @PostMapping
+    protected void handlePost(@PathVariable Long orgID, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/org/" + orgID + "/projects/config?projectID=" + projectID);
         requestDispatcher.forward(req, resp);
     }
 
-    @Override
-    protected void handleGet(Account actor, HttpServletRequest req, HttpServletResponse resp, ViewModel viewModel) throws ServletException, IOException, BusinessException {
+    @GetMapping
+    protected void handleGet(@PathVariable Long orgID, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
 
+        Account actor = this.userInfo.getCurrentAccount();
         final String type = req.getParameter("type");
         final long projectID = Long.parseLong(req.getParameter("projectID"));
 
@@ -162,7 +166,7 @@ public class ProjectImportServlet extends TimeboardServlet {
             importResponse.getErrors().add(new BusinessException("Missing " + type + " Service"));
         }
 
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/org/" + orgID + "/projects/config?projectID=" + projectID);
         req.setAttribute("errors", importResponse.getErrors());
         req.setAttribute("importSuccess", message);
         requestDispatcher.forward(req, resp);

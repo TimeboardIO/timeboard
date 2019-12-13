@@ -26,42 +26,42 @@ package timeboard.account;
  * #L%
  */
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Calendar;
-import java.util.Date;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
-import timeboard.core.ui.TimeboardServlet;
-import timeboard.core.ui.ViewModel;
+import timeboard.core.ui.UserInfo;
 
-@WebServlet(name = "TasExportServlet", urlPatterns = "/account/exportTAS")
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
+
 //TIME ATTACHMENT SHEET
-public class TasExportServlet extends TimeboardServlet {
+@Controller
+@RequestMapping("/org/{orgID}/account/exportTAS")
+public class TasExportServlet{
 
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private UserInfo userInfo;
 
-    @Override
-    protected ClassLoader getTemplateResolutionClassLoader() {
-        return TasExportServlet.class.getClassLoader();
-    }
-
-    @Override
-        protected void handlePost(Account actor, HttpServletRequest request, HttpServletResponse response, ViewModel viewModel) throws ServletException, IOException {
+    @PostMapping
+    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
 
         try {
-
+            Account actor = this.userInfo.getCurrentAccount();
             int month = Integer.parseInt(request.getParameter("month"));
             int year = Integer.parseInt(request.getParameter("year"));
             Long projectID = Long.parseLong(request.getParameter("projectID"));
@@ -91,8 +91,7 @@ public class TasExportServlet extends TimeboardServlet {
             System.out.println(e.getMessage());
         }
 
-        response.sendRedirect("/account");
-
+        return ("/org/" + orgID + "/account");
 
     }
 
