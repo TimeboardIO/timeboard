@@ -77,8 +77,11 @@ describe('Project Test', function() {
             cy.get('input[name=name]').should('be.value', projectName);
             cy.get('input[name=quotation]').should('be.value', 30000);
             cy.get('textarea[name=comments]').should('be', 'My super new project is very awesome. ');
+        });
+        it('Add project member', function () {
 
         });
+
     });
 
 });
