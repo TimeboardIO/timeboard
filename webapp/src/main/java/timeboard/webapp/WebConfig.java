@@ -29,6 +29,8 @@ package timeboard.webapp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.ui.ModelMap;
@@ -39,12 +41,14 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.DispatcherServletWebRequest;
 import timeboard.core.api.DataTableService;
+import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
+import timeboard.core.ui.UserInfo;
 
 import java.util.List;
 
@@ -70,6 +74,9 @@ public class WebConfig implements WebMvcConfigurer {
     private DataTableService dataTableService;
 
     @Autowired
+    private UserInfo userInfo;
+
+    @Autowired
     private OrganizationService organizationService;
 
     @Override
@@ -81,17 +88,20 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addWebRequestInterceptor(new WebRequestInterceptor() {
 
-
             @Override
             public void preHandle(WebRequest webRequest) throws Exception {
-
+                final String url = getURL((DispatcherServletWebRequest) webRequest);
+                final Long orgID = extractOrgID(url);
+                if(orgID != null) {
+                    ThreadLocalStorage.setCurrentOrganizationID(orgID);
+                }
             }
 
             @Override
             public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
                 if(modelMap != null && webRequest.getUserPrincipal() != null)  {
 
-                    String url = ((DispatcherServletWebRequest) webRequest).getRequest().getRequestURI();
+                    String url = getURL((DispatcherServletWebRequest) webRequest);
                     if(url.contains("/org/")) {
                         String orgId = url.split("/")[2];
                         modelMap.put("orgID", orgId);
@@ -100,7 +110,7 @@ public class WebConfig implements WebMvcConfigurer {
                         orgListChoice.add(getActorFromRequestAttributes(webRequest));
                         modelMap.put("orgList", orgListChoice);
                     }
-                    modelMap.put("account", getActorFromRequestAttributes(webRequest));
+                    modelMap.put("account", userInfo.getCurrentAccount());
                     modelMap.put("navs", navRegistry.getEntries());
                     modelMap.put("javascripts", javascriptService.listJavascriptUrls());
                     modelMap.put("CSSs", cssService.listCSSUrls());
@@ -114,15 +124,23 @@ public class WebConfig implements WebMvcConfigurer {
 
             }
 
+            private String getURL(DispatcherServletWebRequest webRequest) {
+                return webRequest.getRequest().getRequestURI();
+            }
+
+            private Long extractOrgID(String url) {
+                try {
+                    return Long.parseLong(url.split("/")[2]);
+                }catch (Exception e){
+                    return null;
+                }
+            }
+
             @Override
             public void afterCompletion(WebRequest webRequest, Exception e) throws Exception {
 
             }
 
-            protected Account getActorFromRequestAttributes(WebRequest request) {
-                OAuth2AuthenticationToken authentication = (OAuth2AuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-                return userService.findUserBySubject((String) authentication.getPrincipal().getAttributes().get("sub"));
-            }
         });
     }
 }

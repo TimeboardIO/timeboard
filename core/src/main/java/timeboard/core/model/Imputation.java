@@ -34,7 +34,7 @@ import java.util.Date;
 @Table(
         uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
 )
-public class Imputation implements Serializable {
+public class Imputation extends OrgEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
