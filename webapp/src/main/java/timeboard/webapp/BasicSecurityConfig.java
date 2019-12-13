@@ -26,7 +26,6 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -40,8 +39,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @ConditionalOnProperty(name = "timeboard.uitest", havingValue = "true")
 public class BasicSecurityConfig extends WebSecurityConfigurerAdapter {
-
-
 
 
     @Override

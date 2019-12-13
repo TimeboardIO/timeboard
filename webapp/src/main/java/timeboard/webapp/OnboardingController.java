@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.ui.UserInfo;
 
 import java.security.Principal;
@@ -45,8 +46,8 @@ public class OnboardingController {
         if(p == null){ 
             return "onboarding";
         }else{
-            Long orgId = userInfo.getCurrentAccount().getId();
-            return "redirect:/org/" + orgId + "/home";
+
+            return "redirect:/org/" + ThreadLocalStorage.getCurrentOrganizationID() + "/home";
         }
 
     }

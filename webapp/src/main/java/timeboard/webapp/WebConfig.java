@@ -27,120 +27,30 @@ package timeboard.webapp;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.context.request.WebRequestInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.handler.DispatcherServletWebRequest;
-import timeboard.core.api.DataTableService;
-import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.UserService;
-import timeboard.core.model.Account;
-import timeboard.core.ui.CssService;
-import timeboard.core.ui.JavascriptService;
-import timeboard.core.ui.NavigationEntryRegistryService;
-import timeboard.core.ui.UserInfo;
-
-import java.util.List;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     @Autowired
-    private NavigationEntryRegistryService navRegistry;
-
-    @Value("${timeboard.appName}")
-    private String appName;
+    private WebRessourcesInterceptor webRessourcesInterceptor;
 
     @Autowired
-    private JavascriptService javascriptService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private CssService cssService;
-
-    @Autowired
-    private DataTableService dataTableService;
-
-    @Autowired
-    private UserInfo userInfo;
-
-    @Autowired
-    private OrganizationService organizationService;
+    private OrganizationFilter organizationInterceptor;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+        registry
+                .addResourceHandler("/webjars/**")
+                .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
+
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addWebRequestInterceptor(new WebRequestInterceptor() {
-
-            @Override
-            public void preHandle(WebRequest webRequest) throws Exception {
-                final String url = getURL((DispatcherServletWebRequest) webRequest);
-                final Long orgID = extractOrgID(url);
-                if(orgID != null) {
-                    ThreadLocalStorage.setCurrentOrganizationID(orgID);
-                }
-            }
-
-            @Override
-            public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
-                if(modelMap != null && webRequest.getUserPrincipal() != null)  {
-
-                    String url = getURL((DispatcherServletWebRequest) webRequest);
-                    if(url.contains("/org/")) {
-                        String orgId = url.split("/")[2];
-                        modelMap.put("orgID", orgId);
-                        modelMap.put("currentOrg", organizationService.getOrganizationByID(userInfo.getCurrentAccount(), Long.valueOf(orgId)));
-                        List<Account> orgListChoice = organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
-                        orgListChoice.add(userInfo.getCurrentAccount());
-                        modelMap.put("orgList", orgListChoice);
-                    }
-                    modelMap.put("account", userInfo.getCurrentAccount());
-                    modelMap.put("navs", navRegistry.getEntries());
-                    modelMap.put("javascripts", javascriptService.listJavascriptUrls());
-                    modelMap.put("CSSs", cssService.listCSSUrls());
-                    // Use instance of DataTablaService
-                    modelMap.put("dataTableService", dataTableService);
-                }
-
-                if(modelMap != null){
-                    modelMap.put("appName", appName);
-                }
-
-            }
-
-            private String getURL(DispatcherServletWebRequest webRequest) {
-                return webRequest.getRequest().getRequestURI();
-            }
-
-            private Long extractOrgID(String url) {
-                try {
-                    return Long.parseLong(url.split("/")[2]);
-                }catch (Exception e){
-                    return null;
-                }
-            }
-
-            @Override
-            public void afterCompletion(WebRequest webRequest, Exception e) throws Exception {
-
-            }
-
-        });
+        registry.addWebRequestInterceptor(this.webRessourcesInterceptor);
     }
 }
