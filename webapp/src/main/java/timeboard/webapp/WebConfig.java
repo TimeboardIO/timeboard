@@ -105,7 +105,7 @@ public class WebConfig implements WebMvcConfigurer {
                     if(url.contains("/org/")) {
                         String orgId = url.split("/")[2];
                         modelMap.put("orgID", orgId);
-                        modelMap.put("orgName", organizationService.getOrganizationByID(userInfo.getCurrentAccount(), Long.valueOf(orgId)).getScreenOrgName());
+                        modelMap.put("currentOrg", organizationService.getOrganizationByID(userInfo.getCurrentAccount(), Long.valueOf(orgId)));
                         List<Account> orgListChoice = organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
                         orgListChoice.add(userInfo.getCurrentAccount());
                         modelMap.put("orgList", orgListChoice);
