@@ -40,7 +40,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/org/{orgID}/reporting")
-public class ReportingServlet {
+public class ReportingController {
 
     @Autowired(
             required = false

@@ -56,7 +56,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/org/{orgID}/org/config")
-public class OrganizationConfigServlet  {
+public class OrganizationConfigController {
 
     @Autowired
     private UserInfo userInfo;

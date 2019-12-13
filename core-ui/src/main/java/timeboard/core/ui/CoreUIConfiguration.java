@@ -27,13 +27,11 @@ package timeboard.core.ui;
  */
 
 
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.core.ui")
-@ServletComponentScan(basePackages = "timeboard.core.ui")
 public class CoreUIConfiguration {
 
 

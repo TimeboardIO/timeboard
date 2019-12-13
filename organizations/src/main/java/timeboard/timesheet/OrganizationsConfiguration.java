@@ -26,12 +26,10 @@ package timeboard.timesheet;
  * #L%
  */
 
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan("timeboard.organizations")
-@ServletComponentScan("timeboard.organizations")
 public class OrganizationsConfiguration {
 }
