@@ -32,7 +32,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class CostByCategory {
+public class CostByCategory extends OrgEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
