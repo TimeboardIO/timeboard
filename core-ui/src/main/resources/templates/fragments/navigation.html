@@ -21,7 +21,7 @@
         <div class="right menu">
             <div class="ui dropdown item" tabindex="0">
                 <i class="sitemap icon"></i>
-                <div class="title" th:text="${account.screenOrgName}"></div>
+                <div class="title" th:text="${orgName}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
                     <div class="ui dropdown item" tabindex="0">
@@ -29,7 +29,7 @@
                         <i class="dropdown icon"></i>
                         <a> Switch organisation</a>
                         <div class="menu transition hidden">
-                            <a class="item" th:each="org: ${orgList}" th:text="${org.screenName}"
+                            <a class="item" th:each="org: ${orgList}" th:text="${org.screenOrgName}"
                                th:href="@{/org/{newOrgId}/home/(newOrgId=${org.id})}"></a>
                         </div>
                     </div>

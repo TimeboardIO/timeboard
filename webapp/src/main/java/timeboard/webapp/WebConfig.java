@@ -46,6 +46,8 @@ import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
 
+import java.util.List;
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
@@ -93,8 +95,10 @@ public class WebConfig implements WebMvcConfigurer {
                     if(url.contains("/org/")) {
                         String orgId = url.split("/")[2];
                         modelMap.put("orgID", orgId);
-                        Account organization = organizationService.getOrganizationByID(getActorFromRequestAttributes(webRequest), Long.valueOf(orgId));
-                        modelMap.put("orgList", organizationService.getParents(getActorFromRequestAttributes(webRequest), organization));
+                        modelMap.put("orgName", organizationService.getOrganizationByID(getActorFromRequestAttributes(webRequest), Long.valueOf(orgId)).getScreenOrgName());
+                        List<Account> orgListChoice = organizationService.getParents(getActorFromRequestAttributes(webRequest), getActorFromRequestAttributes(webRequest));
+                        orgListChoice.add(getActorFromRequestAttributes(webRequest));
+                        modelMap.put("orgList", orgListChoice);
                     }
                     modelMap.put("account", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());
