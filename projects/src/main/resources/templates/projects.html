@@ -35,7 +35,7 @@
             <div class="header">
                 No Projects ?
             </div>
-            <p>You are not member of any project, click <a th:href="@{/org/{orgID}/projects/create}">here</a> to create your first
+            <p>You are not member of any project, click <a th:href="@{/org/{orgID}/projects/create(orgID=${orgID})}">here</a> to create your first
                 project !</p>
         </div>
     </div>
@@ -43,7 +43,7 @@
     <div th:if="${!projects.isEmpty()}">
 
         <div class="ui segment">
-            <a class="ui button positive" th:href="@{/org/{orgID}/projects/create}">Create Project</a>
+            <a class="ui button positive" th:href="@{/org/{orgID}/projects/create(orgID=${orgID})}">Create Project</a>
         </div>
 
         <div class="ui five stackable cards">
