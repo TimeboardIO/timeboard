@@ -31,7 +31,7 @@
                 </tr>
                 <tr th:each="milestone : ${milestones}">
                     <td>
-                        <a th:href="@{/org/{orgID}/projects/milestones/config(projectID=${project.id}, milestoneID=${milestone.id})}"
+                        <a th:href="@{/org/{orgID}/projects/milestones/config(projectID=${project.id}, milestoneID=${milestone.id}, orgID=${orgID})}"
                            th:text="${milestone.name}"></a>
                     </td>
                 </tr>
