@@ -21,7 +21,7 @@
         <div class="right menu">
             <div class="ui dropdown item" tabindex="0">
                 <i class="sitemap icon"></i>
-                <div class="title" th:text="${orgName}"></div>
+                <div class="title" th:text="${currentOrg.screenOrgName}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
                     <div class="ui dropdown item" tabindex="0">
@@ -33,9 +33,15 @@
                                th:href="@{/org/{newOrgId}/home/(newOrgId=${org.id})}"></a>
                         </div>
                     </div>
-                    <a th:href="@{/org/{orgID}/org/create(orgID=${orgID})}" class="item"><i class="edit icon"></i> Create Organisation</a>
-                    <a class="item"><i class="globe icon"></i> Organisation members</a>
-                    <a class="item"><i class="settings icon"></i> Organisation Setup</a>
+                    <a th:href="@{/org/{orgID}/org/create(orgID=${orgID})}" class="item">
+                        <i class="edit icon"></i> Create Organisation
+                    </a>
+                    <a th:if="${currentOrg.isOrganization}" th:href="@{/org/{orgID}/org/members?orgID={orgID}(orgID=${orgID})}" class="item">
+                        <i class="globe icon"></i> Organisation members
+                    </a>
+                    <a th:if="${currentOrg.isOrganization}" th:href="@{/org/{orgID}/org/config?orgID={orgID}(orgID=${orgID})}" class="item">
+                        <i class="settings icon"></i> Organisation Setup
+                    </a>
                 </div>
             </div>
             <div class="ui dropdown item" tabindex="0">

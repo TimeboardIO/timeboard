@@ -88,12 +88,12 @@ public class OrganizationConfigServlet  {
         model.addAttribute("defaultTasks", defaultTasks);
         model.addAttribute("organization", organization);
 
-        return "details_org_config";
+        return "details_org_config.html";
 
     }
 
     @PostMapping
-    protected String handlePost( HttpServletRequest request, Model viewModel) throws Exception {
+    protected String handlePost( HttpServletRequest request, Model model) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
 
         String action = request.getParameter("action");
@@ -123,6 +123,6 @@ public class OrganizationConfigServlet  {
         }
 
         //Extract organization
-        return this.handleGet(request, viewModel);
+        return this.handleGet(request, model);
     }
 }
