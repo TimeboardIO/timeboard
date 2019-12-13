@@ -46,7 +46,7 @@
 
     <div class="ui stackable two column grid">
         <div class="column">
-            <form th:action="@{'setup/informations'}" th:object="${projectConfigForm}" name="projectConfig"
+            <form th:action="@{projects/{projectID}/setup/informations(projectID=${projectID})}" th:object="${projectConfigForm}" name="projectConfig"
                   class="ui form"
                   enctype="application/x-www-form-urlencoded" method="post">
 
