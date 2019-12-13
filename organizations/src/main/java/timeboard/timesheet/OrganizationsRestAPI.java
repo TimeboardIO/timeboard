@@ -33,9 +33,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
@@ -69,6 +67,11 @@ public class OrganizationsRestAPI {
     @Autowired
     private UserInfo userInfo;
 
+    @PostMapping(value="/switch", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public String switchOrganization(HttpServletRequest req, @RequestBody Long orgId) throws JsonProcessingException {
+        return "redirect:/org/" + orgId + "/home";
+
+    }
 
     @GetMapping("/members")
     public ResponseEntity getMembers(HttpServletRequest request) throws JsonProcessingException {

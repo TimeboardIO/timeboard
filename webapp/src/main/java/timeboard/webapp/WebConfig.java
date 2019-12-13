@@ -39,6 +39,7 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.DispatcherServletWebRequest;
 import timeboard.core.api.DataTableService;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.ui.CssService;
@@ -66,6 +67,9 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     private DataTableService dataTableService;
 
+    @Autowired
+    private OrganizationService organizationService;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
@@ -87,7 +91,10 @@ public class WebConfig implements WebMvcConfigurer {
 
                     String url = ((DispatcherServletWebRequest) webRequest).getRequest().getRequestURI();
                     if(url.contains("/org/")) {
-                            modelMap.put("orgID", url.split("/")[2]);
+                        String orgId = url.split("/")[2];
+                        modelMap.put("orgID", orgId);
+                        Account organization = organizationService.getOrganizationByID(getActorFromRequestAttributes(webRequest), Long.valueOf(orgId));
+                        modelMap.put("orgList", organizationService.getParents(getActorFromRequestAttributes(webRequest), organization));
                     }
                     modelMap.put("account", getActorFromRequestAttributes(webRequest));
                     modelMap.put("navs", navRegistry.getEntries());

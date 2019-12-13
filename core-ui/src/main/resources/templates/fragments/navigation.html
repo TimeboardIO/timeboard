@@ -21,10 +21,18 @@
         <div class="right menu">
             <div class="ui dropdown item" tabindex="0">
                 <i class="sitemap icon"></i>
-                <div class="title">Thales Nantes</div>
+                <div class="title" th:text="${account.screenOrgName}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
-                    <a class="item"><i class="sign-out icon"></i> Switch organisation</a>
+                    <div class="ui dropdown item" tabindex="0">
+                        <i class="sign-out icon"></i>
+                        <i class="dropdown icon"></i>
+                        <a> Switch organisation</a>
+                        <div class="menu transition hidden">
+                            <a class="item" th:each="org: ${orgList}" th:text="${org.screenName}"
+                               th:onclick="'switchOrg('+${org.id}+')'"></a>
+                        </div>
+                    </div>
                     <a th:href="@{/org/{orgID}/org/create(orgID=${orgID})}" class="item"><i class="edit icon"></i> Create Organisation</a>
                     <a class="item"><i class="globe icon"></i> Organisation members</a>
                     <a class="item"><i class="settings icon"></i> Organisation Setup</a>
@@ -46,6 +54,18 @@
           .dropdown({
             clearable: true
           });
+
+          var switchOrg = function(orgId){
+            return $.ajax( {
+                method: "POST",
+                url: "/api/org/switch",
+                data: JSON.stringify( {
+                    'orgId': orgId
+                }),
+                contentType: "application/json",
+                dataType: "json",
+            });
+        }
     </script>
 </div>
 </body>
