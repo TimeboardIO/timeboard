@@ -42,12 +42,12 @@ import java.util.*;
 
 
 /**
- * search user  : /search?q={search query}.
- * search user in project : /search?projectID={project id}&q={search query}
+ * search user  : /api/search?q={search query}.
+ * search user in project : /api/search?projectID={project id}&q={search query}
  */
 
 @RestController
-@RequestMapping("/org/{orgID}/search")
+@RequestMapping("/api/search")
 public class UsersSearchRestController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
