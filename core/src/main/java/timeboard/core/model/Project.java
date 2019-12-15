@@ -74,8 +74,6 @@ public class Project extends OrganizationEntity implements Serializable {
     @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
-    @OneToMany(targetEntity = Milestone.class, mappedBy = "project", cascade = CascadeType.ALL)
-    private Set<Milestone> milestones;
 
     @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectTag> tags;
@@ -155,13 +153,6 @@ public class Project extends OrganizationEntity implements Serializable {
         this.attributes = attributes;
     }
 
-    public Set<Milestone> getMilestones() {
-        return milestones;
-    }
-
-    public void setMilestones(Set<Milestone> milestones) {
-        this.milestones = milestones;
-    }
 
     public List<ProjectTag> getTags() {
         return tags;

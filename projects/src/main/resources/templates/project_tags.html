@@ -16,9 +16,13 @@
 <div layout:fragment="placeholder">
     <div id="components-demo">
 
-        <button v-on:click="addTag" class="ui primary icon button">
-            New Tag <i class="plus icon"></i>
-        </button>
+        <div class="ui menu">
+            <a  v-on:click="addTag"
+                class="item">
+                <i class="plus icon"></i>
+                New Tag
+            </a>
+        </div>
 
         <data-table v-bind:config="table">
             <template v-slot:tagkey="{row}">
@@ -28,7 +32,7 @@
             </template>
             <template v-slot:tagvalue="{row}">
                 <div class="ui input">
-                    <div>Project / thales</div>
+                    <input type="text" v-model="row.tagValue" />
                 </div>
             </template>
             <template v-slot:tagactions="{row}">
