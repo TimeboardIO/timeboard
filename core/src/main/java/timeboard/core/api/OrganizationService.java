@@ -32,6 +32,7 @@ import timeboard.core.model.AccountHierarchy;
 import timeboard.core.model.MembershipRole;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for organizations management.
@@ -40,7 +41,7 @@ public interface OrganizationService {
 
     Account createOrganization(final Account actor, final Account organization) throws BusinessException;
 
-    Account getOrganizationByID(final Account actor, long id);
+    Optional<Account> getOrganizationByID(final Account actor, long id);
 
     Account updateOrganization(final Account actor, Account organization);
 

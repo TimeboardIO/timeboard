@@ -106,7 +106,6 @@ public class ProjectServiceImpl implements ProjectService {
         Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
-        newProject.setOrganizationID(ThreadLocalStorage.getCurrentOrganizationID());
         em.persist(newProject);
 
         em.flush();

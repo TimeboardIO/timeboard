@@ -47,6 +47,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Component
@@ -79,15 +80,15 @@ public class OrganizationsRestAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
 
-        final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
 
-        if (organization == null) {
+        if (organization.isPresent()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
         }
 
         //final List<Account> members = this.organizationService.getMembers(actor, organization);
 
-        final Set<AccountHierarchy> members = organization.getMembers();
+        final Set<AccountHierarchy> members = organization.get().getMembers();
         final List<MemberWrapper> result = new ArrayList<>();
 
         for (AccountHierarchy member : members) {
@@ -115,7 +116,7 @@ public class OrganizationsRestAPI {
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -125,10 +126,10 @@ public class OrganizationsRestAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
 
-        final Account member = this.organizationService.getOrganizationByID(actor,  memberID);
+        final Optional<Account> member = this.organizationService.getOrganizationByID(actor,  memberID);
 
         try {
-           AccountHierarchy ah = organizationService.addMember(actor, organization, member);
+           AccountHierarchy ah = organizationService.addMember(actor, organization.get(), member.get());
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(ah)));
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -150,7 +151,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -159,7 +160,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
-        final Account member = this.organizationService.getOrganizationByID(actor,  memberID);
+        final Optional<Account> member = this.organizationService.getOrganizationByID(actor,  memberID);
 
 
         final String strRole = request.getParameter("role");
@@ -171,7 +172,7 @@ public class OrganizationsRestAPI {
         }
 
         try {
-            AccountHierarchy ah = organizationService.updateMemberRole(actor, organization, member, role);
+            AccountHierarchy ah = organizationService.updateMemberRole(actor, organization.get(), member.get(), role);
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(ah)));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -191,7 +192,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Account organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -204,7 +205,7 @@ public class OrganizationsRestAPI {
         final Account member = this.userService.findUserByID(memberID);
 
         try {
-            organizationService.removeMember(actor, organization, member);
+            organizationService.removeMember(actor, organization.get(), member);
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

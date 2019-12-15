@@ -71,10 +71,10 @@ public class OrganizationFilter implements Filter {
             Optional<Cookie> orgCookie = this.extractOrgCookie((HttpServletRequest) servletRequest);
             if(orgCookie.isPresent()){
                 final Long organizationID = Long.parseLong(orgCookie.get().getValue());
-                Account organization = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
+                Optional<Account> organization = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
 
-                if(organization != null){
-                    ThreadLocalStorage.setCurrentOrganizationID(organization.getId());
+                if(organization.isPresent()){
+                    ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
                 }else{
                     ((HttpServletResponse)servletResponse).sendRedirect(OrganizationSelectController.URI);
                     return;

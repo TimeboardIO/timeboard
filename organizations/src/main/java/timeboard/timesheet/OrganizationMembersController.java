@@ -43,6 +43,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -64,8 +65,8 @@ public class OrganizationMembersController {
     protected String handleGet(HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
 
         final Account actor = this.userInfo.getCurrentAccount();
-        final Account organization = this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
-        final List<Account> members = this.organizationService.getMembers(actor, organization);
+        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
+        final List<Account> members = this.organizationService.getMembers(actor, organization.get());
 
         viewModel.addAttribute("roles", MembershipRole.values());
         viewModel.addAttribute("members", members);

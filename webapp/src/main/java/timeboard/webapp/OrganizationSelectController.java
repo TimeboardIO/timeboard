@@ -40,6 +40,7 @@ import timeboard.core.ui.UserInfo;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(OrganizationSelectController.URI)
@@ -67,11 +68,12 @@ public class OrganizationSelectController {
     @PostMapping
     public String selectOrganisation(@ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
 
-        final Account selectedOrg = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), selectedOrgID);
+        final Optional<Account> selectedOrg = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), selectedOrgID);
 
-        final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.getId()));
-        res.addCookie(orgCookie);
-
+        if(selectedOrg.isPresent()) {
+            final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));
+            res.addCookie(orgCookie);
+        }
         return "redirect:/home";
     }
 }

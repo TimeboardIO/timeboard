@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -79,15 +80,16 @@ public class OrganizationConfigController {
 
         long id = Long.parseLong(request.getParameter("orgID"));
 
-        final Account organization = this.organizationService.getOrganizationByID(actor, id);
+        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, id);
 
         final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
         final List<TaskType> taskTypes = this.projectService.listTaskType();
 
         model.addAttribute("taskTypes", taskTypes);
         model.addAttribute("defaultTasks", defaultTasks);
-        model.addAttribute("organization", organization);
-
+        if(organization.isPresent()) {
+            model.addAttribute("organization", organization.get());
+        }
         return "details_org_config.html";
 
     }
@@ -98,12 +100,12 @@ public class OrganizationConfigController {
 
         String action = request.getParameter("action");
         long id = Long.parseLong(request.getParameter("orgID"));
-        Account organization = this.organizationService.getOrganizationByID(actor, id);
+        Optional<Account> organization = this.organizationService.getOrganizationByID(actor, id);
 
         switch (action) {
             case "CONFIG":
-                organization.setName(request.getParameter("organizationName"));
-                this.organizationService.updateOrganization(actor, organization);
+                organization.get().setName(request.getParameter("organizationName"));
+                this.organizationService.updateOrganization(actor, organization.get());
                 break;
             case "NEW_TASK":
                 this.projectService.createDefaultTask(actor, request.getParameter("newDefaultTask"));

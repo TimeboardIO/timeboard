@@ -26,18 +26,26 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.Column;
+import timeboard.core.api.ThreadLocalStorage;
 
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+
+@MappedSuperclass
 public abstract class OrganizationEntity {
 
     @Column(nullable = false)
-    private long organizationID;
+    protected Long organizationID;
 
-    public long getOrganizationID() {
+    public OrganizationEntity(){
+        this.organizationID = ThreadLocalStorage.getCurrentOrganizationID();
+    }
+
+    public Long getOrganizationID() {
         return organizationID;
     }
 
-    public void setOrganizationID(long organizationID) {
+    public void setOrganizationID(Long organizationID) {
         this.organizationID = organizationID;
     }
 }
