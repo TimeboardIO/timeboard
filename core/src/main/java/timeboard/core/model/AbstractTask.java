@@ -36,7 +36,7 @@ import java.util.Set;
 
 @Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
-public abstract class AbstractTask extends OrgEntity  implements Serializable {
+public abstract class AbstractTask extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

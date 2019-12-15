@@ -26,10 +26,13 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
+import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
 
 import javax.servlet.*;
@@ -50,6 +53,9 @@ public class OrganizationFilter implements Filter {
     @Autowired
     private UserInfo userInfo;
 
+    @Autowired
+    private OrganizationService organizationService;
+
     private static final List<String> whitelist = new ArrayList<>();
     static{
         whitelist.add(OrganizationSelectController.URI);
@@ -64,9 +70,19 @@ public class OrganizationFilter implements Filter {
         }else {
             Optional<Cookie> orgCookie = this.extractOrgCookie((HttpServletRequest) servletRequest);
             if(orgCookie.isPresent()){
-                ThreadLocalStorage.setCurrentOrganizationID(Long.parseLong(orgCookie.get().getValue()));
+                final Long organizationID = Long.parseLong(orgCookie.get().getValue());
+                Account organization = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
+
+                if(organization != null){
+                    ThreadLocalStorage.setCurrentOrganizationID(organization.getId());
+                }else{
+                    ((HttpServletResponse)servletResponse).sendRedirect(OrganizationSelectController.URI);
+                    return;
+                }
+
             }else{
                 ((HttpServletResponse)servletResponse).sendRedirect(OrganizationSelectController.URI);
+                return;
             }
 
             filterChain.doFilter(servletRequest, servletResponse);

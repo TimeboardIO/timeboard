@@ -31,7 +31,7 @@ import java.io.Serializable;
 
 
 @Entity
-public class ProjectTag extends OrgEntity implements Serializable {
+public class ProjectTag extends OrganizationEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

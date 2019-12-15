@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-public class Milestone extends OrgEntity implements Serializable {
+public class Milestone extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

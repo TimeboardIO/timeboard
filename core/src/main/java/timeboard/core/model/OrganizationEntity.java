@@ -28,9 +28,9 @@ package timeboard.core.model;
 
 import javax.persistence.Column;
 
-public abstract class OrgEntity {
+public abstract class OrganizationEntity {
 
-    @Column(nullable = true)
+    @Column(nullable = false)
     private long organizationID;
 
     public long getOrganizationID() {
