@@ -46,7 +46,7 @@ import java.io.IOException;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/projects")
+@RequestMapping("/projects")
 public class ProjectsController {
 
 
@@ -64,10 +64,10 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
-        return "redirect:/org/" + orgID + "/projects";
+        return "redirect:/projects";
     }
 
     @GetMapping("/create")
@@ -76,10 +76,10 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(@PathVariable Long orgID, @PathVariable long projectID) throws ServletException, IOException, BusinessException {
+    protected String deleteProject(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
         final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
         this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
-        return "redirect:/org/" + orgID + "/projects";
+        return "redirect:/projects";
     }
 
 

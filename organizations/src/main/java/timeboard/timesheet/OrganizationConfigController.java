@@ -55,7 +55,7 @@ import java.util.List;
  * <p>Ex : /org/config?id=
  */
 @Controller
-@RequestMapping("/org/{orgID}/org/config")
+@RequestMapping("/org/config")
 public class OrganizationConfigController {
 
     @Autowired

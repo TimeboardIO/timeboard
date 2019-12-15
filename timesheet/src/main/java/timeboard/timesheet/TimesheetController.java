@@ -54,7 +54,7 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/timesheet")
+@RequestMapping("/timesheet")
 public class TimesheetController {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

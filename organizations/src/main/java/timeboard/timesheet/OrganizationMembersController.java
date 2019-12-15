@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
@@ -50,7 +51,7 @@ import java.util.List;
  * <p>Ex : /org/config?id=
  */
 @Controller
-@RequestMapping("/org/{orgID}/org/members")
+@RequestMapping("/org/members")
 public class OrganizationMembersController {
 
     @Autowired
@@ -60,10 +61,10 @@ public class OrganizationMembersController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(@PathVariable Long orgID, HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
+    protected String handleGet(HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
 
         final Account actor = this.userInfo.getCurrentAccount();
-        final Account organization = this.organizationService.getOrganizationByID(actor, orgID);
+        final Account organization = this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
         final List<Account> members = this.organizationService.getMembers(actor, organization);
 
         viewModel.addAttribute("roles", MembershipRole.values());

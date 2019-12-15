@@ -63,7 +63,7 @@ public class ModulesConfiguration {
         FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(this.organizationFilter);
-        registrationBean.addUrlPatterns("/org/*", "/home");
+        registrationBean.addUrlPatterns("/*");
 
         return registrationBean;
     }

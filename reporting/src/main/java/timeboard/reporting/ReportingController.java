@@ -39,7 +39,7 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/reporting")
+@RequestMapping("/reporting")
 public class ReportingController {
 
     @Autowired(

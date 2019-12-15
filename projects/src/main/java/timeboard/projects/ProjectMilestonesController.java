@@ -45,7 +45,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/org/{orgID}/projects/{projectID}/milestones")
+@RequestMapping("/projects/{projectID}/milestones")
 public class ProjectMilestonesController {
 
     @Autowired
@@ -67,12 +67,12 @@ public class ProjectMilestonesController {
     }
 
     @GetMapping("/{milestoneID/delete")
-    protected String deleteMilestone(@PathVariable Long orgID, @PathVariable Long projetID, @PathVariable Long milestoneID) throws ServletException, IOException, BusinessException {
+    protected String deleteMilestone(@PathVariable Long projetID, @PathVariable Long milestoneID) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.deleteMilestoneByID(actor, milestoneID);
 
-        return "redirect:/org/" + orgID + "/projects/" + projetID + "/milestones";
+        return "redirect:/projects/" + projetID + "/milestones";
     }
 
     @GetMapping("/{milestoneID}/setup")

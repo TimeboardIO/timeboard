@@ -45,7 +45,7 @@ import java.io.IOException;
 import java.util.Date;
 
 @Controller
-@RequestMapping("/org/{orgID}/org")
+@RequestMapping("/org")
 public class OrganizationCreateController {
     @Autowired
     public OrganizationService organizationService;
@@ -54,13 +54,13 @@ public class OrganizationCreateController {
     public UserInfo userInfo;
 
     @PostMapping("create")
-    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
         organization.setRemoteSubject("Timeboard/Organization/"+System.nanoTime());
         organization.setName(request.getParameter("organizationName"));
         this.organizationService.createOrganization(actor, organization);
-        return "redirect:/org/" + orgID + "/home";
+        return "redirect:/home";
     }
 
     @GetMapping("create")

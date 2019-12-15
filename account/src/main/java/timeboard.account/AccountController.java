@@ -50,7 +50,7 @@ import java.util.*;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/account")
+@RequestMapping("/account")
 public class AccountController {
 
     @Autowired

@@ -1,8 +1,8 @@
-package timeboard.projects;
+package timeboard.webapp;
 
 /*-
  * #%L
- * webui
+ * webapp
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,45 +30,48 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.ProjectDashboard;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
-
-/**
- * Display project dashboard.
- */
 @Controller
-@RequestMapping("/projects/{projectID}/dashboard")
-public class ProjectDashboardController {
+@RequestMapping(OrganizationSelectController.URI)
+public class OrganizationSelectController {
+
+    public static final String URI = "/select";
+    public static final String COOKIE_NAME = "org";
 
     @Autowired
-    public ProjectService projectService;
+    private OrganizationService organizationService;
 
     @Autowired
-    public UserInfo userInfo;
-
+    private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(@PathVariable Long projectID, HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
+    public String selectOrganisation(Model model){
 
-        final Account actor = this.userInfo.getCurrentAccount();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
-        final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
+        final List<Account> orgs = this.organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
+        orgs.add(this.userInfo.getCurrentAccount());
+        model.addAttribute("organizations", orgs);
 
-        model.addAttribute("project", project);
-        model.addAttribute("dashboard", dashboard);
-
-        return "details_project_dashboard.html";
+        return "org_select";
     }
 
+    @PostMapping
+    public String selectOrganisation(@ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
+
+        final Account selectedOrg = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), selectedOrgID);
+
+        final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.getId()));
+        res.addCookie(orgCookie);
+
+        return "redirect:/home";
+    }
 }
