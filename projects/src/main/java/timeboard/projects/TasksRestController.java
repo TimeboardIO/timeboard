@@ -127,7 +127,6 @@ public class TasksRestController {
         TaskGraphWrapper wrapper = new TaskGraphWrapper();
         Account actor = this.userInfo.getCurrentAccount();
 
-
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
         if (taskIdStr != null) {
@@ -137,20 +136,14 @@ public class TasksRestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
 
-        Task task;
-        try {
-            task = (Task) this.projectService.getTaskByID(actor, taskID);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
-
-        }
+        final Task task = (Task) this.projectService.getTaskByID(actor, taskID);
 
         // Datas for dates (Axis X)
-        String formatLocalDate = "yyyy-MM-dd";
-        String formatDateToDisplay = "dd/MM/yyyy";
-        LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getStartDate()));
-        LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getEndDate()));
-        List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
+        final String formatLocalDate = "yyyy-MM-dd";
+        final String formatDateToDisplay = "dd/MM/yyyy";
+        final LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getStartDate()));
+        final LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getEndDate()));
+        final List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
                 .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
                 .collect(Collectors.toList());
         wrapper.setListOfTaskDates(listOfTaskDates);
@@ -161,12 +154,7 @@ public class TasksRestController {
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
-                    try {
-                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
+                    return formatDate(formatDateToDisplay, dateString);
                 })
                 .map(date -> effortSpentDB.stream()
                         .filter(es -> new SimpleDateFormat(formatDateToDisplay)
@@ -189,12 +177,7 @@ public class TasksRestController {
         Map<Date, Double> effortEstimateMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
-                    try {
-                        return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
+                    return formatDate(formatDateToDisplay, dateString);
                 })
                 .map(date -> effortLeftDB.stream()
                         .filter(el -> new SimpleDateFormat(formatDateToDisplay)
@@ -213,6 +196,15 @@ public class TasksRestController {
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
 
+    }
+
+    private Date formatDate(String formatDateToDisplay, String dateString) {
+        try {
+            return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -280,14 +272,13 @@ public class TasksRestController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createTask(HttpServletRequest request, @RequestBody TaskWrapper taskWrapper) throws JsonProcessingException {
+    public ResponseEntity createTask(@RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
         Account actor = this.userInfo.getCurrentAccount();
         Date startDate = null;
         Date endDate = null;
         try {
             startDate = DATE_FORMAT.parse(taskWrapper.startDate);
             endDate = DATE_FORMAT.parse(taskWrapper.endDate);
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect date format");
         }
@@ -315,36 +306,15 @@ public class TasksRestController {
         }
 
         Long milestoneID = taskWrapper.milestoneID;
-        Milestone milestone = null;
-        try {
-            milestone = this.projectService.getMilestoneById(actor, milestoneID);
-        } catch (Exception e) {
-        }
-
+        final Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
 
         Task task = null;
         Long typeID = taskWrapper.typeID;
-
         Long taskID = taskWrapper.taskID;
+
         if (!(taskID != null && taskID == 0)) {
             try {
-                task = (Task) projectService.getTaskByID(actor, taskID);
-
-                if (taskWrapper.assigneeID > 0) {
-                    final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
-                    task.setAssigned(assignee);
-                }
-                task.setName(taskWrapper.getTaskName());
-                task.setComments(taskWrapper.getTaskComments());
-                task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
-                task.setStartDate(DATE_FORMAT.parse(taskWrapper.getStartDate()));
-                task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
-                final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
-                task.setTaskType(taskType);
-                task.setMilestone(milestone);
-                task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
-
-                projectService.updateTask(actor, task);
+                task = processUpdateTask(taskWrapper, actor, milestone, taskID);
 
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
@@ -366,6 +336,31 @@ public class TasksRestController {
         taskWrapper.setTaskID(task.getId());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
+    }
+
+    private Task processUpdateTask(@RequestBody TaskWrapper taskWrapper,
+                                   Account actor,
+                                   Milestone milestone,
+                                   Long taskID) throws BusinessException, ParseException {
+
+        final Task task = (Task) projectService.getTaskByID(actor, taskID);
+
+        if (taskWrapper.assigneeID > 0) {
+            final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
+            task.setAssigned(assignee);
+        }
+        task.setName(taskWrapper.getTaskName());
+        task.setComments(taskWrapper.getTaskComments());
+        task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
+        task.setStartDate(DATE_FORMAT.parse(taskWrapper.getStartDate()));
+        task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
+        final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
+        task.setTaskType(taskType);
+        task.setMilestone(milestone);
+        task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
+
+        projectService.updateTask(actor, task);
+        return task;
     }
 
 

@@ -74,17 +74,17 @@ public class CalendarServiceImpl implements CalendarService {
             double value) throws BusinessException, ParseException, IOException {
 
         /* -- Events -- */
-        Set<Imputation> existingEventList = task.getImputations();
+        final Set<Imputation> existingEventList = task.getImputations();
         final Map<String, List<Event>> newEvents = this.importICS(url); // imported events
 
         final List<Imputation> imputationsToUpdate = new ArrayList<>();
 
-        for (List<Event> newEventList : newEvents.values()) {
-            for (Event event : newEventList) {
+        for (final List<Event> newEventList : newEvents.values()) {
+            for (final Event event : newEventList) {
                 if (existingEventList == null || existingEventList.isEmpty()) { // no existing events for this id
                     imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value)); // so create it
                 } else { //  one or many events exist for this id
-                    Imputation timeboardImputation = this.getImputationByStartDate(existingEventList, event.getStartDate());
+                    final Imputation timeboardImputation = this.getImputationByStartDate(existingEventList, event.getStartDate());
                     if (timeboardImputation != null) { // event and task match (id & date), so update it
                         // convert event to imputation
                         imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));

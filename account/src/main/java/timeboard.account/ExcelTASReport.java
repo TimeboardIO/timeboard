@@ -80,61 +80,7 @@ public class ExcelTASReport extends AbstractExcelReport {
                     .setCellValue("1/" + tasData.getMonth() + "/" + tasData.getYear());
 
             // Updating matriculeID
-            this.sheet.getRow(MATRICULE_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
-                    .setCellValue(tasData.getMatriculeID());
-            this.sheet.getRow(NAME_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN).setCellValue(tasData.getName());
-            this.sheet.getRow(FIRSTNAME_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
-                    .setCellValue(tasData.getFirstName());
-            this.sheet.getRow(BUSINESS_CODE).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
-                    .setCellValue(tasData.getBusinessCode());
-
-            List<String> dayMonthName = tasData.getDayMonthNames();
-            Map<Integer, Double> mapWorkedDAys = tasData.getWorkedDays();
-            Map<Integer, Double> mapOffDays = tasData.getOffDays();
-            Map<Integer, Double> mapOtherDays = tasData.getOtherDays();
-            Map<Integer, String> mapComments = tasData.getComments();
-
-            for (int i = 0; i < tasData.getDayMonthNames().size(); i++) {
-
-                this.sheet.getRow(START_ROW_DAYS + i).getCell(DAY_NAME_COLLUMN).setCellValue(dayMonthName.get(i));
-                // Map keys start at 1 (day in the month) and not 0
-                if (mapWorkedDAys.containsKey(i + 1)) {
-                    this.sheet.getRow(START_ROW_DAYS + i).getCell(WORKED_DAY_COLUMN)
-                            .setCellValue(mapWorkedDAys.get(i + 1).doubleValue());
-                }
-                if (mapOffDays.containsKey(i + 1)) {
-                    this.sheet.getRow(START_ROW_DAYS + i).getCell(OFF_DAY_COLUMN)
-                            .setCellValue(mapOffDays.get(i + 1).doubleValue());
-                }
-                if (mapOtherDays.containsKey(i + 1)) {
-                    this.sheet.getRow(START_ROW_DAYS + i).getCell(OTHER_DAY_COLUMN)
-                            .setCellValue(mapOtherDays.get(i + 1).doubleValue());
-                }
-                if (mapComments.containsKey(i + 1)) {
-                    this.sheet.getRow(START_ROW_DAYS + i).getCell(COMMENTS_COLUMN)
-                            .setCellValue(mapComments.get(i + 1));
-                }
-
-                // Apply the dark yellow style for the first day of the month and weekends
-                // The first day of the template month is already dark yellow
-                Calendar calendarSaturday = new GregorianCalendar();
-                calendarSaturday.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                Calendar calendarSunday = new GregorianCalendar();
-                calendarSunday.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-
-                String currentDayName = tasData.getDayMonthNames().get(i);
-                if (currentDayName.equalsIgnoreCase(
-                        new SimpleDateFormat("EEEE", Locale.ENGLISH)
-                                .format(calendarSaturday.getTime()).toLowerCase())
-                        || currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH)
-                        .format(calendarSunday.getTime()).toLowerCase())) {
-                    for (int j = DAY_NAME_COLLUMN; j <= LAST_COLUMN; j++) {
-                        // We copy the style of the first line, which is predefined in the right way
-                        this.sheet.getRow(START_ROW_DAYS + i).getCell(j)
-                                .setCellStyle(this.sheet.getRow(START_ROW_DAYS).getCell(j).getCellStyle());
-                    }
-                }
-            }
+            updateMatriculeID(tasData);
 
             // Hide the excess lines for months that do not have 31 days
             int i = MONTH_DAY_COUNT;
@@ -151,6 +97,64 @@ public class ExcelTASReport extends AbstractExcelReport {
             this.save();
 
 
+        }
+    }
+
+    private void updateMatriculeID(TASData tasData) {
+        this.sheet.getRow(MATRICULE_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
+                .setCellValue(tasData.getMatriculeID());
+        this.sheet.getRow(NAME_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN).setCellValue(tasData.getName());
+        this.sheet.getRow(FIRSTNAME_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
+                .setCellValue(tasData.getFirstName());
+        this.sheet.getRow(BUSINESS_CODE).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
+                .setCellValue(tasData.getBusinessCode());
+
+        List<String> dayMonthName = tasData.getDayMonthNames();
+        Map<Integer, Double> mapWorkedDAys = tasData.getWorkedDays();
+        Map<Integer, Double> mapOffDays = tasData.getOffDays();
+        Map<Integer, Double> mapOtherDays = tasData.getOtherDays();
+        Map<Integer, String> mapComments = tasData.getComments();
+
+        for (int i = 0; i < tasData.getDayMonthNames().size(); i++) {
+
+            this.sheet.getRow(START_ROW_DAYS + i).getCell(DAY_NAME_COLLUMN).setCellValue(dayMonthName.get(i));
+            // Map keys start at 1 (day in the month) and not 0
+            if (mapWorkedDAys.containsKey(i + 1)) {
+                this.sheet.getRow(START_ROW_DAYS + i).getCell(WORKED_DAY_COLUMN)
+                        .setCellValue(mapWorkedDAys.get(i + 1).doubleValue());
+            }
+            if (mapOffDays.containsKey(i + 1)) {
+                this.sheet.getRow(START_ROW_DAYS + i).getCell(OFF_DAY_COLUMN)
+                        .setCellValue(mapOffDays.get(i + 1).doubleValue());
+            }
+            if (mapOtherDays.containsKey(i + 1)) {
+                this.sheet.getRow(START_ROW_DAYS + i).getCell(OTHER_DAY_COLUMN)
+                        .setCellValue(mapOtherDays.get(i + 1).doubleValue());
+            }
+            if (mapComments.containsKey(i + 1)) {
+                this.sheet.getRow(START_ROW_DAYS + i).getCell(COMMENTS_COLUMN)
+                        .setCellValue(mapComments.get(i + 1));
+            }
+
+            // Apply the dark yellow style for the first day of the month and weekends
+            // The first day of the template month is already dark yellow
+            Calendar calendarSaturday = new GregorianCalendar();
+            calendarSaturday.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            Calendar calendarSunday = new GregorianCalendar();
+            calendarSunday.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+
+            String currentDayName = tasData.getDayMonthNames().get(i);
+            if (currentDayName.equalsIgnoreCase(
+                    new SimpleDateFormat("EEEE", Locale.ENGLISH)
+                            .format(calendarSaturday.getTime()).toLowerCase())
+                    || currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH)
+                    .format(calendarSunday.getTime()).toLowerCase())) {
+                for (int j = DAY_NAME_COLLUMN; j <= LAST_COLUMN; j++) {
+                    // We copy the style of the first line, which is predefined in the right way
+                    this.sheet.getRow(START_ROW_DAYS + i).getCell(j)
+                            .setCellStyle(this.sheet.getRow(START_ROW_DAYS).getCell(j).getCellStyle());
+                }
+            }
         }
     }
 }

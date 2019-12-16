@@ -85,11 +85,11 @@ public abstract class AbstractExcelReport {
      * Delete row (not implemented in POI).
      */
     private static void deleteRow(final HSSFRow row) {
-        int rowIndex = row.getRowNum();
-        HSSFSheet parentSheet = row.getSheet();
+        final int rowIndex = row.getRowNum();
+        final HSSFSheet parentSheet = row.getSheet();
         parentSheet.removeRow(row); // this only deletes all the cell values
 
-        int lastRowNum = parentSheet.getLastRowNum();
+        final int lastRowNum = parentSheet.getLastRowNum();
 
         if ((rowIndex >= 0) && (rowIndex < lastRowNum)) {
             parentSheet.shiftRows(rowIndex + 1, lastRowNum, -1);
@@ -101,10 +101,10 @@ public abstract class AbstractExcelReport {
      */
     private static void setCellComment(final Cell cell, final String message) {
         if (cell != null) {
-            Drawing drawing = cell.getSheet().createDrawingPatriarch();
-            CreationHelper factory = cell.getSheet().getWorkbook().getCreationHelper();
+            final Drawing drawing = cell.getSheet().createDrawingPatriarch();
+            final CreationHelper factory = cell.getSheet().getWorkbook().getCreationHelper();
             // When the comment box is visible, have it show in a 1x3 space
-            ClientAnchor anchor = factory.createClientAnchor();
+            final ClientAnchor anchor = factory.createClientAnchor();
             anchor.setCol1(cell.getColumnIndex());
             anchor.setCol2(cell.getColumnIndex() + 1);
             anchor.setRow1(cell.getRowIndex());
@@ -115,8 +115,8 @@ public abstract class AbstractExcelReport {
             anchor.setDy2(100);
 
             // Create the comment and set the text+author
-            Comment comment = drawing.createCellComment(anchor);
-            RichTextString str = factory.createRichTextString(message);
+            final Comment comment = drawing.createCellComment(anchor);
+            final RichTextString str = factory.createRichTextString(message);
             comment.setString(str);
             comment.setAuthor("Apache POI");
             // Assign the comment to the cell
@@ -183,8 +183,8 @@ public abstract class AbstractExcelReport {
     }
 
     public static void addURLHyperlink(final HSSFCell cell, final String address) {
-        CreationHelper createHelper = cell.getSheet().getWorkbook().getCreationHelper();
-        Hyperlink link = createHelper.createHyperlink(Hyperlink.LINK_URL);
+        final CreationHelper createHelper = cell.getSheet().getWorkbook().getCreationHelper();
+        final Hyperlink link = createHelper.createHyperlink(Hyperlink.LINK_URL);
         link.setAddress(address);
     }
 
@@ -197,10 +197,10 @@ public abstract class AbstractExcelReport {
         if (data.contains("NaN") || data.equalsIgnoreCase("-")) {
             cell.setCellValue(data);
         } else {
-            double valueDouble;
+            final double valueDouble;
             // si c'est un pourcentage
             if (StringUtils.contains(data, "%")) {
-                String[] splitData = data.split("%");
+                final String[] splitData = data.split("%");
                 // on enlève le % et on divise par 100 car les cellules du template sont pré-formatées en pourcentage
                 valueDouble = Double.parseDouble(splitData[0]) / 100;
             } else {
@@ -238,7 +238,7 @@ public abstract class AbstractExcelReport {
      */
     private void copyRow(final HSSFRow sourceRow, final int destinationRowNum) {
 
-        HSSFSheet parentSheet = sourceRow.getSheet();
+        final HSSFSheet parentSheet = sourceRow.getSheet();
         HSSFRow newRow = parentSheet.getRow(destinationRowNum);
         // If the row exist in destination, push down all rows by 1 else create
         // a new row
@@ -298,13 +298,13 @@ public abstract class AbstractExcelReport {
      */
     public void setCustomColor(final short colorToReplace, final int red, final int green, final int blue) {
         // creating a custom palette for the workbook
-        HSSFPalette palette = this.wb.getCustomPalette();
+        final HSSFPalette palette = this.wb.getCustomPalette();
         palette.setColorAtIndex(colorToReplace, (byte) red, (byte) green, (byte) blue);
 
     }
 
     public Font createFont(final short hssfColorIndex, final int height, final boolean bold) {
-        HSSFFont newFont = this.wb.createFont();
+        final HSSFFont newFont = this.wb.createFont();
         newFont.setFontHeightInPoints((short) height);
         newFont.setColor(hssfColorIndex);
         if (bold) {
@@ -314,8 +314,8 @@ public abstract class AbstractExcelReport {
     }
 
     protected void updateCellBackgroundColor(final HSSFCell cell, final HSSFColor color) {
-        HSSFCellStyle initStyle = cell.getCellStyle();
-        String styleName = initStyle.getUserStyleName().split("_")[0] + color.getClass().getSimpleName();
+        final HSSFCellStyle initStyle = cell.getCellStyle();
+        final String styleName = initStyle.getUserStyleName().split("_")[0] + color.getClass().getSimpleName();
         HSSFCellStyle newStyle = this.styles.get(styleName);
         if (newStyle == null) {
             newStyle = this.wb.createCellStyle();
@@ -327,7 +327,7 @@ public abstract class AbstractExcelReport {
     }
 
     public HSSFCellStyle createStyle(final short hssfColorIndex, final Font font) {
-        HSSFCellStyle style = this.wb.createCellStyle();
+        final HSSFCellStyle style = this.wb.createCellStyle();
         style.setAlignment(CellStyle.ALIGN_CENTER);
         style.setFillForegroundColor(hssfColorIndex);
         style.setFillPattern(CellStyle.SOLID_FOREGROUND);

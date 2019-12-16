@@ -94,16 +94,7 @@ public class TimesheetRESTApi {
         final Date de = findEndDate(c, week, year);
 
         // Create days for current week
-        final List<DateWrapper> days = new ArrayList<>();
-        c.setTime(ds); //reset calendar to start date
-        for (int i = 0; i < 7; i++) {
-            DateWrapper dw = new DateWrapper(
-                    c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH),
-                    c.getTime()
-            );
-            days.add(dw);
-            c.add(Calendar.DAY_OF_YEAR, 1);
-        }
+        final List<DateWrapper> days = createDaysForCurrentWeek(c, ds);
 
         //Get tasks for current week
         if (this.projectService != null) {
@@ -138,23 +129,8 @@ public class TimesheetRESTApi {
             });
 
             //Default tasks
-            List<TaskWrapper> tasks = new ArrayList<>();
+            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, imputations, ds, de, days);
 
-            this.projectService.listDefaultTasks(ds, de).stream().forEach(task -> {
-                tasks.add(new TaskWrapper(
-                        task.getId(),
-                        task.getName(), task.getComments(),
-                        0, 0,0, 0,
-                        task.getStartDate(),
-                        task.getEndDate(), TaskStatus.IN_PROGRESS.name(), 0L)
-                );
-
-                days.forEach(dateWrapper -> {
-                    double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
-                    imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
-                });
-
-            });
             projects.add(new ProjectWrapper(
                     (long) 0,
                     "Default Tasks",
@@ -169,6 +145,41 @@ public class TimesheetRESTApi {
         Timesheet ts = new Timesheet(validated, year, week, days, projects, imputations);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
+    }
+
+    private List<TaskWrapper> getDefaultTasks(Account currentAccount, List<ImputationWrapper> imputations, Date ds, Date de, List<DateWrapper> days) {
+        List<TaskWrapper> tasks = new ArrayList<>();
+
+        this.projectService.listDefaultTasks(ds, de).stream().forEach(task -> {
+            tasks.add(new TaskWrapper(
+                    task.getId(),
+                    task.getName(), task.getComments(),
+                    0, 0,0, 0,
+                    task.getStartDate(),
+                    task.getEndDate(), TaskStatus.IN_PROGRESS.name(), 0L)
+            );
+
+            days.forEach(dateWrapper -> {
+                double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
+                imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
+            });
+
+        });
+        return tasks;
+    }
+
+    private List<DateWrapper> createDaysForCurrentWeek(Calendar c, Date ds) {
+        final List<DateWrapper> days = new ArrayList<>();
+        c.setTime(ds); //reset calendar to start date
+        for (int i = 0; i < 7; i++) {
+            DateWrapper dw = new DateWrapper(
+                    c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH),
+                    c.getTime()
+            );
+            days.add(dw);
+            c.add(Calendar.DAY_OF_YEAR, 1);
+        }
+        return days;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)

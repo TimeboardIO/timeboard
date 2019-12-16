@@ -125,26 +125,7 @@ public class ProjectImportController {
                                 }
 
 
-                                newTasks.forEach(task -> {
-                                            String taskName = task.getTitle();
-                                            if (taskName.length() >= 100) {
-                                                taskName = taskName.substring(0, 99);
-                                            }
-                                            String taskComment = task.getComments();
-                                            Date startDate = task.getStartDate();
-                                            Date endDate = task.getStopDate();
-                                            double originaEstimate = 0;
-                                            Long taskTypeID = null;
-                                            Account assignedAccountID = this.userService.findUserByID(task.getLocalUserID());
-                                            String origin = task.getOrigin();
-                                            String remotePath = null;
-                                            Long remoteId = task.getId();
-                                            Milestone milestone = null;
-                                            projectService.createTask(actor, project, taskName, taskComment,
-                                                    startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
-                                                    remotePath, String.valueOf(remoteId), milestone);
-                                        }
-                                );
+                                createTasks(actor, project, newTasks);
 
                                 for (ProjectImportService.RemoteTask remoteTask : updatedTasks) {
                                     Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getId());
@@ -170,6 +151,29 @@ public class ProjectImportController {
         req.setAttribute("errors", importResponse.getErrors());
         req.setAttribute("importSuccess", message);
         requestDispatcher.forward(req, resp);
+    }
+
+    private void createTasks(Account actor, Project project, List<ProjectImportService.RemoteTask> newTasks) {
+        newTasks.forEach(task -> {
+                    String taskName = task.getTitle();
+                    if (taskName.length() >= 100) {
+                        taskName = taskName.substring(0, 99);
+                    }
+                    String taskComment = task.getComments();
+                    Date startDate = task.getStartDate();
+                    Date endDate = task.getStopDate();
+                    double originaEstimate = 0;
+                    Long taskTypeID = null;
+                    Account assignedAccountID = this.userService.findUserByID(task.getLocalUserID());
+                    String origin = task.getOrigin();
+                    String remotePath = null;
+                    Long remoteId = task.getId();
+                    Milestone milestone = null;
+                    projectService.createTask(actor, project, taskName, taskComment,
+                            startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
+                            remotePath, String.valueOf(remoteId), milestone);
+                }
+        );
     }
 
 

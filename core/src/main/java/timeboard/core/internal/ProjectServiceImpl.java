@@ -504,7 +504,9 @@ public class ProjectServiceImpl implements ProjectService {
             //handle JPA Exceptions
         }
 
-        if (tasks.isEmpty()) return null;
+        if (tasks.isEmpty()) {
+            return null;
+        }
 
         return tasks.get(0);
 

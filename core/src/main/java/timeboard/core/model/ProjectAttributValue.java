@@ -62,7 +62,7 @@ public class ProjectAttributValue {
     }
 
     public void setPrivate(boolean isPrivate) {
-        isPrivate = isPrivate;
+        this.isPrivate = isPrivate;
     }
 
     public String getValue() {

@@ -51,7 +51,7 @@ public class BusinessPolicyEvaluator {
     private int limitTasksByProject;
 
     public boolean checkProjectByUserLimit(Account actor) throws CommercialException {
-        int numberProjectByUser = this.getNumberProjectsByUser(actor);
+        final int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
             throw new CommercialException("Limit reached",
                     "Project's creation impossible for " + actor.getScreenName() + "!\n" +
@@ -61,7 +61,7 @@ public class BusinessPolicyEvaluator {
     }
 
     public boolean checkTaskByProjectLimit(Account actor, Project project) throws CommercialException {
-        int numberTasksByProject = this.getNumberTasksByProject(actor, project);
+        final int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
             throw new CommercialException("Limit reached",
                     "Task's creation impossible for " + actor.getScreenName() + "!\n" +
@@ -80,7 +80,7 @@ public class BusinessPolicyEvaluator {
     }
 
     private int getNumberTasksByProject(Account account, Project project) {
-        TypedQuery<Object> q = this.entityManager.createQuery(
+        final TypedQuery<Object> q = this.entityManager.createQuery(
                 "select count(t) from Task t where t.project = :project", Object.class);
         q.setParameter("project", project);
         return Integer.parseInt(q.getSingleResult().toString());
