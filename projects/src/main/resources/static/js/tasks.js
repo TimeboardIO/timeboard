@@ -108,8 +108,8 @@ Vue.component('pending-task-list', {
     },
     computed: {
         filteredTasks: function () {
-            var sortKey = this.sortKey
-            var filterKey = [];
+            let sortKey = this.sortKey
+            let filterKey = [];
             filterKey.push({ key: 'status', value: 'PENDING' });
             var order = this.sortOrders[sortKey] || 1 ;
             var tasks = this.tasks;

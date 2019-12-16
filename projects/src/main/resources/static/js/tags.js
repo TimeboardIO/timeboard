@@ -9,11 +9,14 @@ $(document).ready(function () {
                 cols: [
                     {
                         "slot": "tagkey",
-                        "label": "Tag Key"
+                        "label": "Tag Key",
+                        "sortKey": "tagKey"
                     },
                     {
                         "slot": "tagvalue",
-                        "label": "Tag Value"
+                        "label": "Tag Value",
+                        "sortKey": "tagValue",
+
                     },
                     {
                         "slot": "tagactions",

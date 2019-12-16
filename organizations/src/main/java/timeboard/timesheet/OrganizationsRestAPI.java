@@ -76,7 +76,7 @@ public class OrganizationsRestAPI {
         Long orgID = null;
         if (strOrgID != null) {
             orgID = Long.parseLong(strOrgID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
 
