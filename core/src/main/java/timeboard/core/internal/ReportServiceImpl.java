@@ -67,7 +67,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<Report> listReports(Account owner) {
-        TypedQuery<Report> query = em.createQuery("select r from Report r join fetch p.members m where m.member = :owner", Report.class);
+        TypedQuery<Report> query = em.createQuery("select r from Report r where r.organization = :owner", Report.class);
         query.setParameter("owner", owner);
         return query.getResultList();
     }
