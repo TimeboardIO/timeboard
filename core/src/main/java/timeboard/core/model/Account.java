@@ -155,7 +155,11 @@ public class Account implements Serializable {
     }
 
     public boolean getIsOrganization() {
-        return isOrganization;
+        if(this.isOrganization == null){
+            return false;
+        }else {
+            return isOrganization;
+        }
     }
 
     public void setIsOrganization(Boolean isOrganization) {
