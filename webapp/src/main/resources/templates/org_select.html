@@ -59,12 +59,15 @@
                 <img src="/onboarding/teamwork.png">
             </div>
             <div class="content">
-                <a class="header">Select an organisation</a>
+
+                <a class="header">
+                    Select an organisation:
+                </a>
                 <div class="description">
                     <form th:action="@{/select}" method="post">
                         <div class="ui buttons">
                             <select class="ui button selection dropdown organisations" name="organization">
-                                <option class="item" th:each="org : ${organizations}" th:value="${org.id}" th:text="${org.screenName}">Male</option>
+                                <option class="item" th:each="org : ${organizations}" th:value="${org.id}" th:text="${org.screenName}"></option>
                             </select>
                             <button class="ui item icon positive button">
                                 <i class="icon arrow alternate circle right"></i>
@@ -75,6 +78,24 @@
                         </div>
                     </form>
                 </div>
+
+                <div class="ui horizontal divider" style="margin: 30px 0px;">
+                    Or
+                </div>
+
+                <a class="header">
+                    Create an organisation:
+                </a>
+                <div class="description">
+                    <form th:action="@{/org/create}" method="post">
+                        <div class="field">
+                            <label>Organization Name</label>
+                            <input name="organizationName" required type="text">
+                        </div>
+                        <button class="ui button" type="submit">Create</button>
+                    </form>
+                </div>
+
             </div>
         </div>
     </div>
