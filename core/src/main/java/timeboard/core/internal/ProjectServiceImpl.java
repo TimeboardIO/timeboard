@@ -51,9 +51,11 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -106,6 +108,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
+        newProject.getAttributes().put(Project.PROJECT_COLOR_ATTR,new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
         em.persist(newProject);
 
         em.flush();
@@ -115,6 +118,25 @@ public class ProjectServiceImpl implements ProjectService {
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
         return newProject;
     }
+
+    public static String generateRandomColor(Color mix) {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        // mix the color
+        if (mix != null) {
+            red = (red + mix.getRed()) / 2;
+            green = (green + mix.getGreen()) / 2;
+            blue = (blue + mix.getBlue()) / 2;
+        }
+
+        Color color = new Color(red, green, blue);
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
+
 
 
     @Override
