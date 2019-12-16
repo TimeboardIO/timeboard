@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{layouts/general.html(path='/reporting')}"
+<html layout:decorate="~{layouts/general.html(path='/reports')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
     <title layout:fragment="title">Reporting</title>
@@ -13,22 +14,23 @@
 
     <div class="ui segment">
         <h2 class="ui divided header">Reporting</h2>
-        <table class="ui celled table">
-            <thead>
-            <tr><th>Report</th>
-                <th>Description</th>
-                <th></th>
-            </tr></thead>
-            <tbody>
-            <tr th:each="report: ${reports}">
-                <td th:text="${report.name}">Name</td>
-                <td th:text="${report.mimeType}">Description</td>
-                <td>
-                    <a class="ui primary button" th:href="@{'/'}" target="_blank">Run</a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <div id="reports-app">
+            <data-table v-bind:config="table">
+                <template v-slot:name="{row}">
+                    {{row.name}}
+                </template>
+                <template v-slot:actions="{row}">
+                    <a v-bind:href="'/reports/view/'+row.id" class="ui right labeled success icon button">
+                        <i class="right arrow icon"></i>
+                        View
+                    </a>
+                    <a v-bind:href="'/reports/edit/'+row.id" class="ui right labeled success icon button">
+                        <i class="right arrow icon"></i>
+                        Edit
+                    </a>
+                </template>
+            </data-table>
+        </div>
     </div>
 
 </div>
