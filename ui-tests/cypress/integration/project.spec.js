@@ -61,15 +61,14 @@ describe('Project Test', function() {
             .click()  ;
 
     });
-
+/*
     it('Create project', function() {
        cy.createProject(projectName);
        cy.archiveProject(projectName);
     });
-
-
+*/
+/*
     describe('Project Setup', function() {
-
 
         beforeEach(function () {
             cy.createProject(projectName);
@@ -95,12 +94,44 @@ describe('Project Test', function() {
             cy.get('input[name=quotation]').should('contains.value', 30000);
             cy.get('textarea[name=comments]').should('be', 'My super new project is very awesome. ');
         });
-        it('Add project member', function () {
 
-        });
 
     });
+*/
 
+    describe('Project Tasks', function() {
+
+        beforeEach(function () {
+            cy.createProject(projectName);
+
+            cy.get('.card').contains(projectName) //projectName
+                .get('.button').contains('Setup')
+                .click();
+
+            cy.get('a').contains('Tasks')
+                .click();
+        });
+
+        afterEach(function () {
+            cy.visit('http://localhost:8080');
+            cy.contains("Project")
+                .click();
+            cy.archiveProject(projectName);
+        });
+        it('Create Task', function () {
+            cy.get('a').contains('New Task').click();
+            cy.get('input[name=taskName]').clear().type("First Task");
+            cy.get('textarea[name=taskComments]').clear().type("This my first wonderful task.");
+            cy.get('input[name=taskOriginalEstimate]').clear().type(Math.random());
+            cy.get('input[name=taskStartDate]').clear().type("2019-12-06");
+            cy.get('input[name=taskEndDate]').clear().type("2019-12-20");
+            cy.get('input[name=taskAssignedSearch]').clear().type("use");
+            cy.get('.results').first().click();
+            cy.get('select[name=taskTypeID]').select('Bug')
+        });
+
+
+    });
 
 
 });

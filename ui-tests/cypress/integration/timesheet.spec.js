@@ -21,6 +21,8 @@ Cypress.Commands.add('login', () => {
 
 beforeEach(function () {
     cy.login();
+    cy.contains("Timesheet")
+        .click()  ;
 });
 
 
