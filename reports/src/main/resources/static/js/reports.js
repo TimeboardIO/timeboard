@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     const reportID = $("meta[name='reportID']").attr('content');
 
-    var app = new Vue({
+    var appListReports = new Vue({
         el: '#reports-app',
         data: {
             table: {
@@ -32,4 +32,20 @@ $(document).ready(function () {
             });
         }
     });
+
+
+    var appCreateReport = new Vue({
+            el: '#create-report',
+            data: {
+            },
+            methods: {
+                refreshProjectSelection: function(event){
+                    event.target.classList.toggle('loading');
+                    $.get("/api/reports/refreshProjectSelection")
+                    .then(function(data){
+                        event.target.classList.toggle('loading');
+                    });
+                }
+            }
+        });
 });

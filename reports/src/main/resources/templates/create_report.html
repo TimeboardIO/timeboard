@@ -2,7 +2,8 @@
 
 <html layout:decorate="~{layouts/general.html(path='/reports')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
     <title layout:fragment="title">Create Report Page</title>
@@ -19,11 +20,6 @@
                     <input name="reportName" placeholder="Report Name" required type="text">
                 </div>
                 <div class="field">
-                    <label>Select project by tags</label>
-                    <p>Example ->  key == "CUSTOMER" && (value == "Demo" || value == "Test")</p>
-                    <input name="reportSelectProject" placeholder="Filter projects" required type="text">
-                </div>
-                <div class="field">
                     <label>Report Type</label>
                     <select name="reportType">
                         <option th:each="reportType: ${allReportTypes}"
@@ -31,6 +27,33 @@
                             th:value="${reportType}">
                         </option>
                     </select>
+                </div>
+                <div class="field">
+                    <label>Select project by tags</label>
+                    <p>Example ->  t.tagKey == "CUSTOMER" && (t.tagValue == "Demo" || t.tagValue == "Test")</p>
+                    <input name="reportSelectProject" placeholder="Filter projects" required type="text">
+                </div>
+                <a class="ui button" v-on:click="refreshProjectSelection($event)">
+                    Refresh selection
+                </a>
+                <div class="ui card">
+                    <div class="content header">
+                        Projects selection preview
+                    </div>
+                    <div class="content description">
+                        <div class="ui list" th:if="${projectsPreview.size()} > 0">
+                            <div class="item" th:each="project: ${projectsPreview}">
+                                <i class="folder open icon"></i>
+                                <div class="content">
+                                    <a class="header" th:text="${project.name}"></a>
+                                    <a class="description" th:text="${project.comments}"></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div  th:if="${projectsPreview.size()} <= 0">
+                            No projects
+                        </div>
+                    </div>
                 </div>
                 <button class="ui button" type="submit">Submit</button>
                 <a class="ui button" th:href="@{/reports}">Cancel</a>
