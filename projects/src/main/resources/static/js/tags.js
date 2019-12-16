@@ -22,7 +22,8 @@ $(document).ready(function () {
                     },
                     {
                         "slot": "tagactions",
-                        "label": "Actions"
+                        "label": "Actions",
+                        "primary" : true
                     }],
                 data: [],
                 name: 'tableName'

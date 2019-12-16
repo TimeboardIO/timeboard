@@ -69,6 +69,8 @@ public class DataTableConfigController {
         }
         if (dataTable == null) {
             dataTable = new DataTableConfig();
+            dataTable.setUser(actor);
+            dataTable.setTableInstanceId(tableID);
             dataTable.setColumns(new ArrayList<>());
         }
         return ResponseEntity.ok(new DataTableConfigWrapper(dataTable));

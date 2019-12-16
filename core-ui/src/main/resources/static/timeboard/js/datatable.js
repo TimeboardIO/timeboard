@@ -5,14 +5,14 @@ Vue.component('data-table', {
                 <thead>
                     <tr>
                       <th class="collapsing" ><i class="cog icon" @click="showConfigModal()"></i></th>
-                      <th v-for="col in config.cols" v-if="col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"> </th>
-                      <th v-for="col in config.cols" v-if="!col.sortKey" >{{col.label}} </th>
+                      <th v-for="col in config.cols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"> </th>
+                      <th v-for="col in config.cols" v-if="col.visible && !col.sortKey" >{{col.label}} </th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(row, i) in sortedItems">
                       <td></td>
-                      <td v-for="(col, j) in config.cols">
+                      <td v-for="(col, j) in config.cols" v-if="col.visible">
                           <slot :name="col.slot" v-bind:row="config.data[i]">
                           </slot>
                       </td>
@@ -30,12 +30,13 @@ Vue.component('data-table', {
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="(col, j) in config.cols" >
-                                  <td >
-                                     {{col.slot}}
+                                <tr v-for="(col, j) in config.cols" v-if="col.primary !== true" >
+                                  <td>
+                                     {{ col.slot }}
                                   </td>
-                                   <td >
-                                     <input type="checkbox" v-bind:name="col.slot" checked>
+                                   <td>
+                                     <input type="checkbox" id="checkbox" :checked="col.visible" v-bind:name="col.slot" v-on:change="check(col)">
+                                     {{ col.visible }}
                                   </td>
                                 </tr>
                             </tbody>
@@ -44,24 +45,25 @@ Vue.component('data-table', {
                     </template>
                 </tmodal>
             </table>
-            
 
 `,
     data: function () {
         let sortOrders = {};
+        let finalCols = {};
         this.config.cols.forEach(function (key) {
             sortOrders[key.slot] = 1;
+            key.visible = true;
         });
         let self = this;
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "config/" + this.config.name + "/table",
+            url: "/config/datatable/" + this.config.name,
             success: function (d) {
                 self.config.cols
                    .forEach(function(c) {
                        let visible = d.colNames.includes(c.slot) ;
-                       c.visible = (c.primary === true  || visible);
+                       c.visible = (c.primary === true || visible);
                    });
             }
         });
@@ -98,8 +100,11 @@ Vue.component('data-table', {
                 onApprove : function($element) {
 
                 },
-                detachable : true, centered: true
+                detachable : false, centered: true
             }).modal('show');
+        },
+        check: function(e){
+            col.visible = !col.visible;
         }
 
     }
