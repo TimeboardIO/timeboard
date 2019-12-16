@@ -34,7 +34,7 @@ import javax.persistence.MappedSuperclass;
 @MappedSuperclass
 public abstract class OrganizationEntity {
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     protected Long organizationID;
 
     public OrganizationEntity(){

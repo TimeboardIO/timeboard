@@ -39,6 +39,8 @@ import java.util.*;
 )
 public class Project extends OrganizationEntity implements Serializable {
 
+    public static final String PROJECT_COLOR_ATTR = "project.color";
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

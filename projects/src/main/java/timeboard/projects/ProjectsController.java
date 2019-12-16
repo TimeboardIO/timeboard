@@ -27,6 +27,8 @@ package timeboard.projects;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,6 +45,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -59,8 +63,22 @@ public class ProjectsController {
     @GetMapping
     protected String handleGet(Model model) {
         final Account actor = this.userInfo.getCurrentAccount();
-        model.addAttribute("projects", this.projectService.listProjects(actor));
+        List<Project> allActorProjects = this.projectService.listProjects(actor).subList(0, 5);
+        if(allActorProjects.size()>5){
+            allActorProjects = allActorProjects.subList(0, 5);
+        }
+        model.addAttribute("projects", allActorProjects);
         return "projects.html";
+    }
+
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    protected ResponseEntity<List<ProjectDecorator>> projectList(Model model) {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final List<ProjectDecorator> projects = this.projectService.listProjects(actor)
+                .stream()
+                .map(project -> new ProjectDecorator(project))
+                .collect(Collectors.toList());
+        return  ResponseEntity.ok(projects);
     }
 
     @PostMapping("/create")
@@ -83,4 +101,21 @@ public class ProjectsController {
     }
 
 
+    private class ProjectDecorator {
+
+        private final Project project;
+
+        public ProjectDecorator(Project project) {
+            this.project = project;
+        }
+
+        public long getID(){
+            return this.project.getId();
+        }
+
+        public String getName(){
+            return this.project.getName();
+        }
+
+    }
 }

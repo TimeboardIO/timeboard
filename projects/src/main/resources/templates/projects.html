@@ -2,10 +2,12 @@
 
 <html layout:decorate="~{layouts/general.html(path='/projects')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
     <title layout:fragment="title">Home Page</title>
+    <script type="text/javascript" src="/js/projects.js"></script>
 </head>
 <body>
 
@@ -25,8 +27,6 @@
             margin-bottom: 0.5em;
         }
 
-
-
     </style>
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
@@ -35,16 +35,28 @@
             <div class="header">
                 No Projects ?
             </div>
-            <p>You are not member of any project, click <a th:href="@{/projects/create(orgID=${orgID})}">here</a> to create your first
+            <p>You are not member of any project, click <a th:href="@{/projects/create(orgID=${orgID})}">here</a> to
+                create your first
                 project !</p>
         </div>
     </div>
 
-    <div th:if="${!projects.isEmpty()}">
+    <div th:if="${!projects.isEmpty()}" class="ui segment">
 
-        <div class="ui segment">
-            <a class="ui button positive" th:href="@{/projects/create(orgID=${orgID})}">Create Project</a>
+        <div class="ui menu">
+            <a th:href="@{/projects/create}"
+               class="item">
+                <i class="plus icon"></i>
+                New Project
+            </a>
         </div>
+
+        <br/>
+        <div class="ui horizontal divider">
+            <i class="box icon"></i>
+            Last Projects
+        </div>
+
 
         <div class="ui five stackable cards">
             <div class="ui card" th:each="project : ${projects}">
@@ -73,6 +85,26 @@
                        th:href="@{/projects/{projectID}/delete(projectID=${project.id})}">Archive</a>
                 </div>
             </div>
+        </div>
+
+        <br/>
+        <div class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            All Projects
+        </div>
+
+        <div id="projects-app">
+            <data-table v-bind:config="table">
+                <template v-slot:name="{row}">
+                    {{row.name}}
+                </template>
+                <template v-slot:actions="{row}">
+                    <a v-bind:href="'/projects/'+row.id" class="ui right labeled success icon button">
+                        <i class="right arrow icon"></i>
+                        View
+                    </a>
+                </template>
+            </data-table>
         </div>
     </div>
 
