@@ -2,7 +2,7 @@ package timeboard.timesheet;
 
 /*-
  * #%L
- * webui
+ * kanban-project-plugin
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -31,45 +31,40 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
 import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.util.Date;
 
-
-/**
- * Display Organization details form.
- *
- * <p>Ex : /org/config?id=
- */
 @Controller
-@RequestMapping("/org/{orgID}/members")
-public class OrganizationMembersServlet  {
-
+@RequestMapping("/org")
+public class OrganizationCreateController {
     @Autowired
     public OrganizationService organizationService;
 
     @Autowired
-    private UserInfo userInfo;
+    public UserInfo userInfo;
 
-    @GetMapping
-    protected String handleGet(@PathVariable Long orgID, HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
-
+    @PostMapping("create")
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
-        final Account organization = this.organizationService.getOrganizationByID(actor, orgID);
-        final List<Account> members = this.organizationService.getMembers(actor, organization);
+        Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
+        organization.setRemoteSubject("Timeboard/Organization/"+System.nanoTime());
+        organization.setName(request.getParameter("organizationName"));
+        this.organizationService.createOrganization(actor, organization);
+        return "redirect:/home";
+    }
 
-        viewModel.addAttribute("roles", MembershipRole.values());
-        viewModel.addAttribute("members", members);
-        viewModel.addAttribute("organization", organization);
-
-        return "details_org_members";
+    @GetMapping("create")
+    protected String createFrom(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+        return "create_org.html";
     }
 }

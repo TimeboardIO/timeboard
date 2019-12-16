@@ -26,12 +26,10 @@ package timeboard.account;
  * #L%
  */
 
-import org.springframework.boot.web.servlet.ServletComponentScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan("timeboard.account")
-@ServletComponentScan("timeboard.account")
 public class AccountConfiguration {
 }

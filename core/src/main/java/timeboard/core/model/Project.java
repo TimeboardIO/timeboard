@@ -37,7 +37,7 @@ import java.util.*;
                 @NamedQuery(name = "ListUserProjects", query = "select p from Project p join fetch p.members m where (p.enable = true or p.enable is null) and m.member = :user")
         }
 )
-public class Project extends OrgEntity implements Serializable {
+public class Project extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -74,8 +74,6 @@ public class Project extends OrgEntity implements Serializable {
     @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
-    @OneToMany(targetEntity = Milestone.class, mappedBy = "project", cascade = CascadeType.ALL)
-    private Set<Milestone> milestones;
 
     @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectTag> tags;
@@ -155,13 +153,6 @@ public class Project extends OrgEntity implements Serializable {
         this.attributes = attributes;
     }
 
-    public Set<Milestone> getMilestones() {
-        return milestones;
-    }
-
-    public void setMilestones(Set<Milestone> milestones) {
-        this.milestones = milestones;
-    }
 
     public List<ProjectTag> getTags() {
         return tags;

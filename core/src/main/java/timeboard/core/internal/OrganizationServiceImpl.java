@@ -37,10 +37,12 @@ import timeboard.core.model.AccountHierarchy;
 import timeboard.core.model.MembershipRole;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
@@ -72,11 +74,16 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Account getOrganizationByID(Account actor, long id) {
-        Account data = em.createQuery("select o from Account o  where o.id = :orgID", Account.class)
-                .setParameter("orgID", id)
-                .getSingleResult();
-        return data;
+    public Optional<Account> getOrganizationByID(Account actor, long id) {
+        Account data;
+        try {
+            data = em.createQuery("select o from Account o  where o.id = :orgID", Account.class)
+                    .setParameter("orgID", id)
+                    .getSingleResult();
+        }catch (NoResultException nre){
+            data = null;
+        }
+        return Optional.ofNullable(data);
     }
 
     @Override

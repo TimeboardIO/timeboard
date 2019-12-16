@@ -181,6 +181,14 @@ public class Account implements Serializable {
         }
     }
 
+    @Transient
+    public String getScreenOrgName() {
+        if (this.isOrganization != null && this.isOrganization){
+            return this.getName();
+        }
+        return "My Organization";
+    }
+
 
     public Map<String, String> getExternalIDs() {
         return externalIDs;

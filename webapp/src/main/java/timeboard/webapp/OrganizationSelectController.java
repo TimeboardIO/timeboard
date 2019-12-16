@@ -1,8 +1,8 @@
-package timeboard.timesheet;
+package timeboard.webapp;
 
 /*-
  * #%L
- * kanban-project-plugin
+ * webapp
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.timesheet;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,41 +30,50 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
-@RequestMapping("/org/{orgID}/org")
-public class OrganizationCreateServlet  {
-    @Autowired
-    public OrganizationService organizationService;
+@RequestMapping(OrganizationSelectController.URI)
+public class OrganizationSelectController {
+
+    public static final String URI = "/select";
+    public static final String COOKIE_NAME = "org";
 
     @Autowired
-    public UserInfo userInfo;
+    private OrganizationService organizationService;
 
-    @PostMapping("create")
-    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
-        Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
-        organization.setRemoteSubject("Timeboard/Organization/"+System.nanoTime());
-        organization.setName(request.getParameter("organizationName"));
-        this.organizationService.createOrganization(actor, organization);
-        return "redirect:/org/" + orgID + "/home";
+    @Autowired
+    private UserInfo userInfo;
+
+    @GetMapping
+    public String selectOrganisation(Model model){
+
+        final List<Account> orgs = this.organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
+        orgs.add(this.userInfo.getCurrentAccount());
+        model.addAttribute("organizations", orgs);
+
+        return "org_select";
     }
 
-    @GetMapping("create")
-    protected String createFrom(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
-        return "create_org.html";
+    @PostMapping
+    public String selectOrganisation(@ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
+
+        final Optional<Account> selectedOrg = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), selectedOrgID);
+
+        if(selectedOrg.isPresent()) {
+            final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));
+            res.addCookie(orgCookie);
+        }
+        return "redirect:/home";
     }
 }

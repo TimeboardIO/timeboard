@@ -26,7 +26,6 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,8 +36,6 @@ import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
-
-import java.util.Map;
 
 @Component
 public class SuccessfulLoginListener {

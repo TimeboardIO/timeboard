@@ -12,7 +12,7 @@
             font-family: sans-serif;
             left : 0px;
             right: 0px;
-            top : 20%;
+            top : 0px;
             padding: 2em;
             color : white;
         }
@@ -52,10 +52,11 @@
     </style>
 </head>
 <body>
-    <div class="background"></div>
-    <div class="box">
-        <h1 class="title" th:text="${appName}">Timeboard</h1>
-        <a class="link" th:href="@{/home}">Go to application</a>
-    </div>
+<div class="background"></div>
+<div class="box">
+    <h1 class="title" th:text="${appName}">Timeboard</h1>
+    <iframe src="https://giphy.com/embed/13d2jHlSlxklVe" width="auto" height="auto" frameBorder="0" class="giphy-embed" allowFullScreen></iframe><p><a href="https://giphy.com/gifs/reaction-explosion-government-13d2jHlSlxklVe">via GIPHY</a></p>
+    <a class="link" th:href="@{/home}">Go to application</a>
+</div>
 </body>
 </html>

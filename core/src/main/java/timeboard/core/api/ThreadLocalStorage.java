@@ -26,6 +26,8 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.model.Account;
+
 public class ThreadLocalStorage {
 
     private static ThreadLocal<Long> currentOrganizationID = new ThreadLocal<>();

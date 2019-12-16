@@ -10,7 +10,7 @@
         </div>
 
         <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}"
-           th:href="${'/org/' + orgID + '' + nav.getNavigationPath() + '?' + nav.getNavigationParams()}">
+           th:href="${nav.getNavigationPath()}">
             <i th:class="${nav.getNavigationLogo()}+' icon'"></i>
             <div class="title" th:text="${nav.getNavigationLabel()}"></div>
         </a>
@@ -21,13 +21,22 @@
         <div class="right menu">
             <div class="ui dropdown item" tabindex="0">
                 <i class="sitemap icon"></i>
-                <div class="title">Thales Nantes</div>
+                <div class="title" th:text="${currentOrg.screenName}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
-                    <a class="item"><i class="sign-out icon"></i> Switch organisation</a>
-                    <a th:href="@{/org/{orgID}/org/create}" class="item"><i class="edit icon"></i> Create Organisation</a>
-                    <a class="item"><i class="globe icon"></i> Organisation members</a>
-                    <a class="item"><i class="settings icon"></i> Organisation Setup</a>
+                    <div class="ui item" tabindex="0">
+                        <i class="sign-out icon"></i>
+                        <a th:href="@{/select}">Switch organisation</a>
+                    </div>
+                    <a th:href="@{/org/create(orgID=${orgID})}" class="item">
+                        <i class="edit icon"></i> Create Organisation
+                    </a>
+                    <a th:if="${currentOrg.isOrganization}" th:href="@{/org/members?orgID={orgID}(orgID=${orgID})}" class="item">
+                        <i class="globe icon"></i> Organisation members
+                    </a>
+                    <a th:if="${currentOrg.isOrganization}" th:href="@{/org/config?orgID={orgID}(orgID=${orgID})}" class="item">
+                        <i class="settings icon"></i> Organisation Setup
+                    </a>
                 </div>
             </div>
             <div class="ui dropdown item" tabindex="0">
@@ -35,7 +44,7 @@
                 <div class="title" th:text="${account.screenName}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
-                    <a th:href="@{/org/{orgID}/account}" class="item"><i class="edit icon"></i> Setup</a>
+                    <a th:href="@{/account(orgID=${orgID})}" class="item"><i class="edit icon"></i> Setup</a>
                     <a th:href="@{/logout}" class="item"><i class="sign out alternate icon"></i> Logout</a>
                 </div>
             </div>

@@ -34,8 +34,10 @@ import timeboard.core.ui.UserInfo;
 
 import java.security.Principal;
 
-@Controller
+@Controller(OnboardingController.URI)
 public class OnboardingController {
+
+    public static final String URI = "/";
 
     @Autowired
     public UserInfo userInfo;
@@ -45,8 +47,8 @@ public class OnboardingController {
         if(p == null){ 
             return "onboarding";
         }else{
-            Long orgId = userInfo.getCurrentAccount().getId();
-            return "redirect:/org/" + orgId + "/home";
+
+            return "redirect:/home";
         }
 
     }

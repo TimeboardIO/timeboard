@@ -34,10 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.ProjectExportService;
-import timeboard.core.api.ProjectImportService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
@@ -53,7 +50,7 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/projects/{projectID}/setup")
+@RequestMapping("/projects/{projectID}/setup")
 public class ProjectSetupController {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -122,7 +119,7 @@ public class ProjectSetupController {
     }
 
     @PostMapping("/informations")
-    protected String updateProjectConfiguration(@PathVariable Long orgID, @PathVariable long projectID, @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
+    protected String updateProjectConfiguration(@PathVariable long projectID, @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -133,7 +130,7 @@ public class ProjectSetupController {
 
         this.projectService.updateProject(actor, project);
 
-        return "redirect:/org/" + orgID + "/projects/" + projectID + "/setup";
+        return "redirect:/projects/" + projectID + "/setup";
     }
 
     private void prepareTemplateData(final Account actor, final Project project, final Map<String, Object> map) throws BusinessException, JsonProcessingException {

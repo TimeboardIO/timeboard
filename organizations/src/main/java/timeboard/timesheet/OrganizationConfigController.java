@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -55,8 +56,8 @@ import java.util.List;
  * <p>Ex : /org/config?id=
  */
 @Controller
-@RequestMapping("/org/{orgID}/config")
-public class OrganizationConfigServlet  {
+@RequestMapping("/org/config")
+public class OrganizationConfigController {
 
     @Autowired
     private UserInfo userInfo;
@@ -73,37 +74,38 @@ public class OrganizationConfigServlet  {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
+    protected String handleGet(HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException  {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
         long id = Long.parseLong(request.getParameter("orgID"));
 
-        final Account organization = this.organizationService.getOrganizationByID(actor, id);
+        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, id);
 
         final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
         final List<TaskType> taskTypes = this.projectService.listTaskType();
 
-        viewModel.addAttribute("taskTypes", taskTypes);
-        viewModel.addAttribute("defaultTasks", defaultTasks);
-        viewModel.addAttribute("organization", organization);
-
-        return "details_org_config";
+        model.addAttribute("taskTypes", taskTypes);
+        model.addAttribute("defaultTasks", defaultTasks);
+        if(organization.isPresent()) {
+            model.addAttribute("organization", organization.get());
+        }
+        return "details_org_config.html";
 
     }
 
     @PostMapping
-    protected String handlePost( HttpServletRequest request, Model viewModel) throws Exception {
+    protected String handlePost( HttpServletRequest request, Model model) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
 
         String action = request.getParameter("action");
         long id = Long.parseLong(request.getParameter("orgID"));
-        Account organization = this.organizationService.getOrganizationByID(actor, id);
+        Optional<Account> organization = this.organizationService.getOrganizationByID(actor, id);
 
         switch (action) {
             case "CONFIG":
-                organization.setName(request.getParameter("organizationName"));
-                this.organizationService.updateOrganization(actor, organization);
+                organization.get().setName(request.getParameter("organizationName"));
+                this.organizationService.updateOrganization(actor, organization.get());
                 break;
             case "NEW_TASK":
                 this.projectService.createDefaultTask(actor, request.getParameter("newDefaultTask"));
@@ -123,6 +125,6 @@ public class OrganizationConfigServlet  {
         }
 
         //Extract organization
-        return this.handleGet(request, viewModel);
+        return this.handleGet(request, model);
     }
 }

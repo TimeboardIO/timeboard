@@ -27,6 +27,8 @@ package timeboard.projects;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +47,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/org/{orgID}/projects/{projectID}/milestones")
+@RequestMapping("/projects/{projectID}/milestones")
 public class ProjectMilestonesController {
 
     @Autowired
@@ -55,24 +57,34 @@ public class ProjectMilestonesController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String listMilestones(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
+    protected String milestonesApp(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
         model.addAttribute("project", project);
-
-        return "details_project_milestones.html";
+        return "project_milestones.html";
     }
 
+    @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
+    protected ResponseEntity<List<MilestoneDecorator>> listMilestones(@PathVariable Long projectID) throws BusinessException {
+
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+
+        return ResponseEntity.ok(this.projectService.listProjectMilestones(actor, project)
+                .stream().map(milestone -> new MilestoneDecorator(milestone))
+                .collect(Collectors.toList()));
+    }
+
+
     @GetMapping("/{milestoneID/delete")
-    protected String deleteMilestone(@PathVariable Long orgID, @PathVariable Long projetID, @PathVariable Long milestoneID) throws ServletException, IOException, BusinessException {
+    protected String deleteMilestone(@PathVariable Long projetID, @PathVariable Long milestoneID) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.deleteMilestoneByID(actor, milestoneID);
 
-        return "redirect:/org/" + orgID + "/projects/" + projetID + "/milestones";
+        return "redirect:/projects/" + projetID + "/milestones";
     }
 
     @GetMapping("/{milestoneID}/setup")
@@ -86,7 +98,7 @@ public class ProjectMilestonesController {
         final Project project = this.projectService.getProjectByID(actor, projectID);
         fillModelWithMilestones(model, actor, project);
 
-        return "details_project_milestones_config.html";
+        return "project_milestones_config.html";
     }
 
 
@@ -99,7 +111,7 @@ public class ProjectMilestonesController {
         final Project project = this.projectService.getProjectByID(actor, projectID);
         fillModelWithMilestones(model, actor, project);
 
-        return "details_project_milestones_config.html";
+        return "project_milestones_config.html";
 
     }
 
@@ -181,4 +193,25 @@ public class ProjectMilestonesController {
     }
 
 
+    public class MilestoneDecorator{
+
+        private Milestone milestone;
+
+        public MilestoneDecorator(Milestone milestone){
+            this.milestone = milestone;
+        }
+
+        public String getName(){
+            return this.milestone.getName();
+        }
+
+        public MilestoneType getType(){
+            return this.milestone.getType();
+        }
+
+        public Date getDate(){
+            return this.milestone.getDate();
+        }
+
+    }
 }
