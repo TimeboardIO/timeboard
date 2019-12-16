@@ -63,7 +63,7 @@ public class ProjectsController {
     @GetMapping
     protected String handleGet(Model model) {
         final Account actor = this.userInfo.getCurrentAccount();
-        List<Project> allActorProjects = this.projectService.listProjects(actor).subList(0, 5);
+        List<Project> allActorProjects = this.projectService.listProjects(actor);
         if(allActorProjects.size()>5){
             allActorProjects = allActorProjects.subList(0, 5);
         }
