@@ -1,4 +1,5 @@
-beforeEach(function () {
+
+Cypress.Commands.add('login', () => {
     cy.visit('http://localhost:8080');
 
     cy.get('a.link')
@@ -16,27 +17,39 @@ beforeEach(function () {
             cy.get('.button.ui.item').click();
         }
     });
+});
 
+Cypress.Commands.add('createProject', (projectName) => {
+    cy.get('body').then(($body) => {
+        // synchronously query from body
+        // to find which element was created
+        if ($body.text().includes('No Projects ?')) {
+            // input was found, do something else here
+            return cy.get('a').contains('here');
+        }
+        // else assume it was textarea
+        return cy.contains("Create Project")
+    }).click();
 
+    cy.get('input[name=projectName]').type(projectName);
+    cy.get('button[type=submit]')
+        .click();
+    cy.get('.ui.card .header').should('contain', projectName);
+
+});
+
+Cypress.Commands.add('archiveProject', (projectName) => {
+    cy.get('.card').contains(projectName)
+        .get('.button').contains('Archive')
+        .click();
 
 });
 
 
-describe('Timeboard Test', function() {
-    it('Connection user', function() {
-        cy.url().should('include', '/home')
-        cy.get('.right.menu .title').should('contain', 'user')
-    });
-
-
-    it('Timesheet Test', function() {
-        cy.contains("Timesheet")
-            .click()  ;
-    });
-
-
-
+beforeEach(function () {
+    cy.login();
 });
+
 
 
 describe('Project Test', function() {
@@ -50,33 +63,28 @@ describe('Project Test', function() {
     });
 
     it('Create project', function() {
-        cy.contains("Create Project")
-            .click();
-
-        cy.get('input[name=projectName]').type(projectName);
-
-        cy.get('button[type=submit]')
-            .click();
-
-        cy.get('.ui.card .header').should('contain', 'user');
-
+       cy.createProject(projectName);
+       cy.archiveProject(projectName);
     });
 
-    it('Archive project', function() {
-        cy.get('.card').contains(projectName)
-            .get('.a').contains('Archive')
-                .click();
-
-    });
 
     describe('Project Setup', function() {
 
+
         beforeEach(function () {
-            cy.get('.card').contains('Timeboard') //projectName
+            cy.createProject(projectName);
+
+            cy.get('.card').contains(projectName) //projectName
                 .get('.button').contains('Setup')
                 .click();
         });
 
+        afterEach(function () {
+            cy.visit('http://localhost:8080');
+            cy.contains("Project")
+                .click();
+            cy.archiveProject(projectName);
+        });
         it('Edit project config', function () {
             cy.get('input[name=name]').clear().type(projectName);
             cy.get('input[name=quotation]').clear().type(30000);
@@ -84,7 +92,7 @@ describe('Project Test', function() {
             cy.get('button[type=submit]')
                 .click();
             cy.get('input[name=name]').should('be.value', projectName);
-            cy.get('input[name=quotation]').should('be.value', 30000);
+            cy.get('input[name=quotation]').should('contains.value', 30000);
             cy.get('textarea[name=comments]').should('be', 'My super new project is very awesome. ');
         });
         it('Add project member', function () {
@@ -92,5 +100,7 @@ describe('Project Test', function() {
         });
 
     });
+
+
 
 });
