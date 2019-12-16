@@ -6,14 +6,15 @@
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title layout:fragment="title">Reporting</title>
+    <title layout:fragment="title">Reports</title>
+    <script type="text/javascript" src="/js/reports.js"></script>
 </head>
 <body>
 
 <div layout:fragment="content">
 
     <div class="ui segment">
-        <h2 class="ui divided header">Reporting</h2>
+        <h2 class="ui divided header">Reports</h2>
         <div id="reports-app">
             <data-table v-bind:config="table">
                 <template v-slot:name="{row}">

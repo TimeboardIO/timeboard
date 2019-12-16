@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.reports;
 
 /*-
  * #%L
- * reporting
+ * reports
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -27,30 +27,65 @@ package timeboard.reporting;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.ProjectExportService;
+import timeboard.core.api.ReportService;
+import timeboard.core.model.Account;
+import timeboard.core.model.Report;
+import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/reporting")
-public class ReportingController {
+@RequestMapping("/reports")
+public class ReportsController {
 
-    @Autowired(
-            required = false
-    )
-    private List<ProjectExportService> reportServices;
+    @Autowired
+    private ReportService reportServices;
+
+    @Autowired
+    private UserInfo userInfo;
 
     @GetMapping
     protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-        model.addAttribute("reports", this.reportServices);
-        return "reporting.html";
+        return "reports.html";
    }
+
+    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    protected ResponseEntity<List<ReportDecorator>> reportList(Model model) {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final List<ReportDecorator> reports = this.reportServices.listReports(actor)
+                .stream()
+                .map(report -> new ReportDecorator(report))
+                .collect(Collectors.toList());
+        return  ResponseEntity.ok(reports);
+    }
+
+
+    private class ReportDecorator {
+
+        private final Report report;
+
+        public ReportDecorator(Report report) {
+            this.report = report;
+        }
+
+        public long getID(){
+            return this.report.getId();
+        }
+
+        public String getName(){
+            return this.report.getName();
+        }
+
+    }
 
 }

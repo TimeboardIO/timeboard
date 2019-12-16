@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.reports;
 
 /*-
  * #%L
- * KanbanProjectPlugin
+ * reports
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.reporting;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,29 +26,10 @@ package timeboard.reporting;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-@Component
-public class ReportingNavigationProvider implements NavigationExtPoint {
-
-    @Override
-    public String getNavigationLabel() {
-        return "Reporting";
-    }
-
-    @Override
-    public String getNavigationPath() {
-        return "/reporting";
-    }
-
-    @Override
-    public int getNavigationWeight() {
-        return 5000;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "chart pie";
-    }
+@Configuration
+@ComponentScan(basePackages = "timeboard.reports")
+public class ReportsConfiguration {
 }

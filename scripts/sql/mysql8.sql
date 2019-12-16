@@ -24,7 +24,7 @@
 
     create table Calendar (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         name varchar(50),
         remoteId varchar(100),
         targetType varchar(25),
@@ -33,7 +33,7 @@
 
     create table CostByCategory (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         costPerDay double precision not null,
         costPerHour double precision not null,
         endDate date,
@@ -44,7 +44,7 @@
 
     create table DataTableConfig (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         tableInstanceId varchar(255),
         user_id bigint,
         primary key (id)
@@ -57,7 +57,7 @@
 
     create table DefaultTask (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
@@ -100,9 +100,11 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         day date,
         value double precision,
         account_id bigint,
@@ -112,7 +114,7 @@
 
     create table Milestone (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         attributes TEXT,
         date date,
         name varchar(50),
@@ -123,7 +125,7 @@
 
     create table Project (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         attributes TEXT,
         comments varchar(500),
         enable bit,
@@ -135,7 +137,7 @@
 
     create table ProjectMembership (
        membershipID bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         role varchar(255),
         member_id bigint,
         project_id bigint,
@@ -144,16 +146,29 @@
 
     create table ProjectTag (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         tagKey varchar(255) not null,
         tagValue varchar(255) not null,
         project_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
+    create table Report (
+       id bigint not null,
+        organizationID bigint,
+        name varchar(50),
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table Report_Project (
+       Report_id bigint not null,
+        projects_id bigint not null,
+        primary key (Report_id, projects_id)
+    ) engine=InnoDB;
+
     create table Task (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
@@ -173,7 +188,7 @@
 
     create table TaskRevision (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         effortLeft double precision not null,
         effortSpent double precision not null,
         originalEstimate double precision not null,
@@ -208,6 +223,9 @@
 
     alter table Imputation 
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
+
+    alter table Report_Project 
+       add constraint UK_1bu5v00cycr11phls2ojwnexb unique (projects_id);
 
     alter table AccountHierarchy 
        add constraint FKsiqpllhiyu6kby8mpjhr5u6bb 
@@ -258,6 +276,16 @@
        add constraint FKflkgw7xvdg8kc0gnjsj950con 
        foreign key (project_id) 
        references Project (id);
+
+    alter table Report_Project 
+       add constraint FKq4bnp5qrolpt8q55klb4knll6 
+       foreign key (projects_id) 
+       references Project (id);
+
+    alter table Report_Project 
+       add constraint FK3kqmqtxml1nrf9cw5myproafd 
+       foreign key (Report_id) 
+       references Report (id);
 
     alter table Task 
        add constraint FK26uly7piek733vu0rvs6tkusr 

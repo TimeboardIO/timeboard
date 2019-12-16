@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    const projectID = $("meta[name='reportID']").attr('content');
+    const reportID = $("meta[name='reportID']").attr('content');
 
     var app = new Vue({
         el: '#reports-app',

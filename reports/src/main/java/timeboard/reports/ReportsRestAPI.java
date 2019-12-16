@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.reports;
 
 /*-
  * #%L
- * reporting
+ * reports
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -36,8 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 
 
 @Component
-@RequestMapping(value = "/reporting",produces =  {MediaType.APPLICATION_JSON_VALUE})
-public class RestAPI {
+@RequestMapping(value = "/reports",produces =  {MediaType.APPLICATION_JSON_VALUE})
+public class ReportsRestAPI {
 
 
     @GetMapping
