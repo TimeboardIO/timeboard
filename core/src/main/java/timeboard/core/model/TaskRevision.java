@@ -67,7 +67,11 @@ public class TaskRevision extends OrganizationEntity implements Serializable {
     }
 
 
-    public TaskRevision(Date revisionDate, Task task, Account assigned, double originalEstimate, double effortLeft, double effortSpent, double realEffort) {
+    public TaskRevision(Date revisionDate,
+                        Task task, Account assigned,
+                        double originalEstimate, double effortLeft,
+                        double effortSpent, double realEffort) {
+
         this.revisionDate = revisionDate;
         this.task = task;
         this.assigned = assigned;

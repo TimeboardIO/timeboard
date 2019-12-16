@@ -82,7 +82,10 @@ public class ProjectTagsController {
     }
 
     @PatchMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> patchTag(@PathVariable Long projectID, @PathVariable Long tagID, @ModelAttribute ProjectTag tag) throws BusinessException {
+    public ResponseEntity<List<ProjectTagWrapper>> patchTag(@PathVariable Long projectID,
+                                                            @PathVariable Long tagID,
+                                                            @ModelAttribute ProjectTag tag) throws BusinessException {
+
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
         project.getTags().stream()
@@ -96,7 +99,8 @@ public class ProjectTagsController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> createTag(@PathVariable Long projectID, @ModelAttribute ProjectTag tag) throws BusinessException {
+    public ResponseEntity<List<ProjectTagWrapper>> createTag(@PathVariable Long projectID,
+                                                             @ModelAttribute ProjectTag tag) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
         tag.setProject(project);

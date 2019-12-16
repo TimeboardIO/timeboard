@@ -79,11 +79,11 @@ public class ProjectSetupController {
 
 
     @GetMapping
-    protected String configProject(@PathVariable long projectID, Model model) throws BusinessException, JsonProcessingException {
+    protected String configProject(@PathVariable long projectID, Model model) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         final Map<String, Object> map = new HashMap<>();
-        this.prepareTemplateData(actor, project, map);
+        this.prepareTemplateData(project, map);
         model.addAllAttributes(map);
         return "details_project_config.html";
     }
@@ -100,7 +100,10 @@ public class ProjectSetupController {
     }
 
     @PatchMapping("/memberships/{membershipID}/{role}")
-    protected ResponseEntity updateProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID, @PathVariable MembershipRole role) throws Exception {
+    protected ResponseEntity updateProjectMembers(@PathVariable Long projectID,
+                                                  @PathVariable Long membershipID,
+                                                  @PathVariable MembershipRole role) throws Exception {
+
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.getMembers().stream()
@@ -111,7 +114,9 @@ public class ProjectSetupController {
     }
 
     @DeleteMapping("/memberships/{membershipID}")
-    protected ResponseEntity deleteProjectMembers(@PathVariable Long projectID, @PathVariable Long membershipID) throws Exception {
+    protected ResponseEntity deleteProjectMembers(@PathVariable Long projectID,
+                                                  @PathVariable Long membershipID) throws Exception {
+
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.getMembers().removeIf(projectMembership -> {
@@ -122,7 +127,8 @@ public class ProjectSetupController {
     }
 
     @PostMapping("/informations")
-    protected String updateProjectConfiguration(@PathVariable long projectID, @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
+    protected String updateProjectConfiguration(@PathVariable long projectID,
+                                                @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -136,7 +142,8 @@ public class ProjectSetupController {
         return "redirect:/projects/" + projectID + "/setup";
     }
 
-    private void prepareTemplateData(final Account actor, final Project project, final Map<String, Object> map) throws BusinessException, JsonProcessingException {
+    private void prepareTemplateData(final Project project, final Map<String, Object> map) {
+
         final ProjectConfigForm pcf = new ProjectConfigForm();
         pcf.setName(project.getName());
         pcf.setComments(project.getComments());

@@ -169,7 +169,8 @@ public class TasksRestController {
                     return null;
                 })
                 .map(date -> effortSpentDB.stream()
-                        .filter(es -> new SimpleDateFormat(formatDateToDisplay).format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effort -> {
                             lastEffortSpentSum[0] = new EffortHistory(date, effort.getValue());
                             return lastEffortSpentSum[0];
@@ -196,7 +197,8 @@ public class TasksRestController {
                     return null;
                 })
                 .map(date -> effortLeftDB.stream()
-                        .filter(el -> new SimpleDateFormat(formatDateToDisplay).format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .filter(el -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effortLeft -> {
                             lastEffortEstimate[0] = new EffortHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
                             return lastEffortEstimate[0];
@@ -350,9 +352,14 @@ public class TasksRestController {
         } else {
             try {
                 task = projectService.createTask(actor, project,
-                        name, comment, startDate, endDate, oe, typeID, actor, ProjectService.ORIGIN_TIMEBOARD, null, null, null);
+                        name, comment, startDate,
+                        endDate, oe, typeID, actor,
+                        ProjectService.ORIGIN_TIMEBOARD, null, null, null);
             } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("msg", "Error in task creation please verify your inputs and retry. (" + e.getMessage() + ")").build();
+                return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .header("msg", "Error in task creation please " +
+                                "verify your inputs and retry. (" + e.getMessage() + ")").build();
             }
         }
 
