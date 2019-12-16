@@ -35,13 +35,13 @@ Vue.component('data-table', {
                                      {{ col.slot }}
                                   </td>
                                    <td>
-                                     <input type="checkbox" id="checkbox" v-model="col.visible" v-bind:name="col.slot">
-                                     {{ col.visible }}
+                                     <input type="checkbox" id="checkbox" v-model="col.visible" v-bind:name="col.slot" >
                                   </td>
                                 </tr>
                             </tbody>
                         </tmodal>
                         </table>
+                        <button class="ui positive button"  @click="changeDataTableConfig()> Save </button>
                     </template>
                 </tmodal>
             </table>
@@ -106,8 +106,24 @@ Vue.component('data-table', {
                 detachable : false, centered: true
             }).modal('show');
         },
-        check: function(col){
-            this.config.cols.find(item => item.slot === col.slot).visible = !col.visible;
+        changeDataTableConfig: function(col){
+            let cols = [];
+            this.finalCols.forEach(function (col) {
+               if(col.visible) cols.push(col.slot);
+            });
+            $.ajax({
+                type: "PATCH",
+                dataType: "json",
+                data: {
+                        userID : 0,
+                        tableID : this.config.name,
+                        colNames : cols
+                },
+                url: "/config/datatable/" + this.config.name,
+                success: function (d) {
+                    $('#configModal').modal('close');
+                }
+            });
         }
 
     }
