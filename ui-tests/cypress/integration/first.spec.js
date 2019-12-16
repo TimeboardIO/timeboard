@@ -11,6 +11,14 @@ beforeEach(function () {
     cy.get('button[type=submit]')
         .click()  ;
 
+    cy.url().then(url => {
+        if(url.includes('select')) {
+            cy.get('.button.ui.item').click();
+        }
+    });
+
+
+
 });
 
 
@@ -25,6 +33,7 @@ describe('Timeboard Test', function() {
         cy.contains("Timesheet")
             .click()  ;
     });
+
 
 
 });
