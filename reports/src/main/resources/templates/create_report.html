@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/reports')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">Create Report Page</title>
+</head>
+<body>
+
+    <div layout:fragment="content">
+        <div class="ui segment">
+            <h4 class="ui dividing header">Create Report</h4>
+
+            <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+                <div class="field">
+                    <label>Report Name</label>
+                    <input name="reportName" placeholder="Report Name" required type="text">
+                </div>
+                <div class="field">
+                    <label>Select project by tags</label>
+                    <p>Example ->  key == "CUSTOMER" && (value == "Demo" || value == "Test")</p>
+                    <input name="reportSelectProject" placeholder="Filter projects" required type="text">
+                </div>
+                <div class="field">
+                    <label>Report Type</label>
+                    <select name="reportType">
+                        <option th:each="reportType: ${allReportTypes}"
+                            th:text="${reportType.label}"
+                            th:value="${reportType}">
+                        </option>
+                    </select>
+                </div>
+                <button class="ui button" type="submit">Submit</button>
+                <a class="ui button" th:href="@{/reports}">Cancel</a>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

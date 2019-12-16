@@ -50,12 +50,13 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override
-    public Report createReport(Account owner, String reportName, List<Project> projects) {
+    public Report createReport(Account owner, String reportName, Account organization, List<Project> projects, ReportType type) {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Report newReport = new Report();
-        newReport.setOrganization(ownerAccount);
+        newReport.setOrganization(organization);
         newReport.setName(reportName);
-        newReport.setProjects((Set<Project>) projects);
+        newReport.setProjects(projects);
+        newReport.setType(type);
         em.persist(newReport);
 
         em.flush();

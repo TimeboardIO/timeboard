@@ -15,6 +15,14 @@
 
     <div class="ui segment">
         <h2 class="ui divided header">Reports</h2>
+
+        <div class="ui menu">
+            <a th:href="@{/reports/create}" class="item">
+                <i class="plus icon"></i>
+                New Report
+            </a>
+        </div>
+
         <div id="reports-app">
             <data-table v-bind:config="table">
                 <template v-slot:name="{row}">

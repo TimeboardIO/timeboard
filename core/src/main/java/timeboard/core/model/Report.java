@@ -41,7 +41,7 @@ public class Report extends OrganizationEntity implements Serializable {
     @Column(length = 50, unique = false)
     private String name;
 
-    @Column
+    @OneToOne
     private Account organization;
 
     @OneToMany(targetEntity = Project.class,
@@ -49,15 +49,18 @@ public class Report extends OrganizationEntity implements Serializable {
             cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER
     )
-    private Set<Project> projects;
+    private List<Project> projects;
+
+    private ReportType type;
 
 
     public Report() {}
 
-    public Report(String name, Account organization, Set<Project> projects) {
+    public Report(String name, Account organization, List<Project> projects, ReportType type) {
         this.name = name;
         this.projects = projects;
         this.organization = organization;
+        this.type = type;
     }
 
     public Long getId() {
@@ -84,11 +87,19 @@ public class Report extends OrganizationEntity implements Serializable {
         this.organization = organization;
     }
 
-    public Set<Project> getProjects() {
+    public List<Project> getProjects() {
         return projects;
     }
 
-    public void setProjects(Set<Project> projects) {
+    public void setProjects(List<Project> projects) {
         this.projects = projects;
+    }
+
+    public ReportType geType() {
+        return type;
+    }
+
+    public void setType(ReportType type) {
+        this.type = type;
     }
 }

@@ -1,8 +1,8 @@
-package timeboard.reports;
+package timeboard.core.model;
 
 /*-
  * #%L
- * reports
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,25 +26,20 @@ package timeboard.reports;
  * #L%
  */
 
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.model.Account;
 
-import javax.servlet.http.HttpServletRequest;
+public enum ReportType {
+    PROJECT_KPI("Project KPI");
 
+    public final String label;
 
-@Component
-@RequestMapping(value = "/reports",produces =  {MediaType.APPLICATION_JSON_VALUE})
-public class ReportsRestAPI {
-
-
-    @GetMapping
-    public String export(HttpServletRequest req) {
-        Account account = (Account) req.getAttribute("actor");
-        return "{'name': 'Hello '" + account.getScreenName() + "''}";
+    private ReportType(String label) {
+        this.label = label;
     }
 
+    public String getLabel() {
+        return this.label;
+    }
 
 }
+
+
