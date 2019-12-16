@@ -31,7 +31,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class DataTableConfig extends OrgEntity implements Serializable {
+public class DataTableConfig extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

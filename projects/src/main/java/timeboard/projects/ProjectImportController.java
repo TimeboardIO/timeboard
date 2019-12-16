@@ -53,8 +53,8 @@ import java.util.Optional;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/projects/import")
-public class ProjectImportServlet {
+@RequestMapping("/projects/import")
+public class ProjectImportController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -70,18 +70,18 @@ public class ProjectImportServlet {
     @Autowired(
             required = false
     )
-    private List<ProjectImportService> projectImportServlets;
+    private List<ProjectImportService> projectImportServices;
 
 
     @PostMapping
-    protected void handlePost(@PathVariable Long orgID, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
+    protected void handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/org/" + orgID + "/projects/config?projectID=" + projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         requestDispatcher.forward(req, resp);
     }
 
     @GetMapping
-    protected void handleGet(@PathVariable Long orgID, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
+    protected void handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
 
         Account actor = this.userInfo.getCurrentAccount();
         final String type = req.getParameter("type");
@@ -91,7 +91,7 @@ public class ProjectImportServlet {
 
         ImportResponse importResponse = new ImportResponse();
 
-        final Optional<ProjectImportService> optionalService = this.projectImportServlets.stream()
+        final Optional<ProjectImportService> optionalService = this.projectImportServices.stream()
                 .filter(projectImportService -> projectImportService.getServiceName().equals(type))
                 .findFirst();
 
@@ -166,7 +166,7 @@ public class ProjectImportServlet {
             importResponse.getErrors().add(new BusinessException("Missing " + type + " Service"));
         }
 
-        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/org/" + orgID + "/projects/config?projectID=" + projectID);
+        RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         req.setAttribute("errors", importResponse.getErrors());
         req.setAttribute("importSuccess", message);
         requestDispatcher.forward(req, resp);

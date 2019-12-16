@@ -48,8 +48,8 @@ import java.util.Date;
 
 //TIME ATTACHMENT SHEET
 @Controller
-@RequestMapping("/org/{orgID}/account/exportTAS")
-public class TasExportServlet{
+@RequestMapping("/account/exportTAS")
+public class TasExportController {
 
     @Autowired
     private ProjectService projectService;
@@ -58,7 +58,7 @@ public class TasExportServlet{
     private UserInfo userInfo;
 
     @PostMapping
-    protected String handlePost(@PathVariable Long orgID, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
 
         try {
             Account actor = this.userInfo.getCurrentAccount();
@@ -91,7 +91,7 @@ public class TasExportServlet{
             System.out.println(e.getMessage());
         }
 
-        return ("/org/" + orgID + "/account");
+        return ("/account");
 
     }
 

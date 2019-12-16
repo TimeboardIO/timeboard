@@ -33,10 +33,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
+import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 
-@Component
+@Component("")
 @SessionScope
 public class UserInfo {
 
@@ -61,5 +62,9 @@ public class UserInfo {
 
         }
         return account;
+    }
+
+    public Long getCurrentOrganizationID(){
+        return ThreadLocalStorage.getCurrentOrganizationID()!=null?ThreadLocalStorage.getCurrentOrganizationID():getCurrentAccount().getId();
     }
 }

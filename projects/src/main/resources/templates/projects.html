@@ -35,7 +35,7 @@
             <div class="header">
                 No Projects ?
             </div>
-            <p>You are not member of any project, click <a th:href="@{/org/{orgID}/projects/create(orgID=${orgID})}">here</a> to create your first
+            <p>You are not member of any project, click <a th:href="@{/projects/create(orgID=${orgID})}">here</a> to create your first
                 project !</p>
         </div>
     </div>
@@ -43,13 +43,13 @@
     <div th:if="${!projects.isEmpty()}">
 
         <div class="ui segment">
-            <a class="ui button positive" th:href="@{/org/{orgID}/projects/create(orgID=${orgID})}">Create Project</a>
+            <a class="ui button positive" th:href="@{/projects/create(orgID=${orgID})}">Create Project</a>
         </div>
 
         <div class="ui five stackable cards">
             <div class="ui card" th:each="project : ${projects}">
                 <div class="image">
-                    <a th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id},orgID=${orgID})}">
+                    <a th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">
                         <div class="badge" style="text-transform: capitalize;"
                              th:style="'background-color:'+${project.getColor()}"
                              th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">
@@ -68,9 +68,9 @@
                     </div>
                 </div>
                 <div class="extra content">
-                    <a class="ui positive button" th:href="@{/org/{orgID}/projects/{projectID}/setup(projectID=${project.id},orgID=${orgID})}">Setup</a>
+                    <a class="ui positive button" th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
                     <a class="negative ui basic button"
-                       th:href="@{/org/{orgID}/projects/{projectID}/delete(projectID=${project.id},orgID=${orgID})}">Archive</a>
+                       th:href="@{/projects/{projectID}/delete(projectID=${project.id})}">Archive</a>
                 </div>
             </div>
         </div>

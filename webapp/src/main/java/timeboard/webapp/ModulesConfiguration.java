@@ -26,6 +26,9 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import timeboard.account.AccountConfiguration;
@@ -51,4 +54,17 @@ import timeboard.timesheet.TimesheetConfiguration;
         OrganizationsConfiguration.class
 })
 public class ModulesConfiguration {
+
+    @Autowired
+    private OrganizationFilter organizationFilter;
+
+    @Bean
+    public FilterRegistrationBean<OrganizationFilter> loggingFilter(){
+        FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(this.organizationFilter);
+        registrationBean.addUrlPatterns("/*");
+
+        return registrationBean;
+    }
 }

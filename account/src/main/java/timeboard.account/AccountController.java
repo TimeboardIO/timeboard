@@ -50,8 +50,8 @@ import java.util.*;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/account")
-public class AccountServlet {
+@RequestMapping("/account")
+public class AccountController {
 
     @Autowired
     private UserService userService;
@@ -65,7 +65,7 @@ public class AccountServlet {
     @Autowired(
             required = false
     )
-    private List<ProjectImportService> projectImportServlets;
+    private List<ProjectImportService> projectImportServices;
 
     @Autowired
     private DataTableService dataTableService;
@@ -145,8 +145,8 @@ public class AccountServlet {
 
         List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list
-        if(projectImportServlets != null) {
-            projectImportServlets.forEach(service -> {
+        if(projectImportServices != null) {
+            projectImportServices.forEach(service -> {
                 fieldNames.add(service.getServiceName());
             });
         }

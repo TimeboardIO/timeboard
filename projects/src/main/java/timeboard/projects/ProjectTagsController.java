@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/projects/{projectID}/tags")
+@RequestMapping("/projects/{projectID}/tags")
 public class ProjectTagsController {
 
     @Autowired

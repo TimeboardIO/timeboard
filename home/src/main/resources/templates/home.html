@@ -64,16 +64,16 @@
                     <tbody >
                     <tr th:each="week : ${weeks}" class="center aligned">
                         <td data-label="Week" >
-                            <a style="color: black" th:href="@{/org/{orgID}/timesheet(week=${week.number}, year=${week.year}, orgID=${orgID})} " th:text="${'Week '+week.number}"></a>
+                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year}, orgID=${orgID})} " th:text="${'Week '+week.number}"></a>
                         </td>
                         <td data-label="Days">
-                            <a th:href="@{/org/{orgID}/timesheet(week=${week.number}, year=${week.year}, orgID=${orgID})} ">
+                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year}, orgID=${orgID})} ">
                                 <div th:if="${week.imputationSum >= 5}" class="ui circular label large day-badge green" th:text="${week.imputationSum}"></div>
                                 <div th:if="${week.imputationSum < 5}" class="ui circular label large day-badge red" th:text="${week.imputationSum}"></div>
                             </a>
                         </td>
                         <td data-label="Validated">
-                            <a th:href="@{/org/{orgID}/timesheet(week=${week.number}, year=${week.year}, orgID=${orgID})} ">
+                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year}, orgID=${orgID})} ">
                                 <i class="check icon green" th:if="${week.isValidated}"></i>
                             </a>
                         </td>

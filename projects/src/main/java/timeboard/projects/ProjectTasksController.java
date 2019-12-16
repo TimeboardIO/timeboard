@@ -47,7 +47,7 @@ import java.util.Date;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/projects/{projectID}")
+@RequestMapping("/projects/{projectID}")
 public class ProjectTasksController {
 
     @Autowired

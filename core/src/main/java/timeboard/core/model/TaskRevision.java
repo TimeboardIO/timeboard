@@ -32,7 +32,7 @@ import java.util.Date;
 
 
 @Entity
-public class TaskRevision  extends OrgEntity  implements Serializable {
+public class TaskRevision  extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

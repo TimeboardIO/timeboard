@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
@@ -54,8 +55,8 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/timesheet")
-public class TimesheetServlet {
+@RequestMapping("/timesheet")
+public class TimesheetController {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -94,10 +95,14 @@ public class TimesheetServlet {
     }
 
     @GetMapping
-    protected String handleGet(Account actor, HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    protected String currentWeekTimesheet(Model model) throws Exception {
+        Calendar c = Calendar.getInstance();
+        return this.handleGet(c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+    }
+
+    @GetMapping("/{year}/{week}")
+    protected String handleGet(@PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
-        final int week = Integer.parseInt(request.getParameter("week"));
-        final int year = Integer.parseInt(request.getParameter("year"));
 
         final Calendar c = Calendar.getInstance();
         c.set(Calendar.WEEK_OF_YEAR, week);
@@ -117,12 +122,9 @@ public class TimesheetServlet {
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("lastWeekValidated", lastWeekValidated);
-        model.addAttribute("userID", actor.getId());
-
 
         model.addAttribute("taskTypes", this.projectService.listTaskType());
         model.addAttribute("projectList", this.projectService.listProjects(this.userInfo.getCurrentAccount()));
-
 
         return "timesheet.html";
     }

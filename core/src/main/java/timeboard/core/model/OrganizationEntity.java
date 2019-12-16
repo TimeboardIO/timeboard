@@ -26,46 +26,26 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
+import timeboard.core.api.ThreadLocalStorage;
 
-@Entity
-public class Calendar  extends OrganizationEntity {
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+@MappedSuperclass
+public abstract class OrganizationEntity {
 
-    @Column(length = 50, unique = false)
-    private String name;
+    @Column(nullable = false)
+    protected Long organizationID;
 
-    @Column(length = 100)
-    private String remoteId;
-
-    @Column(length = 25)
-    private String targetType;
-
-    public long getId() {
-        return id;
+    public OrganizationEntity(){
+        this.organizationID = ThreadLocalStorage.getCurrentOrganizationID();
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public Long getOrganizationID() {
+        return organizationID;
     }
 
-    public String getName() {
-        return name;
+    public void setOrganizationID(Long organizationID) {
+        this.organizationID = organizationID;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRemoteId() {
-        return remoteId;
-    }
-
-    public void setRemoteId(String remoteId) {
-        this.remoteId = remoteId;
-    }
-
 }

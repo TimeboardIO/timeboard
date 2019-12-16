@@ -7,7 +7,7 @@
 
 <head>
     <title>Project Tasks details</title>
-    <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id},orgID=${orgID})}"/>
+    <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
     <style>
         .ellipsis {
             text-overflow: ellipsis;
@@ -15,7 +15,9 @@
             overflow: hidden;
             width: 15em;
         }
-</style>
+
+
+    </style>
 </head>
 <body>
 
@@ -33,70 +35,93 @@
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}"
                         @click="sortBy('taskName')"
-                        :class="{ active: sortKey == 'taskName' }" > Task <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'taskName' }"> Task <i class="icon caret"
+                                                                            :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}"
                         @click="sortBy('startDate')"
-                        :class="{ active: sortKey == 'startDate' }" > Start Date <i class="icon caret" :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'startDate' }"> Start Date <i class="icon caret"
+                                                                                   :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}"
                         @click="sortBy('endDate')"
-                        :class="{ active: sortKey == 'endDate' }" > End date <i class="icon caret" :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'endDate' }"> End date <i class="icon caret"
+                                                                               :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}"
                         @click="sortBy('originalEstimate')"
-                        :class="{ active: sortKey == 'originalEstimate' }" > OE <i class="icon caret" :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'originalEstimate' }"> OE <i class="icon caret"
+                                                                                  :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}"
                         @click="sortBy('assignee')"
-                        :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'assignee' }"> Assignee <i class="icon caret"
+                                                                                :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}"
                         @click="sortBy('milestoneID')"
-                        :class="{ active: sortKey == 'milestoneID' }" > Milestone <i class="icon caret" :class="sortOrders['milestoneID'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'milestoneID' }"> Milestone <i class="icon caret"
+                                                                                    :class="sortOrders['milestoneID'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}"
                         @click="sortBy('typeID')"
-                        :class="{ active: sortKey == 'typeID' }" > Type <i class="icon caret" :class="sortOrders['typeID'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'typeID' }"> Type <i class="icon caret"
+                                                                          :class="sortOrders['typeID'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;"
                         th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}"
                         @click="sortBy('status')"
-                        :class="{ active: sortKey == 'status' }" > Status <i class="icon caret" :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i> </th>
+                        :class="{ active: sortKey == 'status' }"> Status <i class="icon caret"
+                                                                            :class="sortOrders['status'] > 0 ? 'up' : 'down'"> </i>
+                    </th>
                     <th style="text-align:center;" th:if="${isProjectOwner}">Actions</th>
 
-                </tr></thead>
+                </tr>
+                </thead>
                 <tbody>
                 <tr>
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">
                         <div class="ui fluid icon input">
-                            <input  v-model="filterKey[columns.indexOf('taskName')].value"  type="text" placeholder="Name.. ">
+                            <input v-model="filterKey[columns.indexOf('taskName')].value" type="text"
+                                   placeholder="Name.. ">
                             <i class="search icon"></i>
                         </div>
                     </td>
 
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}">
                         <div class="ui fluid input">
-                            <input type="date" v-model="filterKey[columns.indexOf('startDate')].value" placeholder="Start date.. ">
+                            <input type="date" v-model="filterKey[columns.indexOf('startDate')].value"
+                                   placeholder="Start date.. ">
                         </div>
                     </td>
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}">
                         <div class="ui fluid input">
-                            <input type="date" v-model="filterKey[columns.indexOf('endDate')].value" placeholder="End date.. ">
+                            <input type="date" v-model="filterKey[columns.indexOf('endDate')].value"
+                                   placeholder="End date.. ">
                         </div>
                     </td>
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}">
                         <div class="ui mini fluid input">
-                            <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.min"  type="text" placeholder="Min">
+                            <input v-model="filterKey[columns.indexOf('originalEstimate')].value.min" type="text"
+                                   placeholder="Min">
                         </div>
                         <div class="ui mini fluid input">
-                            <input  v-model="filterKey[columns.indexOf('originalEstimate')].value.max"  type="text" placeholder="Max">
+                            <input v-model="filterKey[columns.indexOf('originalEstimate')].value.max" type="text"
+                                   placeholder="Max">
                         </div>
                     </td>
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}">
                         <div class="ui fluid category search">
                             <div class="ui fluid icon input">
 
-                                <input v-model="filterKey[columns.indexOf('assignee')].value"  class="prompt assigned" placeholder="Search account..." type="text"/>
+                                <input v-model="filterKey[columns.indexOf('assignee')].value" class="prompt assigned"
+                                       placeholder="Search account..." type="text"/>
 
                                 <input class="taskAssigned" name="taskAssigned"
                                        type="hidden"/>
@@ -107,7 +132,8 @@
                         </div>
                     </td>
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}">
-                        <select class="ui multiple selection fluid dropdown" v-model="filterKey[columns.indexOf('milestoneID')].value" name="taskMilestoneId">
+                        <select class="ui multiple selection fluid dropdown"
+                                v-model="filterKey[columns.indexOf('milestoneID')].value" name="taskMilestoneId">
                             <option
                                     th:each="milestone: ${allProjectMilestones}"
                                     th:text="${milestone.name}"
@@ -116,7 +142,8 @@
                         </select>
                     </td>
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}">
-                        <select class="ui type multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('typeID')].value" name="taskTypeID" >
+                        <select class="ui type multiple selection fluid dropdown"
+                                v-model="filterKey[columns.indexOf('typeID')].value" name="taskTypeID">
                             <option th:each="type: ${taskTypes}"
                                     th:text="${type.typeName}"
                                     th:value="${type.id}"
@@ -124,7 +151,8 @@
                         </select>
                     </td>
                     <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
-                        <select class="ui status multiple selection fluid dropdown"  v-model="filterKey[columns.indexOf('status')].value">
+                        <select class="ui status multiple selection fluid dropdown"
+                                v-model="filterKey[columns.indexOf('status')].value">
                             <option th:each="status: ${allTaskStatus}"
                                     th:text="${status.label}"
                                     th:value="${status}"
@@ -135,22 +163,46 @@
                 </tr>
 
                 <tr v-for="entry in filteredTasks">
-                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}">{{entry['startDate']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}">{{entry['endDate']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}">{{entry['originalEstimate']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}">{{entry['assignee']}}</td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}"><i>{{entry['milestoneName']}}</i></td>
-                    <td  style="text-align: center;" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID') || dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
-                        <div class="ui blue green horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}">{{entry['typeName']}}</div>
-                        <div class="ui small primary horizontal label" th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">{{entry['statusName']}}</div>
+                    <td th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'taskName')}">
+                        {{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                        {{entry['taskComments']}}</p></td>
+                    <td style="text-align: center;"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'startDate')}">
+                        {{entry['startDate']}}
+                    </td>
+                    <td style="text-align: center;"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'endDate')}">
+                        {{entry['endDate']}}
+                    </td>
+                    <td style="text-align: center;"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'originalEstimate')}">
+                        {{entry['originalEstimate']}}
+                    </td>
+                    <td style="text-align: center;"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'assignee')}">
+                        {{entry['assignee']}}
+                    </td>
+                    <td style="text-align: center;"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'milestoneID')}"><i>{{entry['milestoneName']}}</i>
+                    </td>
+                    <td style="text-align: center;"
+                        th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID') || dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
+                        <div class="ui blue green horizontal label"
+                             th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'typeID')}">
+                            {{entry['typeName']}}
+                        </div>
+                        <div class="ui small primary horizontal label"
+                             th:if="${dataTableService.checkColumnDisplayed('tableTask', account, 'status')}">
+                            {{entry['statusName']}}
+                        </div>
                     </td>
 
                     <td style="text-align:center;" th:if="${isProjectOwner}">
                         <button @click="deleteTask($event, entry)" class="ui tiny negative icon button">
                             <i class="close icon"></i>
                         </button>
-                        <button v-on:click="showCreateTaskModal(null, entry, $event)" class="ui tiny primary icon button">
+                        <button v-on:click="showCreateTaskModal(null, entry, $event)"
+                                class="ui tiny primary icon button">
                             <i class="edit icon"></i>
                         </button>
                         <button v-on:click="showGraphModal(null, entry, $event)" class="ui tiny yellow icon button">
@@ -162,7 +214,7 @@
             </table>
         </div>
     </script>
-    <script type="text/x-template" id="pending-task-list-template"  >
+    <script type="text/x-template" id="pending-task-list-template">
 
         <table class="ui celled table" v-if="filteredTasks.length > 0">
             <thead>
@@ -172,39 +224,51 @@
                 </th>
             </tr>
             <tr>
-                <th  style="text-align:center;"
-                     @click="sortBy('taskName')"
-                     :class="{ active: sortKey == 'taskName' }" > Task <i class="icon caret" :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i> </th>
+                <th style="text-align:center;"
+                    @click="sortBy('taskName')"
+                    :class="{ active: sortKey == 'taskName' }"> Task <i class="icon caret"
+                                                                        :class="sortOrders['taskName'] > 0 ? 'up' : 'down'"> </i>
+                </th>
 
                 <th style="text-align:center;"
                     @click="sortBy('startDate')"
-                    :class="{ active: sortKey == 'startDate' }" > Start Date <i class="icon caret" :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                    :class="{ active: sortKey == 'startDate' }"> Start Date <i class="icon caret"
+                                                                               :class="sortOrders['startDate'] > 0 ? 'up' : 'down'"> </i>
+                </th>
                 <th style="text-align:center;"
                     @click="sortBy('endDate')"
-                    :class="{ active: sortKey == 'endDate' }" > End date <i class="icon caret" :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i> </th>
+                    :class="{ active: sortKey == 'endDate' }"> End date <i class="icon caret"
+                                                                           :class="sortOrders['endDate'] > 0 ? 'up' : 'down'"> </i>
+                </th>
                 <th style="text-align:center;"
                     @click="sortBy('originalEstimate')"
-                    :class="{ active: sortKey == 'originalEstimate' }" > OE <i class="icon caret" :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i> </th>
+                    :class="{ active: sortKey == 'originalEstimate' }"> OE <i class="icon caret"
+                                                                              :class="sortOrders['originalEstimate'] > 0 ? 'up' : 'down'"> </i>
+                </th>
                 <th style="text-align:center;"
                     @click="sortBy('assignee')"
-                    :class="{ active: sortKey == 'assignee' }" > Assignee <i class="icon caret" :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i> </th>
+                    :class="{ active: sortKey == 'assignee' }"> Assignee <i class="icon caret"
+                                                                            :class="sortOrders['assignee'] > 0 ? 'up' : 'down'"> </i>
+                </th>
 
-                <th style="text-align:center;" th:if="${isProjectOwner}" >Actions</th>
-            </tr></thead>
+                <th style="text-align:center;" th:if="${isProjectOwner}">Actions</th>
+            </tr>
+            </thead>
             <tbody>
 
-            <tr v-for="entry in filteredTasks" >
-                <td >{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;" >{{entry['taskComments']}}</p></td>
-                <td  style="text-align: center;" >{{entry['startDate']}}</td>
-                <td  style="text-align: center;" >{{entry['endDate']}}</td>
-                <td  style="text-align: center;" >{{entry['originalEstimate']}}</td>
-                <td  style="text-align: center;" >{{entry['assignee']}}</td>
+            <tr v-for="entry in filteredTasks">
+                <td>{{entry['taskName']}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                    {{entry['taskComments']}}</p></td>
+                <td style="text-align: center;">{{entry['startDate']}}</td>
+                <td style="text-align: center;">{{entry['endDate']}}</td>
+                <td style="text-align: center;">{{entry['originalEstimate']}}</td>
+                <td style="text-align: center;">{{entry['assignee']}}</td>
                 <td style="text-align:center;" th:if="${isProjectOwner}">
-                    <button  @click="approveTask($event, entry)" class="ui positive icon button">
+                    <button @click="approveTask($event, entry)" class="ui positive icon button">
                         Approve
                         <i class="check icon"></i>
                     </button>
-                    <button @click="denyTask($event, entry)"  class="ui negative icon button">
+                    <button @click="denyTask($event, entry)" class="ui negative icon button">
                         Deny
                         <i class="close icon"></i>
                     </button>
@@ -215,7 +279,7 @@
 
     </script>
     <script type="text/x-template" id="graph-modal-template">
-        <div class="ui modal graph " >
+        <div class="ui modal graph ">
             <i class="close icon"></i>
             <div class="content">
                 <div class="ui fluid card">
@@ -225,20 +289,20 @@
 
         </div>
     </script>
-    <script type="text/x-template" id="task-modal-template"  >
-        <div class="ui large modal create-task " >
+    <script type="text/x-template" id="task-modal-template">
+        <div class="ui large modal create-task ">
             <i class="close icon"></i>
             <div class="header">
                 {{ modalTitle }}
             </div>
             <div class="content">
-                <form class="ui form" enctype="application/x-www-form-urlencoded" id="task" >
+                <form class="ui form" enctype="application/x-www-form-urlencoded" id="task">
                     <div v-bind="formError" class="ui error message"></div>
 
                     <div class="two fields">
                         <div class="field">
                             <label>Task Name</label>
-                            <input v-model="task.taskName"  name="taskName" placeholder="Task Name" required type="text">
+                            <input v-model="task.taskName" name="taskName" placeholder="Task Name" required type="text">
                         </div>
                         <div class="field">
                             <label>User assigned</label>
@@ -256,13 +320,14 @@
                     </div>
                     <div class="field">
                         <label>Task Description</label>
-                        <textarea v-model="task.taskComments" name="taskComments" placeholder="Task Description" rows="1"></textarea>
+                        <textarea v-model="task.taskComments" name="taskComments" placeholder="Task Description"
+                                  rows="1"></textarea>
                     </div>
                     <div class=" two fields">
                         <div class="field">
                             <label>Task Start Date</label>
                             <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name"
-                                   required  type="date">
+                                   required type="date">
                         </div>
                         <div class="field">
                             <label>Task End Date</label>
@@ -273,11 +338,12 @@
                     <div class="four fields">
                         <div class="field">
                             <label>Task Original Estimate</label>
-                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" required type="number">
+                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE"
+                                   required type="number">
                         </div>
                         <div class="field">
                             <label>Task type</label>
-                            <select class="ui type dropdown"  v-model="task.typeID" name="taskTypeID" >
+                            <select class="ui type dropdown" v-model="task.typeID" name="taskTypeID">
                                 <option th:each="type: ${taskTypes}"
                                         th:text="${type.typeName}" th:value="${type.id}"
                                 ></option>
@@ -285,7 +351,8 @@
                         </div>
                         <div class="field">
                             <label>Task status</label>
-                            <select class="ui status dropdown" v-model="task.status" name="taskStatus" v-bind:class="{disabled: (task.taskID == 0)}">
+                            <select class="ui status dropdown" v-model="task.status" name="taskStatus"
+                                    v-bind:class="{disabled: (task.taskID == 0)}">
                                 <option th:each="status: ${allTaskStatus}"
                                         th:text="${status.label}"
                                         th:value="${status}"
@@ -318,9 +385,31 @@
     </script>
 
     <div id="tasksList">
-        <button th:if="${isProjectOwner}" v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task icon button">
-            New Task <i class="plus icon"></i>
-        </button>
+        <div class="ui menu">
+            <a th:if="${isProjectOwner}" v-on:click="showCreateTaskModal(null, null, $event)"
+               class="item">
+                <i class="plus icon"></i>
+                New Task
+            </a>
+            <div id="import" class="ui dropdown item import">
+                Import tasks
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a class="item">JIRA</a>
+                    <a class="item">Github</a>
+                    <a class="item">CSV</a>
+                </div>
+            </div>
+            <script type="text/javascript">
+            $(document).ready(function(){
+                $('#import').dropdown({
+                    clearable: true
+                  });
+                  });
+
+            </script>
+        </div>
+
 
         <pending-task-list
                 :tasks="gridData"

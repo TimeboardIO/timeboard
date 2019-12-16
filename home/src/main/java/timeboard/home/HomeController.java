@@ -51,8 +51,8 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("/org/{orgID}/home")
-public class HomeServlet {
+@RequestMapping("/home")
+public class HomeController {
 
     @Autowired
     private ProjectService projectService;
