@@ -10,19 +10,22 @@ $(document).ready(function () {
                     {
                         "slot": "tagkey",
                         "label": "Tag Key",
-                        "sortKey": "tagKey"
+                        "sortKey": "tagKey",
+                        "primary" : true
+
                     },
                     {
                         "slot": "tagvalue",
                         "label": "Tag Value",
-                        "sortKey": "tagValue",
+                        "sortKey": "tagValue"
 
                     },
                     {
                         "slot": "tagactions",
                         "label": "Actions"
                     }],
-                data: []
+                data: [],
+                name: 'tableName'
             }
         },
         methods: {

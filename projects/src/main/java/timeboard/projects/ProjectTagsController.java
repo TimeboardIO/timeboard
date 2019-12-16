@@ -105,13 +105,13 @@ public class ProjectTagsController {
         return this.listTags(projectID);
     }
 
-    public static class ProjectTagWrapper{
+    public static class ProjectTagWrapper {
 
         private String tagKey;
         private String tagValue;
         private Long id;
 
-        public ProjectTagWrapper(ProjectTag projectTag){
+        public ProjectTagWrapper(ProjectTag projectTag) {
             this.tagKey = projectTag.getTagKey();
             this.tagValue = projectTag.getTagValue();
             this.id = projectTag.getId();

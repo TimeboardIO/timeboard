@@ -72,7 +72,7 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     private void fillModel(Model model, Account actor, Project project) throws BusinessException {
@@ -98,7 +98,7 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     @PostMapping("/tasks")
@@ -110,7 +110,7 @@ public class ProjectTasksController {
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     public static class TaskForm {

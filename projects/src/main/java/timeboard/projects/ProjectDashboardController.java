@@ -68,7 +68,7 @@ public class ProjectDashboardController {
         model.addAttribute("project", project);
         model.addAttribute("dashboard", dashboard);
 
-        return "details_project_dashboard.html";
+        return "project_dashboard.html";
     }
 
 }
