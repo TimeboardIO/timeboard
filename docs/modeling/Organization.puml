@@ -1,22 +1,14 @@
 @startuml
 
-Organization "1" -- "*" OrganizationMembership
-User "1" -- "1..*" OrganizationMembership
-User "1" -- "*" ProjectMembership
+Account "1" -- "1" AccountHierarchy : organization
+Account "1" -- "1" AccountHierarchy : member
+
+Account "1" -- "*" ProjectMembership
 Project "1" -- "*" ProjectMembership
-ProjectRole "1" -- "1" ProjectMembership
-OrganizationMembership  -- "1" OrganizationRole
+MembershipRole "1" -- "1" ProjectMembership
+AccountHierarchy  -- "1" MembershipRole
 
-ProjectToOrganization "1..*" -- "1" Project
-ProjectToOrganization "*" -- "1" Organization
-
-enum OrganizationRole {
-    LEADER,
-    MANAGER,
-    EMPLOYEE
-}
-
-enum ProjectRole {
+enum MembershipRole {
     OWNER,
     CONTRIBUTOR
 }
