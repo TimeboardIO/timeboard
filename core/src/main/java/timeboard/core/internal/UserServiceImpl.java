@@ -43,7 +43,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-
 @Component
 @Transactional
 public class UserServiceImpl implements UserService {
@@ -55,13 +54,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<Account> createUsers(List<Account> accounts) {
-             accounts.forEach(user -> {
-                em.persist(user);
-                 LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
-            });
-            return accounts;
-     }
-
+        accounts.forEach(user -> {
+            em.persist(user);
+            LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
+        });
+        return accounts;
+    }
 
 
     @Override
@@ -71,58 +69,58 @@ public class UserServiceImpl implements UserService {
         LOGGER.info("User " + account.getFirstName() + " " + account.getName() + " created");
         this.em.flush();
         return account;
-     }
+    }
 
 
     @Override
     public Account updateUser(Account account) {
-             Account u = this.findUserByID(account.getId());
-            if (u != null) {
-                u.setFirstName(account.getFirstName());
-                u.setName(account.getName());
-                u.setEmail(account.getEmail());
-                u.setExternalIDs(account.getExternalIDs());
-            }
-            em.flush();
-            LOGGER.info("User " + account.getEmail() + " updated.");
-            return account;
+        Account u = this.findUserByID(account.getId());
+        if (u != null) {
+            u.setFirstName(account.getFirstName());
+            u.setName(account.getName());
+            u.setEmail(account.getEmail());
+            u.setExternalIDs(account.getExternalIDs());
+        }
+        em.flush();
+        LOGGER.info("User " + account.getEmail() + " updated.");
+        return account;
 
     }
 
 
     @Override
     public List<Account> searchUserByEmail(final String prefix) {
-             TypedQuery<Account> q = em
-                    .createQuery(
-                            "select u from Account u "
-                                    + "where u.email LIKE CONCAT('%',:prefix,'%')",
-                            Account.class);
-            q.setParameter("prefix", prefix);
-            return q.getResultList();
-     }
+        TypedQuery<Account> q = em
+                .createQuery(
+                        "select u from Account u "
+                                + "where u.email LIKE CONCAT('%',:prefix,'%')",
+                        Account.class);
+        q.setParameter("prefix", prefix);
+        return q.getResultList();
+    }
 
-     @Override
+    @Override
     public List<Account> searchUserByName(final String prefix) {
-             TypedQuery<Account> q = em
-                    .createQuery(
-                            "select u from Account u "
-                                    + "where u.name LIKE CONCAT('%',:prefix,'%') or u.firstName LIKE CONCAT('%',:prefix,'%')",
-                            Account.class);
-            q.setParameter("prefix", prefix);
-            return q.getResultList();
-     }
+        TypedQuery<Account> q = em
+                .createQuery(
+                        "select u from Account u "
+                                + "where u.name LIKE CONCAT('%',:prefix,'%') or u.firstName LIKE CONCAT('%',:prefix,'%')",
+                        Account.class);
+        q.setParameter("prefix", prefix);
+        return q.getResultList();
+    }
 
     @Override
     public List<Account> searchUserByEmail(final String prefix, final Long projectId) {
-             Project project = em.find(Project.class, projectId);
-            List<Account> matchedAccount = project.getMembers().stream()
-                    .filter(projectMembership -> projectMembership
-                            .getMember()
-                            .getEmail().startsWith(prefix))
-                    .map(projectMembership -> projectMembership.getMember())
-                    .collect(Collectors.toList());
-            return matchedAccount;
-     }
+        Project project = em.find(Project.class, projectId);
+        List<Account> matchedAccount = project.getMembers().stream()
+                .filter(projectMembership -> projectMembership
+                        .getMember()
+                        .getEmail().startsWith(prefix))
+                .map(projectMembership -> projectMembership.getMember())
+                .collect(Collectors.toList());
+        return matchedAccount;
+    }
 
 
     @Override
@@ -138,26 +136,26 @@ public class UserServiceImpl implements UserService {
         if (email == null) {
             return null;
         }
-             TypedQuery<Account> q = em.createQuery("from Account u where u.email=:email", Account.class);
-            q.setParameter("email", email);
-            Account account;
-            try {
-                account = q.getSingleResult();
-            } catch (NoResultException e) {
-                account = null;
-            }
-            return account;
-     }
+        TypedQuery<Account> q = em.createQuery("from Account u where u.email=:email", Account.class);
+        q.setParameter("email", email);
+        Account account;
+        try {
+            account = q.getSingleResult();
+        } catch (NoResultException e) {
+            account = null;
+        }
+        return account;
+    }
 
     @Override
     public Account findUserBySubject(String remoteSubject) {
         Account u;
         try {
-                 Query q = em
-                        .createQuery("select u from Account u where u.remoteSubject = :sub", Account.class);
-                q.setParameter("sub", remoteSubject);
-                return (Account) q.getSingleResult();
-         } catch (NoResultException | NonUniqueResultException e) {
+            Query q = em
+                    .createQuery("select u from Account u where u.remoteSubject = :sub", Account.class);
+            q.setParameter("sub", remoteSubject);
+            return (Account) q.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException e) {
             u = null;
         }
         return u;
@@ -168,13 +166,13 @@ public class UserServiceImpl implements UserService {
     public Account findUserByExternalID(String origin, String userExternalID) {
         Account u;
         try {
-                 Query q = em // MYSQL native for JSON queries
-                        .createNativeQuery("select * from Account "
-                                + "where JSON_EXTRACT(externalIDs, '$." + origin + "')"
-                                + " = ?", Account.class);
-                q.setParameter(1, userExternalID);
-                return (Account) q.getSingleResult();
-         } catch (javax.persistence.NoResultException e) {
+            Query q = em // MYSQL native for JSON queries
+                    .createNativeQuery("select * from Account "
+                            + "where JSON_EXTRACT(externalIDs, '$." + origin + "')"
+                            + " = ?", Account.class);
+            q.setParameter(1, userExternalID);
+            return (Account) q.getSingleResult();
+        } catch (javax.persistence.NoResultException e) {
             u = null;
         }
         return u;

@@ -43,7 +43,7 @@ public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {
 
     @Override
     public boolean isSatisfied(Account u, Milestone thing) {
-        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+        final Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()
                 )

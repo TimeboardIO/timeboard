@@ -6,11 +6,11 @@
 >
 
 <head>
-    <meta property="organization" th:orgID="${organization.id}" th:baseURL="@{${'/org/'+tab}}"/>
+    <meta property="organization" th:baseURL="@{${'/org/'+tab}}" th:orgID="${organization.id}"/>
 </head>
 <body>
 
-<div layout:fragment="placeholder" id="members">
+<div id="members" layout:fragment="placeholder">
 
     <div class="field">
         <div class="ui category search">
@@ -44,28 +44,28 @@
 
     <table class="ui tablet unstackable table">
         <thead>
-            <tr>
-                <th>First Name</th>
-                <th>Role</th>
-                <th>Action</th>
-            </tr>
+        <tr>
+            <th>First Name</th>
+            <th>Role</th>
+            <th>Action</th>
+        </tr>
         </thead>
         <tbody>
-            <tr v-for="member in members" v-if="member.isOrganization == false" >
-                <td >{{member.screenName}}</td>
-                <td>
-                    <select v-model="member.role"  @change="updateRole($event, member)">
-                        <option th:each="role : ${roles}"
+        <tr v-for="member in members" v-if="member.isOrganization == false">
+            <td>{{member.screenName}}</td>
+            <td>
+                <select @change="updateRole($event, member)" v-model="member.role">
+                    <option th:each="role : ${roles}"
                             th:text="${role}"
                             th:value="${role}"></option>
-                    </select>
-                </td>
-                <td>
-                    <button @click="removeMember($event, member)" class="ui tiny negative icon button">
-                        Remove <i class="close icon"></i>
-                    </button>
-                </td>
-            </tr>
+                </select>
+            </td>
+            <td>
+                <button @click="removeMember($event, member)" class="ui tiny negative icon button">
+                    Remove <i class="close icon"></i>
+                </button>
+            </td>
+        </tr>
         </tbody>
     </table>
 

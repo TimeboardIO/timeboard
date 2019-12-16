@@ -13,6 +13,8 @@
         display: none !important;
       }
     }
+
+
     </style>
 </head>
 <body>
@@ -22,10 +24,10 @@
 
     <div class="ui segment">
 
-        <div class="ui two column grid doubling" >
+        <div class="ui two column grid doubling">
 
             <div class="column center aligned">
-                <div class="ui segment basic middle aligned center aligned grid" >
+                <div class="ui segment basic middle aligned center aligned grid">
                     <div class="column">
                         <div class="ui statistic">
                             <div class="label">
@@ -61,15 +63,18 @@
                         <th class="two wide">Validated</th>
                     </tr>
                     </thead>
-                    <tbody >
-                    <tr th:each="week : ${weeks}" class="center aligned">
-                        <td data-label="Week" >
-                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} " th:text="${'Week '+week.number}"></a>
+                    <tbody>
+                    <tr class="center aligned" th:each="week : ${weeks}">
+                        <td data-label="Week">
+                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} "
+                               th:text="${'Week '+week.number}"></a>
                         </td>
                         <td data-label="Days">
                             <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
-                                <div th:if="${week.imputationSum >= 5}" class="ui circular label large day-badge green" th:text="${week.imputationSum}"></div>
-                                <div th:if="${week.imputationSum < 5}" class="ui circular label large day-badge red" th:text="${week.imputationSum}"></div>
+                                <div class="ui circular label large day-badge green" th:if="${week.imputationSum >= 5}"
+                                     th:text="${week.imputationSum}"></div>
+                                <div class="ui circular label large day-badge red" th:if="${week.imputationSum < 5}"
+                                     th:text="${week.imputationSum}"></div>
                             </a>
                         </td>
                         <td data-label="Validated">

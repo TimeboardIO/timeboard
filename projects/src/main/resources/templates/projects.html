@@ -2,12 +2,12 @@
 
 <html layout:decorate="~{layouts/general.html(path='/projects')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
-      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
     <title layout:fragment="title">Home Page</title>
-    <script type="text/javascript" src="/js/projects.js"></script>
+    <script src="/js/projects.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -27,6 +27,7 @@
             margin-bottom: 0.5em;
         }
 
+
     </style>
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
@@ -41,11 +42,11 @@
         </div>
     </div>
 
-    <div th:if="${!projects.isEmpty()}" class="ui segment">
+    <div class="ui segment" th:if="${!projects.isEmpty()}">
 
         <div class="ui menu">
-            <a th:href="@{/projects/create}"
-               class="item">
+            <a class="item"
+               th:href="@{/projects/create}">
                 <i class="plus icon"></i>
                 New Project
             </a>
@@ -99,7 +100,7 @@
                     {{row.name}}
                 </template>
                 <template v-slot:actions="{row}">
-                    <a v-bind:href="'/projects/'+row.id" class="ui right labeled success icon button">
+                    <a class="ui right labeled success icon button" v-bind:href="'/projects/'+row.id">
                         <i class="right arrow icon"></i>
                         View
                     </a>

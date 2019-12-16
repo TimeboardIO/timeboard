@@ -64,9 +64,16 @@ public class LauncherLoader {
         // Launch the creation of sample datas
         try {
             List<Account> usersSaved = new UserLoader(this.userService).load(nbUsers);
-            List<Project> projectsSaved = new ProjectLoader(this.projectService, this.userService).load(usersSaved, nbProjectsByUsers);
-            List<Task> tasksSaved = new TaskLoader(this.projectService, this.userService).load(usersSaved, projectsSaved, nbProjectsByUsers, nbTasksByProjects);
-            List<Imputation> imputationsSaved = new ImputationLoader(this.projectService, this.userService).load(usersSaved, tasksSaved, nbProjectsByUsers, nbTasksByProjects, nbImputationsByTasks);
+
+            List<Project> projectsSaved = new ProjectLoader(this.projectService, this.userService)
+                    .load(usersSaved, nbProjectsByUsers);
+
+            List<Task> tasksSaved = new TaskLoader(this.projectService, this.userService)
+                    .load(usersSaved, projectsSaved, nbProjectsByUsers, nbTasksByProjects);
+
+            List<Imputation> imputationsSaved = new ImputationLoader(this.projectService, this.userService)
+                    .load(usersSaved, tasksSaved, nbProjectsByUsers, nbTasksByProjects, nbImputationsByTasks);
+
         } catch (BusinessException e){
             e.printStackTrace();
         }

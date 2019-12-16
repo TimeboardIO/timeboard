@@ -117,7 +117,8 @@ public class TimesheetController {
         final Date de = findEndDate(c, week, year);
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
-        final boolean lastWeekValidated = this.timesheetService.isTimesheetValidated(this.userInfo.getCurrentAccount(), lastWeekYear, lastWeek);
+        final boolean lastWeekValidated =
+                this.timesheetService.isTimesheetValidated(this.userInfo.getCurrentAccount(), lastWeekYear, lastWeek);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);

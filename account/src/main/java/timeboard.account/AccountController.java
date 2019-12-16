@@ -41,10 +41,7 @@ import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.text.DateFormatSymbols;
 import java.util.*;
 
@@ -71,43 +68,43 @@ public class AccountController {
     private DataTableService dataTableService;
 
     @PostMapping
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+    protected String handlePost(HttpServletRequest request, Model model) {
 
-        String submitButton = request.getParameter("formType");
-        Account actor = this.userInfo.getCurrentAccount();
+        final String submitButton = request.getParameter("formType");
+        final Account actor = this.userInfo.getCurrentAccount();
 
         switch (submitButton) {
 
             case "account":
-               //Account modification
-               String fistName = request.getParameter("firstName");
-               String name = request.getParameter("name");
-               String email = request.getParameter("email");
+                //Account modification
+                final String fistName = request.getParameter("firstName");
+                final String name = request.getParameter("name");
+                final String email = request.getParameter("email");
 
                 actor.setFirstName(fistName);
                 actor.setName(name);
                 actor.setEmail(email);
 
-               try {
-                   Account u = userService.updateUser(actor);
-                   model.addAttribute("message", "User account changed successfully !");
-               } catch (Exception e) {
-                   model.addAttribute("error", "Error while updating user information.");
-               }
-               break;
+                try {
+                    final Account u = userService.updateUser(actor);
+                    model.addAttribute("message", "User account changed successfully !");
+                } catch (Exception e) {
+                    model.addAttribute("error", "Error while updating user information.");
+                }
+                break;
 
             case "external":
-                Enumeration<String> params1 = request.getParameterNames();
+                final Enumeration<String> params1 = request.getParameterNames();
                 while (params1.hasMoreElements()) {
-                    String param = params1.nextElement();
+                    final String param = params1.nextElement();
                     if (param.startsWith("attr-")) {
-                        String key = param.substring(5, param.length());
-                        String value = request.getParameter(param);
+                        final String key = param.substring(5, param.length());
+                        final String value = request.getParameter(param);
                         actor.getExternalIDs().put(key, value);
                     }
                 }
                 try {
-                    Account u = userService.updateUser(actor);
+                    final Account u = userService.updateUser(actor);
                     model.addAttribute("message", "External tools updated successfully !");
                 } catch (Exception e) {
                     model.addAttribute("error", "Error while external tools");
@@ -115,9 +112,16 @@ public class AccountController {
                 break;
 
             case "columnTask":
-                List<String> selectedColumnsString = request.getParameterValues("columnSelected") != null ? Arrays.asList(request.getParameterValues("columnSelected")) : new ArrayList<>();
+                final List<String> selectedColumnsString
+                        = request.getParameterValues("columnSelected") != null
+                        ? Arrays.asList(request.getParameterValues("columnSelected"))
+                        : new ArrayList<>();
                 try {
-                    this.dataTableService.addOrUpdateTableConfig(this.dataTableService.TABLE_TASK_ID, actor, selectedColumnsString);
+                    this.dataTableService.addOrUpdateTableConfig(
+                            this.dataTableService.TABLE_TASK_ID,
+                            actor,
+                            selectedColumnsString);
+
                     model.addAttribute("message", "Task columns preferences updated successfully !");
                 } catch (Exception e) {
                     model.addAttribute("error", "Error while updating Task columns preferences");
@@ -132,45 +136,53 @@ public class AccountController {
     }
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
-        Account actor = this.userInfo.getCurrentAccount();
+    protected String handleGet(Model model) {
+        final Account actor = this.userInfo.getCurrentAccount();
         loadPage(model, actor);
         return "account.html";
     }
-    
+
     private void loadPage(Model model, Account actor) {
         model.addAttribute("account", actor);
 
-        List<Project> projects = projectService.listProjects(actor);
+        final List<Project> projects = projectService.listProjects(actor);
 
-        List<String> fieldNames = new ArrayList<>();
+        final List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list
-        if(projectImportServices != null) {
+        if (projectImportServices != null) {
             projectImportServices.forEach(service -> {
                 fieldNames.add(service.getServiceName());
             });
         }
 
-        Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
-        Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
-        Calendar end = Calendar.getInstance();
+        final Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
+        final Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
+        final Calendar end = Calendar.getInstance();
         end.setTime(actor.getBeginWorkDate());
-        Calendar start = Calendar.getInstance();
+        final Calendar start = Calendar.getInstance();
         start.setTime(new Date());
-        DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
+        final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
         dfs.getLocalPatternChars();
-        String[] months = dfs.getMonths();
-        for (int i = start.get(Calendar.MONTH); start.after(end); start.add(Calendar.MONTH, -1), i = start.get(Calendar.DAY_OF_MONTH)) {
+        final String[] months = dfs.getMonths();
+        for (int i = start.get(Calendar.MONTH);
+             start.after(end);
+             start.add(Calendar.MONTH, -1), i = start.get(Calendar.DAY_OF_MONTH)) {
+
             yearsSinceHiring.add(start.get(Calendar.YEAR));
-            if(monthsSinceHiring.size() < 12) monthsSinceHiring.put(start.get(Calendar.MONTH), months[start.get(Calendar.MONTH)]);
+            if (monthsSinceHiring.size() < 12) {
+                monthsSinceHiring.put(start.get(Calendar.MONTH), months[start.get(Calendar.MONTH)]);
+            }
         }
 
         model.addAttribute("externalTools", fieldNames);
         model.addAttribute("projects", projects);
         model.addAttribute("yearsSinceHiring", yearsSinceHiring);
         model.addAttribute("monthsSinceHiring", monthsSinceHiring);
-        DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(this.dataTableService.TABLE_TASK_ID, actor);
-        List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
+
+        final DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(
+                this.dataTableService.TABLE_TASK_ID, actor);
+
+        final List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
         model.addAttribute("userTaskColumns", userTaskColumns);
         model.addAttribute("allTaskColumns", this.dataTableService.ALL_COLUMNS_TABLE_TASK);
     }

@@ -47,13 +47,20 @@ public class ImputationLoader {
         this.userService = userService;
     }
 
-    public List<Imputation> load(List<Account> usersSaved, List<Task> tasksSaved, int nbProjectsByUsers, int nbTasksByProjects, int nbImputationsByTasks){
+    public List<Imputation> load(
+                List<Account> usersSaved,
+                List<Task> tasksSaved,
+                int nbProjectsByUsers,
+                int nbTasksByProjects,
+                int nbImputationsByTasks){
+
         List<Imputation> imputationsSaved = new ArrayList<>();
         Map<String, Double> mapDateSumImput = new HashMap<String, Double>();
 
         for (int i = 0; i < tasksSaved.size(); i++) {
 
-            Account actor = usersSaved.get(i/(nbProjectsByUsers*nbTasksByProjects)); // car 1 user possède "nbProjectsByUsers" projects possédant chacun "nbTasksByProjects" tâches
+            Account actor = usersSaved.get(i/(nbProjectsByUsers*nbTasksByProjects));
+            // car 1 user possède "nbProjectsByUsers" projects possédant chacun "nbTasksByProjects" tâches
             Task task = tasksSaved.get(i);
 
             if(actor != null) {

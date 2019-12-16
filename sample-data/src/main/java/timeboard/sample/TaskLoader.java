@@ -58,7 +58,19 @@ public class TaskLoader {
                 // On créé "nbTasksByProjects" tâches par projet
                 for (int j = 0; j < nbTasksByProjects; j++) {
                     try {
-                        tasksSaved.add(this.projectService.createTask(owner, project, "task-project" + i + "-task" + j, "comment task" + j, new Date(), new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)), 8, null, owner, ProjectService.ORIGIN_TIMEBOARD, null, null, null));
+                        tasksSaved.add(this.projectService.createTask(owner,
+                                project, "task-project" + i + "-task" + j,
+                                "comment task" + j,
+                                new Date(),
+                                new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)),
+                                8,
+                                null,
+                                owner,
+                                ProjectService.ORIGIN_TIMEBOARD,
+                                null,
+                                null,
+                                null));
+
                         System.out.println("Save task: project" + i + " task" + j);
 
                     } catch (Exception e) {

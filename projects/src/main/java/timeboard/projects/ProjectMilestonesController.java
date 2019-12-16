@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,10 +39,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,7 +54,7 @@ public class ProjectMilestonesController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String milestonesApp(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
+    protected String milestonesApp(@PathVariable Long projectID, Model model) throws  BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
@@ -79,7 +76,7 @@ public class ProjectMilestonesController {
 
 
     @GetMapping("/{milestoneID/delete")
-    protected String deleteMilestone(@PathVariable Long projetID, @PathVariable Long milestoneID) throws ServletException, IOException, BusinessException {
+    protected String deleteMilestone(@PathVariable Long projetID, @PathVariable Long milestoneID) throws BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.deleteMilestoneByID(actor, milestoneID);
@@ -88,7 +85,10 @@ public class ProjectMilestonesController {
     }
 
     @GetMapping("/{milestoneID}/setup")
-    protected String setupMilestone(@PathVariable Long projectID, @PathVariable Long milestoneID, Model model) throws BusinessException {
+    protected String setupMilestone(@PathVariable Long projectID,
+                                    @PathVariable Long milestoneID,
+                                    Model model) throws BusinessException {
+
         final Account actor = this.userInfo.getCurrentAccount();
 
         Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
@@ -144,7 +144,9 @@ public class ProjectMilestonesController {
     }
 
 
-    protected String createConfigLinks(Account actor, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
+    protected String createConfigLinks(Account actor,
+                                       HttpServletRequest request,
+                                       Model model) throws BusinessException {
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
@@ -155,7 +157,6 @@ public class ProjectMilestonesController {
             Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
             currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
             currentMilestone = addTasksToMilestone(actor, currentMilestone, request);
-
 
             model.addAttribute("milestone", currentMilestone);
 
@@ -173,7 +174,10 @@ public class ProjectMilestonesController {
         }
     }
 
-    private Milestone addTasksToMilestone(Account actor, Milestone currentMilestone, HttpServletRequest request) throws BusinessException {
+    private Milestone addTasksToMilestone(Account actor,
+                                          Milestone currentMilestone,
+                                          HttpServletRequest request) throws BusinessException {
+
         String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
         List<Task> selectedTasks = Arrays
                 .stream(selectedTaskIdsString)
@@ -193,23 +197,23 @@ public class ProjectMilestonesController {
     }
 
 
-    public class MilestoneDecorator{
+    public class MilestoneDecorator {
 
         private Milestone milestone;
 
-        public MilestoneDecorator(Milestone milestone){
+        public MilestoneDecorator(Milestone milestone) {
             this.milestone = milestone;
         }
 
-        public String getName(){
+        public String getName() {
             return this.milestone.getName();
         }
 
-        public MilestoneType getType(){
+        public MilestoneType getType() {
             return this.milestone.getType();
         }
 
-        public Date getDate(){
+        public Date getDate() {
             return this.milestone.getDate();
         }
 

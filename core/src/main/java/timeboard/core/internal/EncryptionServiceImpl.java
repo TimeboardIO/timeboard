@@ -55,7 +55,7 @@ public class EncryptionServiceImpl implements EncryptionService {
                 Cipher cipher = Cipher.getInstance("AES");
                 cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"));
                 value = new String(cipher.doFinal(Base64.getDecoder().decode(value)));
-            } catch (Exception  e) {
+            } catch (Exception e) {
                 // Catch error empty
             }
         }

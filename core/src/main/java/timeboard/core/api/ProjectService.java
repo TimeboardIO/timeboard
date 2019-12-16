@@ -60,6 +60,7 @@ public interface ProjectService {
 
     /**
      * Update a project.
+     *
      * @param project
      * @param memberships Key : userID, Value : user role for project param
      */
@@ -84,7 +85,9 @@ public interface ProjectService {
     List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de);
 
     Task createTask(Account actor, Project project, String taskName, String taskComment,
-                    Date startDate, Date endDate, double originalEstimate, Long taskTypeID, Account assignedAccountID, String origin, String remotePath, String remoteId, Milestone milestone);
+                    Date startDate, Date endDate, double originalEstimate,
+                    Long taskTypeID, Account assignedAccountID, String origin,
+                    String remotePath, String remoteId, Milestone milestone);
 
     void createTasks(Account actor, List<Task> taskList);
 
@@ -100,12 +103,16 @@ public interface ProjectService {
 
     /**
      * Search existing task from specific origin.
-     * @param project target project
-     * @param origin source (Github, GitLab, Jira, ...)
+     *
+     * @param project    target project
+     * @param origin     source (Github, GitLab, Jira, ...)
      * @param remotePath string key of source characteristics (owner, repository, ...)
      * @return list of task corresponding to the origin
      */
-    Map<String, Task> searchExistingTasksFromOrigin(Account actor, Project project, String origin, String remotePath) throws BusinessException;
+    Map<String, Task> searchExistingTasksFromOrigin(Account actor,
+                                                    Project project,
+                                                    String origin,
+                                                    String remotePath) throws BusinessException;
 
     List<TaskRevision> findAllTaskRevisionByTaskID(Account actor, Long taskID);
 
@@ -114,18 +121,24 @@ public interface ProjectService {
     /*
      == Imputations ==
      */
+
     /**
      * Return effort spent for a task.
+     *
      * @return List all effort spent for a task.
      */
-    List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor, Task task, Date startTaskDate, Date endTaskDate) throws BusinessException;
+    List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor,
+                                                      Task task,
+                                                      Date startTaskDate,
+                                                      Date endTaskDate) throws BusinessException;
 
     List<EffortHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
 
-    UpdatedTaskResult updateTaskImputation(Account actor, AbstractTask task, Date day, double imputation) throws BusinessException;
+    UpdatedTaskResult updateTaskImputation(Account actor,
+                                           AbstractTask task,
+                                           Date day, double imputation) throws BusinessException;
 
     List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList);
-
 
 
     /*
@@ -135,12 +148,14 @@ public interface ProjectService {
 
     /**
      * Create a default task.
+     *
      * @return DefaultTask
      */
     DefaultTask createDefaultTask(Account actor, String task) throws BusinessException;
 
     /**
      * default tasks can not be deleted, so they are set disabled and hidden from UI
+     *
      * @param actor
      * @param taskID
      * @throws BusinessException
@@ -151,8 +166,10 @@ public interface ProjectService {
     /*
      == Milestones ==
      */
+
     /**
      * Return all milestones for a project.
+     *
      * @param project project
      * @return List milestones
      */
@@ -160,6 +177,7 @@ public interface ProjectService {
 
     /**
      * Search milestone by id.
+     *
      * @param id milestone's id
      * @return Milestone
      */
@@ -167,25 +185,35 @@ public interface ProjectService {
 
     /**
      * Create a milestone.
+     *
      * @return Milestone
      */
-    Milestone createMilestone(Account actor, String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) throws BusinessException;
+    Milestone createMilestone(Account actor,
+                              String name,
+                              Date date,
+                              MilestoneType type,
+                              Map<String, String> attributes,
+                              Set<Task> tasks, Project project) throws BusinessException;
 
     /**
      * Update a milestone.
+     *
      * @return Milestone
      */
     Milestone updateMilestone(Account actor, Milestone milestone) throws BusinessException;
 
     /**
      * Delete a milestone.
+     *
      * @param milestoneID
      */
     void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException;
 
     List<Task> listTasksByMilestone(Account actor, Milestone milestone) throws BusinessException;
 
-    Milestone addTasksToMilestone(Account actor, Milestone currentMilestone, List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
+    Milestone addTasksToMilestone(Account actor,
+                                  Milestone currentMilestone,
+                                  List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
     TaskType createTaskType(Account actor, String name);
 
@@ -193,6 +221,7 @@ public interface ProjectService {
 
     /**
      * Return task types.
+     *
      * @return List all task types.
      */
     List<TaskType> listTaskType();

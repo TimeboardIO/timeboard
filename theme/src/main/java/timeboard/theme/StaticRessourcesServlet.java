@@ -29,7 +29,6 @@ package timeboard.theme;
 import javax.servlet.http.HttpServlet;
 
 
-
 public class StaticRessourcesServlet extends HttpServlet {
 
 
