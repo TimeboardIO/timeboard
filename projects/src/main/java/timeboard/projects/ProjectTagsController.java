@@ -76,7 +76,7 @@ public class ProjectTagsController {
     public ResponseEntity<List<ProjectTagWrapper>> deleteTag(@PathVariable Long projectID, @PathVariable Long tagID) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
-        project.getTags().removeIf(projectTag -> projectTag.getId() == tagID);
+        project.getTags().removeIf(projectTag -> projectTag.getId().equals(tagID));
         this.projectService.updateProject(actor, project);
         return this.listTags(projectID);
     }
@@ -86,7 +86,7 @@ public class ProjectTagsController {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
         project.getTags().stream()
-                .filter(projectTag -> projectTag.getId() == tagID)
+                .filter(projectTag -> projectTag.getId().equals(tagID))
                 .forEach(projectTag -> {
                     projectTag.setTagKey(tag.getTagKey());
                     projectTag.setTagValue(tag.getTagValue());
