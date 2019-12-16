@@ -55,7 +55,7 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public boolean checkColumnDisplayed(String tableId, Account actor, String colName){
+    public boolean checkColumnDisplayed(String tableId, Account actor, String colName) {
 
         boolean isDefault = Arrays.stream(defaultCols)
                 .map(s -> s.equals(colName))
@@ -67,7 +67,7 @@ public class DataTableServiceImpl implements DataTableService {
     @Override
     public boolean checkColumnDisplayedFromDB(String tableId, Account actor, String colName) {
         DataTableConfig tableConfig = findTableConfigByUserAndTable(tableId, actor);
-        if(tableConfig == null){
+        if (tableConfig == null) {
             return false;
         }
         return tableConfig.getColumns().contains(colName);
@@ -76,7 +76,8 @@ public class DataTableServiceImpl implements DataTableService {
     @Override
     public DataTableConfig findTableConfigByUserAndTable(String tableId, Account actor) {
         TypedQuery<DataTableConfig> q = this.em
-                .createQuery("select d from DataTableConfig d where d.user=:user and d.tableInstanceId=:tableId", DataTableConfig.class);
+                .createQuery("select d from DataTableConfig d " +
+                        "where d.user=:user and d.tableInstanceId=:tableId", DataTableConfig.class);
         q.setParameter("user", actor);
         q.setParameter("tableId", tableId);
         try {
@@ -88,21 +89,21 @@ public class DataTableServiceImpl implements DataTableService {
 
     @Override
     public DataTableConfig addOrUpdateTableConfig(String tableId, Account actor, List<String> columnsNamesList) {
-            DataTableConfig datatableConfig = this.findTableConfigByUserAndTable(tableId, actor);
-            if (datatableConfig != null) {
-                datatableConfig.setUser(actor);
-                datatableConfig.setTableInstanceId(tableId);
-                datatableConfig.setColumns(columnsNamesList);
-            }else{
-                datatableConfig = new DataTableConfig();
-                datatableConfig.setUser(actor);
-                datatableConfig.setTableInstanceId(tableId);
-                datatableConfig.setColumns(columnsNamesList);
-                this.em.persist(datatableConfig);
-            }
-            this.em.flush();
-            LOGGER.info("DataTableConfig " + datatableConfig.getUser() + "/" + datatableConfig.getTableInstanceId() +" updated.");
-            return datatableConfig;
+        DataTableConfig datatableConfig = this.findTableConfigByUserAndTable(tableId, actor);
+        if (datatableConfig != null) {
+            datatableConfig.setUser(actor);
+            datatableConfig.setTableInstanceId(tableId);
+            datatableConfig.setColumns(columnsNamesList);
+        } else {
+            datatableConfig = new DataTableConfig();
+            datatableConfig.setUser(actor);
+            datatableConfig.setTableInstanceId(tableId);
+            datatableConfig.setColumns(columnsNamesList);
+            this.em.persist(datatableConfig);
+        }
+        this.em.flush();
+        LOGGER.info("DataTableConfig " + datatableConfig.getUser() + "/" + datatableConfig.getTableInstanceId() + " updated.");
+        return datatableConfig;
     }
 
 }

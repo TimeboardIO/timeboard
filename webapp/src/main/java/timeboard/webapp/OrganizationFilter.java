@@ -64,14 +64,18 @@ public class OrganizationFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(ServletRequest servletRequest,
+                         ServletResponse servletResponse,
+                         FilterChain filterChain) throws IOException, ServletException {
+
         if(isWhiteListed((HttpServletRequest)servletRequest)){
             filterChain.doFilter(servletRequest, servletResponse);
         }else {
             Optional<Cookie> orgCookie = this.extractOrgCookie((HttpServletRequest) servletRequest);
             if(orgCookie.isPresent()){
                 final Long organizationID = Long.parseLong(orgCookie.get().getValue());
-                Optional<Account> organization = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
+                Optional<Account> organization =
+                        this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
 
                 if(organization.isPresent()){
                     ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
@@ -91,7 +95,8 @@ public class OrganizationFilter implements Filter {
 
     private boolean isWhiteListed(HttpServletRequest servletRequest) {
 
-        final Long nbRulesMatched = whitelist.stream().filter(s -> servletRequest.getRequestURI().matches(s)).collect(Collectors.counting());
+        final Long nbRulesMatched = whitelist.stream()
+                .filter(s -> servletRequest.getRequestURI().matches(s)).collect(Collectors.counting());
 
         return nbRulesMatched != null && nbRulesMatched > 0;
     }

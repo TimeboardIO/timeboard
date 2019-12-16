@@ -64,7 +64,11 @@ public class Milestone extends OrganizationEntity implements Serializable {
     private Set<Task> tasks;
 
 
-    public Milestone(long id, String name, Date date, MilestoneType type, Map<String, String> attributes, Project project, Set<Task> tasks) {
+    public Milestone(long id,
+                     String name,
+                     Date date,
+                     MilestoneType type,
+                     Map<String, String> attributes, Project project, Set<Task> tasks) {
         this.id = id;
         this.name = name;
         this.date = date;
@@ -133,8 +137,6 @@ public class Milestone extends OrganizationEntity implements Serializable {
     public void setProject(Project project) {
         this.project = project;
     }
-
-
 
 
 }

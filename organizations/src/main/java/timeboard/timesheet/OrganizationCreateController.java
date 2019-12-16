@@ -28,7 +28,6 @@ package timeboard.timesheet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,10 +36,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Date;
 
 @Controller
@@ -53,17 +49,17 @@ public class OrganizationCreateController {
     public UserInfo userInfo;
 
     @PostMapping("create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
-        organization.setRemoteSubject("Timeboard/Organization/"+System.nanoTime());
+        organization.setRemoteSubject("Timeboard/Organization/" + System.nanoTime());
         organization.setName(request.getParameter("organizationName"));
         this.organizationService.createOrganization(actor, organization);
         return "redirect:/select";
     }
 
     @GetMapping("create")
-    protected String createFrom(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+    protected String createFrom() {
         return "create_org.html";
     }
 }

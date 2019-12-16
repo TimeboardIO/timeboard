@@ -12,10 +12,10 @@ package timeboard.account;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -50,10 +50,8 @@ import java.util.Map;
 public abstract class AbstractExcelReport {
     /* logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractExcelReport.class);
-
-    private final Map<String, HSSFCellStyle> styles = new HashMap<>();
     protected final DateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
-
+    private final Map<String, HSSFCellStyle> styles = new HashMap<>();
     protected HSSFSheet sheet;
     protected HSSFWorkbook wb;
     protected OutputStream reportFile;
@@ -65,22 +63,7 @@ public abstract class AbstractExcelReport {
     private List<String> sheetNames = new ArrayList<>();
 
     /**
-     * Save current workbook in <code>this.reportFile</code>.
-     */
-    protected void save() throws IOException {
-        try (OutputStream out = this.reportFile) {
-
-            if (this.wb == null) {
-                this.sheet.getWorkbook().write(out);
-            } else {
-                this.wb.write(out);
-            }
-        }
-    }
-
-    /**
      * Update row reference in formula (not implemented in POI).
-     *
      */
     private static void updateRownumInFormula(final HSSFCell cell, final int oldRownum, final int newRownum) {
         try {
@@ -92,8 +75,7 @@ public abstract class AbstractExcelReport {
     }
 
     /**
-     *  Update row reference in formula (not implemented in POI).
-     *
+     * Update row reference in formula (not implemented in POI).
      */
     private static String updateRownumInFormula(final String formula, final int oldRownum, final int newRownum) {
         return formula.replaceAll("([A-Z]{1,2})" + oldRownum, "$1" + newRownum);
@@ -116,7 +98,6 @@ public abstract class AbstractExcelReport {
 
     /**
      * Add comment to cell (not implemented in POI).
-     *
      */
     private static void setCellComment(final Cell cell, final String message) {
         if (cell != null) {
@@ -143,10 +124,109 @@ public abstract class AbstractExcelReport {
         }
     }
 
+    private static void setCellType(final HSSFCell oldCell, final HSSFCell newCell) {
+        // Set the cell data value
+        switch (oldCell.getCellType()) {
+            case Cell.CELL_TYPE_BLANK:
+                newCell.setCellValue(oldCell.getStringCellValue());
+                break;
+            case Cell.CELL_TYPE_BOOLEAN:
+                newCell.setCellValue(oldCell.getBooleanCellValue());
+                break;
+            case Cell.CELL_TYPE_ERROR:
+                newCell.setCellErrorValue(oldCell.getErrorCellValue());
+                break;
+            case Cell.CELL_TYPE_FORMULA:
+                newCell.setCellFormula(oldCell.getCellFormula());
+                break;
+            case Cell.CELL_TYPE_NUMERIC:
+                newCell.setCellValue(oldCell.getNumericCellValue());
+                break;
+            case Cell.CELL_TYPE_STRING:
+                newCell.setCellValue(oldCell.getRichStringCellValue());
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Given a decimal number returns a percentage equivalent of the number as string.
+     */
+    protected static String doubleToPercentage(final double value) {
+        NumberFormat nf = NumberFormat.getPercentInstance();
+        nf = new DecimalFormat("#00.00%");
+        return nf.format(value);
+    }
+
+    /**
+     * Group Rows.
+     */
+    public static void groupRows(final HSSFSheet sheet, final int startRowNum, final int endRowNum,
+                                 final boolean collapsed) {
+
+        if ((startRowNum != 0) && (startRowNum <= endRowNum)) {
+            sheet.groupRow(startRowNum, endRowNum);
+            if (collapsed) {
+                sheet.setRowGroupCollapsed(startRowNum, true);
+            }
+        }
+    }
+
+    public static void updateCellStyle(final HSSFCell cell, final HSSFCellStyle style) {
+        // HSSFCellStyle cellStyle = cell.getCellStyle();
+        // cellStyle.setAlignment(style.getAlignment());
+        // cellStyle.setFillForegroundColor(style.getFillForegroundColor());
+        // cellStyle.setFillPattern(style.getFillPattern());
+        // cellStyle.setFont(style.getFont(this.wb));
+        cell.setCellStyle(style);
+    }
+
+    public static void addURLHyperlink(final HSSFCell cell, final String address) {
+        CreationHelper createHelper = cell.getSheet().getWorkbook().getCreationHelper();
+        Hyperlink link = createHelper.createHyperlink(Hyperlink.LINK_URL);
+        link.setAddress(address);
+    }
+
+    /**
+     * Permet de mettre une formule dans un champ en vérifiant que ce n'est pas un des caractères spéciaux utilisés dans
+     * les dashboards.
+     */
+    public static void setNumberInCell(final Cell cell, final String data) {
+        // si la valeur contient des caractères spéciaux
+        if (data.contains("NaN") || data.equalsIgnoreCase("-")) {
+            cell.setCellValue(data);
+        } else {
+            double valueDouble;
+            // si c'est un pourcentage
+            if (StringUtils.contains(data, "%")) {
+                String[] splitData = data.split("%");
+                // on enlève le % et on divise par 100 car les cellules du template sont pré-formatées en pourcentage
+                valueDouble = Double.parseDouble(splitData[0]) / 100;
+            } else {
+                valueDouble = Double.parseDouble(data);
+            }
+            cell.setCellValue(valueDouble);
+        }
+    }
+
+    /**
+     * Save current workbook in <code>this.reportFile</code>.
+     */
+    protected void save() throws IOException {
+        try (OutputStream out = this.reportFile) {
+
+            if (this.wb == null) {
+                this.sheet.getWorkbook().write(out);
+            } else {
+                this.wb.write(out);
+            }
+        }
+    }
+
     /**
      * Copy row to destination (not implemented in POI).
      * use <code>shiftRows()</code> if a row exists in destinationRowNum, else use <code>createRow()</code>
-     *
      */
     private void copyRow(final int sourceRowNum, final int destinationRowNum) {
         this.copyRow(this.sheet.getRow(sourceRowNum), destinationRowNum);
@@ -155,7 +235,6 @@ public abstract class AbstractExcelReport {
     /**
      * Copy row to destination (not implemented in POI).
      * use <code>shiftRows()</code> if a row exists in destinationRowNum, else use <code>createRow()</code>
-
      */
     private void copyRow(final HSSFRow sourceRow, final int destinationRowNum) {
 
@@ -214,43 +293,6 @@ public abstract class AbstractExcelReport {
         }
     }
 
-    private static void setCellType(final HSSFCell oldCell, final HSSFCell newCell) {
-        // Set the cell data value
-        switch (oldCell.getCellType()) {
-            case Cell.CELL_TYPE_BLANK:
-                newCell.setCellValue(oldCell.getStringCellValue());
-                break;
-            case Cell.CELL_TYPE_BOOLEAN:
-                newCell.setCellValue(oldCell.getBooleanCellValue());
-                break;
-            case Cell.CELL_TYPE_ERROR:
-                newCell.setCellErrorValue(oldCell.getErrorCellValue());
-                break;
-            case Cell.CELL_TYPE_FORMULA:
-                newCell.setCellFormula(oldCell.getCellFormula());
-                break;
-            case Cell.CELL_TYPE_NUMERIC:
-                newCell.setCellValue(oldCell.getNumericCellValue());
-                break;
-            case Cell.CELL_TYPE_STRING:
-                newCell.setCellValue(oldCell.getRichStringCellValue());
-                break;
-            default:
-                break;
-        }
-    }
-
-
-    /**
-     * Given a decimal number returns a percentage equivalent of the number as string.
-     *
-     */
-    protected static String doubleToPercentage(final double value) {
-        NumberFormat nf = NumberFormat.getPercentInstance();
-        nf = new DecimalFormat("#00.00%");
-        return nf.format(value);
-    }
-
     /**
      * Replace existing color with custom color.
      */
@@ -259,29 +301,6 @@ public abstract class AbstractExcelReport {
         HSSFPalette palette = this.wb.getCustomPalette();
         palette.setColorAtIndex(colorToReplace, (byte) red, (byte) green, (byte) blue);
 
-    }
-
-    /**
-     * Group Rows.
-     */
-    public static void groupRows(final HSSFSheet sheet, final int startRowNum, final int endRowNum,
-                                 final boolean collapsed) {
-
-        if ((startRowNum != 0) && (startRowNum <= endRowNum)) {
-            sheet.groupRow(startRowNum, endRowNum);
-            if (collapsed) {
-                sheet.setRowGroupCollapsed(startRowNum, true);
-            }
-        }
-    }
-
-    public static void updateCellStyle(final HSSFCell cell, final HSSFCellStyle style) {
-        // HSSFCellStyle cellStyle = cell.getCellStyle();
-        // cellStyle.setAlignment(style.getAlignment());
-        // cellStyle.setFillForegroundColor(style.getFillForegroundColor());
-        // cellStyle.setFillPattern(style.getFillPattern());
-        // cellStyle.setFont(style.getFont(this.wb));
-        cell.setCellStyle(style);
     }
 
     public Font createFont(final short hssfColorIndex, final int height, final boolean bold) {
@@ -314,34 +333,5 @@ public abstract class AbstractExcelReport {
         style.setFillPattern(CellStyle.SOLID_FOREGROUND);
         style.setFont(font);
         return style;
-    }
-
-    public static void addURLHyperlink(final HSSFCell cell, final String address) {
-        CreationHelper createHelper = cell.getSheet().getWorkbook().getCreationHelper();
-        Hyperlink link = createHelper.createHyperlink(Hyperlink.LINK_URL);
-        link.setAddress(address);
-    }
-
-    /**
-     * Permet de mettre une formule dans un champ en vérifiant que ce n'est pas un des caractères spéciaux utilisés dans
-     * les dashboards.
-     *
-     */
-    public static void setNumberInCell(final Cell cell, final String data) {
-        // si la valeur contient des caractères spéciaux
-        if (data.contains("NaN") || data.equalsIgnoreCase("-")) {
-            cell.setCellValue(data);
-        } else {
-            double valueDouble;
-            // si c'est un pourcentage
-            if (StringUtils.contains(data, "%")) {
-                String[] splitData = data.split("%");
-                // on enlève le % et on divise par 100 car les cellules du template sont pré-formatées en pourcentage
-                valueDouble = Double.parseDouble(splitData[0]) / 100;
-            } else {
-                valueDouble = Double.parseDouble(data);
-            }
-            cell.setCellValue(valueDouble);
-        }
     }
 }

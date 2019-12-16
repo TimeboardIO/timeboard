@@ -12,10 +12,10 @@ package timeboard.account;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -74,8 +74,11 @@ public class ExcelTASReport extends AbstractExcelReport {
 
             // Updating the year
             this.sheet.getRow(YEAR_ROW).getCell(YEAR_MONTH_COLUMN).setCellValue(tasData.getYear());
+
             // Updating the month
-            this.sheet.getRow(MONTH_ROW).getCell(YEAR_MONTH_COLUMN).setCellValue("1/"+tasData.getMonth()+"/"+tasData.getYear());
+            this.sheet.getRow(MONTH_ROW).getCell(YEAR_MONTH_COLUMN)
+                    .setCellValue("1/" + tasData.getMonth() + "/" + tasData.getYear());
+
             // Updating matriculeID
             this.sheet.getRow(MATRICULE_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
                     .setCellValue(tasData.getMatriculeID());
@@ -120,8 +123,11 @@ public class ExcelTASReport extends AbstractExcelReport {
                 calendarSunday.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
                 String currentDayName = tasData.getDayMonthNames().get(i);
-                if (currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(calendarSaturday.getTime()).toLowerCase())
-                        || currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH).format(calendarSunday.getTime()).toLowerCase())) {
+                if (currentDayName.equalsIgnoreCase(
+                        new SimpleDateFormat("EEEE", Locale.ENGLISH)
+                                .format(calendarSaturday.getTime()).toLowerCase())
+                        || currentDayName.equalsIgnoreCase(new SimpleDateFormat("EEEE", Locale.ENGLISH)
+                        .format(calendarSunday.getTime()).toLowerCase())) {
                     for (int j = DAY_NAME_COLLUMN; j <= LAST_COLUMN; j++) {
                         // We copy the style of the first line, which is predefined in the right way
                         this.sheet.getRow(START_ROW_DAYS + i).getCell(j)

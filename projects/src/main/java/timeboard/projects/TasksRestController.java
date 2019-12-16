@@ -366,6 +366,7 @@ public class TasksRestController {
         public List<String> listOfTaskDates;
         public Collection<Double> effortSpentData;
         public Collection<Double> realEffortData;
+
         public TaskGraphWrapper() {
         }
 

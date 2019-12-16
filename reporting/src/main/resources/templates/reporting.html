@@ -15,16 +15,18 @@
         <h2 class="ui divided header">Reporting</h2>
         <table class="ui celled table">
             <thead>
-            <tr><th>Report</th>
+            <tr>
+                <th>Report</th>
                 <th>Description</th>
                 <th></th>
-            </tr></thead>
+            </tr>
+            </thead>
             <tbody>
             <tr th:each="report: ${reports}">
                 <td th:text="${report.name}">Name</td>
                 <td th:text="${report.mimeType}">Description</td>
                 <td>
-                    <a class="ui primary button" th:href="@{'/'}" target="_blank">Run</a>
+                    <a class="ui primary button" target="_blank" th:href="@{'/'}">Run</a>
                 </td>
             </tr>
             </tbody>

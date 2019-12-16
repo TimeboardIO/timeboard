@@ -12,10 +12,10 @@ package timeboard.core.internal;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,7 +39,7 @@ import javax.transaction.Transactional;
 
 @Component(value = "bpe")
 @Transactional
-public class BusinessPolicyEvaluator  {
+public class BusinessPolicyEvaluator {
 
     @Autowired
     private EntityManager entityManager;
@@ -54,8 +54,8 @@ public class BusinessPolicyEvaluator  {
         int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
             throw new CommercialException("Limit reached",
-                "Project's creation impossible for " + actor.getScreenName() + "!\n" +
-                "Too many projects in this account !");
+                    "Project's creation impossible for " + actor.getScreenName() + "!\n" +
+                            "Too many projects in this account !");
         }
         return true;
     }
@@ -64,15 +64,17 @@ public class BusinessPolicyEvaluator  {
         int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
             throw new CommercialException("Limit reached",
-                "Task's creation impossible for " + actor.getScreenName() + "!\n" +
-                "Too many task in project " + project.getName() + "in this account !");
+                    "Task's creation impossible for " + actor.getScreenName() + "!\n" +
+                            "Too many task in project " + project.getName() + "in this account !");
         }
         return true;
     }
 
     private int getNumberProjectsByUser(Account account) {
-        TypedQuery<Object> query = this.entityManager.createQuery(
-                "select count(p) from Project p join p.members memberships where memberships.member = :account", Object.class);
+        final TypedQuery<Object> query = this.entityManager.createQuery(
+                "select count(p) from " +
+                        "Project p join p.members memberships " +
+                        "where memberships.member = :account", Object.class);
         query.setParameter("account", account);
         return Integer.parseInt(query.getSingleResult().toString());
     }

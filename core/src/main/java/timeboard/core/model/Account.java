@@ -73,7 +73,6 @@ public class Account implements Serializable {
     private Map<String, String> externalIDs;
 
 
-
     @OneToMany(targetEntity = AccountHierarchy.class,
             mappedBy = "organization",
             orphanRemoval = true,
@@ -172,9 +171,9 @@ public class Account implements Serializable {
     public String getScreenName() {
         if (this.getFirstName() == null && this.getName() == null) {
             return this.getEmail();
-        } else if(this.getFirstName() == null){
+        } else if (this.getFirstName() == null) {
             return this.getName();
-        } else if(this.getName() == null){
+        } else if (this.getName() == null) {
             return this.getFirstName();
         } else {
             return this.getFirstName() + " " + this.getName();
@@ -183,7 +182,7 @@ public class Account implements Serializable {
 
     @Transient
     public String getScreenOrgName() {
-        if (this.isOrganization != null && this.isOrganization){
+        if (this.isOrganization != null && this.isOrganization) {
             return this.getName();
         }
         return "My Organization";

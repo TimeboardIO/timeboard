@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,7 +32,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(uniqueConstraints={
+@Table(uniqueConstraints = {
         @UniqueConstraint(columnNames = {"organization_id", "member_id"})
 })
 public class AccountHierarchy {
@@ -70,8 +70,8 @@ public class AccountHierarchy {
     }
 
     public void setOrganization(Account organization) throws BusinessException {
-        if(this.member != null && organization.getId() == this.member.getId()){
-            throw  new BusinessException("An parent account can't refer to itself");
+        if (this.member != null && organization.getId() == this.member.getId()) {
+            throw new BusinessException("An parent account can't refer to itself");
         }
         this.organization = organization;
     }
@@ -81,8 +81,8 @@ public class AccountHierarchy {
     }
 
     public void setMember(Account member) throws BusinessException {
-        if(this.organization != null && member.getId() == this.organization.getId()){
-            throw  new BusinessException("An child account can't refer to itself");
+        if (this.organization != null && member.getId() == this.organization.getId()) {
+            throw new BusinessException("An child account can't refer to itself");
         }
         this.member = member;
     }

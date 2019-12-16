@@ -65,12 +65,12 @@ public interface ProjectImportService {
             this.id = id;
         }
 
-        public void setTitle(String summary) {
-            this.title = summary;
-        }
-
         public String getTitle() {
             return title;
+        }
+
+        public void setTitle(String summary) {
+            this.title = summary;
         }
 
         public String getUserName() {
@@ -81,20 +81,20 @@ public interface ProjectImportService {
             this.userName = userName;
         }
 
-        public void setOrigin(String o) {
-            this.origin = o;
-        }
-
-        public void setStartDate(Date date) {
-            this.startDate = date;
-        }
-
         public String getOrigin() {
             return origin;
         }
 
+        public void setOrigin(String o) {
+            this.origin = o;
+        }
+
         public Date getStartDate() {
             return startDate;
+        }
+
+        public void setStartDate(Date date) {
+            this.startDate = date;
         }
 
         public Long getLocalUserID() {

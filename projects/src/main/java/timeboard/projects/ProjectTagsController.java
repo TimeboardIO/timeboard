@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -72,7 +72,7 @@ public class ProjectTagsController {
         return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new ProjectTagWrapper(projectTag)).collect(Collectors.toList()));
     }
 
-    @DeleteMapping(value="/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectTagWrapper>> deleteTag(@PathVariable Long projectID, @PathVariable Long tagID) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
@@ -81,7 +81,7 @@ public class ProjectTagsController {
         return this.listTags(projectID);
     }
 
-    @PatchMapping(value="/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectTagWrapper>> patchTag(@PathVariable Long projectID, @PathVariable Long tagID, @ModelAttribute ProjectTag tag) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
@@ -105,13 +105,13 @@ public class ProjectTagsController {
         return this.listTags(projectID);
     }
 
-    public static class ProjectTagWrapper{
+    public static class ProjectTagWrapper {
 
         private String tagKey;
         private String tagValue;
         private Long id;
 
-        public ProjectTagWrapper(ProjectTag projectTag){
+        public ProjectTagWrapper(ProjectTag projectTag) {
             this.tagKey = projectTag.getTagKey();
             this.tagValue = projectTag.getTagValue();
             this.id = projectTag.getId();

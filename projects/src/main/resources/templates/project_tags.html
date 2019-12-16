@@ -2,13 +2,13 @@
 
 <html layout:decorate="~{details_project_layout.html(tab='five')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform"
-      xmlns:v-on="http://www.w3.org/1999/xhtml">
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
     <title layout:fragment="title">Project tags</title>
-    <meta name="projectID" th:content="${project.id}" />
-    <script type="text/javascript" src="/js/tags.js" ></script>
+    <meta name="projectID" th:content="${project.id}"/>
+    <script src="/js/tags.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -17,8 +17,8 @@
     <div id="components-demo">
 
         <div class="ui menu">
-            <a  v-on:click="addTag"
-                class="item">
+            <a class="item"
+               v-on:click="addTag">
                 <i class="plus icon"></i>
                 New Tag
             </a>
@@ -27,12 +27,12 @@
         <data-table v-bind:config="table">
             <template v-slot:tagkey="{row}">
                 <div class="ui input">
-                    <input type="text" v-model="row.tagKey" />
+                    <input type="text" v-model="row.tagKey"/>
                 </div>
             </template>
             <template v-slot:tagvalue="{row}">
                 <div class="ui input">
-                    <input type="text" v-model="row.tagValue" />
+                    <input type="text" v-model="row.tagValue"/>
                 </div>
             </template>
             <template v-slot:tagactions="{row}">
@@ -48,7 +48,6 @@
         </data-table>
 
     </div>
-
 
 
 </div>

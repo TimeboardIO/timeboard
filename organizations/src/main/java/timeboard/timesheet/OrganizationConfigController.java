@@ -59,9 +59,7 @@ import java.util.Optional;
 @RequestMapping("/org/config")
 public class OrganizationConfigController {
 
-    @Autowired
-    private UserInfo userInfo;
-
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     @Autowired
     public OrganizationService organizationService;
 
@@ -70,11 +68,11 @@ public class OrganizationConfigController {
 
     @Autowired
     public EncryptionService encryptionService;
-
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    @Autowired
+    private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException  {
+    protected String handleGet(HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -87,7 +85,7 @@ public class OrganizationConfigController {
 
         model.addAttribute("taskTypes", taskTypes);
         model.addAttribute("defaultTasks", defaultTasks);
-        if(organization.isPresent()) {
+        if (organization.isPresent()) {
             model.addAttribute("organization", organization.get());
         }
         return "details_org_config.html";
@@ -95,7 +93,7 @@ public class OrganizationConfigController {
     }
 
     @PostMapping
-    protected String handlePost( HttpServletRequest request, Model model) throws Exception {
+    protected String handlePost(HttpServletRequest request, Model model) throws Exception {
         final Account actor = this.userInfo.getCurrentAccount();
 
         String action = request.getParameter("action");
@@ -115,12 +113,13 @@ public class OrganizationConfigController {
                 break;
             case "DELETE_TYPE":
                 long typeID = Long.parseLong(request.getParameter("typeID"));
-                TaskType first = this.projectService.listTaskType().stream().filter(taskType -> taskType.getId() == typeID).findFirst().get();
+                TaskType first = this.projectService.listTaskType()
+                        .stream().filter(taskType -> taskType.getId() == typeID).findFirst().get();
                 this.projectService.disableTaskType(actor, first);
                 break;
             case "DELETE_TASK":
                 long taskID = Long.parseLong(request.getParameter("taskID"));
-                this.projectService.disableDefaultTaskByID(actor,taskID);
+                this.projectService.disableDefaultTaskByID(actor, taskID);
                 break;
         }
 

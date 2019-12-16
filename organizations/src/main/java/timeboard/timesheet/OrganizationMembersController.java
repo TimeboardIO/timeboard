@@ -30,18 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,10 +57,11 @@ public class OrganizationMembersController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, Model viewModel) throws ServletException, IOException, BusinessException  {
+    protected String handleGet(Model viewModel) {
 
         final Account actor = this.userInfo.getCurrentAccount();
-        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
+        final Optional<Account> organization =
+                this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
         final List<Account> members = this.organizationService.getMembers(actor, organization.get());
 
         viewModel.addAttribute("roles", MembershipRole.values());

@@ -36,7 +36,6 @@ import java.util.List;
 public class Task extends AbstractTask implements Serializable {
 
 
-
     @OneToMany(targetEntity = TaskRevision.class, mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskRevision> revisions;
 
@@ -92,10 +91,6 @@ public class Task extends AbstractTask implements Serializable {
         this.assigned = assigned;
     }
 
-    public void setEffortLeft(double effortLeft) {
-        this.effortLeft = effortLeft;
-    }
-
     public Project getProject() {
         return project;
     }
@@ -111,11 +106,14 @@ public class Task extends AbstractTask implements Serializable {
     public void setMilestone(Milestone milestone) {
         this.milestone = milestone;
     }
-    
+
     public double getEffortLeft() {
         return this.effortLeft;
     }
-  
+
+    public void setEffortLeft(double effortLeft) {
+        this.effortLeft = effortLeft;
+    }
 
     public TaskType getTaskType() {
         return taskType;

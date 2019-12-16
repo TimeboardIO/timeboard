@@ -69,7 +69,10 @@ public class TimesheetRESTApi {
 
 
     @GetMapping
-    public ResponseEntity getTimesheetData(HttpServletRequest request, @RequestParam("week") int week, @RequestParam("year") int year ) throws JsonProcessingException {
+    public ResponseEntity getTimesheetData(
+            @RequestParam("week") int week,
+            @RequestParam("year") int year ) throws JsonProcessingException {
+
         Account currentAccount = this.userInfo.getCurrentAccount();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
@@ -169,7 +172,7 @@ public class TimesheetRESTApi {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateDataFromTimesheet(HttpServletRequest req, @RequestBody UpdateRequest request) throws JsonProcessingException {
+    public ResponseEntity updateDataFromTimesheet(@RequestBody UpdateRequest request)  {
 
         try {
             final Account actor = this.userInfo.getCurrentAccount();
@@ -249,7 +252,13 @@ public class TimesheetRESTApi {
         private final List<ProjectWrapper> projects;
         private final List<ImputationWrapper> imputations;
 
-        public Timesheet(boolean validated, int year, int week, List<DateWrapper> days, List<ProjectWrapper> projects, List<ImputationWrapper> imputationWrappers) {
+        public Timesheet(boolean validated,
+                         int year,
+                         int week,
+                         List<DateWrapper> days,
+                         List<ProjectWrapper> projects,
+                         List<ImputationWrapper> imputationWrappers) {
+
             this.validated = validated;
             this.year = year;
             this.week = week;

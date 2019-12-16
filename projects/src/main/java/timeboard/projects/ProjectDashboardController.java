@@ -59,7 +59,7 @@ public class ProjectDashboardController {
 
 
     @GetMapping
-    protected String handleGet(@PathVariable Long projectID, HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
+    protected String handleGet(@PathVariable Long projectID, Model model) throws  BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);

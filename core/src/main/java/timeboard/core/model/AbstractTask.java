@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -64,7 +64,10 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
     private String remoteId;
 
 
-    @OneToMany(targetEntity = Imputation.class, mappedBy = "task", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = Imputation.class,
+            mappedBy = "task", fetch = FetchType.EAGER,
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
     private Set<Imputation> imputations;
 
     public AbstractTask() {
@@ -79,11 +82,11 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
     }
 
     public Long getId() {
-      return id;
+        return id;
     }
 
     public void setId(Long id) {
-      this.id = id;
+        this.id = id;
     }
 
     public String getName() {
@@ -136,25 +139,25 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
     }
 
     public String getRemotePath() {
-      return remotePath;
+        return remotePath;
     }
 
     public void setRemotePath(String remotePath) {
-      this.remotePath = remotePath;
+        this.remotePath = remotePath;
     }
 
     public String getRemoteId() {
-      return remoteId;
+        return remoteId;
     }
 
     public void setRemoteId(String remoteId) {
-      this.remoteId = remoteId;
+        this.remoteId = remoteId;
     }
 
     @Transient
     public double findTaskImputationValueByDate(Date date, Account account) {
         Optional<Imputation> imputationOptional = this.getImputations().stream()
-                .filter(imputation -> areDateSameDay(date,imputation.getDay()))
+                .filter(imputation -> areDateSameDay(date, imputation.getDay()))
                 .filter(imputation -> (imputation.getAccount().getId() == account.getId()))
                 .findFirst();
         if (imputationOptional.isPresent()) {

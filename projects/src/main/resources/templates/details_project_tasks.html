@@ -7,7 +7,7 @@
 
 <head>
     <title>Project Tasks details</title>
-    <meta property="tasks" th:project="${project.id}" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}"/>
+    <meta property="tasks" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}" th:project="${project.id}"/>
     <style>
         .ellipsis {
             text-overflow: ellipsis;
@@ -17,6 +17,7 @@
         }
 
 
+
     </style>
 </head>
 <body>
@@ -24,7 +25,7 @@
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
 
-    <script type="text/x-template" id="task-list-template">
+    <script id="task-list-template" type="text/x-template">
         <div class="dimmable">
             <div class="ui active inverted dimmer">
                 <div class="ui loader"></div>
@@ -214,7 +215,7 @@
             </table>
         </div>
     </script>
-    <script type="text/x-template" id="pending-task-list-template">
+    <script id="pending-task-list-template" type="text/x-template">
 
         <table class="ui celled table" v-if="filteredTasks.length > 0">
             <thead>
@@ -278,7 +279,7 @@
         </table>
 
     </script>
-    <script type="text/x-template" id="graph-modal-template">
+    <script id="graph-modal-template" type="text/x-template">
         <div class="ui modal graph ">
             <i class="close icon"></i>
             <div class="content">
@@ -289,7 +290,7 @@
 
         </div>
     </script>
-    <script type="text/x-template" id="task-modal-template">
+    <script id="task-modal-template" type="text/x-template">
         <div class="ui large modal create-task ">
             <i class="close icon"></i>
             <div class="header">
@@ -386,12 +387,12 @@
 
     <div id="tasksList">
         <div class="ui menu">
-            <a th:if="${isProjectOwner}" v-on:click="showCreateTaskModal(null, null, $event)"
-               class="item">
+            <a class="item" th:if="${isProjectOwner}"
+               v-on:click="showCreateTaskModal(null, null, $event)">
                 <i class="plus icon"></i>
                 New Task
             </a>
-            <div id="import" class="ui dropdown item import">
+            <div class="ui dropdown item import" id="import">
                 Import tasks
                 <i class="dropdown icon"></i>
                 <div class="menu">
@@ -407,30 +408,31 @@
                   });
                   });
 
+
             </script>
         </div>
 
 
         <pending-task-list
-                :tasks="gridData"
                 :columns="gridColumns"
-                :filter-key="searchQueries">
+                :filter-key="searchQueries"
+                :tasks="gridData">
         </pending-task-list>
         <task-list
-                :tasks="gridData"
                 :columns="gridColumns"
-                :filter-key="searchQueries">
+                :filter-key="searchQueries"
+                :tasks="gridData">
         </task-list>
 
         <task-modal
-                :task="newTask"
                 :form-error="formError"
-                :modal-title="modalTitle">
+                :modal-title="modalTitle"
+                :task="newTask">
         </task-modal>
         <graph-modal
-                :task="newTask"
                 :form-error="formError"
-                :modal-title="modalTitle">
+                :modal-title="modalTitle"
+                :task="newTask">
         </graph-modal>
 
         <script src="/js/tasks.js"></script>

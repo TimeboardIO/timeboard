@@ -36,13 +36,13 @@ import java.util.List;
  * Service for users and accounts management.
  */
 public interface UserService {
-     /**
+    /**
      * Search user by remote subject.
      *
      * @param remoteSubject prefix used to search user
      * @return list of users
      */
-     Account findUserBySubject(String remoteSubject);
+    Account findUserBySubject(String remoteSubject);
 
 
     /**

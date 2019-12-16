@@ -30,7 +30,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectImportService;
@@ -74,14 +73,14 @@ public class ProjectImportController {
 
 
     @PostMapping
-    protected void handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
+    protected void handlePost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         final long projectID = Long.parseLong(req.getParameter("projectID"));
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/projects/config?projectID=" + projectID);
         requestDispatcher.forward(req, resp);
     }
 
     @GetMapping
-    protected void handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException, BusinessException {
+    protected void handleGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Account actor = this.userInfo.getCurrentAccount();
         final String type = req.getParameter("type");
@@ -108,7 +107,8 @@ public class ProjectImportController {
 
                                 remoteTasks = importPlugin.getRemoteTasks(actor, projectID);
 
-                                remoteTasks.stream().forEach(task -> mergeAssignee(userService, importPlugin.getServiceName(), task));
+                                remoteTasks.stream()
+                                        .forEach(task -> mergeAssignee(userService, importPlugin.getServiceName(), task));
 
                                 final List<ProjectImportService.RemoteTask> newTasks = new ArrayList<>();
                                 for (ProjectImportService.RemoteTask task1 : remoteTasks) {

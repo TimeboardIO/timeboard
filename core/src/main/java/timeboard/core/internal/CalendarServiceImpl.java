@@ -12,10 +12,10 @@ package timeboard.core.internal;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -62,20 +62,16 @@ import java.util.*;
 public class CalendarServiceImpl implements CalendarService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CalendarServiceImpl.class);
-
+    private static final String CALENDAR_ORIGIN_KEY = "calendar";
     @Autowired
     private EntityManager em;
-
     @Autowired
     private ProjectService projectService;
 
-
-    private static final String CALENDAR_ORIGIN_KEY = "calendar";
-
-
     @Override
-    public boolean importCalendarAsImputationsFromIcs(Account actor, String url, AbstractTask task, List<Account> accountList,
-                                                      double value) throws BusinessException, ParseException, IOException {
+    public boolean importCalendarAsImputationsFromIcs(
+            Account actor, String url, AbstractTask task, List<Account> accountList,
+            double value) throws BusinessException, ParseException, IOException {
 
         /* -- Events -- */
         Set<Imputation> existingEventList = task.getImputations();
@@ -90,7 +86,8 @@ public class CalendarServiceImpl implements CalendarService {
                 } else { //  one or many events exist for this id
                     Imputation timeboardImputation = this.getImputationByStartDate(existingEventList, event.getStartDate());
                     if (timeboardImputation != null) { // event and task match (id & date), so update it
-                        imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));// convert event to imputation
+                        // convert event to imputation
+                        imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));
                         existingEventList.remove(timeboardImputation); // remove  to retrieve orphan at the end
                     } else { // no matching imputation found, so create it
                         imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));
@@ -104,13 +101,18 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public boolean importCalendarAsTasksFromIcs(Account actor, String name, String url, Project project, boolean deleteOrphan) throws BusinessException, ParseException, IOException  {
+    public boolean importCalendarAsTasksFromIcs(
+            Account actor,
+            String name,
+            String url,
+            Project project,
+            boolean deleteOrphan) throws ParseException, IOException {
 
         /* -- Calendar -- */
         final timeboard.core.model.Calendar timeboardCalendar = this.createOrUpdateCalendar(name, url);
 
         /* -- Events -- */
-        final Map<String, List<Task>> existingEvents = this.findAllEventAsTask(timeboardCalendar, project); // database existing events
+        final Map<String, List<Task>> existingEvents = this.findAllEventAsTask(timeboardCalendar, project);
         final Map<String, List<Event>> newEvents = this.importICS(url); // imported events
 
         final List<Task> tasksToCreate = new ArrayList<>();
@@ -148,12 +150,13 @@ public class CalendarServiceImpl implements CalendarService {
 
     /**
      * Import ICS as Event.
+     *
      * @param url ics file url
      * @return map key = remoteId, value = Event
      * @throws ParseException when ICS parser failed
-     * @throws IOException when fil is not found
+     * @throws IOException    when fil is not found
      */
-    private Map<String, List<Event>> importICS(final String url) throws  IOException, ParseException {
+    private Map<String, List<Event>> importICS(final String url) throws IOException, ParseException {
 
         final Map<String, List<Event>> events = new HashMap<>();
 
@@ -223,9 +226,9 @@ public class CalendarServiceImpl implements CalendarService {
 
     private AbstractTask eventToTask(Event event, Task task, Project project) {
 
-       this.eventToTask(event, task);
-       task.setProject((project));
-       return task;
+        this.eventToTask(event, task);
+        task.setProject((project));
+        return task;
 
     }
 
@@ -247,7 +250,7 @@ public class CalendarServiceImpl implements CalendarService {
     private List<Imputation> eventToImputation(Event event, AbstractTask task, List<Account> accountList, double value) {
         List<Imputation> result = new ArrayList<>();
         for (Account account : accountList) {
-            Imputation imputation =  new Imputation();
+            Imputation imputation = new Imputation();
             imputation.setAccount(account);
             imputation.setTask(task);
             imputation.setDay(event.getStartDate());
@@ -258,7 +261,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     }
 
-    private void createRecurringEvents(Event originalEvent, RRule rule, Map<String,  List<Event>> events) {
+    private void createRecurringEvents(Event originalEvent, RRule rule, Map<String, List<Event>> events) {
         // Today
         Calendar startDate = Calendar.getInstance();
         startDate.set(Calendar.HOUR_OF_DAY, 9);
@@ -271,12 +274,13 @@ public class CalendarServiceImpl implements CalendarService {
         // Create recurring tasks from recurring rules
         Recur recur = rule.getRecur();
         DateList dates = recur.getDates(
-            new net.fortuna.ical4j.model.Date(startDate.getTime()),
-            new net.fortuna.ical4j.model.Date(endDate.getTime()),
-            Value.DATE);
+                new net.fortuna.ical4j.model.Date(startDate.getTime()),
+                new net.fortuna.ical4j.model.Date(endDate.getTime()),
+                Value.DATE);
 
         for (Date icsDate : (Date[]) dates.toArray(new Date[0])) {
-            Event event = this.cloneWithDate(originalEvent, icsDate, icsDate);  //TODO start and end date are set equals  is this functionally correct ?
+            //TODO start and end date are set equals  is this functionally correct ?
+            Event event = this.cloneWithDate(originalEvent, icsDate, icsDate);
             List<Event> eventList = events.computeIfAbsent(event.getRemoteId(), k -> new ArrayList<>());
             eventList.add(event);
         }
@@ -307,9 +311,12 @@ public class CalendarServiceImpl implements CalendarService {
         timeboard.core.model.Calendar calendar = null;
 
         try {
-                 TypedQuery<timeboard.core.model.Calendar> q = em.createQuery("select c from Calendar c where c.remoteId = :remoteId", timeboard.core.model.Calendar.class);
-                q.setParameter("remoteId", remoteId);
-                calendar = q.getSingleResult();
+            TypedQuery<timeboard.core.model.Calendar> q = em.createQuery(
+                    "select c from Calendar c where c.remoteId = :remoteId",
+                    timeboard.core.model.Calendar.class);
+
+            q.setParameter("remoteId", remoteId);
+            calendar = q.getSingleResult();
 
         } catch (Exception e) {
             // calendar not already exist
@@ -318,43 +325,49 @@ public class CalendarServiceImpl implements CalendarService {
             timeboard.core.model.Calendar newCalendar = new timeboard.core.model.Calendar();
             newCalendar.setRemoteId(remoteId);
             newCalendar.setName(name);
-                 em.persist(newCalendar);
-                return newCalendar;
-         } else { // update
+            em.persist(newCalendar);
+            return newCalendar;
+        } else { // update
             final timeboard.core.model.Calendar toUpdateCalendar = calendar;
             toUpdateCalendar.setName(name);
             toUpdateCalendar.setRemoteId(remoteId);
-                 em.merge(toUpdateCalendar);
-                return toUpdateCalendar;
-         }
+            em.merge(toUpdateCalendar);
+            return toUpdateCalendar;
+        }
 
 
-     }
+    }
 
     @Override
     public List<timeboard.core.model.Calendar> listCalendars() {
-             TypedQuery<timeboard.core.model.Calendar> q = em.createQuery("select c from Calendar c", timeboard.core.model.Calendar.class);
-            return q.getResultList();
-     }
+        TypedQuery<timeboard.core.model.Calendar> q =
+                em.createQuery("select c from Calendar c", timeboard.core.model.Calendar.class);
+
+        return q.getResultList();
+    }
 
     @Override
     public List<DefaultTask> findExistingEvents(String remotePath, String remoteId) {
-             TypedQuery<DefaultTask> q = em.createQuery("select d from DefaultTask d where d.remotePath = :remotePath and d.remoteId = :remoteId", DefaultTask.class);
-            q.setParameter("remotePath", remotePath);
-            q.setParameter("remoteId", remoteId);
-            q.setParameter("origin", CALENDAR_ORIGIN_KEY);
-            return q.getResultList();
-     }
+        TypedQuery<DefaultTask> q = em.createQuery("select d from DefaultTask d " +
+                "where d.remotePath = :remotePath and d.remoteId = :remoteId", DefaultTask.class);
+
+        q.setParameter("remotePath", remotePath);
+        q.setParameter("remoteId", remoteId);
+        q.setParameter("origin", CALENDAR_ORIGIN_KEY);
+        return q.getResultList();
+    }
 
     @Override
     public Map<String, List<Task>> findAllEventAsTask(timeboard.core.model.Calendar calendar, Project project) {
         Map<String, List<Task>> idToEventList = new HashMap<>();
         try {
-                 TypedQuery<Task> q = em.createQuery("select t from Task t where t.remotePath = :remotePath and t.origin = :origin and t.project = :project", Task.class);
-                q.setParameter("remotePath", calendar.getRemoteId());
-                q.setParameter("origin", CALENDAR_ORIGIN_KEY);
-                q.setParameter("project", project);
-                List<Task> eventList = q.getResultList();
+            TypedQuery<Task> q = em.createQuery("select t from Task t " +
+                    "where t.remotePath = :remotePath and t.origin = :origin and t.project = :project", Task.class);
+
+            q.setParameter("remotePath", calendar.getRemoteId());
+            q.setParameter("origin", CALENDAR_ORIGIN_KEY);
+            q.setParameter("project", project);
+            List<Task> eventList = q.getResultList();
 
             for (Task event : eventList) {
                 List<Task> currentList = idToEventList.get(event.getRemoteId());
@@ -365,7 +378,7 @@ public class CalendarServiceImpl implements CalendarService {
                 currentList.add(event);
             }
         } catch (Exception e) {
-                // handle JPA exception, nothing more to do
+            // handle JPA exception, nothing more to do
         }
         return idToEventList;
     }
@@ -374,30 +387,30 @@ public class CalendarServiceImpl implements CalendarService {
     public void deleteCalendarById(Account actor, Long calendarID) throws BusinessException {
         RuleSet<timeboard.core.model.Calendar> ruleSet = new RuleSet<>();
 
-             timeboard.core.model.Calendar calendar = em.find(timeboard.core.model.Calendar.class, calendarID);
+        timeboard.core.model.Calendar calendar = em.find(timeboard.core.model.Calendar.class, calendarID);
 
-            Set<Rule> wrongRules = ruleSet.evaluate(actor, calendar);
-            if (!wrongRules.isEmpty()) {
-                throw new BusinessException(wrongRules);
-            }
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, calendar);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
 
-            TypedQuery<DefaultTask> query = em.createQuery("select e from DefaultTask where e.remotePath = :remotePath", DefaultTask.class);
-            query.setParameter("remotePath", calendar.getRemoteId());
-            try {
-                List<DefaultTask> eventList = query.getResultList();
-                for (DefaultTask event : eventList) {
-                    for (Imputation i : event.getImputations()) {
-                        em.remove(i); //remove all imputation for this event
-                    }
-                    em.remove(event);
+        TypedQuery<DefaultTask> query = em.createQuery("select e from DefaultTask where e.remotePath = :remotePath", DefaultTask.class);
+        query.setParameter("remotePath", calendar.getRemoteId());
+        try {
+            List<DefaultTask> eventList = query.getResultList();
+            for (DefaultTask event : eventList) {
+                for (Imputation i : event.getImputations()) {
+                    em.remove(i); //remove all imputation for this event
                 }
-
-            } catch (Exception e) {
-                // no event to delete
+                em.remove(event);
             }
 
-            em.remove(calendar);
-            em.flush();
+        } catch (Exception e) {
+            // no event to delete
+        }
+
+        em.remove(calendar);
+        em.flush();
 
         LOGGER.info("Calendar " + calendarID + " deleted by " + actor.getName());
 

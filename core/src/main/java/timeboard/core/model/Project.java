@@ -33,9 +33,11 @@ import java.util.*;
 
 @Entity
 @NamedQueries(
-        {
-                @NamedQuery(name = "ListUserProjects", query = "select p from Project p join fetch p.members m where (p.enable = true or p.enable is null) and m.member = :user")
-        }
+    {
+            @NamedQuery(name = "ListUserProjects", query =
+                    "select p from Project p join fetch p.members m " +
+                    "where (p.enable = true or p.enable is null) and m.member = :user")
+    }
 )
 public class Project extends OrganizationEntity implements Serializable {
 
