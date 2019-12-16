@@ -24,12 +24,8 @@
                 <div class="title" th:text="${currentOrg.screenName}"></div>
                 <i class="dropdown icon"></i>
                 <div class="menu transition hidden" tabindex="-1">
-                    <div class="ui item" tabindex="0">
-                        <i class="sign-out icon"></i>
-                        <a th:href="@{/select}">Switch organisation</a>
-                    </div>
-                    <a th:href="@{/org/create(orgID=${orgID})}" class="item">
-                        <i class="edit icon"></i> Create Organisation
+                    <a th:href="@{/select}" class="item">
+                        <i class="sign-out icon"></i> Create or Switch organisation
                     </a>
                     <a th:if="${currentOrg.isOrganization}" th:href="@{/org/members?orgID={orgID}(orgID=${orgID})}" class="item">
                         <i class="globe icon"></i> Organisation members
