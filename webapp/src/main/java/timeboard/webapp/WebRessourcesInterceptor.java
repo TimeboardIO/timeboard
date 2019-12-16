@@ -86,9 +86,6 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
                 modelMap.put("currentOrg", organizationService.getOrganizationByID(userInfo.getCurrentAccount(), orgaID).get());
             }
 
-            final List<Account> organisations = organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
-            organisations.add(userInfo.getCurrentAccount());
-            modelMap.put("orgList", organisations);
         }
 
         if(modelMap != null){
