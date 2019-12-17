@@ -28,25 +28,29 @@ package timeboard.core.ui;
 
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import timeboard.core.api.DataTableService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
 
+import javax.servlet.http.HttpServletRequest;
 
 
-
-@Controller
-@RequestMapping("/config/datatable")
-public class DataTableConfigController {
+@Component
+@RestController
+@RequestMapping(value = "/api/datatable", produces = MediaType.APPLICATION_JSON_VALUE)
+public class DataTableConfigRestController {
 
     @Autowired
     private DataTableService dataTableService;
@@ -55,9 +59,11 @@ public class DataTableConfigController {
     private UserInfo userInfo;
 
 
-    @GetMapping(value = "/{tableID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DataTableConfigWrapper> listTags( @PathVariable String tableID ) {
-        final Account actor = this.userInfo.getCurrentAccount();
+    @GetMapping
+    public ResponseEntity<DataTableConfigWrapper> getConfig(HttpServletRequest request) {
+        Account actor = this.userInfo.getCurrentAccount();
+
+        final String tableID = request.getParameter("tableID");
 
         DataTableConfig dataTable = null;
         try {
@@ -74,14 +80,15 @@ public class DataTableConfigController {
         return ResponseEntity.ok(new DataTableConfigWrapper(dataTable));
     }
 
-    @PatchMapping(value="/{tableID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DataTableConfig> patchTag(@PathVariable String tableID, @ModelAttribute(name="columns") ArrayList<String> dataConfig) {
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateConfig(@RequestBody DataTableConfigWrapper dataConfig) throws JsonProcessingException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
-        DataTableConfig dataTableConfig = dataTableService.addOrUpdateTableConfig(tableID, actor, dataConfig);
-        return ResponseEntity.ok(dataTableConfig);
+
+        DataTableConfig dataTableConfig = dataTableService.addOrUpdateTableConfig(dataConfig.tableID, actor, dataConfig.getColNames());
+        return ResponseEntity.ok(new DataTableConfigWrapper(dataTableConfig));
     }
 
-    public static class DataTableConfigWrapper {
+    public static class DataTableConfigWrapper implements Serializable {
 
         public List<String> colNames = new ArrayList<String>();
         public String tableID;

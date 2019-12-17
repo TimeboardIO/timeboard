@@ -59,7 +59,7 @@ Vue.component('data-table', {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/config/datatable/" + this.config.name,
+            url: "/api/datatable?tableID=" + this.config.name,
             success: function (d) {
                 self.finalCols
                    .forEach(function(c) {
@@ -111,10 +111,15 @@ Vue.component('data-table', {
                if(col.visible) cols.push(col.slot);
             });
             $.ajax({
-                type: "PATCH",
+                type: "POST",
                 dataType: "json",
-                data: {columns : cols},
-                url: "/config/datatable/" + this.config.name,
+                contentType: "application/json",
+                data: JSON.stringify({
+                    colNames : cols,
+                    tableID : this.config.name,
+                    userID : 0
+                }),
+                url: "/api/datatable",
                 success: function (d) {
                     $('#configModal').modal('close');
                 }
