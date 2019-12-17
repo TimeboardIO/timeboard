@@ -46,8 +46,6 @@ public interface ProjectService {
 
     List<Project> listProjects(Account owner);
 
-    List<Project> listProjectsByFilterTags(Account organization, String filter);
-
     Project getProjectByID(Account actor, Long projectID) throws BusinessException;
 
     Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;

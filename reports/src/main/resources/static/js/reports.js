@@ -37,13 +37,24 @@ $(document).ready(function () {
     var appCreateReport = new Vue({
             el: '#create-report',
             data: {
+                reportSelectProject: "",
+                selectedProjects: [],
+                sizeSelectedProjects: 0,
             },
             methods: {
-                refreshProjectSelection: function(event){
-                    event.target.classList.toggle('loading');
-                    $.get("/api/reports/refreshProjectSelection")
-                    .then(function(data){
-                        event.target.classList.toggle('loading');
+                refreshProjectSelection: function (reportSelectProject) {
+                    var self = this;
+                    $.ajax({
+                        type: "GET",
+                        dataType: "json",
+                        url: "/api/reports/refreshProjectSelection?filter=" + self.reportSelectProject,
+                        success: function (d) {
+                            self.selectedProjects = d;
+                            self.sizeSelectedProjects = d.length;
+                        },
+                        errors: function (d) {
+                            alert(d);
+                        }
                     });
                 }
             }

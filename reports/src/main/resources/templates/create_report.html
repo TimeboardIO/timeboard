@@ -7,51 +7,60 @@
 
 <head>
     <title layout:fragment="title">Create Report Page</title>
+    <script type="text/javascript" src="/js/reports.js"></script>
 </head>
 <body>
 
     <div layout:fragment="content">
-        <div class="ui segment">
+        <div class="ui segment" id="create-report">
             <h4 class="ui dividing header">Create Report</h4>
 
-            <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
-                <div class="field">
-                    <label>Report Name</label>
-                    <input name="reportName" placeholder="Report Name" required type="text">
-                </div>
-                <div class="field">
-                    <label>Report Type</label>
-                    <select name="reportType">
-                        <option th:each="reportType: ${allReportTypes}"
-                            th:text="${reportType.label}"
-                            th:value="${reportType}">
-                        </option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Select project by tags</label>
-                    <p>Example ->  t.tagKey == "CUSTOMER" && (t.tagValue == "Demo" || t.tagValue == "Test")</p>
-                    <input name="reportSelectProject" placeholder="Filter projects" required type="text">
-                </div>
-                <a class="ui button" v-on:click="refreshProjectSelection($event)">
-                    Refresh selection
-                </a>
-                <div class="ui card">
-                    <div class="content header">
-                        Projects selection preview
+            <form action="" class="ui grid form" enctype="application/x-www-form-urlencoded" method="post" style="margin:0px">
+
+                <div class="eight wide column">
+                    <div class="field">
+                        <label>Report Name</label>
+                        <input name="reportName" placeholder="Report Name" required type="text">
                     </div>
-                    <div class="content description">
-                        <div class="ui list" th:if="${projectsPreview.size()} > 0">
-                            <div class="item" th:each="project: ${projectsPreview}">
-                                <i class="folder open icon"></i>
-                                <div class="content">
-                                    <a class="header" th:text="${project.name}"></a>
-                                    <a class="description" th:text="${project.comments}"></a>
+                    <div class="field">
+                        <label>Report Type</label>
+                        <select name="reportType">
+                            <option th:each="reportType: ${allReportTypes}"
+                                th:text="${reportType.label}"
+                                th:value="${reportType}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Select project by tags</label>
+                        <p>Example ->  key == "CUSTOMER" && (value == "Demo" || value == "Test")</p>
+                        <input name="reportSelectProject" v-model="reportSelectProject" placeholder="Filter projects" required type="text">
+                    </div>
+                </div>
+
+                <div class="eight wide column">
+                    <div class="ui card">
+                        <div class="content header">
+                            <p>Projects selection preview</p>
+                            <a class="ui button" v-on:click="refreshProjectSelection(reportSelectProject)">
+                                Refresh selection
+                            </a>
+                        </div>
+                        <div class="content description">
+                            <div class="ui list" v-if="sizeSelectedProjects > 0">
+                                <div class="item" v-for="project in selectedProjects" >
+
+                                    <div class="header">
+                                        <i class="folder open icon"></i>
+                                        {{project.projectName}}
+                                    </div>
+                                    <div class="description" v-if="project.projectComments != null">{{project.projectComments}}</div>
+                                    <div class="description" v-if="project.projectComments == null">(No comments)</div>
                                 </div>
                             </div>
-                        </div>
-                        <div  th:if="${projectsPreview.size()} <= 0">
-                            No projects
+                            <div  v-if="sizeSelectedProjects <= 0">
+                                No projects
+                            </div>
                         </div>
                     </div>
                 </div>

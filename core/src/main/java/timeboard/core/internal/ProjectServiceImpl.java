@@ -145,18 +145,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> listProjectsByFilterTags(Account organization, String filter) {
-        TypedQuery<Project> query = em.createQuery(
-                "select p from Project " +
-                        "join fetch p.members m where m.member = :org " +
-                        "join fetch p.tags t where " + filter
-                , Project.class)
-
-                .setParameter("user", organization);
-        return query.getResultList();
-    }
-
-    @Override
         public Project getProjectByID(Account actor, Long projectId) {
         Project data = em.createQuery("select p from Project p join fetch p.members m " +
                 "where p.id = :projectID and  m.member = :user", Project.class)

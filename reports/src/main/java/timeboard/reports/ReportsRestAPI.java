@@ -26,23 +26,22 @@ package timeboard.reports;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
 
@@ -50,6 +49,8 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @RequestMapping(value = "/api/reports", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ReportsRestAPI {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private UserInfo userInfo;
@@ -60,20 +61,44 @@ public class ReportsRestAPI {
     @Autowired
     private ProjectService projectservice;
 
-    @GetMapping("/refreshProjectSelection")
-    public ResponseEntity refreshProjectSelection(HttpServletRequest request, Model model) {
+    @GetMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity refreshProjectSelection(HttpServletRequest request, Model model) throws JsonProcessingException {
         Account actor = this.userInfo.getCurrentAccount();
         Account organization = this.userService.findUserByID(this.userInfo.getCurrentOrganizationID());
 
-        String filterProject = request.getParameter("reportSelectProject");
-        List<Project> listProjectsConcerned = new ArrayList<>();
+        String filterProject = request.getParameter("filter");
         //TODO filter with request.getParameter("reportSelectProject")
-        listProjectsConcerned = this.projectservice.listProjectsByFilterTags(organization, filterProject);
+        List<ProjectWrapper> listProjectsConcerned = this.projectservice.listProjects(organization)
+                .stream()
+                .map(project -> new ProjectWrapper(project.getId(), project.getName(), project.getComments()))
+                .collect(Collectors.toList());
 
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(listProjectsConcerned.toArray()));
+    }
 
+    public static class ProjectWrapper {
 
-        model.addAttribute("projectsPreview", listProjectsConcerned);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        private final Long projectID;
+        private final String projectName;
+        private final String projectComments;
+
+        public ProjectWrapper(Long projectID, String projectName, String projectComments) {
+            this.projectID = projectID;
+            this.projectName = projectName;
+            this.projectComments = projectComments;
+        }
+
+        public Long getProjectID() {
+            return projectID;
+        }
+
+        public String getProjectName() {
+            return projectName;
+        }
+
+        public String getProjectComments() {
+            return projectComments;
+        }
     }
 
 }
