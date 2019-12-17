@@ -39,10 +39,6 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-
 
 /**
  * Display project dashboard.
@@ -59,7 +55,7 @@ public class ProjectDashboardController {
 
 
     @GetMapping
-    protected String handleGet(@PathVariable Long projectID, HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
+    protected String handleGet(@PathVariable Long projectID, Model model) throws  BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);

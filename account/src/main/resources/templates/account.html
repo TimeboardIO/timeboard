@@ -31,7 +31,7 @@
             <div class="extra content">
                 <div class="ui top large primary attached label">
                     <h4><i class="icon account blue"></i>
-                    <i th:text="${account.firstName} + ' ' + ${account.name}"></i></h4>
+                        <i th:text="${account.firstName} + ' ' + ${account.name}"></i></h4>
                 </div>
                 <br/>
             </div>
@@ -42,13 +42,13 @@
                     <div class="item">
                         <i class="clock outline icon"></i>
                         <div class="content">
-                            Member since  <i th:text="${account.accountCreationTime}"></i>
+                            Member since <i th:text="${account.accountCreationTime}"></i>
                         </div>
                     </div>
                     <div class="item">
                         <i class="mail icon"></i>
                         <div class="content">
-                            <a th:href="'mailto:' + ${account.email}" th:text="${account.email}" ></a>
+                            <a th:href="'mailto:' + ${account.email}" th:text="${account.email}"></a>
                         </div>
                     </div>
 
@@ -67,22 +67,24 @@
                         <label>Name</label>
                         <div class="two fields">
                             <div class="field">
-                                <input type="text" name="firstName" placeholder="First Name" th:value="${account.firstName}">
+                                <input name="firstName" placeholder="First Name" th:value="${account.firstName}"
+                                       type="text">
                             </div>
                             <div class="field">
-                                <input type="text" name="name" placeholder="Last Name" th:value="${account.name}">
+                                <input name="name" placeholder="Last Name" th:value="${account.name}" type="text">
                             </div>
                         </div>
                         <div class="two fields">
 
                             <div class="field">
                                 <label>E-mail</label>
-                                <input type="email" name="email" placeholder="john@mygroup.io" th:value="${account.email}">
+                                <input name="email" placeholder="john@mygroup.io" th:value="${account.email}"
+                                       type="email">
                             </div>
                         </div>
 
                         <input name="formType" type="hidden" value="account">
-                        <div name="submit" class="ui submit positive button right" value="account" >Save</div>
+                        <div class="ui submit positive button right" name="submit" value="account">Save</div>
                         <div class="ui error message"></div>
 
                     </div>
@@ -95,7 +97,8 @@
             <div class="content">
                 <h4 class="ui dividing header">External tools</h4>
 
-                <form id="externalTools" action="" class="ui form password" enctype="application/x-www-form-urlencoded" method="post">
+                <form action="" class="ui form password" enctype="application/x-www-form-urlencoded" id="externalTools"
+                      method="post">
 
                     <div class="field">
 
@@ -106,18 +109,21 @@
                                 <th>Value</th>
                             </tr>
                             </thead>
-                            <tbody class="externalTools" >
-                            <tr th:each="element :  ${externalTools}" th:attr="data-key=${element}" >
-                                <td th:text="${element}">  <i class="github icon"> </i> Github</td>
+                            <tbody class="externalTools">
+                            <tr th:attr="data-key=${element}" th:each="element :  ${externalTools}">
+                                <td th:text="${element}"><i class="github icon"> </i> Github</td>
                                 <td>
-                                    <input th:if="${account.externalIDs != null}" type="text" th:value="${account.externalIDs.containsKey(element)} ? ${account.externalIDs.get(element)} : '' "  th:name="'attr-'+${element}"  />
-                                    <input th:if="${account.externalIDs == null}" type="text" th:name="'attr-'+${element}" />
+                                    <input th:if="${account.externalIDs != null}" th:name="'attr-'+${element}"
+                                           th:value="${account.externalIDs.containsKey(element)} ? ${account.externalIDs.get(element)} : '' "
+                                           type="text"/>
+                                    <input th:if="${account.externalIDs == null}" th:name="'attr-'+${element}"
+                                           type="text"/>
                                 </td>
                             </tr>
                             </tbody>
                         </table>
                         <input name="formType" type="hidden" value="external">
-                        <div name="submitButton" class="ui submit positive button " value="external" >Save</div>
+                        <div class="ui submit positive button " name="submitButton" value="external">Save</div>
                         <div class="ui error message"></div>
                     </div>
                 </form>
@@ -128,7 +134,8 @@
             <div class="content">
                 <h4 class="ui dividing header">Column Preferences For Task</h4>
 
-                <form id="columnPreferences" action="" class="ui form password" enctype="application/x-www-form-urlencoded" method="post">
+                <form action="" class="ui form password" enctype="application/x-www-form-urlencoded"
+                      id="columnPreferences" method="post">
 
                     <div class="field">
 
@@ -142,7 +149,8 @@
                             <tbody>
                             <tr th:each="col : ${allTaskColumns}">
                                 <td>
-                                    <input type="checkbox" name="columnSelected" th:value="${col}" th:checked="${userTaskColumns.contains(col)}"/>
+                                    <input name="columnSelected" th:checked="${userTaskColumns.contains(col)}" th:value="${col}"
+                                           type="checkbox"/>
                                 </td>
                                 <td>
                                     <a th:text="${col}"></a>
@@ -152,7 +160,7 @@
                         </table>
 
                         <input name="formType" type="hidden" value="columnTask">
-                        <div name="submitButton" class="ui submit positive button " value="columnTask" >Save</div>
+                        <div class="ui submit positive button " name="submitButton" value="columnTask">Save</div>
                         <div class="ui error message"></div>
                     </div>
                 </form>
@@ -162,27 +170,33 @@
             <div class="content">
                 <h4 class="ui dividing header">Exports Reports</h4>
 
-                <form action="/account/exportTAS" class="ui form account" enctype="application/x-www-form-urlencoded" method="post">
+                <form action="/account/exportTAS" class="ui form account" enctype="application/x-www-form-urlencoded"
+                      method="post">
                     <div class="field">
                         <div class="two fields">
                             <div class="field">
                                 <label>Month</label>
                                 <select name="month">
-                                    <option th:each="month : ${monthsSinceHiring}" th:value="${month.key}" th:text="${month.value}">December</option>
+                                    <option th:each="month : ${monthsSinceHiring}" th:text="${month.value}"
+                                            th:value="${month.key}">December
+                                    </option>
 
                                 </select>
                             </div>
                             <div class="field">
                                 <label>Year</label>
                                 <select name="year">
-                                    <option th:each="year : ${yearsSinceHiring}" th:value="${year}" th:text="${year}">2019</option>
+                                    <option th:each="year : ${yearsSinceHiring}" th:text="${year}" th:value="${year}">
+                                        2019
+                                    </option>
 
                                 </select>
                             </div>
                             <div class="field">
                                 <label>Month</label>
                                 <select name="projectID">
-                                    <option th:each="project : ${projects}" th:value="${project.id}" th:text="${project.name}" ></option>
+                                    <option th:each="project : ${projects}" th:text="${project.name}"
+                                            th:value="${project.id}"></option>
                                 </select>
                             </div>
                         </div>

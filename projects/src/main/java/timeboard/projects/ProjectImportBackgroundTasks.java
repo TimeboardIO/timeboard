@@ -31,7 +31,7 @@ import timeboard.core.model.Account;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ProjectImportBackgroundTasks {
+public final class ProjectImportBackgroundTasks {
 
     private static ProjectImportBackgroundTasks INSTANCE;
 

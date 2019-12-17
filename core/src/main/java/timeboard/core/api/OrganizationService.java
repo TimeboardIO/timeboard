@@ -53,5 +53,8 @@ public interface OrganizationService {
 
     AccountHierarchy addMember(Account actor, Account organization, Account member) throws BusinessException;
 
-    AccountHierarchy updateMemberRole(Account actor, Account organization, Account member, MembershipRole role) throws BusinessException;
+    AccountHierarchy updateMemberRole(Account actor,
+                                      Account organization,
+                                      Account member,
+                                      MembershipRole role) throws BusinessException;
 }

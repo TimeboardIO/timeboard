@@ -12,10 +12,10 @@ package timeboard.timesheet;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,7 +33,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
@@ -80,10 +82,11 @@ public class OrganizationsRestAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
 
-        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         if (organization.isPresent()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Project does not exists or you don't have enough permissions to access it.");
         }
 
         //final List<Account> members = this.organizationService.getMembers(actor, organization);
@@ -98,7 +101,7 @@ public class OrganizationsRestAPI {
                     member.getMember().getScreenName(),
                     member.getMember().getIsOrganization(),
                     (member.getRole() != null ? member.getRole().name() : "")
-                    ));
+            ));
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(result.toArray()));
@@ -113,31 +116,30 @@ public class OrganizationsRestAPI {
         Long orgID = null;
         if (strOrgID != null) {
             orgID = Long.parseLong(strOrgID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
         if (strMemberID != null) {
             memberID = Long.parseLong(strMemberID);
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
 
-        final Optional<Account> member = this.organizationService.getOrganizationByID(actor,  memberID);
+        final Optional<Account> member = this.organizationService.getOrganizationByID(actor, memberID);
 
         try {
-           AccountHierarchy ah = organizationService.addMember(actor, organization.get(), member.get());
+            AccountHierarchy ah = organizationService.addMember(actor, organization.get(), member.get());
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(ah)));
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
 
     }
-
 
 
     @GetMapping("/members/updateRole")
@@ -151,7 +153,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -160,7 +162,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
-        final Optional<Account> member = this.organizationService.getOrganizationByID(actor,  memberID);
+        final Optional<Account> member = this.organizationService.getOrganizationByID(actor, memberID);
 
 
         final String strRole = request.getParameter("role");
@@ -182,7 +184,7 @@ public class OrganizationsRestAPI {
 
 
     @GetMapping("/members/remove")
-    public ResponseEntity removeMember(HttpServletRequest request){
+    public ResponseEntity removeMember(HttpServletRequest request) {
         Account actor = this.userInfo.getCurrentAccount();
 
         final String strOrgID = request.getParameter("orgID");
@@ -192,7 +194,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Optional<Account> organization  = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -206,7 +208,7 @@ public class OrganizationsRestAPI {
 
         try {
             organizationService.removeMember(actor, organization.get(), member);
-        } catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
@@ -220,8 +222,10 @@ public class OrganizationsRestAPI {
         public boolean isOrganization;
         public String role;
 
-        public MemberWrapper(){}
-        public MemberWrapper(AccountHierarchy h){
+        public MemberWrapper() {
+        }
+
+        public MemberWrapper(AccountHierarchy h) {
             this.orgID = h.getMember().getId();
             this.screenName = h.getMember().getScreenName();
             this.isOrganization = h.getMember().getIsOrganization();

@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class App {
 
     public static void main(String... args){
-        ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
+        final ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
     }
 
 }

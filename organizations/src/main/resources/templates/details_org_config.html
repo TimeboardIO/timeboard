@@ -12,105 +12,106 @@
     <div class="ui segment">
         <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
             <input name="orgID" required th:value="${organization.id}" type="hidden">
-            <input name="action" required value="CONFIG" type="hidden">
+            <input name="action" required type="hidden" value="CONFIG">
 
             <div class="field">
                 <label>Organization Name</label>
-                <input name="organizationName" placeholder="Organization Name" required type="text" th:value="${organization.name}">
+                <input name="organizationName" placeholder="Organization Name" required th:value="${organization.name}"
+                       type="text">
             </div>
-            <button class="ui primary  right align icon button" type="submit" >
+            <button class="ui primary  right align icon button" type="submit">
                 Save config <i class="cog icon"></i>
             </button>
         </form>
     </div>
 
-        <div class="ui stackable two column grid">
-            <div class="column">
-                <table class="ui tablet unstackable table">
-                    <thead>
-                        <tr>
-                            <th colspan="2">Task type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="type : ${taskTypes}" th:data-key="${type.id}">
-                        <td th:text="${type.typeName}"></td>
-                        <td>
-                            <form action="" method="POST">
-                                <input name="orgID" required th:value="${organization.id}" type="hidden">
-                                <input name="action" required value="DELETE_TYPE" type="hidden">
-                                <input name="typeID" required th:value="${type.id}" type="hidden">
-
-                                <button class="ui negative basic button delete" type="submit" th:data-key="${type.id}">
-                                    <i class="remove alternate icon"></i>
-                                    Remove
-                                </button>
-                            </form>
-                        </td>
-
-                    </tr>
-                    <tr>
+    <div class="ui stackable two column grid">
+        <div class="column">
+            <table class="ui tablet unstackable table">
+                <thead>
+                <tr>
+                    <th colspan="2">Task type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:data-key="${type.id}" th:each="type : ${taskTypes}">
+                    <td th:text="${type.typeName}"></td>
+                    <td>
                         <form action="" method="POST">
                             <input name="orgID" required th:value="${organization.id}" type="hidden">
-                            <input name="action" required value="NEW_TYPE" type="hidden">
-                            <td>
-                                <input type="text" name="newTaskType" placeholder="New task type">
-                            </td>
-                            <td>
-                                <button class="ui positive basic button add"  type="submit">
-                                    <i class="plus alternate icon"></i>
-                                    Add
-                                </button>
-                            </td>
+                            <input name="action" required type="hidden" value="DELETE_TYPE">
+                            <input name="typeID" required th:value="${type.id}" type="hidden">
+
+                            <button class="ui negative basic button delete" th:data-key="${type.id}" type="submit">
+                                <i class="remove alternate icon"></i>
+                                Remove
+                            </button>
                         </form>
-                    </tr>
+                    </td>
 
-                    </tbody>
-                </table>
-
-            </div>
-            <div class="column">
-                <table class="ui tablet unstackable table">
-                    <thead>
-                    <tr>
-                        <th colspan="2">Default tasks</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="task : ${defaultTasks}" th:data-key="${task.id}">
-                        <td th:text="${task.name}"></td>
+                </tr>
+                <tr>
+                    <form action="" method="POST">
+                        <input name="orgID" required th:value="${organization.id}" type="hidden">
+                        <input name="action" required type="hidden" value="NEW_TYPE">
                         <td>
-                            <form action="" method="POST">
-                                <input name="orgID" required th:value="${organization.id}" type="hidden">
-                                <input name="taskID" required th:value="${task.id}" type="hidden">
-                                <input name="action" required value="DELETE_TASK" type="hidden">
-                                <button class="ui negative basic button delete"  type="submit" th:data-key="${task.id}">
-                                    <i class="remove alternate icon"></i>
-                                    Remove
-                                </button>
-                            </form>
+                            <input name="newTaskType" placeholder="New task type" type="text">
                         </td>
-                    </tr>
-                    <tr>
-                        <form action="" method="POST">
-                            <input name="orgID" required th:value="${organization.id}" type="hidden">
-                            <input name="action" required value="NEW_TASK" type="hidden">
-                            <td>
-                                <input type="text" name="newDefaultTask" placeholder="New default task">
-                            </td>
-                            <td>
-                                <button class="ui positive basic button add"  type="submit">
-                                    <i class="plus alternate icon"></i>
-                                    Add
-                                </button>
-                            </td>
-                        </form>
-                    </tr>
+                        <td>
+                            <button class="ui positive basic button add" type="submit">
+                                <i class="plus alternate icon"></i>
+                                Add
+                            </button>
+                        </td>
+                    </form>
+                </tr>
 
-                    </tbody>
-                </table>
-            </div>
+                </tbody>
+            </table>
+
         </div>
+        <div class="column">
+            <table class="ui tablet unstackable table">
+                <thead>
+                <tr>
+                    <th colspan="2">Default tasks</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:data-key="${task.id}" th:each="task : ${defaultTasks}">
+                    <td th:text="${task.name}"></td>
+                    <td>
+                        <form action="" method="POST">
+                            <input name="orgID" required th:value="${organization.id}" type="hidden">
+                            <input name="taskID" required th:value="${task.id}" type="hidden">
+                            <input name="action" required type="hidden" value="DELETE_TASK">
+                            <button class="ui negative basic button delete" th:data-key="${task.id}" type="submit">
+                                <i class="remove alternate icon"></i>
+                                Remove
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <tr>
+                    <form action="" method="POST">
+                        <input name="orgID" required th:value="${organization.id}" type="hidden">
+                        <input name="action" required type="hidden" value="NEW_TASK">
+                        <td>
+                            <input name="newDefaultTask" placeholder="New default task" type="text">
+                        </td>
+                        <td>
+                            <button class="ui positive basic button add" type="submit">
+                                <i class="plus alternate icon"></i>
+                                Add
+                            </button>
+                        </td>
+                    </form>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
 
 </div>
 

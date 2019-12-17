@@ -53,7 +53,10 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
-        final String logoutURL = String.format("%s?client_id=%s&logout_uri=%s", this.logoutEndpoint, this.clientid, this.appLogout);
+        final String logoutURL = String.format("%s?client_id=%s&logout_uri=%s",
+                this.logoutEndpoint,
+                this.clientid,
+                this.appLogout);
 
         http.authorizeRequests()
                 .antMatchers("/", "/onboarding/**").permitAll()

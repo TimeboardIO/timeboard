@@ -6,7 +6,7 @@
 
 <head>
     <title layout:fragment="title">Project</title>
-    <meta name="projectID" th:content="${project.id}" />
+    <meta name="projectID" th:content="${project.id}"/>
 </head>
 <body>
 
@@ -42,13 +42,15 @@
         var removeConfig = function(configKey){
             $("[data-key="+configKey+"]").remove();
         }
+
     </script>
 
     <div class="ui stackable two column grid">
         <div class="column">
-            <form th:action="@{projects/{projectID}/setup/informations(projectID=${projectID})}" th:object="${projectConfigForm}" name="projectConfig"
-                  class="ui form"
-                  enctype="application/x-www-form-urlencoded" method="post">
+            <form class="ui form"
+                  enctype="application/x-www-form-urlencoded" method="post"
+                  name="projectConfig"
+                  th:action="@{projects/{projectID}/setup/informations(projectID=${projectID})}" th:object="${projectConfigForm}">
 
                 <h4 class="ui dividing header">Project Informations</h4>
                 <div class="field">
@@ -69,11 +71,11 @@
                 </div>
 
 
-                <button class="ui positive button" type="submit" style="margin-top:1em">Save</button>
+                <button class="ui positive button" style="margin-top:1em" type="submit">Save</button>
             </form>
         </div>
         <div class="column">
-            <div name="projectMembers" class="ui form">
+            <div class="ui form" name="projectMembers">
 
                 <h4 class="ui dividing header">Members</h4>
                 <div class="field">
@@ -86,29 +88,32 @@
                     </div>
                     <table class="ui celled table" id="members">
                         <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Role</th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="membership, status : ${projectMembersForm.memberships}" th:id="${membership.membershipID}">
-                                <td th:text="${membership.member.screenName}"></td>
-                                <td>
-                                    <select th:onchange="'updateUser('+${membership.membershipID}+', this.value)'" th:field="${projectMembersForm.memberships[__${status.index}__].role}">
-                                        <option th:each="role : ${roles}" th:selected="${role == membership.role}"
-                                                th:text="${role}"
-                                                th:value="${role}"></option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <button th:if="${membership.member.id != account.id}" class="ui negative basic button" th:onclick="'removeUser('+${membership.membershipID}+')'">
-                                        <i class="remove alternate icon"></i>
-                                        Remove
-                                    </button>
-                                </td>
-                            </tr>
+                        <tr th:each="membership, status : ${projectMembersForm.memberships}"
+                            th:id="${membership.membershipID}">
+                            <td th:text="${membership.member.screenName}"></td>
+                            <td>
+                                <select th:field="${projectMembersForm.memberships[__${status.index}__].role}"
+                                        th:onchange="'updateUser('+${membership.membershipID}+', this.value)'">
+                                    <option th:each="role : ${roles}" th:selected="${role == membership.role}"
+                                            th:text="${role}"
+                                            th:value="${role}"></option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="ui negative basic button" th:if="${membership.member.id != account.id}"
+                                        th:onclick="'removeUser('+${membership.membershipID}+')'">
+                                    <i class="remove alternate icon"></i>
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -156,6 +161,7 @@
                     minCharacters : 3
             });
 /*]]>*/
+
 
 
 

@@ -54,8 +54,8 @@ import javax.transaction.Transactional;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -76,9 +76,26 @@ public class ProjectServiceImpl implements ProjectService {
 
     private DefaultTask vacationTask;
 
+    public static String generateRandomColor(Color mix) {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        // mix the color
+        if (mix != null) {
+            red = (red + mix.getRed()) / 2;
+            green = (green + mix.getGreen()) / 2;
+            blue = (blue + mix.getBlue()) / 2;
+        }
+
+        Color color = new Color(red, green, blue);
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
     @Transactional
     @EventListener()
-    protected void init(ContextRefreshedEvent ctx){
+    protected void init(ContextRefreshedEvent ctx) {
         //TODO change when vacation model totally implemented
 
         AbstractTask taskFromDB = this.getTasksByName(VACATION_TASK_NAME);
@@ -86,7 +103,7 @@ public class ProjectServiceImpl implements ProjectService {
             DefaultTask task = new DefaultTask();
             task.setName(VACATION_TASK_NAME);
             task.setStartDate(new Date());
-            task.setEndDate(new Date(new Date().getTime()+999999999999L));
+            task.setEndDate(new Date(new Date().getTime() + 999999999999L));
             task.setOrigin("timeboard");
             try {
                 em.persist(task);
@@ -108,7 +125,8 @@ public class ProjectServiceImpl implements ProjectService {
         Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
-        newProject.getAttributes().put(Project.PROJECT_COLOR_ATTR,new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
+        newProject.getAttributes()
+                .put(Project.PROJECT_COLOR_ATTR, new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
         em.persist(newProject);
 
         em.flush();
@@ -119,26 +137,6 @@ public class ProjectServiceImpl implements ProjectService {
         return newProject;
     }
 
-    public static String generateRandomColor(Color mix) {
-        Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
-
-        // mix the color
-        if (mix != null) {
-            red = (red + mix.getRed()) / 2;
-            green = (green + mix.getGreen()) / 2;
-            blue = (blue + mix.getBlue()) / 2;
-        }
-
-        Color color = new Color(red, green, blue);
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
-
-
-
-
     @Override
     public List<Project> listProjects(Account account) {
         TypedQuery<Project> query = em.createNamedQuery("ListUserProjects", Project.class);
@@ -147,8 +145,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Project getProjectByID(Account actor, Long projectId) {
-        Project data = em.createQuery("select p from Project p join fetch p.members m where p.id = :projectID and  m.member = :user", Project.class)
+        public Project getProjectByID(Account actor, Long projectId) {
+        Project data = em.createQuery("select p from Project p join fetch p.members m " +
+                "where p.id = :projectID and  m.member = :user", Project.class)
                 .setParameter("user", actor)
                 .setParameter("projectID", projectId)
                 .getSingleResult();
@@ -251,7 +250,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         final Double effortSpent = effortSpentQuery.getSingleResult();
 
-        return new ProjectDashboard(project.getQuotation(), (Double) originalEstimateAndEffortLeft[0], (Double) originalEstimateAndEffortLeft[1], effortSpent);
+        return new ProjectDashboard(project.getQuotation(),
+                (Double) originalEstimateAndEffortLeft[0],
+                (Double) originalEstimateAndEffortLeft[1], effortSpent);
 
     }
 
@@ -494,14 +495,18 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         try {
-            TypedQuery<DefaultTask> query = em.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
+            TypedQuery<DefaultTask> query = em.createQuery("select distinct t " +
+                    "from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
+
             query.setParameter("name", name);
             tasks.addAll(query.getResultList());
         } catch (Exception e) {
             //handle JPA Exceptions
         }
 
-        if(tasks.isEmpty()) return null;
+        if (tasks.isEmpty()) {
+            return null;
+        }
 
         return tasks.get(0);
 
@@ -512,7 +517,10 @@ public class ProjectServiceImpl implements ProjectService {
         final List<AbstractTask> tasks = new ArrayList<>();
         try {
 
-            TypedQuery<Task> query = em.createQuery("select distinct t from Task t left join fetch t.imputations  where t.name = :name", Task.class);
+            TypedQuery<Task> query = em.createQuery("select distinct t " +
+                    "from Task t left join fetch t.imputations  " +
+                    "where t.name = :name", Task.class);
+
             query.setParameter("name", name);
 
             tasks.addAll(query.getResultList());
@@ -522,7 +530,10 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         try {
-            TypedQuery<DefaultTask> query = em.createQuery("select distinct t from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
+            TypedQuery<DefaultTask> query = em.createQuery("select distinct t " +
+                    "from DefaultTask t left join fetch t.imputations " +
+                    "where t.name = :name", DefaultTask.class);
+
             query.setParameter("name", name);
             tasks.addAll(query.getResultList());
         } catch (Exception e) {
@@ -561,11 +572,16 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
-    private UpdatedTaskResult updateProjectTaskImputation(Account actor, Task task, Date day, double val, Calendar calendar) throws BusinessException {
+    private UpdatedTaskResult updateProjectTaskImputation(Account actor,
+                                                          Task task,
+                                                          Date day,
+                                                          double val,
+                                                          Calendar calendar) throws BusinessException {
+
         Task projectTask = (Task) this.getTaskByID(actor, task.getId());
 
 
-        if(projectTask.getTaskStatus() != TaskStatus.PENDING) {
+        if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
             Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask);
             double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
@@ -573,17 +589,27 @@ public class ProjectServiceImpl implements ProjectService {
             Task updatedTask = em.find(Task.class, projectTask.getId());
             double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);
-            LOGGER.info("User " + actor.getName() + " updated imputations for task " + projectTask.getId() + " (" + day + ") in project " + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
+
+            LOGGER.info("User " + actor.getName()
+                    + " updated imputations for task "
+                    + projectTask.getId() + " (" + day + ") in project "
+                    + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
 
             em.merge(updatedTask);
             em.flush();
 
-            return new UpdatedTaskResult(updatedTask.getProject().getId(), updatedTask.getId(), updatedTask.getEffortSpent(), updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(), updatedTask.getRealEffort());
+            return new UpdatedTaskResult(updatedTask.getProject().getId(),
+                    updatedTask.getId(), updatedTask.getEffortSpent(),
+                    updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(),
+                    updatedTask.getRealEffort());
         }
         return null;
     }
 
-    private UpdatedTaskResult updateDefaultTaskImputation(Account actor, DefaultTask task, Date day, double val, Calendar calendar) throws BusinessException {
+    private UpdatedTaskResult updateDefaultTaskImputation(Account actor,
+                                                          DefaultTask task,
+                                                          Date day, double val, Calendar calendar) throws BusinessException {
+
         DefaultTask defaultTask = (DefaultTask) this.getTaskByID(actor, task.getId());
 
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
@@ -591,21 +617,28 @@ public class ProjectServiceImpl implements ProjectService {
         this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), em);
 
         em.flush();
-        LOGGER.info("User " + actor.getName() + " updated imputations for default task " + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
+        LOGGER.info("User " + actor.getName() + " updated imputations for default task "
+                + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
 
         return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
 
     }
 
     private Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task) {
-        TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  where i.task.id = :taskID and i.day = :day", Imputation.class);
+        TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  " +
+                "where i.task.id = :taskID and i.day = :day", Imputation.class);
         q.setParameter("taskID", task.getId());
         q.setParameter("day", day);
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
 
-    private Imputation actionOnImputation(Imputation imputation, AbstractTask task, Account actor, double val, Date date, EntityManager entityManager) {
+    private Imputation actionOnImputation(Imputation imputation,
+                                          AbstractTask task,
+                                          Account actor,
+                                          double val,
+                                          Date date,
+                                          EntityManager entityManager) {
 
         if (imputation == null) {
             //No imputation for current task and day
@@ -615,7 +648,7 @@ public class ProjectServiceImpl implements ProjectService {
             imputation.setAccount(actor);
             imputation.setValue(val);
             entityManager.persist(imputation);
-        } else  {
+        } else {
             // There is an existing imputation for this day and task
             imputation.setValue(val);
             if (val == 0) {
@@ -633,7 +666,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private double updateEffortLeftFromImputationValue(double currentEffortLeft, double currentImputationValue, double newImputationValue) {
         double newEL = currentEffortLeft; // new effort left
-        double diffValue =  Math.abs(newImputationValue - currentImputationValue);
+        double diffValue = Math.abs(newImputationValue - currentImputationValue);
 
         if (currentImputationValue < newImputationValue) {
             newEL = currentEffortLeft - diffValue;
@@ -661,7 +694,9 @@ public class ProjectServiceImpl implements ProjectService {
         LOGGER.info("User " + actor.getName() + " updated effort left for task " + task.getId()
                 + " in project " + task.getProject().getName() + " with value " + effortLeft);
 
-        return new UpdatedTaskResult(task.getProject().getId(), task.getId(), task.getEffortSpent(), task.getEffortLeft(), task.getOriginalEstimate(), task.getRealEffort());
+        return new UpdatedTaskResult(task.getProject().getId(),
+                task.getId(), task.getEffortSpent(), task.getEffortLeft(),
+                task.getOriginalEstimate(), task.getRealEffort());
     }
 
     @Override
@@ -755,7 +790,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor, Task task, Date startTaskDate, Date endTaskDate) throws BusinessException {
+    public List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor,
+                                                             Task task,
+                                                             Date startTaskDate,
+                                                             Date endTaskDate) throws BusinessException {
+
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
@@ -763,9 +802,12 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-        TypedQuery<Object[]> query = (TypedQuery<Object[]>) em.createNativeQuery("select "
-                + "i.day as date, SUM(value) OVER (ORDER BY day) AS sumPreviousValue "
-                + "from Imputation i  where i.task_id = :taskId and i.day >= :startTaskDate and i.day <= :endTaskDate");
+        TypedQuery<Object[]> query =
+                (TypedQuery<Object[]>) em.createNativeQuery("select "
+                + "i.day as date, SUM(value) " +
+                        "OVER (ORDER BY day) AS sumPreviousValue "
+                + "from Imputation i  where i.task_id = :taskId " +
+                        "and i.day >= :startTaskDate and i.day <= :endTaskDate");
         query.setParameter("taskId", task.getId());
         query.setParameter("startTaskDate", startTaskDate);
         query.setParameter("endTaskDate", endTaskDate);
@@ -809,7 +851,7 @@ public class ProjectServiceImpl implements ProjectService {
             DefaultTask task = new DefaultTask();
             task.setStartDate(new Date());
             Calendar c = Calendar.getInstance();
-            c.set(9999,Calendar.DECEMBER,31);
+            c.set(9999, Calendar.DECEMBER, 31);
             task.setEndDate(c.getTime());
             task.setOrigin(actor.getScreenName() + "/" + System.nanoTime());
             task.setName(name);
@@ -836,7 +878,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Map<String, Task> searchExistingTasksFromOrigin(Account actor, Project project, String origin, String remotePath) throws BusinessException {
+    public Map<String, Task> searchExistingTasksFromOrigin(Account actor,
+                                                           Project project,
+                                                           String origin,
+                                                           String remotePath) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
@@ -888,7 +933,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Milestone createMilestone(Account actor, String name, Date date, MilestoneType type, Map<String, String> attributes, Set<Task> tasks, Project project) throws BusinessException {
+    public Milestone createMilestone(Account actor,
+                                     String name, Date date, MilestoneType type,
+                                     Map<String, String> attributes,
+                                     Set<Task> tasks, Project project) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
@@ -1053,7 +1101,7 @@ public class ProjectServiceImpl implements ProjectService {
             otherProjectImputations.put(i, otherProjectI);
             vacationImputations.put(i, vacationI);
             projectImputations.put(i, projectI);
-            comments.put(i,"");
+            comments.put(i, "");
         }
 
         data.setDayMonthNames(dayMonthNames);

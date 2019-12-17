@@ -41,7 +41,6 @@ import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
@@ -86,7 +85,8 @@ public class ProjectTasksController {
     }
 
     @GetMapping("/tasks/{taskID}")
-    protected String editTasks(@PathVariable Long projectID, @PathVariable Long taskID, Model model) throws ServletException, IOException, BusinessException {
+    protected String editTasks(@PathVariable Long projectID,
+                               @PathVariable Long taskID, Model model) throws BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -102,7 +102,7 @@ public class ProjectTasksController {
     }
 
     @PostMapping("/tasks")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, Model model) throws BusinessException {
         Account actor = this.userInfo.getCurrentAccount();
 
         long id = Long.parseLong(request.getParameter("projectID"));

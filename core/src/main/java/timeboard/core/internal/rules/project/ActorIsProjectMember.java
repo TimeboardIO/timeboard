@@ -43,7 +43,7 @@ public class ActorIsProjectMember implements Rule<Project> {
 
     @Override
     public boolean isSatisfied(Account u, Project thing) {
-        Optional<ProjectMembership> userOptional = thing.getMembers().stream()
+        final Optional<ProjectMembership> userOptional = thing.getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()
                 )

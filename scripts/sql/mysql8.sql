@@ -24,7 +24,7 @@
 
     create table Calendar (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         name varchar(50),
         remoteId varchar(100),
         targetType varchar(25),
@@ -33,7 +33,7 @@
 
     create table CostByCategory (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         costPerDay double precision not null,
         costPerHour double precision not null,
         endDate date,
@@ -44,7 +44,7 @@
 
     create table DataTableConfig (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         tableInstanceId varchar(255),
         user_id bigint,
         primary key (id)
@@ -57,7 +57,7 @@
 
     create table DefaultTask (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
@@ -102,7 +102,7 @@
 
     create table Imputation (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         day date,
         value double precision,
         account_id bigint,
@@ -112,7 +112,7 @@
 
     create table Milestone (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         attributes TEXT,
         date date,
         name varchar(50),
@@ -123,7 +123,7 @@
 
     create table Project (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         attributes TEXT,
         comments varchar(500),
         enable bit,
@@ -135,7 +135,7 @@
 
     create table ProjectMembership (
        membershipID bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         role varchar(255),
         member_id bigint,
         project_id bigint,
@@ -144,7 +144,7 @@
 
     create table ProjectTag (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         tagKey varchar(255) not null,
         tagValue varchar(255) not null,
         project_id bigint,
@@ -153,7 +153,7 @@
 
     create table Task (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         comments varchar(500),
         endDate date,
         name varchar(100) not null,
@@ -173,7 +173,7 @@
 
     create table TaskRevision (
        id bigint not null,
-        organizationID bigint not null,
+        organizationID bigint,
         effortLeft double precision not null,
         effortSpent double precision not null,
         originalEstimate double precision not null,

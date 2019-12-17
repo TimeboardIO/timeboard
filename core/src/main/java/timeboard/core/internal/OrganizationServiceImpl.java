@@ -68,7 +68,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organization.setIsOrganization(true);
         this.em.persist(organization);
 
-        LOGGER.info("User " + actor.getFirstName() + " " + actor.getName() + " created organization "+organization.getName());
+        LOGGER.info("User " + actor.getFirstName() + " " + actor.getName() + " created organization " + organization.getName());
         this.em.flush();
         return organization;
     }
@@ -80,7 +80,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             data = em.createQuery("select o from Account o  where o.id = :orgID", Account.class)
                     .setParameter("orgID", id)
                     .getSingleResult();
-        }catch (NoResultException nre){
+        } catch (NoResultException nre) {
             data = null;
         }
         return Optional.ofNullable(data);
@@ -105,7 +105,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .setParameter("member", member)
                 .setParameter("organization", organization)
                 .getResultList();
-        if (!existingAH.isEmpty()) throw new BusinessException("Organization "+organization.getScreenName()+" already have a parent");
+        if (!existingAH.isEmpty()) {
+            throw new BusinessException("Organization " + organization.getScreenName() + " already have a parent");
+        }
 
         AccountHierarchy ah = new AccountHierarchy();
 
@@ -120,14 +122,15 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public AccountHierarchy removeMember(final Account actor, Account organization, Account member) throws BusinessException{
+    public AccountHierarchy removeMember(final Account actor, Account organization, Account member) throws BusinessException {
 
-        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h where h.member = :member and h.organization = :organization", AccountHierarchy.class)
+        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h " +
+                "where h.member = :member and h.organization = :organization", AccountHierarchy.class)
                 .setParameter("member", member)
                 .setParameter("organization", organization)
                 .getSingleResult();
 
-        if(ah.getRole() == MembershipRole.OWNER){
+        if (ah.getRole() == MembershipRole.OWNER) {
             throw new BusinessException("Can not remove an organization owner");
         }
         em.remove(ah);
@@ -141,7 +144,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public AccountHierarchy updateMemberRole(final Account actor, Account organization, Account member, MembershipRole role) {
-        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h where h.member = :member and h.organization = :organization", AccountHierarchy.class)
+        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h " +
+                "where h.member = :member and h.organization = :organization", AccountHierarchy.class)
                 .setParameter("member", member)
                 .setParameter("organization", organization)
                 .getSingleResult();
@@ -155,14 +159,19 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<Account> getParents(Account actor, Account organization) {
-        return this.em.createQuery("select o from AccountHierarchy h join h.member m join h.organization o where m = :member", Account.class)
+        return this.em.createQuery("select o from AccountHierarchy h " +
+                "join h.member m join h.organization o " +
+                "where m = :member", Account.class)
                 .setParameter("member", organization).getResultList();
     }
 
     @Override
     public List<Account> getMembers(Account actor, Account organization) {
-        if(!organization.getIsOrganization()) return new ArrayList<>();
-        return this.em.createQuery("select m from AccountHierarchy h join h.member m join h.organization o where o = :org", Account.class)
+        if (!organization.getIsOrganization()){
+            return new ArrayList<>();
+        }
+        return this.em.createQuery("select m from AccountHierarchy h " +
+                "join h.member m join h.organization o where o = :org", Account.class)
                 .setParameter("org", organization).getResultList();
 
     }

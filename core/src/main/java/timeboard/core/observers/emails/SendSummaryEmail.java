@@ -12,10 +12,10 @@ package timeboard.core.observers.emails;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,7 +49,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 
-
 @Component
 public class SendSummaryEmail {
 
@@ -71,12 +70,13 @@ public class SendSummaryEmail {
     /**
      * Transform user with his notifications to email structure.
      * Work for task create/delete events and timesheet validation events
+     *
      * @param userNotificationStructure structure user 1 -- * events to notify/inform
      * @return email ready structure
      */
     private EmailStructure generateMailFromEventList(UserNotificationStructure userNotificationStructure) {
 
-        Map<String, Object> data  = new HashMap<>();
+        Map<String, Object> data = new HashMap<>();
 
         List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
         Map<Long, EmailSummaryModel> projects = new HashMap<>();
@@ -98,8 +98,8 @@ public class SendSummaryEmail {
         data.put("validatedTimesheets", validatedTimesheets);
 
         String message = templateGenerator.getTemplateString("mail/summary.html", data);
-                ArrayList<String> list = new ArrayList<>();
-                list.add(userNotificationStructure.getTargetAccount().getEmail());
+        ArrayList<String> list = new ArrayList<>();
+        list.add(userNotificationStructure.getTargetAccount().getEmail());
         String subject = "[Timeboard] Daily summary";
         return new EmailStructure(list, null, subject, message);
     }
@@ -107,6 +107,7 @@ public class SendSummaryEmail {
 
     /**
      * Rebalance events by user to notify/inform.
+     *
      * @param events list of events
      * @return userNotificationStructure structure user 1 -- * events to notify/inform
      */
@@ -123,9 +124,6 @@ public class SendSummaryEmail {
         }
         return new ArrayList<>(dataList.values());
     }
-
-
-
 
 
 }
