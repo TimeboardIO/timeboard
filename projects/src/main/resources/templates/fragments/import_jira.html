@@ -1,0 +1,45 @@
+
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <body>
+        <div th:fragment="form">
+
+            <div class="ui modal import jira">
+                <i class="close icon"></i>
+                <div class="header">
+                    Sync tasks with JIRA
+                </div>
+                <div class="content">
+                    <div class="ui form">
+                        <div class="field">
+                            <label>Jira Username Name</label>
+                            <input type="text" v-model="sync.jira.username" name="username" placeholder="username...">
+                        </div>
+                        <div class="field">
+                            <label>Jira Password</label>
+                            <input type="password" v-model="sync.jira.password" name="password" placeholder="password...">
+                        </div>
+                        <div class="field">
+                            <label>Jira URL</label>
+                            <input type="text" name="url" v-model="sync.jira.url" placeholder="url to jira rest endpoint">
+                        </div>
+                        <div class="field">
+                            <label>Jira Project</label>
+                            <input type="text" name="project" v-model="sync.jira.project" placeholder="url to jira rest endpoint">
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <div class="ui black deny button" v-on:click="$('.ui.modal.import.jira').modal('hide')">
+                        Cancel
+                    </div>
+                    <div class="ui positive right labeled icon button" v-on:click="importFromJIRA">
+                        Start sync in background
+                        <i class="checkmark icon"></i>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </body>
+</html>

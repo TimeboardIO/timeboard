@@ -33,19 +33,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-@Component
+@Component("JiraImportPlugin")
 public class JiraImportPlugin implements ProjectImportService {
 
     private static final String JIRA_USERNAME_KEY = "jira.username";
@@ -78,34 +75,29 @@ public class JiraImportPlugin implements ProjectImportService {
     }
 
     @Override
-    public List<RemoteTask> getRemoteTasks(Account currentAccount, long projectID) throws BusinessException {
+    public List<RemoteTask> getRemoteTasks(final Account currentAccount, final Project project) throws Exception {
 
         List<RemoteTask> remoteTaskList = new ArrayList<>();
-        try {
 
-            final Project project = this.projectService.getProjectByID(currentAccount, projectID);
-            final JiraRestClient client = getJiraRestClient(project);
+        final JiraRestClient client = getJiraRestClient(project);
 
-            client.getSearchClient().searchJql(
-                    "project=\""+project.getAttributes().get(JIRA_PROJECT_KEY).getValue()+"\"",
-                    -1, 0, null
-            ).get().getIssues().forEach(issue -> {
-                RemoteTask rt = new RemoteTask();
-                rt.setId(issue.getId());
-                rt.setTitle(issue.getSummary());
-                rt.setOrigin(this.getOriginLabel());
-                rt.setStartDate(issue.getCreationDate().toDate());
-                if(issue.getAssignee() != null) {
-                    rt.setUserName(issue.getAssignee().getName());
-                }
-                remoteTaskList.add(rt);
-            });
+        client.getSearchClient().searchJql(
+                "project=\"" + project.getAttributes().get(JIRA_PROJECT_KEY).getValue() + "\"",
+                -1, 0, null
+        ).get().getIssues().forEach(issue -> {
+            final RemoteTask rt = new RemoteTask();
+            rt.setId(issue.getId());
+            rt.setTitle(issue.getSummary());
+            rt.setOrigin(this.getOriginLabel());
+            rt.setStartDate(issue.getCreationDate().toDate());
+            if (issue.getAssignee() != null) {
+                rt.setUserName(issue.getAssignee().getName());
+            }
+            remoteTaskList.add(rt);
+        });
 
-            client.close();
+        client.close();
 
-        } catch (URISyntaxException | InterruptedException | ExecutionException | IOException e) {
-            e.printStackTrace();
-        }
 
         return remoteTaskList;
     }

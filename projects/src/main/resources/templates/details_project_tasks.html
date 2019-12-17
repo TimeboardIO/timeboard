@@ -8,6 +8,7 @@
 <head>
     <title>Project Tasks details</title>
     <meta property="tasks" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}" th:project="${project.id}"/>
+    <meta name="projectID" th:value="${project.id}"/>
     <style>
         .ellipsis {
             text-overflow: ellipsis;
@@ -396,9 +397,15 @@
                 Import tasks
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a class="item">JIRA</a>
+                    <div class="item" v-on:click="$('.ui.modal.import.jira').modal('show')">JIRA</div>
                     <a class="item">Github</a>
                     <a class="item">CSV</a>
+                </div>
+            </div>
+
+            <div class="right menu">
+                <div class="ui orange label item" th:if="${import} > 0">
+                    <i class="sync icon rotating"></i> Sync with Jira in progress
                 </div>
             </div>
             <script type="text/javascript">
@@ -407,10 +414,11 @@
                     clearable: true
                   });
                   });
-
-
             </script>
         </div>
+
+        <div class="ui left vertical menu sidebar side"
+             th:include="fragments/import_jira.html :: form"></div>
 
 
         <pending-task-list

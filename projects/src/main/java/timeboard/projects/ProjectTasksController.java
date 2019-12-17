@@ -27,15 +27,15 @@ package timeboard.projects;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.ProjectSyncService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
 
@@ -58,6 +58,13 @@ public class ProjectTasksController {
     @Autowired
     public DataTableService dataTableService;
 
+    @Autowired
+    public AsyncJobService asyncJobService;
+
+    @Autowired
+    public ProjectSyncService projectSyncService;
+
+
     @GetMapping("/tasks")
     protected String listTasks(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
 
@@ -66,6 +73,7 @@ public class ProjectTasksController {
         Task task = new Task();
 
         model.addAttribute("task", new TaskForm(task));
+        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
@@ -99,6 +107,19 @@ public class ProjectTasksController {
         fillModel(model, actor, project);
 
         return "details_project_tasks.html";
+    }
+
+    @PostMapping("/tasks/sync/jira")
+    protected ResponseEntity importFromJIRA(
+            @PathVariable Long projectID,
+            @ModelAttribute ProjectSyncService.JIRACrendentials jiraCrendentials) throws BusinessException {
+
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+
+        this.projectSyncService.syncWithJIRA(actor, actor, project, jiraCrendentials);
+
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/tasks")
