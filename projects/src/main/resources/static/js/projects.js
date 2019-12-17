@@ -9,13 +9,17 @@ $(document).ready(function () {
                 cols: [
                     {
                         "slot": "name",
-                        "label": "Project Name"
+                        "label": "Project Name",
+                        "primary" : true,
+                        "sortKey" : "name"
                     },
                     {
                         "slot": "actions",
-                        "label": "Actions"
+                        "label": "Actions",
+                        "primary" : true
                     }],
-                data: []
+                data: [],
+                name : "tableProjects",
             }
         },
         methods: {

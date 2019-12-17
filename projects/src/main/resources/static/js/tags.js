@@ -26,7 +26,8 @@ $(document).ready(function () {
                         "primary" : true
                     }],
                 data: [],
-                name: 'tableTag'
+                name: 'tableTag',
+                configurable : true
             }
         },
         methods: {

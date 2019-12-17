@@ -4,18 +4,18 @@ Vue.component('data-table', {
             <table class="ui celled table">
                 <thead>
                     <tr>
-                      <th class="collapsing" ><i class="cog icon" @click="showConfigModal()"></i></th>
                       <th v-for="col in finalCols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"> </th>
                       <th v-for="col in finalCols" v-if="col.visible && !col.sortKey" >{{col.label}} </th>
+                      <th v-if="config.configurable === true" class="collapsing" ><i class="cog icon" @click="showConfigModal()"></i></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(row, i) in sortedItems">
-                      <td></td>
                       <td v-for="(col, j) in finalCols" v-if="col.visible">
                           <slot :name="col.slot" v-bind:row="config.data[i]">
                           </slot>
                       </td>
+                      <td v-if="config.configurable === true" ></td>
                     </tr>
                 </tbody>
                 <tmodal 
@@ -56,19 +56,20 @@ Vue.component('data-table', {
             finalCols.push(col);
         });
         let self = this;
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "/api/datatable?tableID=" + this.config.name,
-            success: function (d) {
-                self.finalCols
-                   .forEach(function(c) {
-                       let visible = d.colNames.includes(c.slot) ;
-                       c.visible = (c.primary === true || visible);
-                   });
-            }
-        });
-
+        if (this.config.configurable === true) {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "/api/datatable?tableID=" + this.config.name,
+                success: function (d) {
+                    self.finalCols
+                        .forEach(function(c) {
+                            let visible = d.colNames.includes(c.slot) ;
+                            c.visible = (c.primary === true || visible);
+                        });
+                }
+            });
+        }
         return {
             finalCols : finalCols,
             sortKey: '',
