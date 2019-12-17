@@ -40,7 +40,10 @@ Vue.component('data-table', {
                                 </tr>
                             </tbody>
                         </table>
-                        <button class="ui positive button" @click="changeDataTableConfig"> Save </button>
+                        <div  @click="changeDataTableConfig" class="ui positive submit right labeled icon button">
+                            Save
+                            <i class="checkmark icon"></i>
+                        </div>
                     </template>
                 </tmodal>
             </table>
@@ -122,7 +125,7 @@ Vue.component('data-table', {
                 }),
                 url: "/api/datatable",
                 success: function (d) {
-                    $('#configModal').modal('close');
+                    $('#configModal').modal('hide');
                 }
             });
         }
