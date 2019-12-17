@@ -77,4 +77,22 @@ public class ReportServiceImpl implements ReportService {
         em.flush();
         return report;
     }
+
+    @Override
+    public Report getReportByID(Account actor, Long reportId) {
+        Report data = em.createQuery("select r from Report r where r.id = :reportId", Report.class)
+                .setParameter("user", actor)
+                .setParameter("reportId", reportId)
+                .getSingleResult();
+        return data;
+    }
+
+    @Override
+    public void deleteReportByID(Account actor, Long reportId) {
+        Report report = em.find(Report.class, reportId);
+        em.remove(report);
+        em.flush();
+
+        LOGGER.info("Report " + reportId + " deleted by " + actor.getName());
+    }
 }

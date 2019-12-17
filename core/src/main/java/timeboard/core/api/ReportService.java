@@ -43,4 +43,8 @@ public interface ReportService {
 
     Report updateReport(Account owner, Report report);
 
+    Report getReportByID(Account actor, Long reportId);
+
+    void deleteReportByID(Account actor, Long reportId);
+
 }

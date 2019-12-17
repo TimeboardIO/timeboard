@@ -32,8 +32,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -60,6 +62,9 @@ public class ReportsController {
     private UserService userService;
 
     @Autowired
+    private ProjectService projectService;
+
+    @Autowired
     private UserInfo userInfo;
 
     @GetMapping
@@ -80,18 +85,17 @@ public class ReportsController {
     @GetMapping("/create")
     protected String createReport(Model model) throws ServletException, IOException {
         model.addAttribute("allReportTypes", ReportType.values());
-        model.addAttribute("projectsPreview", new ArrayList<Project>());
         return "create_report.html";
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
-        List<Project> listProjectsConcerned = new ArrayList<>();
         //TODO filter with request.getParameter("reportSelectProject")
+        List<Project> listProjectsConcerned = this.projectService.listProjects(organization);
 
         this.reportService.createReport(
                 actor,
@@ -102,6 +106,13 @@ public class ReportsController {
         );
         return "redirect:/reports";
     }
+
+    @GetMapping("/delete/{reportID}")
+    protected String deleteReport(@PathVariable long reportID) throws ServletException, IOException, BusinessException {
+        this.reportService.deleteReportByID(this.userInfo.getCurrentAccount(), reportID);
+        return "redirect:/reports";
+    }
+
 
 
     private class ReportDecorator {

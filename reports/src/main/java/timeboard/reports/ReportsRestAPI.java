@@ -59,16 +59,15 @@ public class ReportsRestAPI {
     private UserService userService;
 
     @Autowired
-    private ProjectService projectservice;
+    private ProjectService projectService;
 
     @GetMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity refreshProjectSelection(HttpServletRequest request, Model model) throws JsonProcessingException {
         Account actor = this.userInfo.getCurrentAccount();
         Account organization = this.userService.findUserByID(this.userInfo.getCurrentOrganizationID());
 
-        String filterProject = request.getParameter("filter");
-        //TODO filter with request.getParameter("reportSelectProject")
-        List<ProjectWrapper> listProjectsConcerned = this.projectservice.listProjects(organization)
+        //TODO filter with filterProject
+        List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(organization)
                 .stream()
                 .map(project -> new ProjectWrapper(project.getId(), project.getName(), project.getComments()))
                 .collect(Collectors.toList());
