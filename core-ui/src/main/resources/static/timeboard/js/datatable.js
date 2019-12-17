@@ -83,7 +83,20 @@ Vue.component('data-table', {
         sortedItems: function () {
             let sortKey = this.sortKey+'';
             let order = this.sortOrders[sortKey] || 1 ;
-            let sortedData = this.config.data;
+
+            let sortedData = [];
+            let i = this.config.data.length;
+            while(i--) sortedData.push(this.config.data[i]);
+            if(this.config.filters){
+                for (let [key, filter] of Object.entries(this.config.filters)) {
+                    if(filter.filterValue !== '') {
+                        sortedData = sortedData.filter(function (row) {
+                            return filter.filterFunction(filter.filterValue, row[filter.filterKey]);
+                        });
+                    }
+                }
+            }
+
             if (sortKey) {
                 let sortAttr = this.config.cols.find(item => item.slot === sortKey).sortKey;
                 sortedData = this.config.data.slice().sort(function (a, b) {
@@ -92,7 +105,6 @@ Vue.component('data-table', {
                     return (a === b ? 0 : a > b ? 1 : -1) * order;
                 });
             }
-            this.config.data = sortedData;
             return sortedData;
         }
     },

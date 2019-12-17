@@ -25,7 +25,7 @@ $(document).ready(function () {
         methods: {
         },
         mounted: function () {
-            var self = this;
+            let self = this;
             $.ajax({
                 type: "GET",
                 dataType: "json",

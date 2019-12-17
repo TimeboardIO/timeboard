@@ -82,6 +82,7 @@ public class ProjectTasksController {
         model.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
+        model.addAttribute("projectMembers", project.getMembers());
     }
 
     @GetMapping("/tasks/{taskID}")

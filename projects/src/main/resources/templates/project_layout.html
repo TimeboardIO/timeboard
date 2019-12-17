@@ -21,10 +21,6 @@
            th:href="@{/projects/{projectID}/dashboard(projectID=${project.id})}">Dashboard</a>
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"
            th:href="@{/projects/{projectID}/tags(projectID=${project.id})}">Tags</a>
-        <div class="right menu">
-            <a class="ui item primary" style="font-weight: bold;" th:text="${project.name}">
-            </a>
-        </div>
     </div>
     <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
 
