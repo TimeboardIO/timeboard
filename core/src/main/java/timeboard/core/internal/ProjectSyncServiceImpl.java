@@ -28,6 +28,7 @@ package timeboard.core.internal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.concurrent.DelegatingSecurityContextCallable;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
@@ -57,7 +58,7 @@ public class ProjectSyncServiceImpl implements ProjectSyncService {
     @Override
     public void syncWithJIRA(Account org, Account actor, Project project, JIRACrendentials jiraCrendentials) {
 
-        this.asyncJobService.runAsyncJob(org, actor, String.format("Sync project %s with JIRA", project.getName()), () -> {
+        this.asyncJobService.runAsyncJob(org, actor, String.format("Sync project %s with JIRA", project.getName()), new DelegatingSecurityContextCallable(() -> {
 
             ThreadLocalStorage.setCurrentOrganizationID(org.getId());
 
@@ -96,7 +97,7 @@ public class ProjectSyncServiceImpl implements ProjectSyncService {
 
 
             return String.format("Sync %s tasks from Jira", remoteTasks.size());
-        });
+        }));
 
     }
 
