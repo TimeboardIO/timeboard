@@ -190,21 +190,21 @@
                 </div>
                 <div class="column">
                     <label>Milestone </label>
-                    <select class="ui multiple selection fluid dropdown" >
+                    <select v-model="table.filters.milestone.filterValue" class="ui multiple selection fluid dropdown" >
                         <option th:each="milestone: ${allProjectMilestones}"
                                 th:text="${milestone.name}"
                                 th:value="${milestone.id}"
                         ></option>
                     </select>
                     <label>Type </label>
-                    <select class="ui type multiple selection fluid dropdown" >
+                    <select v-model="table.filters.type.filterValue" class="ui type multiple selection fluid dropdown" >
                         <option th:each="type: ${taskTypes}"
                                 th:text="${type.typeName}"
                                 th:value="${type.id}"
                         ></option>
                     </select>
                     <label>Status </label>
-                    <select class="ui status multiple selection fluid dropdown" >
+                    <select v-model="table.filters.status.filterValue" class="ui status multiple selection fluid dropdown" >
                         <option th:each="status: ${allTaskStatus}"
                                 th:text="${status.label}"
                                 th:value="${status}"
