@@ -94,7 +94,7 @@ public class ReportsController {
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
-        //TODO filter with request.getParameter("reportSelectProject")
+        //TODO filter with request.getParameter("reportSelectProject"), cf /refreshProjectSelection du ReportsRestAPI
         List<Project> listProjectsConcerned = this.projectService.listProjects(organization);
 
         this.reportService.createReport(

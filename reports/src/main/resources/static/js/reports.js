@@ -45,9 +45,11 @@ $(document).ready(function () {
                 refreshProjectSelection: function (reportSelectProject) {
                     var self = this;
                     $.ajax({
-                        type: "GET",
+                        type: "POST",
                         dataType: "json",
-                        url: "/api/reports/refreshProjectSelection?filter=" + self.reportSelectProject,
+                        data: JSON.stringify(self.reportSelectProject),
+                        contentType: "application/json",
+                        url: "/api/reports/refreshProjectSelection",
                         success: function (d) {
                             self.selectedProjects = d;
                             self.sizeSelectedProjects = d.length;
