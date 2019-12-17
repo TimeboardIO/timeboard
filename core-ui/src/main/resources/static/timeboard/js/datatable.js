@@ -39,9 +39,8 @@ Vue.component('data-table', {
                                   </td>
                                 </tr>
                             </tbody>
-                        </tmodal>
                         </table>
-                        <button class="ui positive button"  @click="changeDataTableConfig()> Save </button>
+                        <button class="ui positive button" @click="changeDataTableConfig"> Save </button>
                     </template>
                 </tmodal>
             </table>
@@ -106,7 +105,7 @@ Vue.component('data-table', {
                 detachable : false, centered: true
             }).modal('show');
         },
-        changeDataTableConfig: function(col){
+        changeDataTableConfig: function(){
             let cols = [];
             this.finalCols.forEach(function (col) {
                if(col.visible) cols.push(col.slot);
@@ -114,11 +113,7 @@ Vue.component('data-table', {
             $.ajax({
                 type: "PATCH",
                 dataType: "json",
-                data: {
-                        userID : 0,
-                        tableID : this.config.name,
-                        colNames : cols
-                },
+                data: {columns : cols},
                 url: "/config/datatable/" + this.config.name,
                 success: function (d) {
                     $('#configModal').modal('close');

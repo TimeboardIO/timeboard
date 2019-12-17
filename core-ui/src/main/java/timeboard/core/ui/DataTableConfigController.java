@@ -27,23 +27,21 @@ package timeboard.core.ui;
  */
 
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
 import timeboard.core.api.DataTableService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
-import timeboard.core.model.Project;
-import timeboard.core.model.ProjectTag;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 
 @Controller
@@ -77,18 +75,21 @@ public class DataTableConfigController {
     }
 
     @PatchMapping(value="/{tableID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<DataTableConfig> patchTag(@PathVariable String tableID, @ModelAttribute DataTableConfigWrapper dataConfig) {
+    public ResponseEntity<DataTableConfig> patchTag(@PathVariable String tableID, @ModelAttribute(name="columns") ArrayList<String> dataConfig) {
         final Account actor = this.userInfo.getCurrentAccount();
-        DataTableConfig dataTableConfig = dataTableService.addOrUpdateTableConfig(tableID, actor, dataConfig.getColNames());
+        DataTableConfig dataTableConfig = dataTableService.addOrUpdateTableConfig(tableID, actor, dataConfig);
         return ResponseEntity.ok(dataTableConfig);
     }
 
     public static class DataTableConfigWrapper {
 
-        private List<String> colNames;
-        private String tableID;
-        private Long userID;
+        public List<String> colNames = new ArrayList<String>();
+        public String tableID;
+        public Long userID;
 
+        public DataTableConfigWrapper() {
+            colNames = new ArrayList<String>();
+        }
         public DataTableConfigWrapper(DataTableConfig data) {
             this.colNames = data.getColumns();
             this.tableID = data.getTableInstanceId();
