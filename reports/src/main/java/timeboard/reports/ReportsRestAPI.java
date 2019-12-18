@@ -78,11 +78,17 @@ public class ReportsRestAPI {
 
         List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(organization)
                 .stream()
-                .map(project -> new ProjectWrapper(project.getId(), project.getName(), project.getComments(), project.getTags()))
+                .map(project -> {
+                    List<TagWrapper> tags = project.getTags()
+                            .stream()
+                            .map(tag -> new TagWrapper(tag.getTagKey(), tag.getTagValue()))
+                            .collect(Collectors.toList());
+                    return new ProjectWrapper(project.getId(), project.getName(), project.getComments(), tags);
+                })
                 .filter(pw -> pw.getProjectTags()
-                                .stream()
-                                .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
-                                .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
+                            .stream()
+                            .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
+                            .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
                 ).collect(Collectors.toList());
 
 
@@ -94,9 +100,9 @@ public class ReportsRestAPI {
         private final Long projectID;
         private final String projectName;
         private final String projectComments;
-        private final List<ProjectTag> projectTags;
+        private final List<TagWrapper> projectTags;
 
-        public ProjectWrapper(Long projectID, String projectName, String projectComments, List<ProjectTag> projectTags) {
+        public ProjectWrapper(Long projectID, String projectName, String projectComments, List<TagWrapper> projectTags) {
             this.projectID = projectID;
             this.projectName = projectName;
             this.projectComments = projectComments;
@@ -115,8 +121,27 @@ public class ReportsRestAPI {
             return projectComments;
         }
 
-        public List<ProjectTag> getProjectTags() {
+        public List<TagWrapper> getProjectTags() {
             return projectTags;
+        }
+    }
+
+    public static class TagWrapper {
+
+        private final String tagKey;
+        private final String tagValue;
+
+        public TagWrapper(String tagKey, String tagValue) {
+            this.tagKey = tagKey;
+            this.tagValue = tagValue;
+        }
+
+        public String getTagKey() {
+            return tagKey;
+        }
+
+        public String getTagValue() {
+            return tagValue;
         }
     }
 

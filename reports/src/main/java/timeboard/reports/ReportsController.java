@@ -27,6 +27,9 @@ package timeboard.reports;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -94,8 +97,18 @@ public class ReportsController {
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
-        //TODO filter with request.getParameter("reportSelectProject"), cf /refreshProjectSelection du ReportsRestAPI
-        List<Project> listProjectsConcerned = this.projectService.listProjects(organization);
+        ExpressionParser expressionParser = new SpelExpressionParser();
+        //TODO To fix it
+        //Expression expression = expressionParser.parseExpression(filterProjects);
+        //TODO To delete
+        Expression expression = expressionParser.parseExpression("tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")");
+        List<Project> listProjectsConcerned = this.projectService.listProjects(organization)
+                .stream()
+                .filter(p -> p.getTags()
+                        .stream()
+                        .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
+                        .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
+                ).collect(Collectors.toList());
 
         this.reportService.createReport(
                 actor,
