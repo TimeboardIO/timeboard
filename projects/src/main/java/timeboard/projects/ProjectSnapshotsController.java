@@ -87,6 +87,15 @@ public class ProjectSnapshotsController {
         return this.listProjectSnapshots(projectID);
     }
 
+    @DeleteMapping(value = "/{snapshotID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<ProjectSnapshotWrapper>> deleteSnapshot(@PathVariable Long projectID, @PathVariable Long snapshotID) throws BusinessException {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        project.getSnapshots().removeIf(projectSnapshot -> projectSnapshot.getId().equals(snapshotID));
+        this.projectService.updateProject(actor, project);
+        return this.listProjectSnapshots(projectID);
+    }
+
     public static class ProjectSnapshotWrapper {
 
         private double quotation;

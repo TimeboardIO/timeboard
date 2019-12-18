@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{details_project_layout.html(tab='six')}"
+<html layout:decorate="~{project_layout.html(tab='six')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
@@ -27,7 +27,7 @@
         <data-table v-bind:config="table">
             <template v-slot:snapshotdate="{row}">
                 <div class="ui input">
-                    <input type="text" v-model="row.projectSnapshotDate"/>
+                    <input type="date" v-model="row.projectSnapshotDate" value="row.projectSnapshotDate"/>
                 </div>
             </template>
             <template v-slot:snapshotglobalquotation="{row}">
