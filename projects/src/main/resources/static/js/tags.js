@@ -17,7 +17,8 @@ $(document).ready(function () {
                     {
                         "slot": "tagvalue",
                         "label": "Tag Value",
-                        "sortKey": "tagValue"
+                        "sortKey": "tagValue",
+                        "primary" : true
 
                     },
                     {

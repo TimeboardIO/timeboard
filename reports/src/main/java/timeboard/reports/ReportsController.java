@@ -34,10 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.UserService;
@@ -89,26 +86,28 @@ public class ReportsController {
     protected String createReport(Model model) throws ServletException, IOException {
         model.addAttribute("allReportTypes", ReportType.values());
         model.addAttribute("report", new Report());
+        model.addAttribute("action", "create");
+
         return "create_report.html";
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model){
+    protected String handlePost(@ModelAttribute  Report report){
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
         //TODO to delete string test
         //String projectFilter = request.getParameter("selectedProjectFilter");
-        String projectFilter = "tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")";
+        String projectFilter = report.getFilterProject();
         Set<Project> listProjectsConcerned = this.getListProjectFiltered(organization, projectFilter);
 
         this.reportService.createReport(
                 actor,
-                request.getParameter("reportName"),
+                report.getName(),
                 organization,
                 listProjectsConcerned,
-                ReportType.valueOf(request.getParameter("reportType")),
+                report.getType(),
                 projectFilter
         );
         return "redirect:/reports";
@@ -124,27 +123,25 @@ public class ReportsController {
     protected String editReport(@PathVariable long reportID, Model model) throws ServletException, IOException {
         model.addAttribute("allReportTypes", ReportType.values());
         model.addAttribute("reportID", reportID);
+        model.addAttribute("action", "edit");
         model.addAttribute("report", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID));
         return "create_report.html";
     }
 
     @PostMapping("/edit/{reportID}")
-    protected String handlePost(@PathVariable long reportID, HttpServletRequest request, HttpServletResponse response, Model model) {
+    protected String handlePost(@PathVariable long reportID, @ModelAttribute  Report report) {
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
         //TODO to delete string test
-        //String projectFilter = request.getParameter("selectedProjectFilter");
-        String projectFilter = "tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")";
-        Set<Project> listProjectsConcerned = this.getListProjectFiltered(organization, projectFilter);
+        Set<Project> listProjectsConcerned = this.getListProjectFiltered(organization, report.getFilterProject());
 
         Report updatedReport = this.reportService.getReportByID(organization, reportID);
-        updatedReport.setOrganization(organization);
-        updatedReport.setName(request.getParameter("reportName"));
+        updatedReport.setName(report.getName());
         updatedReport.setProjects(listProjectsConcerned);
-        updatedReport.setType(ReportType.valueOf(request.getParameter("reportType")));
-        updatedReport.setFilterProject(projectFilter);
+        updatedReport.setType(ReportType.PROJECT_KPI);
+        updatedReport.setFilterProject(report.getFilterProject());
 
         this.reportService.updateReport(actor, updatedReport);
 

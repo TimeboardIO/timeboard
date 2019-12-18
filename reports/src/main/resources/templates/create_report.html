@@ -15,18 +15,18 @@
         <div class="ui segment" id="create-report">
             <h4 class="ui dividing header">Create Report</h4>
 
-            <form action="" class="ui grid form" enctype="application/x-www-form-urlencoded" method="post" style="margin:0px">
+            <form th:action="${action} == 'create' ? @{/reports/create} : @{/reports/edit/{reportID}(reportID=${report.id})}" th:object="${report}" class="ui grid form" enctype="application/x-www-form-urlencoded" method="post" style="margin:0px">
 
                 <div class="eight wide column">
                     <div class="field">
                         <label>Report Name</label>
-                        <input name="reportName" placeholder="Report Name" required type="text" th:value="${report.name}">
+                        <input name="reportName" placeholder="Report Name" required type="text" th:field="*{name}">
                     </div>
                     <div class="field">
                         <label>Report Type</label>
-                        <select name="reportType">
+                        <select name="reportType"  th:field="*{type}">
                             <option th:each="reportType: ${allReportTypes}"
-                                th:text="${reportType.label}"
+                                th:text="${reportType}"
                                 th:value="${reportType}">
                             </option>
                         </select>
@@ -34,7 +34,7 @@
                     <div class="field">
                         <label>Select project by tags</label>
                         <p>Example ->  tagKey == "CUSTOMER" && (tagValue == "Demo" || tagValue == "Test")</p>
-                        <input name="selectedProjectFilter" th:value="${report.filterProject}" placeholder="Filter projects" type="text">
+                        <input name="selectedProjectFilter" th:field="*{filterProject}" placeholder="Filter projects" type="text">
                     </div>
                 </div>
 

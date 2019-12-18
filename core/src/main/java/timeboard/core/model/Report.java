@@ -41,9 +41,6 @@ public class Report extends OrganizationEntity implements Serializable {
     @Column(length = 50, unique = false)
     private String name;
 
-    @OneToOne
-    private Account organization;
-
     @OneToMany(targetEntity = Project.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER
@@ -57,12 +54,12 @@ public class Report extends OrganizationEntity implements Serializable {
 
     public Report() {
         this.projects = new HashSet<>();
+        this.type = ReportType.PROJECT_KPI;
     }
 
-    public Report(String name, Account organization, Set<Project> projects, ReportType type, String filterProject) {
+    public Report(String name, Set<Project> projects, ReportType type, String filterProject) {
         this.name = name;
         this.projects = projects;
-        this.organization = organization;
         this.type = type;
         this.filterProject = filterProject;
     }
@@ -83,14 +80,6 @@ public class Report extends OrganizationEntity implements Serializable {
         this.name = name;
     }
 
-    public Account getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Account organization) {
-        this.organization = organization;
-    }
-
     public Set<Project> getProjects() {
         return projects;
     }
@@ -99,19 +88,19 @@ public class Report extends OrganizationEntity implements Serializable {
         this.projects = projects;
     }
 
-    public ReportType geType() {
-        return type;
-    }
-
-    public void setType(ReportType type) {
-        this.type = type;
-    }
-
     public String getFilterProject() {
         return filterProject;
     }
 
     public void setFilterProject(String filterProject) {
         this.filterProject = filterProject;
+    }
+
+    public ReportType getType() {
+        return type;
+    }
+
+    public void setType(ReportType type) {
+        this.type = type;
     }
 }

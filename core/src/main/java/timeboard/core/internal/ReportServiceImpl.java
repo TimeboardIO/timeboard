@@ -55,7 +55,6 @@ public class ReportServiceImpl implements ReportService {
                                Set<Project> projects, ReportType type, String filterProject) {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Report newReport = new Report();
-        newReport.setOrganization(organization);
         newReport.setName(reportName);
         newReport.setProjects(projects);
         newReport.setType(type);
@@ -68,8 +67,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public List<Report> listReports(Account owner) {
-        TypedQuery<Report> query = em.createQuery("select r from Report r where r.organization = :owner", Report.class);
-        query.setParameter("owner", owner);
+        TypedQuery<Report> query = em.createQuery("select r from Report r", Report.class);
         return query.getResultList();
     }
 
