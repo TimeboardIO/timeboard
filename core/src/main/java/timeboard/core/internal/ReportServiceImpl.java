@@ -52,11 +52,10 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional
     public Report createReport(Account owner, String reportName, Account organization,
-                               Set<Project> projects, ReportType type, String filterProject) {
+                               ReportType type, String filterProject) {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Report newReport = new Report();
         newReport.setName(reportName);
-        newReport.setProjects(projects);
         newReport.setType(type);
         newReport.setFilterProject(filterProject);
         em.persist(newReport);

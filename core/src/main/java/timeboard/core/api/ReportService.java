@@ -38,7 +38,7 @@ public interface ReportService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
-    Report createReport(Account owner, String reportName, Account organization, Set<Project> projects, ReportType type, String filterProject);
+    Report createReport(Account owner, String reportName, Account organization, ReportType type, String filterProject);
 
     List<Report> listReports(Account owner);
 

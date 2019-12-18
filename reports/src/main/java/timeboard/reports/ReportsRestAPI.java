@@ -72,7 +72,10 @@ public class ReportsRestAPI {
         Account organization = this.userService.findUserByID(this.userInfo.getCurrentOrganizationID());
 
         ExpressionParser expressionParser = new SpelExpressionParser();
-        Expression expression = expressionParser.parseExpression(filterProjects);
+        //TODO to fix
+        //Expression expression = expressionParser.parseExpression(filterProjects);
+        //TODO to delete
+        Expression expression = expressionParser.parseExpression("tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")");
 
         Set<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(organization)
                 .stream()

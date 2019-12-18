@@ -28,6 +28,9 @@ package timeboard.reports;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -68,8 +71,17 @@ public class ReportKPIController {
     protected ResponseEntity getDataChart(@PathVariable long reportID, Model model) throws BusinessException, IOException {
         Account actor = this.userInfo.getCurrentAccount();
         Report report = this.reportService.getReportByID(actor, reportID);
+        ExpressionParser expressionParser = new SpelExpressionParser();
+        Expression expression = expressionParser.parseExpression(report.getFilterProject());
         ReportType type = report.getType();
-        List<Project> listOfProjects = report.getProjects().stream().collect(Collectors.toList());
+
+        List<Project> listOfProjects = this.projectService.listProjects(actor)
+                .stream()
+                .filter(p -> p.getTags()
+                        .stream()
+                        .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
+                        .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
+                ).collect(Collectors.toList());
 
         final ProjectDashboard[] dashboard = {new ProjectDashboard(0.0, 0.0, 0.0, 0.0)};
 

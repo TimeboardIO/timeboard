@@ -103,13 +103,11 @@ public class ReportsController {
         //TODO to delete string test
         //String projectFilter = request.getParameter("selectedProjectFilter");
         String projectFilter = report.getFilterProject();
-        Set<Project> listProjectsConcerned = this.getListProjectFiltered(organization, projectFilter);
 
         this.reportService.createReport(
                 actor,
                 report.getName(),
                 organization,
-                listProjectsConcerned,
                 report.getType(),
                 projectFilter
         );
@@ -137,32 +135,14 @@ public class ReportsController {
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
-        //TODO to delete string test
-        Set<Project> listProjectsConcerned = this.getListProjectFiltered(organization, report.getFilterProject());
-
         Report updatedReport = this.reportService.getReportByID(organization, reportID);
         updatedReport.setName(report.getName());
-        updatedReport.setProjects(listProjectsConcerned);
         updatedReport.setType(ReportType.PROJECT_KPI);
         updatedReport.setFilterProject(report.getFilterProject());
 
         this.reportService.updateReport(actor, updatedReport);
 
         return "redirect:/reports";
-    }
-
-    public Set<Project> getListProjectFiltered(Account organization, String filterProjects){
-        ExpressionParser expressionParser = new SpelExpressionParser();
-        Expression expression = expressionParser.parseExpression(filterProjects);
-
-        Set<Project> listProjectsConcerned = this.projectService.listProjects(organization)
-                .stream()
-                .filter(p -> p.getTags()
-                        .stream()
-                        .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
-                        .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
-                ).collect(Collectors.toSet());
-        return listProjectsConcerned;
     }
 
     @GetMapping("/view/{reportID}")

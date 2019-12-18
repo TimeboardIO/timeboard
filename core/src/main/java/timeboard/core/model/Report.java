@@ -41,12 +41,6 @@ public class Report extends OrganizationEntity implements Serializable {
     @Column(length = 50, unique = false)
     private String name;
 
-    @OneToMany(targetEntity = Project.class,
-            cascade = CascadeType.ALL,
-            fetch = FetchType.EAGER
-    )
-    private Set<Project> projects;
-
     @Column
     private String filterProject;
 
@@ -55,13 +49,11 @@ public class Report extends OrganizationEntity implements Serializable {
 
 
     public Report() {
-        this.projects = new HashSet<>();
         this.type = ReportType.PROJECT_KPI;
     }
 
-    public Report(String name, Set<Project> projects, ReportType type, String filterProject) {
+    public Report(String name, ReportType type, String filterProject) {
         this.name = name;
-        this.projects = projects;
         this.type = type;
         this.filterProject = filterProject;
     }
@@ -80,14 +72,6 @@ public class Report extends OrganizationEntity implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Set<Project> getProjects() {
-        return projects;
-    }
-
-    public void setProjects(Set<Project> projects) {
-        this.projects = projects;
     }
 
     public String getFilterProject() {
