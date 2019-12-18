@@ -104,7 +104,7 @@ public class JiraSyncPlugin implements ProjectSyncPlugin {
                 -1, 0, null
         ).get().getIssues().forEach(issue -> {
             final RemoteTask rt = new RemoteTask();
-            rt.setId(issue.getId());
+            rt.setId(String.valueOf(issue.getId()));
             rt.setTitle(issue.getSummary());
             rt.setOrigin(this.getOriginLabel());
             rt.setStartDate(issue.getCreationDate().toDate());

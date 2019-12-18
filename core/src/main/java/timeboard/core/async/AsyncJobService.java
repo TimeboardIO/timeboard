@@ -37,6 +37,7 @@ import javax.transaction.Transactional;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
@@ -65,12 +66,18 @@ public class AsyncJobService {
     }
 
     public List<AsyncJobState> getAccountJobs(Account owner) {
-        List<AsyncJobState> jobs = new ArrayList<>();
+        final List<AsyncJobState> jobs = new ArrayList<>();
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.MINUTE, -5);
+
         try {
             jobs.addAll(this.jobRepository.findByOwnerID(owner.getId())
                     .stream()
                     .filter(asyncJobState ->
                             asyncJobState.getState().equals(AsyncJobState.State.IN_PROGRESS)
+                    )
+                    .filter(asyncJobState ->
+                            asyncJobState.getStartDate().before(cal.getTime())
                     )
                     .collect(Collectors.toList()));
 

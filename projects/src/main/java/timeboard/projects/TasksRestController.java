@@ -324,7 +324,7 @@ public class TasksRestController {
                 task = projectService.createTask(actor, project,
                         name, comment, startDate,
                         endDate, oe, typeID, actor,
-                        ProjectService.ORIGIN_TIMEBOARD, null, null, null);
+                        ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
             } catch (Exception e) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)

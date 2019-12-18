@@ -27,7 +27,6 @@ package timeboard.core.internal;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.concurrent.DelegatingSecurityContextCallable;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
@@ -42,6 +41,7 @@ import timeboard.core.model.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class ProjectSyncPluginImpl implements ProjectSyncService {
@@ -65,7 +65,11 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                                  final String serviceName,
                                  final List<ProjectSyncCredentialField> jiraCrendentials) {
 
-        this.asyncJobService.runAsyncJob(org, actor, String.format("Sync project %s with JIRA", project.getName()), new DelegatingSecurityContextCallable(() -> {
+        this.asyncJobService.runAsyncJob(
+                org,
+                actor,
+                String.format("Sync project %s with JIRA", project.getName()),
+                new DelegatingSecurityContextCallable(() -> {
 
             ThreadLocalStorage.setCurrentOrganizationID(org.getId());
 
@@ -78,33 +82,39 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             remoteTasks.stream()
                     .forEach(task -> mergeAssignee(userService, syncService.getServiceName(), task));
 
-            final List<RemoteTask> newTasks = new ArrayList<>();
-            for (RemoteTask task1 : remoteTasks) {
-                if (isNewTask(actor, project.getId(), task1)) {
-                    newTasks.add(task1);
-                }
-            }
-
-            final List<RemoteTask> updatedTasks = new ArrayList<>();
-            for (RemoteTask task1 : remoteTasks) {
-                if (isUpdated(actor, project.getId(), task1)) {
-                    updatedTasks.add(task1);
-                }
-            }
-
-
-            this.createTasks(actor, project, newTasks);
-
-            for (RemoteTask remoteTask : updatedTasks) {
-                Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getId());
-                taskToUpdate.setName(remoteTask.getTitle());
-                projectService.updateTask(actor, taskToUpdate);
-            }
+            this.syncTasks(actor, project, remoteTasks);
 
 
             return String.format("Sync %s tasks from Jira", remoteTasks.size());
         }));
 
+    }
+
+    private void syncTasks(final Account actor, final Project project, final List<RemoteTask> remoteTasks) throws BusinessException {
+        final List<RemoteTask> newTasks = new ArrayList<>();
+        for (RemoteTask task1 : remoteTasks) {
+            if (isNewTask(actor, project.getId(), task1)) {
+                newTasks.add(task1);
+            }
+        }
+
+        final List<RemoteTask> updatedTasks = new ArrayList<>();
+        for (RemoteTask task1 : remoteTasks) {
+            if (isUpdated(actor, project.getId(), task1)) {
+                updatedTasks.add(task1);
+            }
+        }
+
+
+        this.createTasks(actor, project, newTasks);
+
+        for (RemoteTask remoteTask : updatedTasks) {
+            Optional<Task> taskToUpdate = projectService.getTaskByRemoteID(actor, remoteTask.getId());
+            if(taskToUpdate.isPresent()){
+                taskToUpdate.get().setName(remoteTask.getTitle());
+                projectService.updateTask(actor, taskToUpdate.get());
+            }
+        }
     }
 
 
@@ -122,11 +132,11 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                     Account assignedAccountID = this.userService.findUserByID(task.getLocalUserID());
                     String origin = task.getOrigin();
                     String remotePath = null;
-                    Long remoteId = task.getId();
+                    String remoteId = task.getId();
                     Milestone milestone = null;
                     projectService.createTask(actor, project, taskName, taskComment,
                             startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
-                            remotePath, String.valueOf(remoteId), milestone);
+                            remotePath, String.valueOf(remoteId), TaskStatus.IN_PROGRESS, milestone);
                 }
         );
     }
@@ -138,8 +148,8 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     private boolean isNewTask(Account actor, long projectID, RemoteTask task) throws BusinessException {
-        AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getId());
-        return existingTask == null;
+        final Optional<Task> existingTask = this.projectService.getTaskByRemoteID(actor, task.getId());
+        return !existingTask.isPresent();
     }
 
     private void mergeAssignee(UserService userService, String externalID, RemoteTask task) {

@@ -54,11 +54,11 @@ public class AsyncJobState extends OrganizationEntity {
     @Column(length=1000)
     private String result;
 
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column
     private Date startDate;
 
-    @Temporal(TemporalType.TIME)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column
     private Date endDate;
 

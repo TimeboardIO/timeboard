@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class RemoteTask {
 
-    private Long id;
+    private String id;
     private String title;
     private String userName;
     private String comments;
@@ -19,11 +19,11 @@ public class RemoteTask {
         return null;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -26,7 +26,6 @@ package timeboard.core.api.sync;
  * #L%
  */
 
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 
 import java.util.List;

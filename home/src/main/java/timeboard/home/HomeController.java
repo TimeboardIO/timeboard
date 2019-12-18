@@ -66,7 +66,6 @@ public class HomeController {
     @GetMapping
     protected String handleGet(Principal principal, Model model) {
 
-        System.out.println(principal);
 
         //load previous weeks data
         Date d = new Date();
