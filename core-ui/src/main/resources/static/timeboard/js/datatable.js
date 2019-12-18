@@ -1,7 +1,7 @@
 Vue.component('data-table', {
     props: ['config'],
     template: `
-            <table class="ui celled table">
+            <table class="ui celled table" v-if="config.data.length > 0">
                 <thead>
                     <tr>
                       <th v-for="col in finalCols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"> </th>
@@ -19,7 +19,7 @@ Vue.component('data-table', {
                     </tr>
                 </tbody>
                 <tmodal 
-                    v-bind:title="'Column config'"
+                    v-bind:title="'Column config '+config.name"
                     v-bind:id="'configModal'">
                     <template v-slot:content>
                         <table class="ui celled table">

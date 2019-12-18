@@ -24,6 +24,7 @@
 <div layout:fragment="placeholder">
     <input name="projectID" required th:value="${project.id}" type="hidden">
 
+    <!-- GRAPH MODAL TEMPLATE-->
     <script id="graph-modal-template" type="text/x-template">
         <div class="ui modal graph ">
             <i class="close icon"></i>
@@ -35,6 +36,8 @@
 
         </div>
     </script>
+
+    <!-- TASK FORM MODAL TEMPLATE-->
     <script id="task-modal-template" type="text/x-template">
         <div class="ui large modal create-task ">
             <i class="close icon"></i>
@@ -130,7 +133,52 @@
         </div>
     </script>
 
+    <!-- MAIN COMPONENT-->
     <div id="tasksList">
+        <!-- Pending tasks datatable component -->
+        <data-table v-bind:config="tablePending">
+            <template v-slot:name="{row}">
+                {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                {{row.taskComments}}</p>
+            </template>
+            <template v-slot:start="{row}">
+                {{row.startDate}}
+            </template>
+            <template v-slot:end="{row}">
+                {{row.endDate}}
+            </template>
+            <template v-slot:oe="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    {{row.originalEstimate}}
+                </div>
+            </template>
+            <template v-slot:assignee="{row}">
+                {{row.assignee}}
+            </template>
+            <template v-slot:milestone="{row}">
+                <i>{{row.milestoneName}}</i>
+            </template>
+            <template v-slot:type="{row}">
+                <div class="ui blue green horizontal label"> {{row.typeName}} </div>
+            </template>
+            <template v-slot:status="{row}">
+                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+            </template>
+
+            <template v-slot:actions="{row}">
+                <button @click="approveTask($event, row)" class="ui positive icon button">
+                    Approve
+                    <i class="check icon"></i>
+                </button>
+                <button @click="denyTask($event, row)" class="ui negative icon button">
+                    Deny
+                    <i class="close icon"></i>
+                </button>
+            </template>
+        </data-table>
+
+
+        <!-- Actions buttons-->
         <div class="ui menu">
             <a class="item" th:if="${isProjectOwner}"
                v-on:click="showCreateTaskModal(null, null, $event)">
@@ -152,13 +200,14 @@
             </div>
 
             <script type="text/javascript">
-            $(document).ready(function(){
-                $('#import').dropdown({
-                    clearable: true
+                $(document).ready(function(){
+                    $('#import').dropdown({
+                        clearable: true
+                    });
                 });
-            });
             </script>
         </div>
+        <!-- Filters-->
         <div class="ui segment filters" style="display: none;">
             <div class="ui four column relaxed equal height divided grid">
                 <div class="column">
@@ -214,6 +263,7 @@
             </div>
         </div>
 
+        <!-- Datatable component -->
         <data-table v-bind:config="table">
             <template v-slot:name="{row}">
                 {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
@@ -226,7 +276,9 @@
                 {{row.endDate}}
             </template>
             <template v-slot:oe="{row}">
-                {{row.originalEstimate}}
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    {{row.originalEstimate}}
+                </div>
             </template>
             <template v-slot:assignee="{row}">
                 {{row.assignee}}
@@ -254,6 +306,9 @@
                 </button>
             </template>
         </data-table>
+
+
+        <!-- Task modal component instance-->
         <task-modal
                 :form-error="formError"
                 :modal-title="modalTitle"

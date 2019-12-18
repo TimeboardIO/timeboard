@@ -70,7 +70,6 @@ const emptyTask =  {
 
 // VUEJS MAIN APP
 let app = new Vue({
-
     el: '#tasksList',
     data: {
         newTask: Object.assign({}, emptyTask),
@@ -154,6 +153,12 @@ let app = new Vue({
             data: [],
             name: 'tableTasks',
             configurable : true
+        },
+        tablePending : {
+            cols: [],
+            data: [],
+            name: 'tableTasks',
+            configurable : true
         }
     },
     methods: {
@@ -213,7 +218,7 @@ let app = new Vue({
             event.preventDefault();
             if(task){
                  this.modalTitle = "Edit task";
-                 this.newTask.projectID = projectID;
+                // load task data in modal
                  this.newTask.projectID = currentProjectID;
                  this.newTask.taskID = task.taskID;
 
@@ -240,7 +245,7 @@ let app = new Vue({
                  this.modalTitle = "Create task";
                  Object.assign(this.newTask , emptyTask);
             }
-            keepThis = this;
+            let self = this;
             $('.create-task.modal').modal({
                 onApprove : function($element){
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
@@ -254,10 +259,10 @@ let app = new Vue({
                             contentType: "application/json",
                             dataType: "json",
                             success : function(data, textStatus, jqXHR) {
-                                keepThis.gridData = keepThis.gridData.filter(function(el){
+                                self.gridData = self.gridData.filter(function(el){
                                     return el.taskID != data.taskID;
                                 });
-                                keepThis.gridData.push(data);
+                                self.gridData.push(data);
                                 $('.create-task .ui.form').form('reset');
                                 $('.create-task.modal').modal('hide');
                             },
@@ -272,6 +277,31 @@ let app = new Vue({
                 detachable : true, centered: true
             }).modal('show');
         },
+        approveTask: function(event, task){
+            var keepThis = this;
+            event.target.classList.toggle('loading');
+            $.get("/api/tasks/approve?task="+task.taskID)
+                .then(function(data){
+                    task.status = 'IN_PROGRESS';
+                    event.target.classList.toggle('loading');
+                });
+        },
+        denyTask: function(event, task){
+            event.target.classList.toggle('loading');
+            $.get("/api/tasks/deny?task="+task.taskID)
+                .then(function(data){
+                    task.status = 'REFUSED';
+                    event.target.classList.toggle('loading');
+                });
+        }
+    },
+    created: function () {
+        // copying table config to pending task table config
+        this.tablePending.cols = this.table.cols;
+    },
+    updated: function () {
+        this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
+
     },
     mounted: function () {
         let self = this;
@@ -281,6 +311,7 @@ let app = new Vue({
             url: "/api/tasks?project="+currentProjectID,
             success: function (d) {
                 self.table.data = d;
+                self.tablePending.data = d.filter(r => r.status === 'PENDING');
                 $('.ui.dimmer').removeClass('active');
             }
         });
