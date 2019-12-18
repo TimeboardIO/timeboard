@@ -38,16 +38,11 @@ import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
 import timeboard.home.model.Week;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 
 
 @Controller
@@ -64,14 +59,13 @@ public class HomeController {
     private UserInfo userInfo;
 
     @PostMapping
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected String handlePost() {
         return "home.html";
     }
 
     @GetMapping
-    protected String handleGet(Principal principal, HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+    protected String handleGet(Principal principal, Model model) {
 
-        System.out.println(principal);
 
         //load previous weeks data
         Date d = new Date();
@@ -82,7 +76,9 @@ public class HomeController {
         int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                boolean weekIsValidated = timesheetService.isTimesheetValidated(account, calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
+                boolean weekIsValidated = timesheetService.isTimesheetValidated(
+                        account,
+                        calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
                 calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
                 Date firstDayOfWeek = calendar.getTime();

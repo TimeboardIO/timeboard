@@ -64,7 +64,7 @@ public class ProjectsController {
     protected String handleGet(Model model) {
         final Account actor = this.userInfo.getCurrentAccount();
         List<Project> allActorProjects = this.projectService.listProjects(actor);
-        if(allActorProjects.size()>5){
+        if (allActorProjects.size() > 5) {
             allActorProjects = allActorProjects.subList(0, 5);
         }
         model.addAttribute("projects", allActorProjects);
@@ -78,7 +78,7 @@ public class ProjectsController {
                 .stream()
                 .map(project -> new ProjectDecorator(project))
                 .collect(Collectors.toList());
-        return  ResponseEntity.ok(projects);
+        return ResponseEntity.ok(projects);
     }
 
     @PostMapping("/create")
@@ -109,11 +109,11 @@ public class ProjectsController {
             this.project = project;
         }
 
-        public long getID(){
+        public long getID() {
             return this.project.getId();
         }
 
-        public String getName(){
+        public String getName() {
             return this.project.getName();
         }
 

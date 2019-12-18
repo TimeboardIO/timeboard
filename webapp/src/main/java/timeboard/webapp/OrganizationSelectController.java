@@ -58,7 +58,8 @@ public class OrganizationSelectController {
     @GetMapping
     public String selectOrganisation(Model model){
 
-        final List<Account> orgs = this.organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
+        final List<Account> orgs =
+                this.organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
         orgs.add(this.userInfo.getCurrentAccount());
         model.addAttribute("organizations", orgs);
 
@@ -68,7 +69,8 @@ public class OrganizationSelectController {
     @PostMapping
     public String selectOrganisation(@ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
 
-        final Optional<Account> selectedOrg = this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), selectedOrgID);
+        final Optional<Account> selectedOrg =
+                this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), selectedOrgID);
 
         if(selectedOrg.isPresent()) {
             final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));

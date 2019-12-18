@@ -44,7 +44,7 @@ public class DataTableConfig extends OrganizationEntity implements Serializable 
     private String tableInstanceId;
 
     @Column
-    @ElementCollection(targetClass=String.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = String.class, fetch = FetchType.EAGER)
     private List<String> columns;
 
     public DataTableConfig() {

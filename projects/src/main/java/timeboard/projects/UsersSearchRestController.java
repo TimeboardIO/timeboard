@@ -76,8 +76,9 @@ public class UsersSearchRestController {
         MAPPER.writeValue(resp.getWriter(), searchResults);
     }
 
-    public static class SearchResult implements Serializable{
+    public static class SearchResult implements Serializable {
         private Long id;
+        private String screenName;
 
         public SearchResult(Account a) {
             this.id = a.getId();
@@ -100,9 +101,8 @@ public class UsersSearchRestController {
             this.screenName = screenName;
         }
 
-        private String screenName;
-
     }
+
     public static class SearchResults {
 
         private Integer count;
@@ -112,7 +112,7 @@ public class UsersSearchRestController {
             this.count = count;
             this.items = new ArrayList<>();
 
-            for (Account a : items){
+            for (Account a : items) {
                 this.items.add(new SearchResult(a));
             }
         }

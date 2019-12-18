@@ -35,7 +35,13 @@ public class UpdatedTaskResult {
     private final double originalEstimate;
     private final double realEffort;
 
-    public UpdatedTaskResult(long projectID, long taskID, double effortSpent, double effortLeft, double originalEstimate, double realEffort) {
+    public UpdatedTaskResult(long projectID,
+                             long taskID,
+                             double effortSpent,
+                             double effortLeft,
+                             double originalEstimate,
+                             double realEffort) {
+
         this.projectID = projectID;
         this.taskID = taskID;
         this.effortSpent = effortSpent;

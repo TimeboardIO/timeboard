@@ -31,6 +31,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
+import timeboard.core.model.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,8 +59,20 @@ public class TaskLoader {
                 // On créé "nbTasksByProjects" tâches par projet
                 for (int j = 0; j < nbTasksByProjects; j++) {
                     try {
-                        tasksSaved.add(this.projectService.createTask(owner, project, "task-project" + i + "-task" + j, "comment task" + j, new Date(), new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)), 8, null, owner, ProjectService.ORIGIN_TIMEBOARD, null, null, null));
-                        System.out.println("Save task: project" + i + " task" + j);
+                        tasksSaved.add(this.projectService.createTask(owner,
+                                project, "task-project" + i + "-task" + j,
+                                "comment task" + j,
+                                new Date(),
+                                new Date(new Date().getTime() + 10 * (1000 * 60 * 60 * 24)),
+                                8,
+                                null,
+                                owner,
+                                ProjectService.ORIGIN_TIMEBOARD,
+                                null,
+                                null,
+                                TaskStatus.PENDING,
+                                null));
+
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -69,8 +82,7 @@ public class TaskLoader {
 
         }
 
-        System.out.println("Tasks saved ! ");
-        return tasksSaved;
+         return tasksSaved;
 
     }
 

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{details_project_layout.html(tab='third')}"
+<html layout:decorate="~{project_layout.html(tab='third')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
@@ -8,15 +8,15 @@
 <head>
     <title layout:fragment="title">Project Milestones</title>
     <meta name="projectID" th:content="${project.id}"/>
-    <script type="text/javascript" src="/js/milestones.js"></script>
+    <script src="/js/milestones.js" type="text/javascript"></script>
 </head>
 <body>
 
 <div layout:fragment="placeholder">
     <div id="milestones-app">
         <div class="ui menu">
-            <a  v-on:click="alert()"
-               class="item">
+            <a class="item"
+               v-on:click="alert()">
                 <i class="plus icon"></i>
                 New Milestone
             </a>

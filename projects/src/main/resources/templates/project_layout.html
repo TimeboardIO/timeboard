@@ -10,7 +10,7 @@
 <div layout:fragment="content">
 
     <div class="ui attached pointing menu">
-        <a class="item" ><span class="primary bold text" th:text="${project.name}"></span></a>
+        <a class="item"><span class="primary bold text" th:text="${project.name}"></span></a>
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
            th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
@@ -21,10 +21,6 @@
            th:href="@{/projects/{projectID}/dashboard(projectID=${project.id})}">Dashboard</a>
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"
            th:href="@{/projects/{projectID}/tags(projectID=${project.id})}">Tags</a>
-        <div class="right menu">
-            <a style="font-weight: bold;" th:text="${project.name}" class="ui item primary">
-            </a>
-        </div>
     </div>
     <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
 

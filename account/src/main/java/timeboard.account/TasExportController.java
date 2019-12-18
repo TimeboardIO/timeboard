@@ -29,7 +29,6 @@ package timeboard.account;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
@@ -67,16 +66,17 @@ public class TasExportController {
             Long projectID = Long.parseLong(request.getParameter("projectID"));
 
             Calendar cal = Calendar.getInstance();
-            cal.set(year, month-1, 1, 2, 0);
+            cal.set(year, month - 1, 1, 2, 0);
 
             try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
                 final Project project = projectService.getProjectByID(actor, projectID);
                 final TASData data = projectService.generateTasData(actor, project, month, year);
-                final ExcelTASReport tasReport = new ExcelTASReport(buf);;
+                final ExcelTASReport tasReport = new ExcelTASReport(buf);
+                ;
                 tasReport.generateFAT(data);
 
                 final String mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-                final String filename = "TAS_"+year+"_"+month+"_"+actor.getScreenName().replaceAll("'| |", "")+"_"+new Date().getTime();
+                final String filename = "TAS_" + year + "_" + month + "_" + actor.getScreenName().replaceAll("'| |", "") + "_" + new Date().getTime();
                 response.setContentLengthLong(buf.toByteArray().length);
                 response.setHeader("Expires:", "0");
                 response.setHeader("Content-Disposition", "attachment; filename=" + filename + ".xls");
@@ -88,8 +88,7 @@ public class TasExportController {
             }
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+         }
 
         return ("/account");
 

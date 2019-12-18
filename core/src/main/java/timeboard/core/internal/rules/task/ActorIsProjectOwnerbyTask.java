@@ -44,7 +44,7 @@ public class ActorIsProjectOwnerbyTask implements Rule<Task> {
 
     @Override
     public boolean isSatisfied(Account u, Task thing) {
-        Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+        final Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()
                                 && projectMembership.getRole().equals(MembershipRole.OWNER)

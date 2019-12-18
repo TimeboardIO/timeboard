@@ -1,8 +1,8 @@
-package timeboard.projects;
+package timeboard.core.async;
 
 /*-
  * #%L
- * projects
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,31 +26,16 @@ package timeboard.projects;
  * #L%
  */
 
-import timeboard.core.model.Account;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.List;
+import java.util.UUID;
 
-public class ProjectImportBackgroundTasks {
+@Repository
+public interface AsyncJobRepository extends CrudRepository<AsyncJobState, UUID> {
 
-    private static ProjectImportBackgroundTasks INSTANCE;
-
-    private static ExecutorService executors = Executors.newFixedThreadPool(10);
-
-    private ProjectImportBackgroundTasks() {
-
-    }
-
-    public static ProjectImportBackgroundTasks getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ProjectImportBackgroundTasks();
-        }
-        return INSTANCE;
-    }
-
-    public void importInBackground(Account actor, Runnable command) {
-        executors.execute(command);
-    }
+    public List<AsyncJobState> findByOwnerID(Long accountID);
 
 
 }

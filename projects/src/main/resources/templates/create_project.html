@@ -9,25 +9,25 @@
 </head>
 <body>
 
-    <div layout:fragment="content">
-        <div class="ui segment">
-            <h4 class="ui dividing header">Create project</h4>
+<div layout:fragment="content">
+    <div class="ui segment">
+        <h4 class="ui dividing header">Create project</h4>
 
-            <div class="ui negative message" th:if="${error}">
-                <i class="close icon"></i>
-                <div class="header">
-                    Failed to create project
-                </div>
-                <p th:text="${error}">:(</p>
+        <div class="ui negative message" th:if="${error}">
+            <i class="close icon"></i>
+            <div class="header">
+                Failed to create project
             </div>
-            <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
-                <div class="field">
-                    <label>Project Name</label>
-                    <input name="projectName" placeholder="Project Name" required type="text">
-                </div>
-                <button class="ui button" type="submit">Submit</button>
-            </form>
+            <p th:text="${error}">:(</p>
         </div>
+        <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+            <div class="field">
+                <label>Project Name</label>
+                <input name="projectName" placeholder="Project Name" required type="text">
+            </div>
+            <button class="ui button" type="submit">Submit</button>
+        </form>
     </div>
+</div>
 </body>
 </html>

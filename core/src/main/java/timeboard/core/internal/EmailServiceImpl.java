@@ -68,12 +68,14 @@ public class EmailServiceImpl implements EmailService {
         msg.setFrom(new InternetAddress(fromEmail));
         msg.setContent(emailStructure.getMessage(), "text/html; charset=utf-8");
 
-        List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList().stream().distinct().collect(Collectors.toList());
+        List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList()
+                .stream().distinct().collect(Collectors.toList());
         String targetToEmails = StringUtils.join(listToEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetToEmails));
 
         if (emailStructure.getTargetCCUserList() != null) {
-            List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList().stream().distinct().collect(Collectors.toList());
+            List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList()
+                    .stream().distinct().collect(Collectors.toList());
             String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
             msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
         }

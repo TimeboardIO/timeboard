@@ -32,7 +32,7 @@ import java.util.Date;
 
 
 @Entity
-public class TaskRevision  extends OrganizationEntity implements Serializable {
+public class TaskRevision extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,11 +63,15 @@ public class TaskRevision  extends OrganizationEntity implements Serializable {
     @Column(nullable = false)
     private double realEffort;
 
-    public TaskRevision(){
+    public TaskRevision() {
     }
 
 
-    public TaskRevision(Date revisionDate, Task task, Account assigned, double originalEstimate, double effortLeft, double effortSpent, double realEffort) {
+    public TaskRevision(Date revisionDate,
+                        Task task, Account assigned,
+                        double originalEstimate, double effortLeft,
+                        double effortSpent, double realEffort) {
+
         this.revisionDate = revisionDate;
         this.task = task;
         this.assigned = assigned;
@@ -140,7 +144,6 @@ public class TaskRevision  extends OrganizationEntity implements Serializable {
     public void setRealEffort(double realEffort) {
         this.realEffort = realEffort;
     }
-
 
 
 }
