@@ -41,10 +41,10 @@ import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
-import timeboard.core.model.ProjectTag;
 import timeboard.core.ui.UserInfo;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 
@@ -66,7 +66,8 @@ public class ReportsRestAPI {
     private ProjectService projectService;
 
     @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity refreshProjectSelection(@RequestBody String filterProjects, HttpServletRequest request, Model model) throws JsonProcessingException {
+    public ResponseEntity refreshProjectSelection(@RequestBody String filterProjects, HttpServletRequest request, Model model)
+            throws JsonProcessingException {
         Account actor = this.userInfo.getCurrentAccount();
         Account organization = this.userService.findUserByID(this.userInfo.getCurrentOrganizationID());
 
@@ -76,7 +77,7 @@ public class ReportsRestAPI {
         //TODO TO delete
         Expression expression = expressionParser.parseExpression("tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")");
 
-        List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(organization)
+        Set<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(organization)
                 .stream()
                 .map(project -> {
                     List<TagWrapper> tags = project.getTags()
@@ -89,7 +90,7 @@ public class ReportsRestAPI {
                             .stream()
                             .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
                             .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
-                ).collect(Collectors.toList());
+                ).collect(Collectors.toSet());
 
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(listProjectsConcerned.toArray()));

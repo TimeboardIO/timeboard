@@ -28,7 +28,8 @@ package timeboard.core.model;
 
 
 public enum ReportType {
-    PROJECT_KPI("Project KPI");
+    PROJECT_KPI("Project KPI"),
+    OTHER("Project Other");
 
     public final String label;
 

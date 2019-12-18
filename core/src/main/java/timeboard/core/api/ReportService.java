@@ -32,12 +32,13 @@ import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ReportService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
-    Report createReport(Account owner, String reportName, Account organization, List<Project> projects, ReportType type);
+    Report createReport(Account owner, String reportName, Account organization, Set<Project> projects, ReportType type, String filterProject);
 
     List<Report> listReports(Account owner);
 

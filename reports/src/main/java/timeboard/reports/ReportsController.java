@@ -49,8 +49,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -88,34 +88,28 @@ public class ReportsController {
     @GetMapping("/create")
     protected String createReport(Model model) throws ServletException, IOException {
         model.addAttribute("allReportTypes", ReportType.values());
+        model.addAttribute("report", new Report());
         return "create_report.html";
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model){
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
-        ExpressionParser expressionParser = new SpelExpressionParser();
-        //TODO To fix it
-        //Expression expression = expressionParser.parseExpression(filterProjects);
-        //TODO To delete
-        Expression expression = expressionParser.parseExpression("tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")");
-        List<Project> listProjectsConcerned = this.projectService.listProjects(organization)
-                .stream()
-                .filter(p -> p.getTags()
-                        .stream()
-                        .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
-                        .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
-                ).collect(Collectors.toList());
+        //TODO to delete string test
+        //String projectFilter = request.getParameter("selectedProjectFilter");
+        String projectFilter = "tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")";
+        Set<Project> listProjectsConcerned = this.getListProjectFiltered(organization, projectFilter);
 
         this.reportService.createReport(
                 actor,
                 request.getParameter("reportName"),
                 organization,
                 listProjectsConcerned,
-                ReportType.valueOf(request.getParameter("reportType"))
+                ReportType.valueOf(request.getParameter("reportType")),
+                projectFilter
         );
         return "redirect:/reports";
     }
@@ -126,6 +120,50 @@ public class ReportsController {
         return "redirect:/reports";
     }
 
+    @GetMapping("/edit/{reportID}")
+    protected String editReport(@PathVariable long reportID, Model model) throws ServletException, IOException {
+        model.addAttribute("allReportTypes", ReportType.values());
+        model.addAttribute("reportID", reportID);
+        model.addAttribute("report", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID));
+        return "create_report.html";
+    }
+
+    @PostMapping("/edit/{reportID}")
+    protected String handlePost(@PathVariable long reportID, HttpServletRequest request, HttpServletResponse response, Model model) {
+        final Account actor = this.userInfo.getCurrentAccount();
+        Long organizationID = userInfo.getCurrentOrganizationID();
+        Account organization = userService.findUserByID(organizationID);
+
+        //TODO to delete string test
+        //String projectFilter = request.getParameter("selectedProjectFilter");
+        String projectFilter = "tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")";
+        Set<Project> listProjectsConcerned = this.getListProjectFiltered(organization, projectFilter);
+
+        Report updatedReport = this.reportService.getReportByID(organization, reportID);
+        updatedReport.setOrganization(organization);
+        updatedReport.setName(request.getParameter("reportName"));
+        updatedReport.setProjects(listProjectsConcerned);
+        updatedReport.setType(ReportType.valueOf(request.getParameter("reportType")));
+        updatedReport.setFilterProject(projectFilter);
+
+        this.reportService.updateReport(actor, updatedReport);
+
+        return "redirect:/reports";
+    }
+
+    public Set<Project> getListProjectFiltered(Account organization, String filterProjects){
+        ExpressionParser expressionParser = new SpelExpressionParser();
+        Expression expression = expressionParser.parseExpression(filterProjects);
+
+        Set<Project> listProjectsConcerned = this.projectService.listProjects(organization)
+                .stream()
+                .filter(p -> p.getTags()
+                        .stream()
+                        .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
+                        .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
+                ).collect(Collectors.toSet());
+        return listProjectsConcerned;
+    }
 
 
     private class ReportDecorator {

@@ -33,21 +33,20 @@ $(document).ready(function () {
         }
     });
 
-
     var appCreateReport = new Vue({
             el: '#create-report',
             data: {
-                reportSelectProject: "",
+                selectedProjectFilter: "",
                 selectedProjects: [],
-                sizeSelectedProjects: 0,
+                sizeSelectedProjects: 0
             },
             methods: {
-                refreshProjectSelection: function (reportSelectProject) {
+                refreshProjectSelection: function (selectedProjectFilter) {
                     var self = this;
                     $.ajax({
                         type: "POST",
                         dataType: "json",
-                        data: JSON.stringify(self.reportSelectProject),
+                        data: JSON.stringify(self.selectedProjectFilter),
                         contentType: "application/json",
                         url: "/api/reports/refreshProjectSelection",
                         success: function (d) {
@@ -61,4 +60,23 @@ $(document).ready(function () {
                 }
             }
         });
+
+
+    $( "#refreshSelectedProjects" ).click(function() {
+        var filter = $( "input[name='selectedProjectFilter']").val();
+         $.ajax({
+             type: "POST",
+             dataType: "json",
+             data: JSON.stringify(filter),
+             contentType: "application/json",
+             url: "/api/reports/refreshProjectSelection",
+             success: function (d) {
+                 selectedProjects = d;
+                 sizeSelectedProjects = d.length;
+             },
+             errors: function (d) {
+                 alert(d);
+             }
+         });
+    });
 });

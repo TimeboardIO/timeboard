@@ -7,6 +7,7 @@
 
 <head>
     <title layout:fragment="title">Create Report Page</title>
+    <meta name="reportID" th:content="${report.id}"/>
     <script type="text/javascript" src="/js/reports.js"></script>
 </head>
 <body>
@@ -20,7 +21,7 @@
                 <div class="eight wide column">
                     <div class="field">
                         <label>Report Name</label>
-                        <input name="reportName" placeholder="Report Name" required type="text">
+                        <input name="reportName" placeholder="Report Name" required type="text" th:value="${report.name}">
                     </div>
                     <div class="field">
                         <label>Report Type</label>
@@ -34,7 +35,7 @@
                     <div class="field">
                         <label>Select project by tags</label>
                         <p>Example ->  tagKey == "CUSTOMER" && (tagValue == "Demo" || tagValue == "Test")</p>
-                        <input name="reportSelectProject" v-model="reportSelectProject" placeholder="Filter projects" type="text">
+                        <input name="selectedProjectFilter" th:value="${report.filterProject}" placeholder="Filter projects" type="text">
                     </div>
                 </div>
 
@@ -42,7 +43,7 @@
                     <div class="ui card">
                         <div class="content header">
                             <p>Projects selection preview</p>
-                            <a class="ui button" v-on:click="refreshProjectSelection(reportSelectProject)">
+                            <a class="ui button" id="refreshSelectedProjects"><!--von:click="refreshProjectSelection(selectedProjectFilter)">-->
                                 Refresh selection
                             </a>
                         </div>

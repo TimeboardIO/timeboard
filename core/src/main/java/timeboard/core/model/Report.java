@@ -42,25 +42,29 @@ public class Report extends OrganizationEntity implements Serializable {
     private String name;
 
     @OneToOne
+    @JoinColumn(name = "ORG_ID", foreignKey = @ForeignKey(name = "FK_ORG_ID"))
     private Account organization;
 
     @OneToMany(targetEntity = Project.class,
-            orphanRemoval = true,
-            cascade = {CascadeType.ALL},
+            cascade = CascadeType.ALL,
             fetch = FetchType.EAGER
     )
-    private List<Project> projects;
+    @JoinColumn(name = "PROJECT_ID", foreignKey = @ForeignKey(name = "FK_PROJECT_ID"))
+    private Set<Project> projects;
+
+    private String filterProject;
 
     private ReportType type;
 
 
     public Report() {}
 
-    public Report(String name, Account organization, List<Project> projects, ReportType type) {
+    public Report(String name, Account organization, Set<Project> projects, ReportType type, String filterProject) {
         this.name = name;
         this.projects = projects;
         this.organization = organization;
         this.type = type;
+        this.filterProject = filterProject;
     }
 
     public Long getId() {
@@ -87,11 +91,11 @@ public class Report extends OrganizationEntity implements Serializable {
         this.organization = organization;
     }
 
-    public List<Project> getProjects() {
+    public Set<Project> getProjects() {
         return projects;
     }
 
-    public void setProjects(List<Project> projects) {
+    public void setProjects(Set<Project> projects) {
         this.projects = projects;
     }
 
@@ -101,5 +105,13 @@ public class Report extends OrganizationEntity implements Serializable {
 
     public void setType(ReportType type) {
         this.type = type;
+    }
+
+    public String getFilterProject() {
+        return filterProject;
+    }
+
+    public void setFilterProject(String filterProject) {
+        this.filterProject = filterProject;
     }
 }

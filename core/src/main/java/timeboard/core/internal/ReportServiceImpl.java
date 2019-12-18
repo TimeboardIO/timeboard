@@ -27,6 +27,7 @@ package timeboard.core.internal;
  */
 
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
@@ -49,16 +50,17 @@ public class ReportServiceImpl implements ReportService {
 
 
     @Override
-    public Report createReport(Account owner, String reportName, Account organization, List<Project> projects, ReportType type) {
+    @Transactional
+    public Report createReport(Account owner, String reportName, Account organization,
+                               Set<Project> projects, ReportType type, String filterProject) {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Report newReport = new Report();
         newReport.setOrganization(organization);
         newReport.setName(reportName);
         newReport.setProjects(projects);
         newReport.setType(type);
+        newReport.setFilterProject(filterProject);
         em.persist(newReport);
-
-        em.flush();
 
         LOGGER.info("Report " + reportName + " created by user " + owner.getId());
         return newReport;
@@ -81,7 +83,6 @@ public class ReportServiceImpl implements ReportService {
     @Override
     public Report getReportByID(Account actor, Long reportId) {
         Report data = em.createQuery("select r from Report r where r.id = :reportId", Report.class)
-                .setParameter("user", actor)
                 .setParameter("reportId", reportId)
                 .getSingleResult();
         return data;
