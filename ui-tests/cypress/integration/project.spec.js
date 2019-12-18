@@ -1,3 +1,4 @@
+const projectName = 'My new project' + Math.floor(Math.random() * 9999);
 
 Cypress.Commands.add('login', () => {
     cy.visit('http://localhost:8080');
@@ -28,7 +29,7 @@ Cypress.Commands.add('createProject', (projectName) => {
             return cy.get('a').contains('here');
         }
         // else assume it was textarea
-        return cy.contains("Create Project")
+        return cy.contains("New Project")
     }).click();
 
     cy.get('input[name=projectName]').type(projectName);
@@ -41,7 +42,7 @@ Cypress.Commands.add('createProject', (projectName) => {
 Cypress.Commands.add('archiveProject', (projectName) => {
     cy.get('.card').contains(projectName)
         .get('.button').contains('Archive')
-        .click();
+        .click({force: true});
 
 });
 
@@ -54,7 +55,6 @@ beforeEach(function () {
 
 describe('Project Test', function() {
 
-    const projectName = 'My new project';
 
     beforeEach(function () {
         cy.contains("Project")
@@ -113,21 +113,21 @@ describe('Project Test', function() {
         });
 
         afterEach(function () {
-            cy.visit('http://localhost:8080');
-            cy.contains("Project")
-                .click();
+            cy.visit('http://localhost:8080/projects');
             cy.archiveProject(projectName);
         });
         it('Create Task', function () {
-            cy.get('a').contains('New Task').click();
+            cy.contains('New Task').click();
             cy.get('input[name=taskName]').clear().type("First Task");
             cy.get('textarea[name=taskComments]').clear().type("This my first wonderful task.");
-            cy.get('input[name=taskOriginalEstimate]').clear().type(Math.random());
+            cy.get('input[name=taskOriginalEstimate]').clear().type(Math.round(Math.random() * 100) / 100);
             cy.get('input[name=taskStartDate]').clear().type("2019-12-06");
             cy.get('input[name=taskEndDate]').clear().type("2019-12-20");
-            cy.get('input[name=taskAssignedSearch]').clear().type("use");
-            cy.get('.results').first().click();
-            cy.get('select[name=taskTypeID]').select('Bug')
+          //   cy.get('input.prompt.assigned').clear().type("use");
+          //  cy.get('.results').first().click();
+           // cy.get('select[name=taskTypeID]').select('Bug')
+
+            cy.contains('Request').click({force: true});
         });
 
 

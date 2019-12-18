@@ -21,15 +21,18 @@ Cypress.Commands.add('login', () => {
 
 beforeEach(function () {
     cy.login();
-    cy.contains("Timesheet")
-        .click()  ;
+    cy.visit('http://localhost:8080/timesheet');
 });
 
 
-describe('Timeboard Test', function() {
+describe('Timeboard Tests', function() {
 
-    it('Timesheet Test', function() {
+    it('Timesheet Menu Test', function() {
         cy.contains("Timesheet")
             .click()  ;
+    });
+
+    it('Imputation on all week', function() {
+
     });
 });
