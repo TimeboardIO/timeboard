@@ -413,7 +413,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setProject(project);
         em.flush();
 
-        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
+        /*TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));*/
         LOGGER.info("Task " + taskName + " created by " + actor.getName() + " in project " + project.getName());
 
         return newTask;
@@ -448,9 +448,9 @@ public class ProjectServiceImpl implements ProjectService {
         LOGGER.info("User " + actor + " updated " + taskList.size() + " tasks ");
         em.flush();
 
-        taskList.stream().forEach(task -> {
+        /*taskList.stream().forEach(task -> {
             TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
-        });
+        });*/
 
     }
 
@@ -682,16 +682,6 @@ public class ProjectServiceImpl implements ProjectService {
         return em.find(TaskType.class, taskTypeID);
     }
 
-    @Override
-    public List<TaskRevision> findAllTaskRevisionByTaskID(Account actor, Long taskID) {
-        TypedQuery<TaskRevision> q = em
-                .createQuery("select t from TaskRevision t left join fetch t.task where "
-                        + "t.task.id = :taskID"
-                        + "group by t.task "
-                        + "having max(t.revisionDate)", TaskRevision.class);
-        q.setParameter("taskID", taskID);
-        return q.getResultList();
-    }
 
 
     @Override
@@ -757,7 +747,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         em.remove(task);
         em.flush();
-        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
+        /*TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));*/
 
 
         LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
@@ -1076,4 +1066,5 @@ public class ProjectServiceImpl implements ProjectService {
 
         return data;
     }
+
 }

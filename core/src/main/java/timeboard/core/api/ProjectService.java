@@ -112,7 +112,6 @@ public interface ProjectService {
                                                     String origin,
                                                     String remotePath) throws BusinessException;
 
-    List<TaskRevision> findAllTaskRevisionByTaskID(Account actor, Long taskID);
 
 
 

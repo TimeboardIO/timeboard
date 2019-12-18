@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{details_project_layout.html(tab='six')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+
+<head>
+    <title layout:fragment="title">Project snapshots</title>
+    <meta name="projectID" th:content="${project.id}"/>
+    <script src="/js/snapshots.js" type="text/javascript"></script>
+</head>
+<body>
+
+
+<div layout:fragment="placeholder">
+    <div id="components-demo">
+
+        <div class="ui menu">
+            <a class="item"
+               v-on:click="addSnapshot">
+                <i class="plus icon"></i>
+                New Snapshot
+            </a>
+        </div>
+
+        <data-table v-bind:config="table">
+            <template v-slot:snapshotdate="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.projectSnapshotDate"/>
+                </div>
+            </template>
+            <template v-slot:snapshotglobalquotation="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.quotation"/>
+                </div>
+            </template>
+            <template v-slot:snapshotglobaloriginalestimate="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.originalEstimate"/>
+                </div>
+            </template>
+            <template v-slot:snapshotglobalreeleffot="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.realEffort"/>
+                </div>
+            </template>
+            <template v-slot:snapshotglobaleffortspent="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.effortSpent"/>
+                </div>
+            </template>
+            <template v-slot:snapshotglobaleffortleft="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.effortLeft"/>
+                </div>
+            </template>
+            <template v-slot:snapshotactions="{row}">
+                <button class="ui negative basic button" v-on:click="removeSnapshot(row)">
+                    <i class="remove alternate icon"></i>
+                    Remove
+                </button>
+            </template>
+        </data-table>
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

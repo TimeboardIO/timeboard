@@ -32,7 +32,7 @@ import java.util.Date;
 
 
 @Entity
-public class TaskRevision extends OrganizationEntity implements Serializable {
+public class TaskSnapshot extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -40,10 +40,11 @@ public class TaskRevision extends OrganizationEntity implements Serializable {
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
-    private Date revisionDate;
+    private Date snapshotDate;
 
     @OneToOne(targetEntity = Task.class, cascade = {CascadeType.PERSIST})
     private Task task;
+
 
     /**
      * Current task assigned at revision date.
@@ -63,18 +64,18 @@ public class TaskRevision extends OrganizationEntity implements Serializable {
     @Column(nullable = false)
     private double realEffort;
 
-    public TaskRevision() {
+    public TaskSnapshot() {
     }
 
 
-    public TaskRevision(Date revisionDate, Task task, Account assigned, double originalEstimate, double effortLeft, double effortSpent, double realEffort) {
-        this.revisionDate = revisionDate;
+    public TaskSnapshot(Date snapshotDate, Task task, Account assigned) {
+        this.snapshotDate = snapshotDate;
         this.task = task;
         this.assigned = assigned;
-        this.originalEstimate = originalEstimate;
-        this.effortLeft = effortLeft;
-        this.effortSpent = effortSpent;
-        this.realEffort = realEffort;
+        this.originalEstimate = task.getOriginalEstimate();
+        this.effortLeft = task.getEffortLeft();
+        this.effortSpent = task.getEffortSpent();
+        this.realEffort = task.getRealEffort();
     }
 
     public Long getId() {
@@ -85,12 +86,12 @@ public class TaskRevision extends OrganizationEntity implements Serializable {
         this.id = id;
     }
 
-    public Date getRevisionDate() {
-        return revisionDate;
+    public Date getSnapshotDate() {
+        return snapshotDate;
     }
 
-    public void setRevisionDate(Date revisionDate) {
-        this.revisionDate = revisionDate;
+    public void setSnapshotDate(Date snapshotDate) {
+        this.snapshotDate = snapshotDate;
     }
 
     public Task getTask() {
@@ -140,6 +141,5 @@ public class TaskRevision extends OrganizationEntity implements Serializable {
     public void setRealEffort(double realEffort) {
         this.realEffort = realEffort;
     }
-
 
 }

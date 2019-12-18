@@ -36,9 +36,6 @@ import java.util.List;
 public class Task extends AbstractTask implements Serializable {
 
 
-    @OneToMany(targetEntity = TaskRevision.class, mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TaskRevision> revisions;
-
     @Column(nullable = false)
     private double originalEstimate;
 
@@ -63,7 +60,6 @@ public class Task extends AbstractTask implements Serializable {
 
     public Task() {
         super();
-        this.revisions = new ArrayList<>();
     }
 
 
@@ -144,15 +140,6 @@ public class Task extends AbstractTask implements Serializable {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
     }
 
-    @Deprecated
-    public List<TaskRevision> getRevisions() {
-        return revisions;
-    }
-
-    @Deprecated
-    public void setRevisions(List<TaskRevision> revisions) {
-        this.revisions = revisions;
-    }
 
 
 }
