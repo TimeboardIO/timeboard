@@ -306,8 +306,10 @@ public class TasksRestController {
         }
 
         Long milestoneID = taskWrapper.milestoneID;
-        final Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
-
+        Milestone milestone = null;
+        if(milestoneID != null) {
+          milestone = this.projectService.getMilestoneById(actor, milestoneID);
+        }
         Task task = null;
         Long typeID = taskWrapper.typeID;
         Long taskID = taskWrapper.taskID;
