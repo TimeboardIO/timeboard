@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/reports')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">View Report Page</title>
+    <meta name="reportID" th:content="${report.id}"/>
+    <meta name="reportType" th:content="${reportType}"/>
+    <script type="text/javascript" src="/js/reportsChart.js"></script>
+</head>
+<body>
+
+    <div layout:fragment="content">
+        <div class="ui segment" id="create-report">
+            <h4 class="ui dividing header">View Report:
+                <div th:text="${report.name}"></div>
+            </h4>
+
+            <div id="app-view-report">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

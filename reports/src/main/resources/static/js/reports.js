@@ -3,7 +3,7 @@ $(document).ready(function () {
     const reportID = $("meta[name='reportID']").attr('content');
 
     var appListReports = new Vue({
-        el: '#reports-app',
+        el: '#app-create-report',
         data: {
             table: {
                 cols: [

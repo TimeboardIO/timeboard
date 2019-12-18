@@ -47,8 +47,10 @@ public class Report extends OrganizationEntity implements Serializable {
     )
     private Set<Project> projects;
 
+    @Column
     private String filterProject;
 
+    @Column
     private ReportType type;
 
 
