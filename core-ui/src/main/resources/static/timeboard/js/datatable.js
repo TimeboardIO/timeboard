@@ -142,7 +142,7 @@ Vue.component('data-table', {
                     userID : 0
                 }),
                 url: "/api/datatable",
-                success: function (event) {
+                success: function (d) {
                     event.target.classList.toggle('loading');
                     $('#configModal'+this.config.name).modal('hide');
                 }
