@@ -31,16 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.ProjectDashboard;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.UserService;
@@ -54,7 +49,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -101,7 +95,7 @@ public class ReportsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(@ModelAttribute  Report report){
+    protected String handlePost(@ModelAttribute Report report){
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
@@ -174,7 +168,7 @@ public class ReportsController {
     @GetMapping("/view/{reportID}")
     protected String viewReport(@PathVariable long reportID, Model model) throws ServletException, IOException {
         model.addAttribute("reportID", reportID);
-        model.addAttribute("reportType", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID).geType().label);
+        model.addAttribute("reportType", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID).getType());
         model.addAttribute("report", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID));
         return "view_report.html";
     }

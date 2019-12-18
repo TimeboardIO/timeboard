@@ -13,9 +13,11 @@
 
     <div layout:fragment="content">
         <div class="ui segment" id="create-report">
-            <h4 class="ui dividing header">Create Report</h4>
+            <h4 class="ui dividing header" th:if="${action} == 'create'">Create Report</h4>
+            <h4 class="ui dividing header" th:if="${action} == 'edit'">Edit Report</h4>
 
-            <form th:action="${action} == 'create' ? @{/reports/create} : @{/reports/edit/{reportID}(reportID=${report.id})}" th:object="${report}" class="ui grid form" enctype="application/x-www-form-urlencoded" method="post" style="margin:0px">
+            <form th:action="${action} == 'create' ? @{/reports/create} : @{/reports/edit/{reportID}(reportID=${report.id})}"
+                  th:object="${report}" class="ui grid form" enctype="application/x-www-form-urlencoded" method="post" style="margin:0px">
 
                 <div class="eight wide column">
                     <div class="field">

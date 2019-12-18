@@ -68,7 +68,7 @@ public class ReportKPIController {
     protected ResponseEntity getDataChart(@PathVariable long reportID, Model model) throws BusinessException, IOException {
         Account actor = this.userInfo.getCurrentAccount();
         Report report = this.reportService.getReportByID(actor, reportID);
-        ReportType type = report.geType();
+        ReportType type = report.getType();
         List<Project> listOfProjects = report.getProjects().stream().collect(Collectors.toList());
 
         final ProjectDashboard[] dashboard = {new ProjectDashboard(0.0, 0.0, 0.0, 0.0)};
