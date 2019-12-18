@@ -415,7 +415,6 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setProject(project);
         em.flush();
 
-        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
         LOGGER.info("Task " + taskName + " created by " + actor.getName() + " in project " + project.getName());
 
         return newTask;
