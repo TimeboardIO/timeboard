@@ -10,9 +10,9 @@ Vue.component('data-table', {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(row, i) in sortedItems">
+                    <tr v-for="(row, i) in finalData">
                       <td v-for="(col, j) in finalCols" v-if="col.visible">
-                          <slot :name="col.slot" v-bind:row="config.data[i]">
+                          <slot :name="col.slot" v-bind:row="finalData[i]">
                           </slot>
                       </td>
                       <td v-if="config.configurable === true" ></td>
@@ -80,32 +80,36 @@ Vue.component('data-table', {
         }
     },
     computed: {
-        sortedItems: function () {
+        finalData: function () {
             let sortKey = this.sortKey+'';
             let order = this.sortOrders[sortKey] || 1 ;
 
-            let sortedData = [];
+            // copying raw data
+            let finalData = [];
             let i = this.config.data.length;
-            while(i--) sortedData.push(this.config.data[i]);
+            while(i--) finalData.push(this.config.data[i]);
+
+            //filtering
             if(this.config.filters){
                 for (let [key, filter] of Object.entries(this.config.filters)) {
                     if(filter.filterValue !== '') {
-                        sortedData = sortedData.filter(function (row) {
+                        finalData = finalData.filter(function (row) {
                             return filter.filterFunction(filter.filterValue, row[filter.filterKey]);
                         });
                     }
                 }
             }
 
+            //sorting
             if (sortKey) {
                 let sortAttr = this.config.cols.find(item => item.slot === sortKey).sortKey;
-                sortedData = this.config.data.slice().sort(function (a, b) {
+                finalData = finalData.slice().sort(function (a, b) {
                     a = a[sortAttr];
                     b = b[sortAttr];
                     return (a === b ? 0 : a > b ? 1 : -1) * order;
                 });
             }
-            return sortedData;
+            return finalData;
         }
     },
     methods: {
@@ -118,7 +122,7 @@ Vue.component('data-table', {
                 onApprove : function($element) {
 
                 },
-                detachable : false, centered: true
+                detachable : true, centered: true
             }).modal('show');
         },
         changeDataTableConfig: function(){
