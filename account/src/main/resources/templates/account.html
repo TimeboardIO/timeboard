@@ -130,42 +130,7 @@
             </div>
         </div>
 
-        <div class="card">
-            <div class="content">
-                <h4 class="ui dividing header">Column Preferences For Task</h4>
 
-                <form action="" class="ui form password" enctype="application/x-www-form-urlencoded"
-                      id="columnPreferences" method="post">
-
-                    <div class="field">
-
-                        <table class="ui unstackable table">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th>Column Name For Task</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr th:each="col : ${allTaskColumns}">
-                                <td>
-                                    <input name="columnSelected" th:checked="${userTaskColumns.contains(col)}" th:value="${col}"
-                                           type="checkbox"/>
-                                </td>
-                                <td>
-                                    <a th:text="${col}"></a>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-
-                        <input name="formType" type="hidden" value="columnTask">
-                        <div class="ui submit positive button " name="submitButton" value="columnTask">Save</div>
-                        <div class="ui error message"></div>
-                    </div>
-                </form>
-            </div>
-        </div>
         <div class="card">
             <div class="content">
                 <h4 class="ui dividing header">Exports Reports</h4>

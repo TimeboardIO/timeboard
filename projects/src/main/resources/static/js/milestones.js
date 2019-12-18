@@ -2,7 +2,7 @@ $(document).ready(function () {
 
     const projectID = $("meta[name='projectID']").attr('content');
 
-    var app = new Vue({
+    let app = new Vue({
         el: '#milestones-app',
         data: {
             table: {
@@ -19,13 +19,15 @@ $(document).ready(function () {
                         "slot": "date",
                         "label": "Milestone Date"
                     }],
-                data: []
+                data: [],
+                name: 'tableMilestone'
+
             }
         },
         methods: {
         },
         mounted: function () {
-            var self = this;
+            let self = this;
             $.ajax({
                 type: "GET",
                 dataType: "json",

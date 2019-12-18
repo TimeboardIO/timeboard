@@ -2,29 +2,37 @@ $(document).ready(function () {
 
     const projectID = $("meta[name='projectID']").attr('content');
 
-    var app = new Vue({
+    let app = new Vue({
         el: '#components-demo',
         data: {
             table: {
                 cols: [
                     {
                         "slot": "tagkey",
-                        "label": "Tag Key"
+                        "label": "Tag Key",
+                        "sortKey": "tagKey",
+                        "primary" : true
+
                     },
                     {
                         "slot": "tagvalue",
-                        "label": "Tag Value"
+                        "label": "Tag Value",
+                        "sortKey": "tagValue"
+
                     },
                     {
                         "slot": "tagactions",
-                        "label": "Actions"
+                        "label": "Actions",
+                        "primary" : true
                     }],
-                data: []
+                data: [],
+                name: 'tableTag',
+                configurable : true
             }
         },
         methods: {
             addTag: function () {
-                var self = this;
+                let self = this;
                 $.ajax({
                     type: "POST",
                     dataType: "json",
@@ -39,7 +47,7 @@ $(document).ready(function () {
                 });
             },
             updateTag: function (row) {
-                var self = this;
+                let self = this;
                 $.ajax({
                     type: "PATCH",
                     dataType: "json",
@@ -51,7 +59,7 @@ $(document).ready(function () {
                 });
             },
             removeTag: function (row) {
-                var self = this;
+                let self = this;
                 $.ajax({
                     type: "DELETE",
                     dataType: "json",
@@ -63,7 +71,7 @@ $(document).ready(function () {
             }
         },
         mounted: function () {
-            var self = this;
+            let self = this;
             $.ajax({
                 type: "GET",
                 dataType: "json",

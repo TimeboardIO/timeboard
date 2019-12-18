@@ -403,6 +403,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(TaskStatus.PENDING);
         newTask.setAssigned(assignedAccount);
+        newTask.setOrganizationID(project.getId());
         if (milestone != null) {
             em.merge(milestone);
         }

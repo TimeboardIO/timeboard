@@ -84,7 +84,7 @@ public class ProjectSetupController {
         final Map<String, Object> map = new HashMap<>();
         this.prepareTemplateData(project, map);
         model.addAllAttributes(map);
-        return "details_project_config.html";
+        return "project_config.html";
     }
 
     @PostMapping("/memberships")
