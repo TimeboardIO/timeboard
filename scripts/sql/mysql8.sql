@@ -25,11 +25,11 @@
     create table AsyncJobState (
        id bigint not null,
         organizationID bigint,
-        endDate time,
+        endDate datetime(6),
         error varchar(1000),
         ownerID bigint,
         result varchar(1000),
-        startDate time,
+        startDate datetime(6),
         state varchar(255),
         title varchar(255),
         primary key (id)
