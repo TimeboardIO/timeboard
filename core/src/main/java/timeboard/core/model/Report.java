@@ -55,7 +55,9 @@ public class Report extends OrganizationEntity implements Serializable {
     private ReportType type;
 
 
-    public Report() {}
+    public Report() {
+        this.projects = new HashSet<>();
+    }
 
     public Report(String name, Account organization, Set<Project> projects, ReportType type, String filterProject) {
         this.name = name;

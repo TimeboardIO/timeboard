@@ -33,35 +33,6 @@ $(document).ready(function () {
         }
     });
 
-    var appCreateReport = new Vue({
-            el: '#create-report',
-            data: {
-                selectedProjectFilter: "",
-                selectedProjects: [],
-                sizeSelectedProjects: 0
-            },
-            methods: {
-                refreshProjectSelection: function (selectedProjectFilter) {
-                    var self = this;
-                    $.ajax({
-                        type: "POST",
-                        dataType: "json",
-                        data: JSON.stringify(self.selectedProjectFilter),
-                        contentType: "application/json",
-                        url: "/api/reports/refreshProjectSelection",
-                        success: function (d) {
-                            self.selectedProjects = d;
-                            self.sizeSelectedProjects = d.length;
-                        },
-                        errors: function (d) {
-                            alert(d);
-                        }
-                    });
-                }
-            }
-        });
-
-
     $( "#refreshSelectedProjects" ).click(function() {
         var filter = $( "input[name='selectedProjectFilter']").val();
          $.ajax({
@@ -70,13 +41,22 @@ $(document).ready(function () {
              data: JSON.stringify(filter),
              contentType: "application/json",
              url: "/api/reports/refreshProjectSelection",
-             success: function (d) {
-                 selectedProjects = d;
-                 sizeSelectedProjects = d.length;
-             },
+             success: function (listProjectsFiltered) {
+                 $( "#listProjectsDiv").empty();
+                 $.each(listProjectsFiltered, function( i, item ) {
+                     var newNameItem = "<div class=\"header\"><i class=\"folder open icon\"></i>"+item.projectName+"</div>";
+                     var comments = item.projectComments != null ? item.projectComments : "(No comments)";
+                     var newCommentItem = "<div class=\"description\">"+comments+"</div>";
+
+                     $( "#listProjectsDiv")
+                        .append(newNameItem)
+                        .append(newCommentItem);
+                 })
+              },
              errors: function (d) {
                  alert(d);
              }
          });
     });
 });
+

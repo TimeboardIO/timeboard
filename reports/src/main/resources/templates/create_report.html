@@ -2,8 +2,7 @@
 
 <html layout:decorate="~{layouts/general.html(path='/reports')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:v-on="http://www.w3.org/1999/xhtml">
+      xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <title layout:fragment="title">Create Report Page</title>
@@ -43,24 +42,13 @@
                     <div class="ui card">
                         <div class="content header">
                             <p>Projects selection preview</p>
-                            <a class="ui button" id="refreshSelectedProjects"><!--von:click="refreshProjectSelection(selectedProjectFilter)">-->
+                            <a class="ui button" id="refreshSelectedProjects">
                                 Refresh selection
                             </a>
                         </div>
-                        <div class="content description">
-                            <div class="ui list" v-if="sizeSelectedProjects > 0">
-                                <div class="item" v-for="project in selectedProjects" >
-
-                                    <div class="header">
-                                        <i class="folder open icon"></i>
-                                        {{project.projectName}}
-                                    </div>
-                                    <div class="description" v-if="project.projectComments != null">{{project.projectComments}}</div>
-                                    <div class="description" v-if="project.projectComments == null">(No comments)</div>
-                                </div>
-                            </div>
-                            <div  v-if="sizeSelectedProjects <= 0">
-                                No projects
+                        <div class="content description" >
+                            <div class="ui list" id="listProjectsDiv">
+                                No projects, please click on refresh button
                             </div>
                         </div>
                     </div>
