@@ -100,9 +100,17 @@
                     {{row.name}}
                 </template>
                 <template v-slot:actions="{row}">
-                    <a class="ui right labeled success icon button" v-bind:href="'/projects/'+row.id">
-                        <i class="right arrow icon"></i>
-                        View
+                    <a class="ui right labeled positive icon button" v-bind:href="'/projects/'+row.id+'/setup'">
+                        <i class="cog icon"></i>
+                        Setup
+                    </a>
+                    <a class="ui right labeled primary icon button" v-bind:href="'/projects/'+row.id+'/tasks'">
+                        <i class="tasks icon"></i>
+                        Task
+                    </a>
+                    <a class="ui right labeled negative basic icon button" v-bind:href="'/projects/'+row.id+'/delete'">
+                        <i class="archive icon"></i>
+                        Archive
                     </a>
                 </template>
             </data-table>
