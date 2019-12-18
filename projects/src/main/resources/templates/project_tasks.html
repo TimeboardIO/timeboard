@@ -134,40 +134,48 @@
     </script>
 
 
-    <!-- Actions buttons-->
-    <div class="ui menu">
-        <a class="item" th:if="${isProjectOwner}"
-           v-on:click="showCreateTaskModal(null, null, $event)">
-            <i class="plus icon"></i>
-            New Task
-        </a>
-        <div class="ui dropdown item import" id="import">
-            Import tasks
-            <i class="dropdown icon"></i>
-            <div class="menu">
-                <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" class="item" v-on:click="$('.ui.modal.sync').modal('show')">plugin name</div>
+
+    <!-- MAIN COMPONENT-->
+    <div id="tasksList">
+
+
+        <!-- Actions buttons-->
+        <div class="ui menu">
+            <a class="item" th:if="${isProjectOwner}"
+               v-on:click="showCreateTaskModal(null, null, $event)">
+                <i class="plus icon"></i>
+                New Task
+            </a>
+            <div class="ui dropdown item import" id="import">
+                Import tasks
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" class="item" v-on:click="$('.ui.modal.sync').modal('show')">plugin name</div>
+                </div>
             </div>
-        </div>
-        <div @click="$('.filters').toggle()" class="ui dropdown item" >
-            Filters
-            <i class="filter icon"></i>
-        </div>
-        <div class="right menu">
-            <div class="ui orange label item" th:if="${import} > 0">
-                <i class="sync icon rotating"></i> Sync with Jira in progress
+            <div @click="$('.filters').toggle()" class="ui dropdown item" >
+                <i class="filter icon"></i>
+                Filters
             </div>
-        </div>
-        <script type="text/javascript">
+            <div class="right menu">
+                <div class="ui orange label item" th:if="${import} > 0">
+                    <i class="sync icon rotating"></i> Sync with Jira in progress
+                </div>
+            </div>
+            <script type="text/javascript">
                 $(document).ready(function(){
                     $('#import').dropdown({
                         clearable: true
                     });
                 });
             </script>
-    </div>
+        </div>
 
-    <!-- MAIN COMPONENT-->
-    <div id="tasksList">
+        <div class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            Pending tasks
+        </div>
+
         <!-- Pending tasks datatable component -->
         <data-table v-bind:config="tablePending">
             <template v-slot:name="{row}">
@@ -210,7 +218,10 @@
             </template>
         </data-table>
 
-
+        <div class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            All tasks
+        </div>
 
         <!-- Filters-->
         <div class="ui segment filters" style="display: none;">
@@ -267,6 +278,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- Datatable component -->
         <data-table v-bind:config="table">
