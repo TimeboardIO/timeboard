@@ -125,7 +125,9 @@ Vue.component('data-table', {
                 detachable : true, centered: true
             }).modal('show');
         },
-        changeDataTableConfig: function(){
+        changeDataTableConfig: function(event){
+            event.target.classList.toggle('loading');
+
             let cols = [];
             this.finalCols.forEach(function (col) {
                if(col.visible) cols.push(col.slot);
@@ -141,6 +143,7 @@ Vue.component('data-table', {
                 }),
                 url: "/api/datatable",
                 success: function (d) {
+                    event.target.classList.toggle('loading');
                     $('#configModal').modal('hide');
                 }
             });

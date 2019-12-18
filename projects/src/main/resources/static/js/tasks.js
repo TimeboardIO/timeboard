@@ -151,13 +151,13 @@ let app = new Vue({
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
             },
             data: [],
-            name: 'tableTasks',
+            name: 'tasks',
             configurable : true
         },
         tablePending : {
-            cols: [],
+            cols: [], //will copy table columns
             data: [],
-            name: 'tableTasks',
+            name: 'pending tasks',
             configurable : true
         }
     },
@@ -247,10 +247,10 @@ let app = new Vue({
             }
             let self = this;
             $('.create-task.modal').modal({
-                onApprove : function($element){
+                onApprove : function($element) {
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     var object = {};
-                    if(validated){
+                    if(validated) {
                         $('.ui.error.message').hide();
                         $.ajax({
                             method: "POST",
@@ -277,21 +277,22 @@ let app = new Vue({
                 detachable : true, centered: true
             }).modal('show');
         },
-        approveTask: function(event, task){
-            var keepThis = this;
+        approveTask: function(event, task) {
             event.target.classList.toggle('loading');
             $.get("/api/tasks/approve?task="+task.taskID)
-                .then(function(data){
+                .then(function(data) {
                     task.status = 'IN_PROGRESS';
                     event.target.classList.toggle('loading');
+                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 });
         },
-        denyTask: function(event, task){
+        denyTask: function(event, task) {
             event.target.classList.toggle('loading');
             $.get("/api/tasks/deny?task="+task.taskID)
                 .then(function(data){
                     task.status = 'REFUSED';
                     event.target.classList.toggle('loading');
+                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 });
         }
     },
@@ -301,7 +302,6 @@ let app = new Vue({
     },
     updated: function () {
         this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
-
     },
     mounted: function () {
         let self = this;
