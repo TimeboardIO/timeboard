@@ -40,9 +40,8 @@ Cypress.Commands.add('createProject', (projectName) => {
 });
 
 Cypress.Commands.add('archiveProject', (projectName) => {
-    cy.get('.card').contains(projectName)
-        .get('.button').contains('Archive')
-        .click({force: true});
+    cy.get('.card:contains("'+projectName+'")').find('.button').contains('Archive')
+            .click({force: true});
 
 });
 
@@ -104,18 +103,13 @@ describe('Project Test', function() {
         beforeEach(function () {
             cy.createProject(projectName);
 
-            cy.get('.card').contains(projectName) //projectName
-                .get('.button').contains('Setup')
-                .click();
+            cy.get('.card:contains("'+projectName+'")').find('.button').contains('Setup')
+                    .click();
 
             cy.get('a').contains('Tasks')
                 .click();
         });
 
-        afterEach(function () {
-            cy.visit('http://localhost:8080/projects');
-            cy.archiveProject(projectName);
-        });
         it('Create Task', function () {
             cy.contains('New Task').click();
             cy.get('input[name=taskName]').clear().type("First Task");
@@ -123,11 +117,17 @@ describe('Project Test', function() {
             cy.get('input[name=taskOriginalEstimate]').clear().type(Math.round(Math.random() * 100) / 100);
             cy.get('input[name=taskStartDate]').clear().type("2019-12-06");
             cy.get('input[name=taskEndDate]').clear().type("2019-12-20");
-          //   cy.get('input.prompt.assigned').clear().type("use");
-          //  cy.get('.results').first().click();
-           // cy.get('select[name=taskTypeID]').select('Bug')
+            //  cy.get('input.prompt.assigned').clear().type("use");
+            //  cy.get('.results').first().click();
 
-            cy.contains('Request').click({force: true});
+            cy.get('div:contains("Request")').click({multiple: true, force: true});
+            cy.wait(500);
+            cy.get('td:contains("First Task")').should('contain', "First Task");
+        });
+
+        afterEach(function () {
+            cy.visit('http://localhost:8080/projects');
+            cy.archiveProject(projectName);
         });
 
 
