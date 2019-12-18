@@ -32,8 +32,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.ProjectImportService;
-import timeboard.core.api.DataTableService;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
