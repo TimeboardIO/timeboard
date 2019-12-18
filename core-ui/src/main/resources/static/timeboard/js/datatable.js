@@ -126,6 +126,7 @@ Vue.component('data-table', {
             }).modal('show');
         },
         changeDataTableConfig: function(event){
+            let self = this;
             event.target.classList.toggle('loading');
 
             let cols = [];
@@ -142,9 +143,9 @@ Vue.component('data-table', {
                     userID : 0
                 }),
                 url: "/api/datatable",
-                success: function (event) {
+                success: function (d) {
                     event.target.classList.toggle('loading');
-                    $('#configModal'+this.config.name).modal('hide');
+                    $('#configModal'+self.config.name).modal('hide');
                 }
             });
         }
