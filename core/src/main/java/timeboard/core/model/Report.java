@@ -42,14 +42,12 @@ public class Report extends OrganizationEntity implements Serializable {
     private String name;
 
     @OneToOne
-    @JoinColumn(name = "ORG_ID", foreignKey = @ForeignKey(name = "FK_ORG_ID"))
     private Account organization;
 
     @OneToMany(targetEntity = Project.class,
             cascade = CascadeType.ALL,
             fetch = FetchType.EAGER
     )
-    @JoinColumn(name = "PROJECT_ID", foreignKey = @ForeignKey(name = "FK_PROJECT_ID"))
     private Set<Project> projects;
 
     private String filterProject;
