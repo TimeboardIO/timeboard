@@ -26,28 +26,37 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.DataTableService;
+import timeboard.core.api.sync.ProjectSyncCredentialField;
+import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.sync.ProjectSyncService;
+import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
+import timeboard.plugin.project.imp.jira.JiraSyncPlugin;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 
 @Controller
 @RequestMapping("/projects/{projectID}")
 public class ProjectTasksController {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     public ProjectService projectService;
@@ -58,20 +67,30 @@ public class ProjectTasksController {
     @Autowired
     public DataTableService dataTableService;
 
+    @Autowired
+    public AsyncJobService asyncJobService;
+
+    @Autowired
+    public ProjectSyncService projectSyncService;
+
+    @Autowired(required = false)
+    public List<ProjectSyncPlugin> projectImportServiceList;
+
     @GetMapping("/tasks")
     protected String listTasks(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
-        Task task = new Task();
+        final Task task = new Task();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
 
         model.addAttribute("task", new TaskForm(task));
-
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("sync_plugins", this.projectImportServiceList);
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     private void fillModel(Model model, Account actor, Project project) throws BusinessException {
@@ -82,6 +101,7 @@ public class ProjectTasksController {
         model.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
+        model.addAttribute("projectMembers", project.getMembers());
     }
 
     @GetMapping("/tasks/{taskID}")
@@ -98,7 +118,29 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
+    }
+
+    @PostMapping(value = "/tasks/sync/{serviceName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    protected String importFromJIRA(
+            @PathVariable Long projectID,
+            @PathVariable String serviceName,
+            @RequestBody MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
+
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+
+        final List<ProjectSyncCredentialField> creds = JiraSyncPlugin.FIELDS;
+
+        creds.forEach(field -> {
+            if(formBody.containsKey(field.getFieldKey())){
+                field.setValue(formBody.get(field.getFieldKey()).get(0));
+            }
+        });
+
+        this.projectSyncService.syncProjectTasks(actor, actor, project, serviceName, creds);
+
+        return "redirect:/projects/"+projectID+"/tasks";
     }
 
     @PostMapping("/tasks")
@@ -110,7 +152,7 @@ public class ProjectTasksController {
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     public static class TaskForm {

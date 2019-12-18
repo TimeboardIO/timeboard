@@ -48,4 +48,5 @@ public abstract class OrganizationEntity {
     public void setOrganizationID(Long organizationID) {
         this.organizationID = organizationID;
     }
+
 }

@@ -305,8 +305,7 @@ public class TasksRestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        Long milestoneID = taskWrapper.milestoneID;
-        final Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
+        final Milestone milestone = getMilestone(taskWrapper, actor);
 
         Task task = null;
         Long typeID = taskWrapper.typeID;
@@ -324,7 +323,7 @@ public class TasksRestController {
                 task = projectService.createTask(actor, project,
                         name, comment, startDate,
                         endDate, oe, typeID, actor,
-                        ProjectService.ORIGIN_TIMEBOARD, null, null, null);
+                        ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
             } catch (Exception e) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
@@ -336,6 +335,15 @@ public class TasksRestController {
         taskWrapper.setTaskID(task.getId());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
+    }
+
+    private Milestone getMilestone(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
+        Long milestoneID = taskWrapper.milestoneID;
+        if(milestoneID != null) {
+            return this.projectService.getMilestoneById(actor, milestoneID);
+        }else{
+            return null;
+        }
     }
 
     private Task processUpdateTask(@RequestBody TaskWrapper taskWrapper,

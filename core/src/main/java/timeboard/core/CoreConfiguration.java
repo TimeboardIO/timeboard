@@ -26,17 +26,17 @@ package timeboard.core;
  * #L%
  */
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = "timeboard.core.model")
-@EnableAutoConfiguration
+@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.async"})
+@EnableJpaRepositories
 @EnableTransactionManagement
 @EnableGlobalMethodSecurity(
         prePostEnabled = true,

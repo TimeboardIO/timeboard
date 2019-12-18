@@ -34,7 +34,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectExportService;
-import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -65,7 +65,7 @@ public class ProjectSetupController {
     @Autowired(
             required = false
     )
-    private List<ProjectImportService> projectImportServices;
+    private List<ProjectSyncPlugin> projectImportServices;
 
     @Autowired
     private ProjectService projectService;
@@ -84,7 +84,7 @@ public class ProjectSetupController {
         final Map<String, Object> map = new HashMap<>();
         this.prepareTemplateData(project, map);
         model.addAllAttributes(map);
-        return "details_project_config.html";
+        return "project_config.html";
     }
 
     @PostMapping("/memberships")

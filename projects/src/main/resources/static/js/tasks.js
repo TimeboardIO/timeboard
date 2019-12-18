@@ -1,166 +1,5 @@
 const currentProjectID = $("meta[property='tasks']").attr('project');
 
-// TASKS TABLE VUEJS COMPONENT
-Vue.component('task-list', {
-    template: '#task-list-template',
-    props: {
-        tasks: Array,
-        columns: Array,
-        filterKey: Array,
-    },
-    data: function () {
-        var sortOrders = {}
-        this.columns.forEach(function (key) {
-            sortOrders[key] = 1;
-        })
-        return {
-            sortKey: '',
-            sortOrders: sortOrders
-        }
-    },
-    computed: {
-        filteredTasks: function () {
-            var sortKey = this.sortKey
-            var filterKeys = this.filterKey.filter(function (f) { return f.value != '' || (f.key == 'originalEstimate' && (f.value.min != '' ||  f.value.max != ''))});
-            var order = this.sortOrders[sortKey] || 1
-            var tasks = this.tasks
-            var keepThis = this;
-            if (filterKeys.length > 0) {
-                tasks = tasks.filter(function (row) {
-                    return filterKeys.every(function(f, i, array){
-                        var rowValue = String(row[f.key]);
-                        var filterValue = String(f.value);
-                        if (f.key == 'startDate') {
-                            var rowDate = new Date(rowValue);
-                            var filterDate = new Date(filterValue);
-                            return rowDate.getTime() > filterDate.getTime();
-                        } else if(f.key == 'endDate') {
-                            var rowDate = new Date(rowValue);
-                            var filterDate = new Date(filterValue);
-                            return rowDate.getTime() < filterDate.getTime();
-                        } else if(f.key == 'originalEstimate') {
-                            var rowDouble = parseFloat(rowValue);
-                            var filterMin =  parseFloat(f.value.min);
-                            if(!filterMin) filterMin = 0;
-                            var filterMax =  parseFloat(f.value.max);
-                            if(!filterMax) filterMax = 9999999;
-                            return rowDouble <= filterMax && rowDouble >= filterMin  ;
-                        }
-                        return rowValue.toLowerCase().indexOf(filterValue.toLowerCase()) > -1
-                    });
-                })
-            }
-            if (sortKey) {
-                tasks = tasks.slice().sort(function (a, b) {
-                    a = a[sortKey]
-                    b = b[sortKey]
-                    return (a === b ? 0 : a > b ? 1 : -1) * order;
-                })
-            }
-            return tasks;
-        }
-   },
-    filters: {
-        capitalize: function (str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-    },
-    methods: {
-        sortBy: function (key) {
-            this.sortKey = key
-            this.sortOrders[key] = this.sortOrders[key] * -1
-        },
-        showCreateTaskModal: function(projectID, task, event){ // proxy to vue app
-            this.$parent.showCreateTaskModal(projectID, task, event);
-        },
-        showGraphModal: function(projectID, task, event){ // proxy to vue app
-            this.$parent.showGraphModal(projectID, task, event);
-        },
-        deleteTask: function(event, task){
-            keepThis = this;
-            event.target.classList.toggle('loading');
-            $.get("/api/tasks/delete?task="+task.taskID)
-            .then(function(data){
-                keepThis.tasks.splice( keepThis.tasks.indexOf(task), 1 );
-                event.target.classList.toggle('loading');
-            });
-        }
-    }
-});
-
-// PENDING TASKS TABLE VUEJS COMPONENT
-Vue.component('pending-task-list', {
-    template: '#pending-task-list-template',
-    props: {
-        tasks: Array,
-        columns: Array,
-        filterKey: Array,
-    },
-    data: function () {
-        var sortOrders = {}
-        this.columns.forEach(function (key) {
-            sortOrders[key] = 1;
-        })
-        return {
-            sortKey: '',
-            sortOrders: sortOrders
-        }
-    },
-    computed: {
-        filteredTasks: function () {
-            var sortKey = this.sortKey
-            var filterKey = [];
-            filterKey.push({ key: 'status', value: 'PENDING' });
-            var order = this.sortOrders[sortKey] || 1 ;
-            var tasks = this.tasks;
-            var keepThis = this;
-            if (filterKey.length > 0) {
-                tasks = tasks.filter(function (row) {
-                    return filterKey.every(function(f, i, array){
-                        return (String(row[f.key]).toLowerCase().indexOf(String(f.value).toLowerCase()) > -1)
-                    });
-                });
-            }
-            if (sortKey) {
-                tasks = tasks.slice().sort(function (a, b) {
-                    a = a[sortKey];
-                    b = b[sortKey];
-                    return (a === b ? 0 : a > b ? 1 : -1) * order;
-                });
-            }
-            return tasks;
-        }
-    },
-    filters: {
-        capitalize: function (str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-    },
-    methods: {
-        sortBy: function (key) {
-            this.sortKey = key
-            this.sortOrders[key] = this.sortOrders[key] * -1
-        },
-        approveTask: function(event, task){
-            var keepThis = this;
-            event.target.classList.toggle('loading');
-            $.get("/api/tasks/approve?task="+task.taskID)
-            .then(function(data){
-                task.status = 'IN_PROGRESS';
-                event.target.classList.toggle('loading');
-            });
-        },
-        denyTask: function(event, task){
-            event.target.classList.toggle('loading');
-            $.get("/api/tasks/deny?task="+task.taskID)
-            .then(function(data){
-                task.status = 'REFUSED';
-                event.target.classList.toggle('loading');
-            });
-        }
-    }
-});
-
 // TASK EDIT/CREATE MODAL VUEJS COMPONENT
 Vue.component('task-modal', {
     template: '#task-modal-template',
@@ -216,32 +55,114 @@ const emptyTask =  {
     projectID: currentProjectID,
     taskName: "",
     taskComments: "",
-    startDate:"", endDate:"",
+    startDate: "",
+    endDate:"",
     originalEstimate: 0,
     typeID: 0,
     typeName: '',
     assignee: "",
     assigneeID: 0,
-    status:"PENDING",
+    status: "PENDING",
     statusName: '',
     milestoneID: '',
     milestoneName: '',
-}
+};
+
+const projectID = $("meta[name='projectID']").attr('value');
+
 
 // VUEJS MAIN APP
-var app = new Vue({
-
+let app = new Vue({
     el: '#tasksList',
     data: {
-        searchQuery: '',
-        searchQueries: [ { key : 'taskName', value: '' }, { key : 'taskComments', value: '' }, {key : 'startDate', value: '' },
-                         { key : 'endDate', value: '' }, { key : 'originalEstimate', value: { min: '', max: '' } },
-                         { key : 'assignee', value: '' }, { key : 'status', value: '' }, { key : 'milestoneID', value: '' }, { key : 'typeID', value: '' } ],
-        gridColumns: ['taskName', 'taskComments', 'startDate', 'endDate', 'originalEstimate', 'assignee', 'status', 'milestoneID', 'typeID'],
-        gridData: [],
         newTask: Object.assign({}, emptyTask),
         formError: "",
-        modalTitle: "Create task"
+        modalTitle: "Create task",
+        table: {
+            cols: [
+                {
+                    "slot": "name",
+                    "label": "Task",
+                    "sortKey": "taskName",
+                    "primary" : true
+                },
+                {
+                    "slot": "start",
+                    "label": "Start date",
+                    "sortKey": "taskStartDate"
+
+                },
+                {
+                    "slot": "end",
+                    "label": "End date",
+                    "sortKey": "taskEndDate"
+
+                },
+                {
+                    "slot": "oe",
+                    "label": "OE",
+                    "sortKey": "originalEstimate"
+
+                },
+                {
+                    "slot": "assignee",
+                    "label": "Assignee",
+                    "sortKey": "assignee"
+
+                },
+                {
+                    "slot": "status",
+                    "label": "Status",
+                    "sortKey": "status"
+
+                },
+                {
+                    "slot": "milestone",
+                    "label": "Milestone",
+                    "sortKey": "milestoneID"
+
+                },
+                {
+                    "slot": "type",
+                    "label": "Type",
+                    "sortKey": "typeID"
+
+                },
+                {
+                    "slot": "actions",
+                    "label": "Actions",
+                    "primary" : true
+                }],
+            filters: {
+                name:      { filterKey: 'taskName', filterValue: '',
+                                filterFunction: (filter, row) => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 },
+                start:     { filterKey: 'startDate',        filterValue: '',
+                                filterFunction: (filter, row) => new Date(row).getTime() >= new Date(filter).getTime() },
+                end:       { filterKey: 'endDate' , filterValue: '',
+                                filterFunction: (filter, row) => new Date(row).getTime() <= new Date(filter).getTime() },
+                oeMin:     { filterKey: 'originalEstimate', filterValue: '',
+                                filterFunction: (filter, row) => parseFloat(row) >= parseFloat(filter) },
+                oeMax:     { filterKey: 'originalEstimate', filterValue: '',
+                                filterFunction: (filter, row) => parseFloat(row) <= parseFloat(filter) },
+                assignee:  { filterKey: 'assignee', filterValue: '',
+                                filterFunction: (filter, row) => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 },
+                status:    { filterKey: 'status', filterValue: '',
+                                filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 ) },
+                milestone: { filterKey: 'milestoneID', filterValue: '',
+                                filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
+                type:      { filterKey: 'typeID', filterValue: '',
+                                filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
+            },
+            data: [],
+            name: 'tasks',
+            configurable : true
+        },
+        tablePending : {
+            cols: [], //will copy table columns
+            data: [],
+            name: 'pending tasks',
+            configurable : true
+        }
     },
     methods: {
         showGraphModal: function(projectID, task, event){
@@ -251,12 +172,12 @@ var app = new Vue({
                 url: "/api/tasks/chart?task="+task.taskID,
                 success : function(data, textStatus, jqXHR) {
 
-                    var listOfTaskDates = data.listOfTaskDates;
-                    var effortSpentDataForChart = data.effortSpentData;
-                    var realEffortDataForChart = data.realEffortData;
+                    let listOfTaskDates = data.listOfTaskDates;
+                    let effortSpentDataForChart = data.effortSpentData;
+                    let realEffortDataForChart = data.realEffortData;
 
                     //chart config
-                    var chart = new Chart($("#lineChart"), {
+                    let chart = new Chart($("#lineChart"), {
                         type: 'line',
                         data: {
                             labels: listOfTaskDates,
@@ -300,9 +221,9 @@ var app = new Vue({
             event.preventDefault();
             if(task){
                  this.modalTitle = "Edit task";
-                 this.newTask.projectID = projectID;
+                // load task data in modal
                  this.newTask.projectID = currentProjectID;
-                 this.newTask.taskID = task.taskID
+                 this.newTask.taskID = task.taskID;
 
                  this.newTask.taskName = task.taskName;
                  this.newTask.taskComments = task.taskComments;
@@ -327,12 +248,12 @@ var app = new Vue({
                  this.modalTitle = "Create task";
                  Object.assign(this.newTask , emptyTask);
             }
-            keepThis = this;
+            let self = this;
             $('.create-task.modal').modal({
-                onApprove : function($element){
+                onApprove : function($element) {
                     var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     var object = {};
-                    if(validated){
+                    if(validated) {
                         $('.ui.error.message').hide();
                         $.ajax({
                             method: "POST",
@@ -341,10 +262,7 @@ var app = new Vue({
                             contentType: "application/json",
                             dataType: "json",
                             success : function(data, textStatus, jqXHR) {
-                                keepThis.gridData = keepThis.gridData.filter(function(el){
-                                    return el.taskID != data.taskID;
-                                });
-                                keepThis.gridData.push(data);
+                                window.location.reload();
                                 $('.create-task .ui.form').form('reset');
                                 $('.create-task.modal').modal('hide');
                             },
@@ -359,18 +277,49 @@ var app = new Vue({
                 detachable : true, centered: true
             }).modal('show');
         },
+        approveTask: function(event, task) {
+            event.target.classList.toggle('loading');
+            $.get("/api/tasks/approve?task="+task.taskID)
+                .then(function(data) {
+                    task.status = 'IN_PROGRESS';
+                    event.target.classList.toggle('loading');
+                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
+                });
+        },
+        denyTask: function(event, task) {
+            event.target.classList.toggle('loading');
+            $.get("/api/tasks/deny?task="+task.taskID)
+                .then(function(data){
+                    task.status = 'REFUSED';
+                    event.target.classList.toggle('loading');
+                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
+                });
+        }
+    },
+    created: function () {
+        // copying table config to pending task table config
+        this.tablePending.cols = this.table.cols;
+    },
+    updated: function () {
+        this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
+    },
+    mounted: function () {
+        let self = this;
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "/api/tasks?project="+currentProjectID,
+            success: function (d) {
+                self.table.data = d;
+                self.tablePending.data = d.filter(r => r.status === 'PENDING');
+                $('.ui.dimmer').removeClass('active');
+            }
+        });
     }
 });
 
 //Initialization
 $(document).ready(function(){
-    //initial data loading
-    $.get("/api/tasks?project="+currentProjectID)
-    .then(function(data){
-        app.gridData = data;
-        $('.ui.dimmer').removeClass('active');
-    });
-
     //init dropdown fields
      $('.ui.multiple.dropdown').dropdown();
 
@@ -394,3 +343,5 @@ $(document).ready(function(){
         minCharacters : 3
     });
 });
+
+

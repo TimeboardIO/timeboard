@@ -56,7 +56,7 @@ public class OrganizationFilter implements Filter {
     private OrganizationService organizationService;
 
     private static final List<String> whitelist = new ArrayList<>();
-    static{
+    static {
         whitelist.add(OrganizationSelectController.URI);
         whitelist.add(OnboardingController.URI);
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2)");

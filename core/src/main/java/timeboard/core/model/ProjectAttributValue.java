@@ -28,6 +28,7 @@ package timeboard.core.model;
 
 public class ProjectAttributValue {
 
+
     private boolean isPrivate;
     private boolean isEncrypted;
     private String value;
@@ -48,6 +49,7 @@ public class ProjectAttributValue {
         this.isPrivate = false;
         this.isEncrypted = newAttrEncrypted;
     }
+
 
     public boolean isEncrypted() {
         return isEncrypted;

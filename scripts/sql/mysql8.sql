@@ -22,6 +22,19 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table AsyncJobState (
+       id bigint not null,
+        organizationID bigint,
+        endDate time,
+        error varchar(1000),
+        ownerID bigint,
+        result varchar(1000),
+        startDate time,
+        state varchar(255),
+        title varchar(255),
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Calendar (
        id bigint not null,
         organizationID bigint,

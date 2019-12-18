@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='second')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Project Tasks details</title>
+    <meta property="tasks" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}" th:project="${project.id}"/>
+    <style>
+        .ellipsis {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            width: 15em;
+        }
+    </style>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+    <input name="projectID" required th:value="${project.id}" type="hidden">
+
+    <!-- GRAPH MODAL TEMPLATE-->
+    <script id="graph-modal-template" type="text/x-template">
+        <div class="ui modal graph ">
+            <i class="close icon"></i>
+            <div class="content">
+                <div class="ui fluid card">
+                    <canvas id="lineChart" width="800" height="450"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </script>
+
+    <!-- TASK FORM MODAL TEMPLATE-->
+    <script id="task-modal-template" type="text/x-template">
+        <div class="ui large modal create-task ">
+            <i class="close icon"></i>
+            <div class="header">
+                {{ modalTitle }}
+            </div>
+            <div class="content">
+                <form class="ui form" enctype="application/x-www-form-urlencoded" id="task">
+                    <div v-bind="formError" class="ui error message"></div>
+
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Task Name</label>
+                            <input v-model="task.taskName" name="taskName" placeholder="Task Name" required type="text">
+                        </div>
+                        <div class="field">
+                            <label>User assigned</label>
+                            <div class="ui category search">
+                                <div class="ui icon input">
+                                    <input class="prompt assigned" placeholder="Search account..."
+                                           v-model="task.assignee" type="text"/>
+                                    <input class="taskAssigned" name="taskAssigned"
+                                           v-model="task.assigneeID" type="hidden"/>
+                                    <i class="search icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>Task Description</label>
+                        <textarea v-model="task.taskComments" name="taskComments" placeholder="Task Description"
+                                  rows="1"></textarea>
+                    </div>
+                    <div class=" two fields">
+                        <div class="field">
+                            <label>Task Start Date</label>
+                            <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name"
+                                   required type="date">
+                        </div>
+                        <div class="field">
+                            <label>Task End Date</label>
+                            <input v-model="task.endDate" name="taskEndDate" placeholder="Task Name" required
+                                   type="date">
+                        </div>
+                    </div>
+                    <div class="four fields">
+                        <div class="field">
+                            <label>Task Original Estimate</label>
+                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE"
+                                   required type="number">
+                        </div>
+                        <div class="field">
+                            <label>Task type</label>
+                            <select class="ui type dropdown" v-model="task.typeID" name="taskTypeID">
+                                <option th:each="type: ${taskTypes}"
+                                        th:text="${type.typeName}" th:value="${type.id}"
+                                ></option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Task status</label>
+                            <select class="ui status dropdown" v-model="task.status" name="taskStatus"
+                                    v-bind:class="{disabled: (task.taskID == 0)}">
+                                <option th:each="status: ${allTaskStatus}"
+                                        th:text="${status.label}"
+                                        th:value="${status}"
+                                ></option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Milestone assigned</label>
+                            <select class="ui milestone dropdown" v-model="task.milestoneID" name="taskMilestoneId">
+                                <option
+                                        th:each="milestone: ${allProjectMilestones}"
+                                        th:text="${milestone.name}"
+                                        th:value="${milestone.id}"
+                                ></option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="actions">
+                <div class="ui black deny button">
+                    Cancel
+                </div>
+                <div class="ui positive submit right labeled icon button">
+                    Request
+                    <i class="checkmark icon"></i>
+                </div>
+            </div>
+        </div>
+    </script>
+
+
+
+    <!-- MAIN COMPONENT-->
+    <div id="tasksList">
+
+
+        <!-- Actions buttons-->
+        <div class="ui menu">
+            <a class="item" th:if="${isProjectOwner}"
+               v-on:click="showCreateTaskModal(null, null, $event)">
+                <i class="plus icon"></i>
+                New Task
+            </a>
+            <div class="ui dropdown item import" id="import">
+                Import tasks
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" class="item" v-on:click="$('.ui.modal.sync').modal('show')">plugin name</div>
+                </div>
+            </div>
+            <div @click="$('.filters').toggle()" class="ui dropdown item" >
+                <i class="filter icon"></i>
+                Filters
+            </div>
+            <div class="right menu">
+                <div class="ui orange label item" th:if="${import} > 0">
+                    <i class="sync icon rotating"></i> Sync with Jira in progress
+                </div>
+            </div>
+            <script type="text/javascript">
+                $(document).ready(function(){
+                    $('#import').dropdown({
+                        clearable: true
+                    });
+                });
+            </script>
+        </div>
+
+        <div class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            Pending tasks
+        </div>
+
+        <!-- Pending tasks datatable component -->
+        <data-table v-bind:config="tablePending">
+            <template v-slot:name="{row}">
+                {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                {{row.taskComments}}</p>
+            </template>
+            <template v-slot:start="{row}">
+                {{row.startDate}}
+            </template>
+            <template v-slot:end="{row}">
+                {{row.endDate}}
+            </template>
+            <template v-slot:oe="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    {{row.originalEstimate}}
+                </div>
+            </template>
+            <template v-slot:assignee="{row}">
+                {{row.assignee}}
+            </template>
+            <template v-slot:milestone="{row}">
+                <i>{{row.milestoneName}}</i>
+            </template>
+            <template v-slot:type="{row}">
+                <div class="ui blue green horizontal label"> {{row.typeName}} </div>
+            </template>
+            <template v-slot:status="{row}">
+                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+            </template>
+
+            <template v-slot:actions="{row}">
+                <button @click="approveTask($event, row)" class="ui positive icon button">
+                    Approve
+                    <i class="check icon"></i>
+                </button>
+                <button @click="denyTask($event, row)" class="ui negative icon button">
+                    Deny
+                    <i class="close icon"></i>
+                </button>
+            </template>
+        </data-table>
+
+        <div class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            All tasks
+        </div>
+
+        <!-- Filters-->
+        <div class="ui segment filters" style="display: none;">
+            <div class="ui four column relaxed equal height divided grid">
+                <div class="column">
+                    <label>Name</label>
+                    <div class="ui fluid icon input">
+                        <input v-model="table.filters.name.filterValue" placeholder="Name.. ">
+                        <i class="search icon"></i>
+                    </div>
+                </div>
+                <div class="column">
+                    <label>Between </label>
+                    <div class="ui fluid input">
+                        <input v-model="table.filters.start.filterValue" type="date" placeholder="Start date.. ">
+                    </div>
+                    <label>and </label>
+                    <div class="ui fluid input">
+                        <input v-model="table.filters.end.filterValue" type="date"  placeholder="End date.. ">
+                    </div>
+                </div>
+                <div class="column">
+
+                    <label>Original estimate </label>
+                    <div class="ui mini fluid input">
+                        <input v-model="table.filters.oeMin.filterValue"  type="text" placeholder="Min">
+                    </div>
+                    <div class="ui mini fluid input">
+                        <input v-model="table.filters.oeMax.filterValue" type="text" placeholder="Max">
+                    </div>
+                </div>
+                <div class="column">
+                    <label>Milestone </label>
+                    <select v-model="table.filters.milestone.filterValue" class="ui multiple selection fluid dropdown" >
+                        <option th:each="milestone: ${allProjectMilestones}"
+                                th:text="${milestone.name}"
+                                th:value="${milestone.id}"
+                        ></option>
+                    </select>
+                    <label>Type </label>
+                    <select v-model="table.filters.type.filterValue" class="ui type multiple selection fluid dropdown" >
+                        <option th:each="type: ${taskTypes}"
+                                th:text="${type.typeName}"
+                                th:value="${type.id}"
+                        ></option>
+                    </select>
+                    <label>Status </label>
+                    <select v-model="table.filters.status.filterValue" class="ui status multiple selection fluid dropdown" >
+                        <option th:each="status: ${allTaskStatus}"
+                                th:text="${status.label}"
+                                th:value="${status}"
+                        ></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Datatable component -->
+        <data-table v-bind:config="table">
+            <template v-slot:name="{row}">
+                {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                {{row.taskComments}}</p>
+            </template>
+            <template v-slot:start="{row}">
+                {{row.startDate}}
+            </template>
+            <template v-slot:end="{row}">
+                {{row.endDate}}
+            </template>
+            <template v-slot:oe="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    {{row.originalEstimate}}
+                </div>
+            </template>
+            <template v-slot:assignee="{row}">
+                {{row.assignee}}
+            </template>
+            <template v-slot:milestone="{row}">
+                <i>{{row.milestoneName}}</i>
+            </template>
+            <template v-slot:type="{row}">
+                <div class="ui blue green horizontal label"> {{row.typeName}} </div>
+            </template>
+            <template v-slot:status="{row}">
+                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+            </template>
+
+            <template v-slot:actions="{row}">
+                <button @click="deleteTask($event, row)" class="ui tiny negative icon button">
+                    <i class="close icon"></i>
+                </button>
+                <button v-on:click="showCreateTaskModal(null, row, $event)"
+                        class="ui tiny primary icon button">
+                    <i class="edit icon"></i>
+                </button>
+                <button v-on:click="showGraphModal(null, row, $event)" class="ui tiny yellow icon button">
+                    <i class="chart line icon"></i>
+                </button>
+            </template>
+        </data-table>
+
+
+        <!-- Task modal component instance-->
+        <task-modal
+                :form-error="formError"
+                :modal-title="modalTitle"
+                :task="newTask">
+        </task-modal>
+        <graph-modal
+                :form-error="formError"
+                :modal-title="modalTitle"
+                :task="newTask">
+        </graph-modal>
+
+
+        <div class="sync plugins" th:each="plugin: ${sync_plugins}">
+            <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getSyncCredentialFields()})"></div>
+        </div>
+
+        <script src="/js/tasks.js"></script>
+
+    </div>
+
+</div>
+
+</body>
+</html>

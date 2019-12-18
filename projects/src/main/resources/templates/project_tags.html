@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{details_project_layout.html(tab='five')}"
+<html layout:decorate="~{project_layout.html(tab='five')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
     <title layout:fragment="title">Project tags</title>
-    <meta name="projectID" th:content="${project.id}"/>
+    <meta name="projectID" th:value="${project.id}"/>
     <script src="/js/tags.js" type="text/javascript"></script>
 </head>
 <body>

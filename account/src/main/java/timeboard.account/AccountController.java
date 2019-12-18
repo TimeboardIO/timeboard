@@ -32,12 +32,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.DataTableService;
-import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
-import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
@@ -62,10 +60,8 @@ public class AccountController {
     @Autowired(
             required = false
     )
-    private List<ProjectImportService> projectImportServices;
+    private List<ProjectSyncPlugin> projectImportServices;
 
-    @Autowired
-    private DataTableService dataTableService;
 
     @PostMapping
     protected String handlePost(HttpServletRequest request, Model model) {
@@ -111,22 +107,6 @@ public class AccountController {
                 }
                 break;
 
-            case "columnTask":
-                final List<String> selectedColumnsString
-                        = request.getParameterValues("columnSelected") != null
-                        ? Arrays.asList(request.getParameterValues("columnSelected"))
-                        : new ArrayList<>();
-                try {
-                    this.dataTableService.addOrUpdateTableConfig(
-                            this.dataTableService.TABLE_TASK_ID,
-                            actor,
-                            selectedColumnsString);
-
-                    model.addAttribute("message", "Task columns preferences updated successfully !");
-                } catch (Exception e) {
-                    model.addAttribute("error", "Error while updating Task columns preferences");
-                }
-                break;
 
             default:
         }
@@ -179,12 +159,6 @@ public class AccountController {
         model.addAttribute("yearsSinceHiring", yearsSinceHiring);
         model.addAttribute("monthsSinceHiring", monthsSinceHiring);
 
-        final DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(
-                this.dataTableService.TABLE_TASK_ID, actor);
-
-        final List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
-        model.addAttribute("userTaskColumns", userTaskColumns);
-        model.addAttribute("allTaskColumns", this.dataTableService.ALL_COLUMNS_TABLE_TASK);
     }
 
 }

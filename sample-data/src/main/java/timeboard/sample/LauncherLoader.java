@@ -81,8 +81,7 @@ public class LauncherLoader {
         // Stop the sample-data bundle
         try {
             FrameworkUtil.getBundle(LauncherLoader.class).getBundleContext().getBundle().stop();
-            System.out.println("Datas saved !");
-        } catch (BundleException e) {
+         } catch (BundleException e) {
             e.printStackTrace();
         }
 
