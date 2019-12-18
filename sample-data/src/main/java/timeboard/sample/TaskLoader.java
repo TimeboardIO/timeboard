@@ -31,6 +31,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
+import timeboard.core.model.TaskStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,9 +70,9 @@ public class TaskLoader {
                                 ProjectService.ORIGIN_TIMEBOARD,
                                 null,
                                 null,
+                                TaskStatus.PENDING,
                                 null));
 
-                        System.out.println("Save task: project" + i + " task" + j);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -81,8 +82,7 @@ public class TaskLoader {
 
         }
 
-        System.out.println("Tasks saved ! ");
-        return tasksSaved;
+         return tasksSaved;
 
     }
 

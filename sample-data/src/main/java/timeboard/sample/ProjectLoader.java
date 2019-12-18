@@ -57,7 +57,6 @@ public class ProjectLoader {
                     try {
                         // On créé "nbProjectsByUsers" projets pour chacun des utilisateurs
                         projectsSaved.add(this.projectService.createProject(owner, "project owner " + i + " number " + j));
-                        System.out.println("Save project: " + "project owner " + i + " number " + j);
 
                     } catch (BusinessException e) {
                         e.printStackTrace();
@@ -65,8 +64,7 @@ public class ProjectLoader {
                 }
             }
         }
-        System.out.println("Projects saved ! ");
-        return projectsSaved;
+         return projectsSaved;
     }
 
 

@@ -1,4 +1,4 @@
-package timeboard.core;
+package timeboard.core.api.sync;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,23 +26,17 @@ package timeboard.core;
  * #L%
  */
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 
-@Configuration
-@ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.async"})
-@EnableJpaRepositories
-@EnableTransactionManagement
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true,
-        jsr250Enabled = true)
-public class CoreConfiguration {
+import java.util.List;
 
+public interface ProjectSyncService {
+
+    void syncProjectTasks(final Account org,
+                          final Account actor,
+                          final Project project,
+                          final String serviceName,
+                          final List<ProjectSyncCredentialField> creds);
 
 }

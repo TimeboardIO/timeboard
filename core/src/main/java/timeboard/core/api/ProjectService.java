@@ -29,10 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface ProjectService {
 
@@ -85,7 +82,8 @@ public interface ProjectService {
     Task createTask(Account actor, Project project, String taskName, String taskComment,
                     Date startDate, Date endDate, double originalEstimate,
                     Long taskTypeID, Account assignedAccountID, String origin,
-                    String remotePath, String remoteId, Milestone milestone);
+                    String remotePath, String remoteId,
+                    TaskStatus taskStatus, Milestone milestone);
 
     void createTasks(Account actor, List<Task> taskList);
 
@@ -114,6 +112,7 @@ public interface ProjectService {
 
 
 
+    Optional<Task> getTaskByRemoteID(Account actor, String id);
 
     /*
      == Imputations ==

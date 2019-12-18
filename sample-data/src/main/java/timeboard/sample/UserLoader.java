@@ -56,11 +56,9 @@ public class UserLoader {
             u.setFirstName("User" + i);
             u.setAccountCreationTime(new Date());
             usersToSave.add(u);
-            System.out.println("Stage user : "+u.getName());
-        }
+         }
 
             accountSaved = this.userService.createUsers(usersToSave);
-            System.out.println("Save "+usersToSave.size()+" users");
 
 
         return accountSaved;
