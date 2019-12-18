@@ -64,8 +64,6 @@ public class AccountController {
     )
     private List<ProjectImportService> projectImportServices;
 
-    @Autowired
-    private DataTableService dataTableService;
 
     @PostMapping
     protected String handlePost(HttpServletRequest request, Model model) {
@@ -111,22 +109,6 @@ public class AccountController {
                 }
                 break;
 
-            case "columnTask":
-                final List<String> selectedColumnsString
-                        = request.getParameterValues("columnSelected") != null
-                        ? Arrays.asList(request.getParameterValues("columnSelected"))
-                        : new ArrayList<>();
-                try {
-                    this.dataTableService.addOrUpdateTableConfig(
-                            this.dataTableService.TABLE_TASK_ID,
-                            actor,
-                            selectedColumnsString);
-
-                    model.addAttribute("message", "Task columns preferences updated successfully !");
-                } catch (Exception e) {
-                    model.addAttribute("error", "Error while updating Task columns preferences");
-                }
-                break;
 
             default:
         }
@@ -178,13 +160,7 @@ public class AccountController {
         model.addAttribute("projects", projects);
         model.addAttribute("yearsSinceHiring", yearsSinceHiring);
         model.addAttribute("monthsSinceHiring", monthsSinceHiring);
-
-        final DataTableConfig tableConfig = this.dataTableService.findTableConfigByUserAndTable(
-                this.dataTableService.TABLE_TASK_ID, actor);
-
-        final List<String> userTaskColumns = tableConfig != null ? tableConfig.getColumns() : new ArrayList<>();
-        model.addAttribute("userTaskColumns", userTaskColumns);
-        model.addAttribute("allTaskColumns", this.dataTableService.ALL_COLUMNS_TABLE_TASK);
+        
     }
 
 }
