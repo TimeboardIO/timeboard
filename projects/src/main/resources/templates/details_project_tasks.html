@@ -397,9 +397,7 @@
                 Import tasks
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div class="item" v-on:click="$('.ui.modal.import.jira').modal('show')">JIRA</div>
-                    <a class="item">Github</a>
-                    <a class="item">CSV</a>
+                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" class="item" v-on:click="$('.ui.modal.sync').modal('show')">plugin name</div>
                 </div>
             </div>
 
@@ -417,9 +415,9 @@
             </script>
         </div>
 
-        <div class="ui left vertical menu sidebar side"
-             th:include="fragments/import_jira.html :: form"></div>
-
+        <div class="sync plugins" th:each="plugin: ${sync_plugins}">
+            <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getSyncCredentialFields()})"></div>
+        </div>
 
         <pending-task-list
                 :columns="gridColumns"

@@ -1,4 +1,4 @@
-package timeboard.core.api;
+package timeboard.core.api.sync;
 
 /*-
  * #%L
@@ -29,48 +29,14 @@ package timeboard.core.api;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 
+import java.util.List;
+
 public interface ProjectSyncService {
 
-    void syncWithJIRA(Account org, Account actor, Project project, JIRACrendentials jiraCrendentials);
-
-    class JIRACrendentials{
-
-        private String username;
-        private String password;
-        private String url;
-        private String project;
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-
-        public String getProject() {
-            return project;
-        }
-
-        public void setProject(String project) {
-            this.project = project;
-        }
-    }
+    void syncProjectTasks(final Account org,
+                          final Account actor,
+                          final Project project,
+                          final String serviceName,
+                          final List<ProjectSyncCredentialField> creds);
 
 }

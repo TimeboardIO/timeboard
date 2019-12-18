@@ -233,7 +233,6 @@ const projectID = $("meta[name='projectID']").attr('value');
 
 // VUEJS MAIN APP
 var app = new Vue({
-
     el: '#tasksList',
     data: {
         searchQuery: '',
@@ -244,30 +243,9 @@ var app = new Vue({
         gridData: [],
         newTask: Object.assign({}, emptyTask),
         formError: "",
-        modalTitle: "Create task",
-        sync:{
-            jira: {
-                username:"",
-                password:"",
-                url:"https://...",
-                project: "JIRA project name"
-            }
-        }
+        modalTitle: "Create task"
     },
     methods: {
-        importFromJIRA: function(){
-            var self = this;
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                data: this.sync.jira,
-                url: "projects/" + projectID + "/tasks/sync/jira",
-                success: function (d) {
-                    $('.ui.modal.import.jira').modal('hide');
-                    window.location.reload();
-                }
-            });
-        },
         showGraphModal: function(projectID, task, event){
             $('.graph.modal').modal({ detachable : true, centered: true }).modal('show');
             $.ajax({

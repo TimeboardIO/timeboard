@@ -31,10 +31,11 @@ import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.ProjectImportService;
+import timeboard.core.api.sync.ProjectSyncCredentialField;
+import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.sync.RemoteTask;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,12 +44,20 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component("JiraImportPlugin")
-public class JiraImportPlugin implements ProjectImportService {
+public class JiraSyncPlugin implements ProjectSyncPlugin {
 
     private static final String JIRA_USERNAME_KEY = "jira.username";
     private static final String JIRA_PASSWORD_KEY = "jira.password";
     private static final String JIRA_PROJECT_KEY = "jira.project";
+    private static final String JIRA_PROJECT_URL = "jira.url";
     private static final String JIRA_SERVICE_NAME = "JIRA";
+
+    public static final List<ProjectSyncCredentialField> FIELDS = Arrays.asList(
+            new ProjectSyncCredentialField(JIRA_USERNAME_KEY, "JIRA Username", ProjectSyncCredentialField.Type.TEXT, 0),
+                new ProjectSyncCredentialField(JIRA_PASSWORD_KEY, "JIRA Password", ProjectSyncCredentialField.Type.PASSWORD, 1),
+                new ProjectSyncCredentialField(JIRA_PROJECT_URL, "JIRA URL", ProjectSyncCredentialField.Type.TEXT, 2),
+                new ProjectSyncCredentialField(JIRA_PROJECT_KEY, "JIRA Project name", ProjectSyncCredentialField.Type.TEXT, 3)
+    );
 
     @Autowired
     private ProjectService projectService;
@@ -60,29 +69,38 @@ public class JiraImportPlugin implements ProjectImportService {
 
 
     @Override
-    public List<String> getRequiredUserFields() {
-        return Arrays.asList(JIRA_USERNAME_KEY, JIRA_PASSWORD_KEY, JIRA_PROJECT_KEY);
+    public List<ProjectSyncCredentialField> getSyncCredentialFields() {
+        return FIELDS;
+    }
+
+    private ProjectSyncCredentialField getFieldByKey(List<ProjectSyncCredentialField> fields, String key){
+        return fields.stream().filter(field -> field.getFieldKey().equals(key)).findFirst().get();
     }
 
 
-    private JiraRestClient getJiraRestClient(Project project) throws URISyntaxException {
-        String jiraUsername = project.getAttributes().get(JIRA_USERNAME_KEY).getValue();
-        String jiraPassword = project.getAttributes().get(JIRA_PASSWORD_KEY).getValue();
+    private JiraRestClient getJiraRestClient(List<ProjectSyncCredentialField> fields) throws URISyntaxException {
+
+        final String jiraUsername = this.getFieldByKey(fields, JIRA_USERNAME_KEY).getValue();
+        final String jiraPassword = this.getFieldByKey(fields, JIRA_PASSWORD_KEY).getValue();
+        final String jiraURL = this.getFieldByKey(fields, JIRA_PROJECT_URL).getValue();
 
         final JiraRestClientFactory factory = new AsynchronousJiraRestClientFactory();
-        final URI uri = new URI("https://tsl-extranet.fr/jira");
+        final URI uri = new URI(jiraURL);
         return factory.createWithBasicHttpAuthentication(uri, jiraUsername, jiraPassword);
     }
 
     @Override
-    public List<RemoteTask> getRemoteTasks(final Account currentAccount, final Project project) throws Exception {
+    public List<RemoteTask> getRemoteTasks(final Account currentAccount,
+                                           final List<ProjectSyncCredentialField> crendentials) throws Exception {
 
-        List<RemoteTask> remoteTaskList = new ArrayList<>();
+        final List<RemoteTask> remoteTaskList = new ArrayList<>();
 
-        final JiraRestClient client = getJiraRestClient(project);
+        final JiraRestClient client = getJiraRestClient(crendentials);
+
+        final String project = this.getFieldByKey(crendentials, JIRA_PROJECT_KEY).getValue();
 
         client.getSearchClient().searchJql(
-                "project=\"" + project.getAttributes().get(JIRA_PROJECT_KEY).getValue() + "\"",
+                "project=\"" + project + "\"",
                 -1, 0, null
         ).get().getIssues().forEach(issue -> {
             final RemoteTask rt = new RemoteTask();

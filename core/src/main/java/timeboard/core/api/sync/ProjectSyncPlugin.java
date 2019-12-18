@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.api.sync;
 
 /*-
  * #%L
@@ -26,52 +26,18 @@ package timeboard.core.model;
  * #L%
  */
 
-public class ProjectAttributValue {
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Account;
 
+import java.util.List;
 
-    private boolean isPrivate;
-    private boolean isEncrypted;
-    private String value;
+public interface ProjectSyncPlugin {
 
-    public ProjectAttributValue() {
-        this.isPrivate = false;
-        this.isEncrypted = false;
-    }
+    String getServiceName();
 
-    public ProjectAttributValue(String value) {
-        this.value = value;
-        this.isPrivate = false;
-        this.isEncrypted = false;
-    }
+    List<ProjectSyncCredentialField> getSyncCredentialFields();
 
-    public ProjectAttributValue(String value, Boolean newAttrEncrypted) {
-        this.value = value;
-        this.isPrivate = false;
-        this.isEncrypted = newAttrEncrypted;
-    }
+    List<RemoteTask> getRemoteTasks(Account currentAccount,
+                                    List<ProjectSyncCredentialField> credentials) throws Exception;
 
-
-    public boolean isEncrypted() {
-        return isEncrypted;
-    }
-
-    public void setEncrypted(boolean encrypted) {
-        isEncrypted = encrypted;
-    }
-
-    public boolean isPrivate() {
-        return isPrivate;
-    }
-
-    public void setPrivate(boolean isPrivate) {
-        this.isPrivate = isPrivate;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
 }

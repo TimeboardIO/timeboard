@@ -32,6 +32,10 @@ import org.springframework.security.concurrent.DelegatingSecurityContextCallable
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.sync.ProjectSyncCredentialField;
+import timeboard.core.api.sync.ProjectSyncPlugin;
+import timeboard.core.api.sync.ProjectSyncService;
+import timeboard.core.api.sync.RemoteTask;
 import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 
@@ -40,7 +44,7 @@ import java.util.Date;
 import java.util.List;
 
 @Component
-public class ProjectSyncServiceImpl implements ProjectSyncService {
+public class ProjectSyncPluginImpl implements ProjectSyncService {
 
     @Autowired
     private AsyncJobService asyncJobService;
@@ -52,35 +56,37 @@ public class ProjectSyncServiceImpl implements ProjectSyncService {
     private UserService userService;
 
     @Autowired
-    @Qualifier("JiraImportPlugin")
-    private ProjectImportService projectImportService;
+    private List<ProjectSyncPlugin> projectImportServiceList;
 
     @Override
-    public void syncWithJIRA(Account org, Account actor, Project project, JIRACrendentials jiraCrendentials) {
+    public void syncProjectTasks(final Account org,
+                                 final Account actor,
+                                 final Project project,
+                                 final String serviceName,
+                                 final List<ProjectSyncCredentialField> jiraCrendentials) {
 
         this.asyncJobService.runAsyncJob(org, actor, String.format("Sync project %s with JIRA", project.getName()), new DelegatingSecurityContextCallable(() -> {
 
             ThreadLocalStorage.setCurrentOrganizationID(org.getId());
 
-            project.getAttributes().put("jira.username", new ProjectAttributValue(jiraCrendentials.getUsername()));
-            project.getAttributes().put("jira.password", new ProjectAttributValue(jiraCrendentials.getPassword()));
-            project.getAttributes().put("jira.project", new ProjectAttributValue(jiraCrendentials.getProject()));
+            ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
+                    .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
+                    .findFirst().get();
 
-            final List<ProjectImportService.RemoteTask> remoteTasks =
-                    this.projectImportService.getRemoteTasks(actor, project);
+            final List<RemoteTask> remoteTasks = syncService.getRemoteTasks(actor, jiraCrendentials);
 
             remoteTasks.stream()
-                    .forEach(task -> mergeAssignee(userService, this.projectImportService.getServiceName(), task));
+                    .forEach(task -> mergeAssignee(userService, syncService.getServiceName(), task));
 
-            final List<ProjectImportService.RemoteTask> newTasks = new ArrayList<>();
-            for (ProjectImportService.RemoteTask task1 : remoteTasks) {
+            final List<RemoteTask> newTasks = new ArrayList<>();
+            for (RemoteTask task1 : remoteTasks) {
                 if (isNewTask(actor, project.getId(), task1)) {
                     newTasks.add(task1);
                 }
             }
 
-            final List<ProjectImportService.RemoteTask> updatedTasks = new ArrayList<>();
-            for (ProjectImportService.RemoteTask task1 : remoteTasks) {
+            final List<RemoteTask> updatedTasks = new ArrayList<>();
+            for (RemoteTask task1 : remoteTasks) {
                 if (isUpdated(actor, project.getId(), task1)) {
                     updatedTasks.add(task1);
                 }
@@ -89,7 +95,7 @@ public class ProjectSyncServiceImpl implements ProjectSyncService {
 
             this.createTasks(actor, project, newTasks);
 
-            for (ProjectImportService.RemoteTask remoteTask : updatedTasks) {
+            for (RemoteTask remoteTask : updatedTasks) {
                 Task taskToUpdate = (Task) projectService.getTaskByID(actor, remoteTask.getId());
                 taskToUpdate.setName(remoteTask.getTitle());
                 projectService.updateTask(actor, taskToUpdate);
@@ -102,7 +108,7 @@ public class ProjectSyncServiceImpl implements ProjectSyncService {
     }
 
 
-    private void createTasks(Account actor, Project project, List<ProjectImportService.RemoteTask> newTasks) {
+    private void createTasks(Account actor, Project project, List<RemoteTask> newTasks) {
         newTasks.forEach(task -> {
                     String taskName = task.getTitle();
                     if (taskName.length() >= 100) {
@@ -127,16 +133,16 @@ public class ProjectSyncServiceImpl implements ProjectSyncService {
 
 
 
-    private boolean isUpdated(Account actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
+    private boolean isUpdated(Account actor, long projectID, RemoteTask task) throws BusinessException {
         return !this.isNewTask(actor, projectID, task);
     }
 
-    private boolean isNewTask(Account actor, long projectID, ProjectImportService.RemoteTask task) throws BusinessException {
+    private boolean isNewTask(Account actor, long projectID, RemoteTask task) throws BusinessException {
         AbstractTask existingTask = this.projectService.getTaskByID(actor, task.getId());
         return existingTask == null;
     }
 
-    private void mergeAssignee(UserService userService, String externalID, ProjectImportService.RemoteTask task) {
+    private void mergeAssignee(UserService userService, String externalID, RemoteTask task) {
         final Account remoteAccount = userService.findUserByExternalID(externalID, task.getUserName());
         if (remoteAccount != null) {
             task.setLocalUserID(remoteAccount.getId());
