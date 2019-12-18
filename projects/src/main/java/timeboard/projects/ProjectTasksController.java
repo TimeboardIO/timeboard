@@ -41,7 +41,6 @@ import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 
@@ -72,7 +71,7 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     private void fillModel(Model model, Account actor, Project project) throws BusinessException {
@@ -83,10 +82,12 @@ public class ProjectTasksController {
         model.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
+        model.addAttribute("projectMembers", project.getMembers());
     }
 
     @GetMapping("/tasks/{taskID}")
-    protected String editTasks(@PathVariable Long projectID, @PathVariable Long taskID, Model model) throws ServletException, IOException, BusinessException {
+    protected String editTasks(@PathVariable Long projectID,
+                               @PathVariable Long taskID, Model model) throws BusinessException {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -98,11 +99,11 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     @PostMapping("/tasks")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, Model model) throws BusinessException {
         Account actor = this.userInfo.getCurrentAccount();
 
         long id = Long.parseLong(request.getParameter("projectID"));
@@ -110,7 +111,7 @@ public class ProjectTasksController {
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     public static class TaskForm {

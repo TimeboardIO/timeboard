@@ -35,13 +35,10 @@ import org.springframework.web.context.request.WebRequestInterceptor;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.model.Account;
 import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
 import timeboard.core.ui.UserInfo;
-
-import java.util.List;
 
 @Component
 public class WebRessourcesInterceptor implements WebRequestInterceptor {

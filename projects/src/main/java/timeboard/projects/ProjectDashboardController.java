@@ -39,10 +39,6 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-
 
 /**
  * Display project dashboard.
@@ -68,7 +64,7 @@ public class ProjectDashboardController {
         model.addAttribute("project", project);
         model.addAttribute("dashboard", dashboard);
 
-        return "details_project_dashboard.html";
+        return "project_dashboard.html";
     }
 
 }

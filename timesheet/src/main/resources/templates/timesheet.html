@@ -83,7 +83,7 @@
     <!-- Timesheet Vue App view -->
     <div id="timesheet">
         <div class="ui segment timesheet-navigation-controls">
-            <div v-if="validated === false" style="left: 1em; position: absolute;" v-bind:data-tooltip="!enableValidateButton()?'Please validate last week and check you have all imputation day total = 1' : false"
+            <div v-if="validated === false" style="left: 1em; position: absolute;" v-bind:data-tooltip="!enableValidateButton()?' Please validate previous week and make sure every working day imputation day total equals 1' : false"
                  data-position="right center">
                 <button
                     v-bind:data-week="week"

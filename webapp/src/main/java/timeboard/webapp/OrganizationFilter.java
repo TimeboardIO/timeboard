@@ -26,7 +26,6 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -57,7 +56,7 @@ public class OrganizationFilter implements Filter {
     private OrganizationService organizationService;
 
     private static final List<String> whitelist = new ArrayList<>();
-    static{
+    static {
         whitelist.add(OrganizationSelectController.URI);
         whitelist.add(OnboardingController.URI);
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2)");
@@ -71,26 +70,33 @@ public class OrganizationFilter implements Filter {
         if(isWhiteListed((HttpServletRequest)servletRequest)){
             filterChain.doFilter(servletRequest, servletResponse);
         }else {
-            Optional<Cookie> orgCookie = this.extractOrgCookie((HttpServletRequest) servletRequest);
-            if(orgCookie.isPresent()){
-                final Long organizationID = Long.parseLong(orgCookie.get().getValue());
-                Optional<Account> organization =
-                        this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
-
-                if(organization.isPresent()){
-                    ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
-                }else{
-                    ((HttpServletResponse)servletResponse).sendRedirect(OrganizationSelectController.URI);
-                    return;
-                }
-
-            }else{
-                ((HttpServletResponse)servletResponse).sendRedirect(OrganizationSelectController.URI);
+            if (processCookieExtraction((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse)) {
                 return;
             }
 
             filterChain.doFilter(servletRequest, servletResponse);
         }
+    }
+
+    private boolean processCookieExtraction(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
+        Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
+        if(orgCookie.isPresent()){
+            final Long organizationID = Long.parseLong(orgCookie.get().getValue());
+            Optional<Account> organization =
+                    this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
+
+            if(organization.isPresent()){
+                ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
+            }else{
+                servletResponse.sendRedirect(OrganizationSelectController.URI);
+                return true;
+            }
+
+        }else{
+            servletResponse.sendRedirect(OrganizationSelectController.URI);
+            return true;
+        }
+        return false;
     }
 
     private boolean isWhiteListed(HttpServletRequest servletRequest) {

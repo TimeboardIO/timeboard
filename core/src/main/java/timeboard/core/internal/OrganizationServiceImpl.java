@@ -105,8 +105,9 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .setParameter("member", member)
                 .setParameter("organization", organization)
                 .getResultList();
-        if (!existingAH.isEmpty())
+        if (!existingAH.isEmpty()) {
             throw new BusinessException("Organization " + organization.getScreenName() + " already have a parent");
+        }
 
         AccountHierarchy ah = new AccountHierarchy();
 
@@ -166,7 +167,9 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<Account> getMembers(Account actor, Account organization) {
-        if (!organization.getIsOrganization()) return new ArrayList<>();
+        if (!organization.getIsOrganization()){
+            return new ArrayList<>();
+        }
         return this.em.createQuery("select m from AccountHierarchy h " +
                 "join h.member m join h.organization o where o = :org", Account.class)
                 .setParameter("org", organization).getResultList();
