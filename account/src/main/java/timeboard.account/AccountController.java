@@ -32,12 +32,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectImportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
-import timeboard.core.model.DataTableConfig;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
@@ -160,7 +158,7 @@ public class AccountController {
         model.addAttribute("projects", projects);
         model.addAttribute("yearsSinceHiring", yearsSinceHiring);
         model.addAttribute("monthsSinceHiring", monthsSinceHiring);
-        
+
     }
 
 }
