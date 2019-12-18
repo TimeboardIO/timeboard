@@ -111,12 +111,18 @@ describe('Project Test', function() {
         });
 
         it('Create Task', function () {
+
+
+            let d1 = new Date();
+            let d2 = new Date();
+            d1.setDate(d1.getDate() - 5);
+            d2.setDate(d2.getDate() + 5);
             cy.contains('New Task').click();
             cy.get('input[name=taskName]').clear().type("First Task");
             cy.get('textarea[name=taskComments]').clear().type("This my first wonderful task.");
             cy.get('input[name=taskOriginalEstimate]').clear().type(Math.round(Math.random() * 100) / 100);
-            cy.get('input[name=taskStartDate]').clear().type("2019-12-06");
-            cy.get('input[name=taskEndDate]').clear().type("2019-12-20");
+            cy.get('input[name=taskStartDate]').clear().type(d1.toISOString().substr(0,10));
+            cy.get('input[name=taskEndDate]').clear().type(d2.toISOString().substr(0,10));
             //  cy.get('input.prompt.assigned').clear().type("use");
             //  cy.get('.results').first().click();
 
