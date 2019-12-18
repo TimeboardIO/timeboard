@@ -272,16 +272,15 @@ public class TasksRestController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createTask(@RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+    public ResponseEntity createTask(@RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException, ParseException {
         Account actor = this.userInfo.getCurrentAccount();
         Date startDate = null;
         Date endDate = null;
-        try {
+
+
             startDate = DATE_FORMAT.parse(taskWrapper.startDate);
             endDate = DATE_FORMAT.parse(taskWrapper.endDate);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect date format");
-        }
+
 
         if (startDate.getTime() > endDate.getTime()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date ");
