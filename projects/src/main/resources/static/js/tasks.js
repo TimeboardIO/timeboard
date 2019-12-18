@@ -262,10 +262,7 @@ let app = new Vue({
                             contentType: "application/json",
                             dataType: "json",
                             success : function(data, textStatus, jqXHR) {
-                                self.gridData = self.gridData.filter(function(el){
-                                    return el.taskID != data.taskID;
-                                });
-                                self.gridData.push(data);
+                                window.location.reload();
                                 $('.create-task .ui.form').form('reset');
                                 $('.create-task.modal').modal('hide');
                             },
