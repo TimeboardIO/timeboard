@@ -387,6 +387,7 @@ public class ProjectServiceImpl implements ProjectService {
                            String origin,
                            String remotePath,
                            String remoteId,
+                           TaskStatus taskStatus,
                            Milestone milestone
     ) {
         Task newTask = new Task();
@@ -401,7 +402,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setComments(taskComment);
         newTask.setEffortLeft(originalEstimate);
         newTask.setOriginalEstimate(originalEstimate);
-        newTask.setTaskStatus(TaskStatus.PENDING);
+        newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
         newTask.setOrganizationID(project.getId());
         if (milestone != null) {
@@ -542,6 +543,17 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return tasks;
+    }
+    @Override
+    public Optional<Task> getTaskByRemoteID(Account actor, String id) {
+        Task task = null;
+        try {
+            final TypedQuery<Task> query = this.em.createQuery("select t from Task t where t.remoteId = :remoteID", Task.class);
+            query.setParameter("remoteID", id);
+            task = query.getSingleResult();
+        }catch (Exception e){
+        }
+        return Optional.ofNullable(task);
     }
 
     @Override
@@ -1058,6 +1070,7 @@ public class ProjectServiceImpl implements ProjectService {
     public boolean isProjectOwner(Account account, Project project) {
         return (new ActorIsProjectOwner()).isSatisfied(account, project);
     }
+
 
 
     @Override

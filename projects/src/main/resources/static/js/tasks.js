@@ -68,6 +68,9 @@ const emptyTask =  {
     milestoneName: '',
 };
 
+const projectID = $("meta[name='projectID']").attr('value');
+
+
 // VUEJS MAIN APP
 let app = new Vue({
     el: '#tasksList',

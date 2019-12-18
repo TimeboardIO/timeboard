@@ -11,7 +11,15 @@
     </module>
 
 
+
     <module name="TreeWalker">
+
+
+
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="System\.out\.println"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
 
         <module name="NPathComplexity">
             <property name="max" value="550"/>

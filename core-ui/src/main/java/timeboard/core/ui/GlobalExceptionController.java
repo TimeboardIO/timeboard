@@ -1,4 +1,4 @@
-package timeboard.core;
+package timeboard.core.ui;
 
 /*-
  * #%L
@@ -26,23 +26,24 @@ package timeboard.core;
  * #L%
  */
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import timeboard.core.api.exceptions.CommercialException;
 
-@Configuration
-@ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.async"})
-@EnableJpaRepositories
-@EnableTransactionManagement
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true,
-        jsr250Enabled = true)
-public class CoreConfiguration {
+@ControllerAdvice
+public class GlobalExceptionController extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(CommercialException.class)
+    public ModelAndView handleCommercialException(CommercialException ex) {
+
+        ModelAndView model = new ModelAndView("commercial_error.html");
+        model.addObject("errCause", ex.getCause());
+        model.addObject("errMsg", ex.getMessage());
+
+        return model;
+
+    }
 
 }

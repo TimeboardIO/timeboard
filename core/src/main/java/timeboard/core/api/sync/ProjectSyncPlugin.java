@@ -1,4 +1,4 @@
-package timeboard.core.api.exceptions;
+package timeboard.core.api.sync;
 
 /*-
  * #%L
@@ -26,23 +26,17 @@ package timeboard.core.api.exceptions;
  * #L%
  */
 
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import timeboard.core.model.Account;
 
-@ControllerAdvice
-public class GlobalExceptionController extends ResponseEntityExceptionHandler {
+import java.util.List;
 
-    @ExceptionHandler(CommercialException.class)
-    public ModelAndView handleCommercialException(CommercialException ex) {
+public interface ProjectSyncPlugin {
 
-        ModelAndView model = new ModelAndView("commercial_error.html");
-        model.addObject("errCause", ex.getCause());
-        model.addObject("errMsg", ex.getMessage());
+    String getServiceName();
 
-        return model;
+    List<ProjectSyncCredentialField> getSyncCredentialFields();
 
-    }
+    List<RemoteTask> getRemoteTasks(Account currentAccount,
+                                    List<ProjectSyncCredentialField> credentials) throws Exception;
 
 }

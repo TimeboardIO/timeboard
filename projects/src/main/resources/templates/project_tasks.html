@@ -189,16 +189,18 @@
                 Import tasks
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a class="item">JIRA</a>
-                    <a class="item">Github</a>
-                    <a class="item">CSV</a>
+                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" class="item" v-on:click="$('.ui.modal.sync').modal('show')">plugin name</div>
                 </div>
             </div>
             <div @click="$('.filters').toggle()" class="ui dropdown item" >
                 Filters
                 <i class="filter icon"></i>
             </div>
-
+            <div class="right menu">
+                <div class="ui orange label item" th:if="${import} > 0">
+                    <i class="sync icon rotating"></i> Sync with Jira in progress
+                </div>
+            </div>
             <script type="text/javascript">
                 $(document).ready(function(){
                     $('#import').dropdown({
@@ -319,6 +321,11 @@
                 :modal-title="modalTitle"
                 :task="newTask">
         </graph-modal>
+
+
+        <div class="sync plugins" th:each="plugin: ${sync_plugins}">
+            <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getSyncCredentialFields()})"></div>
+        </div>
 
         <script src="/js/tasks.js"></script>
 

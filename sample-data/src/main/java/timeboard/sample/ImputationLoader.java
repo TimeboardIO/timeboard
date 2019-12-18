@@ -81,7 +81,6 @@ public class ImputationLoader {
                         imputation.setTask(task);
                         imputation.setValue(value);
                         imputationsSaved.add(imputation);
-                        System.out.println("Save imputations: task" + task.getId() + " imputation" + j);
 
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -91,8 +90,7 @@ public class ImputationLoader {
 
         }
 
-        System.out.println("Imputations saved ! ");
-        return imputationsSaved;
+         return imputationsSaved;
 
     }
 
