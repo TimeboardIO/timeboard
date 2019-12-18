@@ -90,7 +90,7 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     private void fillModel(Model model, Account actor, Project project) throws BusinessException {
@@ -101,6 +101,7 @@ public class ProjectTasksController {
         model.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
+        model.addAttribute("projectMembers", project.getMembers());
     }
 
     @GetMapping("/tasks/{taskID}")
@@ -117,7 +118,7 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     @PostMapping(value = "/tasks/sync/{serviceName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -151,7 +152,7 @@ public class ProjectTasksController {
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);
-        return "details_project_tasks.html";
+        return "project_tasks.html";
     }
 
     public static class TaskForm {
