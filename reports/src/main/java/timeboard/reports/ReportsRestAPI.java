@@ -29,9 +29,11 @@ package timeboard.reports;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,14 +70,11 @@ public class ReportsRestAPI {
     @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity refreshProjectSelection(@RequestBody String filterProjects, HttpServletRequest request, Model model)
             throws JsonProcessingException {
-        Account actor = this.userInfo.getCurrentAccount();
-        Account organization = this.userService.findUserByID(this.userInfo.getCurrentOrganizationID());
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Account organization = this.userService.findUserByID(this.userInfo.getCurrentOrganizationID());
 
-        ExpressionParser expressionParser = new SpelExpressionParser();
-        //TODO to fix
-        //Expression expression = expressionParser.parseExpression(filterProjects);
-        //TODO to delete
-        Expression expression = expressionParser.parseExpression("tagKey == \"CUSTOMER\" && (tagValue == \"Demo\" || tagValue == \"Test\")");
+        final ExpressionParser expressionParser = new SpelExpressionParser();
+        final Expression expression = expressionParser.parseExpression(filterProjects);
 
         Set<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(organization)
                 .stream()
@@ -88,12 +87,16 @@ public class ReportsRestAPI {
                 })
                 .filter(pw -> pw.getProjectTags()
                             .stream()
-                            .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
+                            .map(t -> applyFilterOnTag(expression, t))
                             .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
                 ).collect(Collectors.toSet());
 
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(listProjectsConcerned.toArray()));
+    }
+
+    private Boolean applyFilterOnTag(Expression expression, TagWrapper t) {
+        return expression.getValue(t, Boolean.class);
     }
 
     public static class ProjectWrapper {

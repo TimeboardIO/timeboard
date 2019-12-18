@@ -48,7 +48,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -100,8 +99,6 @@ public class ReportsController {
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
-        //TODO to delete string test
-        //String projectFilter = request.getParameter("selectedProjectFilter");
         String projectFilter = report.getFilterProject();
 
         this.reportService.createReport(

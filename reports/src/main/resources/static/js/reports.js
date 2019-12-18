@@ -38,7 +38,7 @@ $(document).ready(function () {
          $.ajax({
              type: "POST",
              dataType: "json",
-             data: JSON.stringify(filter),
+             data: filter,
              contentType: "application/json",
              url: "/api/reports/refreshProjectSelection",
              success: function (listProjectsFiltered) {
