@@ -29,6 +29,8 @@ package timeboard.core.model;
 
 //import timeboard.apigenerator.annotation.RPCEntity;
 
+import timeboard.core.model.converters.JSONToStringMapConverter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -68,7 +70,7 @@ public class Account implements Serializable {
     private Boolean isOrganization = false;
 
     @Column(columnDefinition = "TEXT")
-    @Convert(converter = JSONToMapStringConverter.class)
+    @Convert(converter = JSONToStringMapConverter.class)
     @Lob
     private Map<String, String> externalIDs;
 

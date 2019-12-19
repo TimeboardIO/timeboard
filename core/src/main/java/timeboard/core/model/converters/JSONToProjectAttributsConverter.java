@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.model.converters;
 
 /*-
  * #%L
@@ -28,6 +28,8 @@ package timeboard.core.model;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import timeboard.core.model.ProjectAttributValue;
+import timeboard.core.model.ProjectAttributeValueMap;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
