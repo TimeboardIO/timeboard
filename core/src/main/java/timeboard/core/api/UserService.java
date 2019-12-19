@@ -29,6 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 
 import java.util.List;
 
@@ -51,19 +52,19 @@ public interface UserService {
      * @param prefix prefix used to search user
      * @return list of users
      */
-    List<Account> searchUserByEmail(String prefix);
+    List<Account> searchUserByEmail(final Account actor, final Account organization, String prefix) throws BusinessException;
 
-    List<Account> searchUserByName(String query);
+    List<Account> searchUserByName(final Account actor, final Account organization, String query) throws BusinessException;
 
     /**
      * Search user where name start with prefix, limit to project with
      * primary Key projectID.
      *
      * @param prefix    prefix used to search user
-     * @param projectID project primary key
+     * @param project project
      * @return list of users
      */
-    List<Account> searchUserByEmail(String prefix, Long projectID);
+    List<Account> searchUserByEmail(final Account actor, String prefix, Project project) throws BusinessException;
 
 
     /**
