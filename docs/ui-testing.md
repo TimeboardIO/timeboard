@@ -18,3 +18,7 @@ Go to cypress ui tests folder and install cypress
     cypress open --project .
 Cypress app is launched. Yo can run all tests by clicking "Run all specs"
 
+### Launch cypress in console
+    cypress run --project .
+Cypress app is launched. Yo can run all tests by clicking "Run all specs"
+
