@@ -71,7 +71,11 @@ $(document).ready(function () {
                     },
                     error: function(dataKPI, textStatus, jqXHR) {
                         $("#app-view-report").empty();
-                        $("#app-view-report").append(dataKPI.responseText)
+                        if(dataKPI.status == 500){
+                           $("#app-view-report").append("Your filter is not supported by the Spring Expression Language (SpEL), please modify your filter.")
+                        }else{
+                           $("#app-view-report").append(dataKPI.responseText)
+                        }
                     }
                 });
             }

@@ -64,7 +64,11 @@ $(document).ready(function () {
               },
              error: function (data, textStatus, jqXHR) {
                  $("#listProjectsDiv").empty();
-                 $("#listProjectsDiv").append(data.responseText)
+                 if(data.status == 500){
+                    $("#listProjectsDiv").append("Your filter is not supported by the Spring Expression Language (SpEL), please modify your filter.")
+                 }else{
+                    $("#listProjectsDiv").append(data.responseText)
+                 }
                  $("#refreshSelectedProjects").toggleClass("loading");
              }
          });
