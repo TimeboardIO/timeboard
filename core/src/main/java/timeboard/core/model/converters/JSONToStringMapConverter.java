@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.model.converters;
 
 /*-
  * #%L
@@ -27,6 +27,7 @@ package timeboard.core.model;
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.AttributeConverter;
@@ -36,16 +37,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Converter
-public class JSONToProjectAttributsConverter implements AttributeConverter<Map<String, ProjectAttributValue>, String> {
+public class JSONToStringMapConverter implements AttributeConverter<Map<String, String>, String> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-
     @Override
-    public String convertToDatabaseColumn(Map<String, ProjectAttributValue> stringProjectAttributValueMap) {
+    public String convertToDatabaseColumn(Map<String, String> stringStringMap) {
         String res = "{}";
         try {
-            res = OBJECT_MAPPER.writeValueAsString(stringProjectAttributValueMap);
+            res = OBJECT_MAPPER.writeValueAsString(stringStringMap);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -53,10 +53,13 @@ public class JSONToProjectAttributsConverter implements AttributeConverter<Map<S
     }
 
     @Override
-    public Map<String, ProjectAttributValue> convertToEntityAttribute(String s) {
-        final Map<String, ProjectAttributValue> attrs = new HashMap<>();
+    public Map<String, String> convertToEntityAttribute(String s) {
+        Map<String, String> attrs = new HashMap<>();
+
+        TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+        };
         try {
-            attrs.putAll(OBJECT_MAPPER.readValue(s, ProjectAttributeValueMap.class));
+            attrs = OBJECT_MAPPER.readValue(s, typeRef);
         } catch (IOException e) {
             e.printStackTrace();
         }

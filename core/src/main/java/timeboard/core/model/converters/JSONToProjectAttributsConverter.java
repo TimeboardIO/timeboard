@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.model.converters;
 
 /*-
  * #%L
@@ -27,8 +27,9 @@ package timeboard.core.model;
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import timeboard.core.model.ProjectAttributValue;
+import timeboard.core.model.ProjectAttributeValueMap;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -37,15 +38,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Converter
-public class JSONToMapStringConverter implements AttributeConverter<Map<String, String>, String> {
+public class JSONToProjectAttributsConverter implements AttributeConverter<Map<String, ProjectAttributValue>, String> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+
     @Override
-    public String convertToDatabaseColumn(Map<String, String> stringStringMap) {
+    public String convertToDatabaseColumn(Map<String, ProjectAttributValue> stringProjectAttributValueMap) {
         String res = "{}";
         try {
-            res = OBJECT_MAPPER.writeValueAsString(stringStringMap);
+            res = OBJECT_MAPPER.writeValueAsString(stringProjectAttributValueMap);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
@@ -53,13 +55,10 @@ public class JSONToMapStringConverter implements AttributeConverter<Map<String, 
     }
 
     @Override
-    public Map<String, String> convertToEntityAttribute(String s) {
-        Map<String, String> attrs = new HashMap<>();
-
-        TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
-        };
+    public Map<String, ProjectAttributValue> convertToEntityAttribute(String s) {
+        final Map<String, ProjectAttributValue> attrs = new HashMap<>();
         try {
-            attrs = OBJECT_MAPPER.readValue(s, typeRef);
+            attrs.putAll(OBJECT_MAPPER.readValue(s, ProjectAttributeValueMap.class));
         } catch (IOException e) {
             e.printStackTrace();
         }

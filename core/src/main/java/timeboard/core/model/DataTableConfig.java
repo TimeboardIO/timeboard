@@ -26,6 +26,8 @@ package timeboard.core.model;
  * #L%
  */
 
+import timeboard.core.model.converters.JSONToStringListConverter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -44,7 +46,7 @@ public class DataTableConfig extends OrganizationEntity implements Serializable 
     private String tableInstanceId;
 
     @Column
-    @Convert(converter = StringListToStringConverter.class)
+    @Convert(converter = JSONToStringListConverter.class)
     private List<String> columns;
 
     public DataTableConfig() {

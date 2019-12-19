@@ -26,6 +26,8 @@ package timeboard.core.model;
  * #L%
  */
 
+import timeboard.core.model.converters.JSONToStringMapConverter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -50,7 +52,7 @@ public class Milestone extends OrganizationEntity implements Serializable {
     private MilestoneType type;
 
     @Column(columnDefinition = "TEXT")
-    @Convert(converter = JSONToMapStringConverter.class)
+    @Convert(converter = JSONToStringMapConverter.class)
     @Lob
     private Map<String, String> attributes;
 
