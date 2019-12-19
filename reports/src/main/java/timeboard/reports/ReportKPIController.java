@@ -70,7 +70,7 @@ public class ReportKPIController {
 
         // If report has no filter, don't show its KPI graph
         if(report.getFilterProject() == null || report.getFilterProject().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This report has no filter. Modify it to show the graph.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This report has no filter. Modify it to display the graph.");
         }
 
         final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService.findProjects(actor, report);

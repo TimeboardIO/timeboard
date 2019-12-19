@@ -26,7 +26,6 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.internal.ReportServiceImpl;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
@@ -34,7 +33,6 @@ import timeboard.core.model.ReportType;
 
 import java.beans.Transient;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public interface ReportService {
