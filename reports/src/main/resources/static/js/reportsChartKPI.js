@@ -69,8 +69,9 @@ $(document).ready(function () {
                         });
 
                     },
-                    error: function(data) {
-                        console.log(data);
+                    error: function(dataKPI, textStatus, jqXHR) {
+                        $("#app-view-report").empty();
+                        $("#app-view-report").append(dataKPI.responseText)
                     }
                 });
             }

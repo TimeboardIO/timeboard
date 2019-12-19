@@ -40,7 +40,6 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 import timeboard.core.ui.UserInfo;
 
@@ -68,10 +67,13 @@ public class ReportKPIController {
     protected ResponseEntity getDataChart(@PathVariable long reportID, Model model) throws BusinessException, IOException {
         final Account actor = this.userInfo.getCurrentAccount();
         final Report report = this.reportService.getReportByID(actor, reportID);
-        final List<Project> allProjects = this.projectService.listProjects(actor);
+
+        // If report has no filter, don't show its KPI graph
+        if(report.getFilterProject() == null || report.getFilterProject().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This report has no filter. Modify it to show the graph.");
+        }
+
         final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService.findProjects(actor, report);
-
-
         AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
         AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
         AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
@@ -89,8 +91,8 @@ public class ReportKPIController {
             }
         });
 
-        final ProjectDashboard dashboardTotal = new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get());
-
+        final ProjectDashboard dashboardTotal =
+                new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get());
         return ResponseEntity.status(HttpStatus.OK).body(dashboardTotal);
     }
 

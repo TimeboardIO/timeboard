@@ -33,32 +33,39 @@ $(document).ready(function () {
         }
     });
 
-    $( "#refreshSelectedProjects" ).click(function() {
+    $("#refreshSelectedProjects").click(function() {
 
         $("#refreshSelectedProjects").toggleClass("loading");
 
-        var filter = $( "textarea[name='filterProject']").val();
+        var filter = $("textarea[name='filterProject']").val();
          $.ajax({
              type: "POST",
              dataType: "json",
-             data: filter,
-             contentType: "application/json",
+             data: {
+                "filter": filter
+             },
              url: "/reports/refreshProjectSelection",
              success: function (listProjectsFiltered) {
-                 $( "#listProjectsDiv").empty();
-                 $.each(listProjectsFiltered, function( i, item ) {
-                     var newNameItem = "<div class=\"header\"><i class=\"folder open icon\"></i>"+item.projectName+"</div>";
-                     var comments = item.projectComments != null ? item.projectComments : "(No comments)";
-                     var newCommentItem = "<div class=\"description\">"+comments+"</div>";
+                 $("#listProjectsDiv").empty();
+                 if(listProjectsFiltered.length > 0){
+                     $.each(listProjectsFiltered, function( i, item ) {
+                         var newNameItem = "<div class=\"header\"><i class=\"folder open icon\"></i>"+item.projectName+"</div>";
+                         var comments = item.projectComments != null ? item.projectComments : "(No comments)";
+                         var newCommentItem = "<div class=\"description\">"+comments+"</div>";
 
-                     $( "#listProjectsDiv")
-                        .append(newNameItem)
-                        .append(newCommentItem);
-                 });
+                         $("#listProjectsDiv")
+                            .append(newNameItem)
+                            .append(newCommentItem);
+                     });
+                 }else{
+                    $("#listProjectsDiv").append("No projects, please click on refresh button or modify your filter. ")
+                 }
                  $("#refreshSelectedProjects").toggleClass("loading");
               },
-             errors: function (d) {
-                 alert(d);
+             error: function (data, textStatus, jqXHR) {
+                 $("#listProjectsDiv").empty();
+                 $("#listProjectsDiv").append(data.responseText)
+                 $("#refreshSelectedProjects").toggleClass("loading");
              }
          });
     });

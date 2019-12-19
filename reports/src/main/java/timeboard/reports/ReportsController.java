@@ -34,6 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
@@ -144,14 +145,20 @@ public class ReportsController {
         return "redirect:/reports";
     }
 
-    @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity refreshProjectSelection(@RequestBody String filterProjects)
+    @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public ResponseEntity refreshProjectSelection(@RequestBody MultiValueMap<String, String> filterProjectsMap)
             throws JsonProcessingException {
         final Account actor = this.userInfo.getCurrentAccount();
 
+        String filterProjects = filterProjectsMap.getFirst("filter");
+
+        // If there is no filter, don't display all the projects
+        if(filterProjects == null || filterProjects.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to display the projects. Give a filter.");
+        }
+
         final String[] filters = filterProjects.split("\n");
         final List<ReportService.ProjectWrapper> projects = this.reportService.findProjects(actor, Arrays.asList(filters));
-
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
     }
 
