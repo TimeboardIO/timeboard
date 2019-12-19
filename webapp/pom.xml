@@ -84,7 +84,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>reporting</artifactId>
+            <artifactId>reports</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

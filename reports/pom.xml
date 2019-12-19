@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>reporting</artifactId>
+    <artifactId>reports</artifactId>
 
     <dependencies>
         <dependency>
@@ -52,7 +52,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            timeboard.reporting.*
+                            timeboard.reports.*
                         </Export-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>

@@ -111,6 +111,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         organizationID bigint,
@@ -159,6 +161,15 @@
         tagKey varchar(255) not null,
         tagValue varchar(255) not null,
         project_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table Report (
+       id bigint not null,
+        organizationID bigint,
+        filterProject varchar(255),
+        name varchar(50),
+        type integer,
         primary key (id)
     ) engine=InnoDB;
 

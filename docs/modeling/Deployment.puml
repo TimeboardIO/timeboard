@@ -13,8 +13,8 @@ node "JVM 11" {
      [home] -- core
      [organization] -- core
      [organization] -- [core-ui]
-     [reporting] -- core
-     [reporting] -- [core-ui]
+     [reports] -- core
+     [reports] -- [core-ui]
      [projects] -- [core-ui]
      [timesheet] -- [core-ui]
      [home] -- [core-ui]

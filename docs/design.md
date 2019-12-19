@@ -33,7 +33,7 @@ Timeboard is based on Spring MVC.
 - Organization : all business about organizations
 - Projects : projects, tasks and clusters setup pages
 - Timesheet : page used to note effort spent on projects
-- Reporting : Used to generate reports
+- Reports : Used to generate reports
 - Theme : Timeboard semantic UI Stylesheets
 
 

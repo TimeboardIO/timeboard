@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.reports;
 
 /*-
  * #%L
- * reporting
+ * reports
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -30,6 +30,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan(basePackages = "timeboard.reporting")
-public class ReportingConfiguration {
+@ComponentScan(basePackages = "timeboard.reports")
+public class ReportsConfiguration {
 }
