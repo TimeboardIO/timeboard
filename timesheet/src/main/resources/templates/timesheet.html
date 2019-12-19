@@ -132,7 +132,6 @@
                         <tr>
                             <th class="two wide">Task</th>
                             <th class="wide one" style="text-align:center" v-for="day in days">
-
                                 <div v-if="(day.day != 'Saturday') && (day.day != 'Sunday')"
                                      v-bind:id="day.date"
                                      v-bind:class="{'ui circular label large day-badge':true,
@@ -142,7 +141,6 @@
                                      v-bind:day-badge="day.date">
                                     {{ getImputationSum(day.date).toFixed(1) }}
                                 </div>
-
                                 <div v-if="(day.day == 'Saturday') || (day.day == 'Sunday')"
                                      v-bind:id="day.date"
                                      v-bind:class="{'ui circular label large day-badge':true,
@@ -190,6 +188,7 @@
                                             v-bind:data-task="taskID"
                                             v-bind:name="'task['+taskID+']day['+day.date+']'"
                                             v-bind:value="getImputation(day.date, taskID).toFixed(1)"
+                                            v-bind:data-cy="project.projectName+'/'+task.taskName+'/'+day.date"
                                             type="number"/>
                                      <i class="search icon hidden" style="color: transparent;"></i>
                                     </div>
