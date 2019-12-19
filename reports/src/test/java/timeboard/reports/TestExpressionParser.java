@@ -12,10 +12,10 @@ package timeboard.reports;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,9 +37,9 @@ import timeboard.core.api.ReportService;
 public class TestExpressionParser {
 
     @Test
-    public void testParseTrue(){
+    public void testParseTrue() {
         final String filter = "tagKey == 'CUSTOMER' && tagValue == 'TIMEBOARD'";
-        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER","TIMEBOARD");
+        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER", "TIMEBOARD");
         final ExpressionParser parser = new SpelExpressionParser();
         final Expression exp = parser.parseExpression(filter);
 
@@ -47,9 +47,9 @@ public class TestExpressionParser {
     }
 
     @Test
-    public void testParseFalse(){
+    public void testParseFalse() {
 
-        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER","TIMEBOARD");
+        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER", "TIMEBOARD");
         final ExpressionParser parser = new SpelExpressionParser();
         final Expression exp = parser.parseExpression("tagKey == 'CUSTOMER' && tagValue != 'TIMEBOARD'");
 
@@ -57,9 +57,9 @@ public class TestExpressionParser {
     }
 
     @Test(expected = SpelParseException.class)
-    public void testParseFail(){
+    public void testParseFail() {
 
-        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER","TIMEBOARD");
+        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER", "TIMEBOARD");
         final ExpressionParser parser = new SpelExpressionParser();
         final Expression exp = parser.parseExpression("tagKey == 'CUSTOMER' &@zfez& tagValue != 'TIMEBOARD'");
 

@@ -12,10 +12,10 @@ package timeboard.reports;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,9 +28,6 @@ package timeboard.reports;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -50,7 +47,6 @@ import timeboard.core.ui.UserInfo;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -70,32 +66,20 @@ public class ReportKPIController {
 
     @GetMapping("/{reportID}")
     protected ResponseEntity getDataChart(@PathVariable long reportID, Model model) throws BusinessException, IOException {
-        Account actor = this.userInfo.getCurrentAccount();
-        Report report = this.reportService.getReportByID(actor, reportID);
-        List<Project> allProjects = this.projectService.listProjects(actor);
-        List<Project> listOfProjectsFiltered = allProjects;
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Report report = this.reportService.getReportByID(actor, reportID);
+        final List<Project> allProjects = this.projectService.listProjects(actor);
+        final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService.findProjects(actor, report);
 
-        if(report.getFilterProject() != null && !report.getFilterProject().equals("")) {
-            ExpressionParser expressionParser = new SpelExpressionParser();
-            Expression expression = expressionParser.parseExpression(report.getFilterProject());
-
-            listOfProjectsFiltered = allProjects
-                    .stream()
-                    .filter(p -> p.getTags()
-                            .stream()
-                            .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
-                            .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
-                    ).collect(Collectors.toList());
-        }
 
         AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
         AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
         AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
         AtomicReference<Double> quotation = new AtomicReference<>(0.0);
 
-        listOfProjectsFiltered.forEach(project -> {
+        listOfProjectsFiltered.forEach(projectWrapper -> {
             try {
-                ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, project);
+                ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, projectWrapper.getProject());
                 originalEstimate.updateAndGet(v -> (v + currentProjectDashboard.getOriginalEstimate()));
                 effortLeft.updateAndGet(v -> (v + currentProjectDashboard.getEffortLeft()));
                 effortSpent.updateAndGet(v -> (v + currentProjectDashboard.getEffortSpent()));
@@ -109,7 +93,6 @@ public class ReportKPIController {
 
         return ResponseEntity.status(HttpStatus.OK).body(dashboardTotal);
     }
-
 
 
 }

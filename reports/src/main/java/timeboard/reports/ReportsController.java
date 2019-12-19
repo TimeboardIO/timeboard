@@ -12,10 +12,10 @@ package timeboard.reports;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -71,7 +71,7 @@ public class ReportsController {
     @GetMapping
     protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
         return "reports.html";
-   }
+    }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<List<ReportDecorator>> reportList(Model model) {
@@ -80,7 +80,7 @@ public class ReportsController {
                 .stream()
                 .map(report -> new ReportDecorator(report))
                 .collect(Collectors.toList());
-        return  ResponseEntity.ok(reports);
+        return ResponseEntity.ok(reports);
     }
 
     @GetMapping("/create")
@@ -93,7 +93,7 @@ public class ReportsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(@ModelAttribute Report report){
+    protected String handlePost(@ModelAttribute Report report) {
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
@@ -126,7 +126,7 @@ public class ReportsController {
     }
 
     @PostMapping("/edit/{reportID}")
-    protected String handlePost(@PathVariable long reportID, @ModelAttribute  Report report) {
+    protected String handlePost(@PathVariable long reportID, @ModelAttribute Report report) {
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
@@ -165,11 +165,11 @@ public class ReportsController {
             this.report = report;
         }
 
-        public long getID(){
+        public long getID() {
             return this.report.getId();
         }
 
-        public String getName(){
+        public String getName() {
             return this.report.getName();
         }
 

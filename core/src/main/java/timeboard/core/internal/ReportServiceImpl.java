@@ -26,6 +26,7 @@ package timeboard.core.internal;
  * #L%
  */
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -101,7 +102,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Set<ProjectWrapper> findProjects(Account actor, List<String> expressions){
+    public List<ProjectWrapper> findProjects(Account actor, List<String> expressions){
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -109,7 +110,7 @@ public class ReportServiceImpl implements ReportService {
                 .stream().map(filter -> expressionParser.parseExpression(filter))
                 .collect(Collectors.toList());
 
-        final Set<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor)
+        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor)
                 .stream()
                 .map(project -> wrapProjectTags(project))
                 .filter(projectWrapper -> {
@@ -120,10 +121,15 @@ public class ReportServiceImpl implements ReportService {
 
                     return match;
 
-                }).collect(Collectors.toSet());
+                }).collect(Collectors.toList());
 
         return listProjectsConcerned;
 
+    }
+
+    @Override
+    public List<ProjectWrapper> findProjects(Account actor, Report report) {
+        return this.findProjects(actor, Arrays.asList(report.getFilterProject().split("\n")));
     }
 
     private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {
@@ -138,7 +144,7 @@ public class ReportServiceImpl implements ReportService {
                 .stream()
                 .map(tag -> new TagWrapper(tag.getTagKey(), tag.getTagValue()))
                 .collect(Collectors.toList());
-        return new ProjectWrapper(project.getId(), project.getName(), project.getComments(), tags);
+        return new ProjectWrapper(project);
     }
 
 

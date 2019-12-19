@@ -28,11 +28,14 @@ package timeboard.core.api;
 
 import timeboard.core.internal.ReportServiceImpl;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
 
+import java.beans.Transient;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public interface ReportService {
 
@@ -48,37 +51,43 @@ public interface ReportService {
 
     void deleteReportByID(Account actor, Long reportId);
 
-    Set<ProjectWrapper> findProjects(Account actor, List<String> expressions);
+    List<ProjectWrapper> findProjects(Account actor, List<String> expressions);
+
+    List<ProjectWrapper> findProjects(Account actor, Report report);
 
 
     class ProjectWrapper {
 
-        private final Long projectID;
-        private final String projectName;
-        private final String projectComments;
         private final List<TagWrapper> projectTags;
+        private final Project project;
 
-        public ProjectWrapper(Long projectID, String projectName, String projectComments, List<TagWrapper> projectTags) {
-            this.projectID = projectID;
-            this.projectName = projectName;
-            this.projectComments = projectComments;
-            this.projectTags = projectTags;
+        public ProjectWrapper(final Project project) {
+            this.project = project;
+            this.projectTags = this.project.getTags()
+                    .stream()
+                    .map(t -> new TagWrapper(t.getTagKey(), t.getTagValue()))
+                    .collect(Collectors.toList());
         }
 
         public Long getProjectID() {
-            return projectID;
+            return this.project.getId();
         }
 
         public String getProjectName() {
-            return projectName;
+            return this.project.getName();
         }
 
         public String getProjectComments() {
-            return projectComments;
+            return this.project.getComments();
         }
 
         public List<TagWrapper> getProjectTags() {
             return projectTags;
+        }
+
+        @Transient
+        public Project getProject(){
+            return this.project;
         }
     }
 
