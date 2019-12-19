@@ -45,10 +45,10 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
-import timeboard.core.model.ReportType;
 import timeboard.core.ui.UserInfo;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 
@@ -71,29 +71,42 @@ public class ReportKPIController {
     protected ResponseEntity getDataChart(@PathVariable long reportID, Model model) throws BusinessException, IOException {
         Account actor = this.userInfo.getCurrentAccount();
         Report report = this.reportService.getReportByID(actor, reportID);
-        ExpressionParser expressionParser = new SpelExpressionParser();
-        Expression expression = expressionParser.parseExpression(report.getFilterProject());
-        ReportType type = report.getType();
+        List<Project> allProjects = this.projectService.listProjects(actor);
+        List<Project> listOfProjectsFiltered = allProjects;
 
-        List<Project> listOfProjects = this.projectService.listProjects(actor)
-                .stream()
-                .filter(p -> p.getTags()
-                        .stream()
-                        .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
-                        .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
-                ).collect(Collectors.toList());
+        if(report.getFilterProject() != null && !report.getFilterProject().equals("")) {
+            ExpressionParser expressionParser = new SpelExpressionParser();
+            Expression expression = expressionParser.parseExpression(report.getFilterProject());
 
-        final ProjectDashboard[] dashboard = {new ProjectDashboard(0.0, 0.0, 0.0, 0.0)};
+            listOfProjectsFiltered = allProjects
+                    .stream()
+                    .filter(p -> p.getTags()
+                            .stream()
+                            .map(t -> expression.getValue(t, Boolean.class) != null ? expression.getValue(t, Boolean.class) : Boolean.FALSE)
+                            .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
+                    ).collect(Collectors.toList());
+        }
 
-        listOfProjects.forEach(project -> {
+        AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
+        AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
+        AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
+        AtomicReference<Double> quotation = new AtomicReference<>(0.0);
+
+        listOfProjectsFiltered.forEach(project -> {
             try {
-                dashboard[0] = this.projectService.projectDashboard(actor, project);
+                ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, project);
+                originalEstimate.updateAndGet(v -> (v + currentProjectDashboard.getOriginalEstimate()));
+                effortLeft.updateAndGet(v -> (v + currentProjectDashboard.getEffortLeft()));
+                effortSpent.updateAndGet(v -> (v + currentProjectDashboard.getEffortSpent()));
+                quotation.updateAndGet(v -> (v + currentProjectDashboard.getQuotation()));
             } catch (BusinessException e) {
                 e.printStackTrace();
             }
         });
 
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(dashboard[0]));
+        final ProjectDashboard dashboardTotal = new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get());
+
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(dashboardTotal));
     }
 
 
