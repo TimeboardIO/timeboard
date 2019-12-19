@@ -35,9 +35,21 @@
                     </div>
                     <div class="field">
                         <label>Select project by tags</label>
-                        <p>Example ->  tagKey == 'CUSTOMER' && (tagValue == 'Demo' || tagValue == 'Test')</p>
+                        <div class="ui icon message" >
+                            <i class="question circle outline icon"></i>
+                            <div class="content">
+                                <div class="header">
+                                    Filter Example
+                                </div>
+                                <p>
+                                    tagKey == 'CUSTOMER' && (tagValue == 'Demo' || tagValue == 'Test')
+                                    tagKey == 'DOMAIN' && !tagValue.isEmpty()
+                                </p>
+                            </div>
+                        </div>
                         <textarea rows="6" name="selectedProjectFilter" th:field="*{filterProject}" placeholder="Filter projects" type="text">
                         </textarea>
+                        <br/>
                         <a class="ui primary button" id="refreshSelectedProjects">
                             Refresh selection
                         </a>
@@ -56,7 +68,7 @@
                         </div>
                     </div>
                 </div>
-                <button class="ui button" type="submit">Submit</button>
+                <button class="ui positive button" type="submit">Submit</button>
                 <a class="ui button" th:href="@{/reports}">Cancel</a>
             </form>
         </div>
