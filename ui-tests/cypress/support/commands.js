@@ -29,7 +29,7 @@
 Cypress.Commands.add('login', () => {
     cy.visit('http://localhost:8080');
 
-    cy.get('a.link')
+    cy.get('[data-cy=go-to-app]')
         .click();
 
     cy.get('input[name=username]').type("user");
@@ -41,7 +41,7 @@ Cypress.Commands.add('login', () => {
 
     cy.url().then(url => {
         if(url.includes('select')) {
-            cy.get('.button.ui.item').click();
+            cy.get('[data-cy=select-org-submit]').click();
         }
     });
 });

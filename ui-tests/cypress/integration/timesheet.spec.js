@@ -14,6 +14,6 @@ describe('Timeboard Tests', function() {
     });
 
     it('Imputation on all week', function() {
-
+        cy.get('input[name=task')
     });
 });

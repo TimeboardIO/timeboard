@@ -9,7 +9,7 @@
         <h2 class="ui header" th:text="${appName}">Timeboard</h2>
     </div>
 
-    <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}"
+    <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}" data-cy="menu-link"
        th:href="${nav.getNavigationPath()}">
         <i th:class="${nav.getNavigationLogo()}+' icon'"></i>
         <div class="title" th:text="${nav.getNavigationLabel()}"></div>
