@@ -17,7 +17,7 @@ deploy:
       secure: "$AWS_ACCESS_KEY"
     secret_access_key:
       secure: "$AWS_SECRET_KEY"
-    region: "ue-west-1"
+    region: "eu-west-1"
     app: "TimeboardApplication"
     env: "TimeboardEnvironment"
     zip_file: "build/timeboard.$TRAVIS_COMMIT.zip"
