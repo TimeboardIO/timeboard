@@ -12,12 +12,13 @@ script:
   - sh eb.sh
 
 deploy:
-  - provider: s3
+  - provider: elasticbeanstalk
     access_key_id: "$AWS_ACCESS_KEY"
     secret_access_key: "$AWS_SECRET_KEY"
-    local_dir: "build"
-    bucket: "$AWS_BUCKET"
-    region: eu-west-1
-    skip_cleanup: true
+    region: "eu-west-1"
+    app: "TimeboardApplication"
+    env: "TimeboardEnvironment"
+    zip_file: "build/timeboard.$TRAVIS_COMMIT.zip"
+    bucket_name: "$AWS_BUCKET"
     on:
-      branch: spring
+      branch: develop
