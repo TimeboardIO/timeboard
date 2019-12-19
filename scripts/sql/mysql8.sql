@@ -58,7 +58,7 @@
     create table DataTableConfig (
        id bigint not null,
         organizationID bigint,
-        columns TEXT,
+        columns varchar(255),
         tableInstanceId varchar(255),
         user_id bigint,
         primary key (id)
