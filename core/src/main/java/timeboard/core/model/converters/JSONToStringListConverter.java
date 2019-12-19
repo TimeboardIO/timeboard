@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.model.converters;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,38 +31,44 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.persistence.AttributeConverter;
-import javax.persistence.Converter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
-@Converter
-public class JSONToMapStringConverter implements AttributeConverter<Map<String, String>, String> {
+import java.util.List;
+
+public class JSONToStringListConverter
+       implements AttributeConverter<List<String>, String> {
+    private static final String DELIMITER = "|";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(Map<String, String> stringStringMap) {
-        String res = "{}";
+    public String convertToDatabaseColumn(List<String> attributes) {
+        if ( attributes == null || attributes.isEmpty() ) {
+            return null;
+        }
         try {
-            res = OBJECT_MAPPER.writeValueAsString(stringStringMap);
+            return OBJECT_MAPPER.writeValueAsString(attributes);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            return null;
         }
-        return res;
     }
 
     @Override
-    public Map<String, String> convertToEntityAttribute(String s) {
-        Map<String, String> attrs = new HashMap<>();
-
-        TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+    public List<String> convertToEntityAttribute(String data) {
+      if ( data == null ) {
+        return new ArrayList<String>();
+      }
+        List attrs = null;
+        TypeReference<ArrayList<String>> typeRef = new TypeReference<ArrayList<String>>() {
         };
         try {
-            attrs = OBJECT_MAPPER.readValue(s, typeRef);
+            attrs = OBJECT_MAPPER.readValue(data, typeRef);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return attrs;
     }
 }
