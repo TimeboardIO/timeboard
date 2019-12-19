@@ -69,7 +69,7 @@
                             <select class="ui button selection dropdown organisations" name="organization">
                                 <option class="item" th:each="org : ${organizations}" th:value="${org.id}" th:text="${org.screenName}"></option>
                             </select>
-                            <button class="ui item icon positive button">
+                            <button class="ui item icon positive button" data-cy="select-org-submit">
                                 <i class="icon arrow alternate circle right"></i>
                             </button>
                             <script type="text/javascript">

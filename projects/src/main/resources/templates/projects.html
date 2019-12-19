@@ -37,7 +37,7 @@
                 No Projects ?
             </div>
             <p>You are not member of any project, click
-                <a th:href="@{/projects/create}">here</a>
+                <a th:href="@{/projects/create}" data-cy="create-project" >here</a>
                 to create your first project !</p>
         </div>
     </div>
@@ -46,7 +46,7 @@
 
         <div class="ui menu">
             <a class="item"
-               th:href="@{/projects/create}">
+               th:href="@{/projects/create}" data-cy="create-project">
                 <i class="plus icon"></i>
                 New Project
             </a>
@@ -60,7 +60,7 @@
 
 
         <div class="ui five stackable cards">
-            <div class="ui card" th:each="project : ${projects}">
+            <div class="ui card" data-cy="project" th:each="project : ${projects}" >
                 <div class="image">
                     <a th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">
                         <div class="badge" style="text-transform: capitalize;"
@@ -70,7 +70,7 @@
                     </a>
                 </div>
                 <div class="content">
-                    <a class="header" th:text="${project.name}"></a>
+                    <a class="header" data-cy="project-title" th:text="${project.name}"></a>
                     <div class="meta">
                         <div>
                             <i class="account icon"></i>
@@ -81,8 +81,9 @@
                     </div>
                 </div>
                 <div class="extra content">
-                    <a class="ui positive button" th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
-                    <a class="negative ui basic button"
+                    <a class="ui positive button" data-cy="setup"
+                       th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
+                    <a class="negative ui basic button"  data-cy="archive"
                        th:href="@{/projects/{projectID}/delete(projectID=${project.id})}">Archive</a>
                 </div>
             </div>
@@ -100,15 +101,15 @@
                     {{row.name}}
                 </template>
                 <template v-slot:actions="{row}">
-                    <a class="ui right labeled positive icon button" v-bind:href="'/projects/'+row.id+'/setup'">
+                    <a class="ui right labeled positive icon button" v-bind:href="'/projects/'+row.id+'/setup'" data-cy="setup">
                         <i class="cog icon"></i>
                         Setup
                     </a>
-                    <a class="ui right labeled primary icon button" v-bind:href="'/projects/'+row.id+'/tasks'">
+                    <a class="ui right labeled primary icon button" v-bind:href="'/projects/'+row.id+'/tasks'" data-cy="tasks">
                         <i class="tasks icon"></i>
                         Task
                     </a>
-                    <a class="ui right labeled negative basic icon button" v-bind:href="'/projects/'+row.id+'/delete'">
+                    <a class="ui right labeled negative basic icon button" v-bind:href="'/projects/'+row.id+'/delete'" data-cy="archive">
                         <i class="archive icon"></i>
                         Archive
                     </a>

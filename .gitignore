@@ -8,3 +8,4 @@ webui/src/main/resources/www/
 /theme/src/main/resources/static/
 build/
 temp/
+ui-tests/cypress/fixtures/projects.json
