@@ -43,7 +43,7 @@ $(document).ready(function () {
              dataType: "json",
              data: filter,
              contentType: "application/json",
-             url: "/api/reports/refreshProjectSelection",
+             url: "/reports/refreshProjectSelection",
              success: function (listProjectsFiltered) {
                  $( "#listProjectsDiv").empty();
                  $.each(listProjectsFiltered, function( i, item ) {

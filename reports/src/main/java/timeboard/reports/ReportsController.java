@@ -26,8 +26,10 @@ package timeboard.reports;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -46,6 +48,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -139,6 +142,17 @@ public class ReportsController {
         this.reportService.updateReport(actor, updatedReport);
 
         return "redirect:/reports";
+    }
+
+    @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity refreshProjectSelection(@RequestBody String filterProjects)
+            throws JsonProcessingException {
+        final Account actor = this.userInfo.getCurrentAccount();
+
+        final String[] filters = filterProjects.split("\n");
+        final List<ReportService.ProjectWrapper> projects = this.reportService.findProjects(actor, Arrays.asList(filters));
+
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
     }
 
     @GetMapping("/view/{reportID}")
