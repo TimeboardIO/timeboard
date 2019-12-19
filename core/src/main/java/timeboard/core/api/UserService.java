@@ -52,9 +52,8 @@ public interface UserService {
      * @param prefix prefix used to search user
      * @return list of users
      */
-    List<Account> searchUserByEmail(final Account actor, final Account organization, String prefix) throws BusinessException;
+    List<Account> searchUserByEmail(final Account actor, String prefix) throws BusinessException;
 
-    List<Account> searchUserByName(final Account actor, final Account organization, String query) throws BusinessException;
 
     /**
      * Search user where name start with prefix, limit to project with
@@ -65,6 +64,16 @@ public interface UserService {
      * @return list of users
      */
     List<Account> searchUserByEmail(final Account actor, String prefix, Project project) throws BusinessException;
+
+    /**
+     * Search user where name start with prefix, limit to project with
+     * primary Key projectID.
+     *
+     * @param prefix    prefix used to search user
+     * @param organization organization
+     * @return list of users
+     */
+    List<Account> searchUserByEmail(final Account actor, String prefix, Account organization) throws BusinessException;
 
 
     /**

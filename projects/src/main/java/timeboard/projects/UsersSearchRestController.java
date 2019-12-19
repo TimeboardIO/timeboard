@@ -74,10 +74,8 @@ public class UsersSearchRestController {
         String query = req.getParameter("q");
         Account actor = userInfo.getCurrentAccount();
 
-        Optional<Account> currentOrg = this.organizationService.getOrganizationByID(actor, userInfo.getCurrentOrganizationID());
-
-        if(currentOrg.isEmpty()){
-            throw new BusinessException("You cannot access this organization.");
+        if (query.isBlank() || query.isEmpty()) {
+            throw new BusinessException("Query is empty");
         }
 
         Long projectID = null;
@@ -91,8 +89,7 @@ public class UsersSearchRestController {
             Project project = projectService.getProjectByID(actor, projectID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
         } else {
-            accounts.addAll(this.userService.searchUserByEmail(actor, currentOrg.get(), query));
-            accounts.addAll(this.userService.searchUserByName(actor, currentOrg.get(), query));
+            accounts.addAll(this.userService.searchUserByEmail(actor,  query));
         }
         SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 

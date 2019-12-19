@@ -99,36 +99,29 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<Account> searchUserByEmail(final Account actor, final Account organization, final String prefix) throws BusinessException {
-
-        MembershipRole role = organizationService.getRoleInOrganization(actor, actor, organization);
-        if (!role.equals(MembershipRole.OWNER)) {
-            throw new BusinessException("You cannot access this data.");
-        }
+    public List<Account> searchUserByEmail(final Account actor, final String email) throws BusinessException {
 
         TypedQuery<Account> q = em
                 .createQuery(
-                        "select u from Account u "
-                                + "where u.email LIKE CONCAT('%',:prefix,'%')",
+                        "select u from Account u " +
+                                "where u.email= :prefix ",
                         Account.class);
-        q.setParameter("prefix", prefix);
+        q.setParameter("prefix", email);
         return q.getResultList();
     }
 
-    @Override
-    public List<Account> searchUserByName(final Account actor, final Account organization, final String prefix) throws BusinessException {
 
-        MembershipRole role = organizationService.getRoleInOrganization(actor, actor, organization);
-        if (!role.equals(MembershipRole.OWNER)) {
-            throw new BusinessException("You cannot access this data.");
-        }
-        
+
+
+    @Override
+    public List<Account> searchUserByEmail(final Account actor, final String email, final Account org) throws BusinessException {
+
         TypedQuery<Account> q = em
                 .createQuery(
-                        "select u from Account u "
-                                + "where u.name LIKE CONCAT('%',:prefix,'%') or u.firstName LIKE CONCAT('%',:prefix,'%')",
+                        "select u from Account u " +
+                                "where u.email= :prefix ",
                         Account.class);
-        q.setParameter("prefix", prefix);
+        q.setParameter("prefix", email);
         return q.getResultList();
     }
 
