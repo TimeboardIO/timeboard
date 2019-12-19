@@ -104,12 +104,12 @@
                  New Task
             </button>
 
-            <a class="ui labeled icon button" v-bind:href="'/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week)">
+            <a class="ui labeled icon button" v-bind:href="'/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week)" :class="{ disabled : disablePrev }">
                 <i class="left arrow icon"></i>Previous week</a>
 
             <span class="ui blue circular label">Week {{ week }}</span>
 
-            <a class="ui right labeled icon button" v-bind:href="'/timesheet/'+nextWeekYear(year,week)+'/'+nextWeek(year,week)">
+            <a class="ui right labeled icon button" v-bind:href="'/timesheet/'+nextWeekYear(year,week)+'/'+nextWeek(year,week)" :class="{ disabled : disableNext }">
                 <i class="right arrow icon"></i>Next week</a>
         </div>
 

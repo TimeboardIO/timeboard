@@ -39,6 +39,8 @@ const emptyTask =  {
 
 const timesheetModel =  { 
     newTask: Object.assign( { } , emptyTask),
+    disableNext: false,
+    disablePrev: false,
     formError:"",
     modalTitle:"",
     week:0,
@@ -49,7 +51,7 @@ const timesheetModel =  {
     projects:  { },
     imputations:  { },
     getImputationSum: function(date) { 
-        var sum = 0;
+        let sum = 0;
         if(this.imputations[date]) { 
             Object.keys(this.imputations[date])
             .forEach(function(i) { 
@@ -63,52 +65,52 @@ const timesheetModel =  {
         return this.imputations[date][taskID];
     },
     enableValidateButton: function(week) { 
-        var result = true;
+        let result = true;
 
         //check last week
         const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
-        result = result && (lastWeekValidated == 'true');
+        result = result && (this.disablePrev || lastWeekValidated === 'true');
 
         //check all days imputations == 1
         this.days.forEach(function(day)  { 
-            if(day.day != 'Sunday' && day.day != 'Saturday') { 
-                var sum = timesheetModel.getImputationSum(day.date);
-                result = result && (sum == 1);
+            if(day.day !== 'Sunday' && day.day !== 'Saturday') {
+                let sum = timesheetModel.getImputationSum(day.date);
+                result = result && (sum === 1);
              }
         });
 
         return result;
     },
     rollWeek: function(year, week, x) { 
-        var day = (1 + (week - 1) * 7); // 1st of January + 7 days for each week
-        var date = new Date(year, 0, day);
+        let day = (1 + (week - 1) * 7); // 1st of January + 7 days for each week
+        let date = new Date(year, 0, day);
         date.setDate(date.getDate() + 7 * x); //Add x week(s)
         return date;
     },
     getWeekNumber: function(date) { 
-        var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        var dayNum = d.getUTCDay() || 7;
+        let d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        let dayNum = d.getUTCDay() || 7;
         d.setUTCDate(d.getUTCDate() + 4 - dayNum);
-        var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+        let yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
         return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
     },
     nextWeek: function(year, week) {
-        var date = timesheetModel.rollWeek(year, week, 1);
+        let date = timesheetModel.rollWeek(year, week, 1);
         return timesheetModel.getWeekNumber(date);
     },
     lastWeek: function(year, week) { 
-        var date = timesheetModel.rollWeek(year, week, -1);
+        let date = timesheetModel.rollWeek(year, week, -1);
         return timesheetModel.getWeekNumber(date);
     },
     nextWeekYear: function(year, week) { 
-        var date = timesheetModel.rollWeek(year, week, 1);
-        var weekNum = timesheetModel.getWeekNumber(date);
+        let date = timesheetModel.rollWeek(year, week, 1);
+        let weekNum = timesheetModel.getWeekNumber(date);
         if(week > weekNum) {  year ++; }
         return year;
     },
     lastWeekYear: function(year, week) { 
-        var date = timesheetModel.rollWeek(year, week, -1);
-        var weekNum = timesheetModel.getWeekNumber(date);
+        let date = timesheetModel.rollWeek(year, week, -1);
+        let weekNum = timesheetModel.getWeekNumber(date);
         if(week < weekNum)  {  year --; }
         return year;
     }
@@ -155,7 +157,7 @@ Vue.component('task-modal',  {
     }
 });
 
-var app = new Vue( { 
+let app = new Vue( { 
     el: '#timesheet',
     data: timesheetModel,
     methods:  { 
@@ -191,8 +193,8 @@ var app = new Vue( {
             const taskID = $(event.target).attr('data-task');
 
             const currentSum = app.getImputationSum(date);
-            var newval = parseFloat($(event.target).val());
-            var oldVal = app.imputations[date][taskID];
+            let newval = parseFloat($(event.target).val());
+            let oldVal = app.imputations[date][taskID];
 
             if(newval > 1) { 
                 newval = 1;
@@ -217,10 +219,10 @@ var app = new Vue( {
             }
         },
         showCreateTaskModal: function(projectID, task, event) {
-            event.preventDefault()
+            event.preventDefault();
             if(task) {
                 this.newTask.projectID = projectID;
-                this.newTask.taskID = task.taskID
+                this.newTask.taskID = task.taskID;
                 this.newTask.taskName = task.taskName;
                 this.newTask.taskComments = task.taskComments;
                 this.newTask.startDate = task.startDate;
@@ -232,10 +234,10 @@ var app = new Vue( {
                 this.modalTitle = "Create task";
                 Object.assign(this.newTask , emptyTask);
             }
-            var keepThis = this;
+            let keepThis = this;
             $('.create-task.modal').modal(  {  
                 onApprove : function($element) { 
-                    var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
                     if(validated) { 
                     $('.ui.error.message').hide();
                     $.ajax( { 
@@ -263,7 +265,7 @@ var app = new Vue( {
     }
 })
 
-    var updateTimesheet = function() { 
+    let updateTimesheet = function() { 
         $('.ui.dimmer').addClass('active');
         $.get("/api/timesheet?week="+week+"&year="+year)
         .then(function(data) { 
@@ -273,19 +275,21 @@ var app = new Vue( {
             app.days = data.days;
             app.imputations = data.imputations;
             app.projects = data.projects;
-        }).then(function() { 
+            app.disableNext = data.disableNext;
+            app.disablePrev = data.disablePrev;
+        }).then(function() {
             $('.ui.dimmer').removeClass('active');
         }).then(function() { 
-             var list = document.getElementsByClassName("day-badge");
-             for (var i = 0; i < list.length; i++ ) { 
-                var badge = list[i];
-                 if(badge.innerText == "1.0") { 
+             let list = document.getElementsByClassName("day-badge");
+             for (let i = 0; i < list.length; i++ ) { 
+                let badge = list[i];
+                 if(badge.innerText === "1.0") {
                       badge.classList.add("green");
                       badge.classList.remove("red");
                  }
             }
         });
-    }
+    };
     updateTimesheet();
 
 });
