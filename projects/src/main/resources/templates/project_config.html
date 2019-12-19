@@ -7,6 +7,7 @@
 <head>
     <title layout:fragment="title">Project</title>
     <meta name="projectID" th:content="${project.id}"/>
+    <meta name="orgID" th:content="${orgID}"/>
 </head>
 <body>
 
@@ -144,7 +145,7 @@
         $('.ui.search')
             .search({
                 apiSettings: {
-                        url: '/api/search?q={query}'
+                        url: '/api/search?q={query}&orgID='+$("meta[name=orgID]").attr("content")
                     },
                     fields: {
                         results : 'items',

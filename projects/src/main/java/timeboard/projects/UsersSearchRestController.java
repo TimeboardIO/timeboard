@@ -83,11 +83,19 @@ public class UsersSearchRestController {
             projectID = Long.parseLong(req.getParameter("projectID"));
         }
 
+        Long orgID = null;
+        if (req.getParameter("orgID") != null) {
+            orgID = Long.parseLong(req.getParameter("orgID"));
+        }
+
         Set<Account> accounts = new HashSet<>();
 
         if (projectID != null) {
             Project project = projectService.getProjectByID(actor, projectID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
+        } else if (orgID != null) {
+            Optional<Account> org = organizationService.getOrganizationByID(actor, orgID);
+            accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
         } else {
             accounts.addAll(this.userService.searchUserByEmail(actor,  query));
         }
