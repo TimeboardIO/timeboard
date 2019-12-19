@@ -51,13 +51,13 @@
                     <div class="two fields">
                         <div class="field">
                             <label>Task Name</label>
-                            <input v-model="task.taskName" name="taskName" placeholder="Task Name" required type="text">
+                            <input v-model="task.taskName" name="taskName" placeholder="Task Name" required type="text" data-cy="task-name">
                         </div>
                         <div class="field">
                             <label>User assigned</label>
                             <div class="ui category search">
                                 <div class="ui icon input">
-                                    <input class="prompt assigned" placeholder="Search account..."
+                                    <input class="prompt assigned" placeholder="Search account..." data-cy="task-assignee-search"
                                            v-model="task.assignee" type="text"/>
                                     <input class="taskAssigned" name="taskAssigned"
                                            v-model="task.assigneeID" type="hidden"/>
@@ -69,30 +69,30 @@
                     </div>
                     <div class="field">
                         <label>Task Description</label>
-                        <textarea v-model="task.taskComments" name="taskComments" placeholder="Task Description"
+                        <textarea v-model="task.taskComments" name="taskComments" placeholder="Task Description" data-cy="task-comments"
                                   rows="1"></textarea>
                     </div>
                     <div class=" two fields">
                         <div class="field">
                             <label>Task Start Date</label>
-                            <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name"
+                            <input v-model="task.startDate" name="taskStartDate" placeholder="Task Name" data-cy="task-start-date"
                                    required type="date">
                         </div>
                         <div class="field">
                             <label>Task End Date</label>
-                            <input v-model="task.endDate" name="taskEndDate" placeholder="Task Name" required
+                            <input v-model="task.endDate" name="taskEndDate" placeholder="Task Name" required data-cy="task-end-date"
                                    type="date">
                         </div>
                     </div>
                     <div class="four fields">
                         <div class="field">
                             <label>Task Original Estimate</label>
-                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE"
+                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" data-cy="task-oe"
                                    required type="number">
                         </div>
                         <div class="field">
                             <label>Task type</label>
-                            <select class="ui type dropdown" v-model="task.typeID" name="taskTypeID">
+                            <select class="ui type dropdown" v-model="task.typeID" name="taskTypeID" data-cy="task-type">
                                 <option th:each="type: ${taskTypes}"
                                         th:text="${type.typeName}" th:value="${type.id}"
                                 ></option>
@@ -100,7 +100,7 @@
                         </div>
                         <div class="field">
                             <label>Task status</label>
-                            <select class="ui status dropdown" v-model="task.status" name="taskStatus"
+                            <select class="ui status dropdown" v-model="task.status" name="taskStatus" data-cy="task-status"
                                     v-bind:class="{disabled: (task.taskID == 0)}">
                                 <option th:each="status: ${allTaskStatus}"
                                         th:text="${status.label}"
@@ -110,7 +110,7 @@
                         </div>
                         <div class="field">
                             <label>Milestone assigned</label>
-                            <select class="ui milestone dropdown" v-model="task.milestoneID" name="taskMilestoneId">
+                            <select class="ui milestone dropdown" v-model="task.milestoneID" name="taskMilestoneId" data-cy="task-milestone">
                                 <option
                                         th:each="milestone: ${allProjectMilestones}"
                                         th:text="${milestone.name}"
@@ -125,7 +125,7 @@
                 <div class="ui black deny button">
                     Cancel
                 </div>
-                <div class="ui positive submit right labeled icon button">
+                <div class="ui positive submit right labeled icon button"  data-cy="task-submit">
                     Request
                     <i class="checkmark icon"></i>
                 </div>
@@ -141,7 +141,7 @@
 
         <!-- Actions buttons-->
         <div class="ui menu">
-            <a class="item" th:if="${isProjectOwner}"
+            <a class="item" th:if="${isProjectOwner}"  data-cy="create-task"
                v-on:click="showCreateTaskModal(null, null, $event)">
                 <i class="plus icon"></i>
                 New Task
@@ -207,11 +207,11 @@
             </template>
 
             <template v-slot:actions="{row}">
-                <button @click="approveTask($event, row)" class="ui positive icon button">
+                <button @click="approveTask($event, row)" class="ui positive icon button" data-cy="approve-task">
                     Approve
                     <i class="check icon"></i>
                 </button>
-                <button @click="denyTask($event, row)" class="ui negative icon button">
+                <button @click="denyTask($event, row)" class="ui negative icon button" data-cy="deny-task">
                     Deny
                     <i class="close icon"></i>
                 </button>
@@ -311,14 +311,15 @@
             </template>
 
             <template v-slot:actions="{row}">
-                <button @click="deleteTask($event, row)" class="ui tiny negative icon button">
+                <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
                     <i class="close icon"></i>
                 </button>
-                <button v-on:click="showCreateTaskModal(null, row, $event)"
+                <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
                         class="ui tiny primary icon button">
                     <i class="edit icon"></i>
                 </button>
-                <button v-on:click="showGraphModal(null, row, $event)" class="ui tiny yellow icon button">
+                <button v-on:click="showGraphModal(null, row, $event)"  data-cy="show-graph-task"
+                        class="ui tiny yellow icon button">
                     <i class="chart line icon"></i>
                 </button>
             </template>
