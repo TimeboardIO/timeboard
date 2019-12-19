@@ -22,7 +22,7 @@
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"
            th:href="@{/projects/{projectID}/tags(projectID=${project.id})}" data-cy="project-menu-tags">Tags</a>
         <a class="item" th:classappend="${tab} == 'six'  ? 'active':''"
-           th:href="@{/projects/{projectID}/snapshots(projectID=${project.id})}">Snapshots</a>
+           th:href="@{/projects/{projectID}/snapshots(projectID=${project.id})}" data-cy="project-menu-tags">Snapshots</a>
     </div>
     <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
 
