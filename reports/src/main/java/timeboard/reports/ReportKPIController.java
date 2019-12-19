@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/data-chart/project_kpi")
+@RequestMapping("/data-chart/report-kpi")
 public class ReportKPIController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -106,7 +106,7 @@ public class ReportKPIController {
 
         final ProjectDashboard dashboardTotal = new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get());
 
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(dashboardTotal));
+        return ResponseEntity.status(HttpStatus.OK).body(dashboardTotal);
     }
 
 

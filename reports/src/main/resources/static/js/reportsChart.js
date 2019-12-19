@@ -12,15 +12,67 @@ $(document).ready(function () {
             mounted: function () {
                 $.ajax({
                     method: "GET",
-                    url: "/data-chart/"+"project_kpi"/*JSON.stringify(reportType)*/+"/"+reportID,
-                    success : function(data, textStatus, jqXHR) {
-                        console.log(data);
+                    url: "/data-chart/report-kpi/"+reportID,
+                    success : function(dataKPI, textStatus, jqXHR) {
+
+                        let chart = new Chart($("#chartKPI"), {
+                            type: 'bar',
+                            data: {
+                                labels: ['QT', 'OE', 'RE', 'ES', "EL"],
+                                datasets: [
+                                    {
+                                        label: 'Quotation',
+                                        data: [dataKPI.quotation, 0, 0, 0, 0],
+                                        backgroundColor: 'royalblue',
+                                        borderWidth: 3
+                                    },
+                                    {
+                                        label: 'Original Estimate',
+                                        data: [0, dataKPI.originalEstimate, 0, 0, 0],
+                                        backgroundColor: '#ff6384',
+                                        borderWidth: 3
+                                    },
+                                    {
+                                       label: 'Real Effort',
+                                       data: [0, 0, dataKPI.realEffort, 0, 0],
+                                        backgroundColor: '#36a2eb',
+                                        borderWidth: 3
+                                    },
+                                    {
+                                        label: 'Effort Spent',
+                                        data: [0, 0, 0, dataKPI.effortSpent, 0],
+                                        backgroundColor: '#cc65fe',
+                                        borderWidth: 3
+                                    },
+                                    {
+                                        label: 'Effort Left',
+                                        data: [0, 0, 0, 0, dataKPI.effortLeft],
+                                        backgroundColor: '#ffce56',
+                                        borderWidth: 3
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                scales: {
+                                    xAxes: [{
+                                        stacked: true
+                                    }],
+                                    yAxes: [{
+                                        stacked: true,
+                                        ticks: {
+                                            beginAtZero: true
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+
                     },
-                    error: function(jqXHR, textStatus, errorThrown) {
+                    error: function(data) {
                         console.log(data);
                     }
                 });
             }
         });
 });
-

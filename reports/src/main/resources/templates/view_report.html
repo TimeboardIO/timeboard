@@ -14,15 +14,14 @@
 
     <div layout:fragment="content">
         <div class="ui segment" id="create-report">
-            <h4 class="ui dividing header">View Report:
-                <div th:text="${report.name}"></div>
-            </h4>
+            <h4 class="ui dividing header">View Report:</h4>
+            <h3 th:text="${report.name}" style="text-align: center"></h3>
 
-            <div id="app-view-report">
-                <canvas id="chart"></canvas>
+            <div class="column" id="app-view-report">
+                <canvas id="chartKPI"></canvas>
             </div>
 
-            <a class="ui button" th:href="@{/reports}">Cancel</a>
+            <a class="ui button" th:href="@{/reports}">Back</a>
 
         </div>
     </div>
