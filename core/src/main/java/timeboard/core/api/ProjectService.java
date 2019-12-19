@@ -30,6 +30,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public interface ProjectService {
 
@@ -52,6 +53,8 @@ public interface ProjectService {
     Project archiveProjectByID(Account actor, Project project) throws BusinessException;
 
     Project updateProject(Account actor, Project project) throws BusinessException;
+
+    boolean isAlreadyMember(Project project, Account targetMember);
 
     /**
      * Update a project.
