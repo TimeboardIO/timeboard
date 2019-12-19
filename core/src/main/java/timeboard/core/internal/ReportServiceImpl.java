@@ -27,12 +27,17 @@ package timeboard.core.internal;
  */
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.model.*;
@@ -47,6 +52,8 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private ProjectService projectService;
 
     @Override
     @Transactional
@@ -92,4 +99,47 @@ public class ReportServiceImpl implements ReportService {
 
         LOGGER.info("Report " + reportId + " deleted by " + actor.getName());
     }
+
+    @Override
+    public Set<ProjectWrapper> findProjects(Account actor, List<String> expressions){
+
+        final ExpressionParser expressionParser = new SpelExpressionParser();
+
+        final List<Expression> spelExp = expressions
+                .stream().map(filter -> expressionParser.parseExpression(filter))
+                .collect(Collectors.toList());
+
+        final Set<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor)
+                .stream()
+                .map(project -> wrapProjectTags(project))
+                .filter(projectWrapper -> {
+
+                    final Boolean match = spelExp.stream()
+                            .map(exp -> applyFilterOnProject(exp, projectWrapper))
+                            .allMatch(aBoolean -> aBoolean == true);
+
+                    return match;
+
+                }).collect(Collectors.toSet());
+
+        return listProjectsConcerned;
+
+    }
+
+    private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {
+        return projectWrapper.getProjectTags()
+                .stream()
+                .map(tagWrapper -> exp.getValue(tagWrapper, Boolean.class))
+                .anyMatch(aBoolean -> aBoolean == true);
+    }
+
+    private ProjectWrapper wrapProjectTags(Project project) {
+        List<TagWrapper> tags = project.getTags()
+                .stream()
+                .map(tag -> new TagWrapper(tag.getTagKey(), tag.getTagValue()))
+                .collect(Collectors.toList());
+        return new ProjectWrapper(project.getId(), project.getName(), project.getComments(), tags);
+    }
+
+
 }

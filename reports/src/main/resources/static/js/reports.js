@@ -34,6 +34,9 @@ $(document).ready(function () {
     });
 
     $( "#refreshSelectedProjects" ).click(function() {
+
+        $("#refreshSelectedProjects").toggleClass("loading");
+
         var filter = $( "textarea[name='filterProject']").val();
          $.ajax({
              type: "POST",
@@ -51,7 +54,8 @@ $(document).ready(function () {
                      $( "#listProjectsDiv")
                         .append(newNameItem)
                         .append(newCommentItem);
-                 })
+                 });
+                 $("#refreshSelectedProjects").toggleClass("loading");
               },
              errors: function (d) {
                  alert(d);

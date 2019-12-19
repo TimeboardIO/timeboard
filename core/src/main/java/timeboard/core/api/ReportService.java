@@ -26,11 +26,13 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.internal.ReportServiceImpl;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ReportService {
 
@@ -46,4 +48,56 @@ public interface ReportService {
 
     void deleteReportByID(Account actor, Long reportId);
 
+    Set<ProjectWrapper> findProjects(Account actor, List<String> expressions);
+
+
+    class ProjectWrapper {
+
+        private final Long projectID;
+        private final String projectName;
+        private final String projectComments;
+        private final List<TagWrapper> projectTags;
+
+        public ProjectWrapper(Long projectID, String projectName, String projectComments, List<TagWrapper> projectTags) {
+            this.projectID = projectID;
+            this.projectName = projectName;
+            this.projectComments = projectComments;
+            this.projectTags = projectTags;
+        }
+
+        public Long getProjectID() {
+            return projectID;
+        }
+
+        public String getProjectName() {
+            return projectName;
+        }
+
+        public String getProjectComments() {
+            return projectComments;
+        }
+
+        public List<TagWrapper> getProjectTags() {
+            return projectTags;
+        }
+    }
+
+    class TagWrapper {
+
+        private final String tagKey;
+        private final String tagValue;
+
+        public TagWrapper(String tagKey, String tagValue) {
+            this.tagKey = tagKey;
+            this.tagValue = tagValue;
+        }
+
+        public String getTagKey() {
+            return tagKey;
+        }
+
+        public String getTagValue() {
+            return tagValue;
+        }
+    }
 }

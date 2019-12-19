@@ -38,16 +38,16 @@
                         <p>Example ->  tagKey == 'CUSTOMER' && (tagValue == 'Demo' || tagValue == 'Test')</p>
                         <textarea rows="6" name="selectedProjectFilter" th:field="*{filterProject}" placeholder="Filter projects" type="text">
                         </textarea>
+                        <a class="ui primary button" id="refreshSelectedProjects">
+                            Refresh selection
+                        </a>
                     </div>
                 </div>
 
                 <div class="eight wide column">
-                    <div class="ui card">
+                    <div class="ui segment">
                         <div class="content header">
                             <p>Projects selection preview</p>
-                            <a class="ui button" id="refreshSelectedProjects">
-                                Refresh selection
-                            </a>
                         </div>
                         <div class="content description" >
                             <div class="ui list" id="listProjectsDiv">

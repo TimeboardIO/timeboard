@@ -32,13 +32,14 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.SpelParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import timeboard.core.api.ReportService;
 
 public class TestExpressionParser {
 
     @Test
     public void testParseTrue(){
         final String filter = "tagKey == 'CUSTOMER' && tagValue == 'TIMEBOARD'";
-        final ReportsService.TagWrapper tag = new ReportsService.TagWrapper("CUSTOMER","TIMEBOARD");
+        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER","TIMEBOARD");
         final ExpressionParser parser = new SpelExpressionParser();
         final Expression exp = parser.parseExpression(filter);
 
@@ -48,7 +49,7 @@ public class TestExpressionParser {
     @Test
     public void testParseFalse(){
 
-        final ReportsService.TagWrapper tag = new ReportsService.TagWrapper("CUSTOMER","TIMEBOARD");
+        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER","TIMEBOARD");
         final ExpressionParser parser = new SpelExpressionParser();
         final Expression exp = parser.parseExpression("tagKey == 'CUSTOMER' && tagValue != 'TIMEBOARD'");
 
@@ -58,7 +59,7 @@ public class TestExpressionParser {
     @Test(expected = SpelParseException.class)
     public void testParseFail(){
 
-        final ReportsService.TagWrapper tag = new ReportsService.TagWrapper("CUSTOMER","TIMEBOARD");
+        final ReportService.TagWrapper tag = new ReportService.TagWrapper("CUSTOMER","TIMEBOARD");
         final ExpressionParser parser = new SpelExpressionParser();
         final Expression exp = parser.parseExpression("tagKey == 'CUSTOMER' &@zfez& tagValue != 'TIMEBOARD'");
 

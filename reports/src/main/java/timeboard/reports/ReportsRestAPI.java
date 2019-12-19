@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timeboard.core.api.ReportService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
@@ -61,7 +62,7 @@ public class ReportsRestAPI {
     private UserService userService;
 
     @Autowired
-    private ReportsService reportsService;
+    private ReportService reportsService;
 
 
     @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,7 +71,7 @@ public class ReportsRestAPI {
         final Account actor = this.userInfo.getCurrentAccount();
 
         final String[] filters = filterProjects.split("\n");
-        final Set<ReportsService.ProjectWrapper> projects = this.reportsService.findProjects(actor, Arrays.asList(filters));
+        final Set<ReportService.ProjectWrapper> projects = this.reportsService.findProjects(actor, Arrays.asList(filters));
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
     }
