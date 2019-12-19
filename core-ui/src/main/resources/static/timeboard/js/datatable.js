@@ -20,7 +20,7 @@ Vue.component('data-table', {
                 </tbody>
                 <tmodal 
                     v-bind:title="'Column config '+config.name"
-                    v-bind:id="'configModal'">
+                    v-bind:id="'configModal'+config.name">
                     <template v-slot:content>
                         <table class="ui celled table">
                             <thead>
@@ -40,7 +40,7 @@ Vue.component('data-table', {
                                 </tr>
                             </tbody>
                         </table>
-                        <div  @click="changeDataTableConfig" class="ui positive submit right labeled icon button">
+                        <div  @click="changeDataTableConfig($event)" class="ui positive submit right labeled icon button">
                             Save
                             <i class="checkmark icon"></i>
                         </div>
@@ -118,7 +118,7 @@ Vue.component('data-table', {
             this.sortOrders[key] = this.sortOrders[key] * -1
         },
         showConfigModal: function() {
-            $('#configModal').modal({
+            $('#configModal'+this.config.name).modal({
                 onApprove : function($element) {
 
                 },
@@ -126,6 +126,7 @@ Vue.component('data-table', {
             }).modal('show');
         },
         changeDataTableConfig: function(event){
+            let self = this;
             event.target.classList.toggle('loading');
 
             let cols = [];
@@ -144,7 +145,7 @@ Vue.component('data-table', {
                 url: "/api/datatable",
                 success: function (d) {
                     event.target.classList.toggle('loading');
-                    $('#configModal').modal('hide');
+                    $('#configModal'+self.config.name).modal('hide');
                 }
             });
         }
