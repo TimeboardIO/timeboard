@@ -26,33 +26,33 @@
 
         <data-table v-bind:config="table">
             <template v-slot:snapshotdate="{row}">
-                <div class="ui input">
-                    <input type="date" v-model="row.projectSnapshotDate" value="row.projectSnapshotDate"/>
+                <div class="ui field">
+                    <label>{{row.projectSnapshotDate}}</label>
                 </div>
             </template>
             <template v-slot:snapshotglobalquotation="{row}">
-                <div class="ui input">
-                    <input type="text" v-model="row.quotation"/>
+                <div class="ui field">
+                    <label>{{row.quotation}}</label>
                 </div>
             </template>
             <template v-slot:snapshotglobaloriginalestimate="{row}">
-                <div class="ui input">
-                    <input type="text" v-model="row.originalEstimate"/>
+                <div class="ui field">
+                    <label>{{row.originalEstimate}}</label>
                 </div>
             </template>
             <template v-slot:snapshotglobalreeleffot="{row}">
-                <div class="ui input">
-                    <input type="text" v-model="row.realEffort"/>
+                <div class="ui field">
+                    <label>{{row.realEffort}}</label>
                 </div>
             </template>
             <template v-slot:snapshotglobaleffortspent="{row}">
-                <div class="ui input">
-                    <input type="text" v-model="row.effortSpent"/>
+                <div class="ui field">
+                    <label>{{row.effortSpent}}</label>
                 </div>
             </template>
             <template v-slot:snapshotglobaleffortleft="{row}">
-                <div class="ui input">
-                    <input type="text" v-model="row.effortLeft"/>
+                <div class="ui field">
+                    <label>{{row.effortLeft}}</label>
                 </div>
             </template>
             <template v-slot:snapshotactions="{row}">

@@ -45,6 +45,9 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
     @OneToOne(targetEntity = Task.class, cascade = {CascadeType.PERSIST})
     private Task task;
 
+    @ManyToOne(targetEntity = ProjectSnapshot.class, fetch = FetchType.EAGER)
+    private ProjectSnapshot projectSnapshot;
+
 
     /**
      * Current task assigned at revision date.

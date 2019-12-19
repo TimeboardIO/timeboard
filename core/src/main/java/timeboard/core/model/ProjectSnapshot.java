@@ -44,7 +44,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
     @Temporal(TemporalType.TIMESTAMP)
     private Date projectSnapshotDate;
 
-    @OneToMany(targetEntity = TaskSnapshot.class, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = TaskSnapshot.class, mappedBy="projectSnapshot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskSnapshot> taskSnapshots;
 
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)

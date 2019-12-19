@@ -38,7 +38,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
-import timeboard.core.model.Task;
 import timeboard.core.ui.UserInfo;
 
 import java.util.Date;

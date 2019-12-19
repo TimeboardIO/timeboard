@@ -13,23 +13,23 @@ $(document).ready(function () {
                     },
                     {
                         "slot": "snapshotglobalquotation",
-                        "label": "Quotation"
+                        "label": "QT"
                     },
                     {
                         "slot": "snapshotglobaloriginalestimate",
-                        "label": "Original Estimate"
+                        "label": "OE"
                     },
                     {
                         "slot": "snapshotglobalreeleffot",
-                        "label": "Reel Effort"
+                        "label": "RE"
                     },
                     {
                         "slot": "snapshotglobaleffortspent",
-                        "label": "Effort Spent"
+                        "label": "ES"
                     },
                     {
                         "slot": "snapshotglobaleffortleft",
-                        "label": "Effort Left"
+                        "label": "EL"
                     },
                     {
                         "slot": "snapshotactions",
@@ -39,6 +39,11 @@ $(document).ready(function () {
             }
         },
         methods: {
+            formatDate: function(d) {
+                for (var  i = 0; i<d.length; i++){
+                    d[i].projectSnapshotDate = new Date(d[i].projectSnapshotDate).toLocaleString();
+                }
+            },
             addSnapshot: function () {
                 var self = this;
                 $.ajax({
@@ -49,6 +54,7 @@ $(document).ready(function () {
 
                     },
                     success: function (d) {
+                        self.formatDate(d);
                         self.table.data = d;
                     }
                 });
@@ -60,6 +66,7 @@ $(document).ready(function () {
                     dataType: "json",
                     url: "projects/" + projectID + "/snapshots/" + row.id,
                     success: function (d) {
+                        self.formatDate(d);
                         self.table.data = d;
                     }
                 });
@@ -72,6 +79,7 @@ $(document).ready(function () {
                 dataType: "json",
                 url: "projects/" + projectID + "/snapshots/list",
                 success: function (d) {
+                    self.formatDate(d);
                     self.table.data = d;
                 }
             });
