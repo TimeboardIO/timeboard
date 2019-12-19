@@ -18,7 +18,8 @@ deploy:
     region: "eu-west-1"
     app: "TimeboardApplication"
     env: "TimeboardEnvironment"
-    zip_file: "./build/timeboard.$TRAVIS_COMMIT.zip"
+    zip_file: "build/timeboard.$TRAVIS_COMMIT.zip"
     bucket_name: "$AWS_BUCKET"
+    skip_cleanup: true
     on:
       branch: develop
