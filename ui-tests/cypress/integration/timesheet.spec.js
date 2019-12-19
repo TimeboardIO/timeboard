@@ -1,12 +1,12 @@
 
 
-beforeEach(function () {
-    cy.login();
-    cy.visit('http://localhost:8080/timesheet');
-});
 
 
 describe('Timeboard Tests', function() {
+    beforeEach(function () {
+        cy.login();
+        cy.visit('http://localhost:8080/timesheet');
+    });
 
     it('Imputation on on today ', function() {
         cy.fixture("projects.json").then((json) => {

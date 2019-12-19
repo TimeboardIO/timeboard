@@ -30,12 +30,17 @@ Cypress.Commands.add('login', () => {
     cy.get('[data-cy=go-to-app]')
         .click();
 
-    cy.get('input[name=username]').type("user");
+    cy.url().then(url => {
+        if(url.includes('login')) {
+            cy.get('input[name=username]').type("user");
 
-    cy.get('input[name=password]').type("password");
+            cy.get('input[name=password]').type("password");
 
-    cy.get('button[type=submit]')
-        .click()  ;
+            cy.get('button[type=submit]')
+                .click()  ;
+        }
+    });
+
 
     cy.url().then(url => {
         if(url.includes('select')) {

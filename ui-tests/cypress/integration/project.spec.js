@@ -1,19 +1,20 @@
-beforeEach(function () {
-
-    cy.login();
-});
 
 const projectName = 'New project' + Math.floor(Math.random() * 999999);
 const taskName ="Task "+ Math.floor(Math.random() * 999999);
 
 
 describe('Project Test', function() {
+
     beforeEach(function () {
+        cy.login();
+
         cy.visit('http://localhost:8080/projects');
     });
+
     it('Save parameters', function() {
         cy.writeFile("cypress/fixtures/projects.json", {projectName: projectName, taskName: taskName});
     });
+
     it('Create project', function() {
         cy.get('[data-cy=create-project]')
             .click();
@@ -67,7 +68,6 @@ describe('Project Test', function() {
         cy.get('td:contains('+taskName+')').should('contain', taskName);
     });
 
-
     it('Approve Task', function () {
         cy.get('[data-cy=project]:contains("'+projectName+'")').find('[data-cy=setup]')
             .click();
@@ -75,7 +75,6 @@ describe('Project Test', function() {
             .click();
 
         cy.get('[data-cy=approve-task]').click({multiple: true, force: true});
-
     });
 
     it('Archive project', function(){
