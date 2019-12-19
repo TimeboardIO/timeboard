@@ -144,9 +144,16 @@ public class ReportsController {
     @GetMapping("/view/{reportID}")
     protected String viewReport(@PathVariable long reportID, Model model) throws ServletException, IOException {
         model.addAttribute("reportID", reportID);
-        model.addAttribute("reportType", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID).getType());
+        ReportType type = this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID).getType();
+        model.addAttribute("reportType", type);
         model.addAttribute("report", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID));
-        return "view_report.html";
+
+        switch (type) {
+            case PROJECT_KPI:
+                return "view_report_kpi.html";
+            default:
+                return "";
+        }
     }
 
 

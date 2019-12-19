@@ -8,7 +8,7 @@
     <title layout:fragment="title">View Report Page</title>
     <meta name="reportID" th:content="${report.id}"/>
     <meta name="reportType" th:content="${reportType}"/>
-    <script type="text/javascript" src="/js/reportsChart.js"></script>
+    <script type="text/javascript" src="/js/reportsChartKPI.js"></script>
 </head>
 <body>
 
@@ -21,7 +21,10 @@
                 <canvas id="chartKPI"></canvas>
             </div>
 
-            <a class="ui button" th:href="@{/reports}">Back</a>
+            <a class="ui button" th:href="@{/reports}">
+                <i class="left arrow icon"></i>
+                Back
+            </a>
 
         </div>
     </div>
