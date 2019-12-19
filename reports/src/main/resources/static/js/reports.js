@@ -34,7 +34,7 @@ $(document).ready(function () {
     });
 
     $( "#refreshSelectedProjects" ).click(function() {
-        var filter = $( "input[name='filterProject']").val();
+        var filter = $( "textarea[name='filterProject']").val();
          $.ajax({
              type: "POST",
              dataType: "json",

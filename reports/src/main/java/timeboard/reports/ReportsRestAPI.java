@@ -29,24 +29,22 @@ package timeboard.reports;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.ProjectService;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
 
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.Set;
 
 
 @Component
@@ -63,88 +61,23 @@ public class ReportsRestAPI {
     private UserService userService;
 
     @Autowired
-    private ProjectService projectService;
+    private ReportsService reportsService;
+
 
     @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity refreshProjectSelection(@RequestBody String filterProjects, HttpServletRequest request, Model model)
             throws JsonProcessingException {
         final Account actor = this.userInfo.getCurrentAccount();
-        final Account organization = this.userService.findUserByID(this.userInfo.getCurrentOrganizationID());
 
-        final ExpressionParser expressionParser = new SpelExpressionParser();
-        final Expression expression = expressionParser.parseExpression(filterProjects);
+        final String[] filters = filterProjects.split("\n");
+        final Set<ReportsService.ProjectWrapper> projects = this.reportsService.findProjects(actor, Arrays.asList(filters));
 
-        Set<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(organization)
-                .stream()
-                .map(project -> {
-                    List<TagWrapper> tags = project.getTags()
-                            .stream()
-                            .map(tag -> new TagWrapper(tag.getTagKey(), tag.getTagValue()))
-                            .collect(Collectors.toList());
-                    return new ProjectWrapper(project.getId(), project.getName(), project.getComments(), tags);
-                })
-                .filter(pw -> pw.getProjectTags()
-                            .stream()
-                            .map(t -> applyFilterOnTag(expression, t))
-                            .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2)
-                ).collect(Collectors.toSet());
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(listProjectsConcerned.toArray()));
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
     }
 
-    private Boolean applyFilterOnTag(Expression expression, TagWrapper t) {
-        return expression.getValue(t, Boolean.class);
-    }
 
-    public static class ProjectWrapper {
 
-        private final Long projectID;
-        private final String projectName;
-        private final String projectComments;
-        private final List<TagWrapper> projectTags;
 
-        public ProjectWrapper(Long projectID, String projectName, String projectComments, List<TagWrapper> projectTags) {
-            this.projectID = projectID;
-            this.projectName = projectName;
-            this.projectComments = projectComments;
-            this.projectTags = projectTags;
-        }
 
-        public Long getProjectID() {
-            return projectID;
-        }
-
-        public String getProjectName() {
-            return projectName;
-        }
-
-        public String getProjectComments() {
-            return projectComments;
-        }
-
-        public List<TagWrapper> getProjectTags() {
-            return projectTags;
-        }
-    }
-
-    public static class TagWrapper {
-
-        private final String tagKey;
-        private final String tagValue;
-
-        public TagWrapper(String tagKey, String tagValue) {
-            this.tagKey = tagKey;
-            this.tagValue = tagValue;
-        }
-
-        public String getTagKey() {
-            return tagKey;
-        }
-
-        public String getTagValue() {
-            return tagValue;
-        }
-    }
 
 }

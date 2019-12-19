@@ -27,12 +27,10 @@ package timeboard.core.api;
  */
 
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
 
 import java.util.List;
-import java.util.Set;
 
 public interface ReportService {
 

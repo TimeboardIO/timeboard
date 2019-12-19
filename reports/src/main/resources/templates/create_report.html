@@ -35,8 +35,9 @@
                     </div>
                     <div class="field">
                         <label>Select project by tags</label>
-                        <p>Example ->  tagKey == "CUSTOMER" && (tagValue == "Demo" || tagValue == "Test")</p>
-                        <input name="selectedProjectFilter" th:field="*{filterProject}" placeholder="Filter projects" type="text">
+                        <p>Example ->  tagKey == 'CUSTOMER' && (tagValue == 'Demo' || tagValue == 'Test')</p>
+                        <textarea rows="6" name="selectedProjectFilter" th:field="*{filterProject}" placeholder="Filter projects" type="text">
+                        </textarea>
                     </div>
                 </div>
 

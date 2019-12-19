@@ -27,7 +27,6 @@ package timeboard.core.internal;
  */
 
 import java.util.List;
-import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;

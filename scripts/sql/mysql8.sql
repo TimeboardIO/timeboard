@@ -115,6 +115,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         organizationID bigint,
@@ -169,14 +171,10 @@
     create table Report (
        id bigint not null,
         organizationID bigint,
+        filterProject varchar(255),
         name varchar(50),
+        type integer,
         primary key (id)
-    ) engine=InnoDB;
-
-    create table Report_Project (
-       Report_id bigint not null,
-        projects_id bigint not null,
-        primary key (Report_id, projects_id)
     ) engine=InnoDB;
 
     create table Task (
@@ -237,9 +235,6 @@
     alter table Imputation 
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
-    alter table Report_Project 
-       add constraint UK_1bu5v00cycr11phls2ojwnexb unique (projects_id);
-
     alter table AccountHierarchy 
        add constraint FKsiqpllhiyu6kby8mpjhr5u6bb 
        foreign key (member_id) 
@@ -289,16 +284,6 @@
        add constraint FKflkgw7xvdg8kc0gnjsj950con 
        foreign key (project_id) 
        references Project (id);
-
-    alter table Report_Project 
-       add constraint FKq4bnp5qrolpt8q55klb4knll6 
-       foreign key (projects_id) 
-       references Project (id);
-
-    alter table Report_Project 
-       add constraint FK3kqmqtxml1nrf9cw5myproafd 
-       foreign key (Report_id) 
-       references Report (id);
 
     alter table Task 
        add constraint FK26uly7piek733vu0rvs6tkusr 
