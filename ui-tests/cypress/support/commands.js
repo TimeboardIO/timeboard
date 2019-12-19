@@ -32,12 +32,14 @@ Cypress.Commands.add('login', () => {
 
     cy.url().then(url => {
         if(url.includes('login')) {
-            cy.get('input[name=username]').type("user");
+            cy.fixture("user.json").then((user) => {
+                cy.get('input[name=username]').type(user.login);
 
-            cy.get('input[name=password]').type("password");
+                cy.get('input[name=password]').type(user.password);
 
-            cy.get('button[type=submit]')
-                .click()  ;
+                cy.get('button[type=submit]')
+                    .click();
+            });
         }
     });
 
