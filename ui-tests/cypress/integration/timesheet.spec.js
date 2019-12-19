@@ -8,12 +8,20 @@ beforeEach(function () {
 
 describe('Timeboard Tests', function() {
 
-    it('Timesheet Menu Test', function() {
-        cy.contains("Timesheet")
-            .click()  ;
-    });
+    it('Imputation on on today ', function() {
+        cy.fixture("projects.json").then((json) => {
 
-    it('Imputation on all week', function() {
-        cy.get('input[name=task')
+           cy.get('[data-cy="'
+                + json.projectName+'/'
+                + json.taskName+'/'
+                + new Date().toISOString().substr(0,10)+'"')
+                .clear().type(1.0);
+            cy.get('td').first().click();          // Click on button
+
+            cy.get('[data-cy="'
+                + json.projectName+'/'
+                + json.taskName+'/'
+                + new Date().toISOString().substr(0,10)+'"').parent().should('not.have.class', 'loading');
+        })
     });
 });

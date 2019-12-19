@@ -12,4 +12,6 @@ describe('Timeboard Test', function() {
         cy.get('.right.menu .title').should('contain', 'user')
     });
 
+
+
 });

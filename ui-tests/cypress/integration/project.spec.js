@@ -4,15 +4,16 @@ beforeEach(function () {
 });
 
 const projectName = 'New project' + Math.floor(Math.random() * 999999);
+const taskName ="Task "+ Math.floor(Math.random() * 999999);
 
-const taskName="Task "+ Math.floor(Math.random() * 999999);
 
 describe('Project Test', function() {
-
     beforeEach(function () {
         cy.visit('http://localhost:8080/projects');
     });
-
+    it('Save parameters', function() {
+        cy.writeFile("cypress/fixtures/projects.json", {projectName: projectName, taskName: taskName});
+    });
     it('Create project', function() {
         cy.get('[data-cy=create-project]')
             .click();
