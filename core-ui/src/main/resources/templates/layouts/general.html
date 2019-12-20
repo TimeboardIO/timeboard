@@ -22,23 +22,25 @@
 <style type="text/css">
     #versionBox {
         display: block;
-        position: absolute;
+        position: fixed;
         bottom: 0px;
         left: 0px;
         z-index: 10000000;
-        width: 30px;
-        height: 30px;
+        width: 20px;
+        height: 20px;
     }
 
     #versionText {
         display: none;
-        position: absolute;
-        bottom: 10px;
-        left: 10px;
+        position: fixed;
+        bottom: 0px;
+        z-index: 1000000;
+        left: 0px;
+        font-size: 0.7em;
         background-color: white;
     }
 
-    #versionBox:hover + #versionText {
+    #versionBox:hover > * {
         display: block;
     }
 </style>
@@ -70,10 +72,10 @@
                 .transition('fade');
         });
 </script>
-</body>
 
-<a id="versionBox" th:onclick="copyToClipboard([[${appVersion}]])"></a>
+<a id="versionBox" th:onclick="copyToClipboard([[${appVersion}]])">
     <div id="versionText" th:text="${appVersion}"></div>
 </a>
 
+</body>
 </html>
