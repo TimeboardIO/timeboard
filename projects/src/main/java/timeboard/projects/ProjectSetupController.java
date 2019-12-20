@@ -93,6 +93,11 @@ public class ProjectSetupController {
         final Account actor = this.userInfo.getCurrentAccount();
         final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, projectID);
+
+        if(project.isMember(targetMember)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This user is already member of this project");
+        }
+
         project.getMembers().add(new ProjectMembership(project, targetMember, MembershipRole.CONTRIBUTOR));
         this.projectService.updateProject(actor, project);
         return ResponseEntity.status(HttpStatus.OK).build();
