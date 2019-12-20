@@ -9,4 +9,4 @@ cd temp && zip timeboard.$(git rev-parse HEAD).zip -r * .[^.]* && mv *.zip ../bu
 cd ..
 ls -al build/*.zip
 
-sed 's/timeboard.commit.id=*/timeboard.commit.id='+$(git rev-parse HEAD)+'/' application.properties
+sed 's/^timeboard.commit.id=.*/timeboard.commit.id='$(git rev-parse HEAD)'/' webapp/src/main/resources/application.properties
