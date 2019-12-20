@@ -31,7 +31,6 @@ import timeboard.core.model.converters.JSONToProjectAttributsConverter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Entity

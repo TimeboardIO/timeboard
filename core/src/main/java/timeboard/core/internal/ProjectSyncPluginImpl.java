@@ -83,7 +83,12 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
         return syncService.getSyncCredentialFields();
     }
 
-    private Object syncTasks(Account org, Account actor, Project project, String serviceName, List<ProjectSyncCredentialField> jiraCrendentials) throws Exception {
+    private Object syncTasks(Account org,
+                             Account actor,
+                             Project project,
+                             String serviceName,
+                             List<ProjectSyncCredentialField> jiraCrendentials) throws Exception {
+
         ThreadLocalStorage.setCurrentOrganizationID(org.getId());
 
         final ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
