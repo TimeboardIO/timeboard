@@ -76,6 +76,9 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Optional<Account> getOrganizationByID(Account actor, long id) {
         Account data;
+        if(actor.getId() == id){
+            return Optional.ofNullable(actor);
+        }
         try {
             data = em.createQuery("select o from Account o join AccountHierarchy h " +
                     "on h.organization = o " +
