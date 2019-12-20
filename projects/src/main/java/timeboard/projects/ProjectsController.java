@@ -49,7 +49,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects")
 public class ProjectsController {
 
-
     @Autowired
     private ProjectService projectService;
 
@@ -57,16 +56,13 @@ public class ProjectsController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(@ModelAttribute("message") String message, Model model, RedirectAttributes attributes) {
+    protected String handleGet(Model model) {
         final Account actor = this.userInfo.getCurrentAccount();
         List<Project> allActorProjects = this.projectService.listProjects(actor);
         if (allActorProjects.size() > 5) {
             allActorProjects = allActorProjects.subList(0, 5);
         }
         model.addAttribute("projects", allActorProjects);
-        if(message != null) {
-            model.addAttribute("message", message);
-        }
 
         return "projects.html";
     }
@@ -86,6 +82,7 @@ public class ProjectsController {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
         attributes.addFlashAttribute("message", "Project created successfully.");
+        attributes.addFlashAttribute("error", "Project created successfully.");
         return "redirect:/projects";
     }
 
