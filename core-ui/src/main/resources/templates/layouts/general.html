@@ -15,6 +15,7 @@
     <script src="/webjars/timeboard/script.js"></script>
     <script src="/timeboard/js/datatable.js"></script>
     <script src="/timeboard/js/modal.js"></script>
+
 </head>
 <body>
 
@@ -37,11 +38,18 @@
     </div>
     <div class="ui container positive message" th:if="${message !=  null && message != ''}">
         <i class="close icon"></i>
-        <div th:text="${message}" class="header">
-            Oups !
-        </div>
+        <div th:text="${message}" class="header">  </div>
     </div>
     <div layout:fragment="content" ></div>
 </div>
+<script>
+    $('.message .close')
+        .on('click', function() {
+            $(this)
+                .closest('.message')
+                .transition('fade');
+        });
+</script>
 </body>
+
 </html>
