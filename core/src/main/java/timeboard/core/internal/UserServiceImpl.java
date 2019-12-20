@@ -31,8 +31,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.internal.rules.RuleSet;
+import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 
@@ -40,6 +44,7 @@ import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 
@@ -51,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private EntityManager em;
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Override
     public List<Account> createUsers(List<Account> accounts) {
@@ -87,32 +95,41 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
     @Override
-    public List<Account> searchUserByEmail(final String prefix) {
+    public List<Account> searchUserByEmail(final Account actor, final String email) throws BusinessException {
+
         TypedQuery<Account> q = em
                 .createQuery(
-                        "select u from Account u "
-                                + "where u.email LIKE CONCAT('%',:prefix,'%')",
+                        "select u from Account u " +
+                                "where u.email= :prefix ",
                         Account.class);
-        q.setParameter("prefix", prefix);
+        q.setParameter("prefix", email);
         return q.getResultList();
     }
 
     @Override
-    public List<Account> searchUserByName(final String prefix) {
+    public List<Account> searchUserByEmail(final Account actor, final String email, final Account org) throws BusinessException {
+
         TypedQuery<Account> q = em
                 .createQuery(
-                        "select u from Account u "
-                                + "where u.name LIKE CONCAT('%',:prefix,'%') or u.firstName LIKE CONCAT('%',:prefix,'%')",
+                        "select h.member from AccountHierarchy h " +
+                                "where h.member.email LIKE CONCAT('%',:prefix,'%') and h.organization = :org",
                         Account.class);
-        q.setParameter("prefix", prefix);
+        q.setParameter("prefix", email);
+        q.setParameter("org", org);
         return q.getResultList();
     }
 
     @Override
-    public List<Account> searchUserByEmail(final String prefix, final Long projectId) {
-        Project project = em.find(Project.class, projectId);
+    public List<Account> searchUserByEmail(final Account actor, final String prefix, final Project project) throws BusinessException {
+
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectOwner());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
         List<Account> matchedAccount = project.getMembers().stream()
                 .filter(projectMembership -> projectMembership
                         .getMember()

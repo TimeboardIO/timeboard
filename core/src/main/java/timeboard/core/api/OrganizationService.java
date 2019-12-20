@@ -49,6 +49,8 @@ public interface OrganizationService {
 
     List<Account> getMembers(final Account actor, Account organization);
 
+    MembershipRole getRoleInOrganization(final Account actor, final Account target, Account organization);
+
     AccountHierarchy removeMember(Account actor, Account organization, Account member) throws BusinessException;
 
     AccountHierarchy addMember(Account actor, Account organization, Account member) throws BusinessException;

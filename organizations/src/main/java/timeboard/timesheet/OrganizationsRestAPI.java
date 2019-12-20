@@ -84,7 +84,7 @@ public class OrganizationsRestAPI {
 
         final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
-        if (organization.isPresent()) {
+        if (!organization.isPresent()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Project does not exists or you don't have enough permissions to access it.");
         }

@@ -77,8 +77,12 @@ public class OrganizationServiceImpl implements OrganizationService {
     public Optional<Account> getOrganizationByID(Account actor, long id) {
         Account data;
         try {
-            data = em.createQuery("select o from Account o  where o.id = :orgID", Account.class)
+            data = em.createQuery("select o from Account o join AccountHierarchy h " +
+                    "on h.organization = o " +
+                    "where o.id = :orgID and h.member = :owner"
+                    , Account.class)
                     .setParameter("orgID", id)
+                    .setParameter("owner", actor)
                     .getSingleResult();
         } catch (NoResultException nre) {
             data = null;
@@ -174,5 +178,13 @@ public class OrganizationServiceImpl implements OrganizationService {
                 "join h.member m join h.organization o where o = :org", Account.class)
                 .setParameter("org", organization).getResultList();
 
+    }
+
+    @Override
+    public MembershipRole getRoleInOrganization(Account actor, Account target, Account organization) {
+        return this.em.createQuery("select h.role  from AccountHierarchy h " +
+                "where h.organization = :org and h.member = :member", MembershipRole.class)
+                .setParameter("org", organization)
+                .setParameter("member", target).getSingleResult();
     }
 }
