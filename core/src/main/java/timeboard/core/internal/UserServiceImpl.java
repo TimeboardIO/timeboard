@@ -36,10 +36,8 @@ import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
-import timeboard.core.internal.rules.project.ActorIsProjectMember;
 import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Project;
 
 import javax.persistence.*;

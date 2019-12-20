@@ -69,7 +69,9 @@ public class UsersSearchRestController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {String query = req.getParameter("q");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+
+        String query = req.getParameter("q");
         Account actor = userInfo.getCurrentAccount();
 
         if (query.isBlank() || query.isEmpty()) {
@@ -148,6 +150,7 @@ public class UsersSearchRestController {
         }
 
         public void setCount(Integer count) {
+
             this.count = count;
         }
 
