@@ -59,7 +59,7 @@ public class OrganizationFilter implements Filter {
     static {
         whitelist.add(OrganizationSelectController.URI);
         whitelist.add(OnboardingController.URI);
-        whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2)");
+        whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2|svg)");
     }
 
     @Override
