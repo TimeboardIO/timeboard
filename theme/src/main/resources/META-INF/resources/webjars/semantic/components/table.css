@@ -24,7 +24,7 @@
           box-shadow: none;
   border-radius: 0.28571429rem;
   text-align: left;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
   border-collapse: separate;
   border-spacing: 0px;
 }
@@ -55,7 +55,7 @@
 }
 .ui.table thead th {
   cursor: auto;
-  background: #3d6488;
+  background: #00bfd8;
   text-align: inherit;
   color: #FFFFFF;
   padding: 0.78571429em 0.78571429em;
@@ -89,7 +89,7 @@
   border-top: 1px solid rgba(34, 36, 38, 0.15);
   background: #F9FAFB;
   text-align: inherit;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
   padding: 0.78571429em 0.78571429em;
   vertical-align: middle;
   font-style: normal;
@@ -368,13 +368,13 @@
 
 .ui.table tr.active,
 .ui.table td.active {
-  -webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.87) inset;
-          box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.87) inset;
+  -webkit-box-shadow: 0px 0px 0px #393939 inset;
+          box-shadow: 0px 0px 0px #393939 inset;
 }
 .ui.table tr.active,
 .ui.table td.active {
   background: #DCDDDE !important;
-  color: rgba(0, 0, 0, 0.87) !important;
+  color: #393939 !important;
 }
 
 /*--------------
@@ -538,7 +538,7 @@
 .ui.table tr td.selectable.active:hover,
 .ui.selectable.table tr:hover td.active {
   background: #DCDDDE !important;
-  color: rgba(0, 0, 0, 0.87) !important;
+  color: #393939 !important;
 }
 .ui.selectable.table tr.positive:hover,
 .ui.table tr td.selectable.positive:hover,
@@ -679,10 +679,10 @@
 
 /* Green */
 .ui.green.table {
-  border-top: 0.2em solid #4dc98d;
+  border-top: 0.2em solid #20c997;
 }
 .ui.inverted.green.table {
-  background-color: #4dc98d !important;
+  background-color: #20c997 !important;
   color: #FFFFFF !important;
 }
 
@@ -697,10 +697,10 @@
 
 /* Blue */
 .ui.blue.table {
-  border-top: 0.2em solid #3d6488;
+  border-top: 0.2em solid #00bfd8;
 }
 .ui.inverted.blue.table {
-  background-color: #3d6488 !important;
+  background-color: #00bfd8 !important;
   color: #FFFFFF !important;
 }
 
@@ -887,7 +887,7 @@
   cursor: pointer;
   white-space: nowrap;
   border-left: 1px solid rgba(34, 36, 38, 0.15);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 .ui.sortable.table thead th:first-child {
   border-left: none;

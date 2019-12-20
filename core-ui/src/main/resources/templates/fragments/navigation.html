@@ -6,7 +6,7 @@
         <i class="sidebar icon"></i>
     </a>
     <div class="item header">
-        <h2 class="ui header" th:text="${appName}">Timeboard</h2>
+        <img src="/onboarding/images/logo.png">
     </div>
 
     <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}" data-cy="menu-link"

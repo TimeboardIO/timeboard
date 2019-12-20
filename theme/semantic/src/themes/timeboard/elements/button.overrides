@@ -1,2 +1,37 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 
+
+
+
+.ui.button{
+
+  padding  : @verticalPadding @horizontalPadding;
+  border  : 0.125rem solid @primaryColor;
+  border-radius      : @borderRadius;
+  color             : @primaryColor;
+  font-weight       : normal;
+
+}
+
+.ui.button:hover{
+  color: @primaryColor !important;
+  background-color: transparent !important;
+
+}
+
+
+ui.button.positive{
+
+  padding  : @verticalPadding @horizontalPadding;
+  border  : 0.125rem solid @green;
+  border-radius      :  @green;
+  color             :  @green;
+  font-weight       : normal;
+
+}
+
+.ui.button.positive:hover{
+  color:  @green !important;
+  background-color: transparent !important;
+
+}

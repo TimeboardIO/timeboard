@@ -6,7 +6,7 @@
        Fonts
 --------------------*/
 
-@fontName          : 'Lato';
+@fontName          : 'Raleway';
 @fontSmoothing     : antialiased;
 
 @headerFont        : @fontName, 'Verdana', Geneva, sans-serif;
@@ -51,12 +51,12 @@
     Brand Colors
 --------------------*/
 
-@primaryColor        : #3d6488;
-@secondaryColor      : @black;
+@primaryColor        : #00bfd8;
+@secondaryColor      : #393939;
 
 
-@backgroundGradientColor1 : #668aa0;
-@backgroundGradientColor2 : #fbfcfd;
+@backgroundGradientColor1 : #00BED8;
+@backgroundGradientColor2 : #007DF7;
 
 @lightPrimaryColor   : #75a7d5;
 @lightSecondaryColor : @lightBlack;
@@ -129,7 +129,7 @@
 @pageOverflowX       : hidden;
 
 @lineHeight          : 1.4285em;
-@textColor           : rgba(0, 0, 0, 0.87);
+@textColor           : @secondaryColor;
 
 /*-------------------
       Paragraph
@@ -225,19 +225,20 @@
 
 /*---  Colors  ---*/
 
+@blue             : @primaryColor;
 @red              : #C53E43;
 @orange           : #F2711C;
 @yellow           : #FBBD08;
 @olive            : #B5CC18;
-@green            : #4dc98d;
+@green            : #20c997;
 @teal             : #00B5AD;
-@blue             : @primaryColor;
 @violet           : #957DAD;
 @purple           : #A333C8;
 @pink             : #E03997;
 @brown            : #A5673F;
 @grey             : #767676;
 @black            : #1B1C1D;
+
 
 /*---  Light Colors  ---*/
 @lightRed         : #FF695E;
@@ -442,7 +443,7 @@
      Neutral Text
 --------------------*/
 
-@darkTextColor               : rgba(0, 0, 0, 0.85);
+@darkTextColor               : @secondaryColor;
 @mutedTextColor              : rgba(0, 0, 0, 0.6);
 @lightTextColor              : rgba(0, 0, 0, 0.4);
 

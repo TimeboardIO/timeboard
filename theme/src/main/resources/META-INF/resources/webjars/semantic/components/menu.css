@@ -24,9 +24,9 @@
   display: -ms-flexbox;
   display: flex;
   margin: 1rem 0em;
-  font-family: 'Roboto', Arial, sans-serif;
+  font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   background: #FFFFFF;
-  font-weight: normal;
+  font-weight: 'bold';
   border: 1px solid rgba(34, 36, 38, 0.15);
   -webkit-box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
           box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
@@ -85,7 +85,7 @@
   background: none;
   padding: 1.14285714em 1.14285714em;
   text-transform: none;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
   font-weight: normal;
   -webkit-transition: background 0.1s ease, color 0.1s ease, -webkit-box-shadow 0.1s ease;
   transition: background 0.1s ease, color 0.1s ease, -webkit-box-shadow 0.1s ease;
@@ -233,7 +233,7 @@
   font-size: 1em !important;
   padding: 0.78571429em 1.14285714em !important;
   background: transparent !important;
-  color: rgba(0, 0, 0, 0.87) !important;
+  color: #393939 !important;
   text-transform: none !important;
   font-weight: normal !important;
   -webkit-box-shadow: none !important;
@@ -579,7 +579,7 @@ Floated Menu / Item
 }
 .ui.vertical.menu .item .menu a.item:hover,
 .ui.vertical.menu .item .menu .link.item:hover {
-  color: rgba(0, 0, 0, 0.85);
+  color: #393939;
 }
 .ui.vertical.menu .menu .item:before {
   display: none;
@@ -632,7 +632,7 @@ Floated Menu / Item
   border-right: 1px solid transparent;
   border-top: 2px solid transparent;
   padding: 1.14285714em 1.42857143em;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 .ui.tabular.menu .item:before {
   display: none;
@@ -948,7 +948,7 @@ Floated Menu / Item
 
 /* Item Types */
 .ui.secondary.pointing.menu .header.item {
-  color: rgba(0, 0, 0, 0.85) !important;
+  color: #393939 !important;
 }
 .ui.secondary.pointing.menu .text.item {
   -webkit-box-shadow: none !important;
@@ -963,7 +963,7 @@ Floated Menu / Item
 .ui.secondary.pointing.menu .link.item:hover,
 .ui.secondary.pointing.menu a.item:hover {
   background-color: transparent;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 /* Pressed */
@@ -979,15 +979,15 @@ Floated Menu / Item
   background-color: transparent;
   -webkit-box-shadow: none;
           box-shadow: none;
-  border-color: #3d6488;
+  border-color: #00bfd8;
   font-weight: bold;
-  color: #3d6488;
+  color: #00bfd8;
 }
 
 /* Active Hover */
 .ui.secondary.pointing.menu .active.item:hover {
-  border-color: #3d6488;
-  color: #3d6488;
+  border-color: #00bfd8;
+  color: #00bfd8;
 }
 
 /* Active Dropdown */
@@ -1013,7 +1013,7 @@ Floated Menu / Item
 
 /* Vertical Active */
 .ui.secondary.vertical.pointing.menu .active.item {
-  border-color: #3d6488;
+  border-color: #00bfd8;
 }
 
 /* Inverted */
@@ -1079,7 +1079,7 @@ Floated Menu / Item
 .ui.text.menu .header.item {
   background-color: transparent;
   opacity: 1;
-  color: rgba(0, 0, 0, 0.85);
+  color: #393939;
   font-size: 0.92857143em;
   text-transform: uppercase;
   font-weight: bold;
@@ -1333,8 +1333,8 @@ Floated Menu / Item
 }
 .ui.menu .green.active.item,
 .ui.green.menu .active.item {
-  border-color: #4dc98d !important;
-  color: #4dc98d !important;
+  border-color: #20c997 !important;
+  color: #20c997 !important;
 }
 .ui.menu .teal.active.item,
 .ui.teal.menu .active.item {
@@ -1343,8 +1343,8 @@ Floated Menu / Item
 }
 .ui.menu .blue.active.item,
 .ui.blue.menu .active.item {
-  border-color: #3d6488 !important;
-  color: #3d6488 !important;
+  border-color: #00bfd8 !important;
+  color: #00bfd8 !important;
 }
 .ui.menu .violet.active.item,
 .ui.violet.menu .active.item {
@@ -1545,7 +1545,7 @@ Floated Menu / Item
 /* Green */
 .ui.inverted.menu .green.active.item,
 .ui.inverted.green.menu {
-  background-color: #4dc98d;
+  background-color: #20c997;
 }
 .ui.inverted.green.menu .item:before {
   background-color: rgba(34, 36, 38, 0.1);
@@ -1569,7 +1569,7 @@ Floated Menu / Item
 /* Blue */
 .ui.inverted.menu .blue.active.item,
 .ui.inverted.blue.menu {
-  background-color: #3d6488;
+  background-color: #00bfd8;
 }
 .ui.inverted.blue.menu .item:before {
   background-color: rgba(34, 36, 38, 0.1);

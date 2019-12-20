@@ -6,14 +6,15 @@
     background-color : white ! important;
 }
 
-body{
-       background: rgba(221,227,232,1);
-       background: linear-gradient(180deg, rgba(110,138,158,1) 0%, rgba(221,227,232,1) 100%);
-       background-repeat: no-repeat;
-}
+
 html{
-       height: 100%;
-       background: rgba(221,227,232,1);
+    height: 100%;
+    background: rgba(221,227,232,1);
+    background: linear-gradient(45deg, #00bed8 0%,#007df7 95%);
+    background-repeat: no-repeat;
+}
+body{
+  background: transparent;
 }
 
 
@@ -57,6 +58,12 @@ ui.input.error > input {
 
 
 
+.item.header img {
+  height: 2rem;
+  width: auto !important;
+}
+
+
 /** Timesheet **/
 
 #timesheet{
@@ -94,10 +101,10 @@ ui.input.error > input {
         margin-top: 1em;
     }
 
-    .project{
+    .project {
         padding: 0.38571429em 0.78571429em !important;
         background-color: @lightBlue !important;
-        color: @primaryColor !important;
+        color: @secondaryColor !important;
         font-size: 1.25em !important;
     }
 
@@ -105,6 +112,14 @@ ui.input.error > input {
         font-size: 1em !important;
         font-weight: normal;
     }
+
+}
+
+.item.nav .title {
+  font-weight: bold;
+}
+.item.nav:hover .title{
+    color: @primaryColor;
 
 }
 

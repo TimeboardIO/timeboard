@@ -13,7 +13,7 @@
              Page
 *******************************/
 
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin');
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700,400italic,700italic&subset=latin');
 /*
 html,
 body {
@@ -29,10 +29,10 @@ body {
   overflow-x: hidden;
   min-width: 320px;
   background: #FFFFFF;
-  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
+  font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   font-size: 14px;
   line-height: 1.4285em;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
   font-smoothing: antialiased;
 }
 
@@ -46,7 +46,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
+  font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   line-height: 1.28571429em;
   margin: calc(2rem -  0.14285714em ) 0em 1rem;
   font-weight: bold;
@@ -127,36 +127,36 @@ a:hover {
 /* Site */
 ::-webkit-selection {
   background-color: #CCE2FF;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 ::-moz-selection {
   background-color: #CCE2FF;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 ::selection {
   background-color: #CCE2FF;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 /* Form */
 textarea::-webkit-selection,
 input::-webkit-selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 textarea::-moz-selection,
 input::-moz-selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 textarea::-moz-selection, input::-moz-selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 textarea::selection,
 input::selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 /* Force Simple Scrollbars */
@@ -207,16 +207,15 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 .navigation {
   background-color: white ! important;
 }
-body {
-  background: #dde3e8;
-  background: -webkit-gradient(linear, left top, left bottom, from(#6e8a9e), to(#dde3e8));
-  background: -webkit-linear-gradient(top, #6e8a9e 0%, #dde3e8 100%);
-  background: linear-gradient(180deg, #6e8a9e 0%, #dde3e8 100%);
-  background-repeat: no-repeat;
-}
 html {
   height: 100%;
   background: #dde3e8;
+  background: -webkit-linear-gradient(45deg, #00bed8 0%, #007df7 95%);
+  background: linear-gradient(45deg, #00bed8 0%, #007df7 95%);
+  background-repeat: no-repeat;
+}
+body {
+  background: transparent;
 }
 th,
 td {
@@ -233,17 +232,21 @@ td {
 h1.ui.header,
 .ui.huge.header {
   font-weight: normal;
-  color: #3d6488;
+  color: #00bfd8;
 }
 h2.ui.header,
 .ui.large.header {
   font-weight: normal;
-  color: #3d6488;
+  color: #00bfd8;
 }
 ui.input.error > input {
   background-color: #fff6f6 !important;
   border-color: #e0b4b4 !important;
   color: #9f3a38 !important;
+}
+.item.header img {
+  height: 2rem;
+  width: auto !important;
 }
 /** Timesheet **/
 #timesheet table td {
@@ -281,12 +284,18 @@ ui.input.error > input {
 #timesheet .project {
   padding: 0.38571429em 0.78571429em !important;
   background-color: #D1DCEB !important;
-  color: #3d6488 !important;
+  color: #393939 !important;
   font-size: 1.25em !important;
 }
 #timesheet th.project {
   font-size: 1em !important;
   font-weight: normal;
+}
+.item.nav .title {
+  font-weight: bold;
+}
+.item.nav:hover .title {
+  color: #00bfd8;
 }
 /** PROJECT **/
 .badge {
@@ -306,10 +315,10 @@ ui.input.error > input {
   font-weight: bold !important;
 }
 .text.primary {
-  color: #3d6488 !important;
+  color: #00bfd8 !important;
 }
 .text.bold {
-  font-: #3d6488 !important;
+  font-: #00bfd8 !important;
 }
 
 
