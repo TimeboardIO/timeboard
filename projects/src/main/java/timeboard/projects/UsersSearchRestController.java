@@ -69,9 +69,7 @@ public class UsersSearchRestController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
-
-        String query = req.getParameter("q");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {String query = req.getParameter("q");
         Account actor = userInfo.getCurrentAccount();
 
         if (query.isBlank() || query.isEmpty()) {
@@ -91,7 +89,7 @@ public class UsersSearchRestController {
         Set<Account> accounts = new HashSet<>();
 
         if (projectID != null) {
-            Project project = projectService.getProjectByID(actor, projectID);
+            Project project = projectService.getProjectByIdWithAllMembers(actor, projectID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
         } else if (orgID != null) {
             Optional<Account> org = organizationService.getOrganizationByID(actor, orgID);
