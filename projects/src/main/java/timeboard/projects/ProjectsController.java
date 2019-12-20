@@ -31,20 +31,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,13 +57,17 @@ public class ProjectsController {
     private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(Model model) {
+    protected String handleGet(@ModelAttribute("message") String message, Model model, RedirectAttributes attributes) {
         final Account actor = this.userInfo.getCurrentAccount();
         List<Project> allActorProjects = this.projectService.listProjects(actor);
         if (allActorProjects.size() > 5) {
             allActorProjects = allActorProjects.subList(0, 5);
         }
         model.addAttribute("projects", allActorProjects);
+        if(message != null) {
+            model.addAttribute("message", message);
+        }
+
         return "projects.html";
     }
 
@@ -82,21 +82,24 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response,  RedirectAttributes attributes) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
+        attributes.addFlashAttribute("message", "Project created successfully.");
         return "redirect:/projects";
     }
 
     @GetMapping("/create")
-    protected String createFrom() throws ServletException, IOException {
+    protected String createFrom() {
         return "create_project.html";
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
+    protected String deleteProject(@PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
         final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
         this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
+        attributes.addFlashAttribute("message", "Project deleted successfully.");
+
         return "redirect:/projects";
     }
 
