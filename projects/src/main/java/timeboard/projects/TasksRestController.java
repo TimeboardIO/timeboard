@@ -2,7 +2,7 @@ package timeboard.projects;
 
 /*-
  * #%L
- * reporting
+ * reports
  * %%
  * Copyright (C) 2019 Timeboard
  * %%

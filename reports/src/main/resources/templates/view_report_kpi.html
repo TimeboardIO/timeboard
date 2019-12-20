@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/reports')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">View Report Page</title>
+    <meta name="reportID" th:content="${report.id}"/>
+    <meta name="reportType" th:content="${reportType}"/>
+    <script src="/js/reportsChartKPI.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="ui segment" id="create-report">
+        <h4 class="ui dividing header">View KPI Report:</h4>
+        <h3 style="text-align: center" th:text="${report.name}"></h3>
+
+        <div class="column" id="app-view-report">
+            <canvas id="chartKPI"></canvas>
+        </div>
+
+        <br>
+        <a class="ui button" th:href="@{/reports}">
+            <i class="left arrow icon"></i>
+            Back
+        </a>
+
+    </div>
+</div>
+</body>
+</html>

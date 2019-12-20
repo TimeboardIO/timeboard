@@ -1,8 +1,8 @@
-package timeboard.reporting;
+package timeboard.reports;
 
 /*-
  * #%L
- * reporting
+ * KanbanProjectPlugin
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,31 +26,29 @@ package timeboard.reporting;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.ProjectExportService;
+import org.springframework.stereotype.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+@Component
+public class ReportsNavigationProvider implements NavigationExtPoint {
 
-
-@Controller
-@RequestMapping("/reporting")
-public class ReportingController {
-
-    @Autowired(
-            required = false
-    )
-    private List<ProjectExportService> reportServices;
-
-    @GetMapping
-    protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
-        model.addAttribute("reports", this.reportServices);
-        return "reporting.html";
+    @Override
+    public String getNavigationLabel() {
+        return "Reports";
     }
 
+    @Override
+    public String getNavigationPath() {
+        return "/reports";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 5000;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "chart pie";
+    }
 }

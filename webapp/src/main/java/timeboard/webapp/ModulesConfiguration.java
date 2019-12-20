@@ -37,7 +37,7 @@ import timeboard.core.ui.CoreUIConfiguration;
 import timeboard.home.HomeConfiguration;
 import timeboard.plugin.project.imp.jira.JiraPluginConfiguration;
 import timeboard.projects.ProjectsConfiguration;
-import timeboard.reporting.ReportingConfiguration;
+import timeboard.reports.ReportsConfiguration;
 import timeboard.theme.ThemeConfiguration;
 import timeboard.timesheet.OrganizationsConfiguration;
 import timeboard.timesheet.TimesheetConfiguration;
@@ -49,7 +49,7 @@ import timeboard.timesheet.TimesheetConfiguration;
         CoreUIConfiguration.class,
         HomeConfiguration.class,
         AccountConfiguration.class,
-        ReportingConfiguration.class,
+        ReportsConfiguration.class,
         TimesheetConfiguration.class,
         ProjectsConfiguration.class,
         JiraPluginConfiguration.class,
