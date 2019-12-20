@@ -223,25 +223,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public boolean isAlreadyMember(Project project, Account targetMember) {
-        /*int nbCorrespondingProject =  Integer.parseInt(em.createQuery("select count(p) " +
-                "from Project p join fetch p.members m " +
-                "where p.id = :projectID and  m.member = :user", Object.class)
-                .setParameter("user", targetMember)
-                .setParameter("projectID", project.getId())
-                .getSingleResult()
-                .toString());
-        return nbCorrespondingProject == 0;*/
-
-        return project.getMembers()
-                .stream()
-                .map(ProjectMembership::getMember)
-                .collect(Collectors.toList())
-                .contains(targetMember);
-        
-    }
-
-    @Override
     public ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());

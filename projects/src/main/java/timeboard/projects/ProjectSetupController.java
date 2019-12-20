@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -95,13 +94,12 @@ public class ProjectSetupController {
         final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        boolean isAlreadyMember = this.projectService.isAlreadyMember(project, targetMember);
-
-        if(!isAlreadyMember){
-            project.getMembers().add(new ProjectMembership(project, targetMember, MembershipRole.CONTRIBUTOR));
-            this.projectService.updateProject(actor, project);
+        if(project.isMember(targetMember)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This user is already member of this project");
         }
 
+        project.getMembers().add(new ProjectMembership(project, targetMember, MembershipRole.CONTRIBUTOR));
+        this.projectService.updateProject(actor, project);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
