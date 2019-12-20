@@ -163,10 +163,10 @@ let app = new Vue( {
     data: timesheetModel,
     methods:  {
         displayErrorMessage : function(message) {
-            this.errorMessages.push({message : message});
+            this.errorMessages.push({message : message, visible : true});
         },
         displaySuccessMessage: function(message) {
-            this.successMessages.push({message : message});
+            this.successMessages.push({message : message, visible : true});
         },
         validateMyWeek: function(event) {
             $.ajax({

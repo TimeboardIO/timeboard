@@ -152,10 +152,10 @@ public class ProjectTasksController {
 
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);
-        attributes.addFlashAttribute("message", "Project created successfully.");
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);
+        attributes.addFlashAttribute("success", "Project created successfully.");
         return "project_tasks.html";
     }
 

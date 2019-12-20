@@ -31,9 +31,9 @@
         <div th:text="${error}" class="header">  </div>
 
     </div>
-    <div class="ui container positive message" th:if="${message !=  null && message != ''}">
+    <div class="ui container positive message" th:if="${success !=  null && success != ''}">
         <i class="close icon"></i>
-        <div th:text="${message}" class="header">  </div>
+        <div th:text="${success}" class="header">  </div>
     </div>
     <div layout:fragment="content" ></div>
 </div>

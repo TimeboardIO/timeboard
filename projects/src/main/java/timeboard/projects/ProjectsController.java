@@ -81,7 +81,7 @@ public class ProjectsController {
     protected String handlePost(HttpServletRequest request, HttpServletResponse response,  RedirectAttributes attributes) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
-        attributes.addFlashAttribute("message", "Project created successfully.");
+        attributes.addFlashAttribute("success", "Project created successfully.");
         return "redirect:/projects";
     }
 
@@ -94,7 +94,7 @@ public class ProjectsController {
     protected String deleteProject(@PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
         final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
         this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
-        attributes.addFlashAttribute("message", "Project deleted successfully.");
+        attributes.addFlashAttribute("success", "Project deleted successfully.");
 
         return "redirect:/projects";
     }

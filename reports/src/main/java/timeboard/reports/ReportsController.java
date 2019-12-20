@@ -112,7 +112,7 @@ public class ReportsController {
                 report.getType(),
                 projectFilter
         );
-        attributes.addFlashAttribute("message", "Report created successfully.");
+        attributes.addFlashAttribute("success", "Report created successfully.");
 
         return "redirect:/reports";
     }
@@ -121,7 +121,7 @@ public class ReportsController {
     protected String deleteReport(@PathVariable long reportID,  RedirectAttributes attributes) {
         this.reportService.deleteReportByID(this.userInfo.getCurrentAccount(), reportID);
 
-        attributes.addFlashAttribute("message", "Report deleted successfully.");
+        attributes.addFlashAttribute("success", "Report deleted successfully.");
 
         return "redirect:/reports";
     }
@@ -147,7 +147,7 @@ public class ReportsController {
         updatedReport.setFilterProject(report.getFilterProject());
 
         this.reportService.updateReport(actor, updatedReport);
-        attributes.addFlashAttribute("message", "Report updated successfully.");
+        attributes.addFlashAttribute("success", "Report updated successfully.");
 
         return "redirect:/reports";
     }
