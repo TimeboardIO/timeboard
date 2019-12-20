@@ -97,7 +97,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
     @Override
     public List<Account> searchUserByEmail(final Account actor, final String email) throws BusinessException {
 
@@ -110,18 +109,16 @@ public class UserServiceImpl implements UserService {
         return q.getResultList();
     }
 
-
-
-
     @Override
     public List<Account> searchUserByEmail(final Account actor, final String email, final Account org) throws BusinessException {
 
         TypedQuery<Account> q = em
                 .createQuery(
-                        "select u from Account u " +
-                                "where u.email= :prefix ",
+                        "select h.member from AccountHierarchy h " +
+                                "where h.member.email LIKE CONCAT('%',:prefix,'%') and h.organization = :org",
                         Account.class);
         q.setParameter("prefix", email);
+        q.setParameter("org", org);
         return q.getResultList();
     }
 
