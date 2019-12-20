@@ -14,38 +14,6 @@
 
 <div layout:fragment="placeholder">
 
-    <script type="text/javascript">
-
-        var updateUser = function(membershipID, role){
-            var path = '/projects/'+$("meta[name=projectID]").attr("content")+'/setup/memberships/'+membershipID+'/'+role;
-            $.ajax({
-                url: path,
-                type: 'PATCH',
-                success: function(result) {
-                    document.location.reload(true);
-                }
-            });
-        }
-
-        var removeUser = function(membershipID){
-            var path = '/projects/'+$("meta[name=projectID]").attr("content")+'/setup/memberships/'+membershipID;
-
-            $.ajax({
-                url: path,
-                type: 'DELETE',
-                success: function(result) {
-                    document.location.reload(true);
-                }
-            });
-
-        }
-
-        var removeConfig = function(configKey){
-            $("[data-key="+configKey+"]").remove();
-        }
-
-    </script>
-
     <div class="ui stackable two column grid">
         <div class="column">
             <form class="ui form"
@@ -120,54 +88,8 @@
                 </div>
             </div>
         </div>
+        <script src="/js/project_config.js"></script>
     </div>
-    <script>
-/*<![CDATA[*/
-        $('.ui.checkbox')
-          .checkbox();
-
-        $('.message .close')
-         .on('click', function() {
-        $(this)
-          .closest('.message')
-          .transition('fade')
-        ;
-        })
-        ;
-
-        $('.delete[data-key]').click(function(){
-        console.log("delete");
-            $('tr[data-key="'+$(this).attr('data-key')+'"]').remove();
-        });
-
-
-        var roles = [(${rolesForNewMember})]
-        $('.ui.search')
-            .search({
-                apiSettings: {
-                        url: '/api/search?q={query}&orgID='+$("meta[name=orgID]").attr("content")
-                    },
-                    fields: {
-                        results : 'items',
-                        title   : 'screenName',
-                        description :'email'
-                    },
-                    onSelect: function(result, response) {
-                        $.post('/projects/'+$("meta[name=projectID]").attr("content")+'/setup/memberships', {
-                            memberID: result.id
-                        }).done(function(){
-                            document.location.reload(true);
-                        });
-                    },
-                    minCharacters : 3
-            });
-/*]]>*/
-
-
-
-
-
-    </script>
 </div>
 
 </body>
