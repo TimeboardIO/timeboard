@@ -640,8 +640,7 @@ input[type='checkbox'] {
 }
 
 .navbar-custom .navbar-brand.logo-image img {
-    width: 7.4375rem;
-	height: 2rem;
+	height: 3rem;
 }
 
 .navbar-custom .navbar-brand.logo-text {
