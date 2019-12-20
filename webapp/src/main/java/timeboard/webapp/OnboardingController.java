@@ -45,7 +45,7 @@ public class OnboardingController {
     @GetMapping("/")
     public String onboarding(Principal p, Model m){
         if(p == null){ 
-            return "onboarding";
+            return "onboarding/index";
         }else{
 
             return "redirect:/home";
