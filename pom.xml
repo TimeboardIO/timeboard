@@ -21,6 +21,7 @@
             <module>reports</module>
             <module>webapp</module>
             <module>plugins/project-jira-import-plugin</module>
+            <module>plugins/project-github-import-plugin</module>
             <module>plugins/project-xls-export-plugin</module>
     </modules>
     <dependencies>

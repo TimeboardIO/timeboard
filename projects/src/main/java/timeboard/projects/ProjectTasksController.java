@@ -44,7 +44,6 @@ import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
-import timeboard.plugin.project.imp.jira.JiraSyncPlugin;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -132,7 +131,7 @@ public class ProjectTasksController {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        final List<ProjectSyncCredentialField> creds = JiraSyncPlugin.FIELDS;
+        final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
 
         creds.forEach(field -> {
             if(formBody.containsKey(field.getFieldKey())){
