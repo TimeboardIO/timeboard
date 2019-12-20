@@ -26,6 +26,8 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -35,13 +37,18 @@ import org.springframework.web.context.request.WebRequestInterceptor;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
+import timeboard.core.model.Account;
 import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
 import timeboard.core.ui.UserInfo;
 
+import java.util.Optional;
+
 @Component
 public class WebRessourcesInterceptor implements WebRequestInterceptor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebRessourcesInterceptor.class);
 
     @Value("${timeboard.appName}")
     private String appName;
@@ -79,14 +86,23 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
             modelMap.put("dataTableService", dataTableService);
             Long orgaID = ThreadLocalStorage.getCurrentOrganizationID();
             if(orgaID != null) {
-                modelMap.put("orgID", orgaID);
-                modelMap.put("currentOrg", organizationService.getOrganizationByID(userInfo.getCurrentAccount(), orgaID).get());
+                fillModelWithOrganization(modelMap, orgaID);
             }
 
         }
 
         if(modelMap != null){
             modelMap.put("appName", appName);
+        }
+    }
+
+    private void fillModelWithOrganization(ModelMap modelMap, Long orgaID) {
+        modelMap.put("orgID", orgaID);
+        Optional<Account> organisation = organizationService.getOrganizationByID(userInfo.getCurrentAccount(), orgaID);
+        if(organisation.isPresent()){
+            modelMap.put("currentOrg", organisation.get());
+        }else{
+            LOGGER.warn("User : {} try to access missing org : {}", userInfo.getCurrentAccount(), orgaID);
         }
     }
 
