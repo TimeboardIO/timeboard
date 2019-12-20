@@ -88,13 +88,13 @@
         <div class="ui text loader">Loading</div>
     </div>
     <div id="timesheet" class="hidden">
-        <div v-if="errorMessage" class="ui container negative timesheet message" >
-            <i class="close icon"></i>
-            <div  class="header"> {{ errorMessage }} </div>
+        <div v-for="error in errorMessages" v-if="!error.hidden" class="ui container negative timesheet message" >
+            <i class="close icon" @click="error.hidden = true"></i>
+            <div  class="header"> {{ error.message }} </div>
         </div>
-        <div v-if="successMessage" class="ui container positive timesheet message" >
-            <i class="close icon"></i>
-            <div  class="header"> {{ successMessage }} </div>
+        <div v-for="success in successMessages" v-if="!success.hidden" class="ui container positive timesheet message" >
+            <i class="close icon" @click="success.hidden = true" ></i>
+            <div  class="header"> {{ success.message }} </div>
         </div>
         <div class="ui segment timesheet-navigation-controls">
             <div v-if="validated === false" style="left: 1em; position: absolute;" v-bind:data-tooltip="!enableValidateButton()?' Please validate previous week and make sure every working day imputation day total equals 1' : false"

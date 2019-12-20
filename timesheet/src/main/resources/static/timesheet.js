@@ -2,23 +2,8 @@
 * type = imputation | effortLeft
 */
 
-const updateTask = function(date, task, type, val) { 
-    return $.ajax( { 
-        method: "POST",
-        url: "api/timesheet",
-        data: JSON.stringify( { 
-            'type': type,
-            'day': date,
-            'task': task,
-            'imputation': val
-        }),
-        contentType: "application/json",
-        dataType: "json",
-    });
-}
 
 const userID = $("meta[property='timesheet']").attr('userID');
-
 
 const emptyTask =  {
     taskID: 0,
@@ -38,8 +23,8 @@ const emptyTask =  {
 }
 
 const timesheetModel =  {
-    successMessage: "",
-    errorMessage: "",
+    successMessages: [],
+    errorMessages: [],
     newTask: Object.assign( { } , emptyTask),
     disableNext: false,
     disablePrev: false,
@@ -115,8 +100,22 @@ const timesheetModel =  {
         let weekNum = timesheetModel.getWeekNumber(date);
         if(week < weekNum)  {  year --; }
         return year;
+    },
+    updateTask: function(date, task, type, val) {
+        return $.ajax( {
+            method: "POST",
+            url: "api/timesheet",
+            data: JSON.stringify( {
+                'type': type,
+                'day': date,
+                'task': task,
+                'imputation': val
+            }),
+            contentType: "application/json",
+            dataType: "json",
+        });
     }
-}
+};
 
 $(document).ready(function() { 
 
@@ -164,13 +163,10 @@ let app = new Vue( {
     data: timesheetModel,
     methods:  {
         displayErrorMessage : function(message) {
-            this.errorMessage = message;
-            $('.message.timesheet.negative').show();
-
+            this.errorMessages.push({message : message});
         },
         displaySuccessMessage: function(message) {
-            this.successMessage = message;
-            $('.message.timesheet.positive').show();
+            this.successMessages.push({message : message});
         },
         validateMyWeek: function(event) {
             $.ajax({
@@ -190,7 +186,7 @@ let app = new Vue( {
             $(event.target).parent().addClass('left icon loading').removeClass('error');
             const taskID = $(event.target).attr('data-task-effortLeft');
             const val = $(event.target).val();
-            updateTask(null, taskID, 'effortLeft', val)
+            this.updateTask(null, taskID, 'effortLeft', val)
             .then(function(updateTask) { 
                 app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
                 app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
@@ -217,7 +213,7 @@ let app = new Vue( {
             }
             if(currentSum + (newval - oldVal) <= 1.0) { 
                 $(event.target).val(newval);
-                updateTask(date, taskID, 'imputation', newval)
+                this.updateTask(date, taskID, 'imputation', newval)
                 .then(function(updateTask) { 
                 app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
                 app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
@@ -229,6 +225,8 @@ let app = new Vue( {
             }else {
                 $(event.target).val(oldVal);
                 $(event.target).parent().removeClass('left icon loading').addClass('error');
+                this.displayErrorMessage("you cannot charge more than one day a day.");
+
             }
         },
         showCreateTaskModal: function(projectID, task, event) {

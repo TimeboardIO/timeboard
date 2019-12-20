@@ -40,7 +40,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
@@ -119,7 +118,7 @@ public class ReportsController {
     }
 
     @GetMapping("/delete/{reportID}")
-    protected String deleteReport(@PathVariable long reportID,  RedirectAttributes attributes) throws ServletException, IOException, BusinessException {
+    protected String deleteReport(@PathVariable long reportID,  RedirectAttributes attributes) {
         this.reportService.deleteReportByID(this.userInfo.getCurrentAccount(), reportID);
 
         attributes.addFlashAttribute("message", "Report deleted successfully.");
@@ -128,7 +127,7 @@ public class ReportsController {
     }
 
     @GetMapping("/edit/{reportID}")
-    protected String editReport(@PathVariable long reportID, Model model) throws ServletException, IOException {
+    protected String editReport(@PathVariable long reportID, Model model) {
         model.addAttribute("allReportTypes", ReportType.values());
         model.addAttribute("reportID", reportID);
         model.addAttribute("action", "edit");
