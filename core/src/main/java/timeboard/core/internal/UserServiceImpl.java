@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
                             + " = ?", Account.class);
             q.setParameter(1, userExternalID);
             return (Account) q.getSingleResult();
-        } catch (javax.persistence.NoResultException e) {
+        } catch (PersistenceException e) {
             u = null;
         }
         return u;

@@ -180,9 +180,8 @@ public class Project extends OrganizationEntity implements Serializable {
     public boolean isMember(Account actor) {
         return this.getMembers()
                 .stream()
-                .map(ProjectMembership::getMember)
-                .collect(Collectors.toList())
-                .contains(actor);
+                .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
+                .count() == 1;
     }
 
     @Transient

@@ -29,10 +29,15 @@ package timeboard.core.api.sync;
 import timeboard.core.model.Account;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface ProjectSyncPlugin {
 
     String getServiceName();
+
+    default String getServiceID(){
+        return this.getServiceName().toLowerCase().replace(" ","");
+    }
 
     List<ProjectSyncCredentialField> getSyncCredentialFields();
 

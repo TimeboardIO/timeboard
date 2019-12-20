@@ -130,7 +130,7 @@ public class ProjectTasksController {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        final List<ProjectSyncCredentialField> creds = JiraSyncPlugin.FIELDS;
+        final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
 
         creds.forEach(field -> {
             if(formBody.containsKey(field.getFieldKey())){

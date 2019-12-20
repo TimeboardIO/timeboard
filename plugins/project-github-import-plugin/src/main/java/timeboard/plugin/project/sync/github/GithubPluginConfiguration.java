@@ -1,8 +1,8 @@
-package timeboard.core.api.sync;
+package timeboard.plugin.project.sync.github;
 
 /*-
  * #%L
- * core
+ * project-jira-import-plugin
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,18 +26,10 @@ package timeboard.core.api.sync;
  * #L%
  */
 
-import timeboard.core.model.Account;
-import timeboard.core.model.Project;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.List;
-
-public interface ProjectSyncService {
-
-    void syncProjectTasks(final Account org,
-                          final Account actor,
-                          final Project project,
-                          final String serviceName,
-                          final List<ProjectSyncCredentialField> creds);
-
-    List<ProjectSyncCredentialField> getServiceFields(String serviceName);
+@Configuration
+@ComponentScan("timeboard.plugin.project.sync.github")
+public class GithubPluginConfiguration {
 }

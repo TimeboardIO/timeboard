@@ -2,15 +2,15 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml">
     <body>
-        <div th:fragment="form(serviceName, fields)">
+        <div th:fragment="form(serviceName, serviceID, fields)">
 
-            <div class="ui modal sync">
+            <div class="ui modal sync" th:id="${serviceID}">
                 <i class="close icon"></i>
                 <div class="header">
                     Sync tasks with <span th:text="${serviceName}"></span>
                 </div>
                 <div class="content">
-                    <form th:action="@{/projects/{projectID}/tasks/sync/{serviceName}(serviceName=${serviceName}, projectID=${project.id})}" id="import-jira" method="post" enctype="application/x-www-form-urlencoded" class="ui form">
+                    <form th:action="@{/projects/{projectID}/tasks/sync/{serviceName}(serviceName=${serviceName}, projectID=${project.id})}" th:id="${serviceID}+'-form'" method="post" enctype="application/x-www-form-urlencoded" class="ui form">
                         <div class="field" th:each="field : ${fields}">
                             <label th:text="${field.fieldName}"></label>
                             <input th:type="${field.fieldType}" th:value="${field.value}" th:name="${field.fieldKey}">
@@ -21,8 +21,8 @@
                     <div class="ui black deny button" onclick="$('.ui.modal.sync').modal('hide')">
                         Cancel
                     </div>
-                    <button type="submit" class="ui positive right labeled icon button"
-                            onclick="$('#import-jira').submit()">
+                    <button type="submit" th:data-service-id="${serviceID}" class="ui positive right labeled icon button"
+                            onclick="$('#'+event.target.getAttribute('data-service-id')+'-form').submit()">
                         Start sync in background
                         <i class="checkmark icon"></i>
                     </button>
