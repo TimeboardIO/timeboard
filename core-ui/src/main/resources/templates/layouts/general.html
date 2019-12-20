@@ -19,22 +19,17 @@
 </head>
 <body>
 
-
 <div class="ui fixed menu main"
      th:include="fragments/navigation.html :: nav(${path})"></div>
 
 <div class="ui left vertical menu sidebar side"
      th:include="fragments/navigation.html :: nav(${path})"></div>
 
-
-
 <div class="ui main container pusher"  style="padding-top:6em">
-    <div class="ui container negative message" th:each="err : ${errors}">
+    <div class="ui container negative message" th:if="${error !=  null && error != ''}">
         <i class="close icon"></i>
-        <div class="header">
-            Oups !
-        </div>
-        <p th:text="${err.getMessage()}"></p>
+        <div th:text="${error}" class="header">  </div>
+
     </div>
     <div class="ui container positive message" th:if="${message !=  null && message != ''}">
         <i class="close icon"></i>

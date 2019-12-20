@@ -34,11 +34,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.DataTableService;
-import timeboard.core.api.sync.ProjectSyncCredentialField;
-import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.sync.ProjectSyncCredentialField;
+import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
@@ -118,6 +119,7 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
+
         return "project_tasks.html";
     }
 
@@ -140,15 +142,17 @@ public class ProjectTasksController {
 
         this.projectSyncService.syncProjectTasks(actor, actor, project, serviceName, creds);
 
+
         return "redirect:/projects/"+projectID+"/tasks";
     }
 
     @PostMapping("/tasks")
-    protected String handlePost(HttpServletRequest request, Model model) throws BusinessException {
+    protected String handlePost(HttpServletRequest request, Model model,  RedirectAttributes attributes) throws BusinessException {
         Account actor = this.userInfo.getCurrentAccount();
 
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);
+        attributes.addFlashAttribute("message", "Project created successfully.");
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);

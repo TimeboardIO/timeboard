@@ -37,7 +37,9 @@ const emptyTask =  {
     milestoneName: '',
 }
 
-const timesheetModel =  { 
+const timesheetModel =  {
+    successMessage: "",
+    errorMessage: "",
     newTask: Object.assign( { } , emptyTask),
     disableNext: false,
     disablePrev: false,
@@ -160,15 +162,26 @@ Vue.component('task-modal',  {
 let app = new Vue( { 
     el: '#timesheet',
     data: timesheetModel,
-    methods:  { 
+    methods:  {
+        displayErrorMessage : function(message) {
+            this.errorMessage = message;
+            $('.message.timesheet.negative').show();
+
+        },
+        displaySuccessMessage: function(message) {
+            this.successMessage = message;
+            $('.message.timesheet.positive').show();
+        },
         validateMyWeek: function(event) {
             $.ajax({
                 method: "GET",
                 url: "api/timesheet/validate?week="+app.week+"&year="+app.year,
-                statusCode: {
-                    201: function() {
-                        app.validated=true;
-                    },
+                success : function(data, textStatus, jqXHR)  {
+                    app.validated=true;
+                    app.displaySuccessMessage("Your timesheet have been validated successfully.");
+                },
+                error: function(jqXHR, textStatus, errorThrown)  {
+                   app.displayErrorMessage("Error can not validate your timesheet.");
                 }
             });
         },
@@ -278,8 +291,10 @@ let app = new Vue( {
             app.disableNext = data.disableNext;
             app.disablePrev = data.disablePrev;
         }).then(function() {
+
             $('.ui.dimmer').removeClass('active');
-        }).then(function() { 
+            $(' #timesheet').removeClass('hidden');
+        }).then(function() {
              let list = document.getElementsByClassName("day-badge");
              for (let i = 0; i < list.length; i++ ) { 
                 let badge = list[i];

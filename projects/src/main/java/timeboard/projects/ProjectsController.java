@@ -82,7 +82,6 @@ public class ProjectsController {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
         attributes.addFlashAttribute("message", "Project created successfully.");
-        attributes.addFlashAttribute("error", "Project created successfully.");
         return "redirect:/projects";
     }
 
