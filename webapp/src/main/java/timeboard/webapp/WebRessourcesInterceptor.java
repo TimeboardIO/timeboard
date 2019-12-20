@@ -87,6 +87,8 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
             Long orgaID = ThreadLocalStorage.getCurrentOrganizationID();
             if(orgaID != null) {
                 fillModelWithOrganization(modelMap, orgaID);
+            }else{
+                LOGGER.warn("User : {} try to access to null organisation", userInfo.getCurrentAccount());
             }
 
         }
