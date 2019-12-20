@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 
-sed -i '' "s/^timeboard.commit.id=.*/timeboard.commit.id=$(git rev-parse HEAD)/" "webapp/src/main/resources/application.properties"
+echo $(git rev-parse HEAD) > ./webapp/src/main/resources/version
 mvn clean install
 mkdir -p build
 mkdir -p temp
