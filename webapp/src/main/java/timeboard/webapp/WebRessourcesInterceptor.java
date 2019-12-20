@@ -86,19 +86,23 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
             modelMap.put("dataTableService", dataTableService);
             Long orgaID = ThreadLocalStorage.getCurrentOrganizationID();
             if(orgaID != null) {
-                modelMap.put("orgID", orgaID);
-                Optional<Account> organisation = organizationService.getOrganizationByID(userInfo.getCurrentAccount(), orgaID);
-                if(organisation.isPresent()){
-                    modelMap.put("currentOrg", organisation.get());
-                }else{
-                    LOGGER.warn("User : {} try to access missing org : {}", userInfo.getCurrentAccount(), orgaID);
-                }
+                fillModelWithOrganization(modelMap, orgaID);
             }
 
         }
 
         if(modelMap != null){
             modelMap.put("appName", appName);
+        }
+    }
+
+    private void fillModelWithOrganization(ModelMap modelMap, Long orgaID) {
+        modelMap.put("orgID", orgaID);
+        Optional<Account> organisation = organizationService.getOrganizationByID(userInfo.getCurrentAccount(), orgaID);
+        if(organisation.isPresent()){
+            modelMap.put("currentOrg", organisation.get());
+        }else{
+            LOGGER.warn("User : {} try to access missing org : {}", userInfo.getCurrentAccount(), orgaID);
         }
     }
 
