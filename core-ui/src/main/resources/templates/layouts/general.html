@@ -15,9 +15,34 @@
     <script src="/webjars/timeboard/script.js"></script>
     <script src="/timeboard/js/datatable.js"></script>
     <script src="/timeboard/js/modal.js"></script>
-
+    <script src="/timeboard/js/general.js"></script>
 </head>
 <body>
+
+<style type="text/css">
+    #versionBox {
+        display: block;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        z-index: 10000000;
+        width: 30px;
+        height: 30px;
+    }
+
+    #versionText {
+        display: none;
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        background-color: white;
+    }
+
+    #versionBox:hover + #versionText {
+        display: block;
+    }
+</style>
+
 
 <div class="ui fixed menu main"
      th:include="fragments/navigation.html :: nav(${path})"></div>
@@ -46,5 +71,9 @@
         });
 </script>
 </body>
+
+<a id="versionBox" th:onclick="copyToClipboard([[${appVersion}]])"></a>
+    <div id="versionText" th:text="${appVersion}"></div>
+</a>
 
 </html>

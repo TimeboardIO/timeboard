@@ -53,6 +53,9 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     @Value("${timeboard.appName}")
     private String appName;
 
+    @Value("${timeboard.commit.id}")
+    private String appVersion;
+
     @Autowired
     private JavascriptService javascriptService;
 
@@ -95,6 +98,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
         if(modelMap != null){
             modelMap.put("appName", appName);
+            modelMap.put("appVersion", appVersion);
         }
     }
 

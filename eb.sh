@@ -8,3 +8,5 @@ cp -r scripts/aws/ temp
 cd temp && zip timeboard.$(git rev-parse HEAD).zip -r * .[^.]* && mv *.zip ../build/
 cd ..
 ls -al build/*.zip
+
+sed 's/timeboard.commit.id=*/timeboard.commit.id='+$(git rev-parse HEAD)+'/' application.properties
