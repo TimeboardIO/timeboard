@@ -26,6 +26,7 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.apache.poi.util.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,8 @@ import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
 import timeboard.core.ui.UserInfo;
 
+import javax.annotation.PostConstruct;
+import java.io.InputStream;
 import java.util.Optional;
 
 @Component
@@ -52,6 +55,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
     @Value("${timeboard.appName}")
     private String appName;
+
 
     @Autowired
     private JavascriptService javascriptService;
@@ -70,6 +74,19 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
     @Autowired
     private OrganizationService organizationService;
+
+    private String version = "";
+
+    @PostConstruct
+    private void init() throws Exception{
+        try(final InputStream versionStream = this.getClass().getClassLoader().getResourceAsStream("version")) {
+            if (versionStream != null) {
+                byte[] array = IOUtils.toByteArray(versionStream);
+                version = new String(array, "UTF-8");
+                LOGGER.info("Timeboard version is {}", version);
+            }
+        }
+    }
 
     @Override
     public void preHandle(WebRequest webRequest) throws Exception {
@@ -95,6 +112,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
         if(modelMap != null){
             modelMap.put("appName", appName);
+            modelMap.put("appVersion", version);
         }
     }
 

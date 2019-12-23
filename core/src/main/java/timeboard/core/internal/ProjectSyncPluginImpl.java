@@ -70,24 +70,46 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                 actor,
                 String.format("Sync project %s with JIRA", project.getName()),
                 new DelegatingSecurityContextCallable(() -> {
+                    return syncTasks(org, actor, project, serviceName, jiraCrendentials);
+                }));
 
-            ThreadLocalStorage.setCurrentOrganizationID(org.getId());
+    }
 
-            ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
-                    .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
-                    .findFirst().get();
+    @Override
+    public List<ProjectSyncCredentialField> getServiceFields(String serviceName) {
+        final ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
+                .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
+                .findFirst().get();
+        return syncService.getSyncCredentialFields();
+    }
 
-            final List<RemoteTask> remoteTasks = syncService.getRemoteTasks(actor, jiraCrendentials);
+    private Object syncTasks(Account org,
+                             Account actor,
+                             Project project,
+                             String serviceName,
+                             List<ProjectSyncCredentialField> jiraCrendentials) throws Exception {
 
-            remoteTasks.stream()
-                    .forEach(task -> mergeAssignee(userService, syncService.getServiceName(), task));
+        ThreadLocalStorage.setCurrentOrganizationID(org.getId());
 
-            this.syncTasks(actor, project, remoteTasks);
+        final ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
+                .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
+                .findFirst().get();
+
+        final List<RemoteTask> remoteTasks = syncService.getRemoteTasks(actor, jiraCrendentials);
+
+        remoteTasks.stream()
+                .forEach(task -> {
+                        try {
+                            mergeAssignee(userService, syncService.getServiceName(), task);
+                        }catch (Exception e){
+
+                        }
+                });
+
+        this.syncTasks(actor, project, remoteTasks);
 
 
-            return String.format("Sync %s tasks from Jira", remoteTasks.size());
-        }));
-
+        return String.format("Sync %s tasks from %s", remoteTasks.size(), serviceName);
     }
 
     private void syncTasks(final Account actor, final Project project, final List<RemoteTask> remoteTasks) throws BusinessException {

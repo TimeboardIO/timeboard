@@ -152,7 +152,7 @@
                 Import tasks
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" class="item" v-on:click="$('.ui.modal.sync').modal('show')">plugin name</div>
+                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" th:modal-id="${plugin.serviceID}" class="item" v-on:click="$('#'+event.target.getAttribute('modal-id')).modal('show')">plugin name</div>
                 </div>
             </div>
             <div @click="$('.filters').toggle()" class="ui dropdown item" >
@@ -342,7 +342,7 @@
 
 
         <div class="sync plugins" th:each="plugin: ${sync_plugins}">
-            <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getSyncCredentialFields()})"></div>
+            <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getServiceID()}, ${plugin.getSyncCredentialFields()})"></div>
         </div>
 
         <script src="/js/project_tasks.js"></script>

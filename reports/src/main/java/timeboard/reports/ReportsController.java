@@ -36,10 +36,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
@@ -93,11 +93,12 @@ public class ReportsController {
         model.addAttribute("report", new Report());
         model.addAttribute("action", "create");
 
+
         return "create_report.html";
     }
 
     @PostMapping("/create")
-    protected String handlePost(@ModelAttribute Report report) {
+    protected String handlePost(@ModelAttribute Report report,  RedirectAttributes attributes) {
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
@@ -111,17 +112,22 @@ public class ReportsController {
                 report.getType(),
                 projectFilter
         );
+        attributes.addFlashAttribute("success", "Report created successfully.");
+
         return "redirect:/reports";
     }
 
     @GetMapping("/delete/{reportID}")
-    protected String deleteReport(@PathVariable long reportID) throws ServletException, IOException, BusinessException {
+    protected String deleteReport(@PathVariable long reportID,  RedirectAttributes attributes) {
         this.reportService.deleteReportByID(this.userInfo.getCurrentAccount(), reportID);
+
+        attributes.addFlashAttribute("success", "Report deleted successfully.");
+
         return "redirect:/reports";
     }
 
     @GetMapping("/edit/{reportID}")
-    protected String editReport(@PathVariable long reportID, Model model) throws ServletException, IOException {
+    protected String editReport(@PathVariable long reportID, Model model) {
         model.addAttribute("allReportTypes", ReportType.values());
         model.addAttribute("reportID", reportID);
         model.addAttribute("action", "edit");
@@ -130,7 +136,7 @@ public class ReportsController {
     }
 
     @PostMapping("/edit/{reportID}")
-    protected String handlePost(@PathVariable long reportID, @ModelAttribute Report report) {
+    protected String handlePost(@PathVariable long reportID, @ModelAttribute Report report,  RedirectAttributes attributes) {
         final Account actor = this.userInfo.getCurrentAccount();
         Long organizationID = userInfo.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
@@ -141,6 +147,7 @@ public class ReportsController {
         updatedReport.setFilterProject(report.getFilterProject());
 
         this.reportService.updateReport(actor, updatedReport);
+        attributes.addFlashAttribute("success", "Report updated successfully.");
 
         return "redirect:/reports";
     }

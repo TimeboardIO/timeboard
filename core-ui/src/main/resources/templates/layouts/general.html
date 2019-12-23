@@ -16,8 +16,35 @@
     <script src="/webjars/timeboard/script.js"></script>
     <script src="/timeboard/js/datatable.js"></script>
     <script src="/timeboard/js/modal.js"></script>
+    <script src="/timeboard/js/general.js"></script>
 </head>
 <body>
+
+<style type="text/css">
+    #versionBox {
+        display: block;
+        position: fixed;
+        bottom: 0px;
+        left: 0px;
+        z-index: 10000000;
+        width: 20px;
+        height: 20px;
+    }
+
+    #versionText {
+        display: none;
+        position: fixed;
+        bottom: 0px;
+        z-index: 1000000;
+        left: 0px;
+        font-size: 0.7em;
+        background-color: white;
+    }
+
+    #versionBox:hover > * {
+        display: block;
+    }
+</style>
 
 
 <div class="ui fixed menu main"
@@ -26,16 +53,30 @@
 <div class="ui left vertical menu sidebar side"
      th:include="fragments/navigation.html :: nav(${path})"></div>
 
-<div class="ui container negative message" th:each="err : ${errors}">
-    <i class="close icon"></i>
-    <div class="header">
-        Oups !
-    </div>
-    <p th:text="${err.getMessage()}"></p>
-</div>
+<div class="ui main container pusher"  style="padding-top:6em">
+    <div class="ui container negative message" th:if="${error !=  null && error != ''}">
+        <i class="close icon"></i>
+        <div th:text="${error}" class="header">  </div>
 
-<div class="ui main container pusher" layout:fragment="content" style="padding-top:6em">
-    Main content
+    </div>
+    <div class="ui container positive message" th:if="${success !=  null && success != ''}">
+        <i class="close icon"></i>
+        <div th:text="${success}" class="header">  </div>
+    </div>
+    <div layout:fragment="content" ></div>
 </div>
+<script>
+    $('.message .close')
+        .on('click', function() {
+            $(this)
+                .closest('.message')
+                .transition('fade');
+        });
+</script>
+
+<a id="versionBox" th:onclick="copyToClipboard([[${appVersion}]])">
+    <div id="versionText" th:text="${appVersion}"></div>
+</a>
+
 </body>
 </html>
