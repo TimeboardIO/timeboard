@@ -26,7 +26,7 @@
   margin: 1rem 0em;
   font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   background: #FFFFFF;
-  font-weight: 'bold';
+  font-weight: normal;
   border: 1px solid rgba(34, 36, 38, 0.15);
   -webkit-box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
           box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
@@ -86,7 +86,7 @@
   padding: 1.14285714em 1.14285714em;
   text-transform: none;
   color: #393939;
-  font-weight: normal;
+  font-weight: 600;
   -webkit-transition: background 0.1s ease, color 0.1s ease, -webkit-box-shadow 0.1s ease;
   transition: background 0.1s ease, color 0.1s ease, -webkit-box-shadow 0.1s ease;
   transition: background 0.1s ease, box-shadow 0.1s ease, color 0.1s ease;
@@ -451,8 +451,8 @@
 
 .ui.menu .active.item:hover,
 .ui.vertical.menu .active.item:hover {
-  background-color: #00bfd8;
-  color: transparent;
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.95);
 }
 
 /*--------------
@@ -1313,8 +1313,8 @@ Floated Menu / Item
 
 .ui.menu .red.active.item,
 .ui.red.menu .active.item {
-  border-color: #C53E43 !important;
-  color: #C53E43 !important;
+  border-color: #db2828 !important;
+  color: #db2828 !important;
 }
 .ui.menu .orange.active.item,
 .ui.orange.menu .active.item {
@@ -1333,8 +1333,8 @@ Floated Menu / Item
 }
 .ui.menu .green.active.item,
 .ui.green.menu .active.item {
-  border-color: #4DC98D !important;
-  color: #4DC98D !important;
+  border-color: #21ba45 !important;
+  color: #21ba45 !important;
 }
 .ui.menu .teal.active.item,
 .ui.teal.menu .active.item {
@@ -1497,7 +1497,7 @@ Floated Menu / Item
 /* Red */
 .ui.inverted.menu .red.active.item,
 .ui.inverted.red.menu {
-  background-color: #C53E43;
+  background-color: #db2828;
 }
 .ui.inverted.red.menu .item:before {
   background-color: rgba(34, 36, 38, 0.1);
@@ -1545,7 +1545,7 @@ Floated Menu / Item
 /* Green */
 .ui.inverted.menu .green.active.item,
 .ui.inverted.green.menu {
-  background-color: #4DC98D;
+  background-color: #21ba45;
 }
 .ui.inverted.green.menu .item:before {
   background-color: rgba(34, 36, 38, 0.1);
@@ -2032,28 +2032,15 @@ Floated Menu / Item
 .ui.massive.vertical.menu {
   width: 25rem;
 }
+.item.header img {
+  height: 2rem;
+  width: auto !important;
+}
 /*
-
-.item.nav  {
-  .title, .icon{
-    font-weight: bold;
-
-  }
+* {
+  font: 600 0.875rem/0.875rem "Raleway", sans-serif;
 }
-.item.nav:hover, item.nav.active {
-  .title, .icon {
-    color: @primaryColor;
-  }
-
-.menu.project{
-    :not(.active){
-        color: white !important;
-        font-weight: bold !important;
-    }
-}
-
-
-}*/
+*/
 
 
 /*******************************

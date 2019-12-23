@@ -13,23 +13,6 @@
 
 <div layout:fragment="content">
 
-    <style type="text/css">
-        .badge{
-           text-align: center;
-            width: 3em;
-            margin: 0 auto;
-            background-color: #957DAD;
-            line-height: 3em;
-            border-radius: 5em;
-            margin-top: 0.5em;
-            font-size: 3em;
-            color: white;
-            margin-bottom: 0.5em;
-        }
-
-
-    </style>
-
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
         <div class="content">
@@ -51,8 +34,6 @@
                 New Project
             </a>
         </div>
-
-        <br/>
         <div class="ui horizontal divider">
             <i class="box icon"></i>
             Last Projects

@@ -9,9 +9,11 @@
 
 html{
     height: 100%;
-    background: rgba(221,227,232,1);
-    background: linear-gradient(45deg, #00bed8 0%,#007df7 95%);
-    background-repeat: no-repeat;
+    background: @primaryColor;
+    background: linear-gradient(45deg, #00bed8 0%,#007df7 95%) fixed;
+
+  // background-size: cover;
+  //  background-repeat: no-repeat;
 }
 body{
   background: transparent;
@@ -45,15 +47,10 @@ ui.input.error > input {
 }
 
 .day-badge {
-  disaply: none;
   width: 2.5rem;
   height: 2.5rem;
 }
 
-.item.header img {
-  height: 2rem;
-  width: auto !important;
-}
 
 
 /** Timesheet **/
@@ -74,8 +71,18 @@ ui.input.error > input {
       margin: 0;
     }
 
-    button.create-task{
-        left: 11em; position: absolute;
+    .timesheet-head tr{
+      background-color: #004751;
+    }
+
+   .actions {
+        * {
+          display: inline-block;
+        }
+        position: absolute;
+        left: 0;
+        top: 25%;
+        margin-left: 1rem;
     }
 
     fieldset{

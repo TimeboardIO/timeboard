@@ -1,5 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);
-
+/*
 
 .ui.button{
 
@@ -51,3 +50,23 @@ ui.button.negative{
   background-color: transparent !important;
 
 }
+*/
+
+/*
+.btn-solid-lg {
+  display: inline-block;
+  padding: 1.375rem 2.625rem 1.375rem 2.625rem;
+  border: 0.125rem solid #00bfd8;
+  border-radius: 2rem;
+  background-color: #00bfd8;
+  color: #fff;
+  font: 700 0.75rem/0 "Raleway", sans-serif;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-solid-lg:hover {
+  background-color: transparent;
+  color: #00bfd8;
+  text-decoration: none;
+}*/

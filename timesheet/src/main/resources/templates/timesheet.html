@@ -97,26 +97,31 @@
             <div  class="header"> {{ success.message }} </div>
         </div>
         <div class="ui segment timesheet-navigation-controls">
-            <div v-if="validated === false" style="left: 1em; position: absolute;" v-bind:data-tooltip="!enableValidateButton()?' Please validate previous week and make sure every working day imputation day total equals 1' : false"
-                 data-position="right center">
-                <button
-                    v-bind:data-week="week"
-                    v-bind:data-year="year"
-                    v-on:click="validateMyWeek"
-                    v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
-                    type="submit" value="Validate My Week">
-                    Validate My Week
-                </button>
-            </div>
-            <div v-if="validated === true" style="left: 1em; position: absolute;" >
-                <button class="ui positive button disabled">
-                    Week validated
+
+
+            <div class="actions">
+                <div v-if="validated === false" v-bind:data-tooltip="!enableValidateButton()?' Please validate previous week and make sure every working day imputation day total equals 1' : false"
+                     data-position="right center">
+                    <button
+                            v-bind:data-week="week"
+                            v-bind:data-year="year"
+                            v-on:click="validateMyWeek"
+                            v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
+                            type="submit" value="Validate My Week">
+                        Validate My Week
+                    </button>
+                </div>
+                <div v-if="validated === true" >
+                    <button class="ui positive button disabled">
+                        Week validated
+                    </button>
+                </div>
+                <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button">
+                    New Task
                 </button>
             </div>
 
-            <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button">
-                 New Task
-            </button>
+
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week)" :class="{ disabled : disablePrev }">
                 <i class="left arrow icon"></i>Previous week</a>
@@ -140,7 +145,7 @@
                             </th>
                             <th class="wide one project" colspan="4"></th>
                         </tr>
-                        <tr>
+                        <tr class="timesheet-head">
                             <th class="two wide">Task</th>
                             <th class="wide one" style="text-align:center" v-for="day in days">
                                 <div v-if="(day.day != 'Saturday') && (day.day != 'Sunday')"

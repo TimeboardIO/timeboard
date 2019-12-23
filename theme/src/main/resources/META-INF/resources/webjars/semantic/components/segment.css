@@ -582,10 +582,10 @@
 
 /* Red */
 .ui.red.segment:not(.inverted) {
-  border-top: 2px solid #DB2828 !important;
+  border-top: 2px solid #db2828 !important;
 }
 .ui.inverted.red.segment {
-  background-color: #DB2828 !important;
+  background-color: #db2828 !important;
   color: #FFFFFF !important;
 }
 
@@ -618,10 +618,10 @@
 
 /* Green */
 .ui.green.segment:not(.inverted) {
-  border-top: 2px solid #21BA45 !important;
+  border-top: 2px solid #21ba45 !important;
 }
 .ui.inverted.green.segment {
-  background-color: #21BA45 !important;
+  background-color: #21ba45 !important;
   color: #FFFFFF !important;
 }
 
@@ -636,19 +636,19 @@
 
 /* Blue */
 .ui.blue.segment:not(.inverted) {
-  border-top: 2px solid #2185D0 !important;
+  border-top: 2px solid #00bfd8 !important;
 }
 .ui.inverted.blue.segment {
-  background-color: #2185D0 !important;
+  background-color: #00bfd8 !important;
   color: #FFFFFF !important;
 }
 
 /* Violet */
 .ui.violet.segment:not(.inverted) {
-  border-top: 2px solid #6435C9 !important;
+  border-top: 2px solid #957DAD !important;
 }
 .ui.inverted.violet.segment {
-  background-color: #6435C9 !important;
+  background-color: #957DAD !important;
   color: #FFFFFF !important;
 }
 
@@ -742,7 +742,7 @@
 
 /* Nested */
 .ui.inverted.segment .segment {
-  color: rgba(0, 0, 0, 0.87);
+  color: rgba(0, 0, 0, 0.6);
 }
 .ui.inverted.segment .inverted.segment {
   color: rgba(255, 255, 255, 0.9);
@@ -865,12 +865,6 @@
 .ui.massive.segment {
   font-size: 1.71428571rem;
 }
-
-
-/*******************************
-         Theme Overrides
-*******************************/
-
 
 
 /*******************************

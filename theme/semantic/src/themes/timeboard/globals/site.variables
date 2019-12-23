@@ -55,7 +55,7 @@
 @secondaryColor      : #393939;
 
 
-@backgroundGradientColor1 : #00BED8;
+@backgroundGradientColor1 : #01BFD9;
 @backgroundGradientColor2 : #007DF7;
 
 @lightPrimaryColor   : #75a7d5;
@@ -226,8 +226,8 @@
 /*---  Colors  ---*/
 
 
-@red              : #C53E43;
-@green            : #4DC98D;
+@red              : #db2828;
+@green            : #21ba45;
 @blue             : @primaryColor;
 @yellow           : #FBBD08;
 

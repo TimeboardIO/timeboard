@@ -1,22 +1,9 @@
+.item.header img {
+  height: 2rem;
+  width: auto !important;
+}
 /*
-
-.item.nav  {
-  .title, .icon{
-    font-weight: bold;
-
-  }
+* {
+  font: 600 0.875rem/0.875rem "Raleway", sans-serif;
 }
-.item.nav:hover, item.nav.active {
-  .title, .icon {
-    color: @primaryColor;
-  }
-
-.menu.project{
-    :not(.active){
-        color: white !important;
-        font-weight: bold !important;
-    }
-}
-
-
-}*/
+*/

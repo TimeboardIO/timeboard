@@ -1,13 +1,15 @@
 @verticalPadding: 0.5rem;
 @horizontalPadding: 1.0rem;
-@borderRadius: 1.5rem;
+@borderRadius: 1.0rem;
+@borderSize: 1px;
 
-
-
-@positiveTextColor: @positiveTextShadow;
+/* positive */
+@positiveTextColor: @white;
 @positiveTextShadow: @invertedTextShadow;
 @positiveBoxShadow: transparent;
 
-@negativeTextColor: @invertedTextColor;
+@fontWeight: 600;
+
+@negativeTextColor: @white;
 @negativeTextShadow: @invertedTextShadow;
 @negativeBoxShadow: transparent;

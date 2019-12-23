@@ -209,10 +209,9 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 }
 html {
   height: 100%;
-  background: #dde3e8;
-  background: -webkit-linear-gradient(45deg, #00bed8 0%, #007df7 95%);
-  background: linear-gradient(45deg, #00bed8 0%, #007df7 95%);
-  background-repeat: no-repeat;
+  background: #00bfd8;
+  background: -webkit-linear-gradient(45deg, #00bed8 0%, #007df7 95%) fixed;
+  background: linear-gradient(45deg, #00bed8 0%, #007df7 95%) fixed;
 }
 body {
   background: transparent;
@@ -237,13 +236,8 @@ ui.input.error > input {
   color: #9f3a38 !important;
 }
 .day-badge {
-  disaply: none;
   width: 2.5rem;
   height: 2.5rem;
-}
-.item.header img {
-  height: 2rem;
-  width: auto !important;
 }
 /** Timesheet **/
 #timesheet table td {
@@ -259,9 +253,17 @@ ui.input.error > input {
   -webkit-appearance: none;
   margin: 0;
 }
-#timesheet button.create-task {
-  left: 11em;
+#timesheet .timesheet-head tr {
+  background-color: #004751;
+}
+#timesheet .actions {
   position: absolute;
+  left: 0;
+  top: 25%;
+  margin-left: 1rem;
+}
+#timesheet .actions * {
+  display: inline-block;
 }
 #timesheet fieldset {
   padding: 0px;
