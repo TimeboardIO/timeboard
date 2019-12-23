@@ -27,10 +27,9 @@ package timeboard.webapp;
  */
 
 
-import com.codahale.metrics.ConsoleReporter;
-import com.codahale.metrics.Histogram;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import com.codahale.metrics.*;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -39,6 +38,9 @@ import javax.servlet.*;
 
 @Component
 public class RequestDurationFilter implements Filter {
+
+    @Value("${timeboard.interval.metrics.minutes}")
+    private static long timeIntervalLogs;
 
     static final MetricRegistry metrics = new MetricRegistry();
 
@@ -70,12 +72,17 @@ public class RequestDurationFilter implements Filter {
 
 
     static void startReport() {
-        ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
+        /*ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
+                .convertRatesTo(TimeUnit.SECONDS)
+                .convertDurationsTo(TimeUnit.MILLISECONDS)
+                .build();*/
+        final Slf4jReporter reporter = Slf4jReporter.forRegistry(metrics)
+                .outputTo(LoggerFactory.getLogger("timeboard.marker.metrics"))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();
         reporter.start(10, TimeUnit.SECONDS);
-       // reporter.start(30, TimeUnit.MINUTES);
+       // reporter.start(timeIntervalLogs, TimeUnit.MINUTES);
     }
 
 }
