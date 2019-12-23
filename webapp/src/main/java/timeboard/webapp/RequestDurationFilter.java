@@ -30,6 +30,7 @@ package timeboard.webapp;
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -42,6 +43,8 @@ public class RequestDurationFilter implements Filter {
     static final MetricRegistry metrics = new MetricRegistry();
 
     private final Histogram responseSizes = metrics.histogram(MetricRegistry.name( "response"));
+
+    //private final com.codahale.metrics.Timer responses = metrics.timer(MetricRegistry.name("responses"));
 
 
     @Override
@@ -56,6 +59,11 @@ public class RequestDurationFilter implements Filter {
 
         responseSizes.update(duration);
 
+        /*try(final Timer.Context context = responses.time()) {
+            // etc;
+            //return "OK";
+        }*/
+
         startReport();
 
     }
@@ -66,7 +74,8 @@ public class RequestDurationFilter implements Filter {
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();
-        reporter.start(1, TimeUnit.SECONDS);
+        reporter.start(10, TimeUnit.SECONDS);
+       // reporter.start(30, TimeUnit.MINUTES);
     }
 
 }
