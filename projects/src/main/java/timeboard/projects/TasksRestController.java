@@ -171,29 +171,6 @@ public class TasksRestController {
                 ));
         wrapper.setEffortSpentData(effortSpentMap.values());
 
-        // Datas for effort estimate (Axis Y)
-        List<ValueHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
-        final ValueHistory[] lastEffortEstimate = {new ValueHistory(task.getStartDate(), task.getOriginalEstimate())};
-        Map<Date, Double> effortEstimateMap = listOfTaskDates
-                .stream()
-                .map(dateString -> {
-                    return formatDate(formatDateToDisplay, dateString);
-                })
-                .map(date -> effortLeftDB.stream()
-                        .filter(el -> new SimpleDateFormat(formatDateToDisplay)
-                                .format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
-                        .map(effortLeft -> {
-                            lastEffortEstimate[0] = new ValueHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
-                            return lastEffortEstimate[0];
-                        })
-                        .findFirst().orElse(new ValueHistory(date, lastEffortEstimate[0].getValue())))
-                .collect(Collectors.toMap(
-                        e -> e.getDate(),
-                        e -> e.getValue(),
-                        (x, y) -> y, LinkedHashMap::new
-                ));
-        wrapper.setRealEffortData(effortEstimateMap.values());
-
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
 
     }

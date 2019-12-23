@@ -28,7 +28,6 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +65,8 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         this.taskSnapshots = new ArrayList<>();
     }
 
-    public ProjectSnapshot(Long id, Date projectSnapshotDate, List<TaskSnapshot> taskSnapshots, Project project, double originalEstimate, double effortLeft, double effortSpent, double realEffort, double quotation) {
+    public ProjectSnapshot(Long id, Date projectSnapshotDate, List<TaskSnapshot> taskSnapshots, Project project, double originalEstimate,
+                           double effortLeft, double effortSpent, double realEffort, double quotation) {
         this.id = id;
         this.projectSnapshotDate = projectSnapshotDate;
         this.taskSnapshots = taskSnapshots;
