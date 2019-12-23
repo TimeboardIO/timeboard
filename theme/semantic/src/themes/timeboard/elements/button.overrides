@@ -1,8 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Roboto);
 
 
-
-
 .ui.button{
 
   padding  : @verticalPadding @horizontalPadding;
@@ -16,22 +14,40 @@
 .ui.button:hover{
   color: @primaryColor !important;
   background-color: transparent !important;
-
 }
 
 
 ui.button.positive{
 
   padding  : @verticalPadding @horizontalPadding;
-  border  : 0.125rem solid @green;
+  border  : 0.125rem solid @green ;
   border-radius      :  @green;
   color             :  @green;
   font-weight       : normal;
+  border-color: @green !important;
 
 }
 
 .ui.button.positive:hover{
   color:  @green !important;
+  background-color: transparent !important;
+
+}
+
+
+ui.button.negative{
+
+  padding  : @verticalPadding @horizontalPadding;
+  border  : 0.125rem solid @red ;
+  border-radius :  @red;
+  color             :  @red;
+  font-weight       : normal;
+  border-color: @red !important;
+
+}
+
+.ui.button.negative:hover{
+  color:  @red !important;
   background-color: transparent !important;
 
 }

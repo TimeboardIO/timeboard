@@ -150,7 +150,7 @@
                                       'red':(getImputationSum(day.date).toFixed(1) < 1)}"
                                      style="margin-top: 5px;"
                                      v-bind:day-badge="day.date">
-                                    {{ getImputationSum(day.date).toFixed(1) }}
+                                    <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
                                 </div>
                                 <div v-if="(day.day == 'Saturday') || (day.day == 'Sunday')"
                                      v-bind:id="day.date"
@@ -158,7 +158,7 @@
                                       'green':(getImputationSum(day.date).toFixed(1) >= 1)}"
                                      style="margin-top: 5px;"
                                      v-bind:day-badge="day.date">
-                                    {{ getImputationSum(day.date).toFixed(1) }}
+                                    <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
                                 </div>
                             </th>
                             <th class="wide one" data-tooltip="Effort spent: Total effort spent on the task" rowspan="1">ES</th>

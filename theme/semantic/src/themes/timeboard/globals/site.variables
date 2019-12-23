@@ -225,12 +225,16 @@
 
 /*---  Colors  ---*/
 
-@blue             : @primaryColor;
+
 @red              : #C53E43;
-@orange           : #F2711C;
+@green            : #4DC98D;
+@blue             : @primaryColor;
 @yellow           : #FBBD08;
+
+//@red              : #C53E43;
+@orange           : #F2711C;
 @olive            : #B5CC18;
-@green            : #20c997;
+//@green            : #20c997;
 @teal             : #00B5AD;
 @violet           : #957DAD;
 @purple           : #A333C8;

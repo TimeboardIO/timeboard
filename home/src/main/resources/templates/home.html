@@ -72,9 +72,9 @@
                         <td data-label="Days">
                             <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
                                 <div class="ui circular label large day-badge green" th:if="${week.imputationSum >= 5}"
-                                     th:text="${week.imputationSum}"></div>
+                                    ><p th:text="${week.imputationSum}" ></p></div>
                                 <div class="ui circular label large day-badge red" th:if="${week.imputationSum < 5}"
-                                     th:text="${week.imputationSum}"></div>
+                                    ><p th:text="${week.imputationSum}" ></p></div>
                             </a>
                         </td>
                         <td data-label="Validated">

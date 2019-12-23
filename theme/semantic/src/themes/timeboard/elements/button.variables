@@ -1,3 +1,13 @@
-@verticalPadding: 0.675rem;
-@horizontalPadding: 1.325rem;
-@borderRadius: 2rem;
+@verticalPadding: 0.5rem;
+@horizontalPadding: 1.0rem;
+@borderRadius: 1.5rem;
+
+
+
+@positiveTextColor: @positiveTextShadow;
+@positiveTextShadow: @invertedTextShadow;
+@positiveBoxShadow: transparent;
+
+@negativeTextColor: @invertedTextColor;
+@negativeTextShadow: @invertedTextShadow;
+@negativeBoxShadow: transparent;

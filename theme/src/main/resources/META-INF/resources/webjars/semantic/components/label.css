@@ -654,7 +654,7 @@ a.ui.olive.label:hover {
 
 /* Ribbon */
 .ui.olive.ribbon.label {
-  border-color: #199d76 !important;
+  border-color: #35ae73 !important;
 }
 
 /* Basic */
@@ -674,16 +674,16 @@ a.ui.basic.olive.label:hover {
 
 .ui.green.labels .label,
 .ui.green.label {
-  background-color: #20c997 !important;
-  border-color: #20c997 !important;
+  background-color: #4DC98D !important;
+  border-color: #4DC98D !important;
   color: #FFFFFF !important;
 }
 
 /* Link */
 .ui.green.labels .label:hover,
 a.ui.green.label:hover {
-  background-color: #15bb8a !important;
-  border-color: #15bb8a !important;
+  background-color: #34c881 !important;
+  border-color: #34c881 !important;
   color: #FFFFFF !important;
 }
 
@@ -695,20 +695,20 @@ a.ui.green.label:hover {
 
 /* Ribbon */
 .ui.green.ribbon.label {
-  border-color: #199d76 !important;
+  border-color: #35ae73 !important;
 }
 
 /* Basic */
 .ui.basic.green.label {
   background: none #FFFFFF !important;
-  color: #20c997 !important;
-  border-color: #20c997 !important;
+  color: #4DC98D !important;
+  border-color: #4DC98D !important;
 }
 .ui.basic.green.labels a.label:hover,
 a.ui.basic.green.label:hover {
   background-color: #FFFFFF !important;
-  color: #15bb8a !important;
-  border-color: #15bb8a !important;
+  color: #34c881 !important;
+  border-color: #34c881 !important;
 }
 
 /*--- Teal ---*/

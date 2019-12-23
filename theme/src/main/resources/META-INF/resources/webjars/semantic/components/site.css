@@ -221,14 +221,6 @@ th,
 td {
   text-align: center;
 }
-.ui.primary.button:hover {
-  -webkit-box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important;
-          box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important;
-}
-.ui.secondary.button:hover {
-  -webkit-box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important;
-          box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important;
-}
 h1.ui.header,
 .ui.huge.header {
   font-weight: normal;
@@ -243,6 +235,11 @@ ui.input.error > input {
   background-color: #fff6f6 !important;
   border-color: #e0b4b4 !important;
   color: #9f3a38 !important;
+}
+.day-badge {
+  disaply: none;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 .item.header img {
   height: 2rem;
@@ -291,16 +288,11 @@ ui.input.error > input {
   font-size: 1em !important;
   font-weight: normal;
 }
-.item.nav .title {
-  font-weight: bold;
-}
-.item.nav:hover .title {
-  color: #00bfd8;
-}
 /** PROJECT **/
 .badge {
   text-align: center;
   width: 3em;
+  height: 3em;
   margin: 0 auto;
   background-color: #957DAD;
   line-height: 3em;
@@ -309,10 +301,6 @@ ui.input.error > input {
   font-size: 3em;
   color: white;
   margin-bottom: 0.5em;
-}
-.menu.project :not(.active) {
-  color: white !important;
-  font-weight: bold !important;
 }
 .text.primary {
   color: #00bfd8 !important;

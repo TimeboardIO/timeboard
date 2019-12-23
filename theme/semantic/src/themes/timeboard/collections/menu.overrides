@@ -1,2 +1,22 @@
+/*
+
+.item.nav  {
+  .title, .icon{
+    font-weight: bold;
+
+  }
+}
+.item.nav:hover, item.nav.active {
+  .title, .icon {
+    color: @primaryColor;
+  }
+
+.menu.project{
+    :not(.active){
+        color: white !important;
+        font-weight: bold !important;
+    }
+}
 
 
+}*/
