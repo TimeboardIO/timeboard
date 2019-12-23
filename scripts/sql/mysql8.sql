@@ -58,14 +58,10 @@
     create table DataTableConfig (
        id bigint not null,
         organizationID bigint,
+        columns varchar(255),
         tableInstanceId varchar(255),
         user_id bigint,
         primary key (id)
-    ) engine=InnoDB;
-
-    create table DataTableConfig_columns (
-       DataTableConfig_id bigint not null,
-        columns varchar(255)
     ) engine=InnoDB;
 
     create table DefaultTask (
@@ -84,6 +80,8 @@
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
+
+    insert into hibernate_sequence values ( 1 );
 
     insert into hibernate_sequence values ( 1 );
 
@@ -166,6 +164,15 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table Report (
+       id bigint not null,
+        organizationID bigint,
+        filterProject varchar(255),
+        name varchar(50),
+        type integer,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Task (
        id bigint not null,
         organizationID bigint,
@@ -243,11 +250,6 @@
        add constraint FKmyycwm902xvsapnqmv1y3r4gj 
        foreign key (user_id) 
        references Account (id);
-
-    alter table DataTableConfig_columns 
-       add constraint FK8qwyjho6c0e0ckvebujyixc03 
-       foreign key (DataTableConfig_id) 
-       references DataTableConfig (id);
 
     alter table Imputation 
        add constraint FKicayo4omi1a8krucb5t7kipva 

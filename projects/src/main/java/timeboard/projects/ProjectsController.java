@@ -35,16 +35,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,7 +51,6 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/projects")
 public class ProjectsController {
-
 
     @Autowired
     private ProjectService projectService;
@@ -68,6 +66,7 @@ public class ProjectsController {
             allActorProjects = allActorProjects.subList(0, 5);
         }
         model.addAttribute("projects", allActorProjects);
+
         return "projects.html";
     }
 
@@ -82,21 +81,24 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, BusinessException {
+    protected String handlePost(HttpServletRequest request, HttpServletResponse response,  RedirectAttributes attributes) throws BusinessException {
         final Account actor = this.userInfo.getCurrentAccount();
         this.projectService.createProject(actor, request.getParameter("projectName"));
+        attributes.addFlashAttribute("success", "Project created successfully.");
         return "redirect:/projects";
     }
 
     @GetMapping("/create")
-    protected String createFrom() throws ServletException, IOException {
+    protected String createFrom() {
         return "create_project.html";
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(@PathVariable long projectID) throws ServletException, IOException, BusinessException {
+    protected String deleteProject(@PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
         final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
         this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
+        attributes.addFlashAttribute("success", "Project deleted successfully.");
+
         return "redirect:/projects";
     }
 

@@ -34,16 +34,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.DataTableService;
-import timeboard.core.api.sync.ProjectSyncCredentialField;
-import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.sync.ProjectSyncCredentialField;
+import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 import timeboard.core.ui.UserInfo;
-import timeboard.plugin.project.imp.jira.JiraSyncPlugin;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -118,6 +118,7 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
+
         return "project_tasks.html";
     }
 
@@ -130,7 +131,7 @@ public class ProjectTasksController {
         final Account actor = this.userInfo.getCurrentAccount();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        final List<ProjectSyncCredentialField> creds = JiraSyncPlugin.FIELDS;
+        final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
 
         creds.forEach(field -> {
             if(formBody.containsKey(field.getFieldKey())){
@@ -140,11 +141,12 @@ public class ProjectTasksController {
 
         this.projectSyncService.syncProjectTasks(actor, actor, project, serviceName, creds);
 
+
         return "redirect:/projects/"+projectID+"/tasks";
     }
 
     @PostMapping("/tasks")
-    protected String handlePost(HttpServletRequest request, Model model) throws BusinessException {
+    protected String handlePost(HttpServletRequest request, Model model,  RedirectAttributes attributes) throws BusinessException {
         Account actor = this.userInfo.getCurrentAccount();
 
         long id = Long.parseLong(request.getParameter("projectID"));
@@ -152,6 +154,7 @@ public class ProjectTasksController {
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);
+        attributes.addFlashAttribute("success", "Project created successfully.");
         return "project_tasks.html";
     }
 

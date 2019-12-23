@@ -2,7 +2,7 @@ package timeboard.projects;
 
 /*-
  * #%L
- * reporting
+ * reports
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -339,7 +339,7 @@ public class TasksRestController {
 
     private Milestone getMilestone(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
         Long milestoneID = taskWrapper.milestoneID;
-        if(milestoneID != null) {
+        if(milestoneID != null && milestoneID > 0) {
             return this.projectService.getMilestoneById(actor, milestoneID);
         }else{
             return null;

@@ -72,6 +72,11 @@ public class TimesheetServiceImpl implements TimesheetService {
         //1 - last week is validated
 
         final Calendar c = Calendar.getInstance();
+
+        c.setTime(accountTimesheet.getBeginWorkDate());
+
+        boolean firstWeek = (c.get(Calendar.WEEK_OF_YEAR) == week) && (c.get(Calendar.YEAR) == year);
+
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
         c.setFirstDayOfWeek(Calendar.MONDAY);
@@ -87,10 +92,9 @@ public class TimesheetServiceImpl implements TimesheetService {
                 c.get(Calendar.YEAR),
                 c.get(Calendar.WEEK_OF_YEAR));
 
-        if (!lastWeekValidated) {
+        if (!firstWeek && !lastWeekValidated) {
             throw new TimesheetException("Can not validate this week, previous week is not validated");
         }
-
 
         //2 - all imputation day sum == 1
         c.set(Calendar.WEEK_OF_YEAR, week);

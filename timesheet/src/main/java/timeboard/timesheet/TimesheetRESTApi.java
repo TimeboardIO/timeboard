@@ -2,7 +2,7 @@ package timeboard.timesheet;
 
 /*-
  * #%L
- * reporting
+ * reports
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -141,8 +141,9 @@ public class TimesheetRESTApi {
             validated = this.timesheetService.isTimesheetValidated(currentAccount, year, week);
         }
 
+        c.setTime(this.userInfo.getCurrentAccount().getBeginWorkDate());
 
-        Timesheet ts = new Timesheet(validated, year, week, days, projects, imputations);
+        Timesheet ts = new Timesheet(validated, year, week, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), days, projects, imputations);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
     }
@@ -172,12 +173,15 @@ public class TimesheetRESTApi {
         final List<DateWrapper> days = new ArrayList<>();
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
-            DateWrapper dw = new DateWrapper(
-                    c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH),
-                    c.getTime()
-            );
-            days.add(dw);
+            if(c.getTime().getTime() >= this.userInfo.getCurrentAccount().getBeginWorkDate().getTime()) {
+                DateWrapper dw = new DateWrapper(
+                        c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH),
+                        c.getTime()
+                );
+                days.add(dw);
+            }
             c.add(Calendar.DAY_OF_YEAR, 1);
+
         }
         return days;
     }
@@ -259,6 +263,8 @@ public class TimesheetRESTApi {
         private final boolean validated;
         private final int year;
         private final int week;
+        private final boolean disablePrev;
+        private final boolean disableNext;
         private final List<DateWrapper> days;
         private final List<ProjectWrapper> projects;
         private final List<ImputationWrapper> imputations;
@@ -266,14 +272,23 @@ public class TimesheetRESTApi {
         public Timesheet(boolean validated,
                          int year,
                          int week,
+                         int beginWorkYear,
+                         int beginWorkWeek,
                          List<DateWrapper> days,
                          List<ProjectWrapper> projects,
                          List<ImputationWrapper> imputationWrappers) {
+
+
+            Calendar c = Calendar.getInstance();
+            final int currentWeek = c.get(Calendar.WEEK_OF_YEAR);
+            final int currentYear = c.get(Calendar.YEAR);
 
             this.validated = validated;
             this.year = year;
             this.week = week;
             this.days = days;
+            this.disablePrev = (year < beginWorkYear) || (year == beginWorkYear && week <= beginWorkWeek);
+            this.disableNext = (year > currentYear) || (year == currentYear && week >= currentWeek);
             this.projects = projects;
             this.imputations = imputationWrappers;
         }
@@ -316,6 +331,14 @@ public class TimesheetRESTApi {
 
             return res;
 
+        }
+
+        public boolean isDisablePrev() {
+            return disablePrev;
+        }
+
+        public boolean isDisableNext() {
+            return disableNext;
         }
     }
 

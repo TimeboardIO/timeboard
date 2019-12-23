@@ -84,7 +84,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>reporting</artifactId>
+            <artifactId>reports</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -135,6 +135,11 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>project-github-import-plugin</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

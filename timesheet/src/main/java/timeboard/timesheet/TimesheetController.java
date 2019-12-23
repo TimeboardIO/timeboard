@@ -38,6 +38,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
@@ -102,6 +103,8 @@ public class TimesheetController {
 
     @GetMapping("/{year}/{week}")
     protected String handleGet(@PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
+
+
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
 
         final Calendar c = Calendar.getInstance();
@@ -112,6 +115,10 @@ public class TimesheetController {
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
+
+        if(c.getTime().getTime() < this.userInfo.getCurrentAccount().getBeginWorkDate().getTime() ){
+            throw new BusinessException("You cannot access your timesheet before you register. ");
+        }
 
         final Date ds = findStartDate(c, week, year);
         final Date de = findEndDate(c, week, year);

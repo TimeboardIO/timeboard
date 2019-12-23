@@ -26,6 +26,8 @@ package timeboard.core.model;
  * #L%
  */
 
+import timeboard.core.model.converters.JSONToProjectAttributsConverter;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
@@ -182,8 +184,10 @@ public class Project extends OrganizationEntity implements Serializable {
     }
 
     public boolean isMember(Account actor) {
-        //TODO check if actor is member of current project
-        return true;
+        return this.getMembers()
+                .stream()
+                .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
+                .count() == 1;
     }
 
     @Transient

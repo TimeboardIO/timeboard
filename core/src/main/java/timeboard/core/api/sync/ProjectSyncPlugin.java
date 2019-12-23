@@ -34,6 +34,10 @@ public interface ProjectSyncPlugin {
 
     String getServiceName();
 
+    default String getServiceID(){
+        return this.getServiceName().toLowerCase().replace(" ","");
+    }
+
     List<ProjectSyncCredentialField> getSyncCredentialFields();
 
     List<RemoteTask> getRemoteTasks(Account currentAccount,

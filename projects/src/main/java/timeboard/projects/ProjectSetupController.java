@@ -33,11 +33,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ProjectExportService;
-import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Project;
@@ -93,6 +94,11 @@ public class ProjectSetupController {
         final Account actor = this.userInfo.getCurrentAccount();
         final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, projectID);
+
+        if(project.isMember(targetMember)){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This user is already member of this project");
+        }
+
         project.getMembers().add(new ProjectMembership(project, targetMember, MembershipRole.CONTRIBUTOR));
         this.projectService.updateProject(actor, project);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -121,13 +127,15 @@ public class ProjectSetupController {
         project.getMembers().removeIf(projectMembership -> {
             return projectMembership.getMembershipID() == membershipID && projectMembership.getMember().getId() != actor.getId();
         });
+
         this.projectService.updateProject(actor, project);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/informations")
     protected String updateProjectConfiguration(@PathVariable long projectID,
-                                                @ModelAttribute ProjectConfigForm projectConfigForm) throws Exception {
+                                                @ModelAttribute ProjectConfigForm projectConfigForm,
+                                                RedirectAttributes attributes) throws Exception {
 
         final Account actor = this.userInfo.getCurrentAccount();
 
@@ -136,7 +144,12 @@ public class ProjectSetupController {
         project.setComments(projectConfigForm.getComments());
         project.setQuotation(projectConfigForm.getQuotation());
 
-        this.projectService.updateProject(actor, project);
+        try {
+            this.projectService.updateProject(actor, project);
+            attributes.addFlashAttribute("success", "Project config updated successfully.");
+        } catch(BusinessException e) {
+            attributes.addFlashAttribute("error", e.getMessage());
+        }
 
         return "redirect:/projects/" + projectID + "/setup";
     }
@@ -152,6 +165,7 @@ public class ProjectSetupController {
         pmf.setMemberships(new ArrayList<>(project.getMembers()));
 
         map.put("project", project);
+        map.put("orgID", this.userInfo.getCurrentOrganizationID());
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());

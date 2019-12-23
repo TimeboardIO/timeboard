@@ -39,4 +39,5 @@ public interface ProjectSyncService {
                           final String serviceName,
                           final List<ProjectSyncCredentialField> creds);
 
+    List<ProjectSyncCredentialField> getServiceFields(String serviceName);
 }

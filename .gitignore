@@ -9,3 +9,4 @@ webui/src/main/resources/www/
 build/
 temp/
 ui-tests/cypress/fixtures/projects.json
+webapp/src/main/resources/version
