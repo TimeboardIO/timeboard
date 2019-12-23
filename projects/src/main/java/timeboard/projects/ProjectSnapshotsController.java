@@ -26,27 +26,36 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectSnapshotService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.ValueHistory;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
 import timeboard.core.ui.UserInfo;
 
-import java.util.Date;
-import java.util.List;
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{projectID}/snapshots")
 public class ProjectSnapshotsController {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private ProjectService projectService;
@@ -66,6 +75,14 @@ public class ProjectSnapshotsController {
         model.addAttribute("project", project);
 
         return "details_project_snapshots";
+    }
+
+    @GetMapping(value = "/chart", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity getDatasForChart(@PathVariable Long projectID) throws BusinessException, JsonProcessingException {
+        final Account actor = this.userInfo.getCurrentAccount();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projectSnapshotGraphWrapper));
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,6 +110,139 @@ public class ProjectSnapshotsController {
         project.getSnapshots().removeIf(projectSnapshot -> projectSnapshot.getId().equals(snapshotID));
         this.projectService.updateProject(actor, project);
         return this.listProjectSnapshots(projectID);
+    }
+
+    public ProjectSnapshotGraphWrapper createGraph(List<ProjectSnapshot> projectSnapshotList){
+
+        ProjectSnapshotsController.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotsController.ProjectSnapshotGraphWrapper();
+
+        final String formatDateToDisplay = "yyyy-MM-dd HH:mm:ss.S";
+        final List<String> listOfProjectSnapshotDates = new ArrayList<>();
+        final List<ProjectDashboard> projectDashboards = new ArrayList<>();
+        projectSnapshotList.forEach(snapshot -> {
+            listOfProjectSnapshotDates.add(String.format(snapshot.getProjectSnapshotDate().toString(), formatDateToDisplay));
+            projectDashboards.add(new ProjectDashboard(snapshot.getQuotation(),
+                    snapshot.getOriginalEstimate(), snapshot.getEffortLeft(), snapshot.getEffortSpent(),
+                    snapshot.getProjectSnapshotDate()));
+        });
+        wrapper.setListOfProjectSnapshotDates(listOfProjectSnapshotDates);
+
+        // Datas for effort spent (Axis Y)
+        final ValueHistory[] quotationSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(), projectSnapshotList.get(0).getQuotation())};
+        Map<Date, Double> quotationMap = listOfProjectSnapshotDates
+                .stream()
+                .map(dateString -> {
+                    return formatDate(formatDateToDisplay, dateString);
+                })
+                .map(date -> projectDashboards.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(quotation -> {
+                            quotationSum[0] = new ValueHistory(date, quotation.getQuotation());
+                            return quotationSum[0];
+                        })
+                        .findFirst().orElse(new ValueHistory(date, quotationSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setQuotationData(quotationMap.values());
+
+        final ValueHistory[] originalEstimateSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(), projectSnapshotList.get(0).getOriginalEstimate())};
+        Map<Date, Double> originalEstimateMap = listOfProjectSnapshotDates
+                .stream()
+                .map(dateString -> {
+                    return formatDate(formatDateToDisplay, dateString);
+                })
+                .map(date -> projectDashboards.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(originalEstimate -> {
+                            originalEstimateSum[0] = new ValueHistory(date, originalEstimate.getOriginalEstimate());
+                            return originalEstimateSum[0];
+                        })
+                        .findFirst().orElse(new ValueHistory(date, originalEstimateSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setOriginalEstimateData(originalEstimateMap.values());
+
+        final ValueHistory[] realEffortSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(), projectSnapshotList.get(0).getRealEffort())};
+        Map<Date, Double> realEffortMap = listOfProjectSnapshotDates
+                .stream()
+                .map(dateString -> {
+                    return formatDate(formatDateToDisplay, dateString);
+                })
+                .map(date -> projectDashboards.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(realEffort -> {
+                            realEffortSum[0] = new ValueHistory(date, realEffort.getRealEffort());
+                            return realEffortSum[0];
+                        })
+                        .findFirst().orElse(new ValueHistory(date, realEffortSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setRealEffortData(realEffortMap.values());
+
+        final ValueHistory[] effortLeftSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(), projectSnapshotList.get(0).getEffortLeft())};
+        Map<Date, Double> effortLeftMap = listOfProjectSnapshotDates
+                .stream()
+                .map(dateString -> {
+                    return formatDate(formatDateToDisplay, dateString);
+                })
+                .map(date -> projectDashboards.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effortLeft -> {
+                            effortLeftSum[0] = new ValueHistory(date, effortLeft.getEffortLeft());
+                            return effortLeftSum[0];
+                        })
+                        .findFirst().orElse(new ValueHistory(date, effortLeftSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setEffortLeftData(effortLeftMap.values());
+
+        final ValueHistory[] effortSpentSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(), projectSnapshotList.get(0).getEffortSpent())};
+        Map<Date, Double> effortSpentMap = listOfProjectSnapshotDates
+                .stream()
+                .map(dateString -> {
+                    return formatDate(formatDateToDisplay, dateString);
+                })
+                .map(date -> projectDashboards.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effortSpent -> {
+                            effortSpentSum[0] = new ValueHistory(date, effortSpent.getEffortSpent());
+                            return effortSpentSum[0];
+                        })
+                        .findFirst().orElse(new ValueHistory(date, effortSpentSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setEffortSpentData(effortSpentMap.values());
+
+        return wrapper;
+    }
+
+    private Date formatDate(String formatDateToDisplay, String dateString) {
+        try {
+            return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static class ProjectSnapshotWrapper {
@@ -142,5 +292,42 @@ public class ProjectSnapshotsController {
         public void setProjectSnapshotDate(Date projectSnapshotDate) { this.projectSnapshotDate = projectSnapshotDate; }
 
         public void setId(Long id) { this.id = id; }
+    }
+
+    public static class ProjectSnapshotGraphWrapper implements Serializable {
+        public List<String> listOfProjectSnapshotDates;
+        public Collection<Double> quotationData;
+        public Collection<Double> originalEstimateData;
+        public Collection<Double> realEffortData;
+        public Collection<Double> effortSpentData;
+        public Collection<Double> effortLeftData;
+
+        public ProjectSnapshotGraphWrapper() {
+        }
+
+        public void setListOfProjectSnapshotDates(List<String> listOfProjectSnapshotDates) {
+            this.listOfProjectSnapshotDates = listOfProjectSnapshotDates;
+        }
+
+        public void setQuotationData(Collection<Double> quotationData) {
+            this.quotationData = quotationData;
+
+        }
+
+        public void setRealEffortData(Collection<Double> realEffortData) {
+            this.realEffortData = realEffortData;
+        }
+
+        public void setOriginalEstimateData(Collection<Double> originalEstimateData) {
+            this.originalEstimateData = originalEstimateData;
+        }
+
+        public void setEffortSpentData(Collection<Double> effortSpentData) {
+            this.effortSpentData = effortSpentData;
+        }
+
+        public void setEffortLeftData(Collection<Double> effortLeftData) {
+            this.effortLeftData = effortLeftData;
+        }
     }
 }

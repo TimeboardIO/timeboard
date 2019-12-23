@@ -36,8 +36,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.events.TaskEvent;
-import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
@@ -252,7 +250,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return new ProjectDashboard(project.getQuotation(),
                 (Double) originalEstimateAndEffortLeft[0],
-                (Double) originalEstimateAndEffortLeft[1], effortSpent);
+                (Double) originalEstimateAndEffortLeft[1], effortSpent, new Date());
 
     }
 
@@ -792,10 +790,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor,
-                                                             Task task,
-                                                             Date startTaskDate,
-                                                             Date endTaskDate) throws BusinessException {
+    public List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor,
+                                                            Task task,
+                                                            Date startTaskDate,
+                                                            Date endTaskDate) throws BusinessException {
 
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
@@ -816,13 +814,13 @@ public class ProjectServiceImpl implements ProjectService {
 
         return query.getResultList()
                 .stream()
-                .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
+                .map(x -> new ValueHistory((Date) x[0], (Double) x[1]))
                 .collect(Collectors.toList());
     }
 
 
     @Override
-    public List<EffortHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException {
+    public List<ValueHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException {
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
@@ -843,7 +841,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return query.getResultList()
                 .stream()
-                .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
+                .map(x -> new ValueHistory((Date) x[0], (Double) x[1]))
                 .collect(Collectors.toList());
     }
 

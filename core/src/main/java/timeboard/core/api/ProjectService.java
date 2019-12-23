@@ -123,12 +123,12 @@ public interface ProjectService {
      *
      * @return List all effort spent for a task.
      */
-    List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor,
-                                                      Task task,
-                                                      Date startTaskDate,
-                                                      Date endTaskDate) throws BusinessException;
+    List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor,
+                                                     Task task,
+                                                     Date startTaskDate,
+                                                     Date endTaskDate) throws BusinessException;
 
-    List<EffortHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
+    List<ValueHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
 
     UpdatedTaskResult updateTaskImputation(Account actor,
                                            AbstractTask task,

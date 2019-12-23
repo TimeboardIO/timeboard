@@ -64,9 +64,6 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
     @Column(nullable = false)
     private double effortSpent;
 
-    @Column(nullable = false)
-    private double realEffort;
-
     public TaskSnapshot() {
     }
 
@@ -78,7 +75,6 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         this.originalEstimate = task.getOriginalEstimate();
         this.effortLeft = task.getEffortLeft();
         this.effortSpent = task.getEffortSpent();
-        this.realEffort = task.getRealEffort();
     }
 
     public Long getId() {
@@ -138,11 +134,8 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
     }
 
     public double getRealEffort() {
-        return realEffort;
+        return effortLeft + effortSpent;
     }
 
-    public void setRealEffort(double realEffort) {
-        this.realEffort = realEffort;
-    }
 
 }

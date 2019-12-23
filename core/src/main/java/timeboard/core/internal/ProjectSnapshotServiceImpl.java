@@ -61,7 +61,6 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
                 TaskSnapshot taskSnapshot = new TaskSnapshot(new Date(), task, actor);
                 projectSnapshot.getTaskSnapshots().add(taskSnapshot);
                 projectSnapshot.setOriginalEstimate(projectSnapshot.getOriginalEstimate() +  taskSnapshot.getOriginalEstimate());
-                projectSnapshot.setRealEffort(projectSnapshot.getRealEffort() + taskSnapshot.getRealEffort());
                 projectSnapshot.setEffortLeft(projectSnapshot.getEffortLeft() + taskSnapshot.getEffortLeft());
                 projectSnapshot.setEffortSpent(projectSnapshot.getEffortSpent() + taskSnapshot.getEffortSpent());
             });

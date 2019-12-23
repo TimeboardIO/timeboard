@@ -28,12 +28,12 @@ package timeboard.core.model;
 
 import java.util.Date;
 
-public class EffortHistory {
+public class ValueHistory {
 
     private Date date;
     private Double value;
 
-    public EffortHistory(Date date, Double value) {
+    public ValueHistory(Date date, Double value) {
         this.date = date;
         this.value = value;
     }

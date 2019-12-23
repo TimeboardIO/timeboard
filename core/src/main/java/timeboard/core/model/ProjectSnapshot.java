@@ -60,9 +60,6 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
     private double effortSpent;
 
     @Column(nullable = false)
-    private double realEffort;
-
-    @Column(nullable = false)
     private double quotation;
 
     public ProjectSnapshot() {
@@ -77,7 +74,6 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         this.originalEstimate = originalEstimate;
         this.effortLeft = effortLeft;
         this.effortSpent = effortSpent;
-        this.realEffort = realEffort;
         this.quotation = quotation;
     }
 
@@ -95,7 +91,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
 
     public double getEffortSpent() { return effortSpent; }
 
-    public double getRealEffort() { return realEffort; }
+    public double getRealEffort() { return effortSpent + effortLeft; }
 
     public double getQuotation() { return quotation; }
 
@@ -112,8 +108,6 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
     public void setEffortLeft(double effortLeft) { this.effortLeft = effortLeft; }
 
     public void setEffortSpent(double effortSpent) { this.effortSpent = effortSpent; }
-
-    public void setRealEffort(double realEffort) { this.realEffort = realEffort; }
 
     public void setQuotation(double quotation) { this.quotation = quotation; }
 }

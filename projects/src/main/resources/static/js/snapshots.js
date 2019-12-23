@@ -20,7 +20,7 @@ $(document).ready(function () {
                         "label": "OE"
                     },
                     {
-                        "slot": "snapshotglobalreeleffot",
+                        "slot": "snapshotglobalreeleffort",
                         "label": "RE"
                     },
                     {
@@ -56,6 +56,7 @@ $(document).ready(function () {
                     success: function (d) {
                         self.formatDate(d);
                         self.table.data = d;
+                        self.showGraph();
                     }
                 });
             },
@@ -68,6 +69,77 @@ $(document).ready(function () {
                     success: function (d) {
                         self.formatDate(d);
                         self.table.data = d;
+                        self.showGraph();
+                    }
+                });
+            },
+            showGraph: function() {
+                var self = this;
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "projects/" + projectID + "/snapshots/chart",
+                    success: function (d) {
+                        let listOfProjectSnapshotDates = d.listOfProjectSnapshotDates;
+                        let quotationDataForChart = d.quotationData;
+                        let originalDataForChart = d.originalEstimateData;
+                        let realEffortDataForChart = d.realEffortData;
+                        let effortLeftDataForChart = d.effortLeftData;
+                        let effortSpentDataForChart = d.effortSpentData;
+
+                        //chart config
+                        let chart = new Chart($("#lineChart"), {
+                            type: 'line',
+                            data: {
+                                labels: listOfProjectSnapshotDates,
+                                datasets: [{
+                                    data: quotationDataForChart,
+                                    label: "QT",
+                                    borderColor: "#3e95cd",
+                                    fill: true,
+                                    steppedLine: true
+                                } , {
+                                    data: originalDataForChart,
+                                    label: "OE",
+                                    borderColor: "#ff6384",
+                                    fill: true,
+                                    steppedLine: true
+                                 } , {
+                                    data: realEffortDataForChart,
+                                    label: "RE",
+                                    borderColor: "#00CC00",
+                                    fill: true,
+                                    steppedLine: true
+                                 } , {
+                                     data: effortLeftDataForChart,
+                                     label: "EL",
+                                     borderColor: "#FF00CC",
+                                     fill: true,
+                                     steppedLine: true
+                                 } , {
+                                    data: effortSpentDataForChart,
+                                    label: "ES",
+                                    borderColor: "#FFFF00",
+                                    fill: true,
+                                    steppedLine: true
+                                  }
+                                 ]
+                            },
+                            options: {
+                                title: { display: true, text: 'Project' },
+                                scales: {
+                                    yAxes: [{
+                                        ticks: {
+                                            min: 0
+                                        },
+                                        scaleLabel: { display: true, labelString: 'Number of point' }
+                                    }],
+                                    xAxes: [{
+                                        scaleLabel: { display: true, labelString: 'Dates' }
+                                    }],
+                                }
+                            }
+                        });
                     }
                 });
             }
@@ -81,6 +153,7 @@ $(document).ready(function () {
                 success: function (d) {
                     self.formatDate(d);
                     self.table.data = d;
+                    self.showGraph();
                 }
             });
         }
