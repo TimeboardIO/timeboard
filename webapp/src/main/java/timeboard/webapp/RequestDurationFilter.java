@@ -42,11 +42,11 @@ public class RequestDurationFilter implements Filter {
     @Value("${timeboard.interval.metrics.minutes}")
     private static long timeIntervalLogs;
 
-    static final MetricRegistry metrics = new MetricRegistry();
+    private static final String metricsMarker = "timeboard.marker.metrics";
+
+    private static final MetricRegistry metrics = new MetricRegistry();
 
     private final Histogram responseSizes = metrics.histogram(MetricRegistry.name( "response"));
-
-    //private final com.codahale.metrics.Timer responses = metrics.timer(MetricRegistry.name("responses"));
 
 
     @Override
@@ -58,26 +58,14 @@ public class RequestDurationFilter implements Filter {
         long timeAfter = System.currentTimeMillis();
         long duration = timeAfter - timeBefore;
 
-
         responseSizes.update(duration);
-
-        /*try(final Timer.Context context = responses.time()) {
-            // etc;
-            //return "OK";
-        }*/
-
         startReport();
-
     }
 
 
     static void startReport() {
-        /*ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
-                .convertRatesTo(TimeUnit.SECONDS)
-                .convertDurationsTo(TimeUnit.MILLISECONDS)
-                .build();*/
         final Slf4jReporter reporter = Slf4jReporter.forRegistry(metrics)
-                .outputTo(LoggerFactory.getLogger("timeboard.marker.metrics"))
+                .outputTo(LoggerFactory.getLogger(metricsMarker))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();
