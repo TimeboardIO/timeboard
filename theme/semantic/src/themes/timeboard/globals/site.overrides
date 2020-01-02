@@ -73,7 +73,7 @@ table, .controls {
 
 /** Timesheet **/
 
-#timesheet{
+#timesheet {
 
   table td{
     padding: 0.3rem 0.3rem;
@@ -169,3 +169,12 @@ table, .controls {
   font-: @primaryColor !important;
 }
 
+
+/** Account **/
+
+.user-card {
+  color: @white !important;
+  background-color: @primaryColor !important;
+  padding: 1.1em 1em !important;
+
+}

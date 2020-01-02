@@ -132,7 +132,6 @@
                 <i class="right arrow icon"></i>Next week</a>
         </div>
 
-        <div class="ui segment">
             <fieldset v-bind:disabled="validated === true">
                 <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
 
@@ -237,8 +236,6 @@
                     </table>
                 </form>
             </fieldset>
-        </div>
-
         <task-modal
                 :task="newTask"
                 :form-error="formError"

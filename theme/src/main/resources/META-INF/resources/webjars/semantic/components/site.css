@@ -249,8 +249,6 @@ ui.input.error > input {
 .day-badge {
   width: 2.5rem;
   height: 2.5rem;
-  -webkit-box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
-          box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
 }
 .ui.statistic .value {
   color: #00bfd8 !important;
@@ -338,6 +336,12 @@ table,
 }
 .text.bold {
   font-: #00bfd8 !important;
+}
+/** Account **/
+.user-card {
+  color: #FFFFFF !important;
+  background-color: #00bfd8 !important;
+  padding: 1.1em 1em !important;
 }
 
 

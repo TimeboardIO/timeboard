@@ -25,7 +25,7 @@
         </div>
     </div>
 
-    <div class="ui segment" th:if="${!projects.isEmpty()}">
+    <div th:if="${!projects.isEmpty()}">
 
         <div class="ui menu">
             <a class="item"
@@ -61,11 +61,18 @@
                     <div class="description" th:text="${project.comments}">
                     </div>
                 </div>
-                <div class="extra content">
-                    <a class="ui positive button" data-cy="setup"
-                       th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
-                    <a class="negative ui button"  data-cy="archive"
-                       th:href="@{/projects/{projectID}/delete(projectID=${project.id})}">Archive</a>
+                <div class="extra content" style="text-align: center;">
+
+                    <a th:href="@{/projects/{projectID}/setup(projectID=${project.id})}" class="ui positive icon button" data-cy="setup">
+                        <i class="cog icon"></i>
+                    </a>
+                    <a  th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}"
+                        class="ui primary icon button">
+                        <i class="tasks icon"></i>
+                    </a>
+                    <a th:href="@{/projects/{projectID}/delete(projectID=${project.id})}" class="ui negative icon button" data-cy="archive">
+                        <i class="archive icon"></i>
+                    </a>
                 </div>
             </div>
         </div>
