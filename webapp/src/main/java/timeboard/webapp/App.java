@@ -37,7 +37,7 @@ import timeboard.webapp.security.TimeboardSecurityConfig;
 
 @SpringBootApplication
 @EnableTransactionManagement
-@EnableWebSecurity
+@EnableWebSecurity(debug = false)
 @EnableAspectJAutoProxy
 @Import({WebConfig.class, ModulesConfiguration.class, TimeboardSecurityConfig.class})
 public class App {

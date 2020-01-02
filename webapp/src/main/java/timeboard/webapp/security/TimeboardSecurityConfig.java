@@ -12,10 +12,10 @@ package timeboard.webapp.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -40,6 +40,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.filter.GenericFilterBean;
 import timeboard.core.TimeboardAuthentication;
@@ -51,6 +52,8 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Configuration
@@ -91,28 +94,28 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
                 this.clientid,
                 this.appLogout);
 
-
         http.authorizeRequests()
 
                 .anyRequest()
-                .authenticated()
+                    .authenticated()
+                        .and()
+                            .formLogin()
+                            .defaultSuccessUrl(HomeController.URI).permitAll()
 
-                .and()
-                .formLogin()
-                .defaultSuccessUrl(HomeController.URI).permitAll()
+                        .and()
+                            .oauth2Login()
+                            .defaultSuccessUrl(HomeController.URI, true)
 
-                .and()
-                    .oauth2Login()
-                    .defaultSuccessUrl(HomeController.URI, true)
+                        .and()
+                            .logout()
+                            .logoutUrl("/logout")
+                            .logoutSuccessUrl(logoutURL);
 
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl(logoutURL);
-
-        http.addFilterAfter(new CustomFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
+        http.addFilterAfter(new CustomFilter(), OAuth2LoginAuthenticationFilter.class);
 
         http.csrf().disable();
+
 
      }
 
@@ -126,6 +129,20 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
             .and()
             .authenticationProvider(this.databaseAuthenticationProvider);
     }
+
+    public class RedirectFilter extends GenericFilterBean {
+
+        @Override
+        public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+            if(((HttpServletRequest)servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")){
+                ((HttpServletResponse) servletResponse).sendRedirect(HomeController.URI);
+                return;
+            }else{
+                filterChain.doFilter(servletRequest, servletResponse);
+            }
+        }
+    }
+
 
 
     public class CustomFilter extends GenericFilterBean {

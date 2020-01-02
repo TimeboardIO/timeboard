@@ -58,6 +58,7 @@ public class OrganizationFilter implements Filter {
     static {
         whitelist.add(OrganizationSelectController.URI);
         whitelist.add(OnboardingController.URI);
+        whitelist.add("/login/oauth2/code/cognito");
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2|svg)");
     }
 
