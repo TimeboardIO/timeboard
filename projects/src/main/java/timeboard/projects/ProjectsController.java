@@ -59,8 +59,8 @@ public class ProjectsController {
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
         final Account actor = authentication.getDetails();
         List<Project> allActorProjects = this.projectService.listProjects(actor);
-        if (allActorProjects.size() > 5) {
-            allActorProjects = allActorProjects.subList(0, 5);
+        if (allActorProjects.size() > 4) {
+            allActorProjects = allActorProjects.subList(0, 4);
         }
         model.addAttribute("projects", allActorProjects);
 

@@ -27,13 +27,6 @@
 
     <div th:if="${!projects.isEmpty()}">
 
-        <div class="ui menu">
-            <a class="item"
-               th:href="@{/projects/create}" data-cy="create-project">
-                <i class="plus icon"></i>
-                New Project
-            </a>
-        </div>
         <div class="ui horizontal divider">
             <i class="box icon"></i>
             Last Projects
@@ -72,6 +65,17 @@
                     </a>
                     <a th:href="@{/projects/{projectID}/delete(projectID=${project.id})}" class="ui negative icon button" data-cy="archive">
                         <i class="archive icon"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="ui card">
+                <div class="content"  style="background-color: lightgrey">
+                    <a  th:href="@{/projects/create}">
+                        <div class="badge" style="font-size: 4.2rem; padding-top: 2rem;">
+                            <i class="plus icon"></i>
+
+                        </div>
                     </a>
                 </div>
             </div>
