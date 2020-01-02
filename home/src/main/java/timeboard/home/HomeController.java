@@ -46,8 +46,10 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("/home")
+@RequestMapping(HomeController.URI)
 public class HomeController {
+
+    public static final String URI = "/home";
 
     @Autowired
     private ProjectService projectService;

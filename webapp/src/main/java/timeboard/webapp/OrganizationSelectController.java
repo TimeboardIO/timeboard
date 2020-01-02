@@ -33,11 +33,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Account;
 import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +58,9 @@ public class OrganizationSelectController {
     private UserInfo userInfo;
 
     @GetMapping
-    public String selectOrganisation(Model model){
+    public String selectOrganisation(HttpServletRequest req, TimeboardAuthentication p, Model model){
+
+        System.out.println(p.getName());
 
         final List<Account> orgs =
                 this.organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());

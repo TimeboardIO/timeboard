@@ -26,9 +26,8 @@ package timeboard.core.model;
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.*;
 import javax.persistence.*;
+import java.io.Serializable;
 
 
 @Entity

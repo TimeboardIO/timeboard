@@ -26,6 +26,7 @@ package timeboard.core.api;
  * #L%
  */
 
+import org.springframework.security.core.userdetails.UserDetailsService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
@@ -36,7 +37,7 @@ import java.util.List;
 /**
  * Service for users and accounts management.
  */
-public interface UserService {
+public interface UserService extends UserDetailsService {
     /**
      * Search user by remote subject.
      *
@@ -108,4 +109,6 @@ public interface UserService {
     Account userProvisionning(String sub, String email) throws BusinessException;
 
     List<Account> createUsers(List<Account> usersList);
+
+    Account findUserByLogin(String name);
 }
