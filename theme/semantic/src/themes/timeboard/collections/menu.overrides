@@ -7,3 +7,7 @@
   font: 600 0.875rem/0.875rem "Raleway", sans-serif;
 }
 */
+
+.menu.attached {
+  border-radius: .28571429rem .28571429rem 0 0 !important;
+}

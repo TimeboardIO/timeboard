@@ -24828,6 +24828,10 @@ Floated Menu / Item
 }
 */
 
+.menu.attached {
+  border-radius: 0.28571429rem 0.28571429rem 0 0 !important;
+}
+
 /*******************************
          Site Overrides
 *******************************/
