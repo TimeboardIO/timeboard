@@ -121,10 +121,15 @@ table, .controls {
         margin-top: 1em;
     }
 
-    .project {
+    .days {
+      background-color: @primaryColor ;
+      color: @white ;
+      font-weight: 600;
+    }
+    .project{
         padding: 0.38571429em 0.78571429em !important;
-        background-color: @lightBlue !important;
-        color: @secondaryColor !important;
+        background-color: @lightBlue ;
+        color: @primaryColor ;
         font-size: 1.25em !important;
     }
 
