@@ -43,6 +43,8 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 
+import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -91,7 +93,7 @@ public class ReportKPIController {
         });
 
         final ProjectDashboard dashboardTotal =
-                new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get());
+                new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get(), new Date());
         return ResponseEntity.status(HttpStatus.OK).body(dashboardTotal);
     }
 

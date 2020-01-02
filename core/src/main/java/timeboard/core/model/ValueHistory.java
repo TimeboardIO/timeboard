@@ -1,4 +1,4 @@
-package timeboard.core.api;
+package timeboard.core.model;
 
 /*-
  * #%L
@@ -26,44 +26,31 @@ package timeboard.core.api;
  * #L%
  */
 
-import java.io.Serializable;
 import java.util.Date;
 
-public final class ProjectDashboard implements Serializable {
+public class ValueHistory {
 
-    private final double originalEstimate;
-    private final double effortLeft;
-    private final double effortSpent;
-    private final double quotation;
-    private final Date date;
+    private Date date;
+    private Double value;
 
-    public ProjectDashboard(double quotation, double originalEstimate, double effortLeft, double effortSpent, Date date) {
-        this.quotation = quotation;
-        this.originalEstimate = originalEstimate;
-        this.effortLeft = effortLeft;
-        this.effortSpent = effortSpent;
+    public ValueHistory(Date date, Double value) {
+        this.date = date;
+        this.value = value;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public double getQuotation() {
-        return quotation;
+    public Double getValue() {
+        return value;
     }
 
-    public final double getOriginalEstimate() {
-        return originalEstimate;
+    public void setValue(Double value) {
+        this.value = value;
     }
-
-    public final double getRealEffort() {
-        return getEffortSpent() + getEffortLeft();
-    }
-
-    public final double getEffortLeft() {
-        return effortLeft;
-    }
-
-    public final double getEffortSpent() {
-        return effortSpent;
-    }
-
-    public Date getDate() { return date; }
 }

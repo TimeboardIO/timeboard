@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.api;
 
 /*-
  * #%L
@@ -26,31 +26,26 @@ package timeboard.core.model;
  * #L%
  */
 
-import java.util.Date;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
+import timeboard.core.model.ProjectSnapshot;
+import timeboard.core.model.TaskSnapshot;
 
-public class EffortHistory {
+import java.util.List;
 
-    private Date date;
-    private Double value;
+public interface ProjectSnapshotService {
 
-    public EffortHistory(Date date, Double value) {
-        this.date = date;
-        this.value = value;
-    }
 
-    public Date getDate() {
-        return date;
-    }
+    /*
+    === ProjectSnapshots ===
+    */
+    /**
+     * Create a ProjectSnapshot for the current project
+     *
+     * @return ProjectSnapshot
+     */
+    ProjectSnapshot createProjectSnapshot(Account actor, Project project) throws BusinessException;
 
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public Double getValue() {
-        return value;
-    }
-
-    public void setValue(Double value) {
-        this.value = value;
-    }
+    List<TaskSnapshot> findAllTaskSnapshotByTaskID(Account actor, Long taskID);
 }
