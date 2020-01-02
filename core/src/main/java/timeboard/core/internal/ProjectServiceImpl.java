@@ -119,7 +119,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
-    @PostAuthorize("returnObject.organizationID == @userInfo.getCurrentOrganizationID()")
+    @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     public Project createProject(Account owner, String projectName) throws BusinessException {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();

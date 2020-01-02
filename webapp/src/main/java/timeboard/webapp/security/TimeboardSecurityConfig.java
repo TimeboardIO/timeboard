@@ -77,9 +77,9 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/",
-                "/onboarding/**",
-                "/public/**");
+
+        web.ignoring().antMatchers(
+                "/public/**", "/","/onboarding/**");
 
     }
 
@@ -90,6 +90,7 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
                 this.logoutEndpoint,
                 this.clientid,
                 this.appLogout);
+
 
         http.authorizeRequests()
 
@@ -102,6 +103,7 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                     .oauth2Login()
+                    .defaultSuccessUrl(HomeController.URI, true)
 
                 .and()
                 .logout()
@@ -109,6 +111,8 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logoutSuccessUrl(logoutURL);
 
         http.addFilterAfter(new CustomFilter(), BasicAuthenticationFilter.class);
+
+        http.csrf().disable();
 
      }
 
@@ -133,19 +137,22 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
                 FilterChain chain) throws IOException, ServletException {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            Account account = null;
 
-            if (auth instanceof UsernamePasswordAuthenticationToken) {
-                account = userService.findUserBySubject(((UsernamePasswordAuthenticationToken) auth).getName());
-            }
+            if(auth != null && (auth instanceof TimeboardAuthentication) == false) {
+                Account account = null;
 
-            if (auth instanceof OAuth2AuthenticationToken) {
-                account = userService.findUserBySubject(
-                        (String) ((OAuth2AuthenticationToken) auth).getPrincipal().getAttributes().get("sub"));
-            }
+                if (auth instanceof UsernamePasswordAuthenticationToken) {
+                    account = userService.findUserBySubject(((UsernamePasswordAuthenticationToken) auth).getName());
+                }
 
-            if (account != null) {
-                SecurityContextHolder.getContext().setAuthentication(new TimeboardAuthentication(account));
+                if (auth instanceof OAuth2AuthenticationToken) {
+                    account = userService.findUserBySubject(
+                            (String) ((OAuth2AuthenticationToken) auth).getPrincipal().getAttributes().get("sub"));
+                }
+
+                if (account != null) {
+                    SecurityContextHolder.getContext().setAuthentication(new TimeboardAuthentication(account));
+                }
             }
 
             chain.doFilter(request, response);

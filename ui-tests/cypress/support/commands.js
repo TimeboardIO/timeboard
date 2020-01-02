@@ -25,10 +25,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 Cypress.Commands.add('login', () => {
-    cy.visit('http://localhost:8080');
-
-    cy.get('[data-cy=go-to-app]')
-        .click();
+    cy.visit('http://localhost:8080/login');
 
     cy.url().then(url => {
         if(url.includes('login')) {
