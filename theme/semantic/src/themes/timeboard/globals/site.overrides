@@ -66,10 +66,14 @@ ui.input.error > input {
   padding-bottom: 1rem;
 }
 
+table, .controls {
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
+}
 
 /** Timesheet **/
 
 #timesheet{
+
   table td{
 
       padding: 0.3rem 0.3rem;

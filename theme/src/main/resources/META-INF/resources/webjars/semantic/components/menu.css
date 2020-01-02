@@ -28,8 +28,8 @@
   background: #FFFFFF;
   font-weight: normal;
   border: 1px solid rgba(34, 36, 38, 0.15);
-  -webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
-          box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
+          box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
   border-radius: 0.28571429rem;
   min-height: 3.28571429em;
 }
@@ -513,8 +513,8 @@ Floated Menu / Item
       -ms-flex-direction: column;
           flex-direction: column;
   background: #FFFFFF;
-  -webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
-          box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
+          box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
 }
 
 /*--- Item ---*/
@@ -1935,8 +1935,8 @@ Floated Menu / Item
   margin-top: 0em;
   top: 0px;
   margin-bottom: 1rem;
-  -webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2), none;
-          box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2), none;
+  -webkit-box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15), none !important;
+          box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15), none !important;
   border-radius: 0em 0em 0.28571429rem 0.28571429rem;
 }
 .ui[class*="bottom attached"].menu:last-child {
