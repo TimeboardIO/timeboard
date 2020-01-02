@@ -13,7 +13,7 @@
              Page
 *******************************/
 
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic&subset=latin');
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700,400italic,700italic&subset=latin');
 /*
 html,
 body {
@@ -29,10 +29,10 @@ body {
   overflow-x: hidden;
   min-width: 320px;
   background: #FFFFFF;
-  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
+  font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   font-size: 14px;
   line-height: 1.4285em;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
   font-smoothing: antialiased;
 }
 
@@ -46,7 +46,7 @@ h2,
 h3,
 h4,
 h5 {
-  font-family: 'Lato', 'Verdana', Geneva, sans-serif;
+  font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   line-height: 1.28571429em;
   margin: calc(2rem -  0.14285714em ) 0em 1rem;
   font-weight: bold;
@@ -127,36 +127,36 @@ a:hover {
 /* Site */
 ::-webkit-selection {
   background-color: #CCE2FF;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 ::-moz-selection {
   background-color: #CCE2FF;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 ::selection {
   background-color: #CCE2FF;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 /* Form */
 textarea::-webkit-selection,
 input::-webkit-selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 textarea::-moz-selection,
 input::-moz-selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 textarea::-moz-selection, input::-moz-selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 textarea::selection,
 input::selection {
   background-color: rgba(100, 100, 100, 0.4);
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 /* Force Simple Scrollbars */
@@ -207,43 +207,58 @@ body .ui.inverted::-webkit-scrollbar-thumb:hover {
 .navigation {
   background-color: white ! important;
 }
-body {
-  background: #dde3e8;
-  background: -webkit-gradient(linear, left top, left bottom, from(#6e8a9e), to(#dde3e8));
-  background: -webkit-linear-gradient(top, #6e8a9e 0%, #dde3e8 100%);
-  background: linear-gradient(180deg, #6e8a9e 0%, #dde3e8 100%);
-  background-repeat: no-repeat;
-}
 html {
   height: 100%;
-  background: #dde3e8;
+  background: #00bfd8;
+  background: rgba(0, 0, 0, 0.05);
+}
+body {
+  background: transparent;
 }
 th,
 td {
   text-align: center;
 }
-.ui.primary.button:hover {
-  -webkit-box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important;
-          box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important;
+.ui.segment {
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
 }
-.ui.secondary.button:hover {
-  -webkit-box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important;
-          box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset, 0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important;
+.ui.segment.controls {
+  -webkit-box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
+          box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
+  border: 1px solid rgba(34, 36, 38, 0.15) !important;
+  background: #FFFFFF !important;
 }
 h1.ui.header,
 .ui.huge.header {
   font-weight: normal;
-  color: #3d6488;
+  color: #00bfd8;
 }
 h2.ui.header,
 .ui.large.header {
   font-weight: normal;
-  color: #3d6488;
+  color: #00bfd8;
 }
 ui.input.error > input {
-  background-color: #fff6f6 !important;
+  background-color: #fff !important;
   border-color: #e0b4b4 !important;
-  color: #9f3a38 !important;
+  color: #e55151 !important;
+}
+.day-badge {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+.ui.statistic .value {
+  color: #00bfd8 !important;
+  padding-bottom: 1rem;
+  font-weight: bold !important;
+}
+table,
+.controls {
+  -webkit-box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
+          box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
 }
 /** Timesheet **/
 #timesheet table td {
@@ -259,9 +274,14 @@ ui.input.error > input {
   -webkit-appearance: none;
   margin: 0;
 }
-#timesheet button.create-task {
-  left: 11em;
+#timesheet .actions {
   position: absolute;
+  left: 0;
+  top: 25%;
+  margin-left: 1rem;
+}
+#timesheet .actions * {
+  display: inline-block;
 }
 #timesheet fieldset {
   padding: 0px;
@@ -281,8 +301,15 @@ ui.input.error > input {
 #timesheet .project {
   padding: 0.38571429em 0.78571429em !important;
   background-color: #D1DCEB !important;
-  color: #3d6488 !important;
   font-size: 1.25em !important;
+}
+#timesheet .days th {
+  background-color: #00bfd8 !important;
+  color: #FFFFFF !important;
+}
+#timesheet .timesheet-head th {
+  background-color: #FFFFFF !important;
+  color: #393939 !important;
 }
 #timesheet th.project {
   font-size: 1em !important;
@@ -292,24 +319,31 @@ ui.input.error > input {
 .badge {
   text-align: center;
   width: 3em;
+  height: 3em;
   margin: 0 auto;
-  background-color: #957DAD;
   line-height: 3em;
   border-radius: 5em;
   margin-top: 0.5em;
   font-size: 3em;
   color: white;
   margin-bottom: 0.5em;
+  font-weight: bold;
+  text-transform: capitalize;
 }
-.menu.project :not(.active) {
-  color: white !important;
-  font-weight: bold !important;
+.ui.form textarea:not([rows]) {
+  height: 8em !important;
 }
 .text.primary {
-  color: #3d6488 !important;
+  color: #00bfd8 !important;
 }
 .text.bold {
-  font-: #3d6488 !important;
+  font-: #00bfd8 !important;
+}
+/** Account **/
+.user-card {
+  color: #FFFFFF !important;
+  background-color: #00bfd8 !important;
+  padding: 1.1em 1em !important;
 }
 
 

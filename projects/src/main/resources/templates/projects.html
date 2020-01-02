@@ -13,23 +13,6 @@
 
 <div layout:fragment="content">
 
-    <style type="text/css">
-        .badge{
-           text-align: center;
-            width: 3em;
-            margin: 0 auto;
-            background-color: #957DAD;
-            line-height: 3em;
-            border-radius: 5em;
-            margin-top: 0.5em;
-            font-size: 3em;
-            color: white;
-            margin-bottom: 0.5em;
-        }
-
-
-    </style>
-
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
         <div class="content">
@@ -42,17 +25,8 @@
         </div>
     </div>
 
-    <div class="ui segment" th:if="${!projects.isEmpty()}">
+    <div th:if="${!projects.isEmpty()}">
 
-        <div class="ui menu">
-            <a class="item"
-               th:href="@{/projects/create}" data-cy="create-project">
-                <i class="plus icon"></i>
-                New Project
-            </a>
-        </div>
-
-        <br/>
         <div class="ui horizontal divider">
             <i class="box icon"></i>
             Last Projects
@@ -61,16 +35,16 @@
 
         <div class="ui five stackable cards">
             <div class="ui card" data-cy="project" th:each="project : ${projects}" >
-                <div class="image">
+                <div class="image"  th:style="'background-color:'+${project.getColor()}" >
                     <a th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">
-                        <div class="badge" style="text-transform: capitalize;"
-                             th:style="'background-color:'+${project.getColor()}"
+                        <div class="badge"
+
                              th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">
                         </div>
                     </a>
                 </div>
                 <div class="content">
-                    <a class="header" data-cy="project-title" th:text="${project.name}"></a>
+                    <a class="header" th:style="'color:'+${project.getColor()}" data-cy="project-title" th:text="${project.name}"></a>
                     <div class="meta">
                         <div>
                             <i class="account icon"></i>
@@ -80,11 +54,29 @@
                     <div class="description" th:text="${project.comments}">
                     </div>
                 </div>
-                <div class="extra content">
-                    <a class="ui positive button" data-cy="setup"
-                       th:href="@{/projects/{projectID}/setup(projectID=${project.id})}">Setup</a>
-                    <a class="negative ui basic button"  data-cy="archive"
-                       th:href="@{/projects/{projectID}/delete(projectID=${project.id})}">Archive</a>
+                <div class="extra content" style="text-align: center;">
+
+                    <a th:href="@{/projects/{projectID}/setup(projectID=${project.id})}" class="ui positive icon button" data-cy="setup">
+                        <i class="cog icon"></i>
+                    </a>
+                    <a  th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}"
+                        class="ui primary icon button">
+                        <i class="tasks icon"></i>
+                    </a>
+                    <a th:href="@{/projects/{projectID}/delete(projectID=${project.id})}" class="ui negative icon button" data-cy="archive">
+                        <i class="archive icon"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="ui card">
+                <div class="content"  style="background-color: lightgrey">
+                    <a  th:href="@{/projects/create}">
+                        <div class="badge" style="font-size: 4.2rem; padding-top: 2rem;">
+                            <i class="plus icon"></i>
+
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -109,7 +101,7 @@
                         <i class="tasks icon"></i>
                         Task
                     </a>
-                    <a class="ui right labeled negative basic icon button" v-bind:href="'/projects/'+row.id+'/delete'" data-cy="archive">
+                    <a class="ui right labeled negative icon button" v-bind:href="'/projects/'+row.id+'/delete'" data-cy="archive">
                         <i class="archive icon"></i>
                         Archive
                     </a>

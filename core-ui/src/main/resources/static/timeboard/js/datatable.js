@@ -6,7 +6,7 @@ Vue.component('data-table', {
                     <tr>
                       <th v-for="col in finalCols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"> </th>
                       <th v-for="col in finalCols" v-if="col.visible && !col.sortKey" >{{col.label}} </th>
-                      <th v-if="config.configurable === true" class="collapsing" ><i class="cog icon" @click="showConfigModal()"></i></th>
+                      <th v-if="config.configurable === true" class="collapsing" style="border-left: none;" ><i class="cog icon" @click="showConfigModal()"></i></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -15,7 +15,7 @@ Vue.component('data-table', {
                           <slot :name="col.slot" v-bind:row="finalData[i]">
                           </slot>
                       </td>
-                      <td v-if="config.configurable === true" ></td>
+                      <td v-if="config.configurable === true" style="border-left: none;" ></td>
                     </tr>
                 </tbody>
                 <tmodal 

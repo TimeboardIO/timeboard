@@ -173,7 +173,7 @@
             </script>
         </div>
 
-        <div class="ui horizontal divider">
+        <div v-if="tablePending.data.length" class="ui horizontal divider">
             <i class="boxes icon"></i>
             Pending tasks
         </div>
@@ -192,7 +192,7 @@
             </template>
             <template v-slot:oe="{row}">
                 <div class="ui circular label large day-badge" style="margin-top: 5px;">
-                    {{row.originalEstimate}}
+                    <p>{{row.originalEstimate}}</p>
                 </div>
             </template>
             <template v-slot:assignee="{row}">
@@ -296,7 +296,7 @@
             </template>
             <template v-slot:oe="{row}">
                 <div class="ui circular label large day-badge" style="margin-top: 5px;">
-                    {{row.originalEstimate}}
+                    <p>{{row.originalEstimate}}</p>
                 </div>
             </template>
             <template v-slot:assignee="{row}">

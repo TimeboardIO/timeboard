@@ -21,7 +21,7 @@
 @border: @borderWidth solid @borderColor;
 @boxShadow: none;
 
-@borderRadius: @defaultBorderRadius;
+@borderRadius: 0.25rem;
 @transition:
   box-shadow @defaultDuration @defaultEasing,
   border-color @defaultDuration @defaultEasing

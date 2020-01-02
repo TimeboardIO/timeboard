@@ -154,7 +154,7 @@
 
 /* White Dimmer (Inverted) */
 .ui.inverted.dimmer .ui.loader {
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 .ui.inverted.dimmer .ui.loader:before {
   border-color: rgba(0, 0, 0, 0.1);
@@ -333,12 +333,6 @@
   margin-left: auto;
   margin-right: auto;
 }
-
-
-/*******************************
-         Theme Overrides
-*******************************/
-
 
 
 /*******************************
