@@ -365,12 +365,12 @@
 }
 .ui.red.message {
   background-color: #FFE8E6;
-  color: #eb112c;
-  -webkit-box-shadow: 0px 0px 0px 1px #eb112c inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
-          box-shadow: 0px 0px 0px 1px #eb112c inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
+  color: #e55151;
+  -webkit-box-shadow: 0px 0px 0px 1px #e55151 inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
+          box-shadow: 0px 0px 0px 1px #e55151 inset, 0px 0px 0px 0px rgba(0, 0, 0, 0);
 }
 .ui.red.message .header {
-  color: #d30f28;
+  color: #e23b3b;
 }
 .ui.orange.message {
   background-color: #FFEDDE;

@@ -510,16 +510,16 @@ a.ui.active.label:ActiveHover:before {
 
 .ui.red.labels .label,
 .ui.red.label {
-  background-color: #eb112c !important;
-  border-color: #eb112c !important;
+  background-color: #e55151 !important;
+  border-color: #e55151 !important;
   color: #FFFFFF !important;
 }
 
 /* Link */
 .ui.red.labels .label:hover,
 a.ui.red.label:hover {
-  background-color: #dd0520 !important;
-  border-color: #dd0520 !important;
+  background-color: #ea3232 !important;
+  border-color: #ea3232 !important;
   color: #FFFFFF !important;
 }
 
@@ -531,20 +531,20 @@ a.ui.red.label:hover {
 
 /* Ribbon */
 .ui.red.ribbon.label {
-  border-color: #bb0e23 !important;
+  border-color: #de2525 !important;
 }
 
 /* Basic */
 .ui.basic.red.label {
   background: none #FFFFFF !important;
-  color: #eb112c !important;
-  border-color: #eb112c !important;
+  color: #e55151 !important;
+  border-color: #e55151 !important;
 }
 .ui.basic.red.labels a.label:hover,
 a.ui.basic.red.label:hover {
   background-color: #FFFFFF !important;
-  color: #dd0520 !important;
-  border-color: #dd0520 !important;
+  color: #ea3232 !important;
+  border-color: #ea3232 !important;
 }
 
 /*--- Orange ---*/

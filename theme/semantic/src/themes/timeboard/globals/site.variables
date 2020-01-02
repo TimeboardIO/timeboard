@@ -227,7 +227,7 @@
 
 
 
-@red              : #eb112c; // #db2828;
+@red              : #e55151; // #db2828;
 @green            : #5BCA7E;  // #21ba45;
 @blue             : @primaryColor;
 @yellow           : #FBBD08;
