@@ -149,8 +149,8 @@ public class TasksRestController {
         wrapper.setListOfTaskDates(listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
-        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
-        final EffortHistory[] lastEffortSpentSum = {new EffortHistory(task.getStartDate(), 0.0)};
+        List<ValueHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
+        final ValueHistory[] lastEffortSpentSum = {new ValueHistory(task.getStartDate(), 0.0)};
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -160,39 +160,16 @@ public class TasksRestController {
                         .filter(es -> new SimpleDateFormat(formatDateToDisplay)
                                 .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effort -> {
-                            lastEffortSpentSum[0] = new EffortHistory(date, effort.getValue());
+                            lastEffortSpentSum[0] = new ValueHistory(date, effort.getValue());
                             return lastEffortSpentSum[0];
                         })
-                        .findFirst().orElse(new EffortHistory(date, lastEffortSpentSum[0].getValue())))
+                        .findFirst().orElse(new ValueHistory(date, lastEffortSpentSum[0].getValue())))
                 .collect(Collectors.toMap(
                         e -> e.getDate(),
                         e -> e.getValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
         wrapper.setEffortSpentData(effortSpentMap.values());
-
-        // Datas for effort estimate (Axis Y)
-        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
-        final EffortHistory[] lastEffortEstimate = {new EffortHistory(task.getStartDate(), task.getOriginalEstimate())};
-        Map<Date, Double> effortEstimateMap = listOfTaskDates
-                .stream()
-                .map(dateString -> {
-                    return formatDate(formatDateToDisplay, dateString);
-                })
-                .map(date -> effortLeftDB.stream()
-                        .filter(el -> new SimpleDateFormat(formatDateToDisplay)
-                                .format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
-                        .map(effortLeft -> {
-                            lastEffortEstimate[0] = new EffortHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
-                            return lastEffortEstimate[0];
-                        })
-                        .findFirst().orElse(new EffortHistory(date, lastEffortEstimate[0].getValue())))
-                .collect(Collectors.toMap(
-                        e -> e.getDate(),
-                        e -> e.getValue(),
-                        (x, y) -> y, LinkedHashMap::new
-                ));
-        wrapper.setRealEffortData(effortEstimateMap.values());
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
 

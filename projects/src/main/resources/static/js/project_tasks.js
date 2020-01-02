@@ -174,7 +174,6 @@ let app = new Vue({
 
                     let listOfTaskDates = data.listOfTaskDates;
                     let effortSpentDataForChart = data.effortSpentData;
-                    let realEffortDataForChart = data.realEffortData;
 
                     //chart config
                     let chart = new Chart($("#lineChart"), {
@@ -187,16 +186,10 @@ let app = new Vue({
                                 borderColor: "#3e95cd",
                                 fill: true,
                                 steppedLine: true
-                            } , {
-                                data: realEffortDataForChart,
-                                label: "Real effort for " + task.taskName,
-                                borderColor: "#ff6384",
-                                fill: true,
-                                steppedLine: true
-                            }]
+                            } ]
                         },
                         options: {
-                            title: { display: true, text: 'Task - Real Effort and Effort Spent graph' },
+                            title: { display: true, text: 'Task - Effort Spent graph' },
                             scales: {
                                 yAxes: [{
                                     ticks: {
