@@ -41,7 +41,6 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.filter.GenericFilterBean;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.UserService;
@@ -133,7 +132,10 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
     public class RedirectFilter extends GenericFilterBean {
 
         @Override
-        public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+        public void doFilter(ServletRequest servletRequest,
+                             ServletResponse servletResponse,
+                             FilterChain filterChain) throws IOException, ServletException {
+
             if(((HttpServletRequest)servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")){
                 ((HttpServletResponse) servletResponse).sendRedirect(HomeController.URI);
                 return;
@@ -148,10 +150,9 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
     public class CustomFilter extends GenericFilterBean {
 
         @Override
-        public void doFilter(
-                ServletRequest request,
-                ServletResponse response,
-                FilterChain chain) throws IOException, ServletException {
+        public void doFilter(ServletRequest request,
+                             ServletResponse response,
+                             FilterChain chain) throws IOException, ServletException {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
