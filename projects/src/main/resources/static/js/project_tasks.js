@@ -294,7 +294,7 @@ let app = new Vue({
         this.tablePending.cols = this.table.cols;
     },
     updated: function () {
-        this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
+       // this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
     },
     mounted: function () {
         let self = this;
