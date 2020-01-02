@@ -242,9 +242,9 @@ h2.ui.header,
   color: #00bfd8;
 }
 ui.input.error > input {
-  background-color: #fff6f6 !important;
+  background-color: #fff !important;
   border-color: #e0b4b4 !important;
-  color: #9f3a38 !important;
+  color: #e55151 !important;
 }
 .day-badge {
   width: 2.5rem;
@@ -253,6 +253,7 @@ ui.input.error > input {
 .ui.statistic .value {
   color: #00bfd8 !important;
   padding-bottom: 1rem;
+  font-weight: bold !important;
 }
 table,
 .controls {
@@ -300,10 +301,15 @@ table,
 #timesheet .timesheet-validation-controls {
   margin-top: 1em;
 }
+#timesheet .days {
+  background-color: #00bfd8;
+  color: #FFFFFF;
+  font-weight: 600;
+}
 #timesheet .project {
   padding: 0.38571429em 0.78571429em !important;
-  background-color: #D1DCEB !important;
-  color: #393939 !important;
+  background-color: #D1DCEB;
+  color: #00bfd8;
   font-size: 1.25em !important;
 }
 #timesheet th.project {

@@ -64,6 +64,7 @@ ui.input.error > input {
 .ui.statistic .value {
   color: @primaryColor !important;
   padding-bottom: 1rem;
+  font-weight: bold !important;
 }
 
 table, .controls {

@@ -164,33 +164,33 @@
 ---------------------*/
 
 .ui.input.error > input {
-  background-color: #FFF6F6 !important;
-  border-color: #E0B4B4 !important;
-  color: #9F3A38 !important;
+  background-color: transparent !important;
+  border-color: #e55151 !important;
+  color: #e55151 !important;
   -webkit-box-shadow: none;
           box-shadow: none;
 }
 
 /* Error Placeholder */
 .ui.input.error > input::-webkit-input-placeholder {
-  color: #e7bdbc !important;
+  color: #ffffff !important;
 }
 .ui.input.error > input::-moz-placeholder {
-  color: #e7bdbc !important;
+  color: #ffffff !important;
 }
 .ui.input.error > input:-ms-input-placeholder {
-  color: #e7bdbc !important;
+  color: #ffffff !important;
 }
 
 /* Focused Error Placeholder */
 .ui.input.error > input:focus::-webkit-input-placeholder {
-  color: #da9796 !important;
+  color: #f9d6d6 !important;
 }
 .ui.input.error > input:focus::-moz-placeholder {
-  color: #da9796 !important;
+  color: #f9d6d6 !important;
 }
 .ui.input.error > input:focus:-ms-input-placeholder {
-  color: #da9796 !important;
+  color: #f9d6d6 !important;
 }
 
 
