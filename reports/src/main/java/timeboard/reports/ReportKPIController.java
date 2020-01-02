@@ -26,7 +26,6 @@ package timeboard.reports;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,7 +42,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -52,8 +50,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @Controller
 @RequestMapping("/data-chart/report-kpi")
 public class ReportKPIController {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private ReportService reportService;
