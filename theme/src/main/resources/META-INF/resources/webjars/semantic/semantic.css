@@ -820,6 +820,8 @@ ui.input.error > input {
 .day-badge {
   width: 2.5rem;
   height: 2.5rem;
+  -webkit-box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
+  box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
 }
 
 .ui.statistic .value {
@@ -852,10 +854,6 @@ table,
   margin: 0;
 }
 
-#timesheet .timesheet-head tr {
-  background-color: #004751;
-}
-
 #timesheet .actions {
   position: absolute;
   left: 0;
@@ -886,17 +884,21 @@ table,
   margin-top: 1em;
 }
 
-#timesheet .days {
-  background-color: #00bfd8;
-  color: #FFFFFF;
+#timesheet .project {
+  padding: 0.38571429em 0.78571429em !important;
+  background-color: #D1DCEB !important;
+  font-size: 1.25em !important;
+}
+
+#timesheet .days th {
+  background-color: #00bfd8 !important;
+  color: #FFFFFF !important;
   font-weight: 600;
 }
 
-#timesheet .project {
-  padding: 0.38571429em 0.78571429em !important;
-  background-color: #D1DCEB;
-  color: #00bfd8;
-  font-size: 1.25em !important;
+#timesheet .timesheet-head th {
+  background-color: #FFFFFF !important;
+  color: #393939 !important;
 }
 
 #timesheet th.project {

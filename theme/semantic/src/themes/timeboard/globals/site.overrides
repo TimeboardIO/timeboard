@@ -76,9 +76,9 @@ table, .controls {
 #timesheet{
 
   table td{
+    padding: 0.3rem 0.3rem;
+  }
 
-      padding: 0.3rem 0.3rem;
-    }
   fieldset input{
       text-align: center;
       border: 0px solid #fff;
@@ -90,54 +90,52 @@ table, .controls {
       margin: 0;
     }
 
-  .timesheet-head tr{
-      background-color: #004751;
-    }
+  .actions {
+      * {
+        display: inline-block;
+      }
+      position: absolute;
+      left: 0;
+      top: 25%;
+      margin-left: 1rem;
+  }
 
+  fieldset{
+      padding: 0px; margin: 0px; border: none;
+  }
+  td:focus {
+      background-color: rgba(128,128,200,0.3);
+  }
+  .timesheet-navigation-controls{
+      margin-bottom: 1em;
+      text-align: right;
+  }
 
+  .timesheet-validation-controls{
+      margin-top: 1em;
+  }
 
+  .project {
+      padding: 0.38571429em 0.78571429em !important;
+      background-color: @lightBlue  !important;
+      font-size: 1.25em !important;
+  }
 
-   .actions {
-        * {
-          display: inline-block;
-        }
-        position: absolute;
-        left: 0;
-        top: 25%;
-        margin-left: 1rem;
-    }
+  .days th {
+    background-color: @primaryColor !important;
+    color: @white !important;
+    font-weight: 600;
+  }
 
-    fieldset{
-        padding: 0px; margin: 0px; border: none;
-    }
-    td:focus {
-        background-color: rgba(128,128,200,0.3);
-    }
-    .timesheet-navigation-controls{
-        margin-bottom: 1em;
-        text-align: right;
-    }
+  .timesheet-head th{
+    background-color: @white  !important;
+    color : @secondaryColor  !important;
+  }
 
-    .timesheet-validation-controls{
-        margin-top: 1em;
-    }
-
-    .days {
-      background-color: @primaryColor ;
-      color: @white ;
-      font-weight: 600;
-    }
-    .project{
-        padding: 0.38571429em 0.78571429em !important;
-        background-color: @lightBlue ;
-        color: @primaryColor ;
-        font-size: 1.25em !important;
-    }
-
-    th.project{
-        font-size: 1em !important;
-        font-weight: normal;
-    }
+  th.project{
+      font-size: 1em !important;
+      font-weight: normal;
+  }
 
 }
 
