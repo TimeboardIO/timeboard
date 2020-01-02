@@ -26,11 +26,10 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import timeboard.core.ui.UserInfo;
+
 
 import java.security.Principal;
 
@@ -38,9 +37,6 @@ import java.security.Principal;
 public class OnboardingController {
 
     public static final String URI = "/";
-
-    @Autowired
-    public UserInfo userInfo;
 
     @GetMapping("/")
     public String onboarding(Principal p, Model m){

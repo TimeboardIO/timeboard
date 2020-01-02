@@ -32,12 +32,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormatSymbols;
@@ -54,8 +54,6 @@ public class AccountController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @Autowired(
             required = false
@@ -64,10 +62,10 @@ public class AccountController {
 
 
     @PostMapping
-    protected String handlePost(HttpServletRequest request, Model model) {
+    protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request, Model model) {
 
         final String submitButton = request.getParameter("formType");
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         switch (submitButton) {
 
@@ -116,8 +114,8 @@ public class AccountController {
     }
 
     @GetMapping
-    protected String handleGet(Model model) {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+        final Account actor = authentication.getDetails();
         loadPage(model, actor);
         return "account.html";
     }

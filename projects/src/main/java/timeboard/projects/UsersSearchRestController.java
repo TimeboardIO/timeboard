@@ -31,13 +31,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,14 +66,12 @@ public class UsersSearchRestController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
-
     @GetMapping
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+    protected void doGet(TimeboardAuthentication authentication,
+                         HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
 
         String query = req.getParameter("q");
-        Account actor = userInfo.getCurrentAccount();
+        Account actor = authentication.getDetails();
 
         if (query.isBlank() || query.isEmpty()) {
             throw new BusinessException("Query is empty");

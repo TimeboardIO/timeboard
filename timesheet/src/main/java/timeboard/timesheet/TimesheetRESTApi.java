@@ -34,6 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
@@ -41,7 +42,7 @@ import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -64,16 +65,14 @@ public class TimesheetRESTApi {
     @Autowired
     private TimesheetService timesheetService;
 
-    @Autowired
-    private UserInfo userInfo;
-
 
     @GetMapping
     public ResponseEntity getTimesheetData(
+            TimeboardAuthentication authentication,
             @RequestParam("week") int week,
             @RequestParam("year") int year ) throws JsonProcessingException {
 
-        Account currentAccount = this.userInfo.getCurrentAccount();
+        Account currentAccount = authentication.getDetails();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
@@ -94,7 +93,7 @@ public class TimesheetRESTApi {
         final Date de = findEndDate(c, week, year);
 
         // Create days for current week
-        final List<DateWrapper> days = createDaysForCurrentWeek(c, ds);
+        final List<DateWrapper> days = createDaysForCurrentWeek(authentication, c, ds);
 
         //Get tasks for current week
         if (this.projectService != null) {
@@ -141,7 +140,7 @@ public class TimesheetRESTApi {
             validated = this.timesheetService.isTimesheetValidated(currentAccount, year, week);
         }
 
-        c.setTime(this.userInfo.getCurrentAccount().getBeginWorkDate());
+        c.setTime(authentication.getDetails().getBeginWorkDate());
 
         Timesheet ts = new Timesheet(validated, year, week, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), days, projects, imputations);
 
@@ -169,11 +168,12 @@ public class TimesheetRESTApi {
         return tasks;
     }
 
-    private List<DateWrapper> createDaysForCurrentWeek(Calendar c, Date ds) {
+    private List<DateWrapper> createDaysForCurrentWeek(
+            TimeboardAuthentication authentication, Calendar c, Date ds) {
         final List<DateWrapper> days = new ArrayList<>();
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
-            if(c.getTime().getTime() >= this.userInfo.getCurrentAccount().getBeginWorkDate().getTime()) {
+            if(c.getTime().getTime() >= authentication.getDetails().getBeginWorkDate().getTime()) {
                 DateWrapper dw = new DateWrapper(
                         c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH),
                         c.getTime()
@@ -187,10 +187,12 @@ public class TimesheetRESTApi {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateDataFromTimesheet(@RequestBody UpdateRequest request)  {
+    public ResponseEntity updateDataFromTimesheet(
+            TimeboardAuthentication authentication,
+            @RequestBody UpdateRequest request)  {
 
         try {
-            final Account actor = this.userInfo.getCurrentAccount();
+            final Account actor = authentication.getDetails();
 
            // String type = request.getParameter("type");
 
@@ -218,9 +220,9 @@ public class TimesheetRESTApi {
     }
 
     @GetMapping("/validate")
-    public ResponseEntity validateTimesheet(HttpServletRequest request) {
+    public ResponseEntity validateTimesheet(TimeboardAuthentication authentication, HttpServletRequest request) {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));

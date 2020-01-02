@@ -7,6 +7,8 @@
         externalIDs TEXT,
         firstName varchar(255),
         isOrganization bit,
+        localLogin varchar(255),
+        localPassword varchar(255),
         name varchar(255),
         remoteSubject varchar(255),
         primary key (id)

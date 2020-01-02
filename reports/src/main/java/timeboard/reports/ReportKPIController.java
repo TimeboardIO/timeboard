@@ -35,15 +35,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
-import timeboard.core.ui.UserInfo;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -60,12 +59,12 @@ public class ReportKPIController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping("/{reportID}")
-    protected ResponseEntity getDataChart(@PathVariable long reportID, Model model) throws BusinessException, IOException {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected ResponseEntity getDataChart(TimeboardAuthentication authentication,
+                                          @PathVariable long reportID, Model model)  {
+
+        final Account actor = authentication.getDetails();
         final Report report = this.reportService.getReportByID(actor, reportID);
 
         // If report has no filter, don't show its KPI graph

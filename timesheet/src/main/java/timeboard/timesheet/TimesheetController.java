@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;
@@ -42,7 +43,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,8 +69,6 @@ public class TimesheetController {
     @Autowired
     private  TimesheetService timesheetService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     private int findLastWeekYear(Calendar c, int week, int year) {
         c.set(Calendar.YEAR, year);
@@ -96,13 +95,14 @@ public class TimesheetController {
     }
 
     @GetMapping
-    protected String currentWeekTimesheet(Model model) throws Exception {
+    protected String currentWeekTimesheet(TimeboardAuthentication authentication, Model model) throws Exception {
         Calendar c = Calendar.getInstance();
-        return this.handleGet(c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+        return this.handleGet(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
     @GetMapping("/{year}/{week}")
-    protected String handleGet(@PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
+    protected String handleGet(TimeboardAuthentication authentication,
+                               @PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
 
 
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
@@ -116,7 +116,7 @@ public class TimesheetController {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
 
-        if(c.getTime().getTime() < this.userInfo.getCurrentAccount().getBeginWorkDate().getTime() ){
+        if(c.getTime().getTime() < authentication.getDetails().getBeginWorkDate().getTime() ){
             throw new BusinessException("You cannot access your timesheet before you register. ");
         }
 
@@ -125,23 +125,24 @@ public class TimesheetController {
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
         final boolean lastWeekValidated =
-                this.timesheetService.isTimesheetValidated(this.userInfo.getCurrentAccount(), lastWeekYear, lastWeek);
+                this.timesheetService.isTimesheetValidated(authentication.getDetails(), lastWeekYear, lastWeek);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("lastWeekValidated", lastWeekValidated);
 
         model.addAttribute("taskTypes", this.projectService.listTaskType());
-        model.addAttribute("projectList", this.projectService.listProjects(this.userInfo.getCurrentAccount()));
+        model.addAttribute("projectList", this.projectService.listProjects(authentication.getDetails()));
 
         return "timesheet.html";
     }
 
     @PostMapping
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost(TimeboardAuthentication authentication,
+                          HttpServletRequest request, HttpServletResponse response) {
 
         try {
-            final Account actor = this.userInfo.getCurrentAccount();
+            final Account actor = authentication.getDetails();
             String type = request.getParameter("type");
             Long taskID = Long.parseLong(request.getParameter("task"));
             AbstractTask task = this.projectService.getTaskByID(actor, taskID);

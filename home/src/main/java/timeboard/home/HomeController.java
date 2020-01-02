@@ -32,13 +32,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
-import timeboard.core.ui.UserInfo;
 import timeboard.home.model.Week;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,16 +56,13 @@ public class HomeController {
     @Autowired
     private TimesheetService timesheetService;
 
-    @Autowired
-    private UserInfo userInfo;
-
     @PostMapping
     protected String handlePost() {
         return "home.html";
     }
 
     @GetMapping
-    protected String handleGet(Principal principal, Model model) {
+    protected String handleGet(TimeboardAuthentication authentication, Model model) {
 
 
         //load previous weeks data
@@ -74,7 +70,7 @@ public class HomeController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
         List<Week> weeks = new ArrayList<>();
-        Account account = this.userInfo.getCurrentAccount();
+        final Account account = authentication.getDetails();
         int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {

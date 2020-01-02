@@ -30,12 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.ui.UserInfo;
+
 
 @Component
 public class SuccessfulLoginListener {
@@ -43,13 +44,12 @@ public class SuccessfulLoginListener {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @EventListener
     public void doSomething(InteractiveAuthenticationSuccessEvent event) throws BusinessException {
 
-        final Account account = this.userInfo.getCurrentAccount();
+
+        final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
         if(account == null){
             if(event.getSource() instanceof OAuth2AuthenticationToken) {
