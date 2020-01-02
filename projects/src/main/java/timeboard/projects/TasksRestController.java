@@ -34,11 +34,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -65,12 +65,11 @@ public class TasksRestController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserInfo userInfo;
-
     @GetMapping
-    public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity getTasks(TimeboardAuthentication authentication,
+                                   HttpServletRequest request) throws JsonProcessingException {
+
+        Account actor = authentication.getDetails();
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -123,9 +122,12 @@ public class TasksRestController {
     }
 
     @GetMapping("/chart")
-    public ResponseEntity getDatasForCharts(HttpServletRequest request) throws BusinessException, JsonProcessingException {
+    public ResponseEntity getDatasForCharts(
+            TimeboardAuthentication authentication,
+            HttpServletRequest request) throws BusinessException, JsonProcessingException {
+
         TaskGraphWrapper wrapper = new TaskGraphWrapper();
-        Account actor = this.userInfo.getCurrentAccount();
+        Account actor = authentication.getDetails();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -186,14 +188,14 @@ public class TasksRestController {
 
 
     @GetMapping("/approve")
-    public ResponseEntity approveTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity approveTask(TimeboardAuthentication authentication, HttpServletRequest request) {
+        Account actor = authentication.getDetails();
         return this.changeTaskStatus(actor, request, TaskStatus.IN_PROGRESS);
     }
 
     @GetMapping("/deny")
-    public ResponseEntity denyTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity denyTask(TimeboardAuthentication authentication, HttpServletRequest request) {
+        Account actor = authentication.getDetails();
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
@@ -224,8 +226,9 @@ public class TasksRestController {
     }
 
     @GetMapping("/delete")
-    public ResponseEntity deleteTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity deleteTask(TimeboardAuthentication authentication,
+                                     HttpServletRequest request) {
+        Account actor = authentication.getDetails();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -249,8 +252,10 @@ public class TasksRestController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createTask(@RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity createTask(TimeboardAuthentication authentication,
+                                     @RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+
+        Account actor = authentication.getDetails();
         Date startDate = null;
         Date endDate = null;
         try {

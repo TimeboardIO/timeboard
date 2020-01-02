@@ -36,14 +36,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,12 +54,10 @@ public class ProjectsController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(Model model) {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+        final Account actor = authentication.getDetails();
         List<Project> allActorProjects = this.projectService.listProjects(actor);
         if (allActorProjects.size() > 5) {
             allActorProjects = allActorProjects.subList(0, 5);
@@ -71,8 +68,8 @@ public class ProjectsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ProjectDecorator>> projectList(Model model) {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected ResponseEntity<List<ProjectDecorator>> projectList(TimeboardAuthentication authentication, Model model) {
+        final Account actor = authentication.getDetails();
         final List<ProjectDecorator> projects = this.projectService.listProjects(actor)
                 .stream()
                 .map(project -> new ProjectDecorator(project))
@@ -81,8 +78,9 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response,  RedirectAttributes attributes) throws BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected String handlePost(TimeboardAuthentication authentication,  HttpServletRequest request,
+                                RedirectAttributes attributes) throws BusinessException {
+        final Account actor = authentication.getDetails();
         this.projectService.createProject(actor, request.getParameter("projectName"));
         attributes.addFlashAttribute("success", "Project created successfully.");
         return "redirect:/projects";
@@ -94,9 +92,11 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(@PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
-        final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
-        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
+    protected String deleteProject(TimeboardAuthentication authentication,
+                                   @PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
+
+        final Project project = this.projectService.getProjectByID(authentication.getDetails(), projectID);
+        this.projectService.archiveProjectByID(authentication.getDetails(), project);
         attributes.addFlashAttribute("success", "Project deleted successfully.");
 
         return "redirect:/projects";

@@ -31,17 +31,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
-import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -53,14 +52,13 @@ public class TasExportController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @PostMapping
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response, Model model) throws ServletException, IOException {
+    protected String handlePost(TimeboardAuthentication authentication,
+                                HttpServletRequest request, HttpServletResponse response, Model model)  {
 
         try {
-            Account actor = this.userInfo.getCurrentAccount();
+            Account actor = authentication.getDetails();
             int month = Integer.parseInt(request.getParameter("month"));
             int year = Integer.parseInt(request.getParameter("year"));
             Long projectID = Long.parseLong(request.getParameter("projectID"));

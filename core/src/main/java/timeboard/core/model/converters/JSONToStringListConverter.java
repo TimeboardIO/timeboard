@@ -33,7 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.persistence.AttributeConverter;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import java.util.List;
 
 public class JSONToStringListConverter

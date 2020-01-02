@@ -34,10 +34,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -50,13 +51,12 @@ public class ProjectMilestonesController {
     @Autowired
     public ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping
-    protected String milestonesApp(@PathVariable Long projectID, Model model) throws  BusinessException {
+    protected String milestonesApp(TimeboardAuthentication authentication,
+                                   @PathVariable Long projectID, Model model) throws  BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
         model.addAttribute("project", project);
@@ -64,9 +64,10 @@ public class ProjectMilestonesController {
     }
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
-    protected ResponseEntity<List<MilestoneDecorator>> listMilestones(@PathVariable Long projectID) throws BusinessException {
+    protected ResponseEntity<List<MilestoneDecorator>> listMilestones(TimeboardAuthentication authentication,
+                                                                      @PathVariable Long projectID) throws BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
         return ResponseEntity.ok(this.projectService.listProjectMilestones(actor, project)
@@ -76,20 +77,22 @@ public class ProjectMilestonesController {
 
 
     @GetMapping("/{milestoneID/delete")
-    protected String deleteMilestone(@PathVariable Long projetID, @PathVariable Long milestoneID) throws BusinessException {
+    protected String deleteMilestone(TimeboardAuthentication authentication,
+                                     @PathVariable Long projetID, @PathVariable Long milestoneID) throws BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
         this.projectService.deleteMilestoneByID(actor, milestoneID);
 
         return "redirect:/projects/" + projetID + "/milestones";
     }
 
     @GetMapping("/{milestoneID}/setup")
-    protected String setupMilestone(@PathVariable Long projectID,
+    protected String setupMilestone(TimeboardAuthentication authentication,
+                                    @PathVariable Long projectID,
                                     @PathVariable Long milestoneID,
                                     Model model) throws BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
         model.addAttribute("milestone", milestone);
@@ -103,8 +106,9 @@ public class ProjectMilestonesController {
 
 
     @GetMapping("/create")
-    protected String createMilestoneView(@PathVariable Long projectID, Model model) throws BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected String createMilestoneView(TimeboardAuthentication authentication,
+                                         @PathVariable Long projectID, Model model) throws BusinessException {
+        final Account actor = authentication.getDetails();
 
         model.addAttribute("milestone", new Milestone());
 

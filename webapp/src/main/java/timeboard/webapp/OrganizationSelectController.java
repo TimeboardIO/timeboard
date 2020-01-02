@@ -33,11 +33,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Account;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
@@ -52,25 +54,24 @@ public class OrganizationSelectController {
     @Autowired
     private OrganizationService organizationService;
 
-    @Autowired
-    private UserInfo userInfo;
-
     @GetMapping
-    public String selectOrganisation(Model model){
+    public String selectOrganisation(TimeboardAuthentication authentication,
+                                     HttpServletRequest req, TimeboardAuthentication p, Model model){
 
         final List<Account> orgs =
-                this.organizationService.getParents(userInfo.getCurrentAccount(), userInfo.getCurrentAccount());
-        orgs.add(this.userInfo.getCurrentAccount());
+                this.organizationService.getParents(authentication.getDetails(), authentication.getDetails());
+        orgs.add(authentication.getDetails());
         model.addAttribute("organizations", orgs);
 
         return "org_select";
     }
 
     @PostMapping
-    public String selectOrganisation(@ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
+    public String selectOrganisation(TimeboardAuthentication authentication,
+                                     @ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
 
         final Optional<Account> selectedOrg =
-                this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), selectedOrgID);
+                this.organizationService.getOrganizationByID(authentication.getDetails(), selectedOrgID);
 
         if(selectedOrg.isPresent()) {
             final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));

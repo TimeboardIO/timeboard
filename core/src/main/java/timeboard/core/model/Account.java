@@ -69,6 +69,14 @@ public class Account implements Serializable {
     @Column
     private Boolean isOrganization = false;
 
+
+    @Column
+    private String localLogin;
+
+    @Column
+    private String localPassword;
+
+
     @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToStringMapConverter.class)
     @Lob
@@ -172,6 +180,21 @@ public class Account implements Serializable {
         return members;
     }
 
+    public String getLocalLogin() {
+        return localLogin;
+    }
+
+    public void setLocalLogin(String localLogin) {
+        this.localLogin = localLogin;
+    }
+
+    public String getLocalPassword() {
+        return localPassword;
+    }
+
+    public void setLocalPassword(String localPassword) {
+        this.localPassword = localPassword;
+    }
 
     @Transient
     public String getScreenName() {
@@ -202,6 +225,7 @@ public class Account implements Serializable {
     public void setExternalIDs(Map<String, String> externalIDs) {
         this.externalIDs = externalIDs;
     }
+
 
 
 }

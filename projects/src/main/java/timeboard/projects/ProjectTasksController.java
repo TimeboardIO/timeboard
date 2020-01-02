@@ -35,6 +35,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -43,11 +44,8 @@ import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
-import timeboard.core.ui.UserInfo;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -62,9 +60,6 @@ public class ProjectTasksController {
     public ProjectService projectService;
 
     @Autowired
-    public UserInfo userInfo;
-
-    @Autowired
     public DataTableService dataTableService;
 
     @Autowired
@@ -77,9 +72,11 @@ public class ProjectTasksController {
     public List<ProjectSyncPlugin> projectImportServiceList;
 
     @GetMapping("/tasks")
-    protected String listTasks(@PathVariable Long projectID, Model model) throws ServletException, IOException, BusinessException {
+    protected String listTasks(
+            TimeboardAuthentication authentication,
+            @PathVariable Long projectID, Model model) throws BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         final Task task = new Task();
         final Project project = this.projectService.getProjectByID(actor, projectID);
@@ -105,10 +102,12 @@ public class ProjectTasksController {
     }
 
     @GetMapping("/tasks/{taskID}")
-    protected String editTasks(@PathVariable Long projectID,
-                               @PathVariable Long taskID, Model model) throws BusinessException {
+    protected String editTasks(
+                    TimeboardAuthentication authentication,
+                    @PathVariable Long projectID,
+                    @PathVariable Long taskID, Model model) throws BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         final Task task = (Task) this.projectService.getTaskByID(actor, taskID);
 
@@ -124,11 +123,12 @@ public class ProjectTasksController {
 
     @PostMapping(value = "/tasks/sync/{serviceName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     protected String importFromJIRA(
+            TimeboardAuthentication authentication,
             @PathVariable Long projectID,
             @PathVariable String serviceName,
             @RequestBody MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
         final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
@@ -146,8 +146,11 @@ public class ProjectTasksController {
     }
 
     @PostMapping("/tasks")
-    protected String handlePost(HttpServletRequest request, Model model,  RedirectAttributes attributes) throws BusinessException {
-        Account actor = this.userInfo.getCurrentAccount();
+    protected String handlePost(
+            TimeboardAuthentication authentication,
+            HttpServletRequest request, Model model,  RedirectAttributes attributes) throws BusinessException {
+
+        Account actor = authentication.getDetails();
 
         long id = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, id);

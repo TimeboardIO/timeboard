@@ -33,6 +33,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
@@ -40,7 +41,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DefaultTask;
 import timeboard.core.model.TaskType;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -68,13 +69,12 @@ public class OrganizationConfigController {
 
     @Autowired
     public EncryptionService encryptionService;
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
+    protected String handleGet(TimeboardAuthentication authentication,
+                               HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         long id = Long.parseLong(request.getParameter("orgID"));
 
@@ -93,8 +93,10 @@ public class OrganizationConfigController {
     }
 
     @PostMapping
-    protected String handlePost(HttpServletRequest request, Model model) throws Exception {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected String handlePost(TimeboardAuthentication authentication,
+                                HttpServletRequest request, Model model) throws Exception {
+
+        final Account actor = authentication.getDetails();
 
         String action = request.getParameter("action");
         long id = Long.parseLong(request.getParameter("orgID"));
@@ -124,6 +126,6 @@ public class OrganizationConfigController {
         }
 
         //Extract organization
-        return this.handleGet(request, model);
+        return this.handleGet(authentication, request, model);
     }
 }

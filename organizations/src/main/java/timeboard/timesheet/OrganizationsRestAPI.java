@@ -36,12 +36,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.AccountHierarchy;
 import timeboard.core.model.MembershipRole;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -67,12 +68,12 @@ public class OrganizationsRestAPI {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping("/members")
-    public ResponseEntity getMembers(HttpServletRequest request) throws JsonProcessingException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity getMembers(TimeboardAuthentication authentication,
+                                     HttpServletRequest request) throws JsonProcessingException {
+
+        Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -109,8 +110,10 @@ public class OrganizationsRestAPI {
     }
 
     @GetMapping("/members/add")
-    public ResponseEntity addMember(HttpServletRequest request) throws JsonProcessingException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity addMember(TimeboardAuthentication authentication,
+                                    HttpServletRequest request) throws JsonProcessingException {
+
+        Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -143,8 +146,10 @@ public class OrganizationsRestAPI {
 
 
     @GetMapping("/members/updateRole")
-    public ResponseEntity updateMemberRole(HttpServletRequest request) throws JsonProcessingException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity updateMemberRole(TimeboardAuthentication authentication,
+                                           HttpServletRequest request) throws JsonProcessingException {
+
+        Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -184,8 +189,10 @@ public class OrganizationsRestAPI {
 
 
     @GetMapping("/members/remove")
-    public ResponseEntity removeMember(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity removeMember(TimeboardAuthentication authentication,
+                                       HttpServletRequest request) {
+
+        Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
