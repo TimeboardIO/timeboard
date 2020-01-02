@@ -1313,8 +1313,8 @@ Floated Menu / Item
 
 .ui.menu .red.active.item,
 .ui.red.menu .active.item {
-  border-color: #db2828 !important;
-  color: #db2828 !important;
+  border-color: #eb112c !important;
+  color: #eb112c !important;
 }
 .ui.menu .orange.active.item,
 .ui.orange.menu .active.item {
@@ -1333,8 +1333,8 @@ Floated Menu / Item
 }
 .ui.menu .green.active.item,
 .ui.green.menu .active.item {
-  border-color: #21ba45 !important;
-  color: #21ba45 !important;
+  border-color: #5BCA7E !important;
+  color: #5BCA7E !important;
 }
 .ui.menu .teal.active.item,
 .ui.teal.menu .active.item {
@@ -1497,7 +1497,7 @@ Floated Menu / Item
 /* Red */
 .ui.inverted.menu .red.active.item,
 .ui.inverted.red.menu {
-  background-color: #db2828;
+  background-color: #eb112c;
 }
 .ui.inverted.red.menu .item:before {
   background-color: rgba(34, 36, 38, 0.1);
@@ -1545,7 +1545,7 @@ Floated Menu / Item
 /* Green */
 .ui.inverted.menu .green.active.item,
 .ui.inverted.green.menu {
-  background-color: #21ba45;
+  background-color: #5BCA7E;
 }
 .ui.inverted.green.menu .item:before {
   background-color: rgba(34, 36, 38, 0.1);

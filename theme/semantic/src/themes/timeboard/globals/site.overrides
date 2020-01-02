@@ -10,8 +10,8 @@
 html{
     height: 100%;
     background: @primaryColor;
-    background: linear-gradient(45deg, #00bed8 0%,#007df7 95%) fixed;
-
+    //background: linear-gradient(45deg, #00bed8 0%,#007df7 95%) fixed;
+    background: rgba(0,0,0,.05)
   // background-size: cover;
   //  background-repeat: no-repeat;
 }
@@ -25,7 +25,17 @@ th, td {
 }
 
 
+.ui.segment {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
 
+.ui.segment.controls {
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
+  border: 1px solid rgba(34,36,38,.15) !important;
+  background: @white !important;
+}
 
 h1.ui.header,
 .ui.huge.header {
@@ -51,29 +61,36 @@ ui.input.error > input {
   height: 2.5rem;
 }
 
+.ui.statistic .value {
+  color: @primaryColor !important;
+  padding-bottom: 1rem;
+}
 
 
 /** Timesheet **/
 
 #timesheet{
-    table td{
+  table td{
 
-        padding: 0.3rem 0.3rem;
+      padding: 0.3rem 0.3rem;
     }
-    fieldset input{
-        text-align: center;
-        border: 0px solid #fff;
-        background-color: rgba(1,0,1,0);
+  fieldset input{
+      text-align: center;
+      border: 0px solid #fff;
+      background-color: rgba(1,0,1,0);
     }
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
 
-    .timesheet-head tr{
+  .timesheet-head tr{
       background-color: #004751;
     }
+
+
+
 
    .actions {
         * {
@@ -116,19 +133,22 @@ ui.input.error > input {
 
 
 
+
 /** PROJECT **/
 .badge{
        text-align: center;
         width: 3em;
         height: 3em;
         margin: 0 auto;
-        background-color: @violet;
+       // background-color: @violet;
         line-height: 3em;
         border-radius: 5em;
         margin-top: 0.5em;
         font-size: 3em;
         color: white;
         margin-bottom: 0.5em;
+        font-weight: bold;
+        text-transform: capitalize;
 }
 
 

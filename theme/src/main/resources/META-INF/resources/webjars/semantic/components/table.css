@@ -643,10 +643,10 @@
 
 /* Red */
 .ui.red.table {
-  border-top: 0.2em solid #db2828;
+  border-top: 0.2em solid #eb112c;
 }
 .ui.inverted.red.table {
-  background-color: #db2828 !important;
+  background-color: #eb112c !important;
   color: #FFFFFF !important;
 }
 
@@ -679,10 +679,10 @@
 
 /* Green */
 .ui.green.table {
-  border-top: 0.2em solid #21ba45;
+  border-top: 0.2em solid #5BCA7E;
 }
 .ui.inverted.green.table {
-  background-color: #21ba45 !important;
+  background-color: #5BCA7E !important;
   color: #FFFFFF !important;
 }
 

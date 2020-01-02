@@ -96,7 +96,7 @@
             <i class="close icon" @click="success.visible = false; " ></i>
             <div  class="header"> {{ success.message }} </div>
         </div>
-        <div class="ui segment timesheet-navigation-controls">
+        <div class="ui segment controls timesheet-navigation-controls">
 
 
             <div class="actions">
@@ -139,14 +139,14 @@
                     <table class="ui celled table" style="text-align:center">
                         <thead>
                         <tr class="">
-                            <th class="two wide project"></th>
+                            <th class="two wide project" style="background-color: white;" ></th>
                             <th class="wide one project" style="text-align:center" v-for="day in days">
                                 {{ day.day }} {{ new Date(day.date).getDate() }}
                             </th>
-                            <th class="wide one project" colspan="4"></th>
+                            <th class="wide one project" style="background-color: white;" colspan="4"></th>
                         </tr>
                         <tr class="timesheet-head">
-                            <th class="two wide">Task</th>
+                            <th class="two wide" >Task</th>
                             <th class="wide one" style="text-align:center" v-for="day in days">
                                 <div v-if="(day.day != 'Saturday') && (day.day != 'Sunday')"
                                      v-bind:id="day.date"

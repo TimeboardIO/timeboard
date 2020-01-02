@@ -510,16 +510,16 @@ a.ui.active.label:ActiveHover:before {
 
 .ui.red.labels .label,
 .ui.red.label {
-  background-color: #db2828 !important;
-  border-color: #db2828 !important;
+  background-color: #eb112c !important;
+  border-color: #eb112c !important;
   color: #FFFFFF !important;
 }
 
 /* Link */
 .ui.red.labels .label:hover,
 a.ui.red.label:hover {
-  background-color: #d01919 !important;
-  border-color: #d01919 !important;
+  background-color: #dd0520 !important;
+  border-color: #dd0520 !important;
   color: #FFFFFF !important;
 }
 
@@ -531,20 +531,20 @@ a.ui.red.label:hover {
 
 /* Ribbon */
 .ui.red.ribbon.label {
-  border-color: #b21e1e !important;
+  border-color: #bb0e23 !important;
 }
 
 /* Basic */
 .ui.basic.red.label {
   background: none #FFFFFF !important;
-  color: #db2828 !important;
-  border-color: #db2828 !important;
+  color: #eb112c !important;
+  border-color: #eb112c !important;
 }
 .ui.basic.red.labels a.label:hover,
 a.ui.basic.red.label:hover {
   background-color: #FFFFFF !important;
-  color: #d01919 !important;
-  border-color: #d01919 !important;
+  color: #dd0520 !important;
+  border-color: #dd0520 !important;
 }
 
 /*--- Orange ---*/
@@ -654,7 +654,7 @@ a.ui.olive.label:hover {
 
 /* Ribbon */
 .ui.olive.ribbon.label {
-  border-color: #198f35 !important;
+  border-color: #3bb762 !important;
 }
 
 /* Basic */
@@ -674,16 +674,16 @@ a.ui.basic.olive.label:hover {
 
 .ui.green.labels .label,
 .ui.green.label {
-  background-color: #21ba45 !important;
-  border-color: #21ba45 !important;
+  background-color: #5BCA7E !important;
+  border-color: #5BCA7E !important;
   color: #FFFFFF !important;
 }
 
 /* Link */
 .ui.green.labels .label:hover,
 a.ui.green.label:hover {
-  background-color: #16ab39 !important;
-  border-color: #16ab39 !important;
+  background-color: #42ca6d !important;
+  border-color: #42ca6d !important;
   color: #FFFFFF !important;
 }
 
@@ -695,20 +695,20 @@ a.ui.green.label:hover {
 
 /* Ribbon */
 .ui.green.ribbon.label {
-  border-color: #198f35 !important;
+  border-color: #3bb762 !important;
 }
 
 /* Basic */
 .ui.basic.green.label {
   background: none #FFFFFF !important;
-  color: #21ba45 !important;
-  border-color: #21ba45 !important;
+  color: #5BCA7E !important;
+  border-color: #5BCA7E !important;
 }
 .ui.basic.green.labels a.label:hover,
 a.ui.basic.green.label:hover {
   background-color: #FFFFFF !important;
-  color: #16ab39 !important;
-  border-color: #16ab39 !important;
+  color: #42ca6d !important;
+  border-color: #42ca6d !important;
 }
 
 /*--- Teal ---*/

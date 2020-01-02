@@ -175,7 +175,7 @@ public class TimesheetRESTApi {
         for (int i = 0; i < 7; i++) {
             if(c.getTime().getTime() >= this.userInfo.getCurrentAccount().getBeginWorkDate().getTime()) {
                 DateWrapper dw = new DateWrapper(
-                        c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH),
+                        c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).substring(0,3),
                         c.getTime()
                 );
                 days.add(dw);
