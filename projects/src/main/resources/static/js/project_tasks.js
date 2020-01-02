@@ -131,7 +131,8 @@ let app = new Vue({
                 {
                     "slot": "actions",
                     "label": "Actions",
-                    "primary" : true
+                    "primary" : true,
+                    "class":"right aligned collapsing"
                 }],
             filters: {
                 name:      { filterKey: 'taskName', filterValue: '',

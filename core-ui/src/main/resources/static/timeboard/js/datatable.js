@@ -11,7 +11,7 @@ Vue.component('data-table', {
                 </thead>
                 <tbody>
                     <tr v-for="(row, i) in finalData">
-                      <td v-for="(col, j) in finalCols" v-if="col.visible">
+                      <td v-for="(col, j) in finalCols" v-if="col.visible" v-bind:class="col.class">
                           <slot :name="col.slot" v-bind:row="finalData[i]">
                           </slot>
                       </td>

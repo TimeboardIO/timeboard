@@ -11,12 +11,13 @@ $(document).ready(function () {
                         "slot": "name",
                         "label": "Project Name",
                         "primary" : true,
-                        "sortKey" : "name"
+                        "sortKey" : "name",
                     },
                     {
                         "slot": "actions",
                         "label": "Actions",
-                        "primary" : true
+                        "primary" : true,
+                        "class":"right aligned collapsing"
                     }],
                 data: [],
                 name : "tableProjects",

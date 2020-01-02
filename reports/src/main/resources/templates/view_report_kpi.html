@@ -16,7 +16,14 @@
 
 <div layout:fragment="content">
     <div class="ui segment" id="create-report">
-        <h4 class="ui dividing header">View KPI Report:</h4>
+        <h4 class="ui dividing header">
+
+            <a class="ui button" th:href="@{/reports}">
+                <i class="left arrow icon"></i>
+                Back
+            </a>
+
+            View KPI Report:</h4>
         <h3 style="text-align: center" th:text="${report.name}"></h3>
 
         <div class="column" id="app-view-report">
@@ -24,11 +31,6 @@
         </div>
 
         <br>
-        <a class="ui button" th:href="@{/reports}">
-            <i class="left arrow icon"></i>
-            Back
-        </a>
-
     </div>
 </div>
 </body>

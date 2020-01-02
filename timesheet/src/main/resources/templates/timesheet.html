@@ -176,7 +176,9 @@
                         <tbody>
                         <template v-for="(project, projectID) in projects">
                             <tr>
-                                <td class="ui header left aligned project" v-bind:colspan="days.length + 5">{{ project.projectName }}</td>
+                                <td class="ui header left aligned project" v-bind:colspan="days.length + 5">
+                                    <a v-bind:href="'/projects/'+project.projectID+'/setup'">{{ project.projectName }}</a>
+                                </td>
                             </tr>
 
                             <tr v-for="(task, taskID) in project.tasks">
