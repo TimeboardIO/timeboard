@@ -60,7 +60,7 @@ const timesheetModel =  {
 
         //check all days imputations == 1
         this.days.forEach(function(day)  { 
-            if(day.day !== 'Sunday' && day.day !== 'Saturday') {
+            if(day.day !== 'Sun' && day.day !== 'Sat') {
                 let sum = timesheetModel.getImputationSum(day.date);
                 result = result && (sum === 1);
              }
