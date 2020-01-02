@@ -34,8 +34,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
@@ -43,7 +45,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectMembership;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -74,13 +76,12 @@ public class ProjectSetupController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserInfo userInfo;
 
 
     @GetMapping
-    protected String configProject(@PathVariable long projectID, Model model) throws BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected String configProject(TimeboardAuthentication authentication,
+                                   @PathVariable long projectID, Model model) throws BusinessException {
+        final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         final Map<String, Object> map = new HashMap<>();
         this.prepareTemplateData(project, map);
@@ -90,8 +91,9 @@ public class ProjectSetupController {
 
     @PostMapping("/memberships")
     @ResponseBody
-    protected ResponseEntity updateProjectMembers(@PathVariable long projectID, HttpServletRequest request) throws Exception {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected ResponseEntity updateProjectMembers(TimeboardAuthentication authentication,
+                                                  @PathVariable long projectID, HttpServletRequest request) throws Exception {
+        final Account actor = authentication.getDetails();
         final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
@@ -105,11 +107,12 @@ public class ProjectSetupController {
     }
 
     @PatchMapping("/memberships/{membershipID}/{role}")
-    protected ResponseEntity updateProjectMembers(@PathVariable Long projectID,
+    protected ResponseEntity updateProjectMembers(TimeboardAuthentication authentication,
+                                                  @PathVariable Long projectID,
                                                   @PathVariable Long membershipID,
                                                   @PathVariable MembershipRole role) throws Exception {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.getMembers().stream()
                 .filter(projectMembership -> projectMembership.getMembershipID() == membershipID)
@@ -119,10 +122,11 @@ public class ProjectSetupController {
     }
 
     @DeleteMapping("/memberships/{membershipID}")
-    protected ResponseEntity deleteProjectMembers(@PathVariable Long projectID,
+    protected ResponseEntity deleteProjectMembers(TimeboardAuthentication authentication,
+                                                  @PathVariable Long projectID,
                                                   @PathVariable Long membershipID) throws Exception {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.getMembers().removeIf(projectMembership -> {
             return projectMembership.getMembershipID() == membershipID && projectMembership.getMember().getId() != actor.getId();
@@ -133,11 +137,12 @@ public class ProjectSetupController {
     }
 
     @PostMapping("/informations")
-    protected String updateProjectConfiguration(@PathVariable long projectID,
+    protected String updateProjectConfiguration(TimeboardAuthentication authentication,
+                                                @PathVariable long projectID,
                                                 @ModelAttribute ProjectConfigForm projectConfigForm,
                                                 RedirectAttributes attributes) throws Exception {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.setName(projectConfigForm.getName());
@@ -165,7 +170,7 @@ public class ProjectSetupController {
         pmf.setMemberships(new ArrayList<>(project.getMembers()));
 
         map.put("project", project);
-        map.put("orgID", this.userInfo.getCurrentOrganizationID());
+        map.put("orgID", ThreadLocalStorage.getCurrentOrganizationID());
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());

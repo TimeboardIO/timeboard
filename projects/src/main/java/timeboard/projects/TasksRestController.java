@@ -34,11 +34,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -65,12 +65,11 @@ public class TasksRestController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private UserInfo userInfo;
-
     @GetMapping
-    public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity getTasks(TimeboardAuthentication authentication,
+                                   HttpServletRequest request) throws JsonProcessingException {
+
+        Account actor = authentication.getDetails();
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -123,9 +122,12 @@ public class TasksRestController {
     }
 
     @GetMapping("/chart")
-    public ResponseEntity getDatasForCharts(HttpServletRequest request) throws BusinessException, JsonProcessingException {
+    public ResponseEntity getDatasForCharts(
+            TimeboardAuthentication authentication,
+            HttpServletRequest request) throws BusinessException, JsonProcessingException {
+
         TaskGraphWrapper wrapper = new TaskGraphWrapper();
-        Account actor = this.userInfo.getCurrentAccount();
+        Account actor = authentication.getDetails();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -149,8 +151,8 @@ public class TasksRestController {
         wrapper.setListOfTaskDates(listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
-        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
-        final EffortHistory[] lastEffortSpentSum = {new EffortHistory(task.getStartDate(), 0.0)};
+        List<ValueHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
+        final ValueHistory[] lastEffortSpentSum = {new ValueHistory(task.getStartDate(), 0.0)};
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -160,39 +162,16 @@ public class TasksRestController {
                         .filter(es -> new SimpleDateFormat(formatDateToDisplay)
                                 .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effort -> {
-                            lastEffortSpentSum[0] = new EffortHistory(date, effort.getValue());
+                            lastEffortSpentSum[0] = new ValueHistory(date, effort.getValue());
                             return lastEffortSpentSum[0];
                         })
-                        .findFirst().orElse(new EffortHistory(date, lastEffortSpentSum[0].getValue())))
+                        .findFirst().orElse(new ValueHistory(date, lastEffortSpentSum[0].getValue())))
                 .collect(Collectors.toMap(
                         e -> e.getDate(),
                         e -> e.getValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
         wrapper.setEffortSpentData(effortSpentMap.values());
-
-        // Datas for effort estimate (Axis Y)
-        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
-        final EffortHistory[] lastEffortEstimate = {new EffortHistory(task.getStartDate(), task.getOriginalEstimate())};
-        Map<Date, Double> effortEstimateMap = listOfTaskDates
-                .stream()
-                .map(dateString -> {
-                    return formatDate(formatDateToDisplay, dateString);
-                })
-                .map(date -> effortLeftDB.stream()
-                        .filter(el -> new SimpleDateFormat(formatDateToDisplay)
-                                .format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
-                        .map(effortLeft -> {
-                            lastEffortEstimate[0] = new EffortHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
-                            return lastEffortEstimate[0];
-                        })
-                        .findFirst().orElse(new EffortHistory(date, lastEffortEstimate[0].getValue())))
-                .collect(Collectors.toMap(
-                        e -> e.getDate(),
-                        e -> e.getValue(),
-                        (x, y) -> y, LinkedHashMap::new
-                ));
-        wrapper.setRealEffortData(effortEstimateMap.values());
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
 
@@ -209,14 +188,14 @@ public class TasksRestController {
 
 
     @GetMapping("/approve")
-    public ResponseEntity approveTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity approveTask(TimeboardAuthentication authentication, HttpServletRequest request) {
+        Account actor = authentication.getDetails();
         return this.changeTaskStatus(actor, request, TaskStatus.IN_PROGRESS);
     }
 
     @GetMapping("/deny")
-    public ResponseEntity denyTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity denyTask(TimeboardAuthentication authentication, HttpServletRequest request) {
+        Account actor = authentication.getDetails();
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
@@ -247,8 +226,9 @@ public class TasksRestController {
     }
 
     @GetMapping("/delete")
-    public ResponseEntity deleteTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity deleteTask(TimeboardAuthentication authentication,
+                                     HttpServletRequest request) {
+        Account actor = authentication.getDetails();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -272,8 +252,10 @@ public class TasksRestController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createTask(@RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity createTask(TimeboardAuthentication authentication,
+                                     @RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+
+        Account actor = authentication.getDetails();
         Date startDate = null;
         Date endDate = null;
         try {

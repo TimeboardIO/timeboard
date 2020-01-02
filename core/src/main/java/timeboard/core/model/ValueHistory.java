@@ -26,66 +26,31 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
-import java.io.Serializable;
+import java.util.Date;
 
+public class ValueHistory {
 
-@Entity
-public class Report extends OrganizationEntity implements Serializable {
+    private Date date;
+    private Double value;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column(length = 50, unique = false)
-    private String name;
-
-    @Column
-    private String filterProject;
-
-    @Column
-    private ReportType type;
-
-
-    public Report() {
-        this.type = ReportType.PROJECT_KPI;
+    public ValueHistory(Date date, Double value) {
+        this.date = date;
+        this.value = value;
     }
 
-    public Report(String name, ReportType type, String filterProject) {
-        this.name = name;
-        this.type = type;
-        this.filterProject = filterProject;
+    public Date getDate() {
+        return date;
     }
 
-    public Long getId() {
-        return id;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public Double getValue() {
+        return value;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getFilterProject() {
-        return filterProject;
-    }
-
-    public void setFilterProject(String filterProject) {
-        this.filterProject = filterProject;
-    }
-
-    public ReportType getType() {
-        return type;
-    }
-
-    public void setType(ReportType type) {
-        this.type = type;
+    public void setValue(Double value) {
+        this.value = value;
     }
 }

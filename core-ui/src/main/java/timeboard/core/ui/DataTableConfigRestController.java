@@ -27,24 +27,20 @@ package timeboard.core.ui;
  */
 
 
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Component
@@ -55,13 +51,11 @@ public class DataTableConfigRestController {
     @Autowired
     private DataTableService dataTableService;
 
-    @Autowired
-    private UserInfo userInfo;
 
 
     @GetMapping
-    public ResponseEntity<DataTableConfigWrapper> getConfig(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity<DataTableConfigWrapper> getConfig(TimeboardAuthentication authentication, HttpServletRequest request) {
+        final Account actor = authentication.getDetails();
 
         final String tableID = request.getParameter("tableID");
 
@@ -81,8 +75,8 @@ public class DataTableConfigRestController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateConfig(@RequestBody DataTableConfigWrapper dataConfig) throws JsonProcessingException, BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity updateConfig(TimeboardAuthentication authentication, @RequestBody DataTableConfigWrapper dataConfig) {
+        final Account actor = authentication.getDetails();
 
         DataTableConfig dataTableConfig = dataTableService.addOrUpdateTableConfig(dataConfig.tableID, actor, dataConfig.getColNames());
         return ResponseEntity.ok(new DataTableConfigWrapper(dataTableConfig));

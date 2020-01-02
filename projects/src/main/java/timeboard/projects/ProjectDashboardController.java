@@ -32,12 +32,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.ui.UserInfo;
+
 
 
 /**
@@ -50,14 +51,12 @@ public class ProjectDashboardController {
     @Autowired
     public ProjectService projectService;
 
-    @Autowired
-    public UserInfo userInfo;
-
 
     @GetMapping
-    protected String handleGet(@PathVariable Long projectID, Model model) throws  BusinessException {
+    protected String handleGet(TimeboardAuthentication authentication,
+                               @PathVariable Long projectID, Model model) throws  BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, projectID);
         final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
 

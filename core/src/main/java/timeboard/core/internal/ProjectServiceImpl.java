@@ -36,8 +36,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.events.TaskEvent;
-import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
@@ -119,7 +117,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
-    @PostAuthorize("returnObject.organizationID == @userInfo.getCurrentOrganizationID()")
+    @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     public Project createProject(Account owner, String projectName) throws BusinessException {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
@@ -252,7 +250,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return new ProjectDashboard(project.getQuotation(),
                 (Double) originalEstimateAndEffortLeft[0],
-                (Double) originalEstimateAndEffortLeft[1], effortSpent);
+                (Double) originalEstimateAndEffortLeft[1], effortSpent, new Date());
 
     }
 
@@ -449,9 +447,9 @@ public class ProjectServiceImpl implements ProjectService {
         LOGGER.info("User " + actor + " updated " + taskList.size() + " tasks ");
         em.flush();
 
-        taskList.stream().forEach(task -> {
+        /*taskList.stream().forEach(task -> {
             TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
-        });
+        });*/
 
     }
 
@@ -719,16 +717,6 @@ public class ProjectServiceImpl implements ProjectService {
         return em.find(TaskType.class, taskTypeID);
     }
 
-    @Override
-    public List<TaskRevision> findAllTaskRevisionByTaskID(Account actor, Long taskID) {
-        TypedQuery<TaskRevision> q = em
-                .createQuery("select t from TaskRevision t left join fetch t.task where "
-                        + "t.task.id = :taskID"
-                        + "group by t.task "
-                        + "having max(t.revisionDate)", TaskRevision.class);
-        q.setParameter("taskID", taskID);
-        return q.getResultList();
-    }
 
 
     @Override
@@ -794,7 +782,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         em.remove(task);
         em.flush();
-        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
+        /*TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));*/
 
 
         LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
@@ -802,10 +790,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor,
-                                                             Task task,
-                                                             Date startTaskDate,
-                                                             Date endTaskDate) throws BusinessException {
+    public List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor,
+                                                            Task task,
+                                                            Date startTaskDate,
+                                                            Date endTaskDate) throws BusinessException {
 
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
@@ -826,13 +814,13 @@ public class ProjectServiceImpl implements ProjectService {
 
         return query.getResultList()
                 .stream()
-                .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
+                .map(x -> new ValueHistory((Date) x[0], (Double) x[1]))
                 .collect(Collectors.toList());
     }
 
 
     @Override
-    public List<EffortHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException {
+    public List<ValueHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException {
         RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
@@ -853,7 +841,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return query.getResultList()
                 .stream()
-                .map(x -> new EffortHistory((Date) x[0], (Double) x[1]))
+                .map(x -> new ValueHistory((Date) x[0], (Double) x[1]))
                 .collect(Collectors.toList());
     }
 
@@ -1127,4 +1115,5 @@ public class ProjectServiceImpl implements ProjectService {
 
         return data;
     }
+
 }

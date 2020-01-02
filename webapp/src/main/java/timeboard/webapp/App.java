@@ -33,12 +33,13 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import timeboard.webapp.security.TimeboardSecurityConfig;
 
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableWebSecurity
 @EnableAspectJAutoProxy
-@Import({WebConfig.class, ModulesConfiguration.class})
+@Import({WebConfig.class, ModulesConfiguration.class, TimeboardSecurityConfig.class})
 public class App {
 
     public static void main(String... args){

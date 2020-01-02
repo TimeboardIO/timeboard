@@ -84,6 +84,9 @@ public class Project extends OrganizationEntity implements Serializable {
     @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectTag> tags;
 
+    @OneToMany(targetEntity = ProjectSnapshot.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectSnapshot> snapshots;
+
 
     public Project() {
         this.enable = true;
@@ -167,6 +170,10 @@ public class Project extends OrganizationEntity implements Serializable {
     public void setTags(List<ProjectTag> tags) {
         this.tags = tags;
     }
+
+    public List<ProjectSnapshot> getSnapshots() { return snapshots; }
+
+    public void setSnapshots(List<ProjectSnapshot> snapshots) { this.snapshots = snapshots; }
 
     public boolean isEnable() {
         return enable;

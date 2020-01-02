@@ -30,6 +30,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
@@ -67,6 +69,22 @@ public class UserServiceImpl implements UserService {
             LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
         });
         return accounts;
+    }
+
+    @Override
+    public Account findUserByLogin(String name) {
+        if (name == null) {
+            return null;
+        }
+        TypedQuery<Account> q = em.createQuery("from Account u where u.localLogin=:name", Account.class);
+        q.setParameter("name", name);
+        Account account;
+        try {
+            account = q.getSingleResult();
+        } catch (NoResultException e) {
+            account = null;
+        }
+        return account;
     }
 
 
@@ -211,6 +229,11 @@ public class UserServiceImpl implements UserService {
 
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+        return null;
     }
   /*
     private boolean checkPassword(String password, String hash) {

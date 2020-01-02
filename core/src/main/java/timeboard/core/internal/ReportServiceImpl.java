@@ -26,12 +26,6 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +33,19 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.*;
-import timeboard.core.model.*;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.ReportService;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
+import timeboard.core.model.Report;
+import timeboard.core.model.ReportType;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component

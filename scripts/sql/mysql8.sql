@@ -7,6 +7,8 @@
         externalIDs TEXT,
         firstName varchar(255),
         isOrganization bit,
+        localLogin varchar(255),
+        localPassword varchar(255),
         name varchar(255),
         remoteSubject varchar(255),
         primary key (id)
@@ -113,6 +115,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         organizationID bigint,
@@ -155,6 +159,18 @@
         primary key (membershipID)
     ) engine=InnoDB;
 
+    create table ProjectSnapshot (
+       id bigint not null,
+        organizationID bigint,
+        effortLeft double precision not null,
+        effortSpent double precision not null,
+        originalEstimate double precision not null,
+        projectSnapshotDate datetime(6),
+        quotation double precision not null,
+        project_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table ProjectTag (
        id bigint not null,
         organizationID bigint,
@@ -193,15 +209,15 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table TaskRevision (
+    create table TaskSnapshot (
        id bigint not null,
         organizationID bigint,
         effortLeft double precision not null,
         effortSpent double precision not null,
         originalEstimate double precision not null,
-        realEffort double precision not null,
-        revisionDate datetime(6),
+        snapshotDate datetime(6),
         assigned_id bigint,
+        projectSnapshot_id bigint,
         task_id bigint,
         primary key (id)
     ) engine=InnoDB;
@@ -271,6 +287,11 @@
        foreign key (project_id) 
        references Project (id);
 
+    alter table ProjectSnapshot 
+       add constraint FKfeonsxvox8vw2ckgx517uvncs 
+       foreign key (project_id) 
+       references Project (id);
+
     alter table ProjectTag 
        add constraint FKflkgw7xvdg8kc0gnjsj950con 
        foreign key (project_id) 
@@ -296,13 +317,18 @@
        foreign key (taskType_id) 
        references TaskType (id);
 
-    alter table TaskRevision 
-       add constraint FKtiitw2jkye656vww7or0ufx99 
+    alter table TaskSnapshot 
+       add constraint FKqlt7jdeboxt0lajph1uwq3l95 
        foreign key (assigned_id) 
        references Account (id);
 
-    alter table TaskRevision 
-       add constraint FKpsj9t1js8flo735q3nx3o0c6d 
+    alter table TaskSnapshot 
+       add constraint FKf0uknp6e8ohk8xok1ww5kece8 
+       foreign key (projectSnapshot_id) 
+       references ProjectSnapshot (id);
+
+    alter table TaskSnapshot 
+       add constraint FKq0s3frhsv5jms3r14ax9jtnnh 
        foreign key (task_id) 
        references Task (id);
 

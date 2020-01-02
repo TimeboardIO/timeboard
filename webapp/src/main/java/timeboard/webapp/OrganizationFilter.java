@@ -28,11 +28,13 @@ package timeboard.webapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
-import timeboard.core.ui.UserInfo;
+
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -48,9 +50,6 @@ import java.util.stream.Collectors;
 @Component
 @Order(1)
 public class OrganizationFilter implements Filter {
-
-    @Autowired
-    private UserInfo userInfo;
 
     @Autowired
     private OrganizationService organizationService;
@@ -70,7 +69,10 @@ public class OrganizationFilter implements Filter {
         if(isWhiteListed((HttpServletRequest)servletRequest)){
             filterChain.doFilter(servletRequest, servletResponse);
         }else {
-            if (processCookieExtraction((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse)) {
+            if (processCookieExtraction(
+                    (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication(),
+                    (HttpServletRequest) servletRequest,
+                    (HttpServletResponse) servletResponse)) {
                 return;
             }
 
@@ -78,12 +80,15 @@ public class OrganizationFilter implements Filter {
         }
     }
 
-    private boolean processCookieExtraction(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
+    private boolean processCookieExtraction(TimeboardAuthentication authentication,
+                                            HttpServletRequest servletRequest,
+                                            HttpServletResponse servletResponse) throws IOException {
+
         Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
         if(orgCookie.isPresent()){
             final Long organizationID = Long.parseLong(orgCookie.get().getValue());
             Optional<Account> organization =
-                    this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
+                    this.organizationService.getOrganizationByID(authentication.getDetails(), organizationID);
 
             if(organization.isPresent()){
                 ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
