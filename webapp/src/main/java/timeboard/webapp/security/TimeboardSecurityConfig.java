@@ -146,8 +146,6 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
 
             if (account != null) {
                 SecurityContextHolder.getContext().setAuthentication(new TimeboardAuthentication(account));
-            }else{
-                SecurityContextHolder.clearContext();
             }
 
             chain.doFilter(request, response);
