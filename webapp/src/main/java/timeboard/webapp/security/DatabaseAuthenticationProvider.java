@@ -27,6 +27,7 @@ package timeboard.webapp.security;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -45,7 +46,13 @@ public class DatabaseAuthenticationProvider  implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         Account account = this.userService.findUserByLogin(((UsernamePasswordAuthenticationToken) authentication).getName());
-        return new TimeboardAuthentication(account);
+
+        if(account != null && account.getLocalPassword().equals(((UsernamePasswordAuthenticationToken) authentication).getCredentials())){
+            return new TimeboardAuthentication(account);
+        }else{
+            throw new AuthenticationCredentialsNotFoundException(authentication.getName());
+        }
+
     }
 
     @Override
