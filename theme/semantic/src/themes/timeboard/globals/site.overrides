@@ -159,7 +159,9 @@ table, .controls {
         text-transform: capitalize;
 }
 
-
+.ui.form textarea:not([rows]) {
+  height: 8em !important;
+}
 
 .text.primary {
   color: @primaryColor !important;

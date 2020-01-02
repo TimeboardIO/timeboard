@@ -921,6 +921,10 @@ table,
   text-transform: capitalize;
 }
 
+.ui.form textarea:not([rows]) {
+  height: 8em !important;
+}
+
 .text.primary {
   color: #00bfd8 !important;
 }
@@ -13285,7 +13289,7 @@ img.ui.bordered.image {
 ---------------------*/
 
 .ui.input.error > input {
-  background-color: transparent !important;
+  background-color: #FFFFFF !important;
   border-color: #e55151 !important;
   color: #e55151 !important;
   -webkit-box-shadow: none;
@@ -19586,7 +19590,7 @@ ol.ui.horizontal.list li:before,
 .ui.form .field.error input[type="text"],
 .ui.form .field.error input[type="file"],
 .ui.form .field.error input[type="url"] {
-  background: transparent;
+  background: #FFFFFF;
   border-color: #e55151;
   color: #e55151;
   border-radius: '';
@@ -19608,7 +19612,7 @@ ol.ui.horizontal.list li:before,
 .ui.form .field.error input[type="text"]:focus,
 .ui.form .field.error input[type="file"]:focus,
 .ui.form .field.error input[type="url"]:focus {
-  background: transparent;
+  background: #FFFFFF;
   border-color: #e55151;
   color: #e55151;
   -webkit-appearance: none;
@@ -19631,7 +19635,7 @@ ol.ui.horizontal.list li:before,
 .ui.form .field.error .ui.dropdown,
 .ui.form .field.error .ui.dropdown .text,
 .ui.form .field.error .ui.dropdown .item {
-  background: transparent;
+  background: #FFFFFF;
   color: #e55151;
 }
 
@@ -19692,7 +19696,7 @@ ol.ui.horizontal.list li:before,
 .ui.form .field.error .checkbox:not(.toggle):not(.slider) label:before,
 .ui.form .fields.error .field .checkbox:not(.toggle):not(.slider) .box:before,
 .ui.form .field.error .checkbox:not(.toggle):not(.slider) .box:before {
-  background: transparent;
+  background: #FFFFFF;
   border-color: #e55151;
 }
 
@@ -25149,7 +25153,7 @@ Floated Menu / Item
 /* Positive */
 
 .ui.positive.message {
-  background-color: transparent;
+  background-color: #FFFFFF;
   color: #5BCA7E;
 }
 
@@ -25166,7 +25170,7 @@ Floated Menu / Item
 /* Negative */
 
 .ui.negative.message {
-  background-color: transparent;
+  background-color: #FFFFFF;
   color: #e55151;
 }
 
@@ -25183,7 +25187,7 @@ Floated Menu / Item
 /* Info */
 
 .ui.info.message {
-  background-color: transparent;
+  background-color: #FFFFFF;
   color: #00bfd8;
 }
 
@@ -25200,7 +25204,7 @@ Floated Menu / Item
 /* Warning */
 
 .ui.warning.message {
-  background-color: transparent;
+  background-color: #FFFFFF;
   color: #FBBD08;
 }
 
@@ -25217,7 +25221,7 @@ Floated Menu / Item
 /* Error */
 
 .ui.error.message {
-  background-color: transparent;
+  background-color: #FFFFFF;
   color: #e55151;
 }
 
@@ -25234,7 +25238,7 @@ Floated Menu / Item
 /* Success */
 
 .ui.success.message {
-  background-color: transparent;
+  background-color: #FFFFFF;
   color: #5BCA7E;
 }
 
@@ -25768,7 +25772,7 @@ Floated Menu / Item
 
 .ui.table tr.positive,
 .ui.table td.positive {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #5BCA7E !important;
 }
 
@@ -25784,7 +25788,7 @@ Floated Menu / Item
 
 .ui.table tr.negative,
 .ui.table td.negative {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #e55151 !important;
 }
 
@@ -25800,7 +25804,7 @@ Floated Menu / Item
 
 .ui.table tr.error,
 .ui.table td.error {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #e55151 !important;
 }
 
@@ -25816,7 +25820,7 @@ Floated Menu / Item
 
 .ui.table tr.warning,
 .ui.table td.warning {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #FBBD08 !important;
 }
 
@@ -25997,14 +26001,14 @@ Floated Menu / Item
 .ui.selectable.table tr.error:hover,
 .ui.table tr td.selectable.error:hover,
 .ui.selectable.table tr:hover td.error {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #e34444 !important;
 }
 
 .ui.selectable.table tr.warning:hover,
 .ui.table tr td.selectable.warning:hover,
 .ui.selectable.table tr:hover td.warning {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #f0b404 !important;
 }
 
@@ -26018,14 +26022,14 @@ Floated Menu / Item
 .ui.selectable.table tr.positive:hover,
 .ui.table tr td.selectable.positive:hover,
 .ui.selectable.table tr:hover td.positive {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #4fc675 !important;
 }
 
 .ui.selectable.table tr.negative:hover,
 .ui.table tr td.selectable.negative:hover,
 .ui.selectable.table tr:hover td.negative {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #e34444 !important;
 }
 

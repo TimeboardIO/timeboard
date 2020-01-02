@@ -366,28 +366,28 @@
 
 /* Positive */
 @positiveColor           : @green;
-@positiveBackgroundColor : transparent;
+@positiveBackgroundColor : @white;
 @positiveBorderColor     : @green;
 @positiveHeaderColor     : @green;
 @positiveTextColor       : @green;
 
 /* Negative */
 @negativeColor           : @red;
-@negativeBackgroundColor : transparent;
+@negativeBackgroundColor : @white;
 @negativeBorderColor     : @red;
 @negativeHeaderColor     : @red;
 @negativeTextColor       : @red;
 
 /* Info */
 @infoColor              : @primaryColor;
-@infoBackgroundColor    : transparent;
+@infoBackgroundColor    : @white;
 @infoBorderColor        : @primaryColor;
 @infoHeaderColor        : @primaryColor;
 @infoTextColor          : @primaryColor;
 
 /* Warning */
 @warningColor           : @yellow;
-@warningBackgroundColor : transparent;
+@warningBackgroundColor : @white;
 @warningBorderColor     : @yellow;
 @warningHeaderColor     : @yellow;
 @warningTextColor       : @yellow;

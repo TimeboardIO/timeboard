@@ -479,7 +479,7 @@
 .ui.form .field.error input[type="text"],
 .ui.form .field.error input[type="file"],
 .ui.form .field.error input[type="url"] {
-  background: transparent;
+  background: #FFFFFF;
   border-color: #e55151;
   color: #e55151;
   border-radius: '';
@@ -500,7 +500,7 @@
 .ui.form .field.error input[type="text"]:focus,
 .ui.form .field.error input[type="file"]:focus,
 .ui.form .field.error input[type="url"]:focus {
-  background: transparent;
+  background: #FFFFFF;
   border-color: #e55151;
   color: #e55151;
   -webkit-appearance: none;
@@ -522,7 +522,7 @@
 .ui.form .field.error .ui.dropdown,
 .ui.form .field.error .ui.dropdown .text,
 .ui.form .field.error .ui.dropdown .item {
-  background: transparent;
+  background: #FFFFFF;
   color: #e55151;
 }
 .ui.form .fields.error .field .ui.dropdown,
@@ -575,7 +575,7 @@
 .ui.form .field.error .checkbox:not(.toggle):not(.slider) label:before,
 .ui.form .fields.error .field .checkbox:not(.toggle):not(.slider) .box:before,
 .ui.form .field.error .checkbox:not(.toggle):not(.slider) .box:before {
-  background: transparent;
+  background: #FFFFFF;
   border-color: #e55151;
 }
 .ui.form .fields.error .field .checkbox label:after,

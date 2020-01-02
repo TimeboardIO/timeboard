@@ -331,6 +331,9 @@ table,
   font-weight: bold;
   text-transform: capitalize;
 }
+.ui.form textarea:not([rows]) {
+  height: 8em !important;
+}
 .text.primary {
   color: #00bfd8 !important;
 }

@@ -164,7 +164,7 @@
 ---------------------*/
 
 .ui.input.error > input {
-  background-color: transparent !important;
+  background-color: #FFFFFF !important;
   border-color: #e55151 !important;
   color: #e55151 !important;
   -webkit-box-shadow: none;

@@ -313,7 +313,7 @@
 }
 .ui.table tr.positive,
 .ui.table td.positive {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #5BCA7E !important;
 }
 
@@ -328,7 +328,7 @@
 }
 .ui.table tr.negative,
 .ui.table td.negative {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #e55151 !important;
 }
 
@@ -343,7 +343,7 @@
 }
 .ui.table tr.error,
 .ui.table td.error {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #e55151 !important;
 }
 
@@ -358,7 +358,7 @@
 }
 .ui.table tr.warning,
 .ui.table td.warning {
-  background: transparent !important;
+  background: #FFFFFF !important;
   color: #FBBD08 !important;
 }
 
@@ -525,13 +525,13 @@
 .ui.selectable.table tr.error:hover,
 .ui.table tr td.selectable.error:hover,
 .ui.selectable.table tr:hover td.error {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #e34444 !important;
 }
 .ui.selectable.table tr.warning:hover,
 .ui.table tr td.selectable.warning:hover,
 .ui.selectable.table tr:hover td.warning {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #f0b404 !important;
 }
 .ui.selectable.table tr.active:hover,
@@ -543,13 +543,13 @@
 .ui.selectable.table tr.positive:hover,
 .ui.table tr td.selectable.positive:hover,
 .ui.selectable.table tr:hover td.positive {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #4fc675 !important;
 }
 .ui.selectable.table tr.negative:hover,
 .ui.table tr td.selectable.negative:hover,
 .ui.selectable.table tr:hover td.negative {
-  background: rgba(0, 0, 0, 0) !important;
+  background: #f7f7f7 !important;
   color: #e34444 !important;
 }
 
