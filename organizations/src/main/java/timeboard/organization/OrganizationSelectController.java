@@ -27,6 +27,7 @@ package timeboard.organization;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,11 +37,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Organization;
+import timeboard.core.model.OrganizationMembership;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping(OrganizationSelectController.URI)
@@ -52,12 +57,20 @@ public class OrganizationSelectController {
     @Autowired
     private OrganizationService organizationService;
 
+    @Value("${timeboard.organizations.default}")
+    private String defaultOrganisationName;
+
     @GetMapping
     public String selectOrganisation(TimeboardAuthentication authentication,
                                      HttpServletRequest req, TimeboardAuthentication p, Model model){
 
 
-        model.addAttribute("organizations", authentication.getDetails().getOrganizations());
+        final List<Organization> orgs = authentication.getDetails().getOrganizations()
+                .stream().map(organizationMembership -> organizationMembership.getOrganization()).collect(Collectors.toList());
+
+        orgs.add(this.organizationService.getOrganizationByName(this.defaultOrganisationName).get());
+
+        model.addAttribute("organizations", orgs);
 
         return "org_select";
     }

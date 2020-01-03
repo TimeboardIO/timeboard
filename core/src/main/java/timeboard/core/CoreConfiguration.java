@@ -26,12 +26,23 @@ package timeboard.core;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.model.Organization;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.core")
@@ -43,6 +54,30 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
         securedEnabled = true,
         jsr250Enabled = true)
 public class CoreConfiguration {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoreConfiguration.class);
+
+    @Autowired
+    private OrganizationService organizationService;
+
+    @Value("${timeboard.organizations.default}")
+    private String defaultOrganisationName;
+
+    @PostConstruct
+    private void verifyPublicOrganization(){
+
+        final Optional<Organization> defaultOrganization = this.organizationService
+                    .getOrganizationByName(this.defaultOrganisationName);
+
+        if(!defaultOrganization.isPresent()){
+            final Map<String, String> props = new HashMap<>();
+            props.put(Organization.SETUP_PUBLIC, "true");
+
+            this.organizationService.createOrganization(this.defaultOrganisationName, props);
+        }
+
+
+    }
 
 
 }

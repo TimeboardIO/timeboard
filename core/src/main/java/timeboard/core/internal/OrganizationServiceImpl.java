@@ -39,8 +39,10 @@ import timeboard.core.model.Organization;
 import timeboard.core.model.OrganizationMembership;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -53,25 +55,29 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private EntityManager em;
 
-    @Override
-    public Organization createOrganization(final Account actor, String organizationName) throws BusinessException {
 
-        this.em.merge(actor);
+    @Override
+    public Organization createOrganization(final String organizationName, Map<String, String> properties) {
 
         final Organization organization = new Organization();
         organization.setName(organizationName);
         organization.setCreatedDate(new Date());
+        organization.setSetup(properties);
+
         this.em.persist(organization);
 
-        final OrganizationMembership organizationMembership = new OrganizationMembership();
-        organizationMembership.setMember(actor);
-        organizationMembership.setRole(MembershipRole.OWNER);
-        organizationMembership.setOrganization(organization);
+        LOGGER.info("Organization " + organization.getName() + " created");
 
-        this.em.persist(organizationMembership);
-
-        LOGGER.info("User " + actor.getFirstName() + " " + actor.getName() + " created organization " + organization.getName());
         return organization;
+    }
+
+    @Override
+    public Organization createOrganization(final Account actor, String organizationName, Map<String, String> properties) throws BusinessException {
+
+        final Organization org = this.createOrganization(organizationName, properties);
+        this.addMember(actor, org, actor, MembershipRole.OWNER);
+
+        return org;
     }
 
     @Override
@@ -87,6 +93,19 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public Optional<Organization> getOrganizationByName(String orgName) {
+        Organization org = null;
+        try {
+            TypedQuery<Organization> q = this.em.createNamedQuery(Organization.FIND_BY_NAME, Organization.class);
+            q.setParameter("name", orgName);
+            org = q.getSingleResult();
+        }catch (Exception e){
+            org=null;
+        }
+        return Optional.ofNullable(org);
+    }
+
+    @Override
     public Organization updateOrganization(Account actor, Organization organization) {
 
         em.merge(organization);
@@ -97,7 +116,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Optional<Organization> addMember(final Account actor, Organization organization, Account member) throws BusinessException {
+    public Optional<Organization> addMember(final Account actor,
+                                            Organization organization,
+                                            Account member,
+                                            MembershipRole role)  {
 
         final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 
@@ -106,7 +128,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             final OrganizationMembership om = new OrganizationMembership();
             om.setOrganization(org.get());
             om.setMember(member);
-            om.setRole(MembershipRole.CONTRIBUTOR);
+            om.setRole(role);
             this.em.persist(om);
 
             org.get().getMembers().add(om);
@@ -121,7 +143,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Optional<Organization> removeMember(final Account actor, Organization organization, Account member) throws BusinessException {
+    public Optional<Organization> removeMember(final Account actor, Organization organization, Account member) {
 
         final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 

@@ -37,6 +37,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/org")
@@ -50,7 +51,7 @@ public class OrganizationCreateController {
                                 HttpServletRequest request) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        this.organizationService.createOrganization(actor, request.getParameter("organizationName"));
+        this.organizationService.createOrganization(actor, request.getParameter("organizationName"), new HashMap<>());
         return "redirect:/select";
     }
 

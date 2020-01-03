@@ -26,15 +26,10 @@ package timeboard.core.internal;
  * #L%
  */
 
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
@@ -233,46 +228,4 @@ public class UserServiceImpl implements UserService {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-
-        Account user = this.findUserByEmail(s);
-
-        return new UserDetails() {
-            @Override
-            public Collection<? extends GrantedAuthority> getAuthorities() {
-                return Collections.EMPTY_LIST;
-            }
-
-            @Override
-            public String getPassword() {
-                return user.getLocalPassword();
-            }
-
-            @Override
-            public String getUsername() {
-                return user.getEmail();
-            }
-
-            @Override
-            public boolean isAccountNonExpired() {
-                return true;
-            }
-
-            @Override
-            public boolean isAccountNonLocked() {
-                return true;
-            }
-
-            @Override
-            public boolean isCredentialsNonExpired() {
-                return true;
-            }
-
-            @Override
-            public boolean isEnabled() {
-                return true;
-            }
-        };
-    }
 }

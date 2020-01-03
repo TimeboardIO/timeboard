@@ -31,6 +31,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -38,11 +39,16 @@ import java.util.Optional;
  */
 public interface OrganizationService {
 
+
+    Organization createOrganization(String organizationName, Map<String, String> properties);
+
     Organization createOrganization(Account actor,
-                                    String organizationName) throws BusinessException;
+                                    String organizationName, Map<String, String> properties) throws BusinessException;
 
     Optional<Organization> getOrganizationByID(final Account actor,
                                                long id);
+
+    Optional<Organization> getOrganizationByName(String organisationName);
 
     Organization updateOrganization(final Account actor,
                                     Organization organization);
@@ -53,7 +59,8 @@ public interface OrganizationService {
 
     Optional<Organization> addMember(Account actor,
                                      Organization organization,
-                                     Account member) throws BusinessException;
+                                     Account member,
+                                     MembershipRole role) throws BusinessException;
 
     Optional<Organization> updateMemberRole(Account actor,
                                             Organization organization,

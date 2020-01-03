@@ -27,8 +27,6 @@ package timeboard.core.model;
  */
 
 
-//import timeboard.apigenerator.annotation.RPCEntity;
-
 import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
@@ -62,13 +60,6 @@ public class Account implements Serializable {
 
     @Column(nullable = true, unique = true)
     private String remoteSubject;
-
-
-    @Column
-    private String localLogin;
-
-    @Column
-    private String localPassword;
 
 
     @Column(columnDefinition = "TEXT")
@@ -170,22 +161,6 @@ public class Account implements Serializable {
 
 
 
-    public String getLocalLogin() {
-        return localLogin;
-    }
-
-    public void setLocalLogin(String localLogin) {
-        this.localLogin = localLogin;
-    }
-
-    public String getLocalPassword() {
-        return localPassword;
-    }
-
-    public void setLocalPassword(String localPassword) {
-        this.localPassword = localPassword;
-    }
-
     @Transient
     public String getScreenName() {
         if (this.getFirstName() == null && this.getName() == null) {
@@ -207,6 +182,12 @@ public class Account implements Serializable {
     @Transient
     public boolean isMemberOf(final Optional<Organization> orgToTest) {
         if(orgToTest.isPresent()) {
+            if(orgToTest.get().getSetup().containsKey(Organization.SETUP_PUBLIC)
+                &&
+                    orgToTest.get().getSetup().get(Organization.SETUP_PUBLIC).equals("true")){
+                return true;
+            }
+
             return orgToTest.get().getMembers()
                     .stream().filter(om -> om.getMember().getId() == this.getId())
                     .count() >= 1;

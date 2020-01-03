@@ -34,17 +34,27 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table
+@NamedQueries(
+        {
+                @NamedQuery(
+                        name = Organization.FIND_BY_NAME,
+                        query = "select o from Organization o where o.name = :name and o.enabled = true")
+        }
+)
 public class Organization {
+
+    public static final String FIND_BY_NAME = "org_find_by_name";
+    public static final String SETUP_PUBLIC = "org_public";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column
-    private Boolean enabled;
+    private Boolean enabled=true;
 
     @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToStringMapConverter.class)
@@ -62,6 +72,7 @@ public class Organization {
             fetch = FetchType.EAGER
     )
     private Set<OrganizationMembership> members = new HashSet<>();
+
 
     public Date getCreatedDate() {
         return createdDate;
