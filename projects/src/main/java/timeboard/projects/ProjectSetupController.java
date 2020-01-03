@@ -94,7 +94,7 @@ public class ProjectSetupController {
                                                   @PathVariable long projectID, HttpServletRequest request) throws Exception {
         final Account actor = authentication.getDetails();
         final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         if(project.isMember(targetMember)){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This user is already member of this project");

@@ -59,7 +59,7 @@ public class ProjectsController {
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
         final Account actor = authentication.getDetails();
-        List<Project> allActorProjects = this.projectService.listProjects(actor);
+        List<Project> allActorProjects = this.projectService.listProjects(actor, authentication.getCurrentOrganization());
         Collections.reverse(allActorProjects);
         if (allActorProjects.size() > 4) {
             allActorProjects = allActorProjects.subList(0, 4);
@@ -72,7 +72,7 @@ public class ProjectsController {
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<List<ProjectDecorator>> projectList(TimeboardAuthentication authentication, Model model) {
         final Account actor = authentication.getDetails();
-        final List<ProjectDecorator> projects = this.projectService.listProjects(actor)
+        final List<ProjectDecorator> projects = this.projectService.listProjects(actor, authentication.getCurrentOrganization())
                 .stream()
                 .map(project -> new ProjectDecorator(project))
                 .collect(Collectors.toList());
@@ -97,7 +97,7 @@ public class ProjectsController {
     protected String deleteProject(TimeboardAuthentication authentication,
                                    @PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
 
-        final Project project = this.projectService.getProjectByID(authentication.getDetails(), projectID);
+        final Project project = this.projectService.getProjectByID(authentication.getDetails(), authentication.getCurrentOrganization(), projectID);
         this.projectService.archiveProjectByID(authentication.getDetails(), project);
         attributes.addFlashAttribute("success", "Project deleted successfully.");
 

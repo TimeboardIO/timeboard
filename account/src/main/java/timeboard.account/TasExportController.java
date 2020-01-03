@@ -66,7 +66,7 @@ public class TasExportController {
             cal.set(year, month - 1, 1, 2, 0);
 
             try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
-                final Project project = projectService.getProjectByID(actor, projectID);
+                final Project project = projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
                 final TASData data = projectService.generateTasData(actor, project, month, year);
                 final ExcelTASReport tasReport = new ExcelTASReport(buf);
                 ;

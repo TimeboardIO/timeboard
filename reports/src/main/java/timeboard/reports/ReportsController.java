@@ -172,7 +172,9 @@ public class ReportsController {
         }
 
         final String[] filters = filterProjects.split("\n");
-        final List<ReportService.ProjectWrapper> projects = this.reportService.findProjects(actor, Arrays.asList(filters));
+        final List<ReportService.ProjectWrapper> projects = this.reportService
+                .findProjects(actor, authentication.getCurrentOrganization(), Arrays.asList(filters));
+
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
     }
 
