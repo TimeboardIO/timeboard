@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules.milestone;
+package timeboard.core.model;
 
 /*-
  * #%L
@@ -26,30 +26,22 @@ package timeboard.core.internal.rules.milestone;
  * #L%
  */
 
-import timeboard.core.internal.rules.Rule;
-import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Milestone;
-import timeboard.core.model.ProjectMembership;
+public enum BatchType {
+    BILL("Bill"),
+    DELIVERY("Delivery"),
+    INPUT("Inupt"),
+    SCHEDULING("Scheduling"),
+    GROUP("Group"),
+    SPRINT("Sprint");
 
-import java.util.Optional;
 
+    public final String label;
 
-public class ActorIsProjectOwnerByMilestone implements Rule<Milestone> {
-
-    @Override
-    public String ruleDescription() {
-        return "User is not project Owner";
+    private BatchType(String label) {
+        this.label = label;
     }
 
-    @Override
-    public boolean isSatisfied(Account u, Milestone thing) {
-        final Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
-                .filter(projectMembership ->
-                        projectMembership.getMember().getId() == u.getId()
-                                && projectMembership.getRole().equals(MembershipRole.OWNER)
-                )
-                .findFirst();
-        return userOptional.isPresent();
+    String getLabel() {
+        return this.label;
     }
 }

@@ -46,6 +46,7 @@ import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -95,7 +96,7 @@ public class ProjectTasksController {
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("taskTypes", this.projectService.listTaskType());
         model.addAttribute("allTaskStatus", TaskStatus.values());
-        model.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
+        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());
@@ -174,21 +175,23 @@ public class ProjectTasksController {
 
         private TaskType taskType;
         private TaskStatus taskStatus;
-        private Long milestoneID;
+        private List<Long> batchesID;
 
         public TaskForm(Task task) {
-            taskID = task.getId();
-            taskType = task.getTaskType();
-            milestoneID = task.getMilestone() != null ? task.getMilestone().getId() : null;
-
-            originalEstimate = task.getOriginalEstimate();
-            startDate = task.getStartDate();
-            endDate = task.getEndDate();
-            assignedAccount = task.getAssigned();
-            taskName = task.getName();
-            taskComment = task.getComments();
-            taskStatus = task.getTaskStatus();
-            taskStatus = TaskStatus.PENDING;
+            this.taskID = task.getId();
+            this.taskType = task.getTaskType();
+            if( task.getBatches() != null){
+                this.batchesID = new ArrayList<>();
+                task.getBatches().forEach(batch -> batchesID.add(batch.getId()));
+            }
+            this.originalEstimate = task.getOriginalEstimate();
+            this.startDate = task.getStartDate();
+            this.endDate = task.getEndDate();
+            this.assignedAccount = task.getAssigned();
+            this.taskName = task.getName();
+            this.taskComment = task.getComments();
+            this.taskStatus = task.getTaskStatus();
+            this.taskStatus = TaskStatus.PENDING;
 
         }
 
@@ -260,12 +263,12 @@ public class ProjectTasksController {
             this.taskStatus = taskStatus;
         }
 
-        public Long getMilestoneID() {
-            return milestoneID;
+        public List<Long> getBatchesID() {
+            return batchesID;
         }
 
-        public void setMilestoneID(Long milestoneID) {
-            this.milestoneID = milestoneID;
+        public void setBatchesID(List<Long> batchesID) {
+            this.batchesID = batchesID;
         }
     }
 }

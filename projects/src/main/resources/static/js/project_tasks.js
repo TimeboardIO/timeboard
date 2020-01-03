@@ -64,8 +64,8 @@ const emptyTask =  {
     assigneeID: 0,
     status: "PENDING",
     statusName: '',
-    milestoneID: '',
-    milestoneName: '',
+    batchNames: [],
+    batchIDs: [],
 };
 
 const projectID = $("meta[name='projectID']").attr('value');
@@ -117,10 +117,9 @@ let app = new Vue({
 
                 },
                 {
-                    "slot": "milestone",
-                    "label": "Milestone",
-                    "sortKey": "milestoneID"
-
+                    "slot": "batch",
+                    "label": "Batches",
+                    "sortKey": "batchID"
                 },
                 {
                     "slot": "type",
@@ -149,7 +148,7 @@ let app = new Vue({
                                 filterFunction: (filter, row) => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 },
                 status:    { filterKey: 'status', filterValue: '',
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 ) },
-                milestone: { filterKey: 'milestoneID', filterValue: '',
+                batch:     { filterKey: 'batchID', filterValue: '',
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
                 type:      { filterKey: 'typeID', filterValue: '',
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
@@ -218,25 +217,19 @@ let app = new Vue({
                 // load task data in modal
                  this.newTask.projectID = currentProjectID;
                  this.newTask.taskID = task.taskID;
-
                  this.newTask.taskName = task.taskName;
                  this.newTask.taskComments = task.taskComments;
-
                  this.newTask.endDate = task.endDate;
                  this.newTask.startDate = task.startDate;
-
                  this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
-
-                 this.newTask.assignee = task.assignee;
-                 this.newTask.assigneeID = task.assigneeID;
-
                  this.newTask.status = task.status;
-                 this.newTask.milestoneID = task.milestoneID;
-
-                 this.newTask.milestoneName = task.milestoneName;
-                 this.newTask.typeName = task.typeName;
-                 this.newTask.statusName = task.statusName;
+                this.newTask.batchIDs = task.batchIDs;
+                this.newTask.batchNames = task.batchNames;
+                this.newTask.typeName = task.typeName;
+                this.newTask.statusName = task.statusName;
+                this.newTask.assignee = task.assignee;
+                this.newTask.assigneeID = task.assigneeID;
 
             }else{
                  this.modalTitle = "Create task";
@@ -295,6 +288,7 @@ let app = new Vue({
         this.tablePending.cols = this.table.cols;
     },
     updated: function () {
+        // ! \\ create a infinite loop
        // this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
     },
     mounted: function () {

@@ -3,24 +3,24 @@ $(document).ready(function () {
     const projectID = $("meta[name='projectID']").attr('content');
 
     let app = new Vue({
-        el: '#milestones-app',
+        el: '#batches-app',
         data: {
             table: {
                 cols: [
                     {
                         "slot": "name",
-                        "label": "Milestone Name"
+                        "label": "Batch Name"
                     },
                     {
                         "slot": "type",
-                        "label": "Milestone Type"
+                        "label": "Batch Type"
                     },
                     {
                         "slot": "date",
-                        "label": "Milestone Date"
+                        "label": "Batch Date"
                     }],
                 data: [],
-                name: 'tableMilestone'
+                name: 'tableBatch'
 
             }
         },
@@ -31,7 +31,7 @@ $(document).ready(function () {
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: "projects/" + projectID + "/milestones/list",
+                url: "projects/" + projectID + "/batches/list",
                 success: function (d) {
                     self.table.data = d;
                 }

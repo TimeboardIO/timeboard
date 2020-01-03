@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules.milestone;
+package timeboard.core.internal.rules.batch;
 
 /*-
  * #%L
@@ -28,13 +28,14 @@ package timeboard.core.internal.rules.milestone;
 
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Account;
-import timeboard.core.model.Milestone;
+import timeboard.core.model.Batch;
+import timeboard.core.model.MembershipRole;
 import timeboard.core.model.ProjectMembership;
 
 import java.util.Optional;
 
 
-public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {
+public class ActorIsProjectOwnerByBatch implements Rule<Batch> {
 
     @Override
     public String ruleDescription() {
@@ -42,10 +43,11 @@ public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {
     }
 
     @Override
-    public boolean isSatisfied(Account u, Milestone thing) {
+    public boolean isSatisfied(Account u, Batch thing) {
         final Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
                 .filter(projectMembership ->
                         projectMembership.getMember().getId() == u.getId()
+                                && projectMembership.getRole().equals(MembershipRole.OWNER)
                 )
                 .findFirst();
         return userOptional.isPresent();
