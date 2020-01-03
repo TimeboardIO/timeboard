@@ -30,8 +30,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
@@ -40,13 +38,12 @@ import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -126,7 +123,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Account> searchUserByEmail(final Account actor, final String email, final Account org) throws BusinessException {
+    public List<Account> searchUserByEmail(final Account actor, final String email, final Organization org) throws BusinessException {
 
         TypedQuery<Account> q = em
                 .createQuery(
@@ -231,12 +228,4 @@ public class UserServiceImpl implements UserService {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        return null;
-    }
-  /*
-    private boolean checkPassword(String password, String hash) {
-        return BCrypt.checkpfw(password, hash);
-    }*/
 }

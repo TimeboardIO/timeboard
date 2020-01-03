@@ -80,7 +80,7 @@ public class TasksRestController {
         }
 
         try {
-            final Project project = this.projectService.getProjectByID(actor, projectID);
+            final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
             if (project == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
             }
@@ -287,7 +287,7 @@ public class TasksRestController {
         Long projectID = taskWrapper.projectID;
         Project project = null;
         try {
-            project = this.projectService.getProjectByID(actor, projectID);
+            project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

@@ -36,14 +36,21 @@ import java.util.*;
 @Entity
 @NamedQueries(
     {
-            @NamedQuery(name = "ListUserProjects", query =
+            @NamedQuery(name = Project.PROJECT_LIST, query =
                     "select p from Project p join fetch p.members m " +
-                    "where (p.enable = true or p.enable is null) and m.member = :user")
+                    "where (p.enable = true or p.enable is null) and m.member = :user and p.organizationID IN :orgs"),
+
+            @NamedQuery(name = Project.PROJECT_BET_BY_ID, query =
+                    "select p from Project p join fetch p.members m " +
+                            "where p.id = :projectID and m.member = :user and p.organizationID = :orgID"),
+
     }
 )
 public class Project extends OrganizationEntity implements Serializable {
 
     public static final String PROJECT_COLOR_ATTR = "project.color";
+    public static final String PROJECT_LIST = "pjt_list";
+    public static final String PROJECT_BET_BY_ID = "pjt_get_by_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

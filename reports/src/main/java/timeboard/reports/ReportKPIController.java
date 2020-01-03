@@ -70,11 +70,13 @@ public class ReportKPIController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This report has no filter. Modify it to display the graph.");
         }
 
-        final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService.findProjects(actor, report);
-        AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
-        AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
-        AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
-        AtomicReference<Double> quotation = new AtomicReference<>(0.0);
+        final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService
+                .findProjects(actor, authentication.getCurrentOrganization(), report);
+
+        final AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
+        final AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
+        final AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
+        final AtomicReference<Double> quotation = new AtomicReference<>(0.0);
 
         listOfProjectsFiltered.forEach(projectWrapper -> {
             try {

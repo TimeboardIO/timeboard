@@ -57,7 +57,7 @@ public class ProjectDashboardController {
                                @PathVariable Long projectID, Model model) throws  BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
 
         model.addAttribute("project", project);

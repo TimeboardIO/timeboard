@@ -45,7 +45,7 @@ public class TimesheetEvent extends TimeboardEvent {
 
         this.timesheet = timesheet;
 
-        List<Project> projects = projectService.listProjects(timesheet.getAccount());
+        final List<Project> projects = projectService.listProjects(timesheet.getAccount());
 
         projects.stream().forEach(project -> project.getMembers()
                 .stream()

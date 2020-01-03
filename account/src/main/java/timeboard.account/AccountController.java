@@ -108,7 +108,7 @@ public class AccountController {
 
             default:
         }
-        loadPage(model, actor);
+        loadPage(model, actor, authentication.getCurrentOrganization());
         return "account.html";
 
     }
@@ -116,14 +116,14 @@ public class AccountController {
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
         final Account actor = authentication.getDetails();
-        loadPage(model, actor);
+        loadPage(model, actor, authentication.getCurrentOrganization());
         return "account.html";
     }
 
-    private void loadPage(Model model, Account actor) {
+    private void loadPage(Model model, Account actor, Long orgID) {
         model.addAttribute("account", actor);
 
-        final List<Project> projects = projectService.listProjects(actor);
+        final List<Project> projects = projectService.listProjects(actor, orgID);
 
         final List<String> fieldNames = new ArrayList<>();
         //import external ID field name from import plugins list
