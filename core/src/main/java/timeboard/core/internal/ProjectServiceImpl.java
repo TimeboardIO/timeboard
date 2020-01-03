@@ -1018,7 +1018,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         oldTaskIds.forEach(tr -> {
-            tr.setBatch(null);
+            tr.setBatches(null);
             b.getTasks().removeIf(task -> task.getId() == tr.getId());
         });
 

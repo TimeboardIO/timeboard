@@ -46,6 +46,7 @@ import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -174,13 +175,15 @@ public class ProjectTasksController {
 
         private TaskType taskType;
         private TaskStatus taskStatus;
-        private Long milestoneID;
+        private List<Long> batchesID;
 
         public TaskForm(Task task) {
             taskID = task.getId();
             taskType = task.getTaskType();
-            milestoneID = task.getBatch() != null ? task.getBatch().getId() : null;
-
+            if( task.getBatches() != null){
+                batchesID = new ArrayList<>();
+                task.getBatches().stream().forEach(batch -> batchesID.add(batch.getId()));
+            }
             originalEstimate = task.getOriginalEstimate();
             startDate = task.getStartDate();
             endDate = task.getEndDate();
@@ -260,12 +263,12 @@ public class ProjectTasksController {
             this.taskStatus = taskStatus;
         }
 
-        public Long getMilestoneID() {
-            return milestoneID;
+        public List<Long> getBatchesID() {
+            return batchesID;
         }
 
-        public void setMilestoneID(Long milestoneID) {
-            this.milestoneID = milestoneID;
+        public void setMilestoneID(List<Long> milestoneID) {
+            this.batchesID = batchesID;
         }
     }
 }

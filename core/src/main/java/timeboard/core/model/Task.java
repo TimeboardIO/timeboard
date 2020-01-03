@@ -97,7 +97,7 @@ public class Task extends AbstractTask implements Serializable {
         return batches;
     }
 
-    public void setBatch(Set<Batch> batches) {
+    public void setBatches(Set<Batch> batches) {
         this.batches = batches;
     }
 

@@ -34,7 +34,7 @@ public class BatchHasNoTask implements Rule<Batch> {
 
     @Override
     public String ruleDescription() {
-        return "Milestone with tasks cannot be removed";
+        return "Batch with tasks cannot be removed";
     }
 
     @Override
