@@ -96,7 +96,7 @@ public class ProjectTasksController {
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("taskTypes", this.projectService.listTaskType());
         model.addAttribute("allTaskStatus", TaskStatus.values());
-        model.addAttribute("allProjectMilestones", this.projectService.listProjectBatches(actor, project));
+        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());
@@ -178,20 +178,20 @@ public class ProjectTasksController {
         private List<Long> batchesID;
 
         public TaskForm(Task task) {
-            taskID = task.getId();
-            taskType = task.getTaskType();
+            this.taskID = task.getId();
+            this.taskType = task.getTaskType();
             if( task.getBatches() != null){
-                batchesID = new ArrayList<>();
-                task.getBatches().stream().forEach(batch -> batchesID.add(batch.getId()));
+                this.batchesID = new ArrayList<>();
+                task.getBatches().forEach(batch -> batchesID.add(batch.getId()));
             }
-            originalEstimate = task.getOriginalEstimate();
-            startDate = task.getStartDate();
-            endDate = task.getEndDate();
-            assignedAccount = task.getAssigned();
-            taskName = task.getName();
-            taskComment = task.getComments();
-            taskStatus = task.getTaskStatus();
-            taskStatus = TaskStatus.PENDING;
+            this.originalEstimate = task.getOriginalEstimate();
+            this.startDate = task.getStartDate();
+            this.endDate = task.getEndDate();
+            this.assignedAccount = task.getAssigned();
+            this.taskName = task.getName();
+            this.taskComment = task.getComments();
+            this.taskStatus = task.getTaskStatus();
+            this.taskStatus = TaskStatus.PENDING;
 
         }
 
@@ -267,7 +267,7 @@ public class ProjectTasksController {
             return batchesID;
         }
 
-        public void setMilestoneID(List<Long> milestoneID) {
+        public void setBatchesID(List<Long> batchesID) {
             this.batchesID = batchesID;
         }
     }

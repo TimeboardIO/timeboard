@@ -97,8 +97,12 @@ public class TasksRestController {
                     assignee.setFirstName("");
                 }
 
-                List<BatchWrapper> batches = new ArrayList<>();
-                task.getBatches().stream().forEach(b -> batches.add(new BatchWrapper(b.getId(), b.getName())));
+                List<Long> batchIDs = new ArrayList<>();
+                List<String> batchNames = new ArrayList<>();
+                task.getBatches().stream().forEach(b -> {
+                    batchIDs.add(b.getId());
+                    batchNames.add(b.getName());
+                });
                 result.add(new TaskWrapper(
                         task.getId(),
                         task.getName(),
@@ -109,7 +113,7 @@ public class TasksRestController {
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
-                        batches,
+                        batchIDs, batchNames,
                         task.getTaskStatus().getLabel(),
                         (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
                 ));
@@ -322,12 +326,13 @@ public class TasksRestController {
 
     private Set<Batch> getBatches(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
         Set<Batch> returnList = null;
-        List<BatchWrapper> batchWrapperList = taskWrapper.batches;
-        if(batchWrapperList != null && !batchWrapperList.isEmpty()) {
+        List<Long> batchIDList = taskWrapper.batchIDs;
+
+        if(batchIDList != null && !batchIDList.isEmpty()) {
             returnList = new HashSet<>();
-            for (BatchWrapper batchWrapper : batchWrapperList ) {
+            for (Long batchID : batchIDList ) {
                 try {
-                    Batch batch = this.projectService.getBatchById(actor, batchWrapper.batchID);
+                    Batch batch = this.projectService.getBatchById(actor, batchID);
                     if (batch != null) {
                         returnList.add(batch);
                     }
@@ -409,23 +414,15 @@ public class TasksRestController {
         public String status;
         public String statusName;
 
-        public List<BatchWrapper> getBatches() {
-            return batches;
-        }
-
-        public void setBatches(List<BatchWrapper> batches) {
-            this.batches = batches;
-        }
-
-        public List<BatchWrapper> batches;
-
+        public List<Long> batchIDs;
+        public List<String> batchNames;
 
         public TaskWrapper() {
         }
 
         public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate,
                            Date startDate, Date endDate, String assignee, Long assigneeID,
-                           String status, Long typeID, List<BatchWrapper> batches, String statusName, String typeName) {
+                           String status, Long typeID, List<Long> batchIDs, List<String> batchNames, String statusName, String typeName) {
 
             this.taskID = taskID;
 
@@ -441,11 +438,29 @@ public class TasksRestController {
             this.status = status;
             this.typeID = typeID;
 
+            this.batchNames = batchNames;
+            this.batchIDs = batchIDs;
 
             this.statusName = statusName;
             this.typeName = typeName;
         }
 
+
+        public List<Long> getBatchIDs() {
+            return batchIDs;
+        }
+
+        public void setBatchIDs(List<Long> batchIDs) {
+            this.batchIDs = batchIDs;
+        }
+
+        public List<String> getBatchNames() {
+            return batchNames;
+        }
+
+        public void setBatchNames(List<String> batchNames) {
+            this.batchNames = batchNames;
+        }
 
         public Long getTaskID() {
             return taskID;
@@ -528,7 +543,7 @@ public class TasksRestController {
         }
     }
 
-    public static class BatchWrapper {
+  /*  public static class BatchWrapper {
 
         public Long batchID;
         public String batchName;
@@ -555,5 +570,5 @@ public class TasksRestController {
         }
 
 
-    }
+    }*/
 }
