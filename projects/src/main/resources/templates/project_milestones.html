@@ -16,7 +16,7 @@
     <div id="milestones-app">
         <div class="ui menu">
             <a class="item"
-               v-on:click="alert()">
+               v-on:click="$('#editMilestone').modal('show')">
                 <i class="plus icon"></i>
                 New Milestone
             </a>
@@ -33,6 +33,16 @@
                 {{row.date}}
             </template>
         </data-table>
+
+        <tmodal
+                v-bind:title="'Milestone'"
+                v-bind:id="'editMilestone'">
+            <template v-slot:content>
+
+                <h1>Form</h1>
+
+            </template>
+        </tmodal>
 
     </div>
 </div>
