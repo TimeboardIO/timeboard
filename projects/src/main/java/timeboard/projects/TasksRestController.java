@@ -97,6 +97,12 @@ public class TasksRestController {
                     assignee.setFirstName("");
                 }
 
+                List<Long> batchIDs = new ArrayList<>();
+                List<String> batchNames = new ArrayList<>();
+                task.getBatches().stream().forEach(b -> {
+                    batchIDs.add(b.getId());
+                    batchNames.add(b.getName());
+                });
                 result.add(new TaskWrapper(
                         task.getId(),
                         task.getName(),
@@ -107,8 +113,7 @@ public class TasksRestController {
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getName() : ""),
+                        batchIDs, batchNames,
                         task.getTaskStatus().getLabel(),
                         (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
                 ));
@@ -287,7 +292,7 @@ public class TasksRestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        final Milestone milestone = getMilestone(taskWrapper, actor);
+        final Set<Batch> batches = getBatches(taskWrapper, actor);
 
         Task task = null;
         Long typeID = taskWrapper.typeID;
@@ -295,7 +300,7 @@ public class TasksRestController {
 
         if (!(taskID != null && taskID == 0)) {
             try {
-                task = processUpdateTask(taskWrapper, actor, milestone, taskID);
+                task = processUpdateTask(taskWrapper, actor, batches, taskID);
 
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
@@ -319,18 +324,29 @@ public class TasksRestController {
 
     }
 
-    private Milestone getMilestone(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
-        Long milestoneID = taskWrapper.milestoneID;
-        if(milestoneID != null && milestoneID > 0) {
-            return this.projectService.getMilestoneById(actor, milestoneID);
-        }else{
-            return null;
+    private Set<Batch> getBatches(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
+        Set<Batch> returnList = null;
+        List<Long> batchIDList = taskWrapper.batchIDs;
+
+        if(batchIDList != null && !batchIDList.isEmpty()) {
+            returnList = new HashSet<>();
+            for (Long batchID : batchIDList ) {
+                try {
+                    Batch batch = this.projectService.getBatchById(actor, batchID);
+                    if (batch != null) {
+                        returnList.add(batch);
+                    }
+                } catch (Exception e) {
+                    // Do nothing, just handling the exceptions
+                }
+            }
         }
+        return returnList;
     }
 
     private Task processUpdateTask(@RequestBody TaskWrapper taskWrapper,
                                    Account actor,
-                                   Milestone milestone,
+                                   Set<Batch> batches,
                                    Long taskID) throws BusinessException, ParseException {
 
         final Task task = (Task) projectService.getTaskByID(actor, taskID);
@@ -346,7 +362,7 @@ public class TasksRestController {
         task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
         final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
         task.setTaskType(taskType);
-        task.setMilestone(milestone);
+        task.setBatches(batches);
         task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
         projectService.updateTask(actor, task);
@@ -398,16 +414,15 @@ public class TasksRestController {
         public String status;
         public String statusName;
 
-        public Long milestoneID;
-        public String milestoneName;
-
+        public List<Long> batchIDs;
+        public List<String> batchNames;
 
         public TaskWrapper() {
         }
 
         public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate,
                            Date startDate, Date endDate, String assignee, Long assigneeID,
-                           String status, Long typeID, Long milestoneID, String milestoneName, String statusName, String typeName) {
+                           String status, Long typeID, List<Long> batchIDs, List<String> batchNames, String statusName, String typeName) {
 
             this.taskID = taskID;
 
@@ -423,18 +438,28 @@ public class TasksRestController {
             this.status = status;
             this.typeID = typeID;
 
-            this.milestoneID = milestoneID;
-            this.milestoneName = milestoneName;
+            this.batchNames = batchNames;
+            this.batchIDs = batchIDs;
+
             this.statusName = statusName;
             this.typeName = typeName;
         }
 
-        public Long getMilestoneID() {
-            return milestoneID;
+
+        public List<Long> getBatchIDs() {
+            return batchIDs;
         }
 
-        public void setMilestoneID(Long milestoneID) {
-            this.milestoneID = milestoneID;
+        public void setBatchIDs(List<Long> batchIDs) {
+            this.batchIDs = batchIDs;
+        }
+
+        public List<String> getBatchNames() {
+            return batchNames;
+        }
+
+        public void setBatchNames(List<String> batchNames) {
+            this.batchNames = batchNames;
         }
 
         public Long getTaskID() {
@@ -517,4 +542,33 @@ public class TasksRestController {
             return this.endDate;
         }
     }
+
+  /*  public static class BatchWrapper {
+
+        public Long batchID;
+        public String batchName;
+
+        public BatchWrapper(Long batchID, String batchName) {
+            this.batchID = batchID;
+            this.batchName = batchName;
+        }
+
+        public Long getBatchID() {
+            return batchID;
+        }
+
+        public void setBatchID(Long batchID) {
+            this.batchID = batchID;
+        }
+
+        public String getBatchName() {
+            return batchName;
+        }
+
+        public void setBatchName(String batchName) {
+            this.batchName = batchName;
+        }
+
+
+    }*/
 }

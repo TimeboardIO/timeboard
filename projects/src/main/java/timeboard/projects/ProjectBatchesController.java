@@ -44,82 +44,82 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{projectID}/milestones")
-public class ProjectMilestonesController {
+@RequestMapping("/projects/{projectID}/batches")
+public class ProjectBatchesController {
 
     @Autowired
     public ProjectService projectService;
 
 
     @GetMapping
-    protected String milestonesApp(TimeboardAuthentication authentication,
+    protected String batchApp(TimeboardAuthentication authentication,
                                    @PathVariable Long projectID, Model model) throws  BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
         model.addAttribute("project", project);
-        return "project_milestones.html";
+        return "project_batches.html";
     }
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
-    protected ResponseEntity<List<MilestoneDecorator>> listMilestones(TimeboardAuthentication authentication,
+    protected ResponseEntity<List<BatchDecorator>> listBatches(TimeboardAuthentication authentication,
                                                                       @PathVariable Long projectID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, projectID);
 
-        return ResponseEntity.ok(this.projectService.listProjectMilestones(actor, project)
-                .stream().map(milestone -> new MilestoneDecorator(milestone))
+        return ResponseEntity.ok(this.projectService.listProjectBatches(actor, project)
+                .stream().map(batch -> new BatchDecorator(batch))
                 .collect(Collectors.toList()));
     }
 
 
-    @GetMapping("/{milestoneID/delete")
-    protected String deleteMilestone(TimeboardAuthentication authentication,
-                                     @PathVariable Long projetID, @PathVariable Long milestoneID) throws BusinessException {
+    @GetMapping("/{batchesID/delete")
+    protected String deleteBatch(TimeboardAuthentication authentication,
+                                     @PathVariable Long projetID, @PathVariable Long batchID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        this.projectService.deleteMilestoneByID(actor, milestoneID);
+        this.projectService.deleteBatchByID(actor, batchID);
 
-        return "redirect:/projects/" + projetID + "/milestones";
+        return "redirect:/projects/" + projetID + "/batches";
     }
 
-    @GetMapping("/{milestoneID}/setup")
-    protected String setupMilestone(TimeboardAuthentication authentication,
+    @GetMapping("/{batchID}/setup")
+    protected String setupBatch(TimeboardAuthentication authentication,
                                     @PathVariable Long projectID,
-                                    @PathVariable Long milestoneID,
+                                    @PathVariable Long batchID,
                                     Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
-        Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
-        model.addAttribute("milestone", milestone);
-        model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, milestone));
+        Batch batch = this.projectService.getBatchById(actor, batchID);
+        model.addAttribute("batch", batch);
+        model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, batch));
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
-        fillModelWithMilestones(model, actor, project);
+        fillModelWithBatches(model, actor, project);
 
-        return "project_milestones_config.html";
+        return "project_batches_config.html";
     }
 
 
     @GetMapping("/create")
-    protected String createMilestoneView(TimeboardAuthentication authentication,
+    protected String createBatchView(TimeboardAuthentication authentication,
                                          @PathVariable Long projectID, Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
 
-        model.addAttribute("milestone", new Milestone());
+        model.addAttribute("batch", new Batch());
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
-        fillModelWithMilestones(model, actor, project);
+        fillModelWithBatches(model, actor, project);
 
-        return "project_milestones_config.html";
+        return "project_batches_config.html";
 
     }
 
 
-    private Map<String, String> getCurrentMilestoneAttributes(HttpServletRequest request) {
+    private Map<String, String> getCurrentBatchAttributes(HttpServletRequest request) {
         Map<String, String> attributes = new HashMap<>();
 
         String newAttrKey = request.getParameter("newAttrKey");
@@ -139,11 +139,11 @@ public class ProjectMilestonesController {
         return attributes;
     }
 
-    private void fillModelWithMilestones(Model model, Account actor, Project project) throws BusinessException {
+    private void fillModelWithBatches(Model model, Account actor, Project project) throws BusinessException {
         model.addAttribute("project", project);
-        model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
+        model.addAttribute("batches", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
-        model.addAttribute("allMilestoneTypes", MilestoneType.values());
+        model.addAttribute("allBatchTypes", BatchType.values());
     }
 
 
@@ -153,15 +153,15 @@ public class ProjectMilestonesController {
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
-        Milestone currentMilestone = null;
+        Batch currentBatch = null;
 
         try {
 
-            Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
-            currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
-            currentMilestone = addTasksToMilestone(actor, currentMilestone, request);
+            Long batchID = Long.parseLong(request.getParameter("batchID"));
+            currentBatch = this.projectService.getBatchById(actor, batchID);
+            currentBatch = addTasksToBatch(actor, currentBatch, request);
 
-            model.addAttribute("milestone", currentMilestone);
+            model.addAttribute("batch", currentBatch);
 
             model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
 
@@ -170,16 +170,16 @@ public class ProjectMilestonesController {
         } finally {
 
             model.addAttribute("project", project);
-            model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
-            model.addAttribute("allMilestoneTypes", MilestoneType.values());
-            model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, currentMilestone));
-            return "details_project_milestones_config_links.html";
+            model.addAttribute("batches", this.projectService.listProjectBatches(actor, project));
+            model.addAttribute("allBatchTypes", BatchType.values());
+            model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, currentBatch));
+            return "details_project_batches_config_links.html";
         }
     }
 
-    private Milestone addTasksToMilestone(Account actor,
-                                          Milestone currentMilestone,
-                                          HttpServletRequest request) throws BusinessException {
+    private Batch addTasksToBatch(Account actor,
+                                      Batch currentBatch,
+                                      HttpServletRequest request) throws BusinessException {
 
         String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
         List<Task> selectedTasks = Arrays
@@ -194,30 +194,30 @@ public class ProjectMilestonesController {
                         return t;
                     }
                 }).collect(Collectors.toList());
-        List<Task> oldTasks = this.projectService.listTasksByMilestone(actor, currentMilestone);
+        List<Task> oldTasks = this.projectService.listTasksByBatch(actor, currentBatch);
 
-        return this.projectService.addTasksToMilestone(actor, currentMilestone, selectedTasks, oldTasks);
+        return this.projectService.addTasksToBatch(actor, currentBatch, selectedTasks, oldTasks);
     }
 
 
-    public class MilestoneDecorator {
+    public class BatchDecorator {
 
-        private Milestone milestone;
+        private Batch batch;
 
-        public MilestoneDecorator(Milestone milestone) {
-            this.milestone = milestone;
+        public BatchDecorator(Batch batch) {
+            this.batch = batch;
         }
 
         public String getName() {
-            return this.milestone.getName();
+            return this.batch.getName();
         }
 
-        public MilestoneType getType() {
-            return this.milestone.getType();
+        public BatchType getType() {
+            return this.batch.getType();
         }
 
         public Date getDate() {
-            return this.milestone.getDate();
+            return this.batch.getDate();
         }
 
     }

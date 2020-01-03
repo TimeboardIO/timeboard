@@ -157,10 +157,10 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                     String origin = task.getOrigin();
                     String remotePath = null;
                     String remoteId = task.getId();
-                    Milestone milestone = null;
+                    Batch batch = null;
                     projectService.createTask(actor, project, taskName, taskComment,
                             startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
-                            remotePath, String.valueOf(remoteId), TaskStatus.IN_PROGRESS, milestone);
+                            remotePath, String.valueOf(remoteId), TaskStatus.IN_PROGRESS, batch);
                 }
         );
     }

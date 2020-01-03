@@ -5,7 +5,7 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:v-bind="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/xhtml"
-      xmlns:v-on="http://www.w3.org/1999/xhtml">
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-for="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>Project Tasks details</title>
@@ -111,12 +111,12 @@
                             </select>
                         </div>
                         <div class="field">
-                            <label>Milestone assigned</label>
-                            <select class="ui milestone dropdown" v-model="task.milestoneID" name="taskMilestoneId" data-cy="task-milestone">
+                            <label>Batches</label>
+                            <select multiple="" class="ui batch dropdown" v-model="task.batchIDs" name="taskBatchId" data-cy="task-batch">
                                 <option
-                                        th:each="milestone: ${allProjectMilestones}"
-                                        th:text="${milestone.name}"
-                                        th:value="${milestone.id}"
+                                        th:each="batch: ${allProjectBatches}"
+                                        th:text="${batch.name}"
+                                        th:value="${batch.id}"
                                 ></option>
                             </select>
                         </div>
@@ -173,58 +173,6 @@
             </script>
         </div>
 
-        <div v-if="tablePending.data.length" class="ui horizontal divider">
-            <i class="boxes icon"></i>
-            Pending tasks
-        </div>
-
-        <!-- Pending tasks datatable component -->
-        <data-table v-bind:config="tablePending">
-            <template v-slot:name="{row}">
-                {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
-                {{row.taskComments}}</p>
-            </template>
-            <template v-slot:start="{row}">
-                {{row.startDate}}
-            </template>
-            <template v-slot:end="{row}">
-                {{row.endDate}}
-            </template>
-            <template v-slot:oe="{row}">
-                <div class="ui circular label large day-badge" style="margin-top: 5px;">
-                    <p>{{row.originalEstimate}}</p>
-                </div>
-            </template>
-            <template v-slot:assignee="{row}">
-                {{row.assignee}}
-            </template>
-            <template v-slot:milestone="{row}">
-                <i>{{row.milestoneName}}</i>
-            </template>
-            <template v-slot:type="{row}">
-                <div class="ui blue green horizontal label"> {{row.typeName}} </div>
-            </template>
-            <template v-slot:status="{row}">
-                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
-            </template>
-
-            <template v-slot:actions="{row}">
-                <button @click="approveTask($event, row)" class="ui positive icon button" data-cy="approve-task">
-                    Approve
-                    <i class="check icon"></i>
-                </button>
-                <button @click="denyTask($event, row)" class="ui negative icon button" data-cy="deny-task">
-                    Deny
-                    <i class="close icon"></i>
-                </button>
-            </template>
-        </data-table>
-
-        <div class="ui horizontal divider">
-            <i class="boxes icon"></i>
-            All tasks
-        </div>
-
         <!-- Filters-->
         <div class="ui segment filters" style="display: none;">
             <div class="ui four column relaxed equal height divided grid">
@@ -256,11 +204,11 @@
                     </div>
                 </div>
                 <div class="column">
-                    <label>Milestone </label>
-                    <select v-model="table.filters.milestone.filterValue" class="ui multiple selection fluid dropdown" >
-                        <option th:each="milestone: ${allProjectMilestones}"
-                                th:text="${milestone.name}"
-                                th:value="${milestone.id}"
+                    <label>Batch </label>
+                    <select v-model="table.filters.batch.filterValue" class="ui multiple selection fluid dropdown" >
+                        <option th:each="batch: ${allProjectBatches}"
+                                th:text="${batch.name}"
+                                th:value="${batch.id}"
                         ></option>
                     </select>
                     <label>Type </label>
@@ -280,6 +228,60 @@
                 </div>
             </div>
         </div>
+
+
+        <div v-if="tablePending.data.length" class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            Pending tasks
+        </div>
+
+        <!-- Pending tasks datatable component -->
+        <data-table v-bind:config="tablePending">
+            <template v-slot:name="{row}">
+                {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                {{row.taskComments}}</p>
+            </template>
+            <template v-slot:start="{row}">
+                {{row.startDate}}
+            </template>
+            <template v-slot:end="{row}">
+                {{row.endDate}}
+            </template>
+            <template v-slot:oe="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    <p>{{row.originalEstimate}}</p>
+                </div>
+            </template>
+            <template v-slot:assignee="{row}">
+                {{row.assignee}}
+            </template>
+            <template v-slot:batch="{row}">
+                <i v-for="item in row.batchNames"> {{item}} </i>
+            </template>
+            <template v-slot:type="{row}">
+                <div v-if="row.typeName" class="ui blue horizontal label"> {{row.typeName}} </div>
+            </template>
+            <template v-slot:status="{row}">
+                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+            </template>
+
+            <template v-slot:actions="{row}">
+                <button @click="approveTask($event, row)" class="ui positive icon button" data-cy="approve-task">
+                    Approve
+                    <i class="check icon"></i>
+                </button>
+                <button @click="denyTask($event, row)" class="ui negative icon button" data-cy="deny-task">
+                    Deny
+                    <i class="close icon"></i>
+                </button>
+            </template>
+        </data-table>
+
+        <div class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            All tasks
+        </div>
+
 
 
         <!-- Datatable component -->
@@ -302,8 +304,8 @@
             <template v-slot:assignee="{row}">
                 {{row.assignee}}
             </template>
-            <template v-slot:milestone="{row}">
-                <i>{{row.milestoneName}}</i>
+            <template v-slot:batch="{row}">
+                <i v-for="item in row.batchNames"> {{item}} </i>
             </template>
             <template v-slot:type="{row}">
                 <div class="ui blue green horizontal label"> {{row.typeName}} </div>

@@ -26,6 +26,17 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table Batch (
+       id bigint not null,
+        organizationID bigint,
+        attributes TEXT,
+        date date,
+        name varchar(50),
+        type integer,
+        project_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Calendar (
        id bigint not null,
         organizationID bigint,
@@ -118,34 +129,6 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table Milestone (
-       id bigint not null,
-        organizationID bigint,
-        attributes TEXT,
-        date date,
-        name varchar(50),
-        type integer,
-        project_id bigint,
-        primary key (id)
-    ) engine=InnoDB;
-
-    create table Organization (
-       id bigint not null,
-        createdDate datetime(6),
-        enabled bit,
-        name varchar(255) not null,
-        setup TEXT,
-        primary key (id)
-    ) engine=InnoDB;
-
-    create table OrganizationMembership (
-       id bigint not null,
-        role varchar(255),
-        member_id bigint,
-        organization_id bigint,
-        primary key (id)
-    ) engine=InnoDB;
-
     create table Project (
        id bigint not null,
         organizationID bigint,
@@ -211,10 +194,15 @@
         originalEstimate double precision not null,
         taskStatus integer not null,
         assigned_id bigint,
-        milestone_id bigint,
         project_id bigint,
         taskType_id bigint,
         primary key (id)
+    ) engine=InnoDB;
+
+    create table Task_Batch (
+       tasks_id bigint not null,
+        batches_id bigint not null,
+        primary key (tasks_id, batches_id)
     ) engine=InnoDB;
 
     create table TaskSnapshot (
@@ -255,6 +243,16 @@
     alter table OrganizationMembership 
        add constraint UKpaqirhkf66d2aqtd9y6w8jn0p unique (member_id, organization_id);
 
+    alter table AccountHierarchy 
+       add constraint FKqlc8oegowh9hvnyvgdckpw6uv 
+       foreign key (organization_id) 
+       references Account (id);
+
+    alter table Batch 
+       add constraint FK21pv4fxo1jl876oc1u31wf21n 
+       foreign key (project_id) 
+       references Project (id);
+
     alter table CostByCategory 
        add constraint FKpeelsy07hkv1baei6fv1oo7s2 
        foreign key (account_id) 
@@ -269,21 +267,6 @@
        add constraint FKicayo4omi1a8krucb5t7kipva 
        foreign key (account_id) 
        references Account (id);
-
-    alter table Milestone 
-       add constraint FK4y2imlhl4and4511uh6lhnaiy 
-       foreign key (project_id) 
-       references Project (id);
-
-    alter table OrganizationMembership 
-       add constraint FKif7ywhi6j3a20y5ului9p2bix 
-       foreign key (member_id) 
-       references Account (id);
-
-    alter table OrganizationMembership 
-       add constraint FKevb5cud2ia1prwjdqor09er57 
-       foreign key (organization_id) 
-       references Organization (id);
 
     alter table ProjectMembership 
        add constraint FK3wl3q3i14wuy156wafo33wlas 
@@ -311,11 +294,6 @@
        references Account (id);
 
     alter table Task 
-       add constraint FKjl7lj35hlsnb3n8x2kyk9w5lx 
-       foreign key (milestone_id) 
-       references Milestone (id);
-
-    alter table Task 
        add constraint FKkkcat6aybe3nbvhc54unstxm6 
        foreign key (project_id) 
        references Project (id);
@@ -324,6 +302,16 @@
        add constraint FKigksw4egslpbdevlab7ucu8lb 
        foreign key (taskType_id) 
        references TaskType (id);
+
+    alter table Task_Batch 
+       add constraint FK3alougowadwygx3bxx1ug2vqi 
+       foreign key (batches_id) 
+       references Batch (id);
+
+    alter table Task_Batch 
+       add constraint FKkbly41iq8y7y6nasf42mn3b1t 
+       foreign key (tasks_id) 
+       references Task (id);
 
     alter table TaskSnapshot 
        add constraint FKqlt7jdeboxt0lajph1uwq3l95 

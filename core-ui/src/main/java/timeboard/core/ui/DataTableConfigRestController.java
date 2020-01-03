@@ -51,8 +51,6 @@ public class DataTableConfigRestController {
     @Autowired
     private DataTableService dataTableService;
 
-
-
     @GetMapping
     public ResponseEntity<DataTableConfigWrapper> getConfig(TimeboardAuthentication authentication, HttpServletRequest request) {
         final Account actor = authentication.getDetails();

@@ -38,7 +38,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -56,12 +55,7 @@ public class DataTableServiceImpl implements DataTableService {
 
     @Override
     public boolean checkColumnDisplayed(String tableId, Account actor, String colName) {
-
-        boolean isDefault = Arrays.stream(defaultCols)
-                .map(s -> s.equals(colName))
-                .reduce(false, (aBoolean, aBoolean2) -> aBoolean || aBoolean2);
-
-        return isDefault || checkColumnDisplayedFromDB(tableId, actor, colName);
+        return checkColumnDisplayedFromDB(tableId, actor, colName);
     }
 
     @Override
