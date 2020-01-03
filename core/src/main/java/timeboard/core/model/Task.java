@@ -49,8 +49,8 @@ public class Task extends AbstractTask implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER, optional = true)
-    private Milestone milestone;
+    @ManyToOne(targetEntity = Batch.class, fetch = FetchType.EAGER, optional = true)
+    private Batch batch;
 
     @OneToOne
     private Account assigned;
@@ -93,12 +93,12 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
-    public Milestone getMilestone() {
-        return milestone;
+    public Batch getBatch() {
+        return batch;
     }
 
-    public void setMilestone(Milestone milestone) {
-        this.milestone = milestone;
+    public void setBatch(Batch batch) {
+        this.batch = batch;
     }
 
     public double getEffortLeft() {

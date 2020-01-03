@@ -83,7 +83,7 @@ public interface ProjectService {
                     Date startDate, Date endDate, double originalEstimate,
                     Long taskTypeID, Account assignedAccountID, String origin,
                     String remotePath, String remoteId,
-                    TaskStatus taskStatus, Milestone milestone);
+                    TaskStatus taskStatus, Batch batch);
 
     void createTasks(Account actor, List<Task> taskList);
 
@@ -169,7 +169,7 @@ public interface ProjectService {
      * @param project project
      * @return List milestones
      */
-    List<Milestone> listProjectMilestones(Account actor, Project project) throws BusinessException;
+    List<Batch> listProjectMilestones(Account actor, Project project) throws BusinessException;
 
     /**
      * Search milestone by id.
@@ -177,26 +177,26 @@ public interface ProjectService {
      * @param id milestone's id
      * @return Milestone
      */
-    Milestone getMilestoneById(Account actor, long id) throws BusinessException;
+    Batch getMilestoneById(Account actor, long id) throws BusinessException;
 
     /**
      * Create a milestone.
      *
      * @return Milestone
      */
-    Milestone createMilestone(Account actor,
-                              String name,
-                              Date date,
-                              MilestoneType type,
-                              Map<String, String> attributes,
-                              Set<Task> tasks, Project project) throws BusinessException;
+    Batch createMilestone(Account actor,
+                          String name,
+                          Date date,
+                          BatchType type,
+                          Map<String, String> attributes,
+                          Set<Task> tasks, Project project) throws BusinessException;
 
     /**
      * Update a milestone.
      *
      * @return Milestone
      */
-    Milestone updateMilestone(Account actor, Milestone milestone) throws BusinessException;
+    Batch updateMilestone(Account actor, Batch batch) throws BusinessException;
 
     /**
      * Delete a milestone.
@@ -205,11 +205,11 @@ public interface ProjectService {
      */
     void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException;
 
-    List<Task> listTasksByMilestone(Account actor, Milestone milestone) throws BusinessException;
+    List<Task> listTasksByMilestone(Account actor, Batch batch) throws BusinessException;
 
-    Milestone addTasksToMilestone(Account actor,
-                                  Milestone currentMilestone,
-                                  List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
+    Batch addTasksToMilestone(Account actor,
+                              Batch currentBatch,
+                              List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
     TaskType createTaskType(Account actor, String name);
 

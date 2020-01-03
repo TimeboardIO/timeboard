@@ -386,7 +386,7 @@ public class ProjectServiceImpl implements ProjectService {
                            String remotePath,
                            String remoteId,
                            TaskStatus taskStatus,
-                           Milestone milestone
+                           Batch batch
     ) {
         Task newTask = new Task();
         newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
@@ -403,10 +403,10 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
         newTask.setOrganizationID(project.getId());
-        if (milestone != null) {
-            em.merge(milestone);
+        if (batch != null) {
+            em.merge(batch);
         }
-        newTask.setMilestone(milestone);
+        newTask.setBatch(batch);
 
         em.persist(newTask);
         em.merge(project);
@@ -906,7 +906,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Milestone> listProjectMilestones(Account actor, Project project) throws BusinessException {
+    public List<Batch> listProjectMilestones(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -914,29 +914,29 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-        TypedQuery<Milestone> q = em.createQuery("select m from Milestone m where m.project = :project", Milestone.class);
+        TypedQuery<Batch> q = em.createQuery("select m from Batch m where m.project = :project", Batch.class);
         q.setParameter("project", project);
         return q.getResultList();
     }
 
     @Override
-    public Milestone getMilestoneById(Account account, long id) throws BusinessException {
+    public Batch getMilestoneById(Account account, long id) throws BusinessException {
 
-        Milestone milestone = em.find(Milestone.class, id);
-        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        Batch batch = em.find(Batch.class, id);
+        RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
-        Set<Rule> wrongRules = ruleSet.evaluate(account, milestone);
+        Set<Rule> wrongRules = ruleSet.evaluate(account, batch);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
-        return milestone;
+        return batch;
     }
 
     @Override
-    public Milestone createMilestone(Account actor,
-                                     String name, Date date, MilestoneType type,
-                                     Map<String, String> attributes,
-                                     Set<Task> tasks, Project project) throws BusinessException {
+    public Batch createMilestone(Account actor,
+                                 String name, Date date, BatchType type,
+                                 Map<String, String> attributes,
+                                 Set<Task> tasks, Project project) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
@@ -946,71 +946,71 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
 
-        Milestone newMilestone = new Milestone();
-        newMilestone.setName(name);
-        newMilestone.setDate(date);
-        newMilestone.setType(type);
-        newMilestone.setAttributes(attributes);
-        newMilestone.setTasks(tasks);
-        newMilestone.setProject(project);
+        Batch newBatch = new Batch();
+        newBatch.setName(name);
+        newBatch.setDate(date);
+        newBatch.setType(type);
+        newBatch.setAttributes(attributes);
+        newBatch.setTasks(tasks);
+        newBatch.setProject(project);
 
-        em.persist(newMilestone);
-        LOGGER.info("Milestone " + newMilestone);
+        em.persist(newBatch);
+        LOGGER.info("Milestone " + newBatch);
 
-        return newMilestone;
+        return newBatch;
 
     }
 
     @Override
-    public Milestone updateMilestone(Account actor, Milestone milestone) throws BusinessException {
-        RuleSet<Milestone> ruleSet = new RuleSet<>();
+    public Batch updateMilestone(Account actor, Batch batch) throws BusinessException {
+        RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
-        em.merge(milestone);
+        em.merge(batch);
         em.flush();
 
-        LOGGER.info("Milestone " + milestone.getName() + " updated");
-        return milestone;
+        LOGGER.info("Milestone " + batch.getName() + " updated");
+        return batch;
     }
 
     @Override
     public void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException {
-        RuleSet<Milestone> ruleSet = new RuleSet<>();
+        RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
         ruleSet.addRule(new MilestoneHasNoTask());
 
-        Milestone milestone = em.find(Milestone.class, milestoneID);
+        Batch batch = em.find(Batch.class, milestoneID);
 
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
 
-        em.remove(milestone);
+        em.remove(batch);
         em.flush();
 
         LOGGER.info("Milestone " + milestoneID + " deleted by " + actor.getName());
     }
 
     @Override
-    public List<Task> listTasksByMilestone(Account actor, Milestone milestone) throws BusinessException {
-        RuleSet<Milestone> ruleSet = new RuleSet<>();
+    public List<Task> listTasksByMilestone(Account actor, Batch batch) throws BusinessException {
+        RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, milestone);
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
         TypedQuery<Task> q = em.createQuery("select t from Task t where t.milestone = :milestone", Task.class);
-        q.setParameter("milestone", milestone);
+        q.setParameter("milestone", batch);
         return q.getResultList();
     }
 
     @Override
-    public Milestone addTasksToMilestone(Account actor, Milestone m, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
-        RuleSet<Milestone> ruleSet = new RuleSet<>();
+    public Batch addTasksToMilestone(Account actor, Batch m, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
+        RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByMilestone());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, m);
         if (!wrongRules.isEmpty()) {
@@ -1018,12 +1018,12 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         oldTaskIds.forEach(tr -> {
-            tr.setMilestone(null);
+            tr.setBatch(null);
             m.getTasks().removeIf(task -> task.getId() == tr.getId());
         });
 
         selectedTaskIds.forEach(tr -> {
-            tr.setMilestone(m);
+            tr.setBatch(m);
             m.getTasks().add(tr);
         });
 

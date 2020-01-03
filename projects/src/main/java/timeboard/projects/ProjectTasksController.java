@@ -179,7 +179,7 @@ public class ProjectTasksController {
         public TaskForm(Task task) {
             taskID = task.getId();
             taskType = task.getTaskType();
-            milestoneID = task.getMilestone() != null ? task.getMilestone().getId() : null;
+            milestoneID = task.getBatch() != null ? task.getBatch().getId() : null;
 
             originalEstimate = task.getOriginalEstimate();
             startDate = task.getStartDate();

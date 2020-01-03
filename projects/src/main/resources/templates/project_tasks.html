@@ -112,11 +112,11 @@
                         </div>
                         <div class="field">
                             <label>Milestone assigned</label>
-                            <select class="ui milestone dropdown" v-model="task.milestoneID" name="taskMilestoneId" data-cy="task-milestone">
+                            <select class="ui batch dropdown" v-model="task.milestoneID" name="taskMilestoneId" data-cy="task-batch">
                                 <option
-                                        th:each="milestone: ${allProjectMilestones}"
-                                        th:text="${milestone.name}"
-                                        th:value="${milestone.id}"
+                                        th:each="batch: ${allProjectMilestones}"
+                                        th:text="${batch.name}"
+                                        th:value="${batch.id}"
                                 ></option>
                             </select>
                         </div>
@@ -198,7 +198,7 @@
             <template v-slot:assignee="{row}">
                 {{row.assignee}}
             </template>
-            <template v-slot:milestone="{row}">
+            <template v-slot:batch="{row}">
                 <i>{{row.milestoneName}}</i>
             </template>
             <template v-slot:type="{row}">
@@ -257,10 +257,10 @@
                 </div>
                 <div class="column">
                     <label>Milestone </label>
-                    <select v-model="table.filters.milestone.filterValue" class="ui multiple selection fluid dropdown" >
-                        <option th:each="milestone: ${allProjectMilestones}"
-                                th:text="${milestone.name}"
-                                th:value="${milestone.id}"
+                    <select v-model="table.filters.batch.filterValue" class="ui multiple selection fluid dropdown" >
+                        <option th:each="batch: ${allProjectMilestones}"
+                                th:text="${batch.name}"
+                                th:value="${batch.id}"
                         ></option>
                     </select>
                     <label>Type </label>
@@ -302,7 +302,7 @@
             <template v-slot:assignee="{row}">
                 {{row.assignee}}
             </template>
-            <template v-slot:milestone="{row}">
+            <template v-slot:batch="{row}">
                 <i>{{row.milestoneName}}</i>
             </template>
             <template v-slot:type="{row}">

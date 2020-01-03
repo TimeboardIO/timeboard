@@ -107,8 +107,8 @@ public class TasksRestController {
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getName() : ""),
+                        (task.getBatch() != null ? task.getBatch().getId() : 0L),
+                        (task.getBatch() != null ? task.getBatch().getName() : ""),
                         task.getTaskStatus().getLabel(),
                         (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
                 ));
@@ -287,7 +287,7 @@ public class TasksRestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        final Milestone milestone = getMilestone(taskWrapper, actor);
+        final Batch batch = getMilestone(taskWrapper, actor);
 
         Task task = null;
         Long typeID = taskWrapper.typeID;
@@ -295,7 +295,7 @@ public class TasksRestController {
 
         if (!(taskID != null && taskID == 0)) {
             try {
-                task = processUpdateTask(taskWrapper, actor, milestone, taskID);
+                task = processUpdateTask(taskWrapper, actor, batch, taskID);
 
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
@@ -319,7 +319,7 @@ public class TasksRestController {
 
     }
 
-    private Milestone getMilestone(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
+    private Batch getMilestone(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
         Long milestoneID = taskWrapper.milestoneID;
         if(milestoneID != null && milestoneID > 0) {
             return this.projectService.getMilestoneById(actor, milestoneID);
@@ -330,7 +330,7 @@ public class TasksRestController {
 
     private Task processUpdateTask(@RequestBody TaskWrapper taskWrapper,
                                    Account actor,
-                                   Milestone milestone,
+                                   Batch batch,
                                    Long taskID) throws BusinessException, ParseException {
 
         final Task task = (Task) projectService.getTaskByID(actor, taskID);
@@ -346,7 +346,7 @@ public class TasksRestController {
         task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
         final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
         task.setTaskType(taskType);
-        task.setMilestone(milestone);
+        task.setBatch(batch);
         task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
         projectService.updateTask(actor, task);

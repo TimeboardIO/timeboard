@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Entity
-public class Milestone extends OrganizationEntity implements Serializable {
+public class Batch extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -49,7 +49,7 @@ public class Milestone extends OrganizationEntity implements Serializable {
     private Date date;
 
     @Column(length = 500)
-    private MilestoneType type;
+    private BatchType type;
 
     @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToStringMapConverter.class)
@@ -61,16 +61,16 @@ public class Milestone extends OrganizationEntity implements Serializable {
 
     @OneToMany(
             targetEntity = Task.class,
-            mappedBy = "milestone",
+            mappedBy = "batch",
             fetch = FetchType.LAZY)
     private Set<Task> tasks;
 
 
-    public Milestone(long id,
-                     String name,
-                     Date date,
-                     MilestoneType type,
-                     Map<String, String> attributes, Project project, Set<Task> tasks) {
+    public Batch(long id,
+                 String name,
+                 Date date,
+                 BatchType type,
+                 Map<String, String> attributes, Project project, Set<Task> tasks) {
         this.id = id;
         this.name = name;
         this.date = date;
@@ -80,7 +80,7 @@ public class Milestone extends OrganizationEntity implements Serializable {
         this.tasks = tasks;
     }
 
-    public Milestone() {
+    public Batch() {
         this.tasks = new HashSet<>();
     }
 
@@ -108,11 +108,11 @@ public class Milestone extends OrganizationEntity implements Serializable {
         this.date = date;
     }
 
-    public MilestoneType getType() {
+    public BatchType getType() {
         return type;
     }
 
-    public void setType(MilestoneType type) {
+    public void setType(BatchType type) {
         this.type = type;
     }
 

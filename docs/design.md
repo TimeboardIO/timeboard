@@ -57,7 +57,7 @@ A task is assigned to a unique Actor.
 
 ### Milestone
 
-A milestone is a set of tasks. A milestone is mainly defined by a name, a date and a type.
+A batch is a set of tasks. A batch is mainly defined by a name, a date and a type.
 A project may have several milestones.
 
 ### Organization

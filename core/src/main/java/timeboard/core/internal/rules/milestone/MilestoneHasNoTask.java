@@ -28,9 +28,9 @@ package timeboard.core.internal.rules.milestone;
 
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Account;
-import timeboard.core.model.Milestone;
+import timeboard.core.model.Batch;
 
-public class MilestoneHasNoTask implements Rule<Milestone> {
+public class MilestoneHasNoTask implements Rule<Batch> {
 
     @Override
     public String ruleDescription() {
@@ -38,7 +38,7 @@ public class MilestoneHasNoTask implements Rule<Milestone> {
     }
 
     @Override
-    public boolean isSatisfied(Account u, Milestone thing) {
+    public boolean isSatisfied(Account u, Batch thing) {
         return thing.getTasks().isEmpty();
     }
 }

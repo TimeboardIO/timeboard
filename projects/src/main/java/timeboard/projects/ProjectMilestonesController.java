@@ -94,9 +94,9 @@ public class ProjectMilestonesController {
 
         final Account actor = authentication.getDetails();
 
-        Milestone milestone = this.projectService.getMilestoneById(actor, milestoneID);
-        model.addAttribute("milestone", milestone);
-        model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, milestone));
+        Batch batch = this.projectService.getMilestoneById(actor, milestoneID);
+        model.addAttribute("milestone", batch);
+        model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, batch));
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
         fillModelWithMilestones(model, actor, project);
@@ -110,7 +110,7 @@ public class ProjectMilestonesController {
                                          @PathVariable Long projectID, Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
 
-        model.addAttribute("milestone", new Milestone());
+        model.addAttribute("milestone", new Batch());
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
         fillModelWithMilestones(model, actor, project);
@@ -144,7 +144,7 @@ public class ProjectMilestonesController {
         model.addAttribute("project", project);
         model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
         model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
-        model.addAttribute("allMilestoneTypes", MilestoneType.values());
+        model.addAttribute("allMilestoneTypes", BatchType.values());
     }
 
 
@@ -154,15 +154,15 @@ public class ProjectMilestonesController {
 
         long projectID = Long.parseLong(request.getParameter("projectID"));
         Project project = this.projectService.getProjectByID(actor, projectID);
-        Milestone currentMilestone = null;
+        Batch currentBatch = null;
 
         try {
 
             Long milestoneID = Long.parseLong(request.getParameter("milestoneID"));
-            currentMilestone = this.projectService.getMilestoneById(actor, milestoneID);
-            currentMilestone = addTasksToMilestone(actor, currentMilestone, request);
+            currentBatch = this.projectService.getMilestoneById(actor, milestoneID);
+            currentBatch = addTasksToMilestone(actor, currentBatch, request);
 
-            model.addAttribute("milestone", currentMilestone);
+            model.addAttribute("milestone", currentBatch);
 
             model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
 
@@ -172,15 +172,15 @@ public class ProjectMilestonesController {
 
             model.addAttribute("project", project);
             model.addAttribute("milestones", this.projectService.listProjectMilestones(actor, project));
-            model.addAttribute("allMilestoneTypes", MilestoneType.values());
-            model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, currentMilestone));
+            model.addAttribute("allMilestoneTypes", BatchType.values());
+            model.addAttribute("taskIdsByMilestone", this.projectService.listTasksByMilestone(actor, currentBatch));
             return "details_project_milestones_config_links.html";
         }
     }
 
-    private Milestone addTasksToMilestone(Account actor,
-                                          Milestone currentMilestone,
-                                          HttpServletRequest request) throws BusinessException {
+    private Batch addTasksToMilestone(Account actor,
+                                      Batch currentBatch,
+                                      HttpServletRequest request) throws BusinessException {
 
         String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
         List<Task> selectedTasks = Arrays
@@ -195,30 +195,30 @@ public class ProjectMilestonesController {
                         return t;
                     }
                 }).collect(Collectors.toList());
-        List<Task> oldTasks = this.projectService.listTasksByMilestone(actor, currentMilestone);
+        List<Task> oldTasks = this.projectService.listTasksByMilestone(actor, currentBatch);
 
-        return this.projectService.addTasksToMilestone(actor, currentMilestone, selectedTasks, oldTasks);
+        return this.projectService.addTasksToMilestone(actor, currentBatch, selectedTasks, oldTasks);
     }
 
 
     public class MilestoneDecorator {
 
-        private Milestone milestone;
+        private Batch batch;
 
-        public MilestoneDecorator(Milestone milestone) {
-            this.milestone = milestone;
+        public MilestoneDecorator(Batch batch) {
+            this.batch = batch;
         }
 
         public String getName() {
-            return this.milestone.getName();
+            return this.batch.getName();
         }
 
-        public MilestoneType getType() {
-            return this.milestone.getType();
+        public BatchType getType() {
+            return this.batch.getType();
         }
 
         public Date getDate() {
-            return this.milestone.getDate();
+            return this.batch.getDate();
         }
 
     }

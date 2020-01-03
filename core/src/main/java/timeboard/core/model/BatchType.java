@@ -26,15 +26,18 @@ package timeboard.core.model;
  * #L%
  */
 
-public enum MilestoneType {
+public enum BatchType {
     BILL("Bill"),
     DELIVERY("Delivery"),
     INPUT("Inupt"),
-    SCHEDULING("Scheduling");
+    SCHEDULING("Scheduling"),
+    GROUP("Group"),
+    SPRINT("Sprint");
+
 
     public final String label;
 
-    private MilestoneType(String label) {
+    private BatchType(String label) {
         this.label = label;
     }
 
