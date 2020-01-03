@@ -322,7 +322,7 @@ public class TasksRestController {
     private Batch getMilestone(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
         Long milestoneID = taskWrapper.milestoneID;
         if(milestoneID != null && milestoneID > 0) {
-            return this.projectService.getMilestoneById(actor, milestoneID);
+            return this.projectService.getBatchById(actor, milestoneID);
         }else{
             return null;
         }

@@ -111,10 +111,10 @@
                             </select>
                         </div>
                         <div class="field">
-                            <label>Milestone assigned</label>
-                            <select class="ui batch dropdown" v-model="task.milestoneID" name="taskMilestoneId" data-cy="task-batch">
+                            <label>Batch</label>
+                            <select class="ui batch dropdown" v-model="task.batchID" name="taskBatchId" data-cy="task-batch">
                                 <option
-                                        th:each="batch: ${allProjectMilestones}"
+                                        th:each="batch: ${allProjectBatches}"
                                         th:text="${batch.name}"
                                         th:value="${batch.id}"
                                 ></option>
@@ -199,7 +199,7 @@
                 {{row.assignee}}
             </template>
             <template v-slot:batch="{row}">
-                <i>{{row.milestoneName}}</i>
+                <i>{{row.batchName}}</i>
             </template>
             <template v-slot:type="{row}">
                 <div class="ui blue green horizontal label"> {{row.typeName}} </div>
@@ -256,9 +256,9 @@
                     </div>
                 </div>
                 <div class="column">
-                    <label>Milestone </label>
+                    <label>Batch </label>
                     <select v-model="table.filters.batch.filterValue" class="ui multiple selection fluid dropdown" >
-                        <option th:each="batch: ${allProjectMilestones}"
+                        <option th:each="batch: ${allProjectBatches}"
                                 th:text="${batch.name}"
                                 th:value="${batch.id}"
                         ></option>
@@ -303,7 +303,7 @@
                 {{row.assignee}}
             </template>
             <template v-slot:batch="{row}">
-                <i>{{row.milestoneName}}</i>
+                <i>{{row.batchName}}</i>
             </template>
             <template v-slot:type="{row}">
                 <div class="ui blue green horizontal label"> {{row.typeName}} </div>

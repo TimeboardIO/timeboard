@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules.milestone;
+package timeboard.core.internal.rules.batch;
 
 /*-
  * #%L
@@ -29,25 +29,16 @@ package timeboard.core.internal.rules.milestone;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.model.Account;
 import timeboard.core.model.Batch;
-import timeboard.core.model.ProjectMembership;
 
-import java.util.Optional;
-
-
-public class ActorIsProjectMemberByMilestone implements Rule<Batch> {
+public class BatchHasNoTask implements Rule<Batch> {
 
     @Override
     public String ruleDescription() {
-        return "User is not project Owner";
+        return "Milestone with tasks cannot be removed";
     }
 
     @Override
     public boolean isSatisfied(Account u, Batch thing) {
-        final Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
-                .filter(projectMembership ->
-                        projectMembership.getMember().getId() == u.getId()
-                )
-                .findFirst();
-        return userOptional.isPresent();
+        return thing.getTasks().isEmpty();
     }
 }

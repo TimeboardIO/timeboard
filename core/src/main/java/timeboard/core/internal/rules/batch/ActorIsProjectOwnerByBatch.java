@@ -1,4 +1,4 @@
-package timeboard.core.internal.rules.milestone;
+package timeboard.core.internal.rules.batch;
 
 /*-
  * #%L
@@ -35,7 +35,7 @@ import timeboard.core.model.ProjectMembership;
 import java.util.Optional;
 
 
-public class ActorIsProjectOwnerByMilestone implements Rule<Batch> {
+public class ActorIsProjectOwnerByBatch implements Rule<Batch> {
 
     @Override
     public String ruleDescription() {

@@ -59,9 +59,9 @@ public class Batch extends OrganizationEntity implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @OneToMany(
+    @ManyToMany(
             targetEntity = Task.class,
-            mappedBy = "batch",
+            mappedBy = "batches",
             fetch = FetchType.LAZY)
     private Set<Task> tasks;
 

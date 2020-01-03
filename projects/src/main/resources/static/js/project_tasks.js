@@ -64,8 +64,8 @@ const emptyTask =  {
     assigneeID: 0,
     status: "PENDING",
     statusName: '',
-    milestoneID: '',
-    milestoneName: '',
+    batchID: '',
+    batchName: '',
 };
 
 const projectID = $("meta[name='projectID']").attr('value');
@@ -117,9 +117,9 @@ let app = new Vue({
 
                 },
                 {
-                    "slot": "milestone",
-                    "label": "Milestone",
-                    "sortKey": "milestoneID"
+                    "slot": "batch",
+                    "label": "batch",
+                    "sortKey": "batchID"
 
                 },
                 {
@@ -149,7 +149,7 @@ let app = new Vue({
                                 filterFunction: (filter, row) => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 },
                 status:    { filterKey: 'status', filterValue: '',
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 ) },
-                milestone: { filterKey: 'milestoneID', filterValue: '',
+                batch: { filterKey: 'batchID', filterValue: '',
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
                 type:      { filterKey: 'typeID', filterValue: '',
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
@@ -232,9 +232,9 @@ let app = new Vue({
                  this.newTask.assigneeID = task.assigneeID;
 
                  this.newTask.status = task.status;
-                 this.newTask.milestoneID = task.milestoneID;
+                 this.newTask.batchID = task.batchID;
 
-                 this.newTask.milestoneName = task.milestoneName;
+                 this.newTask.batchName = task.batchName;
                  this.newTask.typeName = task.typeName;
                  this.newTask.statusName = task.statusName;
 

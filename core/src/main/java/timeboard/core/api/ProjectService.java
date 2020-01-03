@@ -160,56 +160,56 @@ public interface ProjectService {
 
 
     /*
-     == Milestones ==
+     == Batches ==
      */
 
     /**
-     * Return all milestones for a project.
+     * Return all batches for a project.
      *
      * @param project project
-     * @return List milestones
+     * @return List batches
      */
-    List<Batch> listProjectMilestones(Account actor, Project project) throws BusinessException;
+    List<Batch> listProjectBatches(Account actor, Project project) throws BusinessException;
 
     /**
-     * Search milestone by id.
+     * Search batch by id.
      *
-     * @param id milestone's id
-     * @return Milestone
+     * @param id batch's id
+     * @return Batch
      */
-    Batch getMilestoneById(Account actor, long id) throws BusinessException;
+    Batch getBatchById(Account actor, long id) throws BusinessException;
 
     /**
-     * Create a milestone.
+     * Create a batch.
      *
-     * @return Milestone
+     * @return Batch
      */
-    Batch createMilestone(Account actor,
-                          String name,
-                          Date date,
-                          BatchType type,
-                          Map<String, String> attributes,
-                          Set<Task> tasks, Project project) throws BusinessException;
+    Batch createBatch(Account actor,
+                      String name,
+                      Date date,
+                      BatchType type,
+                      Map<String, String> attributes,
+                      Set<Task> tasks, Project project) throws BusinessException;
 
     /**
-     * Update a milestone.
+     * Update a batch.
      *
-     * @return Milestone
+     * @return Batch
      */
-    Batch updateMilestone(Account actor, Batch batch) throws BusinessException;
+    Batch updateBatch(Account actor, Batch batch) throws BusinessException;
 
     /**
-     * Delete a milestone.
+     * Delete a batch.
      *
-     * @param milestoneID
+     * @param batchID
      */
-    void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException;
+    void deleteBatchByID(Account actor, long batchID) throws BusinessException;
 
-    List<Task> listTasksByMilestone(Account actor, Batch batch) throws BusinessException;
+    List<Task> listTasksByBatch(Account actor, Batch batch) throws BusinessException;
 
-    Batch addTasksToMilestone(Account actor,
-                              Batch currentBatch,
-                              List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
+    Batch addTasksToBatch(Account actor,
+                          Batch currentBatch,
+                          List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
     TaskType createTaskType(Account actor, String name);
 

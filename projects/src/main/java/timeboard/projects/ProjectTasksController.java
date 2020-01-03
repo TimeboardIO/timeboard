@@ -95,7 +95,7 @@ public class ProjectTasksController {
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("taskTypes", this.projectService.listTaskType());
         model.addAttribute("allTaskStatus", TaskStatus.values());
-        model.addAttribute("allProjectMilestones", this.projectService.listProjectMilestones(actor, project));
+        model.addAttribute("allProjectMilestones", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());

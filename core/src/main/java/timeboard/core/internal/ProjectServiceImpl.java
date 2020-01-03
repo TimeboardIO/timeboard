@@ -38,8 +38,8 @@ import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
-import timeboard.core.internal.rules.milestone.ActorIsProjectMemberByMilestone;
-import timeboard.core.internal.rules.milestone.MilestoneHasNoTask;
+import timeboard.core.internal.rules.batch.ActorIsProjectMemberByBatch;
+import timeboard.core.internal.rules.batch.BatchHasNoTask;
 import timeboard.core.internal.rules.project.ActorIsProjectMember;
 import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
@@ -406,7 +406,7 @@ public class ProjectServiceImpl implements ProjectService {
         if (batch != null) {
             em.merge(batch);
         }
-        newTask.setBatch(batch);
+        newTask.addBatch(batch);
 
         em.persist(newTask);
         em.merge(project);
@@ -906,7 +906,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Batch> listProjectMilestones(Account actor, Project project) throws BusinessException {
+    public List<Batch> listProjectBatches(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -914,17 +914,17 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-        TypedQuery<Batch> q = em.createQuery("select m from Batch m where m.project = :project", Batch.class);
+        TypedQuery<Batch> q = em.createQuery("select b from Batch b where b.project = :project", Batch.class);
         q.setParameter("project", project);
         return q.getResultList();
     }
 
     @Override
-    public Batch getMilestoneById(Account account, long id) throws BusinessException {
+    public Batch getBatchById(Account account, long id) throws BusinessException {
 
         Batch batch = em.find(Batch.class, id);
         RuleSet<Batch> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        ruleSet.addRule(new ActorIsProjectMemberByBatch());
         Set<Rule> wrongRules = ruleSet.evaluate(account, batch);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
@@ -933,10 +933,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Batch createMilestone(Account actor,
-                                 String name, Date date, BatchType type,
-                                 Map<String, String> attributes,
-                                 Set<Task> tasks, Project project) throws BusinessException {
+    public Batch createBatch(Account actor,
+                             String name, Date date, BatchType type,
+                             Map<String, String> attributes,
+                             Set<Task> tasks, Project project) throws BusinessException {
 
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
@@ -955,16 +955,16 @@ public class ProjectServiceImpl implements ProjectService {
         newBatch.setProject(project);
 
         em.persist(newBatch);
-        LOGGER.info("Milestone " + newBatch);
+        LOGGER.info("Batch " + newBatch);
 
         return newBatch;
 
     }
 
     @Override
-    public Batch updateMilestone(Account actor, Batch batch) throws BusinessException {
+    public Batch updateBatch(Account actor, Batch batch) throws BusinessException {
         RuleSet<Batch> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        ruleSet.addRule(new ActorIsProjectMemberByBatch());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
@@ -972,17 +972,17 @@ public class ProjectServiceImpl implements ProjectService {
         em.merge(batch);
         em.flush();
 
-        LOGGER.info("Milestone " + batch.getName() + " updated");
+        LOGGER.info("Batch " + batch.getName() + " updated");
         return batch;
     }
 
     @Override
-    public void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException {
+    public void deleteBatchByID(Account actor, long batchID) throws BusinessException {
         RuleSet<Batch> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
-        ruleSet.addRule(new MilestoneHasNoTask());
+        ruleSet.addRule(new ActorIsProjectMemberByBatch());
+        ruleSet.addRule(new BatchHasNoTask());
 
-        Batch batch = em.find(Batch.class, milestoneID);
+        Batch batch = em.find(Batch.class, batchID);
 
         Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
         if (!wrongRules.isEmpty()) {
@@ -992,42 +992,42 @@ public class ProjectServiceImpl implements ProjectService {
         em.remove(batch);
         em.flush();
 
-        LOGGER.info("Milestone " + milestoneID + " deleted by " + actor.getName());
+        LOGGER.info("Batch " + batchID + " deleted by " + actor.getName());
     }
 
     @Override
-    public List<Task> listTasksByMilestone(Account actor, Batch batch) throws BusinessException {
+    public List<Task> listTasksByBatch(Account actor, Batch batch) throws BusinessException {
         RuleSet<Batch> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
+        ruleSet.addRule(new ActorIsProjectMemberByBatch());
         Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
-        TypedQuery<Task> q = em.createQuery("select t from Task t where t.milestone = :milestone", Task.class);
-        q.setParameter("milestone", batch);
+        TypedQuery<Task> q = em.createQuery("select distinct t from Task t join t.batches b where b = :batch", Task.class);
+        q.setParameter("batch", batch);
         return q.getResultList();
     }
 
     @Override
-    public Batch addTasksToMilestone(Account actor, Batch m, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
+    public Batch addTasksToBatch(Account actor, Batch b, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
         RuleSet<Batch> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMemberByMilestone());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, m);
+        ruleSet.addRule(new ActorIsProjectMemberByBatch());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, b);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
 
         oldTaskIds.forEach(tr -> {
             tr.setBatch(null);
-            m.getTasks().removeIf(task -> task.getId() == tr.getId());
+            b.getTasks().removeIf(task -> task.getId() == tr.getId());
         });
 
         selectedTaskIds.forEach(tr -> {
-            tr.setBatch(m);
-            m.getTasks().add(tr);
+            tr.addBatch(b);
+            b.getTasks().add(tr);
         });
 
-        return m;
+        return b;
     }
 
     @Override

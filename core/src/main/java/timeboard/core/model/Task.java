@@ -28,11 +28,11 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
 public class Task extends AbstractTask implements Serializable {
-
 
     @Column(nullable = false)
     private double originalEstimate;
@@ -49,8 +49,8 @@ public class Task extends AbstractTask implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @ManyToOne(targetEntity = Batch.class, fetch = FetchType.EAGER, optional = true)
-    private Batch batch;
+    @ManyToMany(targetEntity = Batch.class, fetch = FetchType.EAGER)
+    private Set<Batch> batches;
 
     @OneToOne
     private Account assigned;
@@ -93,12 +93,16 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
-    public Batch getBatch() {
-        return batch;
+    public Set<Batch>  getBatches() {
+        return batches;
     }
 
-    public void setBatch(Batch batch) {
-        this.batch = batch;
+    public void setBatch(Set<Batch> batches) {
+        this.batches = batches;
+    }
+
+    public void addBatch(Batch batches) {
+        this.batches .add(batches);
     }
 
     public double getEffortLeft() {
