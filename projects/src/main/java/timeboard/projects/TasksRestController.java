@@ -65,6 +65,51 @@ public class TasksRestController {
     @Autowired
     private UserService userService;
 
+    @GetMapping("/batches")
+    public ResponseEntity getBatches(TimeboardAuthentication authentication,
+                                   HttpServletRequest request) throws JsonProcessingException {
+        Account actor = authentication.getDetails();
+        Project project = null;
+
+        final String strProjectID = request.getParameter("project");
+        final String strBatchType = request.getParameter("batchType");
+
+        Long projectID = null;
+        if (strProjectID != null) {
+            projectID = Long.parseLong(strProjectID);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
+        }
+
+        BatchType batchType = null;
+        if (strBatchType != null) {
+            batchType = BatchType.valueOf(strBatchType.toUpperCase());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect batchType argument");
+        }
+
+        try {
+            project = this.projectService.getProjectByID(actor, projectID);
+        } catch (BusinessException e ) {
+            // just handling exception
+        }
+        if (project == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+        }
+
+        List<Batch> batchList = null;
+        try {
+            batchList = projectService.getBatchList(actor, project, batchType);
+        } catch (BusinessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+        }
+
+        List<BatchWrapper> batchWrapperList = new ArrayList<>();
+        batchList.forEach(batch -> batchWrapperList.add(new BatchWrapper(batch.getId(), batch.getName())));
+
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(batchWrapperList.toArray()));
+    }
+
     @GetMapping
     public ResponseEntity getTasks(TimeboardAuthentication authentication,
                                    HttpServletRequest request) throws JsonProcessingException {
@@ -99,6 +144,7 @@ public class TasksRestController {
 
                 List<Long> batchIDs = new ArrayList<>();
                 List<String> batchNames = new ArrayList<>();
+
                 task.getBatches().stream().forEach(b -> {
                     batchIDs.add(b.getId());
                     batchNames.add(b.getName());
@@ -392,6 +438,36 @@ public class TasksRestController {
         }
     }
 
+    public static class BatchWrapper implements Serializable {
+
+
+        public Long batchID;
+        public String batchName;
+
+
+        public BatchWrapper(Long batchID, String batchName) {
+            this.batchID = batchID;
+            this.batchName = batchName;
+        }
+
+        public Long getBatchID() {
+            return batchID;
+        }
+
+        public void setBatchID(Long batchID) {
+            this.batchID = batchID;
+        }
+
+        public String getBatchName() {
+            return batchName;
+        }
+
+        public void setBatchName(String batchName) {
+            this.batchName = batchName;
+        }
+
+
+    }
 
     public static class TaskWrapper implements Serializable {
         public Long taskID;

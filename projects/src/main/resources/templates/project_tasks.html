@@ -307,14 +307,14 @@
         </div>
 
         <div class="ui styled fluid accordion">
-            <div th:each="batch: ${batchList}">
+            <div v-for="batch in batches">
                 <div class="title">
                     <i class="plus icon"></i>
-                    <span th:text="${batch.name}"></span>
+                    {{ batch.name }}
                 </div>
                 <div class="content">
                     <!-- Datatable component -->
-                    <data-table v-bind:config="table">
+                    <data-table v-bind:config="table.filter(row -> { row.batchIDs.some(b -> b === batch.id) } )">
                         <template v-slot:name="{row}">
                             {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
                             {{row.taskComments}}</p>

@@ -78,6 +78,7 @@ let app = new Vue({
     data: {
         newTask: Object.assign({}, emptyTask),
         formError: "",
+        batches: [],
         modalTitle: "Create task",
         table: {
             cols: [
@@ -294,6 +295,16 @@ let app = new Vue({
     },
     mounted: function () {
         let self = this;
+        if (currentBatchType !== 'Default'){
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "/api/tasks/batches?project="+currentProjectID+"&batchType="+currentBatchType,
+                success: function (d) {
+                    self.batches = d;
+                }
+            });
+        }
         $.ajax({
             type: "GET",
             dataType: "json",
@@ -312,7 +323,7 @@ $(document).ready(function(){
     //init dropdown fields
     $('.ui.multiple.dropdown').dropdown();
 
-    $('.ui.accordion').accordion();
+    $('.ui.accordion').accordion({exclusive : false});
     //init search fields
     $('.ui.search')
     .search({
