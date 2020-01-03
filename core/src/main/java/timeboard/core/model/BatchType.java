@@ -29,7 +29,7 @@ package timeboard.core.model;
 public enum BatchType {
     BILL("Bill"),
     DELIVERY("Delivery"),
-    INPUT("Inupt"),
+    INPUT("Input"),
     SCHEDULING("Scheduling"),
     GROUP("Group"),
     SPRINT("Sprint");

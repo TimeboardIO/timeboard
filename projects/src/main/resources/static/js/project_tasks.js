@@ -1,4 +1,5 @@
 const currentProjectID = $("meta[property='tasks']").attr('project');
+const currentBatchType = $("meta[property='tasks']").attr('batchType');
 
 // TASK EDIT/CREATE MODAL VUEJS COMPONENT
 Vue.component('task-modal', {
@@ -309,8 +310,9 @@ let app = new Vue({
 //Initialization
 $(document).ready(function(){
     //init dropdown fields
-     $('.ui.multiple.dropdown').dropdown();
+    $('.ui.multiple.dropdown').dropdown();
 
+    $('.ui.accordion').accordion();
     //init search fields
     $('.ui.search')
     .search({

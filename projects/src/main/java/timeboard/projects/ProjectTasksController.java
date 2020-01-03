@@ -88,6 +88,31 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
+        model.addAttribute("batchType", "Default");
+        return "project_tasks.html";
+    }
+
+
+    @GetMapping("/tasks/group/{batchType}")
+    protected String listTasksGroupByBatchType(
+            TimeboardAuthentication authentication,
+            @PathVariable Long projectID, @PathVariable String batchType, Model model) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+
+        final Task task = new Task();
+        final Project project = this.projectService.getProjectByID(actor, projectID);
+
+        BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
+        model.addAttribute("batchType", batchType);
+        model.addAttribute("batchList", this.projectService.getBatchList(actor, project, javaBatchType));
+
+        model.addAttribute("task", new TaskForm(task));
+        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("sync_plugins", this.projectImportServiceList);
+
+        fillModel(model, actor, project);
+
         return "project_tasks.html";
     }
 
