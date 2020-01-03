@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
@@ -42,9 +43,9 @@ import java.util.Optional;
 
 
 /**
- * Display Organization details form.
+ * Display Organization members form.
  *
- * <p>Ex : /org/config?id=
+ * <p>Ex : /org/members
  */
 @Controller
 @RequestMapping("/org/members")
@@ -54,12 +55,12 @@ public class OrganizationMembersController {
     public OrganizationService organizationService;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model viewModel) {
+    protected String handleGet(TimeboardAuthentication authentication,  Model viewModel) {
 
         final Account actor = authentication.getDetails();
 
         final Optional<Organization> organization =
-                this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
+                this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
         if(organization.isPresent()) {
             viewModel.addAttribute("members", organization.get().getMembers());

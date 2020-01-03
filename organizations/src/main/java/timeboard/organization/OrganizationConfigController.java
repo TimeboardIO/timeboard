@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.TimeboardAuthentication;
@@ -57,7 +58,7 @@ import java.util.Optional;
  * <p>Ex : /org/config?id=
  */
 @Controller
-@RequestMapping("/org/config")
+@RequestMapping("/org/setup")
 public class OrganizationConfigController {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -76,9 +77,7 @@ public class OrganizationConfigController {
 
         final Account actor = authentication.getDetails();
 
-        long id = Long.parseLong(request.getParameter("orgID"));
-
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, id);
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
         final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
         final List<TaskType> taskTypes = this.projectService.listTaskType();
@@ -99,8 +98,7 @@ public class OrganizationConfigController {
         final Account actor = authentication.getDetails();
 
         String action = request.getParameter("action");
-        long id = Long.parseLong(request.getParameter("orgID"));
-        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, id);
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
         switch (action) {
             case "CONFIG":

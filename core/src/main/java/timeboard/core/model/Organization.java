@@ -122,6 +122,16 @@ public class Organization {
         this.setup = setup;
     }
 
+
+    /**
+     * Test if current org is public
+     * @return true if setup contain key SETUP_PUBLIC with "true" as value
+     */
+    @Transient
+    public boolean isPublicOrganisation(){
+        return this.getSetup().containsKey(SETUP_PUBLIC) && this.getSetup().get(SETUP_PUBLIC).equals("true");
+    }
+
     @Transient
     public List<MembershipRole> getAccountRoles(Account target) {
         return this.getMembers()

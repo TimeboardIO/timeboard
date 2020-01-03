@@ -182,9 +182,7 @@ public class Account implements Serializable {
     @Transient
     public boolean isMemberOf(final Optional<Organization> orgToTest) {
         if(orgToTest.isPresent()) {
-            if(orgToTest.get().getSetup().containsKey(Organization.SETUP_PUBLIC)
-                &&
-                    orgToTest.get().getSetup().get(Organization.SETUP_PUBLIC).equals("true")){
+            if(orgToTest.get().isPublicOrganisation()){
                 return true;
             }
 
