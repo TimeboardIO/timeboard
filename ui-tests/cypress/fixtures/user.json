@@ -1,4 +1,5 @@
 {
-  "login": "user",
-  "password": "password"
+  "login": "changeme",
+  "password": "changeme",
+  "email": "changeme"
 }

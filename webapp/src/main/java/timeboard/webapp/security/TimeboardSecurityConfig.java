@@ -97,9 +97,6 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .anyRequest()
                     .authenticated()
-                        //.and()
-                        //    .formLogin()
-                        //    .defaultSuccessUrl(HomeController.URI).permitAll()
 
                         .and()
                             .oauth2Login()

@@ -26,6 +26,7 @@ package timeboard.projects;
  * #L%
  */
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +60,7 @@ public class ProjectsController {
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
         final Account actor = authentication.getDetails();
         List<Project> allActorProjects = this.projectService.listProjects(actor);
+        Collections.reverse(allActorProjects);
         if (allActorProjects.size() > 4) {
             allActorProjects = allActorProjects.subList(0, 4);
         }

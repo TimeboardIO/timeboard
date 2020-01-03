@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -30,6 +30,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan("timeboard.organizations")
+@ComponentScan("timeboard.organization")
 public class OrganizationsConfiguration {
 }

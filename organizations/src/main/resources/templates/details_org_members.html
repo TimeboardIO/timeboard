@@ -30,7 +30,7 @@
             <a th:text="${parent.screenName}" th:href="@{${'/org/'+tab}(orgID=${parent.id})}" class="ui basic label"> </a>
         </div>
 
-        <a th:text="${organization.screenName}" class="ui horizontal divider" >Name</a>
+        <a th:text="${organization.name}" class="ui horizontal divider" >Name</a>
         <div v-for="member  in members " v-if="member.isOrganization == true" class="ui left labeled primary button" tabindex="0">
             <a  v-bind:href="baseURL+'?orgID='+member.id" class="ui basic label">
                 {{member.screenName}}
