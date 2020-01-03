@@ -163,14 +163,37 @@
                 <div class="ui orange label item" th:if="${import} > 0">
                     <i class="sync icon rotating"></i> Sync with Jira in progress
                 </div>
+
+                <div class="ui dropdown item" tabindex="0" id="view">
+                    <i class="eye icon"></i>
+                    <div class="title" >Default</div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu transition hidden" tabindex="-1">
+                        <a class="item" th:href="@{/select}">
+                            Default
+                        </a>
+                        <a class="item"  th:each="type: ${allProjectBatchTypes}"
+                                th:text="${type.label}"
+                        ></a>
+
+                    </div>
+                </div>
+
+
             </div>
             <script type="text/javascript">
                 $(document).ready(function(){
-                    $('#import').dropdown({
+                    $('#import, #view').dropdown({
                         clearable: true
                     });
                 });
             </script>
+
+
+
+
+
+
         </div>
 
         <!-- Filters-->
