@@ -37,7 +37,6 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;

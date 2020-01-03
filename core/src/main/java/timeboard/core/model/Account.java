@@ -33,10 +33,7 @@ import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table
@@ -66,9 +63,6 @@ public class Account implements Serializable {
     @Column(nullable = true, unique = true)
     private String remoteSubject;
 
-    @Column
-    private Boolean isOrganization = false;
-
 
     @Column
     private String localLogin;
@@ -83,17 +77,17 @@ public class Account implements Serializable {
     private Map<String, String> externalIDs;
 
 
-    @OneToMany(targetEntity = AccountHierarchy.class,
-            mappedBy = "organization",
+    @OneToMany(targetEntity = OrganizationMembership.class,
+            mappedBy = "member",
             orphanRemoval = true,
             cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER
     )
-    private Set<AccountHierarchy> members;
+    private Set<OrganizationMembership> organizations;
 
     public Account() {
         this.externalIDs = new HashMap<>();
-        this.isOrganization = false;
+        this.organizations = new HashSet<>();
     }
 
 
@@ -106,6 +100,16 @@ public class Account implements Serializable {
         this.accountCreationTime = accountCreationTime;
         this.beginWorkDate = beginWorkDate;
         this.externalIDs = new HashMap<>();
+    }
+
+
+
+    public Set<OrganizationMembership> getOrganizations() {
+        return organizations;
+    }
+
+    public void setOrganizations(Set<OrganizationMembership> organizations) {
+        this.organizations = organizations;
     }
 
     public long getId() {
@@ -164,21 +168,7 @@ public class Account implements Serializable {
         this.email = email;
     }
 
-    public boolean getIsOrganization() {
-        if(this.isOrganization == null){
-            return false;
-        }else {
-            return isOrganization;
-        }
-    }
 
-    public void setIsOrganization(Boolean isOrganization) {
-        this.isOrganization = isOrganization;
-    }
-
-    public Set<AccountHierarchy> getMembers() {
-        return members;
-    }
 
     public String getLocalLogin() {
         return localLogin;
@@ -211,12 +201,19 @@ public class Account implements Serializable {
 
     @Transient
     public String getScreenOrgName() {
-        if (this.isOrganization != null && this.isOrganization) {
-            return this.getName();
-        }
-        return "My Organization";
+        return this.getName();
     }
 
+    @Transient
+    public boolean isMemberOf(final Optional<Organization> orgToTest) {
+        if(orgToTest.isPresent()) {
+            return orgToTest.get().getMembers()
+                    .stream().filter(om -> om.getMember().getId() == this.getId())
+                    .count() >= 1;
+        }else{
+            return false;
+        }
+    }
 
     public Map<String, String> getExternalIDs() {
         return externalIDs;

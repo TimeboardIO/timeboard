@@ -40,6 +40,7 @@ import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import javax.persistence.*;
@@ -126,7 +127,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Account> searchUserByEmail(final Account actor, final String email, final Account org) throws BusinessException {
+    public List<Account> searchUserByEmail(final Account actor, final String email, final Organization org) throws BusinessException {
 
         TypedQuery<Account> q = em
                 .createQuery(

@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -43,7 +43,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

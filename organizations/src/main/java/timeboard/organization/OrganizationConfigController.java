@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -40,8 +40,8 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DefaultTask;
+import timeboard.core.model.Organization;
 import timeboard.core.model.TaskType;
-
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +78,7 @@ public class OrganizationConfigController {
 
         long id = Long.parseLong(request.getParameter("orgID"));
 
-        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, id);
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, id);
 
         final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
         final List<TaskType> taskTypes = this.projectService.listTaskType();
@@ -100,7 +100,7 @@ public class OrganizationConfigController {
 
         String action = request.getParameter("action");
         long id = Long.parseLong(request.getParameter("orgID"));
-        Optional<Account> organization = this.organizationService.getOrganizationByID(actor, id);
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, id);
 
         switch (action) {
             case "CONFIG":

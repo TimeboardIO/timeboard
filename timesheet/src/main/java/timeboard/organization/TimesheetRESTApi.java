@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -42,7 +42,6 @@ import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
-
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;

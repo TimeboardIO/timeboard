@@ -30,6 +30,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.UserException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import java.util.List;
@@ -74,7 +75,7 @@ public interface UserService extends UserDetailsService {
      * @param organization organization
      * @return list of users
      */
-    List<Account> searchUserByEmail(final Account actor, String prefix, Account organization) throws BusinessException;
+    List<Account> searchUserByEmail(final Account actor, String prefix, Organization organization) throws BusinessException;
 
 
     /**

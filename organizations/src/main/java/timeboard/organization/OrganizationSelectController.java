@@ -1,8 +1,8 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
- * webui
+ * webapp
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.timesheet;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,42 +30,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Organization;
 
-
-import java.util.List;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
-
-/**
- * Display Organization details form.
- *
- * <p>Ex : /org/config?id=
- */
 @Controller
-@RequestMapping("/org/members")
-public class OrganizationMembersController {
+@RequestMapping(OrganizationSelectController.URI)
+public class OrganizationSelectController {
+
+    public static final String URI = "/select";
+    public static final String COOKIE_NAME = "org";
 
     @Autowired
-    public OrganizationService organizationService;
+    private OrganizationService organizationService;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model viewModel) {
+    public String selectOrganisation(TimeboardAuthentication authentication,
+                                     HttpServletRequest req, TimeboardAuthentication p, Model model){
 
-        final Account actor = authentication.getDetails();
-        final Optional<Account> organization =
-                this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
-        final List<Account> members = this.organizationService.getMembers(actor, organization.get());
 
-        viewModel.addAttribute("roles", MembershipRole.values());
-        viewModel.addAttribute("members", members);
-        viewModel.addAttribute("organization", organization.get());
+        model.addAttribute("organizations", authentication.getDetails().getOrganizations());
 
-        return "details_org_members";
+        return "org_select";
+    }
+
+    @PostMapping
+    public String selectOrganisation(TimeboardAuthentication authentication,
+                                     @ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
+
+        final Optional<Organization> selectedOrg =
+                this.organizationService.getOrganizationByID(authentication.getDetails(), selectedOrgID);
+
+        if(selectedOrg.isPresent()) {
+            final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));
+            res.addCookie(orgCookie);
+        }
+        return "redirect:/home";
     }
 }

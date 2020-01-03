@@ -40,8 +40,8 @@ import timeboard.plugin.project.sync.github.GithubPluginConfiguration;
 import timeboard.projects.ProjectsConfiguration;
 import timeboard.reports.ReportsConfiguration;
 import timeboard.theme.ThemeConfiguration;
-import timeboard.timesheet.OrganizationsConfiguration;
-import timeboard.timesheet.TimesheetConfiguration;
+import timeboard.organization.OrganizationsConfiguration;
+import timeboard.organization.TimesheetConfiguration;
 
 @Configuration
 @Import({

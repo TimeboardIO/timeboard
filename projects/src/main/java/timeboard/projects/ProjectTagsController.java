@@ -40,7 +40,6 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectTag;
 
-
 import java.util.List;
 import java.util.stream.Collectors;
 

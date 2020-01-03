@@ -40,10 +40,10 @@ import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.ui.CssService;
 import timeboard.core.ui.JavascriptService;
 import timeboard.core.ui.NavigationEntryRegistryService;
-
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
@@ -117,7 +117,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
     private void fillModelWithOrganization(Account account, ModelMap modelMap, Long orgaID) {
         modelMap.put("orgID", orgaID);
-        Optional<Account> organisation = organizationService.getOrganizationByID(account, orgaID);
+        Optional<Organization> organisation = organizationService.getOrganizationByID(account, orgaID);
         if(organisation.isPresent()){
             modelMap.put("currentOrg", organisation.get());
         }else{

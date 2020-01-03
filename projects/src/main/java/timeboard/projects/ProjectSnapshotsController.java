@@ -41,9 +41,9 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectSnapshotService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.model.ValueHistory;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
+import timeboard.core.model.ValueHistory;
 
 import java.io.Serializable;
 import java.text.ParseException;

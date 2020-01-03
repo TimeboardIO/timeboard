@@ -1,8 +1,8 @@
-package timeboard.webapp;
+package timeboard.organization;
 
 /*-
  * #%L
- * webapp
+ * webui
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,53 +30,44 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
+import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Organization;
 
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Optional;
 
-@Controller
-@RequestMapping(OrganizationSelectController.URI)
-public class OrganizationSelectController {
 
-    public static final String URI = "/select";
-    public static final String COOKIE_NAME = "org";
+/**
+ * Display Organization details form.
+ *
+ * <p>Ex : /org/config?id=
+ */
+@Controller
+@RequestMapping("/org/members")
+public class OrganizationMembersController {
 
     @Autowired
-    private OrganizationService organizationService;
+    public OrganizationService organizationService;
 
     @GetMapping
-    public String selectOrganisation(TimeboardAuthentication authentication,
-                                     HttpServletRequest req, TimeboardAuthentication p, Model model){
+    protected String handleGet(TimeboardAuthentication authentication, Model viewModel) {
 
-        final List<Account> orgs =
-                this.organizationService.getParents(authentication.getDetails(), authentication.getDetails());
-        orgs.add(authentication.getDetails());
-        model.addAttribute("organizations", orgs);
+        final Account actor = authentication.getDetails();
 
-        return "org_select";
-    }
+        final Optional<Organization> organization =
+                this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
 
-    @PostMapping
-    public String selectOrganisation(TimeboardAuthentication authentication,
-                                     @ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
-
-        final Optional<Account> selectedOrg =
-                this.organizationService.getOrganizationByID(authentication.getDetails(), selectedOrgID);
-
-        if(selectedOrg.isPresent()) {
-            final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));
-            res.addCookie(orgCookie);
+        if(organization.isPresent()) {
+            viewModel.addAttribute("members", organization.get().getMembers());
         }
-        return "redirect:/home";
+
+        viewModel.addAttribute("roles", MembershipRole.values());
+        viewModel.addAttribute("organization", organization.get());
+
+        return "details_org_members";
     }
 }

@@ -28,10 +28,9 @@ package timeboard.core.api;
 
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.model.AccountHierarchy;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Organization;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -39,24 +38,26 @@ import java.util.Optional;
  */
 public interface OrganizationService {
 
-    Account createOrganization(final Account actor, final Account organization) throws BusinessException;
+    Organization createOrganization(Account actor,
+                                    String organizationName) throws BusinessException;
 
-    Optional<Account> getOrganizationByID(final Account actor, long id);
+    Optional<Organization> getOrganizationByID(final Account actor,
+                                               long id);
 
-    Account updateOrganization(final Account actor, Account organization);
+    Organization updateOrganization(final Account actor,
+                                    Organization organization);
 
-    List<Account> getParents(final Account actor, Account organization);
+    Optional<Organization> removeMember(Account actor,
+                                        Organization organization,
+                                        Account member) throws BusinessException;
 
-    List<Account> getMembers(final Account actor, Account organization);
+    Optional<Organization> addMember(Account actor,
+                                     Organization organization,
+                                     Account member) throws BusinessException;
 
-    MembershipRole getRoleInOrganization(final Account actor, final Account target, Account organization);
+    Optional<Organization> updateMemberRole(Account actor,
+                                            Organization organization,
+                                            Account member,
+                                            MembershipRole role) throws BusinessException;
 
-    AccountHierarchy removeMember(Account actor, Account organization, Account member) throws BusinessException;
-
-    AccountHierarchy addMember(Account actor, Account organization, Account member) throws BusinessException;
-
-    AccountHierarchy updateMemberRole(Account actor,
-                                      Account organization,
-                                      Account member,
-                                      MembershipRole role) throws BusinessException;
 }

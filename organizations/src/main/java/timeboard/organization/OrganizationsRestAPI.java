@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -40,9 +40,9 @@ import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
-import timeboard.core.model.AccountHierarchy;
 import timeboard.core.model.MembershipRole;
-
+import timeboard.core.model.Organization;
+import timeboard.core.model.OrganizationMembership;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -83,24 +83,22 @@ public class OrganizationsRestAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
 
-        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         if (!organization.isPresent()) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Project does not exists or you don't have enough permissions to access it.");
         }
 
-        //final List<Account> members = this.organizationService.getMembers(actor, organization);
 
-        final Set<AccountHierarchy> members = organization.get().getMembers();
+        final Set<OrganizationMembership> members = organization.get().getMembers();
         final List<MemberWrapper> result = new ArrayList<>();
 
-        for (AccountHierarchy member : members) {
+        for (OrganizationMembership member : members) {
 
             result.add(new MemberWrapper(
                     member.getMember().getId(),
                     member.getMember().getScreenName(),
-                    member.getMember().getIsOrganization(),
                     (member.getRole() != null ? member.getRole().name() : "")
             ));
         }
@@ -122,7 +120,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -132,11 +130,12 @@ public class OrganizationsRestAPI {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
 
-        final Optional<Account> member = this.organizationService.getOrganizationByID(actor, memberID);
+        final Optional<Organization> member = this.organizationService.getOrganizationByID(actor, memberID);
 
         try {
-            AccountHierarchy ah = organizationService.addMember(actor, organization.get(), member.get());
-            return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(ah)));
+            //Optional<Organization> ah = organizationService.addMember(actor, organization.get(), member.get());
+
+            return ResponseEntity.ok(HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -158,7 +157,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -167,7 +166,8 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
-        final Optional<Account> member = this.organizationService.getOrganizationByID(actor, memberID);
+
+        final Account member = this.userService.findUserByID(memberID);
 
 
         final String strRole = request.getParameter("role");
@@ -179,8 +179,8 @@ public class OrganizationsRestAPI {
         }
 
         try {
-            AccountHierarchy ah = organizationService.updateMemberRole(actor, organization.get(), member.get(), role);
-            return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(new MemberWrapper(ah)));
+            Optional<Organization> ah = organizationService.updateMemberRole(actor, organization.get(), member, role);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -201,7 +201,7 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Optional<Account> organization = this.organizationService.getOrganizationByID(actor, orgID);
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -232,17 +232,15 @@ public class OrganizationsRestAPI {
         public MemberWrapper() {
         }
 
-        public MemberWrapper(AccountHierarchy h) {
+        public MemberWrapper(OrganizationMembership h) {
             this.orgID = h.getMember().getId();
             this.screenName = h.getMember().getScreenName();
-            this.isOrganization = h.getMember().getIsOrganization();
             this.role = h.getRole().name();
         }
 
-        public MemberWrapper(Long orgID, String screenName, boolean isOrganization, String role) {
+        public MemberWrapper(Long orgID, String screenName, String role) {
             this.orgID = orgID;
             this.screenName = screenName;
-            this.isOrganization = isOrganization;
             this.role = role;
         }
 

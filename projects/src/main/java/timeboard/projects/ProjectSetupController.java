@@ -46,7 +46,6 @@ import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectMembership;
 
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
