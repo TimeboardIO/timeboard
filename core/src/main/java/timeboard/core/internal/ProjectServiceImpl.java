@@ -905,6 +905,21 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList();
     }
 
+
+    @Override
+    public List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
+        TypedQuery<BatchType> q = em.createQuery("select distinct b.type from Batch b where b.project = :project", BatchType.class);
+        q.setParameter("project", project);
+        return q.getResultList();
+    }
+
     @Override
     public Batch getBatchById(Account account, long id) throws BusinessException {
 

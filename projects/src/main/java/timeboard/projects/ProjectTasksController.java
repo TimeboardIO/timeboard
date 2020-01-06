@@ -122,7 +122,7 @@ public class ProjectTasksController {
         model.addAttribute("taskTypes", this.projectService.listTaskType());
         model.addAttribute("allTaskStatus", TaskStatus.values());
         model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
-        model.addAttribute("allProjectBatchTypes", BatchType.values());
+        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());
