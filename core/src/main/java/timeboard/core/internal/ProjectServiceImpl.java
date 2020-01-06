@@ -399,7 +399,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setProject(project);
         em.flush();
 
-        LOGGER.info("Task " + taskName + " created by " + actor.getName() + " in project " + project.getName());
+        LOGGER.info("Task " + taskName + " created by " + actor.getScreenName() + " in project " + project.getName());
 
         return newTask;
     }
