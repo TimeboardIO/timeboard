@@ -23,9 +23,9 @@ Vue.component('tmodal', {
 
 
 Vue.component('tmodal-confirm', {
-    props: ['title', 'id', 'text', 'icon' ],
+    props: ['title', 'text', 'icon' ],
     template: `
-        <div class="ui basic modal">
+        <div v-bind:id="id" class="ui basic modal">
             <div class="ui icon header">
                 <i :class="icon" class="icon"></i>
                 {{ title }}
@@ -45,15 +45,42 @@ Vue.component('tmodal-confirm', {
             </div>
         </div>
     `,
-    data: {
-        id : Math.floor(Math.random() * 10000)
+    data: function () {
+        return {
+            id: Math.floor(Math.random() * 10000),
+            callback : function () { },
+        }
     },
     methods: {
         yes : function () {
-
+            this.callback();
+            this.close();
         },
         no : function () {
+            this.close();
 
+        },
+        confirm :  function (element, callback) {
+
+            let self = this;
+
+            this.text = element;
+
+            $('#'+this.id).modal({ detachable : true, centered: true }).modal({
+                onDeny    : function(){
+                    self.close();
+                },
+                onApprove : function() {
+                    self.callback();
+                    self.close();
+                }
+            }).modal('show');
+
+            this.callback = callback;
+        },
+        close : function () {
+            $('#'+this.id).modal({ detachable : true, centered: true }).modal('hide');
+            this.callback = function () { }
         }
     }
 });
