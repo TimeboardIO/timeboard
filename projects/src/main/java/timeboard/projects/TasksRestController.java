@@ -89,7 +89,7 @@ public class TasksRestController {
         }
 
         try {
-            project = this.projectService.getProjectByID(actor, projectID);
+            project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         } catch (BusinessException e ) {
             // just handling exception
         }

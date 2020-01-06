@@ -101,7 +101,7 @@ public class ProjectTasksController {
         final Account actor = authentication.getDetails();
 
         final Task task = new Task();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
         model.addAttribute("batchType", batchType);
