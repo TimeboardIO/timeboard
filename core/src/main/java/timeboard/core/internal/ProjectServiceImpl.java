@@ -130,7 +130,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
         public Project getProjectByID(Account actor, Long orgID, Long projectId) {
-        Project data = em.createNamedQuery(Project.PROJECT_BET_BY_ID, Project.class)
+        Project data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
                 .setParameter("user", actor)
                 .setParameter("projectID", projectId)
                 .setParameter("orgID", orgID)

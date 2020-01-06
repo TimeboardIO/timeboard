@@ -36,15 +36,13 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.internal.events.TimesheetEvent;
-import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Account;
-import timeboard.core.model.Project;
-import timeboard.core.model.ValidatedTimesheet;
+import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.Calendar;
 
 
 @Component
@@ -64,7 +62,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public void validateTimesheet(Account actor, Account accountTimesheet,  int year, int week) throws TimesheetException {
+    public void validateTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException {
 
 
         //check if validation is possible
@@ -132,7 +130,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.persist(validatedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService, currentOrg));
 
         LOGGER.info("Week " + week + " validated for user" + accountTimesheet.getName() + " by user " + actor.getName());
 
