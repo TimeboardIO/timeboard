@@ -29,6 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import java.util.Date;
@@ -46,7 +47,7 @@ public interface TimesheetService {
      * @param week             timesheet week
      * @return true if timesheet is validate else, false.
      */
-    void validateTimesheet(Account actor, Account accountTimesheet, int year, int week) throws TimesheetException;
+    void validateTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException;
 
     /**
      * Is timesheet validated.
