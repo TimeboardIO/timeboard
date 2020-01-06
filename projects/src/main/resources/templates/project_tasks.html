@@ -180,14 +180,7 @@
                     </div>
                 </div>
 
-
             </div>
-
-
-
-
-
-
 
         </div>
 
@@ -308,7 +301,7 @@
                 </div>
                 <div class="content">
                     <!-- Datatable component -->
-                    <data-table v-bind:config="table">
+                    <data-table v-bind:config="tableByBatch[batch.batchID]">
                         <template v-slot:name="{row}">
                             {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
                             {{row.taskComments}}</p>

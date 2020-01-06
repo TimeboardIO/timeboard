@@ -165,7 +165,8 @@ let app = new Vue({
             data: [],
             name: 'pending tasks',
             configurable : true
-        }
+        },
+        tableByBatch : {}
     },
     methods: {
         showGraphModal: function(projectID, task, event){
@@ -289,6 +290,22 @@ let app = new Vue({
     created: function () {
         // copying table config to pending task table config
         this.tablePending.cols = this.table.cols;
+
+        let self = this;
+        if (currentBatchType !== 'Default') {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "/api/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
+                success: function (d) {
+                    self.batches = d;
+                    d.forEach(function(batch) {
+                        self.tableByBatch[batch.batchID] = Object.assign({}, self.table );
+                    });
+                }
+            });
+        }
+
     },
     updated: function () {
         // ! \\ create a infinite loop
@@ -296,22 +313,18 @@ let app = new Vue({
     },
     mounted: function () {
         let self = this;
-        if (currentBatchType !== 'Default'){
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                url: "/api/tasks/batches?project="+currentProjectID+"&batchType="+currentBatchType,
-                success: function (d) {
-                    self.batches = d;
-                }
-            });
-        }
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/api/tasks?project="+currentProjectID,
+            url: "/api/tasks?project=" + currentProjectID,
             success: function (d) {
                 self.table.data = d;
+                if(currentBatchType !== 'Default') {
+                    // Spliting data by batch
+                    self.batches.forEach(function(batch) {
+                        self.tableByBatch[batch.batchID].data = d.filter(row => { return row.batchIDs.some(b => b === batch.batchID) });
+                    });
+                }
                 self.tablePending.data = d.filter(r => r.status === 'PENDING');
                 $('.ui.dimmer').removeClass('active');
             }
