@@ -270,7 +270,7 @@
                 <i v-for="item in row.batchNames"> {{item}} </i>
             </template>
             <template v-slot:type="{row}">
-                <div v-if="row.typeName" class="ui blue horizontal label"> {{row.typeName}} </div>
+                <div v-if="row.typeName !== '' " class="ui blue horizontal label"> {{row.typeName}} </div>
             </template>
             <template v-slot:status="{row}">
                 <div class="ui small primary horizontal label"> {{row.statusName}} </div>
@@ -324,7 +324,7 @@
                             <i v-for="item in row.batchNames"> {{item}} </i>
                         </template>
                         <template v-slot:type="{row}">
-                            <div class="ui blue green horizontal label"> {{row.typeName}} </div>
+                            <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
                         </template>
                         <template v-slot:status="{row}">
                             <div class="ui small primary horizontal label"> {{row.statusName}} </div>
@@ -370,7 +370,7 @@
                         <i v-for="item in row.batchNames"> {{item}} </i>
                     </template>
                     <template v-slot:type="{row}">
-                        <div class="ui blue green horizontal label"> {{row.typeName}} </div>
+                        <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
                     </template>
                     <template v-slot:status="{row}">
                         <div class="ui small primary horizontal label"> {{row.statusName}} </div>

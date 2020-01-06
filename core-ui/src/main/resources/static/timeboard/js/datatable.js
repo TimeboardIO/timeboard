@@ -20,7 +20,7 @@ Vue.component('data-table', {
                 </tbody>
                 <tmodal 
                     v-bind:title="'Column config '+config.name"
-                    v-bind:id="'configModal'+config.name">
+                    v-bind:id=" 'configModal' + config.name.replace(/ /g,'') ">
                     <template v-slot:content>
                         <table class="ui celled table">
                             <thead>
@@ -118,7 +118,7 @@ Vue.component('data-table', {
             this.sortOrders[key] = this.sortOrders[key] * -1
         },
         showConfigModal: function() {
-            $('#configModal'+this.config.name).modal({
+            $( '#configModal' + this.config.name.replace(/ /g, '' )).modal({
                 onApprove : function($element) {
 
                 },
