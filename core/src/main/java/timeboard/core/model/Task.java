@@ -103,7 +103,9 @@ public class Task extends AbstractTask implements Serializable {
     }
 
     public void addBatch(Batch batch) {
-        if(batches == null) this.batches = new HashSet<Batch>();
+        if(batches == null) {
+            this.batches = new HashSet<Batch>();
+        }
         this.batches.add(batch);
     }
 

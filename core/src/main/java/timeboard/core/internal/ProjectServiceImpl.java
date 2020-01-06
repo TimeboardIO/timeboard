@@ -1018,7 +1018,9 @@ public class ProjectServiceImpl implements ProjectService {
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
-        TypedQuery<Batch> q = em.createQuery("select distinct b from Batch b join b.tasks t where t.project = :project and b.type = :type", Batch.class);
+        TypedQuery<Batch> q = em.createQuery(
+                "select distinct b from Batch b join b.tasks t where t.project = :project and b.type = :type",
+                Batch.class);
         q.setParameter("project", project);
         q.setParameter("type", batchType);
         return q.getResultList();
