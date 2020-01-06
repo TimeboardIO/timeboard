@@ -49,9 +49,9 @@ public interface ReportService {
 
     void deleteReportByID(Account actor, Long reportId);
 
-    List<ProjectWrapper> findProjects(Account actor, List<String> expressions);
+    List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions);
 
-    List<ProjectWrapper> findProjects(Account actor, Report report);
+    List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report);
 
 
     class ProjectWrapper {

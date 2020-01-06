@@ -42,7 +42,7 @@ public interface ProjectExportService {
 
     String getName();
 
-    void export(Account actor, long projectID, OutputStream output) throws IOException, BusinessException;
+    void export(Account actor, long orgID, long projectID, OutputStream output) throws IOException, BusinessException;
 
     String getExtension();
 }

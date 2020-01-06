@@ -80,7 +80,7 @@ public class ProjectTasksController {
         final Account actor = authentication.getDetails();
 
         final Task task = new Task();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("task", new TaskForm(task));
         model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
@@ -140,7 +140,7 @@ public class ProjectTasksController {
 
         model.addAttribute("task", new TaskForm(task));
 
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         fillModel(model, actor, project);
 
@@ -156,7 +156,7 @@ public class ProjectTasksController {
             @RequestBody MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
 
@@ -179,8 +179,8 @@ public class ProjectTasksController {
 
         Account actor = authentication.getDetails();
 
-        long id = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(actor, id);
+        long projectID = Long.parseLong(request.getParameter("projectID"));
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("project", project);

@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -36,9 +36,8 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 
-
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
+import java.util.HashMap;
 
 @Controller
 @RequestMapping("/org")
@@ -52,10 +51,7 @@ public class OrganizationCreateController {
                                 HttpServletRequest request) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        Account organization = new Account(request.getParameter("organizationName"), null, "", new Date(), new Date());
-        organization.setRemoteSubject("Timeboard/Organization/" + System.nanoTime());
-        organization.setName(request.getParameter("organizationName"));
-        this.organizationService.createOrganization(actor, organization);
+        this.organizationService.createOrganization(actor, request.getParameter("organizationName"), new HashMap<>());
         return "redirect:/select";
     }
 

@@ -40,7 +40,6 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectTag;
 
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,7 +56,7 @@ public class ProjectTagsController {
                           @PathVariable Long projectID, Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
 
@@ -68,7 +67,7 @@ public class ProjectTagsController {
     public ResponseEntity<List<ProjectTagWrapper>> listTags(TimeboardAuthentication authentication,
                                                             @PathVariable Long projectID) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new ProjectTagWrapper(projectTag)).collect(Collectors.toList()));
     }
 
@@ -76,7 +75,7 @@ public class ProjectTagsController {
     public ResponseEntity<List<ProjectTagWrapper>> deleteTag(TimeboardAuthentication authentication,
                                                              @PathVariable Long projectID, @PathVariable Long tagID) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getTags().removeIf(projectTag -> projectTag.getId().equals(tagID));
         this.projectService.updateProject(actor, project);
         return this.listTags(authentication, projectID);
@@ -89,7 +88,7 @@ public class ProjectTagsController {
                                                             @ModelAttribute ProjectTag tag) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getTags().stream()
                 .filter(projectTag -> projectTag.getId().equals(tagID))
                 .forEach(projectTag -> {
@@ -105,7 +104,7 @@ public class ProjectTagsController {
                                                              @PathVariable Long projectID,
                                                              @ModelAttribute ProjectTag tag) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         tag.setProject(project);
         project.getTags().add(tag);
         this.projectService.updateProject(actor, project);

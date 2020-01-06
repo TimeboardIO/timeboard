@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -33,19 +33,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Organization;
 
-
-import java.util.List;
 import java.util.Optional;
 
 
 /**
- * Display Organization details form.
+ * Display Organization members form.
  *
- * <p>Ex : /org/config?id=
+ * <p>Ex : /org/members
  */
 @Controller
 @RequestMapping("/org/members")
@@ -55,15 +53,18 @@ public class OrganizationMembersController {
     public OrganizationService organizationService;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model viewModel) {
+    protected String handleGet(TimeboardAuthentication authentication,  Model viewModel) {
 
         final Account actor = authentication.getDetails();
-        final Optional<Account> organization =
-                this.organizationService.getOrganizationByID(actor, ThreadLocalStorage.getCurrentOrganizationID());
-        final List<Account> members = this.organizationService.getMembers(actor, organization.get());
+
+        final Optional<Organization> organization =
+                this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
+
+        if(organization.isPresent()) {
+            viewModel.addAttribute("members", organization.get().getMembers());
+        }
 
         viewModel.addAttribute("roles", MembershipRole.values());
-        viewModel.addAttribute("members", members);
         viewModel.addAttribute("organization", organization.get());
 
         return "details_org_members";

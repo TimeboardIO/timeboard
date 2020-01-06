@@ -41,9 +41,9 @@ public interface ProjectService {
 
     Project createProject(Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(Account owner);
+    List<Project> listProjects(Account owner, Long... org);
 
-    Project getProjectByID(Account actor, Long projectID) throws BusinessException;
+    Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
 
     Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
 

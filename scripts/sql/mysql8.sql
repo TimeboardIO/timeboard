@@ -6,21 +6,8 @@
         email varchar(255) not null,
         externalIDs TEXT,
         firstName varchar(255),
-        isOrganization bit,
-        localLogin varchar(255),
-        localPassword varchar(255),
         name varchar(255),
         remoteSubject varchar(255),
-        primary key (id)
-    ) engine=InnoDB;
-
-    create table AccountHierarchy (
-       id bigint not null,
-        endDate datetime(6),
-        role varchar(255),
-        startDate datetime(6) not null,
-        member_id bigint,
-        organization_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -128,6 +115,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         organizationID bigint,
@@ -135,6 +124,23 @@
         value double precision,
         account_id bigint,
         task_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table Organization (
+       id bigint not null,
+        createdDate datetime(6),
+        enabled bit,
+        name varchar(255) not null,
+        setup TEXT,
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table OrganizationMembership (
+       id bigint not null,
+        role varchar(255),
+        member_id bigint,
+        organization_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -246,21 +252,14 @@
     alter table Account 
        add constraint UK_l1aov0mnvpvcmg0ctq466ejwm unique (remoteSubject);
 
-    alter table AccountHierarchy 
-       add constraint UK76o95xmqbunfiuaal3c86h3oc unique (organization_id, member_id);
-
     alter table Imputation 
        add constraint UKsc0a68hjsx40d6xt9yep80o7l unique (day, task_id);
 
-    alter table AccountHierarchy 
-       add constraint FKsiqpllhiyu6kby8mpjhr5u6bb 
-       foreign key (member_id) 
-       references Account (id);
+    alter table Organization 
+       add constraint UK_griwilufaypfq6nxhupb1jfrv unique (name);
 
-    alter table AccountHierarchy 
-       add constraint FKqlc8oegowh9hvnyvgdckpw6uv 
-       foreign key (organization_id) 
-       references Account (id);
+    alter table OrganizationMembership 
+       add constraint UKpaqirhkf66d2aqtd9y6w8jn0p unique (member_id, organization_id);
 
     alter table Batch 
        add constraint FK21pv4fxo1jl876oc1u31wf21n 
@@ -281,6 +280,16 @@
        add constraint FKicayo4omi1a8krucb5t7kipva 
        foreign key (account_id) 
        references Account (id);
+
+    alter table OrganizationMembership 
+       add constraint FKif7ywhi6j3a20y5ului9p2bix 
+       foreign key (member_id) 
+       references Account (id);
+
+    alter table OrganizationMembership 
+       add constraint FKevb5cud2ia1prwjdqor09er57 
+       foreign key (organization_id) 
+       references Organization (id);
 
     alter table ProjectMembership 
        add constraint FK3wl3q3i14wuy156wafo33wlas 

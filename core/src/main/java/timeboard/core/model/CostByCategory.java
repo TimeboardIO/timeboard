@@ -66,9 +66,6 @@ public class CostByCategory extends OrganizationEntity {
     }
 
     public void setAccount(Account account) throws BusinessException {
-        if (account.getIsOrganization()) {
-            throw new BusinessException("Cost By Category can't be atteched to an Organsation account");
-        }
         this.account = account;
     }
 

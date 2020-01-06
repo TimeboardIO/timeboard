@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -26,10 +26,41 @@ package timeboard.timesheet;
  * #L%
  */
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-@Configuration
-@ComponentScan("timeboard.organizations")
-public class OrganizationsConfiguration {
+import java.util.Calendar;
+import java.util.Date;
+
+
+@Component
+public class TimesheetNavigationProvider implements NavigationExtPoint {
+
+    @Override
+    public String getNavigationLabel() {
+        return "Timesheet";
+    }
+
+    @Override
+    public String getNavigationParams() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+
+        return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));
+    }
+
+    @Override
+    public String getNavigationPath() {
+        return "/timesheet";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 100;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "calendar alternate outline";
+    }
 }

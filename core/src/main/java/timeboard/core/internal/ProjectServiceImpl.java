@@ -74,22 +74,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     private DefaultTask vacationTask;
 
-    public static String generateRandomColor(Color mix) {
-        Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
 
-        // mix the color
-        if (mix != null) {
-            red = (red + mix.getRed()) / 2;
-            green = (green + mix.getGreen()) / 2;
-            blue = (blue + mix.getBlue()) / 2;
-        }
-
-        Color color = new Color(red, green, blue);
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
-    }
 
     @Transactional
     @EventListener()
@@ -118,7 +103,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
-    public Project createProject(Account owner, String projectName) throws BusinessException {
+    public Project createProject(Account owner, String projectName)  {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
         newProject.setName(projectName);
@@ -136,18 +121,19 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> listProjects(Account account) {
-        TypedQuery<Project> query = em.createNamedQuery("ListUserProjects", Project.class);
-        query.setParameter("user", account);
+    public List<Project> listProjects(Account candidate, Long... orgIDs) {
+        TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
+        query.setParameter("user", candidate);
+        query.setParameter("orgs", Arrays.asList(orgIDs));
         return query.getResultList();
     }
 
     @Override
-        public Project getProjectByID(Account actor, Long projectId) {
-        Project data = em.createQuery("select p from Project p join fetch p.members m " +
-                "where p.id = :projectID and  m.member = :user", Project.class)
+        public Project getProjectByID(Account actor, Long orgID, Long projectId) {
+        Project data = em.createNamedQuery(Project.PROJECT_BET_BY_ID, Project.class)
                 .setParameter("user", actor)
                 .setParameter("projectID", projectId)
+                .setParameter("orgID", orgID)
                 .getSingleResult();
         return data;
     }
@@ -1132,6 +1118,23 @@ public class ProjectServiceImpl implements ProjectService {
         data.setComments(comments);
 
         return data;
+    }
+
+    public static String generateRandomColor(Color mix) {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        // mix the color
+        if (mix != null) {
+            red = (red + mix.getRed()) / 2;
+            green = (green + mix.getGreen()) / 2;
+            blue = (blue + mix.getBlue()) / 2;
+        }
+
+        Color color = new Color(red, green, blue);
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 
 }
