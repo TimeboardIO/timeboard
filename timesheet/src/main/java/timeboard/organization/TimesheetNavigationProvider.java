@@ -1,8 +1,8 @@
-package timeboard.core.model;
+package timeboard.organization;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,19 +26,41 @@ package timeboard.core.model;
  * #L%
  */
 
-public enum MilestoneType {
-    BILL("Bill"),
-    DELIVERY("Delivery"),
-    INPUT("Inupt"),
-    SCHEDULING("Scheduling");
+import org.springframework.stereotype.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-    public final String label;
+import java.util.Calendar;
+import java.util.Date;
 
-    private MilestoneType(String label) {
-        this.label = label;
+
+@Component
+public class TimesheetNavigationProvider implements NavigationExtPoint {
+
+    @Override
+    public String getNavigationLabel() {
+        return "Timesheet";
     }
 
-    String getLabel() {
-        return this.label;
+    @Override
+    public String getNavigationParams() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date());
+
+        return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));
+    }
+
+    @Override
+    public String getNavigationPath() {
+        return "/timesheet";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 100;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "calendar alternate outline";
     }
 }

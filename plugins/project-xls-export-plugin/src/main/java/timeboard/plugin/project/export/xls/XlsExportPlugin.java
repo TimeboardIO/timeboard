@@ -60,9 +60,9 @@ public class XlsExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(Account actor, long projectID, OutputStream output) throws IOException, BusinessException {
+    public void export(Account actor, long orgID, long projectID, OutputStream output) throws IOException, BusinessException {
 
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
 
         String sheetName = project.getName();
 

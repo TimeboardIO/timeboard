@@ -1,8 +1,8 @@
-package timeboard.core.internal.rules.milestone;
+package timeboard.organization;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.core.internal.rules.milestone;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,28 +26,10 @@ package timeboard.core.internal.rules.milestone;
  * #L%
  */
 
-import timeboard.core.internal.rules.Rule;
-import timeboard.core.model.Account;
-import timeboard.core.model.Milestone;
-import timeboard.core.model.ProjectMembership;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.Optional;
-
-
-public class ActorIsProjectMemberByMilestone implements Rule<Milestone> {
-
-    @Override
-    public String ruleDescription() {
-        return "User is not project Owner";
-    }
-
-    @Override
-    public boolean isSatisfied(Account u, Milestone thing) {
-        final Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
-                .filter(projectMembership ->
-                        projectMembership.getMember().getId() == u.getId()
-                )
-                .findFirst();
-        return userOptional.isPresent();
-    }
+@Configuration
+@ComponentScan("timeboard.timesheet")
+public class TimesheetConfiguration {
 }

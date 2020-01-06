@@ -90,7 +90,7 @@ public class HomeController {
             }
         }
 
-        model.addAttribute("nb_projects", this.projectService.listProjects(account).size());
+        model.addAttribute("nb_projects", this.projectService.listProjects(account, authentication.getCurrentOrganization()).size());
         model.addAttribute("nb_tasks", this.projectService.listUserTasks(account).size());
         model.addAttribute("weeks", weeks);
 

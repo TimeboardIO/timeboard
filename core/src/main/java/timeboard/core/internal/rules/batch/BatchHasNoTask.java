@@ -1,8 +1,8 @@
-package timeboard.timesheet;
+package timeboard.core.internal.rules.batch;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,41 +26,19 @@ package timeboard.timesheet;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Account;
+import timeboard.core.model.Batch;
 
-import java.util.Calendar;
-import java.util.Date;
-
-
-@Component
-public class TimesheetNavigationProvider implements NavigationExtPoint {
+public class BatchHasNoTask implements Rule<Batch> {
 
     @Override
-    public String getNavigationLabel() {
-        return "Timesheet";
+    public String ruleDescription() {
+        return "Batch with tasks cannot be removed";
     }
 
     @Override
-    public String getNavigationParams() {
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-
-        return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));
-    }
-
-    @Override
-    public String getNavigationPath() {
-        return "/timesheet";
-    }
-
-    @Override
-    public int getNavigationWeight() {
-        return 100;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "calendar alternate outline";
+    public boolean isSatisfied(Account u, Batch thing) {
+        return thing.getTasks().isEmpty();
     }
 }

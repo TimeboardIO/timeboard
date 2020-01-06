@@ -106,7 +106,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(Account actor, List<String> expressions){
+    public List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions){
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -114,7 +114,7 @@ public class ReportServiceImpl implements ReportService {
                 .stream().map(filter -> expressionParser.parseExpression(filter))
                 .collect(Collectors.toList());
 
-        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor)
+        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor, orgID)
                 .stream()
                 .map(project -> wrapProjectTags(project))
                 .filter(projectWrapper -> {
@@ -132,8 +132,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(Account actor, Report report) {
-        return this.findProjects(actor, Arrays.asList(report.getFilterProject().split("\n")));
+    public List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report) {
+        return this.findProjects(actor, orgID, Arrays.asList(report.getFilterProject().split("\n")));
     }
 
     private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {

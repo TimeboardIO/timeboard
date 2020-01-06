@@ -37,8 +37,8 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -93,7 +93,7 @@ public class UsersSearchRestController {
             Project project = projectService.getProjectByIdWithAllMembers(actor, projectID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
         } else if (orgID != null) {
-            Optional<Account> org = organizationService.getOrganizationByID(actor, orgID);
+            Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
         } else {
             accounts.addAll(this.userService.searchUserByEmail(actor,  query));

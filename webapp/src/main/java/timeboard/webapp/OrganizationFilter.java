@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,13 +28,14 @@ package timeboard.webapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.model.Account;
-
+import timeboard.core.model.Organization;
+import timeboard.organization.OrganizationSelectController;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -55,9 +56,11 @@ public class OrganizationFilter implements Filter {
     private OrganizationService organizationService;
 
     private static final List<String> whitelist = new ArrayList<>();
+
     static {
         whitelist.add(OrganizationSelectController.URI);
         whitelist.add(OnboardingController.URI);
+        whitelist.add("/org/create");
         whitelist.add("/login/oauth2/code/cognito");
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2|svg)");
     }
@@ -67,9 +70,9 @@ public class OrganizationFilter implements Filter {
                          ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
 
-        if(isWhiteListed((HttpServletRequest)servletRequest)){
+        if (isWhiteListed((HttpServletRequest) servletRequest)) {
             filterChain.doFilter(servletRequest, servletResponse);
-        }else {
+        } else {
             if (processCookieExtraction(
                     (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication(),
                     (HttpServletRequest) servletRequest,
@@ -86,19 +89,25 @@ public class OrganizationFilter implements Filter {
                                             HttpServletResponse servletResponse) throws IOException {
 
         Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
-        if(orgCookie.isPresent()){
-            final Long organizationID = Long.parseLong(orgCookie.get().getValue());
-            Optional<Account> organization =
-                    this.organizationService.getOrganizationByID(authentication.getDetails(), organizationID);
+        if (orgCookie.isPresent()) {
+            try {
+                final Long organizationID = Long.parseLong(orgCookie.get().getValue());
 
-            if(organization.isPresent()){
-                ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
-            }else{
+                Optional<Organization> organization = this.organizationService
+                        .getOrganizationByID(authentication.getDetails(), organizationID);
+
+                if (organization.isPresent()) {
+                    ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
+                } else {
+                    servletResponse.sendRedirect(OrganizationSelectController.URI);
+                    return true;
+                }
+            } catch (AccessDeniedException ex) {
                 servletResponse.sendRedirect(OrganizationSelectController.URI);
                 return true;
             }
 
-        }else{
+        } else {
             servletResponse.sendRedirect(OrganizationSelectController.URI);
             return true;
         }

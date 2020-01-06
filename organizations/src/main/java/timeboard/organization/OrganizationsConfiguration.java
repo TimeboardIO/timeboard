@@ -1,8 +1,8 @@
-package timeboard.core.internal.rules.milestone;
+package timeboard.organization;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,19 +26,10 @@ package timeboard.core.internal.rules.milestone;
  * #L%
  */
 
-import timeboard.core.internal.rules.Rule;
-import timeboard.core.model.Account;
-import timeboard.core.model.Milestone;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-public class MilestoneHasNoTask implements Rule<Milestone> {
-
-    @Override
-    public String ruleDescription() {
-        return "Milestone with tasks cannot be removed";
-    }
-
-    @Override
-    public boolean isSatisfied(Account u, Milestone thing) {
-        return thing.getTasks().isEmpty();
-    }
+@Configuration
+@ComponentScan("timeboard.organization")
+public class OrganizationsConfiguration {
 }

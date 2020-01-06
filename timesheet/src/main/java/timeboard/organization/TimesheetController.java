@@ -1,4 +1,4 @@
-package timeboard.timesheet;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -44,7 +44,6 @@ import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
@@ -53,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 
 
 @Controller
@@ -132,7 +130,10 @@ public class TimesheetController {
         model.addAttribute("lastWeekValidated", lastWeekValidated);
 
         model.addAttribute("taskTypes", this.projectService.listTaskType());
-        model.addAttribute("projectList", this.projectService.listProjects(authentication.getDetails()));
+
+        model.addAttribute("projectList",
+                this.projectService.listProjects(
+                        authentication.getDetails(), authentication.getCurrentOrganization()));
 
         return "timesheet.html";
     }

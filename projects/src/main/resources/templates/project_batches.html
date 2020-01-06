@@ -6,19 +6,19 @@
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
-    <title layout:fragment="title">Project Milestones</title>
+    <title layout:fragment="title">Project Batches</title>
     <meta name="projectID" th:content="${project.id}"/>
-    <script src="/js/project_milestones.js" type="text/javascript"></script>
+    <script src="/js/project_batches.js" type="text/javascript"></script>
 </head>
 <body>
 
 <div layout:fragment="placeholder">
-    <div id="milestones-app">
+    <div id="batches-app">
         <div class="ui menu">
             <a class="item"
                v-on:click="$('#editMilestone').modal('show')">
                 <i class="plus icon"></i>
-                New Milestone
+                New Batch
             </a>
         </div>
 

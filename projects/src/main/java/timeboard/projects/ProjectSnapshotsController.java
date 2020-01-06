@@ -41,9 +41,9 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectSnapshotService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.model.ValueHistory;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
+import timeboard.core.model.ValueHistory;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -68,7 +68,7 @@ public class ProjectSnapshotsController {
     public String display(TimeboardAuthentication authentication, @PathVariable Long projectID, Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
 
@@ -81,7 +81,7 @@ public class ProjectSnapshotsController {
 
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projectSnapshotGraphWrapper));
     }
@@ -92,7 +92,7 @@ public class ProjectSnapshotsController {
                          @PathVariable Long projectID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         return ResponseEntity.ok(project.getSnapshots().stream().map(projectSnapshot ->
                 new ProjectSnapshotsController.ProjectSnapshotWrapper(projectSnapshot)).collect(Collectors.toList()));
     }
@@ -103,7 +103,7 @@ public class ProjectSnapshotsController {
             TimeboardAuthentication authentication) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final ProjectSnapshot projectSnapshot = this.projectSnapshotService.createProjectSnapshot(actor, project);
         projectSnapshot.setProject(project);
         project.getSnapshots().add(projectSnapshot);
@@ -117,7 +117,7 @@ public class ProjectSnapshotsController {
                    @PathVariable Long projectID, @PathVariable Long snapshotID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getSnapshots().removeIf(projectSnapshot -> projectSnapshot.getId().equals(snapshotID));
         this.projectService.updateProject(actor, project);
         return this.listProjectSnapshots(authentication, projectID);

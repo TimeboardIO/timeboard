@@ -1,8 +1,8 @@
-package timeboard.timesheet;
+package timeboard.core.internal.rules.batch;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,10 +26,28 @@ package timeboard.timesheet;
  * #L%
  */
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import timeboard.core.internal.rules.Rule;
+import timeboard.core.model.Account;
+import timeboard.core.model.Batch;
+import timeboard.core.model.ProjectMembership;
 
-@Configuration
-@ComponentScan("timeboard.organizations")
-public class OrganizationsConfiguration {
+import java.util.Optional;
+
+
+public class ActorIsProjectMemberByBatch implements Rule<Batch> {
+
+    @Override
+    public String ruleDescription() {
+        return "User is not project Owner";
+    }
+
+    @Override
+    public boolean isSatisfied(Account u, Batch thing) {
+        final Optional<ProjectMembership> userOptional = thing.getProject().getMembers().stream()
+                .filter(projectMembership ->
+                        projectMembership.getMember().getId() == u.getId()
+                )
+                .findFirst();
+        return userOptional.isPresent();
+    }
 }

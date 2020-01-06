@@ -1,8 +1,8 @@
-package timeboard.timesheet;
+package timeboard.core.model;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.timesheet;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,10 +26,22 @@ package timeboard.timesheet;
  * #L%
  */
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+public enum BatchType {
+    BILL("Bill"),
+    DELIVERY("Delivery"),
+    INPUT("Inupt"),
+    SCHEDULING("Scheduling"),
+    GROUP("Group"),
+    SPRINT("Sprint");
 
-@Configuration
-@ComponentScan("timeboard.timesheet")
-public class TimesheetConfiguration {
+
+    public final String label;
+
+    private BatchType(String label) {
+        this.label = label;
+    }
+
+    String getLabel() {
+        return this.label;
+    }
 }

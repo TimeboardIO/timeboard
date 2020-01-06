@@ -16,7 +16,7 @@
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
            th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}" data-cy="project-menu-tasks">Tasks</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
-           th:href="@{/projects/{projectID}/milestones(projectID=${project.id})}" data-cy="project-menu-milestones">Milestones</a>
+           th:href="@{/projects/{projectID}/batches(projectID=${project.id})}" data-cy="project-menu-batches">Batches</a>
         <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
            th:href="@{/projects/{projectID}/dashboard(projectID=${project.id})}" data-cy="project-menu-dashboard" >Dashboard</a>
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"

@@ -26,83 +26,63 @@ package timeboard.core.model;
  * #L%
  */
 
-import timeboard.core.api.exceptions.BusinessException;
-
 import javax.persistence.*;
-import java.util.Date;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"organization_id", "member_id"})
+        @UniqueConstraint(columnNames={"member_id", "organization_id"})
 })
-public class AccountHierarchy {
+public class OrganizationMembership  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
-    @ManyToOne(targetEntity = Account.class)
-    private Account organization;
-
-    @ManyToOne(targetEntity = Account.class)
+    @OneToOne(fetch = FetchType.EAGER)
     private Account member;
 
-    @Column(nullable = false)
-    private Date startDate;
-
-    @Column
-    private Date endDate;
+    @OneToOne(fetch = FetchType.EAGER)
+    private Organization organization;
 
     @Column()
     @Enumerated(EnumType.STRING)
     private MembershipRole role;
 
-    public long getId() {
+    public OrganizationMembership() {
+    }
+
+
+    public OrganizationMembership(Organization organization, Account owner, MembershipRole role) {
+        this.member = owner;
+        this.role = role;
+        this.organization = organization;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
-    }
-
-    public Account getOrganization() {
-        return organization;
-    }
-
-    public void setOrganization(Account organization) throws BusinessException {
-        if (this.member != null && organization.getId() == this.member.getId()) {
-            throw new BusinessException("An parent account can't refer to itself");
-        }
-        this.organization = organization;
     }
 
     public Account getMember() {
         return member;
     }
 
-    public void setMember(Account member) throws BusinessException {
-        if (this.organization != null && member.getId() == this.organization.getId()) {
-            throw new BusinessException("An child account can't refer to itself");
-        }
+    public void setMember(Account member) {
         this.member = member;
+        member.getOrganizations().add(this);
     }
 
-    public Date getStartDate() {
-        return startDate;
+    public Organization getOrganization() {
+        return organization;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+        this.organization.getMembers().add(this);
     }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
 
     public MembershipRole getRole() {
         return role;
@@ -111,5 +91,4 @@ public class AccountHierarchy {
     public void setRole(MembershipRole role) {
         this.role = role;
     }
-
 }

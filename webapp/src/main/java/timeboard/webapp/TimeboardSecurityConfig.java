@@ -1,4 +1,4 @@
-package timeboard.webapp.security;
+package timeboard.webapp;
 
 /*-
  * #%L
@@ -30,15 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.web.filter.GenericFilterBean;
@@ -73,9 +70,6 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private DatabaseAuthenticationProvider databaseAuthenticationProvider;
-
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -97,9 +91,6 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .anyRequest()
                     .authenticated()
-                        .and()
-                            .formLogin()
-                            .defaultSuccessUrl(HomeController.URI).permitAll()
 
                         .and()
                             .oauth2Login()
@@ -119,15 +110,6 @@ public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
      }
 
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        final PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
-
-        auth
-            .userDetailsService(this.userService)
-            .and()
-            .authenticationProvider(this.databaseAuthenticationProvider);
-    }
 
     public class RedirectFilter extends GenericFilterBean {
 
