@@ -149,11 +149,11 @@ let app = new Vue({
                                 filterFunction: (filter, row) => parseFloat(row) <= parseFloat(filter) },
                 assignee:  { filterKey: 'assignee', filterValue: '',
                                 filterFunction: (filter, row) => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 },
-                status:    { filterKey: 'status', filterValue: '',
+                status:    { filterKey: 'status', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 ) },
-                batch:     { filterKey: 'batchID', filterValue: '',
+                batch:     { filterKey: 'batchID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
-                type:      { filterKey: 'typeID', filterValue: '',
+                type:      { filterKey: 'typeID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
             },
             data: [],
@@ -285,6 +285,9 @@ let app = new Vue({
                     event.target.classList.toggle('loading');
                     app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 });
+        },
+        toggleFilters : function() {
+            $('.filters').toggle();
         }
     },
     created: function () {

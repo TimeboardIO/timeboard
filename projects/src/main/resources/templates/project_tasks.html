@@ -155,7 +155,7 @@
                     <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" th:modal-id="${plugin.serviceID}" class="item" v-on:click="$('#'+event.target.getAttribute('modal-id')).modal('show')">plugin name</div>
                 </div>
             </div>
-            <div @click="$('.filters').toggle()" class="ui dropdown item" >
+            <div @click="toggleFilters" class="ui dropdown item" >
                 <i class="filter icon"></i>
                 Filters
             </div>
