@@ -21,6 +21,7 @@ Vue.component('graph-modal', {
     }
 });
 
+
 // Form validations rules
 const formValidationRules = {
     fields: {

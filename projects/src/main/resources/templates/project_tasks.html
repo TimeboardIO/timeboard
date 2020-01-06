@@ -182,13 +182,7 @@
 
 
             </div>
-            <script type="text/javascript">
-                $(document).ready(function(){
-                    $('#import, #view').dropdown({
-                        clearable: true
-                    });
-                });
-            </script>
+
 
 
 
@@ -310,11 +304,11 @@
             <div v-for="batch in batches">
                 <div class="title">
                     <i class="plus icon"></i>
-                    {{ batch.name }}
+                    {{ batch.batchName }}
                 </div>
                 <div class="content">
                     <!-- Datatable component -->
-                    <data-table v-bind:config="table.filter(row -> { row.batchIDs.some(b -> b === batch.id) } )">
+                    <data-table v-bind:config="table">
                         <template v-slot:name="{row}">
                             {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
                             {{row.taskComments}}</p>
@@ -358,9 +352,53 @@
                         </template>
                     </data-table>
                 </div>
+            </div >
+            <div th:if="${batchType} == 'Default' ">
+                <data-table v-bind:config="table">
+                    <template v-slot:name="{row}">
+                        {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                        {{row.taskComments}}</p>
+                    </template>
+                    <template v-slot:start="{row}">
+                        {{row.startDate}}
+                    </template>
+                    <template v-slot:end="{row}">
+                        {{row.endDate}}
+                    </template>
+                    <template v-slot:oe="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.originalEstimate}}</p>
+                        </div>
+                    </template>
+                    <template v-slot:assignee="{row}">
+                        {{row.assignee}}
+                    </template>
+                    <template v-slot:batch="{row}">
+                        <i v-for="item in row.batchNames"> {{item}} </i>
+                    </template>
+                    <template v-slot:type="{row}">
+                        <div class="ui blue green horizontal label"> {{row.typeName}} </div>
+                    </template>
+                    <template v-slot:status="{row}">
+                        <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                    </template>
+
+                    <template v-slot:actions="{row}">
+                        <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
+                            <i class="close icon"></i>
+                        </button>
+                        <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
+                                class="ui tiny primary icon button">
+                            <i class="edit icon"></i>
+                        </button>
+                        <button v-on:click="showGraphModal(null, row, $event)"  data-cy="show-graph-task"
+                                class="ui tiny yellow icon button">
+                            <i class="chart line icon"></i>
+                        </button>
+                    </template>
+                </data-table>
             </div>
         </div>
-
 
 
 
@@ -381,9 +419,15 @@
             <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getServiceID()}, ${plugin.getSyncCredentialFields()})"></div>
         </div>
 
-        <script src="/js/project_tasks.js"></script>
-
     </div>
+    <script src="/js/project_tasks.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#import, #view').dropdown({
+                clearable: true
+            });
+        });
+    </script>
 
 </div>
 

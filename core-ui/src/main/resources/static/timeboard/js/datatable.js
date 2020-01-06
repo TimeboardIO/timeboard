@@ -4,7 +4,7 @@ Vue.component('data-table', {
             <table class="ui celled table" v-if="config.data.length > 0">
                 <thead>
                     <tr>
-                      <th v-for="col in finalCols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"> </th>
+                      <th v-for="col in finalCols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"></i> </th>
                       <th v-for="col in finalCols" v-if="col.visible && !col.sortKey" >{{col.label}} </th>
                       <th v-if="config.configurable === true" class="collapsing" style="border-left: none;" ><i class="cog icon" @click="showConfigModal()"></i></th>
                     </tr>
