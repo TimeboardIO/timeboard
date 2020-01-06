@@ -121,10 +121,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> listProjects(Account candidate, Long... orgIDs) {
+    public List<Project> listProjects(Account candidate, Long orgID) {
         TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
-        query.setParameter("orgs", Arrays.asList(orgIDs));
+        query.setParameter("orgID", orgID);
         return query.getResultList();
     }
 
