@@ -307,9 +307,14 @@ public class TasksRestController {
             }
         } else {
             try {
+                Account assignee = null;
+                if (taskWrapper.assigneeID > 0) {
+                    assignee = userService.findUserByID(taskWrapper.assigneeID);
+                }
+                
                 task = projectService.createTask(actor, project,
                         name, comment, startDate,
-                        endDate, oe, typeID, actor,
+                        endDate, oe, typeID, assignee,
                         ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
             } catch (Exception e) {
                 return ResponseEntity

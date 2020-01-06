@@ -28,6 +28,7 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -101,8 +102,11 @@ public class Task extends AbstractTask implements Serializable {
         this.batches = batches;
     }
 
-    public void addBatch(Batch batches) {
-        this.batches .add(batches);
+    public void addBatch(Batch batch) {
+        if(batch == null) {
+            this.batches = new HashSet<>();
+        }
+        this.batches.add(batch);
     }
 
     public double getEffortLeft() {
