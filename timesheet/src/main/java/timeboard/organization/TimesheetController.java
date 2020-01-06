@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @Controller
@@ -132,13 +131,9 @@ public class TimesheetController {
 
         model.addAttribute("taskTypes", this.projectService.listTaskType());
 
-        List<Long> userOrgs = authentication.getDetails().getOrganizations()
-                .stream()
-                .map(om -> om.getOrganization().getId()).collect(Collectors.toList());
-
         model.addAttribute("projectList",
                 this.projectService.listProjects(
-                        authentication.getDetails(), userOrgs.toArray(Long[]::new)));
+                        authentication.getDetails(), authentication.getCurrentOrganization()));
 
         return "timesheet.html";
     }
