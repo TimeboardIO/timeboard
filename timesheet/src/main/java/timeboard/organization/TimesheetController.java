@@ -127,6 +127,7 @@ public class TimesheetController {
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
+        model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekValidated", lastWeekValidated);
 
         model.addAttribute("taskTypes", this.projectService.listTaskType());

@@ -61,15 +61,18 @@ $(document).ready(function () {
             },
             removeTag: function (row) {
                 let self = this;
-                $.ajax({
-                    type: "DELETE",
-                    dataType: "json",
-                    url: "projects/" + projectID + "/tags/" + row.id,
-                    success: function (d) {
-                        self.table.data = d;
-                    }
+                this.$refs.confirmModal.confirm("Are you sure you want to delete "+ row.tagKey + "?", function() {
+                    $.ajax({
+                        type: "DELETE",
+                        dataType: "json",
+                        url: "projects/" + projectID + "/tags/" + row.id,
+                        success: function (d) {
+                            self.table.data = d;
+                        }
+                    });
                 });
             }
+
         },
         mounted: function () {
             let self = this;

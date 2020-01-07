@@ -31,9 +31,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -50,6 +48,17 @@ public class ProjectBatchesController {
     @Autowired
     public ProjectService projectService;
 
+    @DeleteMapping(value = "/{batchID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteBatch(
+            TimeboardAuthentication authentication,
+            @PathVariable Long projectID,
+            @PathVariable Long batchID) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+        this.projectService.deleteBatchByID(actor, batchID);
+
+        return ResponseEntity.ok(batchID);
+    }
 
     @GetMapping
     protected String batchApp(TimeboardAuthentication authentication,
@@ -59,8 +68,41 @@ public class ProjectBatchesController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
+        model.addAttribute("batchTypes", BatchType.values());
+
         return "project_batches.html";
     }
+
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    protected ResponseEntity<BatchDecorator> createBatch(TimeboardAuthentication authentication,
+                              @ModelAttribute BatchWrapper batch,
+                              @PathVariable Long projectID) throws  BusinessException {
+
+
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+
+        if(batch.getId() == null) {
+            final Batch newBatch = this.projectService.createBatch(
+                    actor,
+                    batch.getName(),
+                    batch.getDate(),
+                    batch.getType(),
+                    new HashMap<>(),
+                    new HashSet<>(),
+                    project);
+
+            return ResponseEntity.ok(new BatchDecorator(newBatch));
+        }else{
+
+            final Batch dbBatch = this.projectService.getBatchById(actor, batch.getId());
+            batch.updpate(dbBatch);
+            this.projectService.updateBatch(actor, dbBatch);
+
+            return ResponseEntity.ok(new BatchDecorator(dbBatch));
+        }
+    }
+
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
     protected ResponseEntity<List<BatchDecorator>> listBatches(TimeboardAuthentication authentication,
@@ -75,18 +117,9 @@ public class ProjectBatchesController {
     }
 
 
-    @GetMapping("/{batchesID/delete")
-    protected String deleteBatch(TimeboardAuthentication authentication,
-                                     @PathVariable Long projetID, @PathVariable Long batchID) throws BusinessException {
 
-        final Account actor = authentication.getDetails();
-        this.projectService.deleteBatchByID(actor, batchID);
-
-        return "redirect:/projects/" + projetID + "/batches";
-    }
-
-    @GetMapping("/{batchID}/setup")
-    protected String setupBatch(TimeboardAuthentication authentication,
+    @GetMapping(value = "/{batchID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    protected ResponseEntity<BatchDecorator> setupBatch(TimeboardAuthentication authentication,
                                     @PathVariable Long projectID,
                                     @PathVariable Long batchID,
                                     Model model) throws BusinessException {
@@ -97,10 +130,8 @@ public class ProjectBatchesController {
         model.addAttribute("batch", batch);
         model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, batch));
 
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        fillModelWithBatches(model, actor, project);
 
-        return "project_batches_config.html";
+        return ResponseEntity.ok(new BatchDecorator(batch));
     }
 
 
@@ -200,13 +231,65 @@ public class ProjectBatchesController {
         return this.projectService.addTasksToBatch(actor, currentBatch, selectedTasks, oldTasks);
     }
 
+    public class BatchWrapper{
+
+        private Long id;
+        private String name;
+        private BatchType type;
+        private Date date;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public BatchType getType() {
+            return type;
+        }
+
+        public void setType(BatchType type) {
+            this.type = type;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public void updpate(final Batch dbBatch) {
+            dbBatch.setName(this.getName());
+            dbBatch.setType(this.getType());
+            dbBatch.setDate(this.getDate());
+        }
+    }
 
     public class BatchDecorator {
 
-        private Batch batch;
+        private Batch batch = new Batch();
+
+        public BatchDecorator() {
+        }
 
         public BatchDecorator(Batch batch) {
             this.batch = batch;
+        }
+
+        public Long getId(){
+            return this.batch.getId();
         }
 
         public String getName() {
@@ -220,6 +303,12 @@ public class ProjectBatchesController {
         public Date getDate() {
             return this.batch.getDate();
         }
+
+        public Integer getTasks() {
+            return this.batch.getTasks().size();
+        }
+
+
 
     }
 }

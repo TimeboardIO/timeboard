@@ -12,11 +12,6 @@
     <artifactId>projects</artifactId>
     <dependencies>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>
@@ -39,10 +34,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>timeboard</groupId>
-            <artifactId>project-jira-import-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
     </dependencies>
 

@@ -45,7 +45,7 @@ public class TimesheetEvent extends TimeboardEvent {
 
         final List<Project> projects = projectService.listProjects(timesheet.getAccount(), currentOrg.getId());
 
-        projects.stream().forEach(project -> project.getMembers()
+        projects.forEach(project -> project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == MembershipRole.OWNER)
                 .forEach(member -> this.usersToNotify.add(member.getMember())));

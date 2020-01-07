@@ -16,7 +16,7 @@
     <div id="batches-app">
         <div class="ui menu">
             <a class="item"
-               v-on:click="alert()">
+               v-on:click="$('#editMilestone').modal('show')">
                 <i class="plus icon"></i>
                 New Batch
             </a>
@@ -32,7 +32,47 @@
             <template v-slot:date="{row}">
                 {{row.date}}
             </template>
+            <template v-slot:tasks="{row}">
+                {{row.tasks}}
+            </template>
+            <template v-slot:actions="{row}">
+                <button class="ui positive basic button" @click="editBatch(row)">
+                    <i class="edit alternate icon"></i>
+                    Edit
+                </button>
+                <button class="ui negative basic button" @click="deleteBatch(row)">
+                    <i class="remove alternate icon"></i>
+                    Remove
+                </button>
+            </template>
         </data-table>
+
+        <tmodal
+                v-bind:title="'Milestone'"
+                v-bind:id="'editMilestone'">
+            <template v-slot:content>
+
+                <div class="ui form">
+                    <div class="field">
+                        <label>Batch Label</label>
+                        <input v-model="batch.name" type="text" name="batch-label" placeholder="Batch Label">
+                    </div>
+                    <div class="field">
+                        <label>Batch Type</label>
+                        <select v-model="batch.type" class="ui dropdown" name="batch-type">
+                            <option th:each="b : ${batchTypes}" th:text="${b}" th:value="${b}"></option>
+                        </select>
+                    </div>
+
+                    <div class="field" v-if="batch.type!='GROUP'">
+                        <label>Date</label>
+                        <input v-model="batch.date"  type="date" name="batch-date">
+                    </div>
+                    <button v-on:click="saveBatch" class="ui button">Submit</button>
+                </div>
+
+            </template>
+        </tmodal>
 
     </div>
 </div>

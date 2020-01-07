@@ -6,7 +6,7 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekValidated="${lastWeekValidated}" th:userID="${userID}"/>
+    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekValidated="${lastWeekValidated}" th:actorID="${actorID}"/>
     <style> .hidden { display: none; } </style>
 </head>
 
@@ -243,9 +243,9 @@
                 :form-error="formError"
                 :modal-title="modalTitle">
         </task-modal>
-        <script src="timesheet.js"></script>
 
     </div>
+    <script src="timesheet.js"></script>
 </div>
 
 </body>

@@ -41,7 +41,7 @@ public interface ProjectService {
 
     Project createProject(Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(Account owner, Long org);
+    List<Project> listProjects(Account owner,  Long orgID);
 
     Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
 
@@ -231,4 +231,7 @@ public interface ProjectService {
 
     boolean isProjectOwner(Account user, Project project);
 
+    List<Batch> getBatchList(Account user, Project project, BatchType batchType) throws BusinessException;
+
+    List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 }

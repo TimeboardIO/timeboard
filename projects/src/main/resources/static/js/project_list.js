@@ -24,6 +24,12 @@ $(document).ready(function () {
             }
         },
         methods: {
+            archive : function (row){
+                this.$refs.confirmModal.confirm("Are you sure you want to archive project "+ row.name + "? This action is irreversible.",
+                    function(){
+                        document.location.replace('/projects/'+row.id+'/delete');
+                    });
+            }
         },
         mounted: function () {
             let self = this;
@@ -33,6 +39,7 @@ $(document).ready(function () {
                 url: "projects/list",
                 success: function (d) {
                     self.table.data = d;
+                    $('.ui.loading').toggle();
                 }
             });
         }

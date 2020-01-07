@@ -586,7 +586,7 @@ public class ProjectServiceImpl implements ProjectService {
             double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);
 
-            LOGGER.info("User " + actor.getName()
+            LOGGER.info("User " + actor.getScreenName()
                     + " updated imputations for task "
                     + projectTask.getId() + " (" + day + ") in project "
                     + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
@@ -613,7 +613,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), em);
 
         em.flush();
-        LOGGER.info("User " + actor.getName() + " updated imputations for default task "
+        LOGGER.info("User " + actor.getScreenName() + " updated imputations for default task "
                 + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
 
         return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
@@ -908,6 +908,21 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList();
     }
 
+
+    @Override
+    public List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
+        TypedQuery<BatchType> q = em.createQuery("select distinct b.type from Batch b where b.project = :project", BatchType.class);
+        q.setParameter("project", project);
+        return q.getResultList();
+    }
+
     @Override
     public Batch getBatchById(Account account, long id) throws BusinessException {
 
@@ -922,6 +937,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     public Batch createBatch(Account actor,
                              String name, Date date, BatchType type,
                              Map<String, String> attributes,
@@ -937,20 +953,21 @@ public class ProjectServiceImpl implements ProjectService {
 
         Batch newBatch = new Batch();
         newBatch.setName(name);
-        newBatch.setDate(date);
         newBatch.setType(type);
+        newBatch.setDate(date);
         newBatch.setAttributes(attributes);
         newBatch.setTasks(tasks);
         newBatch.setProject(project);
 
         em.persist(newBatch);
-        LOGGER.info("Batch " + newBatch);
+        LOGGER.info("Batch {} created by {} ",newBatch.getName(), actor.getScreenName());
 
         return newBatch;
 
     }
 
     @Override
+    @PreAuthorize("#batch.organizationID == authentication.currentOrganization")
     public Batch updateBatch(Account actor, Batch batch) throws BusinessException {
         RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByBatch());
@@ -967,13 +984,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteBatchByID(Account actor, long batchID) throws BusinessException {
-        RuleSet<Batch> ruleSet = new RuleSet<>();
+        final RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByBatch());
         ruleSet.addRule(new BatchHasNoTask());
 
-        Batch batch = em.find(Batch.class, batchID);
+        final Batch batch = em.find(Batch.class, batchID);
 
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
+        final Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
+
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
@@ -994,6 +1012,23 @@ public class ProjectServiceImpl implements ProjectService {
         }
         TypedQuery<Task> q = em.createQuery("select distinct t from Task t join t.batches b where b = :batch", Task.class);
         q.setParameter("batch", batch);
+        return q.getResultList();
+    }
+
+
+    @Override
+    public List<Batch> getBatchList(Account actor, Project project, BatchType batchType) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+        TypedQuery<Batch> q = em.createQuery(
+                "select distinct b from Batch b join b.tasks t where t.project = :project and b.type = :type",
+                Batch.class);
+        q.setParameter("project", project);
+        q.setParameter("type", batchType);
         return q.getResultList();
     }
 
@@ -1030,6 +1065,8 @@ public class ProjectServiceImpl implements ProjectService {
         return taskType;
     }
 
+
+
     @Override
     public void disableTaskType(Account actor, TaskType type) {
 
@@ -1046,6 +1083,7 @@ public class ProjectServiceImpl implements ProjectService {
     public boolean isProjectOwner(Account account, Project project) {
         return (new ActorIsProjectOwner()).isSatisfied(account, project);
     }
+
 
 
 
