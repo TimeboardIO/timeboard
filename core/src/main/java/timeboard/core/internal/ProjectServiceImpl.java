@@ -919,6 +919,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     public Batch createBatch(Account actor,
                              String name, Date date, BatchType type,
                              Map<String, String> attributes,
@@ -948,6 +949,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("#batch.organizationID == authentication.currentOrganization")
     public Batch updateBatch(Account actor, Batch batch) throws BusinessException {
         RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByBatch());
@@ -964,13 +966,14 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteBatchByID(Account actor, long batchID) throws BusinessException {
-        RuleSet<Batch> ruleSet = new RuleSet<>();
+        final RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByBatch());
         ruleSet.addRule(new BatchHasNoTask());
 
-        Batch batch = em.find(Batch.class, batchID);
+        final Batch batch = em.find(Batch.class, batchID);
 
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
+        final Set<Rule> wrongRules = ruleSet.evaluate(actor, batch);
+
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
