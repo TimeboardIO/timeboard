@@ -121,16 +121,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> listProjects(Account candidate, Long... orgIDs) {
+    public List<Project> listProjects(Account candidate, Long orgID) {
         TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
-        query.setParameter("orgs", Arrays.asList(orgIDs));
+        query.setParameter("orgID", orgID);
         return query.getResultList();
     }
 
     @Override
         public Project getProjectByID(Account actor, Long orgID, Long projectId) {
-        Project data = em.createNamedQuery(Project.PROJECT_BET_BY_ID, Project.class)
+        Project data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
                 .setParameter("user", actor)
                 .setParameter("projectID", projectId)
                 .setParameter("orgID", orgID)
@@ -399,7 +399,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setProject(project);
         em.flush();
 
-        LOGGER.info("Task " + taskName + " created by " + actor.getName() + " in project " + project.getName());
+        LOGGER.info("Task " + taskName + " created by " + actor.getScreenName() + " in project " + project.getName());
 
         return newTask;
     }

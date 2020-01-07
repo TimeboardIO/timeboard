@@ -35,19 +35,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.TimeboardAuthentication;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
-import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Account;
-import timeboard.core.model.Task;
-import timeboard.core.model.TaskStatus;
+import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Calendar;
 
 
 @Component
@@ -63,6 +62,9 @@ public class TimesheetRESTApi {
 
     @Autowired
     private TimesheetService timesheetService;
+
+    @Autowired
+    private OrganizationService organizationService;
 
 
     @GetMapping
@@ -227,7 +229,8 @@ public class TimesheetRESTApi {
         final int year = Integer.parseInt(request.getParameter("year"));
 
         try{
-            this.timesheetService.validateTimesheet(actor, actor, year, week);
+            Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
+            this.timesheetService.validateTimesheet(actor, actor, currentOrg, year, week);
             return ResponseEntity.status(201).build();
         }catch (Exception e){ // TimesheetException
             return ResponseEntity.status(412).build();
