@@ -3,7 +3,7 @@
 <html layout:decorate="~{project_layout.html(tab='third')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
-      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
     <title layout:fragment="title">Project Batches</title>
@@ -16,7 +16,7 @@
     <div id="batches-app">
         <div class="ui menu">
             <a class="item"
-               v-on:click="$('#editMilestone').modal('show')">
+               v-on:click="openModal">
                 <i class="plus icon"></i>
                 New Batch
             </a>
@@ -40,10 +40,10 @@
                     <i class="edit alternate icon"></i>
                     Edit
                 </button>
-                <button class="ui negative basic button" @click="deleteBatch(row)">
+                <a class="ui negative basic button" v-bind:href="deleteURL(row)">
                     <i class="remove alternate icon"></i>
                     Remove
-                </button>
+                </a>
             </template>
         </data-table>
 

@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -48,16 +49,21 @@ public class ProjectBatchesController {
     @Autowired
     public ProjectService projectService;
 
-    @DeleteMapping(value = "/{batchID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteBatch(
+    @GetMapping(value = "/{batchID}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String deleteBatch(
             TimeboardAuthentication authentication,
             @PathVariable Long projectID,
-            @PathVariable Long batchID) throws BusinessException {
+            @PathVariable Long batchID,
+            RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        this.projectService.deleteBatchByID(actor, batchID);
+        try {
+            this.projectService.deleteBatchByID(actor, batchID);
+        }catch (BusinessException e){
+            attributes.addFlashAttribute("error", e.getMessage());
+        }
 
-        return ResponseEntity.ok(batchID);
+        return "redirect:/projects/"+projectID+"/batches";
     }
 
     @GetMapping
