@@ -31,15 +31,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,6 +49,17 @@ public class ProjectBatchesController {
     @Autowired
     public ProjectService projectService;
 
+    @DeleteMapping(value = "/{batchID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteBatch(
+            TimeboardAuthentication authentication,
+            @PathVariable Long projectID,
+            @PathVariable Long batchID) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+        this.projectService.deleteBatchByID(actor, batchID);
+
+        return ResponseEntity.ok(batchID);
+    }
 
     @GetMapping
     protected String batchApp(TimeboardAuthentication authentication,
@@ -59,8 +69,37 @@ public class ProjectBatchesController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
+        model.addAttribute("batchTypes", BatchType.values());
+
         return "project_batches.html";
     }
+
+    @PostMapping
+    protected ResponseEntity createBatch(TimeboardAuthentication authentication,
+                              @ModelAttribute Batch batch,
+                              @PathVariable Long projectID, Model model) throws  BusinessException {
+
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+
+        model.addAttribute("project", project);
+        model.addAttribute("batchTypes", BatchType.values());
+
+        if(batch.getId() == null) {
+            final Batch newBatch = this.projectService.createBatch(
+                    actor,
+                    batch.getName(),
+                    batch.getDate(),
+                    batch.getType(),
+                    batch.getAttributes(),
+                    batch.getTasks(),
+                    project);
+            return ResponseEntity.created(URI.create("/projects/"+projectID+"/batches/"+newBatch.getId())).build();
+        }else{
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
     protected ResponseEntity<List<BatchDecorator>> listBatches(TimeboardAuthentication authentication,
@@ -75,18 +114,9 @@ public class ProjectBatchesController {
     }
 
 
-    @GetMapping("/{batchesID/delete")
-    protected String deleteBatch(TimeboardAuthentication authentication,
-                                     @PathVariable Long projetID, @PathVariable Long batchID) throws BusinessException {
 
-        final Account actor = authentication.getDetails();
-        this.projectService.deleteBatchByID(actor, batchID);
-
-        return "redirect:/projects/" + projetID + "/batches";
-    }
-
-    @GetMapping("/{batchID}/setup")
-    protected String setupBatch(TimeboardAuthentication authentication,
+    @GetMapping(value = "/{batchID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    protected ResponseEntity<BatchDecorator> setupBatch(TimeboardAuthentication authentication,
                                     @PathVariable Long projectID,
                                     @PathVariable Long batchID,
                                     Model model) throws BusinessException {
@@ -97,10 +127,8 @@ public class ProjectBatchesController {
         model.addAttribute("batch", batch);
         model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, batch));
 
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        fillModelWithBatches(model, actor, project);
 
-        return "project_batches_config.html";
+        return ResponseEntity.ok(new BatchDecorator(batch));
     }
 
 
@@ -207,6 +235,10 @@ public class ProjectBatchesController {
 
         public BatchDecorator(Batch batch) {
             this.batch = batch;
+        }
+
+        public Long getId(){
+            return this.batch.getId();
         }
 
         public String getName() {

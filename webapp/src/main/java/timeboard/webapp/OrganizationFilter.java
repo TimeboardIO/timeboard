@@ -26,6 +26,8 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
@@ -51,6 +53,8 @@ import java.util.stream.Collectors;
 @Component
 @Order(1)
 public class OrganizationFilter implements Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationFilter.class);
 
     @Autowired
     private OrganizationService organizationService;
@@ -100,15 +104,18 @@ public class OrganizationFilter implements Filter {
                     ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
                 } else {
                     servletResponse.sendRedirect(OrganizationSelectController.URI);
+                    LOGGER.debug("Wrong or missing org cookie, redirect to login");
                     return true;
                 }
             } catch (AccessDeniedException ex) {
                 servletResponse.sendRedirect(OrganizationSelectController.URI);
+                LOGGER.debug("Wrong or missing org cookie, redirect to login");
                 return true;
             }
 
         } else {
             servletResponse.sendRedirect(OrganizationSelectController.URI);
+            LOGGER.debug("Wrong or missing org cookie, redirect to login");
             return true;
         }
         return false;

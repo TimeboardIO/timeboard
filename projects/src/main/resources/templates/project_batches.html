@@ -32,6 +32,12 @@
             <template v-slot:date="{row}">
                 {{row.date}}
             </template>
+            <template v-slot:actions="{row}">
+                <button class="ui negative basic button" @click="deleteBatch(row)">
+                    <i class="remove alternate icon"></i>
+                    Remove
+                </button>
+            </template>
         </data-table>
 
         <tmodal
@@ -39,7 +45,24 @@
                 v-bind:id="'editMilestone'">
             <template v-slot:content>
 
-                <h1>Form</h1>
+                <div class="ui form">
+                    <div class="field">
+                        <label>Batch Label</label>
+                        <input v-model="batch.name" type="text" name="batch-label" placeholder="Batch Label">
+                    </div>
+                    <div class="field">
+                        <label>Batch Type</label>
+                        <select v-model="batch.type" class="ui dropdown" name="batch-type">
+                            <option th:each="b : ${batchTypes}" th:text="${b}" th:value="${b}"></option>
+                        </select>
+                    </div>
+
+                    <div class="field" v-if="batch.type!='GROUP'">
+                        <label>Date</label>
+                        <input v-model="batch.date"  type="date" name="batch-date">
+                    </div>
+                    <button v-on:click="saveBatch" class="ui button">Submit</button>
+                </div>
 
             </template>
         </tmodal>
