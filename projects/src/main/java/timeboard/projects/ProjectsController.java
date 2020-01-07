@@ -112,13 +112,24 @@ public class ProjectsController {
         public ProjectDecorator(Project project) {
             this.project = project;
         }
-
         public long getID() {
             return this.project.getId();
         }
 
         public String getName() {
             return this.project.getName();
+        }
+
+        public String getColor() {
+            return this.project.getColor();
+        }
+
+        public String getComments() {
+            return this.project.getComments();
+        }
+
+        public String getMemberSize() {
+            return this.project.getMembers().size()+"";
         }
 
     }

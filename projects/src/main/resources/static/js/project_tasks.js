@@ -277,6 +277,18 @@ let app = new Vue({
                     app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 });
         },
+        deleteTask: function(event, task) {
+            this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.taskName + "?",
+                function() {
+                    event.target.classList.toggle('loading');
+                    $.get("/api/tasks/delete?task="+task.taskID)
+                        .then(function(data) {
+                            event.target.classList.toggle('loading');
+                            window.location.reload();
+                        });
+                });
+
+        },
         denyTask: function(event, task) {
             event.target.classList.toggle('loading');
             $.get("/api/tasks/deny?task="+task.taskID)

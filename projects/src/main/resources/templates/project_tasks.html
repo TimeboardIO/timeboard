@@ -407,6 +407,12 @@
                 :task="newTask">
         </graph-modal>
 
+        <tmodal-confirm
+                ref="confirmModal"
+                title="Delete task ?"
+                icon="close"
+        ></tmodal-confirm>
+
 
         <div class="sync plugins" th:each="plugin: ${sync_plugins}">
             <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getServiceID()}, ${plugin.getSyncCredentialFields()})"></div>
