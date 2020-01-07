@@ -3,7 +3,7 @@
 */
 
 
-const userID = $("meta[property='timesheet']").attr('userID');
+const actorID = $("meta[property='timesheet']").attr('actorID');
 
 const emptyTask =  {
     taskID: 0,
@@ -240,10 +240,12 @@ let app = new Vue( {
                 this.newTask.endDate = task.endDate;
                 this.newTask.originalEstimate = task.originalEstimate;
                 this.newTask.typeID = task.typeID;
+                this.newTask.assigneeID = task.assigneeID;
                 this.modalTitle = "Edit task";
             } else {
                 this.modalTitle = "Create task";
                 Object.assign(this.newTask , emptyTask);
+                this.newTask.assigneeID = actorID;
             }
             let keepThis = this;
             $('.create-task.modal').modal(  {  

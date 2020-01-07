@@ -361,7 +361,7 @@ public class TasksRestController {
 
         final Task task = (Task) projectService.getTaskByID(actor, taskID);
 
-        if (taskWrapper.assigneeID > 0) {
+        if (taskWrapper.assigneeID != null && taskWrapper.assigneeID > 0) {
             final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
             task.setAssigned(assignee);
         }
