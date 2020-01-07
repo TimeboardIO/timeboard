@@ -79,7 +79,7 @@ public class OrganizationConfigController {
 
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
-        final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
+        final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(authentication.getCurrentOrganization(), new Date(), new Date());
         final List<TaskType> taskTypes = this.projectService.listTaskType();
 
         model.addAttribute("taskTypes", taskTypes);
@@ -95,9 +95,8 @@ public class OrganizationConfigController {
     @GetMapping(value = "/default-task/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TaskWrapper>> listDefaultTasks(TimeboardAuthentication authentication,
                                                             @PathVariable Long projectID) throws BusinessException {
-        final Account actor = authentication.getDetails();
-        final Project project = this.projectService.listDefaultTasks(actor, authentication.getCurrentOrganization(), projectID);
-        return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new TaskWrapper(projectTag)).collect(Collectors.toList()));
+        final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(authentication.getCurrentOrganization(), new Date(0L), new Date(Long.MAX_VALUE));
+        return ResponseEntity.ok(defaultTasks.stream().map(TaskWrapper::new).collect(Collectors.toList()));
     }
 
 
@@ -117,7 +116,7 @@ public class OrganizationConfigController {
                 this.organizationService.updateOrganization(actor, organization.get());
                 break;
             case "NEW_TASK":
-                this.projectService.createDefaultTask(actor, request.getParameter("newDefaultTask"));
+                this.projectService.createDefaultTask(actor, authentication.getCurrentOrganization(), request.getParameter("newDefaultTask"));
                 break;
             case "NEW_TYPE":
                 this.projectService.createTaskType(actor, request.getParameter("newTaskType"));
@@ -130,7 +129,7 @@ public class OrganizationConfigController {
                 break;
             case "DELETE_TASK":
                 long taskID = Long.parseLong(request.getParameter("taskID"));
-                this.projectService.disableDefaultTaskByID(actor, taskID);
+                this.projectService.disableDefaultTaskByID(actor, authentication.getCurrentOrganization(), taskID);
                 break;
         }
 

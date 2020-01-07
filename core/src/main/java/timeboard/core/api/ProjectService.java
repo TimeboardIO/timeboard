@@ -140,14 +140,14 @@ public interface ProjectService {
     /*
      == Default Tasks ==
      */
-    List<DefaultTask> listDefaultTasks(Date ds, Date de);
+    List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de);
 
     /**
      * Create a default task.
      *
      * @return DefaultTask
      */
-    DefaultTask createDefaultTask(Account actor, String task) throws BusinessException;
+    DefaultTask createDefaultTask(Account actor, Long orgID, String task) throws BusinessException;
 
     /**
      * default tasks can not be deleted, so they are set disabled and hidden from UI
@@ -156,7 +156,7 @@ public interface ProjectService {
      * @param taskID
      * @throws BusinessException
      */
-    void disableDefaultTaskByID(Account actor, long taskID) throws BusinessException;
+    void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException;
 
 
     /*

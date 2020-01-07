@@ -738,14 +738,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<DefaultTask> listDefaultTasks(Date ds, Date de) {
+    public List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de) {
         TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
                         + "t.endDate > :ds "
                         + "and t.startDate <= :de "
-                        + "and t.startDate < t.endDate", DefaultTask.class);
+                        + "and t.startDate < t.endDate "
+                        + "and t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("ds", ds);
         q.setParameter("de", de);
+        q.setParameter("orgID", orgID);
         List<DefaultTask> tasks = q.getResultList();
 
         return q.getResultList();
@@ -832,7 +834,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DefaultTask createDefaultTask(Account actor, String name) throws BusinessException {
+    public DefaultTask createDefaultTask(Account actor, Long orgID, String name) throws BusinessException {
         try {
             DefaultTask task = new DefaultTask();
             task.setStartDate(new Date());
@@ -841,6 +843,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setEndDate(c.getTime());
             task.setOrigin(actor.getScreenName() + "/" + System.nanoTime());
             task.setName(name);
+            task.setOrganizationID(orgID);
             em.persist(task);
             em.flush();
             LOGGER.info("Default task " + task.getName() + " is created.");
@@ -852,7 +855,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public void disableDefaultTaskByID(Account actor, long taskID) throws BusinessException {
+    public void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException {
 
         DefaultTask task = em.find(DefaultTask.class, taskID);
         task.setEndDate(new Date());
