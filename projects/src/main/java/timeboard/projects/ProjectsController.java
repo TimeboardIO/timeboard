@@ -83,7 +83,7 @@ public class ProjectsController {
     protected String handlePost(TimeboardAuthentication authentication,  HttpServletRequest request,
                                 RedirectAttributes attributes) throws BusinessException {
         final Account actor = authentication.getDetails();
-        this.projectService.createProject(actor, request.getParameter("projectName"));
+        Project prj =  this.projectService.createProject(actor, request.getParameter("projectName"));
         attributes.addFlashAttribute("success", "Project created successfully.");
         return "redirect:/projects";
     }
