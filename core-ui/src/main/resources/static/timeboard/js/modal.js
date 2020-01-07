@@ -21,11 +21,10 @@ Vue.component('tmodal', {
     }
 });
 
-
 Vue.component('tmodal-confirm', {
     props: ['title', 'text', 'icon' ],
     template: `
-        <div v-bind:id="id" class="ui basic modal">
+        <div v-bind:id="id" class="ui mini modal">
             <div class="ui icon header">
                 <i :class="icon" class="icon"></i>
                 {{ title }}
@@ -34,7 +33,7 @@ Vue.component('tmodal-confirm', {
                 <p>{{ text }}</p>
             </div>
             <div class="actions">
-                <div class="ui red basic cancel inverted button">
+                <div class="ui red cancel inverted button">
                     <i class="remove icon"></i>
                     No
                 </div>
