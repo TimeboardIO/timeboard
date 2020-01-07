@@ -274,7 +274,7 @@ let app = new Vue({
                 });
         },
         deleteTask: function(event, task) {
-            this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.name + "?",
+            this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.taskName + "?",
                 function() {
                     event.target.classList.toggle('loading');
                     $.get("/api/tasks/delete?task="+task.taskID)
