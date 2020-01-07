@@ -586,7 +586,7 @@ public class ProjectServiceImpl implements ProjectService {
             double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);
 
-            LOGGER.info("User " + actor.getName()
+            LOGGER.info("User " + actor.getScreenName()
                     + " updated imputations for task "
                     + projectTask.getId() + " (" + day + ") in project "
                     + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
@@ -613,7 +613,7 @@ public class ProjectServiceImpl implements ProjectService {
         this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), em);
 
         em.flush();
-        LOGGER.info("User " + actor.getName() + " updated imputations for default task "
+        LOGGER.info("User " + actor.getScreenName() + " updated imputations for default task "
                 + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
 
         return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
