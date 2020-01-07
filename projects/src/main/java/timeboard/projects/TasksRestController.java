@@ -344,7 +344,7 @@ public class TasksRestController {
         Long typeID = taskWrapper.typeID;
         Long taskID = taskWrapper.taskID;
 
-        if (!(taskID != null && taskID == 0)) {
+        if (taskID != null && taskID != 0) {
             try {
                 task = processUpdateTask(taskWrapper, actor, batches, taskID);
 
@@ -353,10 +353,7 @@ public class TasksRestController {
             }
         } else {
             try {
-                task = projectService.createTask(actor, project,
-                        name, comment, startDate,
-                        endDate, oe, typeID, actor,
-                        ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
+                task = createTask(taskWrapper, actor, startDate, endDate, name, comment, oe, project, typeID);
             } catch (Exception e) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
@@ -368,6 +365,19 @@ public class TasksRestController {
         taskWrapper.setTaskID(task.getId());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
+    }
+
+    private Task createTask(TaskWrapper taskWrapper, Account actor, Date startDate, Date endDate, String name, String comment, double oe,
+                                Project project, Long typeID) {
+        Account assignee = null;
+        if (taskWrapper.assigneeID > 0) {
+            assignee = userService.findUserByID(taskWrapper.assigneeID);
+        }
+
+        return projectService.createTask(actor, project,
+                name, comment, startDate,
+                endDate, oe, typeID, assignee,
+                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
     }
 
     private Set<Batch> getBatches(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {

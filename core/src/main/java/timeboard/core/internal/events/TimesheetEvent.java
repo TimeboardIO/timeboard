@@ -27,9 +27,7 @@ package timeboard.core.internal.events;
  */
 
 import timeboard.core.api.ProjectService;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Project;
-import timeboard.core.model.ValidatedTimesheet;
+import timeboard.core.model.*;
 
 import java.util.Date;
 import java.util.List;
@@ -40,12 +38,12 @@ public class TimesheetEvent extends TimeboardEvent {
     private ValidatedTimesheet timesheet;
 
 
-    public TimesheetEvent(ValidatedTimesheet timesheet, ProjectService projectService) {
+    public TimesheetEvent(ValidatedTimesheet timesheet, ProjectService projectService, Organization currentOrg) {
         super(new Date());
 
         this.timesheet = timesheet;
 
-        final List<Project> projects = projectService.listProjects(timesheet.getAccount());
+        final List<Project> projects = projectService.listProjects(timesheet.getAccount(), currentOrg.getId());
 
         projects.stream().forEach(project -> project.getMembers()
                 .stream()
