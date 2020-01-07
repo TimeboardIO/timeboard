@@ -934,14 +934,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         Batch newBatch = new Batch();
         newBatch.setName(name);
-        newBatch.setDate(date);
         newBatch.setType(type);
+        newBatch.setDate(date);
         newBatch.setAttributes(attributes);
         newBatch.setTasks(tasks);
         newBatch.setProject(project);
 
         em.persist(newBatch);
-        LOGGER.info("Batch " + newBatch);
+        LOGGER.info("Batch {} created by {} ",newBatch.getName(), actor.getScreenName());
 
         return newBatch;
 

@@ -32,7 +32,14 @@
             <template v-slot:date="{row}">
                 {{row.date}}
             </template>
+            <template v-slot:tasks="{row}">
+                {{row.tasks}}
+            </template>
             <template v-slot:actions="{row}">
+                <button class="ui positive basic button" @click="editBatch(row)">
+                    <i class="edit alternate icon"></i>
+                    Edit
+                </button>
                 <button class="ui negative basic button" @click="deleteBatch(row)">
                     <i class="remove alternate icon"></i>
                     Remove

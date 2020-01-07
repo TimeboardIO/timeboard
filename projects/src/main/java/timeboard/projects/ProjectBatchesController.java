@@ -38,7 +38,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URI;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,16 +73,14 @@ public class ProjectBatchesController {
         return "project_batches.html";
     }
 
-    @PostMapping
-    protected ResponseEntity createBatch(TimeboardAuthentication authentication,
-                              @ModelAttribute Batch batch,
-                              @PathVariable Long projectID, Model model) throws  BusinessException {
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    protected ResponseEntity<BatchDecorator> createBatch(TimeboardAuthentication authentication,
+                              @ModelAttribute BatchWrapper batch,
+                              @PathVariable Long projectID) throws  BusinessException {
+
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-
-        model.addAttribute("project", project);
-        model.addAttribute("batchTypes", BatchType.values());
 
         if(batch.getId() == null) {
             final Batch newBatch = this.projectService.createBatch(
@@ -91,12 +88,18 @@ public class ProjectBatchesController {
                     batch.getName(),
                     batch.getDate(),
                     batch.getType(),
-                    batch.getAttributes(),
-                    batch.getTasks(),
+                    new HashMap<>(),
+                    new HashSet<>(),
                     project);
-            return ResponseEntity.created(URI.create("/projects/"+projectID+"/batches/"+newBatch.getId())).build();
+
+            return ResponseEntity.ok(new BatchDecorator(newBatch));
         }else{
-            return ResponseEntity.badRequest().build();
+
+            final Batch dbBatch = this.projectService.getBatchById(actor, batch.getId());
+            batch.updpate(dbBatch);
+            this.projectService.updateBatch(actor, dbBatch);
+
+            return ResponseEntity.ok(new BatchDecorator(dbBatch));
         }
     }
 
@@ -228,10 +231,58 @@ public class ProjectBatchesController {
         return this.projectService.addTasksToBatch(actor, currentBatch, selectedTasks, oldTasks);
     }
 
+    public class BatchWrapper{
+
+        private Long id;
+        private String name;
+        private BatchType type;
+        private Date date;
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public BatchType getType() {
+            return type;
+        }
+
+        public void setType(BatchType type) {
+            this.type = type;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public void updpate(final Batch dbBatch) {
+            dbBatch.setName(this.getName());
+            dbBatch.setType(this.getType());
+            dbBatch.setDate(this.getDate());
+        }
+    }
 
     public class BatchDecorator {
 
-        private Batch batch;
+        private Batch batch = new Batch();
+
+        public BatchDecorator() {
+        }
 
         public BatchDecorator(Batch batch) {
             this.batch = batch;
@@ -252,6 +303,12 @@ public class ProjectBatchesController {
         public Date getDate() {
             return this.batch.getDate();
         }
+
+        public Integer getTasks() {
+            return this.batch.getTasks().size();
+        }
+
+
 
     }
 }

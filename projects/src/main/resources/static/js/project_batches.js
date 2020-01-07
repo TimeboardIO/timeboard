@@ -26,6 +26,10 @@ $(document).ready(function () {
                         "label": "Batch Date"
                     },
                     {
+                        "slot": "tasks",
+                        "label": "Tasks"
+                    },
+                    {
                         "slot": "actions",
                         "label": "Actions"
                     }],
@@ -36,16 +40,12 @@ $(document).ready(function () {
         },
         methods: {
             saveBatch : function(){
-               let self = this;
-                $.ajax({
-                    type: "POST",
-                    dataType: "json",
-                    data: self.batch,
-                    url: "projects/" + projectID + "/batches",
-                    success: function (d) {
-                        self.listBatch();
-                        $('#editMilestone').modal('hide');
-                    }
+                let self = this;
+                this.batch.date = new Date(this.batch.date);
+                $.post("projects/" + projectID + "/batches",
+                self.batch, function (d) {
+                    self.listBatch();
+                    $('#editMilestone').modal('hide');
                 });
             },
             deleteBatch: function(row){
@@ -58,6 +58,10 @@ $(document).ready(function () {
                         self.listBatch();
                     }
                 });
+            },
+            editBatch: function(row){
+                this.batch = row;
+                $('#editMilestone').modal('show');
             },
             listBatch : function(){
                 let self = this;
