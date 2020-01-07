@@ -3,11 +3,9 @@
 
 ## Big picture
 
-Timeboard is based on Apache Karaf Runtime.
+Timeboard is based on Spring MVC.
 
 ![alt text](images/deployment.png "Login form UI")
-
-All Timeboard runtime dependencies can be found in Karaf [feature.xml](../features/src/main/feature/feature.xml) file
 
 
 ## Technical stack
@@ -15,31 +13,35 @@ All Timeboard runtime dependencies can be found in Karaf [feature.xml](../featur
 ### Server side
 
 - Java JDK 11
-- Apache Karaf 2.4.6
-- OSGI R6
+- Spring 5.1.x
 - Hibernate
 
 ### Client side 
 
 - Thymeleaf
 - Semantic-UI
+- Vue JS
 
 
 ## Timeboard components
 
 - Core : business logic
+- Webapp : Spring main headpoint 
 - Core-ui : runtime framework for web ui
-- Home : landing page, display graphs and user activities
+- Home : landing page, display graphs and account activities
+- Account : account information edition
+- Organization : all business about organizations
 - Projects : projects, tasks and clusters setup pages
 - Timesheet : page used to note effort spent on projects
-- Security : brind software security (filters, login form)
-- Shell : custom karaf shell commands for Timeboard
+- Reports : Used to generate reports
+- Theme : Timeboard semantic UI Stylesheets
+
 
 ## Functionnal basics
 
 ### Actor
 
-Any logged user to Timeboard is an actor
+Any logged account to Timeboard is an actor
 
 ### Project
 
@@ -53,10 +55,14 @@ Project role is used to allow or not some actions on project.
 A task is time based job. A Task as a start date, a stop date and and original effort.
 A task is assigned to a unique Actor.
 
+### Milestone
 
-### Project Clusters
+A batch is a set of tasks. A batch is mainly defined by a name, a date and a type.
+A project may have several milestones.
 
-Project Clusters is a tree of project. This concept is used to group project for reporting generation.
+### Organization
+
+Organization is a tenant on project, members, tasks. This concept is used to compartmentalize data of different tenants.
 
 A project can be referenced by several project clusters.
 

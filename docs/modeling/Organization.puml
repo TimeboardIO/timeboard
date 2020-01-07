@@ -1,0 +1,16 @@
+@startuml
+
+Account "1" -- "1" AccountHierarchy : organization
+Account "1" -- "1" AccountHierarchy : member
+
+Account "1" -- "*" ProjectMembership
+Project "1" -- "*" ProjectMembership
+MembershipRole "1" -- "1" ProjectMembership
+AccountHierarchy  -- "1" MembershipRole
+
+enum MembershipRole {
+    OWNER,
+    CONTRIBUTOR
+}
+
+@enduml

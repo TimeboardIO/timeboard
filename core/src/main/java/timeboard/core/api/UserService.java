@@ -26,35 +26,26 @@ package timeboard.core.api;
  * #L%
  */
 
-
-import timeboard.core.model.User;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.exceptions.UserException;
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
 
 import java.util.List;
-
 
 /**
  * Service for users and accounts management.
  */
-public interface UserService {
-
+public interface UserService  {
     /**
-     * Create new user.
+     * Search user by remote subject.
      *
-     * @param user to create
-     * @return user will with primary key
-     * @throws BusinessException user already exist
+     * @param remoteSubject prefix used to search user
+     * @return list of users
      */
-    User createUser(User user) throws BusinessException;
+    Account findUserBySubject(String remoteSubject);
 
-    /**
-     * Same as createUser but for a batch of users.
-     *
-     * @param users user list to create
-     * @return user will with primary key
-     * @throws BusinessException user already exist
-     */
-    List<User> createUsers(List<User> users) throws BusinessException;
 
     /**
      * Search user where name start with prefix.
@@ -62,35 +53,29 @@ public interface UserService {
      * @param prefix prefix used to search user
      * @return list of users
      */
-    List<User> searchUserByName(String prefix);
+    List<Account> searchUserByEmail(final Account actor, String prefix) throws BusinessException;
+
 
     /**
      * Search user where name start with prefix, limit to project with
      * primary Key projectID.
      *
      * @param prefix    prefix used to search user
-     * @param projectID project primary key
+     * @param project project
      * @return list of users
      */
-    List<User> searchUserByName(String prefix, Long projectID);
+    List<Account> searchUserByEmail(final Account actor, String prefix, Project project) throws BusinessException;
 
     /**
-     * Method used to check if a user with username exist and if password match.
+     * Search user where name start with prefix, limit to project with
+     * primary Key projectID.
      *
-     * @param username username to check
-     * @param password password to chekc
-     * @return user if username and password match with database entry,
-     * else return null.
+     * @param prefix    prefix used to search user
+     * @param organization organization
+     * @return list of users
      */
-    User autenticateUser(String username, String password);
+    List<Account> searchUserByEmail(final Account actor, String prefix, Organization organization) throws BusinessException;
 
-    /**
-     * Find user by login field.
-     *
-     * @param login login value
-     * @return user instance or null if not exist
-     */
-    User findUserByLogin(String login);
 
     /**
      * Find user by primary key.
@@ -98,7 +83,32 @@ public interface UserService {
      * @param userID user primary key
      * @return user instance or null if not exist
      */
-    User findUserByID(Long userID);
+    Account findUserByID(Long userID);
 
+    /**
+     * Find user by email.
+     *
+     * @param email user email
+     * @return user instance or null if not exist
+     */
+    Account findUserByEmail(String email);
 
+    /**
+     * Update user.
+     *
+     * @param account to update
+     * @return user will with primary key
+     * @throws BusinessException user does not exist
+     */
+    Account updateUser(Account account) throws UserException;
+
+    Account createUser(final Account account) throws BusinessException;
+
+    Account findUserByExternalID(String origin, String userExternalID);
+
+    Account userProvisionning(String sub, String email) throws BusinessException;
+
+    List<Account> createUsers(List<Account> usersList);
+
+    Account findUserByLogin(String name);
 }

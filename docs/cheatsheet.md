@@ -1,24 +1,11 @@
 # Timeboard Cheats
 
-
-## How to control database connexion ?
-
-    jdbc:ds-list 
-
-## Where is my database configuration ?
-
-    [KRONOPS_HOME]/etc/org.ops4j.datasource-timeboard-core-ds.cfg
-
-## How to create new users ?
-
-    timeboard:add-user
-
-## How to display active http endpoints ?
-
-    http:list
-
-## How to not redeploy everythings ?
+    
+## How to get current user from swing controller ?
 
 This command auto redeploy new installed maven artifacts 
-
-    dev:watch [bundle name]
+    
+    @Autowired
+    public UserInfo userInfo;
+    ...
+    final User actor = this.userInfo.getCurrentUser();

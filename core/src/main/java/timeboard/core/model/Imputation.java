@@ -34,7 +34,7 @@ import java.util.Date;
 @Table(
         uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
 )
-public class Imputation implements Serializable {
+public class Imputation extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,8 +47,11 @@ public class Imputation implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date day;
 
-    @ManyToOne(targetEntity = Task.class)
-    private Task task;
+    @ManyToOne(targetEntity = AbstractTask.class)
+    private AbstractTask task;
+
+    @OneToOne
+    private Account account;
 
     public long getId() {
         return id;
@@ -74,11 +77,19 @@ public class Imputation implements Serializable {
         this.day = day;
     }
 
-    public Task getTask() {
+    public AbstractTask getTask() {
         return task;
     }
 
-    public void setTask(Task task) {
+    public void setTask(AbstractTask task) {
         this.task = task;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

@@ -5,3 +5,8 @@ target/
 *.iml
 .DS_Store
 webui/src/main/resources/www/
+/theme/src/main/resources/static/
+build/
+temp/
+ui-tests/cypress/fixtures/projects.json
+webapp/src/main/resources/version

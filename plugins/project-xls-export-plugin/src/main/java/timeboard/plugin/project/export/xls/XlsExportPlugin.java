@@ -26,28 +26,27 @@ package timeboard.plugin.project.export.xls;
  * #L%
  */
 
-import timeboard.core.api.ProjectExportService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.model.Project;
-import timeboard.core.model.Task;
-import timeboard.core.model.User;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.ProjectExportService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-@Component(
-        service = ProjectExportService.class,
-        immediate = true
-)
+
+@Component
 public class XlsExportPlugin implements ProjectExportService {
 
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
     @Override
@@ -61,9 +60,9 @@ public class XlsExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(User actor, long projectID, OutputStream output) throws IOException {
+    public void export(Account actor, long orgID, long projectID, OutputStream output) throws IOException, BusinessException {
 
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
 
         String sheetName = project.getName();
 
@@ -72,15 +71,15 @@ public class XlsExportPlugin implements ProjectExportService {
 
            HSSFRow headerRow = sheet.createRow(0);
            headerRow.createCell(0).setCellValue("Task name");
-           headerRow.createCell(1).setCellValue("Task estimated work");
+           headerRow.createCell(1).setCellValue("Task Original Estimate");
 
            int rowNum = 1;
-           for (Task task : this.projectService.listProjectTasks(project)) {
+           for (Task task : this.projectService.listProjectTasks(actor, project)) {
 
                HSSFRow taskRow = sheet.createRow(rowNum);
 
-               taskRow.createCell(0).setCellValue(task.getLatestRevision().getName());
-               taskRow.createCell(1).setCellValue(task.getEstimateWork());
+               taskRow.createCell(0).setCellValue(task.getName());
+               taskRow.createCell(1).setCellValue(task.getOriginalEstimate());
                rowNum++;
            }
 

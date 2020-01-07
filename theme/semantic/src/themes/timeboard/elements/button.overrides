@@ -1,15 +1,72 @@
-@import url(https://fonts.googleapis.com/css?family=Roboto);
+/*
 
-.ui.primary.button:hover {
-  box-shadow:
-    0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset,
-    0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important
-  ;
+.ui.button{
+
+  padding  : @verticalPadding @horizontalPadding;
+  border  : 0.125rem solid @primaryColor;
+  border-radius      : @borderRadius;
+  color             : @primaryColor;
+  font-weight       : normal;
+
 }
 
-.ui.secondary.button:hover {
-  box-shadow:
-    0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset,
-    0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important
-  ;
+.ui.button:hover{
+  color: @primaryColor !important;
+  background-color: transparent !important;
 }
+
+
+ui.button.positive{
+
+  padding  : @verticalPadding @horizontalPadding;
+  border  : 0.125rem solid @green ;
+  border-radius      :  @green;
+  color             :  @green;
+  font-weight       : normal;
+  border-color: @green !important;
+
+}
+
+.ui.button.positive:hover{
+  color:  @green !important;
+  background-color: transparent !important;
+
+}
+
+
+ui.button.negative{
+
+  padding  : @verticalPadding @horizontalPadding;
+  border  : 0.125rem solid @red ;
+  border-radius :  @red;
+  color             :  @red;
+  font-weight       : normal;
+  border-color: @red !important;
+
+}
+
+.ui.button.negative:hover{
+  color:  @red !important;
+  background-color: transparent !important;
+
+}
+*/
+
+/*
+.btn-solid-lg {
+  display: inline-block;
+  padding: 1.375rem 2.625rem 1.375rem 2.625rem;
+  border: 0.125rem solid #00bfd8;
+  border-radius: 2rem;
+  background-color: #00bfd8;
+  color: #fff;
+  font: 700 0.75rem/0 "Raleway", sans-serif;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-solid-lg:hover {
+  background-color: transparent;
+  color: #00bfd8;
+  text-decoration: none;
+}*/

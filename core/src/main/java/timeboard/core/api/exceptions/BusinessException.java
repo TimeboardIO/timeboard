@@ -52,7 +52,7 @@ public class BusinessException extends Exception {
         if (this.triggeredRules.isEmpty()) {
             return super.getMessage();
         } else {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             this.triggeredRules.forEach(rule -> {
                 builder.append(rule.ruleDescription());
                 builder.append("\n");

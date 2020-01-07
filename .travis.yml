@@ -9,19 +9,17 @@ before_install:
   - nvm install $NODE_VERSION
 
 script:
-  - mvn clean install -P full
-  - mvn -f features/pom.xml install karaf:kar
-
-after_success:
-  - docker build -t timeboardio/timeboard .
-
+  - sh eb.sh
 
 deploy:
-  - provider: releases
-    api_key: "$GITHUB_TOKEN"
-    file: "features/target/features-1.0-SNAPSHOT.kar"
+  - provider: elasticbeanstalk
+    access_key_id: "$AWS_ACCESS_KEY"
+    secret_access_key: "$AWS_SECRET_KEY"
+    region: "eu-west-1"
+    app: "TimeboardApplication"
+    env: "TimeboardEnvironment"
+    zip_file: "build/timeboard.$TRAVIS_COMMIT.zip"
+    bucket_name: "$AWS_BUCKET"
     skip_cleanup: true
     on:
-      tags: true
-  - provider: script
-    script: bash docker_push
+      branch: develop

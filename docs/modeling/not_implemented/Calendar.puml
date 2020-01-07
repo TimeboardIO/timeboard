@@ -1,0 +1,30 @@
+@startuml
+
+class Calendar {
+    -Long id
+    -String name
+    -String prodID
+    -boolean public
+}
+
+class AbstractTask {
+
+}
+
+AbstractTask <|-- DefaultTask
+
+ProjectMembership "*" -- "1" User
+ProjectMembership "*" -- "1" Project
+
+Imputation "*" -- "*" AbstractTask
+DefaultTask "*" -- "*" User : attend
+Calendar "*" --  "1-0" Project
+
+User << (C,lightgrey) >>
+Project << (C,lightgrey) >>
+Imputation << (C,lightgrey) >>
+AbstractTask << (C,lightgrey) >>
+ProjectMembership << (C,lightgrey) >>
+
+
+@enduml

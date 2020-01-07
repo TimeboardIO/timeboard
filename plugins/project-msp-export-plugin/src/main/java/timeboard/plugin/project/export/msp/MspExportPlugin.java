@@ -26,15 +26,16 @@ package timeboard.plugin.project.export.msp;
  * #L%
  */
 
-import timeboard.core.api.ProjectExportService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.model.Project;
-import timeboard.core.model.User;
 import net.sf.mpxj.ProjectFile;
 import net.sf.mpxj.Task;
 import net.sf.mpxj.mpx.MPXWriter;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import org.springframework.beans.factory.annotation.Autowired;
+import timeboard.core.api.ProjectExportService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.Project;
+import timeboard.core.model.User;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -46,7 +47,7 @@ import java.io.OutputStream;
 public class MspExportPlugin implements ProjectExportService {
 
 
-    @Reference
+    @Autowired
     private ProjectService projectService;
 
     @Override
@@ -60,18 +61,18 @@ public class MspExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(User actor, long projectID, OutputStream output) throws IOException {
+    public void export(User actor, long projectID, OutputStream output) throws IOException, BusinessException {
 
         final Project project = this.projectService.getProjectByID(actor, projectID);
         MPXWriter writer = new MPXWriter();
         ProjectFile projectFile = new ProjectFile();
 
-        this.projectService.listProjectTasks(project).forEach(task -> {
+        this.projectService.listProjectTasks(actor, project).forEach(task -> {
             Task mspTask = projectFile.addTask();
-            mspTask.setName(task.getLatestRevision().getName());
-            mspTask.setStart(task.getLatestRevision().getStartDate());
-            mspTask.setStop(task.getLatestRevision().getEndDate());
-            mspTask.setBaselineCost(task.getEstimateWork());
+            mspTask.setName(task.getName());
+            mspTask.setStart(task.getStartDate());
+            mspTask.setStop(task.getEndDate());
+            mspTask.setBaselineCost(task.getOriginalEstimate());
         });
 
         writer.write(projectFile, output);

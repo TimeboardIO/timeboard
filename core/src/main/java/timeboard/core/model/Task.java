@@ -26,31 +26,23 @@ package timeboard.core.model;
  * #L%
  */
 
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
-
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-public class Task implements Serializable {
+@PrimaryKeyJoinColumn(name = "id")
+public class Task extends AbstractTask implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Column(nullable = false)
+    private double originalEstimate;
 
-    @OneToOne(targetEntity = TaskRevision.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private TaskRevision latestRevision;
+    @Column(nullable = false)
+    private double effortLeft;
 
-    @OneToMany(targetEntity = TaskRevision.class, mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("revisionDate desc")
-    private List<TaskRevision> revisions;
-
-    /**
-     * Task creation origin
-     */
-    @Column
-    private String origin;
+    @Column(nullable = false)
+    private TaskStatus taskStatus;
 
     @OneToOne(targetEntity = TaskType.class)
     private TaskType taskType;
@@ -58,37 +50,40 @@ public class Task implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @OneToMany(targetEntity = Imputation.class, mappedBy = "task")
-    private Set<Imputation> imputations;
+    @ManyToMany(targetEntity = Batch.class, fetch = FetchType.EAGER)
+    private Set<Batch> batches;
+
+    @OneToOne
+    private Account assigned;
+
 
     public Task() {
-        this.revisions = new ArrayList<>();
-        this.imputations = new HashSet<>();
+        super();
     }
 
 
-    public TaskRevision getLatestRevision() {
-        return latestRevision;
+    public double getOriginalEstimate() {
+        return originalEstimate;
     }
 
-    public void setLatestRevision(TaskRevision latestRevision) {
-        this.latestRevision = latestRevision;
+    public void setOriginalEstimate(double originalEstimate) {
+        this.originalEstimate = originalEstimate;
     }
 
-    public Long getId() {
-        return id;
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setTaskStatus(TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
     }
 
-    public String getOrigin() {
-        return origin;
+    public Account getAssigned() {
+        return assigned;
     }
 
-    public void setOrigin(String origin) {
-        this.origin = origin;
+    public void setAssigned(Account assigned) {
+        this.assigned = assigned;
     }
 
     public Project getProject() {
@@ -99,49 +94,27 @@ public class Task implements Serializable {
         this.project = project;
     }
 
-    public Set<Imputation> getImputations() {
-        return imputations;
+    public Set<Batch>  getBatches() {
+        return batches;
     }
 
-    public void setImputations(Set<Imputation> imputations) {
-        this.imputations = imputations;
+    public void setBatches(Set<Batch> batches) {
+        this.batches = batches;
     }
 
-    public double getEstimateWork(){
-        if(this.getLatestRevision() != null) {
-            return this.getLatestRevision().getEstimateWork();
-        }else{
-            return 0;
+    public void addBatch(Batch batch) {
+        if(batch == null) {
+            this.batches = new HashSet<>();
         }
+        this.batches.add(batch);
     }
 
-    /**
-     * EL.
-     *
-     * @return EL
-     */
-    @Transient
-    public double getRemainsToBeDone() {
-        if(this.getLatestRevision() != null) {
-            return this.getLatestRevision().getRemainsToBeDone();
-        }else{
-            return 0;
-        }
+    public double getEffortLeft() {
+        return this.effortLeft;
     }
 
-    @Transient
-    public void setRemainsToBeDone(final User actor, double rtbd) {
-        TaskRevision taskRevision = this.getLatestRevision().clone();
-        taskRevision.setRemainsToBeDone(rtbd);
-        taskRevision.setRevisionDate(new Date());
-        taskRevision.setRevisionActor(actor);
-        this.setLatestRevision(taskRevision);
-        this.revisions.add(taskRevision);
-    }
-
-    @Transient
-    public void updateCurrentRemainsToBeDone(final User actor, double rtbd) {
-        this.getLatestRevision().setRemainsToBeDone(rtbd);
+    public void setEffortLeft(double effortLeft) {
+        this.effortLeft = effortLeft;
     }
 
     public TaskType getTaskType() {
@@ -154,42 +127,25 @@ public class Task implements Serializable {
 
 
     /**
-     * RE.
+     * Real Effort = EffortSpent + EffortLeft.
      *
-     * @return RE
+     * @return Real Effort
      */
     @Transient
-    public double getReEstimateWork() {
-        return this.getEffortSpent() + this.getRemainsToBeDone();
+    public double getRealEffort() {
+        return this.getEffortSpent() + this.getEffortLeft();
     }
 
     /**
-     * ES.
+     * Effort Spent.
      *
-     * @return ES
+     * @return Effort Spent
      */
     @Transient
     public double getEffortSpent() {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
     }
 
-    @Transient
-    public double findTaskImputationValueByDate(Date date) {
-        Optional<Imputation> iOpt = this.getImputations().stream()
-                .filter(imputation -> imputation.getDay().equals(date))
-                .findFirst();
-        if (iOpt.isPresent()) {
-            return iOpt.get().getValue();
-        } else {
-            return 0;
-        }
-    }
 
-    public List<TaskRevision> getRevisions() {
-        return revisions;
-    }
 
-    public void setRevisions(List<TaskRevision> revisions) {
-        this.revisions = revisions;
-    }
 }

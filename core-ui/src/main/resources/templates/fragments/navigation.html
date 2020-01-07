@@ -2,20 +2,57 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="nav(title)">
-    <div class="ui secondary pointing menu nav navigation">
-        <a class="item" th:classappend="${title} == '/'  ? 'active':''" th:href="@{/}">Home</a>
-        <a class="item" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}"
-           th:href="${nav.getNavigationPath()+'?'+nav.getNavigationParams()}" th:text="${nav.getNavigationLabel()}"></a>
+    <a class="toc item">
+        <i class="sidebar icon"></i>
+    </a>
+    <div class="item header">
+        <img src="/onboarding/images/logo.png">
+    </div>
 
-        <div class="right menu">
-            <a class="item" th:href="@{/logout}">
-                <i class="sign out alternate icon">
+    <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}" data-cy="menu-link"
+       th:href="${nav.getNavigationPath()}">
+        <i th:class="${nav.getNavigationLogo()}+' icon'"></i>
+        <div class="title" th:text="${nav.getNavigationLabel()}"></div>
+    </a>
+    <a class="item nav"><i class="beer icon"></i>
+        <div class="title">Vacations</div>
+    </a>
 
-                </i>
-                <span th:if=${user} th:text="${user.name}"></span>
-            </a>
+    <div class="right menu">
+        <div class="ui dropdown item" tabindex="0">
+            <i class="sitemap icon"></i>
+            <div class="title" th:text="${currentOrg.name}"></div>
+            <i class="dropdown icon"></i>
+            <div class="menu transition hidden" tabindex="-1">
+                <a class="item" th:href="@{/select}">
+                    <i class="sign-out icon"></i> Create or Switch organisation
+                </a>
+                <a class="item" th:href="@{/org/members}" th:if="${!currentOrg.isPublicOrganisation()}">
+                    <i class="globe icon"></i> Organisation members
+                </a>
+                <a class="item" th:href="@{/org/setup}" th:if="${!currentOrg.isPublicOrganisation()}">
+                    <i class="settings icon"></i> Organisation Setup
+                </a>
+            </div>
+        </div>
+        <div class="ui dropdown item" tabindex="0">
+            <i class="user icon"></i>
+            <div class="title" th:text="${account.screenName}"></div>
+            <i class="dropdown icon"></i>
+            <div class="menu transition hidden" tabindex="-1">
+                <a class="item" th:href="@{/account}"><i class="edit icon"></i> Setup</a>
+                <a class="item" th:href="@{/logout}"><i class="sign out alternate icon"></i> Logout</a>
+            </div>
         </div>
     </div>
+
+    <script>
+        $('.ui.dropdown')
+          .dropdown({
+            clearable: true
+          });
+
+    </script>
 </div>
 </body>
 </html>

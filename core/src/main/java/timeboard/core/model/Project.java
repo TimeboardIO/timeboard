@@ -26,6 +26,7 @@ package timeboard.core.model;
  * #L%
  */
 
+import timeboard.core.model.converters.JSONToProjectAttributsConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -33,11 +34,27 @@ import java.util.*;
 
 
 @Entity
-public class Project implements Serializable {
+@NamedQueries(
+    {
+            @NamedQuery(name = Project.PROJECT_LIST, query =
+                    "select p from Project p join fetch p.members m " +
+                    "where (p.enable = true or p.enable is null) and m.member = :user and p.organizationID = :orgID"),
+
+            @NamedQuery(name = Project.PROJECT_GET_BY_ID, query =
+                    "select p from Project p join fetch p.members m " +
+                    "where p.id = :projectID and m.member = :user and p.organizationID = :orgID"),
+
+    }
+)
+public class Project extends OrganizationEntity implements Serializable {
+
+    public static final String PROJECT_COLOR_ATTR = "project.color";
+    public static final String PROJECT_LIST = "pjt_list";
+    public static final String PROJECT_GET_BY_ID = "pjt_get_by_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column(length = 50, unique = false)
     private String name;
@@ -51,8 +68,9 @@ public class Project implements Serializable {
     @Column(length = 500)
     private String comments;
 
-    @Column(columnDefinition = "json")
+    @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToProjectAttributsConverter.class)
+    @Lob
     private Map<String, ProjectAttributValue> attributes;
 
     @OneToMany(targetEntity = ProjectMembership.class,
@@ -63,29 +81,37 @@ public class Project implements Serializable {
     )
     private Set<ProjectMembership> members;
 
-    @ManyToMany(targetEntity = ProjectCluster.class, fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
-    private Set<ProjectCluster> clusters;
+    @Column(nullable = true)
+    private Boolean enable;
 
-    @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.PERSIST)
+    @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
+
+    @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectTag> tags;
+
+    @OneToMany(targetEntity = ProjectSnapshot.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectSnapshot> snapshots;
+
+
     public Project() {
-        members = new HashSet<>();
-        clusters = new HashSet<>();
-        tasks = new HashSet<>();
+        this.enable = true;
+        this.members = new HashSet<>();
+        this.tasks = new HashSet<>();
         this.attributes = new HashMap<>();
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     public Double getQuotation() {
-        if(this.quotation == null){
+        if (this.quotation == null) {
             return 0.0;
         }
         return quotation;
@@ -127,14 +153,6 @@ public class Project implements Serializable {
         this.members = members;
     }
 
-    public Set<ProjectCluster> getClusters() {
-        return clusters;
-    }
-
-    public void setClusters(Set<ProjectCluster> cluster) {
-        this.clusters = cluster;
-    }
-
     public Set<Task> getTasks() {
         return tasks;
     }
@@ -149,5 +167,42 @@ public class Project implements Serializable {
 
     public void setAttributes(Map<String, ProjectAttributValue> attributes) {
         this.attributes = attributes;
+    }
+
+
+    public List<ProjectTag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<ProjectTag> tags) {
+        this.tags = tags;
+    }
+
+    public List<ProjectSnapshot> getSnapshots() { return snapshots; }
+
+    public void setSnapshots(List<ProjectSnapshot> snapshots) { this.snapshots = snapshots; }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
+
+    public boolean isMember(Account actor) {
+        return this.getMembers()
+                .stream()
+                .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
+                .count() == 1;
+    }
+
+    @Transient
+    public String getColor() {
+        if (this.getAttributes().get("project.color") != null) {
+            return this.getAttributes().get("project.color").getValue();
+        } else {
+            return "#957DAD";
+        }
     }
 }

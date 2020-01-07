@@ -8,6 +8,29 @@
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+            <module>core</module>
+            <module>theme</module>
+            <module>core-ui</module>
+            <module>home</module>
+            <module>projects</module>
+            <module>organizations</module>
+            <module>timesheet</module>
+            <module>sample-data</module>
+            <module>account</module>
+            <module>reports</module>
+            <module>webapp</module>
+            <module>plugins/project-jira-import-plugin</module>
+            <module>plugins/project-github-import-plugin</module>
+            <module>plugins/project-xls-export-plugin</module>
+    </modules>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
     <name>timeboard-parent</name>
 
     <properties>
@@ -24,6 +47,18 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>11.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.1.6.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
                 <version>2.9.10</version>
@@ -33,44 +68,61 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.9.10.1</version>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>javax.persistence</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.transaction</groupId>
+                <artifactId>javax.transaction-api</artifactId>
+                <version>1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>5.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mindrot</groupId>
+                <artifactId>jbcrypt</artifactId>
+                <version>0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hsqldb</groupId>
+                <artifactId>hsqldb</artifactId>
+                <version>2.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.10.19</version>
+            </dependency>
+            <dependency>
+                <groupId>nz.net.ultraq.thymeleaf</groupId>
+                <artifactId>thymeleaf-layout-dialect</artifactId>
+                <version>2.4.1</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4.7</version>
+            </dependency>
+            <dependency>
+                <groupId>io.reactivex.rxjava2</groupId>
+                <artifactId>rxjava</artifactId>
+                <version>2.2.0</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <profile>
-            <id>core</id>
-            <modules>
-                <module>core</module>
-                <module>security</module>
-                <module>theme</module>
-                <module>core-ui</module>
-                <module>home</module>
-                <module>projects</module>
-                <module>timesheet</module>
-                <module>features</module>
-                <module>shell</module>
-            </modules>
-        </profile>
-        <profile>
-            <id>full</id>
-            <modules>
-                <module>core</module>
-                <module>security</module>
-                <module>theme</module>
-                <module>core-ui</module>
-                <module>home</module>
-                <module>projects</module>
-                <module>timesheet</module>
-                <module>features</module>
-                <module>sample-data</module>
-                <module>shell</module>
-                <module>plugins/project-xls-export-plugin</module>
-                <module>plugins/project-msp-export-plugin</module>
-                <module>plugins/project-github-import-plugin</module>
-                <module>plugins/project-jira-import-plugin</module>
-            </modules>
-        </profile>
-    </profiles>
+
 
     <build>
         <pluginManagement>
@@ -91,7 +143,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-                <version>2.0.0</version>
+                <version>1.20</version>
                 <configuration>
                     <organizationName>Timeboard</organizationName>
                     <inceptionYear>2019</inceptionYear>
@@ -114,10 +166,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>11</release>
                 </configuration>
             </plugin>
             <plugin>
@@ -130,26 +181,36 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.0.0</version>
             </plugin>
-        </plugins>
-    </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>checkstyle</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
+                <version>3.1.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.puppycrawl.tools</groupId>
+                        <artifactId>checkstyle</artifactId>
+                        <version>8.24</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configLocation>timeboard_checkstyle.xml</configLocation>
+                    <encoding>UTF-8</encoding>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
-    </reporting>
+    </build>
+
+
 </project>

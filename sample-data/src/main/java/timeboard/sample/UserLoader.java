@@ -28,48 +28,40 @@ package timeboard.sample;
 
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.User;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
+import timeboard.core.model.Account;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Component(
-        service = UserLoader.class,
-        immediate = true
-)
+
 public class UserLoader {
 
-    @Reference
     UserService userService;
 
+    UserLoader(UserService userService){
+        this.userService = userService;
+    }
 
-    @Activate
-    public void load() throws BusinessException {
-        List<User> users = new ArrayList<>();
-        for (int i = 0; i < 1000; i++) {
-            User u = new User();
+    public List<Account> load(int nbUsers) throws BusinessException {
+        List<Account> accountSaved = new ArrayList<>();
+
+        List<Account> usersToSave = new ArrayList<>();
+        // On créé "nbUsers" utilisateurs
+        for (int i = 0; i < nbUsers; i++) {
+            Account u = new Account();
             u.setName("timeboard" + i);
-            u.setPassword("timeboard" + i);
             u.setEmail("user" + i + "@timeboard.com");
-            u.setImputationFutur(true);
             u.setBeginWorkDate(new Date());
             u.setFirstName("User" + i);
-            u.setLogin("timeboard" + i);
             u.setAccountCreationTime(new Date());
-            users.add(u);
-            System.out.println("Stage user : "+u.getName());
-        }
+            usersToSave.add(u);
+         }
 
-        try {
-            this.userService.createUsers(users);
-            System.out.println("Save "+users.size()+" users");
-        } catch (BusinessException e) {
-            e.printStackTrace();
-        }
+            accountSaved = this.userService.createUsers(usersToSave);
+
+
+        return accountSaved;
 
     }
 

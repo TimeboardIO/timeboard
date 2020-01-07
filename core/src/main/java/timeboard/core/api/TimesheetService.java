@@ -26,26 +26,51 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.model.User;
+import timeboard.core.api.exceptions.TimesheetException;
+import timeboard.core.model.AbstractTask;
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
+
+import java.util.Date;
+import java.util.Map;
+
 
 public interface TimesheetService {
 
     /**
      * Validate user timesheet.
      *
-     * @param actorID         user PK who trigger this function.
-     * @param userTimesheetID user PK which be used to build timehseet to validate
-     * @param year            timesheet year
-     * @param week            timesheet week
+     * @param actor            user who trigger this function.
+     * @param accountTimesheet user which be used to build timehseet to validate
+     * @param year             timesheet year
+     * @param week             timesheet week
      * @return true if timesheet is validate else, false.
      */
-    boolean validateTimesheet(long actorID, long userTimesheetID, int year, int week);
+    void validateTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException;
 
     /**
-     * @param userTimesheet user used to check timesheet validation state.
-     * @param week          timesheet week
-     * @param year          timesheet year
+     * Is timesheet validated.
+     *
+     * @param accountTimesheet user used to check timesheet validation state.
+     * @param week             timesheet week
+     * @param year             timesheet year
      * @return true if timesheet is already validated
      */
-    boolean isTimesheetValidated(User userTimesheet, int year, int week);
+    boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
+
+
+    /**
+     * Get the sum of all imputations by week by user.
+     *
+     * @param firstDayOfWeek first day of week
+     * @param lastDayOfWeek  last day of week
+     * @param account        user used to check timesheet validation state.
+     * @return the sum of all imputations of the week
+     */
+    double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, Account account);
+
+    Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, Account user, Project project);
+
+    Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, Account user, AbstractTask task);
 }

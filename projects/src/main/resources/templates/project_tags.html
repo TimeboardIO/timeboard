@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='five')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
+
+<head>
+    <title layout:fragment="title">Project tags</title>
+    <meta name="projectID" th:value="${project.id}"/>
+    <script src="/js/project_tags.js" type="text/javascript"></script>
+</head>
+<body>
+
+
+<div layout:fragment="placeholder">
+    <div id="components-demo">
+
+        <div class="ui menu">
+            <a class="item"
+               v-on:click="addTag">
+                <i class="plus icon"></i>
+                New Tag
+            </a>
+        </div>
+
+        <data-table v-bind:config="table">
+            <template v-slot:tagkey="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.tagKey"/>
+                </div>
+            </template>
+            <template v-slot:tagvalue="{row}">
+                <div class="ui input">
+                    <input type="text" v-model="row.tagValue"/>
+                </div>
+            </template>
+            <template v-slot:tagactions="{row}">
+                <button class="ui negative basic button" v-on:click="removeTag(row)">
+                    <i class="remove alternate icon"></i>
+                    Remove
+                </button>
+                <button class="ui positive basic button" v-on:click="updateTag(row)">
+                    <i class="add alternate icon"></i>
+                    Update
+                </button>
+            </template>
+        </data-table>
+
+        <tmodal-confirm
+                ref="confirmModal"
+                title="Confirm deletion ?"
+                icon="eye"
+        ></tmodal-confirm>
+
+    </div>
+
+
+</div>
+
+</body>
+</html>

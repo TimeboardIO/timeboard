@@ -6,7 +6,7 @@
        Fonts
 --------------------*/
 
-@fontName          : 'Lato';
+@fontName          : 'Raleway';
 @fontSmoothing     : antialiased;
 
 @headerFont        : @fontName, 'Verdana', Geneva, sans-serif;
@@ -39,7 +39,7 @@
     Border Radius
 --------------------*/
 
-/* See Power-user section below
+/* See Power-account section below
    for explanation of @px variables
 */
 @relativeBorderRadius: @relative4px;
@@ -51,8 +51,12 @@
     Brand Colors
 --------------------*/
 
-@primaryColor        : #3d6488;
-@secondaryColor      : @black;
+@primaryColor        : #00bfd8;
+@secondaryColor      : #393939;
+
+
+@backgroundGradientColor1 : #01BFD9;
+@backgroundGradientColor2 : #007DF7;
 
 @lightPrimaryColor   : #75a7d5;
 @lightSecondaryColor : @lightBlack;
@@ -125,7 +129,7 @@
 @pageOverflowX       : hidden;
 
 @lineHeight          : 1.4285em;
-@textColor           : rgba(0, 0, 0, 0.87);
+@textColor           : @secondaryColor;
 
 /*-------------------
       Paragraph
@@ -220,22 +224,26 @@
 --------------------*/
 
 /*---  Colors  ---*/
-/*@red              : #DB2828;*/
-@red              : #C53E43;
-@orange           : #F2711C;
-@yellow           : #FBBD08;
-@olive            : #B5CC18;
-/*@green            : #21BA45;*/
-@green            : #4dc98d;
-@teal             : #00B5AD;
+
+
+
+@red              : #e55151; // #db2828;
+@green            : #5BCA7E;  // #21ba45;
 @blue             : @primaryColor;
-/*@blue             : #2185D0;*/
-@violet           : #6435C9;
+@yellow           : #FBBD08;
+
+//@red              : #C53E43;
+@orange           : #F2711C;
+@olive            : #B5CC18;
+//@green            : #20c997;
+@teal             : #00B5AD;
+@violet           : #957DAD;
 @purple           : #A333C8;
 @pink             : #E03997;
 @brown            : #A5673F;
 @grey             : #767676;
 @black            : #1B1C1D;
+
 
 /*---  Light Colors  ---*/
 @lightRed         : #FF695E;
@@ -244,13 +252,20 @@
 @lightOlive       : #D9E778;
 @lightGreen       : #2ECC40;
 @lightTeal        : #6DFFFF;
-@lightBlue        : #54C8FF;
+@lightBlue        : #D1DCEB;
 @lightViolet      : #A291FB;
 @lightPurple      : #DC73FF;
 @lightPink        : #FF8EDF;
 @lightBrown       : #D67C1C;
 @lightGrey        : #DCDDDE;
 @lightBlack       : #545454;
+
+/*---- Dark Colors ---*/
+@darkRed          : @red;
+@veryLightRed      : #fff;
+@inputBorderColor : #e0b4b4;
+
+
 
 /*---   Neutrals  ---*/
 @fullBlack        : #000000;
@@ -351,31 +366,31 @@
 
 /* Positive */
 @positiveColor           : @green;
-@positiveBackgroundColor : #FCFFF5;
-@positiveBorderColor     : #A3C293;
-@positiveHeaderColor     : #1A531B;
-@positiveTextColor       : #2C662D;
+@positiveBackgroundColor : @white;
+@positiveBorderColor     : @green;
+@positiveHeaderColor     : @green;
+@positiveTextColor       : @green;
 
 /* Negative */
 @negativeColor           : @red;
-@negativeBackgroundColor : #FFF6F6;
-@negativeBorderColor     : #E0B4B4;
-@negativeHeaderColor     : #912D2B;
-@negativeTextColor       : #9F3A38;
+@negativeBackgroundColor : @white;
+@negativeBorderColor     : @red;
+@negativeHeaderColor     : @red;
+@negativeTextColor       : @red;
 
 /* Info */
-@infoColor              : #31CCEC;
-@infoBackgroundColor    : #F8FFFF;
-@infoBorderColor        : #A9D5DE;
-@infoHeaderColor        : #0E566C;
-@infoTextColor          : #276F86;
+@infoColor              : @primaryColor;
+@infoBackgroundColor    : @white;
+@infoBorderColor        : @primaryColor;
+@infoHeaderColor        : @primaryColor;
+@infoTextColor          : @primaryColor;
 
 /* Warning */
-@warningColor           : #F2C037;
-@warningBorderColor     : #C9BA9B;
-@warningBackgroundColor : #FFFAF3;
-@warningHeaderColor     : #794B02;
-@warningTextColor       : #573A08;
+@warningColor           : @yellow;
+@warningBackgroundColor : @white;
+@warningBorderColor     : @yellow;
+@warningHeaderColor     : @yellow;
+@warningTextColor       : @yellow;
 
 /*-------------------
         Paths
@@ -433,7 +448,7 @@
      Neutral Text
 --------------------*/
 
-@darkTextColor               : rgba(0, 0, 0, 0.85);
+@darkTextColor               : @secondaryColor;
 @mutedTextColor              : rgba(0, 0, 0, 0.6);
 @lightTextColor              : rgba(0, 0, 0, 0.4);
 

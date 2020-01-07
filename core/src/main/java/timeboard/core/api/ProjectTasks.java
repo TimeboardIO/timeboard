@@ -31,6 +31,7 @@ import timeboard.core.model.Task;
 
 import java.util.List;
 
+
 public class ProjectTasks {
 
     private final Project project;
@@ -45,7 +46,7 @@ public class ProjectTasks {
         return project;
     }
 
-    public List<Task> getTaskRevisions() {
+    public List<Task> getTasks() {
         return tasks;
     }
 }

@@ -1,0 +1,46 @@
+@startuml
+
+abstract class AbstractTask
+
+
+AbstractTask <|-- ProjectTask
+AbstractTask <|-- DefaultTask
+AbstractTask <|-- VacationTask
+
+Imputation "1" -- "*" AbstractTask
+VacationRequest "1" -- "1" User : actor
+VacationRequest "1" -- "1..*" User : requestAsssigned
+
+VacationRequest -- "1" VacationTask
+
+
+class VacationRequest{
+    boolean isValidated
+    Date startDate
+    Date endDate
+    HalfDay startHalfDay
+    HalfDay endHalfDay
+
+}
+
+enum HalfDay {
+    MORNING,
+    AFTERNOON
+}
+class Imputation{
+    double value
+    Date date
+}
+
+class AbstractTask {
+    Long id
+    String name
+    String description
+    Date startDate
+    Date endDate
+}
+
+
+
+
+@enduml

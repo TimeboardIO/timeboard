@@ -31,17 +31,23 @@ public class UpdatedTaskResult {
     private final long projectID;
     private final long taskID;
     private final double effortSpent;
-    private final double remainToBeDone;
-    private final double estimateWork;
-    private final double reEstimateWork;
+    private final double effortLeft;
+    private final double originalEstimate;
+    private final double realEffort;
 
-    public UpdatedTaskResult(long projectID, long taskID, double effortSpent, double remainToBeDone, double estimateWork, double reEstimateWork) {
+    public UpdatedTaskResult(long projectID,
+                             long taskID,
+                             double effortSpent,
+                             double effortLeft,
+                             double originalEstimate,
+                             double realEffort) {
+
         this.projectID = projectID;
         this.taskID = taskID;
         this.effortSpent = effortSpent;
-        this.remainToBeDone = remainToBeDone;
-        this.estimateWork = estimateWork;
-        this.reEstimateWork = reEstimateWork;
+        this.effortLeft = effortLeft;
+        this.originalEstimate = originalEstimate;
+        this.realEffort = realEffort;
     }
 
     public long getProjectID() {
@@ -56,16 +62,16 @@ public class UpdatedTaskResult {
         return this.effortSpent;
     }
 
-    public double getRemainToBeDone() {
-        return this.remainToBeDone;
+    public double getEffortLeft() {
+        return this.effortLeft;
     }
 
-    public double getEstimateWork() {
-        return this.estimateWork;
+    public double getOriginalEstimate() {
+        return this.originalEstimate;
     }
 
-    public double getReEstimateWork() {
+    public double getRealEffort() {
 
-        return this.reEstimateWork;
+        return this.realEffort;
     }
 }

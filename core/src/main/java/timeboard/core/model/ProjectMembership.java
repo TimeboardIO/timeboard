@@ -29,27 +29,27 @@ package timeboard.core.model;
 import javax.persistence.*;
 
 @Entity
-public class ProjectMembership {
+public class ProjectMembership extends OrganizationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long membershipID;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    private User member;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
+    private Account member;
 
     @OneToOne()
     private Project project;
 
     @Column()
     @Enumerated(EnumType.STRING)
-    private ProjectRole role;
+    private MembershipRole role;
 
     public ProjectMembership() {
     }
 
 
-    public ProjectMembership(Project project, User owner, ProjectRole role) {
+    public ProjectMembership(Project project, Account owner, MembershipRole role) {
         this.member = owner;
         this.role = role;
         this.project = project;
@@ -63,11 +63,11 @@ public class ProjectMembership {
         this.membershipID = membershipID;
     }
 
-    public User getMember() {
+    public Account getMember() {
         return member;
     }
 
-    public void setMember(User member) {
+    public void setMember(Account member) {
         this.member = member;
     }
 
@@ -79,11 +79,11 @@ public class ProjectMembership {
         this.project = project;
     }
 
-    public ProjectRole getRole() {
+    public MembershipRole getRole() {
         return role;
     }
 
-    public void setRole(ProjectRole role) {
+    public void setRole(MembershipRole role) {
         this.role = role;
     }
 }

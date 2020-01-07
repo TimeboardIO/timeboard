@@ -26,11 +26,13 @@ package timeboard.core.internal.rules;
  * #L%
  */
 
-import timeboard.core.model.User;
+import timeboard.core.model.Account;
 
 public interface Rule<T> {
 
     String ruleDescription();
 
-    boolean isSatisfied(User user, T thing);
+    boolean isSatisfied(Account account, T thing);
+
+
 }

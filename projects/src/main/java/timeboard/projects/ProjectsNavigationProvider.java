@@ -26,13 +26,11 @@ package timeboard.projects;
  * #L%
  */
 
+import org.springframework.stereotype.Component;
 import timeboard.core.ui.NavigationExtPoint;
-import org.osgi.service.component.annotations.Component;
 
-@Component(
-        service = NavigationExtPoint.class,
-        immediate = true
-)
+
+@Component
 public class ProjectsNavigationProvider implements NavigationExtPoint {
 
     @Override
@@ -43,5 +41,15 @@ public class ProjectsNavigationProvider implements NavigationExtPoint {
     @Override
     public String getNavigationPath() {
         return "/projects";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 50;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "tasks";
     }
 }

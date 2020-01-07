@@ -2,31 +2,16 @@
 
 <html layout:decorate="~{layouts/general.html(path='/projects')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
     <title layout:fragment="title">Home Page</title>
+    <script src="/js/project_list.js" type="text/javascript"></script>
 </head>
 <body>
 
 <div layout:fragment="content">
-
-    <style type="text/css">
-        .badge{
-           text-align: center;
-            width: 3em;
-            margin: 0 auto;
-            background-color: #957DAD;
-            line-height: 3em;
-            border-radius: 5em;
-            margin-top: 0.5em;
-            font-size: 3em;
-            color: white;
-            margin-bottom: 0.5em;
-        }
-
-
-    </style>
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
@@ -34,47 +19,106 @@
             <div class="header">
                 No Projects ?
             </div>
-            <p>You are not member of any project, click <a th:href="@{/projects/create}">here</a> to create your first
-                project !</p>
+            <p>You are not member of any project, click
+                <a th:href="@{/projects/create}" data-cy="create-project" >here</a>
+                to create your first project !</p>
         </div>
     </div>
 
     <div th:if="${!projects.isEmpty()}">
 
-        <div class="ui segment">
-            <a class="ui button positive" th:href="@{/projects/create}">Create Project</a>
+        <div class="ui horizontal divider">
+            <i class="box icon"></i>
+            Last Projects
         </div>
 
-        <div class="ui grid segment">
-            <div class="four wide column" th:each="project : ${projects}">
-                <div class="ui card">
-                    <div class="image">
-                        <div class="badge" style="text-transform: capitalize;"
-                             th:text="${project.name.charAt(0)+''+project.name.charAt(1)}">P
-                        </div>
+        <div class="ui five stackable cards">
+        </div>
+        <div id="projects-app">
+            <div class="ui five stackable cards">
+                <div v-for="project in table.data.slice(0, 4)" class="ui project card" data-cy="project" >
+                    <div class="image"  v-bind:style="'background-color:' + project.color" >
+                        <a v-bind:href="'/projects/'+project.id+'/setup'">
+                            <div class="badge" >
+                                {{ project.name.charAt(0) + '' + project.name.charAt(1)  }}
+                            </div>
+                        </a>
                     </div>
                     <div class="content">
-                        <a class="header" th:text="${project.name}"></a>
+                        <a class="header" v-bind:style="'color:'+ project.color " data-cy="project-title"> {{ project.name }}</a>
                         <div class="meta">
-                    <span class="date">
-                        <i class="archive icon"></i>
-                        [[${project.clusters.size()}]] Clusters
-                    </span>
                             <div>
-                                <i class="user icon"></i>
-                                [[${project.members.size()}]] Members
+                                <i class="account icon"></i>
+                                {{ project.memberSize }} Members
                             </div>
                         </div>
-                        <div class="description" th:text="${project.comments}">
+                        <div class="description" >
+                            {{ project.comments }}
                         </div>
                     </div>
-                    <div class="extra content">
-                        <a class="ui positive button" th:href="@{/projects/config(projectID=${project.id})}">Setup</a>
-                        <a class="negative ui basic button"
-                           th:href="@{/projects/delete(projectID=${project.id})}">Delete</a>
+                    <div class="extra content" style="text-align: center;">
+
+                        <a v-bind:href="'/projects/'+project.id+'/setup'" class="ui positive icon button" data-cy="setup">
+                            <i class="cog icon"></i>
+                        </a>
+                        <a v-bind:href="'/projects/'+project.id+'/tasks'"
+                            class="ui primary icon button">
+                            <i class="tasks icon"></i>
+                        </a>
+                        <a @click="archive(project)" class="ui negative icon button" data-cy="archive">
+                            <i class="archive icon"></i>
+                        </a>
                     </div>
                 </div>
+
+                <div class="ui card loading">
+                    <a class="content"  style="background-color: lightgrey" >
+                        <div class="ui active loader"></div>
+                    </a>
+                </div>
+                <div class="ui card">
+                    <a class="content"  style="background-color: lightgrey" data-cy="create-project"  th:href="@{/projects/create}">
+                        <div class="badge" style="font-size: 4.2rem; padding-top: 2rem;">
+                            <i class="plus icon"></i>
+
+                        </div>
+                    </a>
+                </div>
             </div>
+
+        <br/>
+        <div class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            All Projects
+        </div>
+
+
+            <data-table v-bind:config="table">
+                <template v-slot:name="{row}">
+                    {{row.name}}
+                </template>
+                <template v-slot:actions="{row}">
+                    <a class="ui right labeled positive icon button" v-bind:href="'/projects/'+row.id+'/setup'" data-cy="setup">
+                        <i class="cog icon"></i>
+                        Setup
+                    </a>
+                    <a class="ui right labeled primary icon button" v-bind:href="'/projects/'+row.id+'/tasks'" data-cy="tasks">
+                        <i class="tasks icon"></i>
+                        Task
+                    </a>
+                    <a class="ui right labeled negative icon button" @click="archive(row)" data-cy="archive">
+                        <i class="archive icon"></i>
+                        Archive
+                    </a>
+                </template>
+            </data-table>
+
+            <tmodal-confirm
+                    ref="confirmModal"
+                    title="Confirm archive ?"
+                    icon="archive"
+            ></tmodal-confirm>
+
         </div>
     </div>
 
