@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{org_layout.html(tab='config')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta property="organization" th:baseURL="@{${'/org/'+tab}}" th:orgID="${organization.id}"/>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+<div id="orgConfig">
+    <div class="ui segment">
+        <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
+            <input name="orgID" required th:value="${organization.id}" type="hidden">
+            <input name="action" required type="hidden" value="CONFIG">
+
+            <div class="field">
+                <label>Organization Name</label>
+                <input name="organizationName" placeholder="Organization Name" required th:value="${organization.name}"
+                       type="text">
+            </div>
+            <button class="ui primary  right align icon button" type="submit">
+                Save config <i class="cog icon"></i>
+            </button>
+        </form>
+    </div>
+
+    <div class="ui stackable two column grid">
+        <div class="column">
+
+
+            <data-table v-bind:config="types">
+                <template v-slot:name="{row}">
+                    <div class="ui input">
+                        <input type="text" v-model="row.name"/>
+                    </div>
+                </template>
+                <template v-slot:actions="{row}">
+                    <button class="ui negative basic button" v-on:click="removeTag(row)">
+                        <i class="remove alternate icon"></i>
+                        Remove
+                    </button>
+                    <button class="ui positive basic button" v-on:click="updateTag(row)">
+                        <i class="add alternate icon"></i>
+                        Update
+                    </button>
+                </template>
+            </data-table>
+
+
+
+        </div>
+        <div class="column">
+            <data-table v-bind:config="tasks">
+                <template v-slot:name="{row}">
+                    <div class="ui input">
+                        <input type="text" v-model="row.name"/>
+                    </div>
+                </template>
+                <template v-slot:actions="{row}">
+                    <button class="ui negative basic button" v-on:click="removeTag(row)">
+                        <i class="remove alternate icon"></i>
+                        Remove
+                    </button>
+                    <button class="ui positive basic button" v-on:click="updateTag(row)">
+                        <i class="add alternate icon"></i>
+                        Update
+                    </button>
+                </template>
+            </data-table>
+
+        </div>
+    </div>
+
+    <script src="/js/org_members.js"></script>
+</div>
+</div>
+
+</body>
+</html>

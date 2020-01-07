@@ -55,7 +55,7 @@ import java.util.Set;
 
 @Component
 @RestController
-@RequestMapping(value = "/api/org", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/org", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrganizationsRestAPI {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");

@@ -28,9 +28,12 @@ package timeboard.organization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.TimeboardAuthentication;
@@ -38,10 +41,7 @@ import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.DefaultTask;
-import timeboard.core.model.Organization;
-import timeboard.core.model.TaskType;
+import timeboard.core.model.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**
@@ -86,9 +87,20 @@ public class OrganizationConfigController {
         if (organization.isPresent()) {
             model.addAttribute("organization", organization.get());
         }
-        return "details_org_config.html";
+        return "org_config.html";
 
     }
+
+
+    @GetMapping(value = "/default-task/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TaskWrapper>> listDefaultTasks(TimeboardAuthentication authentication,
+                                                            @PathVariable Long projectID) throws BusinessException {
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.listDefaultTasks(actor, authentication.getCurrentOrganization(), projectID);
+        return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new TaskWrapper(projectTag)).collect(Collectors.toList()));
+    }
+
+
 
     @PostMapping
     protected String handlePost(TimeboardAuthentication authentication,
@@ -124,5 +136,20 @@ public class OrganizationConfigController {
 
         //Extract organization
         return this.handleGet(authentication, request, model);
+    }
+
+
+
+    public static class TaskWrapper {
+        private DefaultTask task;
+
+        public TaskWrapper(DefaultTask task) {
+            this.task = task;
+        }
+
+        public String getName(){
+            return task.getName();
+        }
+
     }
 }
