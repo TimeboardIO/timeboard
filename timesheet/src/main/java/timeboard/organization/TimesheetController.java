@@ -130,7 +130,7 @@ public class TimesheetController {
         model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekValidated", lastWeekValidated);
 
-        model.addAttribute("taskTypes", this.projectService.listTaskType());
+        model.addAttribute("taskTypes", this.projectService.listTaskType(authentication.getCurrentOrganization()));
 
         model.addAttribute("projectList",
                 this.projectService.listProjects(

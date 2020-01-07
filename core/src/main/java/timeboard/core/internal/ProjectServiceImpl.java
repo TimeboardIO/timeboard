@@ -350,8 +350,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<TaskType> listTaskType() {
-        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true", TaskType.class);
+    public List<TaskType> listTaskType(Long orgID) {
+        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
+        q.setParameter("orgID", orgID);
         return q.getResultList();
     }
 
@@ -747,6 +748,19 @@ public class ProjectServiceImpl implements ProjectService {
                         + "and t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("ds", ds);
         q.setParameter("de", de);
+        q.setParameter("orgID", orgID);
+        List<DefaultTask> tasks = q.getResultList();
+
+        return q.getResultList();
+
+    }
+
+    @Override
+    public List<DefaultTask> listDefaultTasks(Long orgID) {
+        TypedQuery<DefaultTask> q = em
+                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
+                        + "t.organizationID = :orgID", DefaultTask.class);
+
         q.setParameter("orgID", orgID);
         List<DefaultTask> tasks = q.getResultList();
 

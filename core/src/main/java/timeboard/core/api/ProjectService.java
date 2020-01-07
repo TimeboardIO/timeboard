@@ -141,6 +141,7 @@ public interface ProjectService {
      == Default Tasks ==
      */
     List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de);
+    List<DefaultTask> listDefaultTasks(Long orgID);
 
     /**
      * Create a default task.
@@ -220,7 +221,7 @@ public interface ProjectService {
      *
      * @return List all task types.
      */
-    List<TaskType> listTaskType();
+    List<TaskType> listTaskType(Long orgID);
 
     TaskType findTaskTypeByID(Long taskTypeID);
 
