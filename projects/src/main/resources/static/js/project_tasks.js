@@ -1,4 +1,5 @@
 const currentProjectID = $("meta[property='tasks']").attr('project');
+const currentBatchType = $("meta[property='tasks']").attr('batchType');
 
 // TASK EDIT/CREATE MODAL VUEJS COMPONENT
 Vue.component('task-modal', {
@@ -19,6 +20,7 @@ Vue.component('graph-modal', {
         modalTitle: String
     }
 });
+
 
 // Form validations rules
 const formValidationRules = {
@@ -77,6 +79,7 @@ let app = new Vue({
     data: {
         newTask: Object.assign({}, emptyTask),
         formError: "",
+        batches: [],
         modalTitle: "Create task",
         table: {
             cols: [
@@ -146,11 +149,11 @@ let app = new Vue({
                                 filterFunction: (filter, row) => parseFloat(row) <= parseFloat(filter) },
                 assignee:  { filterKey: 'assignee', filterValue: '',
                                 filterFunction: (filter, row) => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 },
-                status:    { filterKey: 'status', filterValue: '',
+                status:    { filterKey: 'status', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 ) },
-                batch:     { filterKey: 'batchID', filterValue: '',
+                batch:     { filterKey: 'batchID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
-                type:      { filterKey: 'typeID', filterValue: '',
+                type:      { filterKey: 'typeID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
             },
             data: [],
@@ -162,7 +165,8 @@ let app = new Vue({
             data: [],
             name: 'pending tasks',
             configurable : true
-        }
+        },
+        tableByBatch : {}
     },
     methods: {
         showGraphModal: function(projectID, task, event){
@@ -281,11 +285,30 @@ let app = new Vue({
                     event.target.classList.toggle('loading');
                     app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 });
+        },
+        toggleFilters : function() {
+            $('.filters').toggle();
         }
     },
     created: function () {
         // copying table config to pending task table config
         this.tablePending.cols = this.table.cols;
+
+        let self = this;
+        if (currentBatchType !== 'Default') {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "/api/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
+                success: function (d) {
+                    self.batches = d;
+                    d.forEach(function(batch) {
+                        self.tableByBatch[batch.batchID] = Object.assign({}, self.table );
+                    });
+                }
+            });
+        }
+
     },
     updated: function () {
         // ! \\ create a infinite loop
@@ -296,9 +319,15 @@ let app = new Vue({
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/api/tasks?project="+currentProjectID,
+            url: "/api/tasks?project=" + currentProjectID,
             success: function (d) {
                 self.table.data = d;
+                if(currentBatchType !== 'Default') {
+                    // Spliting data by batch
+                    self.batches.forEach(function(batch) {
+                        self.tableByBatch[batch.batchID].data = d.filter(row => { return row.batchIDs.some(b => b === batch.batchID) });
+                    });
+                }
                 self.tablePending.data = d.filter(r => r.status === 'PENDING');
                 $('.ui.dimmer').removeClass('active');
             }
@@ -309,8 +338,9 @@ let app = new Vue({
 //Initialization
 $(document).ready(function(){
     //init dropdown fields
-     $('.ui.multiple.dropdown').dropdown();
+    $('.ui.multiple.dropdown').dropdown();
 
+    $('.ui.accordion').accordion({exclusive : false});
     //init search fields
     $('.ui.search')
     .search({

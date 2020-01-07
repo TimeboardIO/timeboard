@@ -4,7 +4,7 @@ Vue.component('data-table', {
             <table class="ui celled table" v-if="config.data.length > 0">
                 <thead>
                     <tr>
-                      <th v-for="col in finalCols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"> </th>
+                      <th v-for="col in finalCols" v-if="col.visible && col.sortKey" @click="sortBy(col.slot)" >{{col.label}} <i class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"></i> </th>
                       <th v-for="col in finalCols" v-if="col.visible && !col.sortKey" >{{col.label}} </th>
                       <th v-if="config.configurable === true" class="collapsing" style="border-left: none;" ><i class="cog icon" @click="showConfigModal()"></i></th>
                     </tr>
@@ -20,7 +20,7 @@ Vue.component('data-table', {
                 </tbody>
                 <tmodal 
                     v-bind:title="'Column config '+config.name"
-                    v-bind:id="'configModal'+config.name">
+                    v-bind:id=" 'configModal' + config.name.replace(/ /g,'') ">
                     <template v-slot:content>
                         <table class="ui celled table">
                             <thead>
@@ -118,7 +118,7 @@ Vue.component('data-table', {
             this.sortOrders[key] = this.sortOrders[key] * -1
         },
         showConfigModal: function() {
-            $('#configModal'+this.config.name).modal({
+            $( '#configModal' + this.config.name.replace(/ /g, '' )).modal({
                 onApprove : function($element) {
 
                 },
@@ -145,7 +145,7 @@ Vue.component('data-table', {
                 url: "/api/datatable",
                 success: function (d) {
                     event.target.classList.toggle('loading');
-                    $('#configModal'+self.config.name).modal('hide');
+                    $('#configModal'+self.config.name.replace(/ /g, '' )).modal('hide');
                 }
             });
         }

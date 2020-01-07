@@ -9,7 +9,7 @@
 
 <head>
     <title>Project Tasks details</title>
-    <meta property="tasks" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}" th:project="${project.id}"/>
+    <meta property="tasks" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}" th:project="${project.id}"  th:batchtype="${batchType}"/>
     <style>
         .ellipsis {
             text-overflow: ellipsis;
@@ -155,7 +155,7 @@
                     <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" th:modal-id="${plugin.serviceID}" class="item" v-on:click="$('#'+event.target.getAttribute('modal-id')).modal('show')">plugin name</div>
                 </div>
             </div>
-            <div @click="$('.filters').toggle()" class="ui dropdown item" >
+            <div @click="toggleFilters" class="ui dropdown item" >
                 <i class="filter icon"></i>
                 Filters
             </div>
@@ -163,14 +163,25 @@
                 <div class="ui orange label item" th:if="${import} > 0">
                     <i class="sync icon rotating"></i> Sync with Jira in progress
                 </div>
+
+                <div class="ui dropdown item" tabindex="0" id="view">
+                    <i class="list alternate icon"></i>
+                    <div class="title" th:text="${batchType}"></div>
+                    <i class="dropdown icon"></i>
+                    <div class="menu transition hidden" tabindex="-1">
+                        <a class="item" th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}" >
+                            Default
+                        </a>
+                        <a class="item"  th:each="type: ${allProjectBatchTypes}"
+                                th:text="${type.label}"
+                                th:href="@{/projects/{projectID}/tasks/group/{batchType}/(projectID=${project.id}, batchType=${type.label})}"
+                        ></a>
+
+                    </div>
+                </div>
+
             </div>
-            <script type="text/javascript">
-                $(document).ready(function(){
-                    $('#import').dropdown({
-                        clearable: true
-                    });
-                });
-            </script>
+
         </div>
 
         <!-- Filters-->
@@ -259,7 +270,7 @@
                 <i v-for="item in row.batchNames"> {{item}} </i>
             </template>
             <template v-slot:type="{row}">
-                <div v-if="row.typeName" class="ui blue horizontal label"> {{row.typeName}} </div>
+                <div v-if="row.typeName !== '' " class="ui blue horizontal label"> {{row.typeName}} </div>
             </template>
             <template v-slot:status="{row}">
                 <div class="ui small primary horizontal label"> {{row.statusName}} </div>
@@ -279,55 +290,109 @@
 
         <div class="ui horizontal divider">
             <i class="boxes icon"></i>
-            All tasks
+            All tasks <span th:if="${batchType} != 'Default' " th:text="'group by ' + ${batchType}"></span>
         </div>
 
-
-
-        <!-- Datatable component -->
-        <data-table v-bind:config="table">
-            <template v-slot:name="{row}">
-                {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
-                {{row.taskComments}}</p>
-            </template>
-            <template v-slot:start="{row}">
-                {{row.startDate}}
-            </template>
-            <template v-slot:end="{row}">
-                {{row.endDate}}
-            </template>
-            <template v-slot:oe="{row}">
-                <div class="ui circular label large day-badge" style="margin-top: 5px;">
-                    <p>{{row.originalEstimate}}</p>
+        <div class="ui styled fluid accordion">
+            <div v-for="batch in batches">
+                <div class="title">
+                    <i class="plus icon"></i>
+                    {{ batch.batchName }}
                 </div>
-            </template>
-            <template v-slot:assignee="{row}">
-                {{row.assignee}}
-            </template>
-            <template v-slot:batch="{row}">
-                <i v-for="item in row.batchNames"> {{item}} </i>
-            </template>
-            <template v-slot:type="{row}">
-                <div class="ui blue green horizontal label"> {{row.typeName}} </div>
-            </template>
-            <template v-slot:status="{row}">
-                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
-            </template>
+                <div class="content">
+                    <!-- Datatable component -->
+                    <data-table v-bind:config="tableByBatch[batch.batchID]">
+                        <template v-slot:name="{row}">
+                            {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                            {{row.taskComments}}</p>
+                        </template>
+                        <template v-slot:start="{row}">
+                            {{row.startDate}}
+                        </template>
+                        <template v-slot:end="{row}">
+                            {{row.endDate}}
+                        </template>
+                        <template v-slot:oe="{row}">
+                            <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                                <p>{{row.originalEstimate}}</p>
+                            </div>
+                        </template>
+                        <template v-slot:assignee="{row}">
+                            {{row.assignee}}
+                        </template>
+                        <template v-slot:batch="{row}">
+                            <i v-for="item in row.batchNames"> {{item}} </i>
+                        </template>
+                        <template v-slot:type="{row}">
+                            <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
+                        </template>
+                        <template v-slot:status="{row}">
+                            <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                        </template>
 
-            <template v-slot:actions="{row}">
-                <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
-                    <i class="close icon"></i>
-                </button>
-                <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
-                        class="ui tiny primary icon button">
-                    <i class="edit icon"></i>
-                </button>
-                <button v-on:click="showGraphModal(null, row, $event)"  data-cy="show-graph-task"
-                        class="ui tiny yellow icon button">
-                    <i class="chart line icon"></i>
-                </button>
-            </template>
-        </data-table>
+                        <template v-slot:actions="{row}">
+                            <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
+                                <i class="close icon"></i>
+                            </button>
+                            <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
+                                    class="ui tiny primary icon button">
+                                <i class="edit icon"></i>
+                            </button>
+                            <button v-on:click="showGraphModal(null, row, $event)"  data-cy="show-graph-task"
+                                    class="ui tiny yellow icon button">
+                                <i class="chart line icon"></i>
+                            </button>
+                        </template>
+                    </data-table>
+                </div>
+            </div >
+            <div th:if="${batchType} == 'Default' ">
+                <data-table v-bind:config="table">
+                    <template v-slot:name="{row}">
+                        {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
+                        {{row.taskComments}}</p>
+                    </template>
+                    <template v-slot:start="{row}">
+                        {{row.startDate}}
+                    </template>
+                    <template v-slot:end="{row}">
+                        {{row.endDate}}
+                    </template>
+                    <template v-slot:oe="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.originalEstimate}}</p>
+                        </div>
+                    </template>
+                    <template v-slot:assignee="{row}">
+                        {{row.assignee}}
+                    </template>
+                    <template v-slot:batch="{row}">
+                        <i v-for="item in row.batchNames"> {{item}} </i>
+                    </template>
+                    <template v-slot:type="{row}">
+                        <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
+                    </template>
+                    <template v-slot:status="{row}">
+                        <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                    </template>
+
+                    <template v-slot:actions="{row}">
+                        <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
+                            <i class="close icon"></i>
+                        </button>
+                        <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
+                                class="ui tiny primary icon button">
+                            <i class="edit icon"></i>
+                        </button>
+                        <button v-on:click="showGraphModal(null, row, $event)"  data-cy="show-graph-task"
+                                class="ui tiny yellow icon button">
+                            <i class="chart line icon"></i>
+                        </button>
+                    </template>
+                </data-table>
+            </div>
+        </div>
+
 
 
         <!-- Task modal component instance-->
@@ -347,9 +412,15 @@
             <div  th:include="fragments/sync_task_form.html :: form(${plugin.getServiceName()}, ${plugin.getServiceID()}, ${plugin.getSyncCredentialFields()})"></div>
         </div>
 
-        <script src="/js/project_tasks.js"></script>
-
     </div>
+    <script src="/js/project_tasks.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('#import, #view').dropdown({
+                clearable: true
+            });
+        });
+    </script>
 
 </div>
 

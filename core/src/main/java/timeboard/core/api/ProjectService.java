@@ -231,4 +231,7 @@ public interface ProjectService {
 
     boolean isProjectOwner(Account user, Project project);
 
+    List<Batch> getBatchList(Account user, Project project, BatchType batchType) throws BusinessException;
+
+    List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 }

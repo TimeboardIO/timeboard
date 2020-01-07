@@ -88,6 +88,31 @@ public class ProjectTasksController {
 
         fillModel(model, actor, project);
 
+        model.addAttribute("batchType", "Default");
+        return "project_tasks.html";
+    }
+
+
+    @GetMapping("/tasks/group/{batchType}")
+    protected String listTasksGroupByBatchType(
+            TimeboardAuthentication authentication,
+            @PathVariable Long projectID, @PathVariable String batchType, Model model) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+
+        final Task task = new Task();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+
+        BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
+        model.addAttribute("batchType", batchType);
+        model.addAttribute("batchList", this.projectService.getBatchList(actor, project, javaBatchType));
+
+        model.addAttribute("task", new TaskForm(task));
+        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("sync_plugins", this.projectImportServiceList);
+
+        fillModel(model, actor, project);
+
         return "project_tasks.html";
     }
 
@@ -97,6 +122,7 @@ public class ProjectTasksController {
         model.addAttribute("taskTypes", this.projectService.listTaskType());
         model.addAttribute("allTaskStatus", TaskStatus.values());
         model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
+        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());

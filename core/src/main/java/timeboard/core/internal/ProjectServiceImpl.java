@@ -905,6 +905,21 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList();
     }
 
+
+    @Override
+    public List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
+        TypedQuery<BatchType> q = em.createQuery("select distinct b.type from Batch b where b.project = :project", BatchType.class);
+        q.setParameter("project", project);
+        return q.getResultList();
+    }
+
     @Override
     public Batch getBatchById(Account account, long id) throws BusinessException {
 
@@ -997,6 +1012,23 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList();
     }
 
+
+    @Override
+    public List<Batch> getBatchList(Account actor, Project project, BatchType batchType) throws BusinessException {
+        RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+        TypedQuery<Batch> q = em.createQuery(
+                "select distinct b from Batch b join b.tasks t where t.project = :project and b.type = :type",
+                Batch.class);
+        q.setParameter("project", project);
+        q.setParameter("type", batchType);
+        return q.getResultList();
+    }
+
     @Override
     public Batch addTasksToBatch(Account actor, Batch b, List<Task> selectedTaskIds, List<Task> oldTaskIds) throws BusinessException {
         RuleSet<Batch> ruleSet = new RuleSet<>();
@@ -1030,6 +1062,8 @@ public class ProjectServiceImpl implements ProjectService {
         return taskType;
     }
 
+
+
     @Override
     public void disableTaskType(Account actor, TaskType type) {
 
@@ -1046,6 +1080,7 @@ public class ProjectServiceImpl implements ProjectService {
     public boolean isProjectOwner(Account account, Project project) {
         return (new ActorIsProjectOwner()).isSatisfied(account, project);
     }
+
 
 
 
