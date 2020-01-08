@@ -36,6 +36,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.events.TaskEvent;
+import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.batch.ActorIsProjectMemberByBatch;
@@ -401,6 +403,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         LOGGER.info("Task " + taskName + " created by " + actor.getScreenName() + " in project " + project.getName());
 
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
+
         return newTask;
     }
 
@@ -411,6 +415,8 @@ public class ProjectServiceImpl implements ProjectService {
             em.merge(task);
             em.flush();
         }
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
+
         return task;
     }
 
@@ -436,7 +442,6 @@ public class ProjectServiceImpl implements ProjectService {
         /*taskList.stream().forEach(task -> {
             TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
         });*/
-
     }
 
     @Override
@@ -768,7 +773,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         em.remove(task);
         em.flush();
-        /*TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));*/
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
 
 
         LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
