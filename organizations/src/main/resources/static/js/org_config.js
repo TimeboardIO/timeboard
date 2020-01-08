@@ -20,7 +20,7 @@ let app = new Vue({
                 }],
             data: [],
             name: 'tableTag',
-            configurable : true
+            configurable : false
         },
         tasks: {
             cols: [
@@ -38,7 +38,7 @@ let app = new Vue({
                 }],
             data: [],
             name: 'tableTag',
-            configurable : true
+            configurable : false
         }
     },
     methods: {
@@ -47,13 +47,14 @@ let app = new Vue({
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                url: "projects/" + projectID + "/tags",
+                url: "org/setup/task-type/",
                 data: {
-                    "tagKey": "New Tag",
-                    "tagValue": "New Value"
+                    "name": "New Type",
+                    "id": 0
                 },
                 success: function (d) {
-                    self.table.data = d;
+                    d.forEach(r => r.edition = false);
+                    self.types.data = d;
                 }
             });
         },
@@ -63,21 +64,66 @@ let app = new Vue({
                 type: "PATCH",
                 dataType: "json",
                 data: row,
-                url: "projects/" + projectID + "/tags/" + row.id,
+                url: "org/setup/task-type/"+row.id,
                 success: function (d) {
-                    self.table.data = d;
+                    d.forEach(r => r.edition = false);
+                    self.types.data = d;
                 }
             });
         },
         removeType: function (row) {
             let self = this;
+            this.$refs.confirmModal.confirm("Are you sure you want to delete "+ row.name + "?", function() {
+                $.ajax({
+                    type: "DELETE",
+                    dataType: "json",
+                    url: "org/setup/task-type/"+row.id,
+                    success: function (d) {
+                        d.forEach(r => r.edition = false);
+                        self.types.data = d;
+                    }
+                });
+            });
+        },
+        addTask: function () {
+            let self = this;
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "org/setup/default-task/",
+                data: {
+                    "name": "New Task",
+                    "id": 0
+                },
+                success: function (d) {
+                    d.forEach(r => r.edition = false);
+                    self.tasks.data = d;
+                }
+            });
+        },
+        updateTask: function (row) {
+            let self = this;
+            $.ajax({
+                type: "PATCH",
+                dataType: "json",
+                data: row,
+                url: "org/setup/default-task/"+row.id,
+                success: function (d) {
+                    d.forEach(r => r.edition = false);
+                    self.tasks.data = d;
+                }
+            });
+        },
+        removeTask: function (row) {
+            let self = this;
             this.$refs.confirmModal.confirm("Are you sure you want to delete "+ row.tagKey + "?", function() {
                 $.ajax({
                     type: "DELETE",
                     dataType: "json",
-                    url: "projects/" + projectID + "/tags/" + row.id,
+                    url: "org/setup/default-task/"+row.id,
                     success: function (d) {
-                        self.table.data = d;
+                        d.forEach(r => r.edition = false);
+                        self.tasks.data = d;
                     }
                 });
             });
@@ -90,6 +136,7 @@ let app = new Vue({
             dataType: "json",
             url: "org/setup/default-task/list",
             success: function (d) {
+                d.forEach(r => r.edition = false);
                 self.tasks.data = d;
             }
         });
@@ -98,7 +145,10 @@ let app = new Vue({
             dataType: "json",
             url: "org/setup/task-type/list",
             success: function (d) {
+                d.forEach(r => r.edition = false);
                 self.types.data = d;
+
+
             }
         });
     }

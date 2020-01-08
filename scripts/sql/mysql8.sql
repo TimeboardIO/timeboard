@@ -235,6 +235,7 @@
 
     create table TaskType (
        id bigint not null,
+        organizationID bigint,
         enable bit,
         typeName varchar(255),
         primary key (id)

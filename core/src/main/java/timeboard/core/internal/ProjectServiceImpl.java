@@ -70,6 +70,9 @@ public class ProjectServiceImpl implements ProjectService {
     private TimesheetService timesheetService;
 
     @Autowired
+    private OrganizationService organizationService;
+
+    @Autowired
     private EntityManager em;
 
     private DefaultTask vacationTask;
@@ -416,6 +419,16 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public DefaultTask updateDefaultTask(Account actor, final DefaultTask task) {
+        Optional<Organization> org = this.organizationService.getOrganizationByID(actor, task.getOrganizationID());
+        if (org.isPresent()) {
+            em.merge(task);
+            em.flush();
+        }
+        return task;
+    }
+
+    @Override
     public void createTasks(final Account actor, final List<Task> taskList) {
         for (Task newTask : taskList) {  //TODO create task here
             LOGGER.info("User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
@@ -704,6 +717,15 @@ public class ProjectServiceImpl implements ProjectService {
         return em.find(TaskType.class, taskTypeID);
     }
 
+    @Override
+    public TaskType updateTaskType(Account actor, TaskType type) {
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, type.getOrganizationID());
+        if(organization.isPresent()){
+            em.merge(type);
+            em.flush();
+        }
+        return type;
+    }
 
 
     @Override
@@ -1069,9 +1091,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public TaskType createTaskType(Account actor, String name) {
+    public TaskType createTaskType(Account actor, Long orgID, String name) {
         TaskType taskType = new TaskType();
         taskType.setTypeName(name);
+        taskType.setOrganizationID(orgID);
         em.persist(taskType);
         em.flush();
         LOGGER.info("User " + actor.getScreenName() + " create task type " + name);

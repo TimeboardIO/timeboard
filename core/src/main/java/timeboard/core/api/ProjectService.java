@@ -88,6 +88,7 @@ public interface ProjectService {
     void createTasks(Account actor, List<Task> taskList);
 
     Task updateTask(Account actor, Task task);
+    DefaultTask updateDefaultTask(Account actor, DefaultTask task);
 
     void updateTasks(Account actor, List<Task> taskList);
 
@@ -212,7 +213,7 @@ public interface ProjectService {
                           Batch currentBatch,
                           List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
-    TaskType createTaskType(Account actor, String name);
+    TaskType createTaskType(Account actor, Long orgID, String name);
 
     void disableTaskType(Account actor, TaskType type);
 
@@ -225,7 +226,10 @@ public interface ProjectService {
 
     TaskType findTaskTypeByID(Long taskTypeID);
 
+    TaskType updateTaskType(Account actor, TaskType type);
+
     TASData generateTasData(Account user, Project project, int month, int year);
+
     /*
      == Rule ==
      */
