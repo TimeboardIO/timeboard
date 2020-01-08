@@ -148,7 +148,8 @@ public class TimesheetRESTApi {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
     }
 
-    private List<TaskWrapper> getDefaultTasks(Account currentAccount, Long orgID, List<ImputationWrapper> imputations, Date ds, Date de, List<DateWrapper> days) {
+    private List<TaskWrapper> getDefaultTasks(Account currentAccount, Long orgID, List<ImputationWrapper> imputations,
+                                              Date ds, Date de, List<DateWrapper> days) {
         List<TaskWrapper> tasks = new ArrayList<>();
 
         this.projectService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
