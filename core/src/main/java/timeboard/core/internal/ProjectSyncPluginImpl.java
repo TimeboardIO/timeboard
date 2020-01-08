@@ -75,60 +75,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                                  final List<ProjectSyncCredentialField> jiraCrendentials) {
 
 
-        final JobDetail jobDetails = new JobDetail() {
-
-            private UUID key = UUID.randomUUID();
-
-            @Override
-            public JobKey getKey() {
-                return new JobKey("timeboard-" + key.toString());
-            }
-
-            @Override
-            public String getDescription() {
-                return serviceName + " Job";
-            }
-
-            @Override
-            public Class<? extends Job> getJobClass() {
-                return ProjectSyncJob.class;
-            }
-
-            @Override
-            public JobDataMap getJobDataMap() {
-                return null;
-            }
-
-            @Override
-            public boolean isDurable() {
-                return true;
-            }
-
-            @Override
-            public boolean isPersistJobDataAfterExecution() {
-                return true;
-            }
-
-            @Override
-            public boolean isConcurrentExectionDisallowed() {
-                return true;
-            }
-
-            @Override
-            public boolean requestsRecovery() {
-                return true;
-            }
-
-            @Override
-            public JobBuilder getJobBuilder() {
-                return JobBuilder.newJob(getJobClass());
-            }
-
-            @Override
-            public Object clone() {
-                return this;
-            }
-        };
+        final JobDetail jobDetails = buildJobDetails(serviceName);
 
         try {
             final JobDataMap data = new JobDataMap();
@@ -154,6 +101,63 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             e.printStackTrace();
         }
 
+    }
+
+    private JobDetail buildJobDetails(String serviceName) {
+        return new JobDetail() {
+
+                private UUID key = UUID.randomUUID();
+
+                @Override
+                public JobKey getKey() {
+                    return new JobKey("timeboard-" + key.toString());
+                }
+
+                @Override
+                public String getDescription() {
+                    return serviceName + " Job";
+                }
+
+                @Override
+                public Class<? extends Job> getJobClass() {
+                    return ProjectSyncJob.class;
+                }
+
+                @Override
+                public JobDataMap getJobDataMap() {
+                    return null;
+                }
+
+                @Override
+                public boolean isDurable() {
+                    return true;
+                }
+
+                @Override
+                public boolean isPersistJobDataAfterExecution() {
+                    return true;
+                }
+
+                @Override
+                public boolean isConcurrentExectionDisallowed() {
+                    return true;
+                }
+
+                @Override
+                public boolean requestsRecovery() {
+                    return true;
+                }
+
+                @Override
+                public JobBuilder getJobBuilder() {
+                    return JobBuilder.newJob(getJobClass());
+                }
+
+                @Override
+                public Object clone() {
+                    return this;
+                }
+            };
     }
 
     @Override
@@ -189,7 +193,8 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                 final long accountID = context.getMergedJobDataMap().getLong(ACCOUNT_ID);
                 final long projectID = context.getMergedJobDataMap().getLong(PROJECT_ID);
                 final String serviceName = context.getMergedJobDataMap().getString(SERVICE_NAME);
-                final List<ProjectSyncCredentialField> credentials = (List<ProjectSyncCredentialField>) context.getMergedJobDataMap().get(CREDENTIELS);
+                final List<ProjectSyncCredentialField> credentials =
+                        (List<ProjectSyncCredentialField>) context.getMergedJobDataMap().get(CREDENTIELS);
 
                 final ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
                         .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))

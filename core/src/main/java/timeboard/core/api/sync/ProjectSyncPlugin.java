@@ -26,14 +26,10 @@ package timeboard.core.api.sync;
  * #L%
  */
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import timeboard.core.model.Account;
 
-import java.rmi.Remote;
 import java.util.List;
 
 public interface ProjectSyncPlugin {
