@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/account')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">Account</title>
+</head>
+
+<body>
+
+
+<div layout:fragment="content">
+
+    <div class="ui negative message" th:if="${error}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${error}">
+        </div>
+    </div>
+    <div class="ui positive message" th:if="${message}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${message}">
+        </div>
+    </div>
+
+    <div class="ui segment" >
+        
+    </div>
+
+    <script src="/js/vacations.js"></script>
+
+</div>
+</div>
+
+</body>
+</html>
