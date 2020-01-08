@@ -26,7 +26,9 @@ package timeboard.core.api.sync;
  * #L%
  */
 
-public class ProjectSyncCredentialField {
+import java.io.Serializable;
+
+public class ProjectSyncCredentialField implements Serializable {
 
     private String fieldKey;
     private String fieldName;

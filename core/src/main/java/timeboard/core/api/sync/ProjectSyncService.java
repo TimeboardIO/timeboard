@@ -27,13 +27,14 @@ package timeboard.core.api.sync;
  */
 
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import java.util.List;
 
 public interface ProjectSyncService {
 
-    void syncProjectTasks(final Account org,
+    void syncProjectTasks(final Long orgID,
                           final Account actor,
                           final Project project,
                           final String serviceName,

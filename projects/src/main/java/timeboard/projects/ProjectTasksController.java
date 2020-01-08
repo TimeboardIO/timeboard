@@ -166,7 +166,7 @@ public class ProjectTasksController {
             }
         });
 
-        this.projectSyncService.syncProjectTasks(actor, actor, project, serviceName, creds);
+        this.projectSyncService.syncProjectTasks(authentication.getCurrentOrganization(), actor, project, serviceName, creds);
 
 
         return "redirect:/projects/"+projectID+"/tasks";
