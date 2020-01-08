@@ -29,6 +29,7 @@
 	<link href="/onboarding/css/styles.css" rel="stylesheet">
 
     <link rel="icon" href="/onboarding/images/ico.png">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
 </head>
 <body data-spy="scroll" data-target=".fixed-top">
@@ -697,98 +698,22 @@
                 </div> <!-- end of col -->
             </div> <!-- end of row -->
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-lg-12" id="members">
                     
-                    <!-- Team Member -->
-                    <div class="team-member">
-                        <div class="image-wrapper">
-                            <img class="img-fluid" src="/onboarding/images/team-member-1.svg" alt="alternative">
-                        </div> <!-- end of image-wrapper -->
-                        <p class="p-large"><strong>Lacy Whitelong</strong></p>
-                        <p class="job-title">Business Developer</p>
-                        <span class="social-icons">
-                            <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x facebook"></i>
-                                    <i class="fab fa-facebook-f fa-stack-1x"></i>
-                                </a>
-                            </span>
-                            <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x twitter"></i>
-                                    <i class="fab fa-twitter fa-stack-1x"></i>
-                                </a>
-                            </span>
-                        </span> <!-- end of social-icons -->
-                    </div> <!-- end of team-member -->
-                    <!-- end of team member -->
+
 
                     <!-- Team Member -->
-                    <div class="team-member">
+                    <div class="team-member template" style="display:none">
                         <div class="image-wrapper">
-                            <img class="img-fluid" src="/onboarding/images/team-member-2.svg" alt="alternative">
-                        </div> <!-- end of image wrapper -->
-                        <p class="p-large"><strong>Chris Brown</strong></p>
-                        <p class="job-title">Online Marketer</p>
-                        <span class="social-icons">
-                            <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x facebook"></i>
-                                    <i class="fab fa-facebook-f fa-stack-1x"></i>
-                                </a>
-                            </span>
-                            <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x twitter"></i>
-                                    <i class="fab fa-twitter fa-stack-1x"></i>
-                                </a>
-                            </span>
-                        </span> <!-- end of social-icons -->
-                    </div> <!-- end of team-member -->
-                    <!-- end of team member -->
-
-                    <!-- Team Member -->
-                    <div class="team-member">
-                        <div class="image-wrapper">
-                            <img class="img-fluid" src="/onboarding/images/team-member-3.svg" alt="alternative">
-                        </div> <!-- end of image wrapper -->
-                        <p class="p-large"><strong>Sheila Zimerman</strong></p>
-                        <p class="job-title">Software Engineer</p>
-                        <span class="social-icons">
-                            <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x facebook"></i>
-                                    <i class="fab fa-facebook-f fa-stack-1x"></i>
-                                </a>
-                            </span>
-                            <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x twitter"></i>
-                                    <i class="fab fa-twitter fa-stack-1x"></i>
-                                </a>
-                            </span>
-                        </span> <!-- end of social-icons -->
-                    </div> <!-- end of team-member -->
-                    <!-- end of team member -->
-
-                    <!-- Team Member -->
-                    <div class="team-member">
-                        <div class="image-wrapper">
-                            <img class="img-fluid" src="/onboarding/images/team-member-4.svg" alt="alternative">
+                            <img class="img-fluid" style="filter: grayscale(1);" src="/onboarding/images/team-member-4.svg" alt="alternative">
                         </div> <!-- end of image wrapper -->
                         <p class="p-large"><strong>Mary Villalonga</strong></p>
-                        <p class="job-title">Product Manager</p>
+                        <p class="job-title"></p>
                         <span class="social-icons">
                             <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x facebook"></i>
-                                    <i class="fab fa-facebook-f fa-stack-1x"></i>
-                                </a>
-                            </span>
-                            <span class="fa-stack">
-                                <a href="#your-link">
-                                    <i class="fas fa-circle fa-stack-2x twitter"></i>
-                                    <i class="fab fa-twitter fa-stack-1x"></i>
+                                <a href="#your-link" class="github-link">
+                                    <i class="fab fa-circle fa-stack-2x fa-github"></i>
+                                    <i class="fab fa-github-f fa-stack-1x"></i>
                                 </a>
                             </span>
                         </span> <!-- end of social-icons -->
@@ -796,6 +721,29 @@
                     <!-- end of team member -->
 
                 </div> <!-- end of col -->
+
+                <script type="text/javascript">
+                    $.get('https://api.github.com/repos/timeboardio/timeboard/contributors', function(data){
+                        $(data).each(function(member){
+                            if(this.type==="User"){
+                                var template = $(".team-member.template").clone();
+                                $(template).css("display", "inline-block");
+                                $(template).removeClass("template");
+
+                                $(template).find(".img-fluid").attr("src",this.avatar_url);
+                                $(template).find(".github-link").attr("src",this.html_url);
+                                $(template).find(".p-large>strong").text(this.login);
+                                $("#members").append(template);
+                                $.get(this.url, function(profile){
+                                    if(profile.name){
+                                        $(template).find(".p-large>strong").text(profile.name);
+                                        $(template).find(".job-title").text(profile.bio);
+                                    }
+                                });
+                            }
+                        });
+                    });
+                </script>
             </div> <!-- end of row -->
         </div> <!-- end of container -->
     </div> <!-- end of basic-4 -->
@@ -809,18 +757,17 @@
                 <div class="col-lg-12">
                     <h2>Contact Information</h2>
                     <ul class="list-unstyled li-space-lg">
-                        <li class="address">Don't hesitate to give us a call or send us a contact form message</li>
-                        <li><i class="fas fa-map-marker-alt"></i>22 Innovative Area, San Francisco, CA 94043, US</li>
-                        <li><i class="fas fa-phone"></i><a class="turquoise" href="tel:003024630820">+81 720 2212</a></li>
-                        <li><i class="fas fa-envelope"></i><a class="turquoise" href="mailto:office@evolo.com">office@evolo.com</a></li>
+                        <li class="address">Don't hesitate to send us a contact form message</li>
+                        <li style="display:none"><i class="fas fa-map-marker-alt"></i></li>
+                        <li style="display:none"><i class="fas fa-phone"></i><a class="turquoise" href="tel:003024630820">+81 720 2212</a></li>
+                        <li><i class="fas fa-envelope"></i><a class="turquoise" href="mailto:af396da5.HomeOffice862.onmicrosoft.com@fr.teams.ms">My Timeboard Support</a></li>
                     </ul>
                 </div> <!-- end of col -->
             </div> <!-- end of row -->
             <div class="row">
                 <div class="col-lg-6">
                     <div class="map-responsive">
-                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d100939.98555098464!2d-122.507640204439!3d37.757814996609724!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80859a6d00690021%3A0x4a501367f076adff!2sSan+Francisco%2C+CA%2C+USA!5e0!3m2!1sen!2sro!4v1498231462606" allowfullscreen></iframe>
-                    </div>
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5661927.674048756!2d-2.4478606712173763!3d46.13853582381869!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd54a02933785731%3A0x6bfd3f96c747d9f7!2sFrance!5e0!3m2!1sfr!2sfr!4v1578470730646!5m2!1sfr!2sfr" allowfullscreen=""></iframe>                    </div>
                 </div> <!-- end of col -->
                 <div class="col-lg-6">
                     

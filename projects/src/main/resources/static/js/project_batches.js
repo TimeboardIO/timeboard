@@ -39,7 +39,13 @@ $(document).ready(function () {
             }
         },
         methods: {
-            saveBatch : function(){
+            openModal: function(){
+                $('#editMilestone').modal('show');
+            },
+            deleteURL(row){
+                return "/projects/"+projectID+"/batches/"+row.id+"/delete";
+            },
+            saveBatch: function(){
                 let self = this;
                 this.batch.date = new Date(this.batch.date);
                 $.post("projects/" + projectID + "/batches",
