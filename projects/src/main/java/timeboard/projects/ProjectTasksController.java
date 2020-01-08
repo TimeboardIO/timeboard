@@ -42,7 +42,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
-import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
