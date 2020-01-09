@@ -1,10 +1,10 @@
-package timeboard.organization;
+package timeboard.core.security;
 
 /*-
  * #%L
- * kanban-project-plugin
+ * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.organization;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,36 +27,28 @@ package timeboard.organization;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.security.TimeboardAuthentication;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/org")
-public class OrganizationCreateController {
+@Component
+public class ContextAwarePolicyEnforcement {
     @Autowired
-    public OrganizationService organizationService;
+    protected PolicyEnforcement policy;
 
-
-    @PostMapping("create")
-    protected String handlePost(TimeboardAuthentication authentication,
-                                HttpServletRequest request) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
-        this.organizationService.createOrganization(actor, request.getParameter("organizationName"), new HashMap<>());
-        return "redirect:/select";
-    }
-
-    @GetMapping("create")
-    protected String createFrom() {
-        return "create_org.html";
+    public void checkPermission(Object resource, String permission) {
+        //Getting the subject
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        //Getting the environment
+        Map<String, Object> environment = new HashMap<>();
+        environment.put("time", new Date());
+        if (!policy.check(auth.getPrincipal(), resource, permission, environment)) {
+            throw new AccessDeniedException("Access is denied");
+        }
     }
 }

@@ -39,7 +39,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.web.filter.GenericFilterBean;
-import timeboard.core.TimeboardAuthentication;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.home.HomeController;
@@ -54,7 +54,7 @@ import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
-public class TimeboardSecurityConfig extends WebSecurityConfigurerAdapter {
+public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${cognito.logout}")
     private String logoutEndpoint;

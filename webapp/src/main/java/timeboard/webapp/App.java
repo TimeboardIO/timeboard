@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EnableWebSecurity(debug = false)
 @EnableAspectJAutoProxy
-@Import({WebConfig.class, ModulesConfiguration.class, TimeboardSecurityConfig.class})
+@Import({TimeboardWebMVCConfig.class, ModulesConfiguration.class, TimeboardWebSecurityConfig.class})
 public class App {
 
     public static void main(String... args){

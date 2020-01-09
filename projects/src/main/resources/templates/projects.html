@@ -3,6 +3,7 @@
 <html layout:decorate="~{layouts/general.html(path='/projects')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
@@ -15,7 +16,7 @@
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
-        <div class="content">
+        <div class="content" sec:authorize="hasPermission(null,'PROJECTS_CREATE')">
             <div class="header">
                 No Projects ?
             </div>
@@ -76,7 +77,7 @@
                         <div class="ui active loader"></div>
                     </a>
                 </div>
-                <div class="ui card">
+                <div class="ui card" sec:authorize="hasPermission(null,'PROJECTS_CREATE')">
                     <a class="content"  style="background-color: lightgrey" data-cy="create-project"  th:href="@{/projects/create}">
                         <div class="badge" style="font-size: 4.2rem; padding-top: 2rem;">
                             <i class="plus icon"></i>

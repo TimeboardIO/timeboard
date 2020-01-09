@@ -35,7 +35,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.TimeboardAuthentication;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;

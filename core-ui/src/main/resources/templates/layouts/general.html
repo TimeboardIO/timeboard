@@ -8,7 +8,6 @@
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
     <!--script src="https://cdn.jsdelivr.net/npm/vue"></script-->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <link href="https://fonts.googleapis.com/css?family=Raleway:400,400i,600,700,700i&amp;subset=latin-ext" rel="stylesheet">
     <link rel="stylesheet" th:each="css : ${CSSs}" th:href="${css}">
@@ -78,6 +77,8 @@
 <a id="versionBox" th:onclick="copyToClipboard([[${appVersion}]])">
     <div id="versionText" th:text="${appVersion}"></div>
 </a>
+
+
 
 </body>
 </html>
