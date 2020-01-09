@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component("projectService")
 @Transactional
 public class ProjectServiceImpl implements ProjectService {
 

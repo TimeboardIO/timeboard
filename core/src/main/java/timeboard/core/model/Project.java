@@ -190,12 +190,23 @@ public class Project extends OrganizationEntity implements Serializable {
         this.enable = enable;
     }
 
+    @Transient
     public boolean isMember(Account actor) {
         return this.getMembers()
                 .stream()
                 .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
                 .count() == 1;
     }
+
+    @Transient
+    public boolean isMember(Account actor, MembershipRole role) {
+        return this.getMembers()
+                .stream()
+                .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
+                .filter(pm -> pm.getRole() == role)
+                .count() == 1;
+    }
+
 
     @Transient
     public String getColor() {
