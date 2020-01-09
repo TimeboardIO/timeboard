@@ -34,12 +34,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.UserService;
 import timeboard.core.api.VacationService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.events.TimeboardEventType;
+import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.Account;
 import timeboard.core.model.VacationRequest;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,6 +65,9 @@ public class VacationsController {
     private VacationService vacationService;
 
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
         return "vacations.html";
@@ -73,7 +82,7 @@ public class VacationsController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VacationRequestWrapper>> createRequest(TimeboardAuthentication authentication,
-                                                             @ModelAttribute VacationRequestWrapper requestWrapper) throws BusinessException {
+                                                             @ModelAttribute VacationRequestWrapper requestWrapper) throws BusinessException, ParseException {
 
         Account actor = authentication.getDetails();
 
@@ -83,13 +92,16 @@ public class VacationsController {
         request.setApplicant(actor);
         request.setAssignee(assignee);
         request.setLabel(requestWrapper.label);
-        request.setStartDate(requestWrapper.start);
-        request.setEndDate(requestWrapper.end);
+        request.setStartDate(DATE_FORMAT.parse(requestWrapper.start));
+        request.setEndDate(DATE_FORMAT.parse(requestWrapper.end));
         request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setValidated(false);
 
         vacationService.createVacationRequest(actor, request);
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.CREATE, request));
+
         return this.listRequests(authentication) ;
     }
 
@@ -112,18 +124,20 @@ public class VacationsController {
     public static class VacationRequestWrapper {
 
         public long id;
-        public Date start;
-        public Date end;
+        public String start;
+        public String end;
         public boolean halfStart;
         public boolean halfEnd;
         public long assigneeID;
         public String assigneeName;
         public String label;
 
+        public VacationRequestWrapper() { }
+
         public VacationRequestWrapper(VacationRequest r) {
             this.id = r.getId();
-            this.start = r.getStartDate();
-            this.end = r.getEndDate();
+            this.start = DATE_FORMAT.format(r.getStartDate());
+            this.end = DATE_FORMAT.format(r.getEndDate());
             this.halfStart = r.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON);
             this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
             this.assigneeID = r.getAssignee().getId();
@@ -138,19 +152,19 @@ public class VacationsController {
             this.id = id;
         }
 
-        public Date getStart() {
+        public String getStart() {
             return start;
         }
 
-        public void setStart(Date start) {
+        public void setStart(String start) {
             this.start = start;
         }
 
-        public Date getEnd() {
+        public String getEnd() {
             return end;
         }
 
-        public void setEnd(Date end) {
+        public void setEnd(String end) {
             this.end = end;
         }
 

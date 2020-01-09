@@ -32,12 +32,10 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.internal.TemplateGenerator;
-import timeboard.core.internal.events.TaskEvent;
-import timeboard.core.internal.events.TimeboardEvent;
-import timeboard.core.internal.events.TimeboardEventType;
-import timeboard.core.internal.events.TimesheetEvent;
+import timeboard.core.internal.events.*;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
+import timeboard.core.model.VacationRequest;
 import timeboard.core.model.ValidatedTimesheet;
 
 import javax.annotation.PostConstruct;
@@ -79,6 +77,7 @@ public class SendSummaryEmail {
         Map<String, Object> data = new HashMap<>();
 
         List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
+        List<VacationRequest> vacationRequests = new ArrayList<>();
         Map<Long, EmailSummaryModel> projects = new HashMap<>();
 
         for (TimeboardEvent event : userNotificationStructure.getNotificationEventList()) {
@@ -92,10 +91,14 @@ public class SendSummaryEmail {
                 }
             } else if (event instanceof TimesheetEvent) {
                 validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
+            } else if (event instanceof VacationEvent) {
+                vacationRequests.add(((VacationEvent) event).getRequest());
             }
+
         }
         data.put("projects", projects.values());
         data.put("validatedTimesheets", validatedTimesheets);
+        data.put("vacationsRequests", vacationRequests);
 
         String message = templateGenerator.getTemplateString("mail/summary.html", data);
         ArrayList<String> list = new ArrayList<>();

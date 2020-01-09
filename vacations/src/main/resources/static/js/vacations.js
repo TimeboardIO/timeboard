@@ -4,12 +4,12 @@ let app = new Vue({
     el: '#vacationApp',
     data: {
         vacationRequest: {
-            start : '',
-            end : '',
-            halfStart : true,
-            halfEnd : true,
-            label : '',
-            assigneeName : '',
+            start : "",
+            end : "",
+            halfStart : false,
+            halfEnd : false,
+            label : "",
+            assigneeName : "",
             assigneeID : 0,
         }
     },
@@ -22,8 +22,8 @@ let app = new Vue({
             $.ajax({
                 type: "POST",
                 dataType: "json",
-                data: vacationRequest,
-                url: "vacation",
+                data: self.vacationRequest,
+                url: "/vacation",
                 success: function (d) {
                     self.table.data = d;
                 }
@@ -46,6 +46,26 @@ $(document).ready(function(){
     $('.ui.radio.checkbox')
         .checkbox()
     ;
+
+
+    $('.ui.search')
+        .search({
+            apiSettings: {
+                url: '/api/search?q={query}&orgID='+$("meta[name=orgID]").attr("content")
+            },
+            fields: {
+                results : 'items',
+                title   : 'screenName',
+                description :'email'
+            },
+            onSelect: function(result, response) {
+                app.vacationRequest.assigneeID = result.id;
+                app.vacationRequest.assigneeName = result.screenName;
+
+            },
+            minCharacters : 3
+        });
+
 });
 
 

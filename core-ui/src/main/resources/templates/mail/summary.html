@@ -346,6 +346,74 @@
                             </tr>
 
                         </table>
+
+                        <table align="left" border="0" cellpadding="0" cellspacing="0"
+                               class="col380" style="width: 100%; max-width: 800px;" th:if="${vacationRequests.size() > 0}">
+                            <tr>
+                                <td class=" title bodycopy " style="font-size:30px"><b>Vacation Requests</b></td>
+                            </tr>
+                            <tr>
+                                <td class=" bodycopy borderbottom" style="text-align:center;">Here is vacation requests
+                                </td>
+                            </tr>
+                            <tr th:each="request : ${vacationRequests}">
+                                <td class="borderbottom">
+                                    <table border="0" cellpadding="4" cellspacing="2" width="100%">
+
+                                        <tr>
+                                            <td class="bodycopy center">
+                                                <table>
+                                                    <tr>
+                                                        <td><b>Applicant</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td th:text="${request.applicant.firstName}">John</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td th:text="${request.applicant.name}">Doe</td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                            <td class="bodycopy center">
+                                                <table>
+                                                    <tr>
+                                                        <td><b>Dates</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td th:text="${#dates.format(request.endDate, 'dd/MM/yyyy') + request.endHalfDay}">
+                                                            01/11/2019 MORNING
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td th:text="${#dates.format(request.startDate, 'dd/MM/yyyy') + request.startHalfDay}" > 05/11/2019 AFTERNOON</td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                            <td class="bodycopy center">
+                                                <table>
+                                                    <tr>
+                                                        <td><b>Pending</b></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td th:text="${request.assignee.firstName}">John</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td th:text="${request.assignee.name}">Doe</td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+
+                                        </tr>
+
+                                    </table>
+                                </td>
+                            </tr>
+
+                        </table>
+
                         <!--[if (gte mso 9)|(IE)]>
                         </td>
                         </tr>
