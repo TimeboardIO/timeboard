@@ -1,0 +1,14 @@
+[
+  {
+    "name": "User can create project",
+    "description": "User can create project",
+    "target": "action == 'PROJECTS_CREATE'",
+    "condition": "subject.currentOrganizationRole('OWNER')"
+  },
+  {
+    "name": "Org owner can setup org",
+    "description": "Only user with role OWNER on org can setup org",
+    "target": "action == 'ORG_SETUP'",
+    "condition": "subject.currentOrganizationRole('OWNER')"
+  }
+]

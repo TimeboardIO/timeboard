@@ -1,5 +1,7 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
 <body>
 <div th:fragment="nav(title)">
     <a class="toc item">
@@ -27,10 +29,10 @@
                 <a class="item" th:href="@{/select}">
                     <i class="sign-out icon"></i> Create or Switch organisation
                 </a>
-                <a class="item" th:href="@{/org/members}" th:if="${!currentOrg.isPublicOrganisation()}">
+                <a class="item" th:href="@{/org/members}" th:if="${!currentOrg.isPublicOrganisation()}" sec:authorize="hasPermission(null,'ORG_SETUP')">
                     <i class="globe icon"></i> Organisation members
                 </a>
-                <a class="item" th:href="@{/org/setup}" th:if="${!currentOrg.isPublicOrganisation()}">
+                <a class="item" th:href="@{/org/setup}" th:if="${!currentOrg.isPublicOrganisation()}" sec:authorize="hasPermission(null,'ORG_SETUP')">
                     <i class="settings icon"></i> Organisation Setup
                 </a>
             </div>

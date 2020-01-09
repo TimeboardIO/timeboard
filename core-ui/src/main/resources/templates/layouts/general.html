@@ -5,6 +5,8 @@
     <meta charset="UTF-8"/>
     <base th:href="@{/}">
     <title>[[${appName}]]</title>
+    <script src="https://togetherjs.com/togetherjs-min.js"></script>
+
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
     <!--script src="https://cdn.jsdelivr.net/npm/vue"></script-->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -78,6 +80,9 @@
 <a id="versionBox" th:onclick="copyToClipboard([[${appVersion}]])">
     <div id="versionText" th:text="${appVersion}"></div>
 </a>
+
+<button class="ui button" style="position:fixed; bottom:0px; right:0px" onclick="TogetherJS(this); return false;">Start TogetherJS</button>
+
 
 </body>
 </html>

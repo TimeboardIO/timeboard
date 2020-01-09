@@ -31,7 +31,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.TimeboardAuthentication;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;

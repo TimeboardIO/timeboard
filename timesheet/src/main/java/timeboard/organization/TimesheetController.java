@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.TimeboardAuthentication;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectTasks;
 import timeboard.core.api.TimesheetService;

@@ -1,10 +1,10 @@
-package timeboard.webapp;
+package timeboard.core.security;
 
 /*-
  * #%L
- * webapp
+ * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,18 +26,8 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import timeboard.plugin.project.export.xls.ExcelPluginConfiguration;
-import timeboard.plugin.project.imp.jira.JiraPluginConfiguration;
+import java.util.List;
 
-@Configuration
-@Import({
-        JiraPluginConfiguration.class,
-        ExcelPluginConfiguration.class
-})
-public class PluginsConfiguration {
-
-
-
+public interface PolicyDefinition {
+    List<PolicyRule> getAllPolicyRules();
 }

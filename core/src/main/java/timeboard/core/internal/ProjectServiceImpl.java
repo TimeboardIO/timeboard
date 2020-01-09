@@ -101,7 +101,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
+    @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     public Project createProject(Account owner, String projectName)  {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
