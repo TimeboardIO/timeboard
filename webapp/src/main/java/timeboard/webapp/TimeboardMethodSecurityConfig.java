@@ -4,7 +4,7 @@ package timeboard.webapp;
  * #%L
  * webapp
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,33 +27,23 @@ package timeboard.webapp;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.CacheControl;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
+import timeboard.core.security.AbacPermissionEvaluator;
 
-import java.util.concurrent.TimeUnit;
-
-@Configuration
-public class WebConfig implements WebMvcConfigurer {
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class TimeboardMethodSecurityConfig extends GlobalMethodSecurityConfiguration {
 
     @Autowired
-    private WebRessourcesInterceptor webRessourcesInterceptor;
-
-    @Autowired
-    private OrganizationFilter organizationInterceptor;
+    AbacPermissionEvaluator permissionEvaluator;
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry
-                .addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/META-INF/resources/webjars/")
-                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS));
+    protected MethodSecurityExpressionHandler createExpressionHandler() {
+        DefaultMethodSecurityExpressionHandler result = new DefaultMethodSecurityExpressionHandler();
+        result.setPermissionEvaluator(permissionEvaluator);
+        return result;
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addWebRequestInterceptor(this.webRessourcesInterceptor);
-    }
 }

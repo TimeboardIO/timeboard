@@ -32,7 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.TimeboardAuthentication;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
 import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
