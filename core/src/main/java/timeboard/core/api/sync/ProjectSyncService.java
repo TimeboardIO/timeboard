@@ -33,6 +33,12 @@ import java.util.List;
 
 public interface ProjectSyncService {
 
+    public static final String ORG_ID = "orgID";
+    public static final String ACCOUNT_ID = "accountID";
+    public static final String PROJECT_ID = "projectID";
+    public static final String SERVICE_NAME = "serviceName";
+    public static final String CREDENTIALS = "credentials";
+
     void syncProjectTasks(final Long orgID,
                           final Account actor,
                           final Project project,

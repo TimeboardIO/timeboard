@@ -63,9 +63,6 @@ public class ProjectTasksController {
     public DataTableService dataTableService;
 
     @Autowired
-    public AsyncJobService asyncJobService;
-
-    @Autowired
     public ProjectSyncService projectSyncService;
 
     @Autowired(required = false)
@@ -82,7 +79,7 @@ public class ProjectTasksController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("task", new TaskForm(task));
-        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
         fillModel(model, actor, project);
@@ -107,7 +104,7 @@ public class ProjectTasksController {
         model.addAttribute("batchList", this.projectService.getBatchList(actor, project, javaBatchType));
 
         model.addAttribute("task", new TaskForm(task));
-        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
         fillModel(model, actor, project);

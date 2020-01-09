@@ -28,31 +28,19 @@ package timeboard.core.internal;
 
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import timeboard.core.TimeboardAuthentication;
-import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
-import timeboard.core.api.sync.RemoteTask;
+import timeboard.core.async.ProjectSyncJob;
 import timeboard.core.model.*;
 
 import java.util.*;
 
 @Component
 public class ProjectSyncPluginImpl implements ProjectSyncService {
-
-    public static final String ORG_ID = "orgID";
-    public static final String ACCOUNT_ID = "accountID";
-    public static final String PROJECT_ID = "projectID";
-    public static final String SERVICE_NAME = "serviceName";
-    public static final String CREDENTIELS = "credentiels";
-    @Autowired
-    private AsyncJobService asyncJobService;
 
     @Autowired
     private ProjectService projectService;
@@ -71,7 +59,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                                  final Account actor,
                                  final Project project,
                                  final String serviceName,
-                                 final List<ProjectSyncCredentialField> jiraCrendentials) {
+                                 final List<ProjectSyncCredentialField> jiraCredentials) {
 
 
         final JobDetail jobDetails = buildJobDetails(serviceName);
@@ -79,7 +67,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
         try {
             final JobDataMap data = new JobDataMap();
             data.put(ACCOUNT_ID, actor.getId());
-            data.put(CREDENTIELS, jiraCrendentials);
+            data.put(CREDENTIALS, jiraCredentials);
             data.put(ORG_ID, orgID);
             data.put(SERVICE_NAME, serviceName);
             data.put(PROJECT_ID, project.getId());
