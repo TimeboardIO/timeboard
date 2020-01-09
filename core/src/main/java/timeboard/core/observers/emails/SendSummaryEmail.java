@@ -98,7 +98,7 @@ public class SendSummaryEmail {
         }
         data.put("projects", projects.values());
         data.put("validatedTimesheets", validatedTimesheets);
-        data.put("vacationsRequests", vacationRequests);
+        data.put("vacationRequests", vacationRequests);
 
         String message = templateGenerator.getTemplateString("mail/summary.html", data);
         ArrayList<String> list = new ArrayList<>();
