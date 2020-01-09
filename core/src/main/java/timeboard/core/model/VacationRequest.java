@@ -122,7 +122,7 @@ public class VacationRequest {
     }
 
 
-    enum HalfDay {
+    public enum HalfDay {
         MORNING,
         AFTERNOON
     }

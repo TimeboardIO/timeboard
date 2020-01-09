@@ -37,8 +37,10 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.ProjectTag;
+import timeboard.core.model.VacationRequest;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -89,8 +91,80 @@ public class VacationsController {
 
 
     public static class VacationRequestWrapper {
-        public VacationRequestWrapper() {
 
+        public long id;
+        public Date start;
+        public Date end;
+        public boolean halfStart;
+        public boolean halfEnd;
+        public long assigneeID;
+        public String assigneeName;
+
+        public VacationRequestWrapper(VacationRequest r) {
+            this.id = r.getId();
+            this.start = r.getStartDate();
+            this.end = r.getEndDate();
+            this.halfStart = r.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON);
+            this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
+            this.assigneeID = r.getAssignee().getId();
+            this.assigneeName = r.getAssignee().getName();
+        }
+
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public Date getStart() {
+            return start;
+        }
+
+        public void setStart(Date start) {
+            this.start = start;
+        }
+
+        public Date getEnd() {
+            return end;
+        }
+
+        public void setEnd(Date end) {
+            this.end = end;
+        }
+
+        public boolean isHalfStart() {
+            return halfStart;
+        }
+
+        public void setHalfStart(boolean halfStart) {
+            this.halfStart = halfStart;
+        }
+
+        public boolean isHalfEnd() {
+            return halfEnd;
+        }
+
+        public void setHalfEnd(boolean halfEnd) {
+            this.halfEnd = halfEnd;
+        }
+
+        public long getAssigneeID() {
+            return assigneeID;
+        }
+
+        public void setAssigneeID(long assigneeID) {
+            this.assigneeID = assigneeID;
+        }
+
+        public String getAssigneeName() {
+            return assigneeName;
+        }
+
+        public void setAssigneeName(String assigneeName) {
+            this.assigneeName = assigneeName;
         }
     }
 
