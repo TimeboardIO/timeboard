@@ -21,6 +21,32 @@ Vue.component('graph-modal', {
     }
 });
 
+// SYnc in progress or not
+var interval = 1000;  // 5000 = 5 seconds
+function showStateSync() {
+    $.ajax({
+        method: "GET",
+        url: "/projects/"+currentProjectID+"/tasks/sync/inProgress",
+        contentType: "application/json",
+        dataType: "json",
+        success: function (data) {
+            if(data == "IN_PROGRESS"){
+                $("#jobInProgress").show();
+            }else{
+                $("#jobInProgress").hide();
+            }
+        },
+        error: function(data) {
+            console.log(data);
+        },
+        complete: function () {
+            // Schedule the next
+            setTimeout(showStateSync, interval);
+        }
+    });
+}
+showStateSync();
+
 
 // Form validations rules
 const formValidationRules = {

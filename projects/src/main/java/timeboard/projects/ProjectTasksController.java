@@ -26,22 +26,17 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
-import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,9 +56,6 @@ public class ProjectTasksController {
 
     @Autowired
     public DataTableService dataTableService;
-
-    @Autowired
-    public ProjectSyncService projectSyncService;
 
     @Autowired(required = false)
     public List<ProjectSyncPlugin> projectImportServiceList;
@@ -142,30 +134,6 @@ public class ProjectTasksController {
 
 
         return "project_tasks.html";
-    }
-
-    @PostMapping(value = "/tasks/sync/{serviceName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    protected String importFromJIRA(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID,
-            @PathVariable String serviceName,
-            @RequestBody MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
-
-        final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-
-        final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
-
-        creds.forEach(field -> {
-            if(formBody.containsKey(field.getFieldKey())){
-                field.setValue(formBody.get(field.getFieldKey()).get(0));
-            }
-        });
-
-        this.projectSyncService.syncProjectTasks(authentication.getCurrentOrganization(), actor, project, serviceName, creds);
-
-
-        return "redirect:/projects/"+projectID+"/tasks";
     }
 
     @PostMapping("/tasks")

@@ -62,7 +62,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                                  final List<ProjectSyncCredentialField> jiraCredentials) {
 
 
-        final JobDetail jobDetails = buildJobDetails(serviceName);
+        final JobDetail jobDetails = buildJobDetails(serviceName, project);
 
         try {
             final JobDataMap data = new JobDataMap();
@@ -90,14 +90,14 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
 
     }
 
-    private JobDetail buildJobDetails(String serviceName) {
+    private JobDetail buildJobDetails(String serviceName, Project project) {
         return new JobDetail() {
 
-                private UUID key = UUID.randomUUID();
+                private Long key = project.getId();
 
                 @Override
                 public JobKey getKey() {
-                    return new JobKey("timeboard-" + key.toString());
+                    return new JobKey(key.toString());
                 }
 
                 @Override
