@@ -32,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.UserService;
@@ -42,12 +41,12 @@ import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.Account;
 import timeboard.core.model.VacationRequest;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 
@@ -82,7 +81,8 @@ public class VacationsController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VacationRequestWrapper>> createRequest(TimeboardAuthentication authentication,
-                                                             @ModelAttribute VacationRequestWrapper requestWrapper) throws BusinessException, ParseException {
+                                                             @ModelAttribute VacationRequestWrapper requestWrapper)
+            throws BusinessException, ParseException {
 
         Account actor = authentication.getDetails();
 

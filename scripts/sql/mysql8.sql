@@ -244,12 +244,13 @@
 
     create table VacationRequest (
        id bigint not null,
-        description varchar(255),
         endDate date,
         endHalfDay integer,
+        label varchar(255),
         startDate date,
         startHalfDay integer,
         validated bit,
+        applicant_id bigint,
         assignee_id bigint,
         primary key (id)
     ) engine=InnoDB;
@@ -364,6 +365,11 @@
        add constraint FKq0s3frhsv5jms3r14ax9jtnnh 
        foreign key (task_id) 
        references Task (id);
+
+    alter table VacationRequest 
+       add constraint FKf501udnxw766cpsw730g0jhxn 
+       foreign key (applicant_id) 
+       references Account (id);
 
     alter table VacationRequest 
        add constraint FK28esu0dtlr0he4ie5j5oipsck 
