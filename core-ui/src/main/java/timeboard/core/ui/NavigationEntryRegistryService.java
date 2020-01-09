@@ -27,9 +27,6 @@ package timeboard.core.ui;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostFilter;
-import org.springframework.security.access.prepost.PreAuthorize;
-
 import java.util.Comparator;
 import java.util.List;
 
