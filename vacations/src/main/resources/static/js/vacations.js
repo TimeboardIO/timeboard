@@ -1,4 +1,25 @@
 
+
+let app = new Vue({
+    el: '#vacationApp',
+    data : {
+        vacationRequest: {
+            start : '',
+            end : '',
+            halfStart : true,
+            halfEnd : true,
+            label : '',
+            assigneeName : '',
+            assigneeID : 0,
+        }
+    },
+    methods :  {
+        openModal: function(){
+            $('#newVacation').modal('show');
+        },
+    }
+});
+
 $(document).ready(function(){
 
     $('.message .close')
@@ -10,52 +31,9 @@ $(document).ready(function(){
       })
     ;
 
-    $('.ui.form.password')
-      .form({
-        fields: {
-          oldPassword: {
-            rules: [
-              {
-                type   : 'empty',
-                prompt : 'You have to type your old password'
-              }
-            ]
-          },
-          password1: {
-            rules: [
-              {
-                type   : 'empty',
-                prompt : 'You have to specify a new password'
-              }
-            ]
-          },
-          password2: {
-            rules: [
-              {
-                type   : 'match[password1]',
-                prompt : 'Password are not the same.'
-
-              }
-            ]
-          },
-        }
-      });
-
-
-      $('.ui.form.account')
-            .form({
-              fields: {
-                email: {
-                  rules: [
-                    {
-                      type   : 'email',
-                      prompt : 'Email format is not correct'
-                    }
-                  ]
-                },
-              }
-            });
-
+    $('.ui.radio.checkbox')
+        .checkbox()
+    ;
 });
 
 

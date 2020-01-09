@@ -1,8 +1,8 @@
-package timeboard.account;
+package timeboard.vacations;
 
 /*-
  * #%L
- * account
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,10 +26,30 @@ package timeboard.account;
  * #L%
  */
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-@Configuration
-@ComponentScan("timeboard.vacations")
-public class VacationsConfiguration {
+
+@Component
+public class VacationNavigationProvider implements NavigationExtPoint {
+
+    @Override
+    public String getNavigationLabel() {
+        return "Vacation";
+    }
+
+    @Override
+    public String getNavigationPath() {
+        return "/vacation";
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 6000;
+    }
+
+    @Override
+    public String getNavigationLogo() {
+        return "suitcase";
+    }
 }

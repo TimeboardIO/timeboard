@@ -2,7 +2,8 @@
 
 <html layout:decorate="~{layouts/general.html(path='/account')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
     <title layout:fragment="title">Account</title>
@@ -23,9 +24,74 @@
         <div class="header" th:text="${message}">
         </div>
     </div>
+    <div id="vacationApp">
+        <div class="ui menu">
+            <a class="item"  v-on:click="openModal" >
+                <i class="plus icon"></i>
+                New Vacation
+            </a>
+        </div>
 
-    <div class="ui segment" >
-        
+        <tmodal
+                title="Request vacation"
+                id="newVacation">
+            <template v-slot:content>
+                <form class="ui form">
+
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Departure Date</label>
+                            <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
+                            <div class="inline fields" style="padding-top: 1rem;">
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-start"  v-model="vacationRequest.halfStart" tabindex="0" class="hidden">
+                                        <label>Morning</label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-start" v-bind="!vacationRequest.halfStart" tabindex="0" class="hidden">
+                                        <label>Afternoon</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Return Date</label>
+                            <input type="date" name="end-date" placeholder="Return date" v-model="vacationRequest.end">
+                            <div class="inline fields" style="padding-top: 1rem;">
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-end" tabindex="0" class="hidden" v-model="vacationRequest.=">
+                                        <label>Morning</label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-end" tabindex="0" class="hidden" v-bind="!vacationRequest.halfStart" >
+                                        <label>Afternoon</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Label</label>
+                            <input type="text" name="label" placeholder="Label" v-model="vacationRequest.label">
+                        </div>
+                        <div class="field">
+                            <label>User to notify</label>
+                            <input type="text" name="assignee" placeholder="User" v-model="vacationRequest.assignee">
+                        </div>
+                    </div>
+                    <button class="ui positive button" type="submit">Request new vacation</button>
+                </form>
+
+            </template>
+        </tmodal>
     </div>
 
     <script src="/js/vacations.js"></script>
