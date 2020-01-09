@@ -1,4 +1,23 @@
-
+// Form validations rules
+const formValidationRules = {
+    fields: {
+        endDate: {
+            identifier: 'end-date',
+            rules: [ { type   : 'empty', prompt : 'Please enter a start date'  } ]
+        },
+        startDate: {
+            identifier: 'start-date',
+            rules: [
+                { type: "empty", prompt : 'Please enter an end date'  } ]
+        }
+        ,
+        assignee: {
+            identifier: 'assignee',
+            rules: [
+                { type: "empty", prompt : 'Please enter user to notify'  } ]
+        }
+    }
+};
 
 let app = new Vue({
     el: '#vacationApp',
@@ -18,16 +37,24 @@ let app = new Vue({
             $('#newVacation').modal('show');
         },
         addVacationRequest: function () {
+            let validated = $('.ui.form').form(formValidationRules).form('validate form');
+
             let self = this;
-            $.ajax({
-                type: "POST",
-                dataType: "json",
-                data: self.vacationRequest,
-                url: "/vacation",
-                success: function (d) {
-                    self.table.data = d;
-                }
-            });
+            if(validated) {
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    data: self.vacationRequest,
+                    url: "/vacation",
+                    success: function (d) {
+                        // do something
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        $('.ui.error.message').text(jqXHR.responseText);
+                        $('.ui.error.message').show();
+                    }
+                });
+            }
         }
     }
 });

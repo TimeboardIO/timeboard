@@ -47,8 +47,8 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-
 
 @Controller
 @RequestMapping("/vacation")
@@ -63,9 +63,7 @@ public class VacationsController {
     @Autowired
     private VacationService vacationService;
 
-
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
 
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
@@ -80,20 +78,30 @@ public class VacationsController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<VacationRequestWrapper>> createRequest(TimeboardAuthentication authentication,
-                                                             @ModelAttribute VacationRequestWrapper requestWrapper)
+    public ResponseEntity createRequest(TimeboardAuthentication authentication,
+            @ModelAttribute VacationRequestWrapper requestWrapper)
             throws BusinessException, ParseException {
 
         Account actor = authentication.getDetails();
-
         Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
+        Date startDate = DATE_FORMAT.parse(requestWrapper.start);
+        Date endDate = DATE_FORMAT.parse(requestWrapper.end);
+
+
+        if(startDate.getTime() > endDate.getTime()){
+            return ResponseEntity.badRequest().body("Start date must be before end date. ");
+        }
+
+        if(assignee == null){
+            return ResponseEntity.badRequest().body("Please enter user to notify. ");
+        }
 
         VacationRequest request = new VacationRequest();
         request.setApplicant(actor);
         request.setAssignee(assignee);
         request.setLabel(requestWrapper.label);
-        request.setStartDate(DATE_FORMAT.parse(requestWrapper.start));
-        request.setEndDate(DATE_FORMAT.parse(requestWrapper.end));
+        request.setStartDate(startDate);
+        request.setEndDate(endDate);
         request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setValidated(false);
@@ -104,7 +112,6 @@ public class VacationsController {
 
         return this.listRequests(authentication) ;
     }
-
 
     @PatchMapping(value = "/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VacationRequestWrapper>> patchRequest(TimeboardAuthentication authentication,
@@ -118,8 +125,6 @@ public class VacationsController {
                                                                   @PathVariable Long requestID) throws BusinessException {
         return this.listRequests(authentication) ;
     }
-
-
 
     public static class VacationRequestWrapper {
 

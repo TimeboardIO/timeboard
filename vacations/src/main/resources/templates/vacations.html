@@ -37,7 +37,7 @@
                 id="newVacation">
             <template v-slot:content>
                 <form class="ui form">
-
+                    <div v-bind="formError" class="ui error message"></div>
                     <div class="two fields">
                         <div class="field">
                             <label>Departure Date</label>
@@ -84,9 +84,10 @@
                         </div>
                         <div class="field">
                             <label>User to notify</label>
+                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID" name="assignee" type="text">
                             <div class="ui category search">
                                 <div class="ui icon input">
-                                    <input class="prompt" placeholder="Search account..." type="text">
+                                    <input class="prompt" name="assignee" placeholder="Search account..." type="text">
                                     <i class="search icon"></i>
                                 </div>
                                 <div class="results"></div>
