@@ -55,6 +55,43 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     private List<ProjectSyncPlugin> projectImportServiceList;
 
     @Override
+    public void syncProjectTasksWithSchedule(final Long orgID,
+                                 final Account actor,
+                                 final Project project,
+                                 final String serviceName,
+                                 final List<ProjectSyncCredentialField> jiraCredentials,
+                                 final CronScheduleBuilder cronScheduleBuilder) {
+
+
+        final JobDetail jobDetails = buildJobDetails(serviceName, project);
+
+        try {
+            final JobDataMap data = new JobDataMap();
+            data.put(ACCOUNT_ID, actor.getId());
+            data.put(CREDENTIALS, jiraCredentials);
+            data.put(ORG_ID, orgID);
+            data.put(SERVICE_NAME, serviceName);
+            data.put(PROJECT_ID, project.getId());
+
+            this.scheduler.addJob(jobDetails, true);
+
+            final Trigger trigger = TriggerBuilder.newTrigger()
+                    .forJob(jobDetails)
+                    .startAt(new Date())
+                    .usingJobData(data)
+                    .withSchedule(cronScheduleBuilder)
+                    .build();
+
+            this.scheduler.scheduleJob(trigger);
+
+
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
     public void syncProjectTasks(final Long orgID,
                                  final Account actor,
                                  final Project project,
@@ -78,7 +115,6 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
                     .forJob(jobDetails)
                     .startAt(new Date())
                     .usingJobData(data)
-                    .withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 * 1/1 * ? *"))
                     .build();
 
             this.scheduler.scheduleJob(trigger);

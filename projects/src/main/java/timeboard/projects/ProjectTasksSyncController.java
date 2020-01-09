@@ -2,6 +2,7 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.quartz.CronScheduleBuilder;
 import org.quartz.JobExecutionContext;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
@@ -57,7 +58,14 @@ public class ProjectTasksSyncController {
             }
         });
 
+        // Job launched directly
         this.projectSyncService.syncProjectTasks(authentication.getCurrentOrganization(), actor, project, serviceName, creds);
+
+        // Job launched recursively
+        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/1 * 1/1 * ? *");
+        this.projectSyncService.syncProjectTasksWithSchedule(authentication.getCurrentOrganization(), actor, project,
+                serviceName, creds, cronScheduleBuilder);
+
 
 
         return "redirect:/projects/"+projectID+"/tasks";

@@ -26,6 +26,7 @@ package timeboard.core.api.sync;
  * #L%
  */
 
+import org.quartz.CronScheduleBuilder;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 
@@ -38,6 +39,13 @@ public interface ProjectSyncService {
     public static final String PROJECT_ID = "projectID";
     public static final String SERVICE_NAME = "serviceName";
     public static final String CREDENTIALS = "credentials";
+
+    void syncProjectTasksWithSchedule(final Long orgID,
+                          final Account actor,
+                          final Project project,
+                          final String serviceName,
+                          final List<ProjectSyncCredentialField> creds,
+                          CronScheduleBuilder cronScheduleBuilder);
 
     void syncProjectTasks(final Long orgID,
                           final Account actor,
