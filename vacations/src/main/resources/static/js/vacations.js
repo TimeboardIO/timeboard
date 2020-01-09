@@ -2,7 +2,7 @@
 
 let app = new Vue({
     el: '#vacationApp',
-    data : {
+    data: {
         vacationRequest: {
             start : '',
             end : '',
@@ -13,10 +13,22 @@ let app = new Vue({
             assigneeID : 0,
         }
     },
-    methods :  {
+    methods:  {
         openModal: function(){
             $('#newVacation').modal('show');
         },
+        addVacationRequest: function () {
+            let self = this;
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                data: vacationRequest,
+                url: "vacation",
+                success: function (d) {
+                    self.table.data = d;
+                }
+            });
+        }
     }
 });
 

@@ -35,8 +35,9 @@ import org.springframework.web.bind.annotation.*;
 import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.VacationService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.ProjectTag;
+import timeboard.core.model.Account;
 import timeboard.core.model.VacationRequest;
 
 import java.util.ArrayList;
@@ -54,6 +55,9 @@ public class VacationsController {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private VacationService vacationService;
+
 
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
@@ -69,8 +73,23 @@ public class VacationsController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VacationRequestWrapper>> createRequest(TimeboardAuthentication authentication,
-                                                             @PathVariable Long requestID,
                                                              @ModelAttribute VacationRequestWrapper requestWrapper) throws BusinessException {
+
+        Account actor = authentication.getDetails();
+
+        Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
+
+        VacationRequest request = new VacationRequest();
+        request.setApplicant(actor);
+        request.setAssignee(assignee);
+        request.setLabel(requestWrapper.label);
+        request.setStartDate(requestWrapper.start);
+        request.setEndDate(requestWrapper.end);
+        request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
+        request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
+        request.setValidated(false);
+
+        vacationService.createVacationRequest(actor, request);
         return this.listRequests(authentication) ;
     }
 
@@ -99,6 +118,7 @@ public class VacationsController {
         public boolean halfEnd;
         public long assigneeID;
         public String assigneeName;
+        public String label;
 
         public VacationRequestWrapper(VacationRequest r) {
             this.id = r.getId();
@@ -109,7 +129,6 @@ public class VacationsController {
             this.assigneeID = r.getAssignee().getId();
             this.assigneeName = r.getAssignee().getName();
         }
-
 
         public long getId() {
             return id;
@@ -166,6 +185,15 @@ public class VacationsController {
         public void setAssigneeName(String assigneeName) {
             this.assigneeName = assigneeName;
         }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
     }
 
 

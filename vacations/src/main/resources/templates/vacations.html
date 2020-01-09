@@ -42,7 +42,7 @@
                         <div class="field">
                             <label>Departure Date</label>
                             <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
-                            <div class="inline fields" style="padding-top: 1rem;">
+                            <div class="inline fields">
                                 <div class="field">
                                     <div class="ui radio checkbox">
                                         <input type="radio" name="halfday-start"  v-model="vacationRequest.halfStart" tabindex="0" class="hidden">
@@ -63,13 +63,13 @@
                             <div class="inline fields" style="padding-top: 1rem;">
                                 <div class="field">
                                     <div class="ui radio checkbox">
-                                        <input type="radio" name="halfday-end" tabindex="0" class="hidden" v-model="vacationRequest.=">
+                                        <input type="radio" name="halfday-end" tabindex="0" class="hidden" v-model="vacationRequest.halfEnd">
                                         <label>Morning</label>
                                     </div>
                                 </div>
                                 <div class="field">
                                     <div class="ui radio checkbox">
-                                        <input type="radio" name="halfday-end" tabindex="0" class="hidden" v-bind="!vacationRequest.halfStart" >
+                                        <input type="radio" name="halfday-end" tabindex="0" class="hidden" v-bind="!vacationRequest.halfEnd" >
                                         <label>Afternoon</label>
                                     </div>
                                 </div>

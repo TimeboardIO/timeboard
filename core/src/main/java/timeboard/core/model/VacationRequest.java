@@ -37,7 +37,7 @@ public class VacationRequest {
     private Long id;
 
     @Column
-    private String description;
+    private String label;
 
     @Column
     private boolean validated = true;
@@ -55,6 +55,9 @@ public class VacationRequest {
     private HalfDay endHalfDay;
 
     @OneToOne
+    private Account applicant;
+
+    @OneToOne
     private Account assignee;
 
     public Long getId() {
@@ -65,12 +68,12 @@ public class VacationRequest {
         this.id = id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getLabel() {
+        return label;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setLabel(String description) {
+        this.label = description;
     }
 
     public boolean isValidated() {
@@ -121,6 +124,13 @@ public class VacationRequest {
         this.assignee = assignee;
     }
 
+    public Account getApplicant() {
+        return applicant;
+    }
+
+    public void setApplicant(Account applicant) {
+        this.applicant = applicant;
+    }
 
     public enum HalfDay {
         MORNING,
