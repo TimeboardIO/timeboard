@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Component("projectService")
 @Transactional
 public class ProjectServiceImpl implements ProjectService {
 
@@ -104,7 +104,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
+    @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     public Project createProject(Account owner, String projectName)  {
         Account ownerAccount = this.em.find(Account.class, owner.getId());

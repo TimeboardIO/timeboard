@@ -1,4 +1,4 @@
-package timeboard.core;
+package timeboard.core.security;
 
 /*-
  * #%L
@@ -29,24 +29,21 @@ package timeboard.core;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import timeboard.core.model.Account;
+import timeboard.core.model.MembershipRole;
 
+import javax.persistence.Transient;
 import java.security.Principal;
 import java.util.Collection;
 
 public class TimeboardAuthentication implements Authentication {
 
-    private Principal principal;
+    private Principal p;
     private Account account;
     private Long currentOrganization;
 
     public  TimeboardAuthentication(Account a){
         this.account = a;
-        this.principal = new Principal() {
-            @Override
-            public String getName() {
-                return account.getEmail();
-            }
-        };
+        this.p = () -> account.getEmail();
     }
 
     @Override
@@ -66,12 +63,12 @@ public class TimeboardAuthentication implements Authentication {
 
     @Override
     public Principal getPrincipal() {
-        return this.principal;
+        return this.p;
     }
 
     @Override
     public boolean isAuthenticated() {
-        return this.principal != null;
+        return this.p != null;
     }
 
     @Override
@@ -91,4 +88,15 @@ public class TimeboardAuthentication implements Authentication {
     public String getName() {
         return null;
     }
+
+    @Transient
+    public boolean currentOrganizationRole(final MembershipRole role) {
+        return account.getOrganizations()
+                .stream()
+                .filter(o -> o.getOrganization().getId() == currentOrganization)
+                .filter(o -> o.getRole() == role)
+                .count() > 0;
+    }
+
+
 }

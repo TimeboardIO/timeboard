@@ -1,10 +1,10 @@
-package timeboard.core.ui;
+package timeboard.core.security;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.core.ui;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,20 +27,33 @@ package timeboard.core.ui;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import java.util.Comparator;
-import java.util.List;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Component;
 
-@org.springframework.stereotype.Component
-public class NavigationEntryRegistryService {
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+@Component
+public class AbacPermissionEvaluator implements PermissionEvaluator {
 
-    @Autowired(required = false)
-    private List<NavigationExtPoint> entries;
+    @Autowired
+    PolicyEnforcement policy;
 
-    //ex : @PostFilter("hasPermission(filterObject,'NAVIGATION_VIEW')")
-    public List<NavigationExtPoint> getEntries() {
-        this.entries.sort(Comparator.comparing(o -> ((Integer) o.getNavigationWeight())));
-        return this.entries;
+    @Override
+    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+        //Getting subject
+        TimeboardAuthentication user = (TimeboardAuthentication) authentication;
+        //Getting environment
+        Map<String, Object> environment = new HashMap<>();
+        environment.put("time", new Date());
+        return policy.check(user, targetDomainObject, permission, environment);
     }
 
+    @Override
+    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+        return false;
+    }
 }

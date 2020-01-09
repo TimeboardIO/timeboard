@@ -34,7 +34,6 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Organization;
@@ -49,10 +48,6 @@ import java.util.Optional;
 @EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.async"})
 @EnableJpaRepositories
 @EnableTransactionManagement
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true,
-        jsr250Enabled = true)
 public class CoreConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CoreConfiguration.class);
