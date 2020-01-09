@@ -22,7 +22,7 @@ Vue.component('graph-modal', {
 });
 
 // SYnc in progress or not
-var interval = 1000;  // 5000 = 5 seconds
+var interval = 5000;  // 5000 = 5 seconds
 function showStateSync() {
     $.ajax({
         method: "GET",
@@ -30,10 +30,12 @@ function showStateSync() {
         contentType: "application/json",
         dataType: "json",
         success: function (data) {
-            if(data == "IN_PROGRESS"){
+            if(data == "IN_PROGRESS" && $('#jobInProgress').is(':hidden')){
                 $("#jobInProgress").show();
-            }else{
+            }
+            if(data == "NO_JOB" && $('#jobInProgress').is(':visible')){
                 $("#jobInProgress").hide();
+                document.location.reload(true);
             }
         },
         error: function(data) {
