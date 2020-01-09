@@ -3,7 +3,7 @@ $(document).ready(function () {
     const projectID = $("meta[name='projectID']").attr('value');
 
     let app = new Vue({
-        el: '#components-demo',
+        el: '#orgConfig',
         data: {
             table: {
                 cols: [

@@ -67,6 +67,6 @@ public class OrganizationMembersController {
         viewModel.addAttribute("roles", MembershipRole.values());
         viewModel.addAttribute("organization", organization.get());
 
-        return "details_org_members";
+        return "org_members";
     }
 }
