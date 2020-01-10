@@ -36,6 +36,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.events.TaskEvent;
+import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.batch.ActorIsProjectMemberByBatch;
@@ -68,6 +70,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private TimesheetService timesheetService;
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Autowired
     private EntityManager em;
@@ -350,8 +355,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<TaskType> listTaskType() {
-        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true", TaskType.class);
+    public List<TaskType> listTaskType(Long orgID) {
+        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
+        q.setParameter("orgID", orgID);
         return q.getResultList();
     }
 
@@ -401,6 +407,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         LOGGER.info("Task " + taskName + " created by " + actor.getScreenName() + " in project " + project.getName());
 
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.CREATE, newTask, actor));
+
         return newTask;
     }
 
@@ -408,6 +416,18 @@ public class ProjectServiceImpl implements ProjectService {
     public Task updateTask(Account actor, final Task task) {
         //TODO check actor permissions
         if (task.getProject().isMember(actor)) {
+            em.merge(task);
+            em.flush();
+        }
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
+
+        return task;
+    }
+
+    @Override
+    public DefaultTask updateDefaultTask(Account actor, final DefaultTask task) {
+        Optional<Organization> org = this.organizationService.getOrganizationByID(actor, task.getOrganizationID());
+        if (org.isPresent()) {
             em.merge(task);
             em.flush();
         }
@@ -436,7 +456,6 @@ public class ProjectServiceImpl implements ProjectService {
         /*taskList.stream().forEach(task -> {
             TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
         });*/
-
     }
 
     @Override
@@ -703,6 +722,15 @@ public class ProjectServiceImpl implements ProjectService {
         return em.find(TaskType.class, taskTypeID);
     }
 
+    @Override
+    public TaskType updateTaskType(Account actor, TaskType type) {
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, type.getOrganizationID());
+        if(organization.isPresent()){
+            em.merge(type);
+            em.flush();
+        }
+        return type;
+    }
 
 
     @Override
@@ -738,14 +766,29 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<DefaultTask> listDefaultTasks(Date ds, Date de) {
+    public List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de) {
         TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
                         + "t.endDate > :ds "
                         + "and t.startDate <= :de "
-                        + "and t.startDate < t.endDate", DefaultTask.class);
+                        + "and t.startDate < t.endDate "
+                        + "and t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("ds", ds);
         q.setParameter("de", de);
+        q.setParameter("orgID", orgID);
+        List<DefaultTask> tasks = q.getResultList();
+
+        return q.getResultList();
+
+    }
+
+    @Override
+    public List<DefaultTask> listDefaultTasks(Long orgID) {
+        TypedQuery<DefaultTask> q = em
+                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
+                        + "t.organizationID = :orgID", DefaultTask.class);
+
+        q.setParameter("orgID", orgID);
         List<DefaultTask> tasks = q.getResultList();
 
         return q.getResultList();
@@ -768,7 +811,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         em.remove(task);
         em.flush();
-        /*TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));*/
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
 
 
         LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
@@ -832,7 +875,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public DefaultTask createDefaultTask(Account actor, String name) throws BusinessException {
+    public DefaultTask createDefaultTask(Account actor, Long orgID, String name) throws BusinessException {
         try {
             DefaultTask task = new DefaultTask();
             task.setStartDate(new Date());
@@ -841,6 +884,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setEndDate(c.getTime());
             task.setOrigin(actor.getScreenName() + "/" + System.nanoTime());
             task.setName(name);
+            task.setOrganizationID(orgID);
             em.persist(task);
             em.flush();
             LOGGER.info("Default task " + task.getName() + " is created.");
@@ -852,7 +896,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public void disableDefaultTaskByID(Account actor, long taskID) throws BusinessException {
+    public void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException {
 
         DefaultTask task = em.find(DefaultTask.class, taskID);
         task.setEndDate(new Date());
@@ -1052,9 +1096,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public TaskType createTaskType(Account actor, String name) {
+    public TaskType createTaskType(Account actor, Long orgID, String name) {
         TaskType taskType = new TaskType();
         taskType.setTypeName(name);
+        taskType.setOrganizationID(orgID);
         em.persist(taskType);
         em.flush();
         LOGGER.info("User " + actor.getScreenName() + " create task type " + name);

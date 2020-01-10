@@ -1,10 +1,10 @@
-package timeboard.core.model;
+package timeboard.core.internal;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,45 +26,31 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.VacationService;
+import timeboard.core.model.Account;
+import timeboard.core.model.VacationRequest;
 
-@Entity
-public class TaskType extends OrganizationEntity  {
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+@Component
+@Transactional
+public class VacationServiceImpl implements VacationService {
 
-    @Column
-    private String typeName;
+    @Autowired
+    private EntityManager em;
 
-    @Column
-    private boolean enable = true;
+    @Override
+    public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
 
-    public TaskType() {
+
+        em.persist(request);
+
+        em.flush();
+
+        return request;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean active) {
-        this.enable = active;
-    }
 }

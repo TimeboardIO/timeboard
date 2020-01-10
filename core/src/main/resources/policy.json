@@ -22,5 +22,11 @@
     "description": "Only user with role OWNER on current project",
     "target": "action == 'PROJECT_SNAPSHOT'",
     "condition": "resource.isMember(subject.getDetails(), 'OWNER')"
+  },
+  {
+    "name": "Project owner can view snapshot",
+    "description": "Only user with role OWNER on current project",
+    "target": "action == 'PROJECT_SNAPSHOT'",
+    "condition": "resource.isMember(subject.getDetails(), 'OWNER')"
   }
 ]

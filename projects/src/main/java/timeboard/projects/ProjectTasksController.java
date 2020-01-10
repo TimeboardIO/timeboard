@@ -74,7 +74,7 @@ public class ProjectTasksController {
         model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), actor, project);
 
         model.addAttribute("batchType", "Default");
         return "project_tasks.html";
@@ -99,15 +99,15 @@ public class ProjectTasksController {
         model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), actor, project);
 
         return "project_tasks.html";
     }
 
-    private void fillModel(Model model, Account actor, Project project) throws BusinessException {
+    private void fillModel(Model model, Long orgID, Account actor, Project project) throws BusinessException {
         model.addAttribute("project", project);
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
-        model.addAttribute("taskTypes", this.projectService.listTaskType());
+        model.addAttribute("taskTypes", this.projectService.listTaskType(orgID));
         model.addAttribute("allTaskStatus", TaskStatus.values());
         model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
@@ -130,7 +130,7 @@ public class ProjectTasksController {
 
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), actor, project);
 
 
         return "project_tasks.html";

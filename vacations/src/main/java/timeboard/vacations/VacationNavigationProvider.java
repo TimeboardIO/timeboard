@@ -1,8 +1,8 @@
-package timeboard.core.model;
+package timeboard.vacations;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,45 +26,30 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
+import org.springframework.stereotype.Component;
+import timeboard.core.ui.NavigationExtPoint;
 
-@Entity
-public class TaskType extends OrganizationEntity  {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+@Component
+public class VacationNavigationProvider implements NavigationExtPoint {
 
-    @Column
-    private String typeName;
-
-    @Column
-    private boolean enable = true;
-
-    public TaskType() {
+    @Override
+    public String getNavigationLabel() {
+        return "Vacation";
     }
 
-    public Long getId() {
-        return id;
+    @Override
+    public String getNavigationPath() {
+        return "/vacation";
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    @Override
+    public int getNavigationWeight() {
+        return 6000;
     }
 
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean active) {
-        this.enable = active;
+    @Override
+    public String getNavigationLogo() {
+        return "suitcase";
     }
 }
