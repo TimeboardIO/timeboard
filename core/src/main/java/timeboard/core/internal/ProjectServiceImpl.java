@@ -106,6 +106,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
+    // @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
     @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     public Project createProject(Account owner, String projectName)  {
@@ -364,7 +365,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
+    //@PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
+    @PreAuthorize("hasPermission(#project,'TASKS_CREATE')")
     public Task createTask(Account actor,
                            Project project,
                            String taskName,
