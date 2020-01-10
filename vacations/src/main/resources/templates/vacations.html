@@ -6,7 +6,7 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title layout:fragment="title">Account</title>
+    <title layout:fragment="title">Vacation</title>
 </head>
 
 <body>
@@ -31,7 +31,7 @@
                 New Vacation
             </a>
         </div>
-        <div class="ui horizontal divider"><i class="boxes icon"></i>
+        <div v-if="toValidateRequests.data.length" class="ui horizontal divider"><i class="boxes icon"></i>
             Vacations requests to Validate
         </div>
         <data-table v-bind:config="toValidateRequests">
@@ -54,18 +54,18 @@
                 {{ row.applicantName }}
             </template>
             <template v-slot:actions="{row}">
-                <button class="ui positive button icon" v-on:click="">
+                <button class="ui positive button icon" v-on:click="approveRequest(row)">
                     <i class="check alternate icon"></i>
                     Approve
                 </button>
-                <button class="ui negative button icon" v-on:click="">
+                <button class="ui negative button icon" v-on:click="rejectRequest(row)">
                     <i class="remove alternate icon"></i>
                     Deny
                 </button>
             </template>
 
         </data-table>
-        <div class="ui horizontal divider"><i class="boxes icon"></i>
+        <div v-if="myRequests.data.length" class="ui horizontal divider"><i class="boxes icon"></i>
             My vacation requests
         </div>
         <data-table v-bind:config="myRequests">
@@ -88,21 +88,33 @@
                 {{ row.assigneeName }}
             </template>
             <template v-slot:status="{row}">
-                <button v-if="row.status"   class="ui green icon button">
+                <button v-if="row.status == 'ACCEPTED'"   class="ui disabled green icon button">
                     <i class="check icon"></i>
+                    Accepted
                 </button>
-                <button v-else   class="ui yellow icon button">
+                <button v-else-if="row.status == 'REJECTED'" class="ui disabled negative icon button">
+                    <i class="close icon"></i>
+                    Rejected
+                </button>
+                <button v-else class="ui disabled yellow icon button">
                     <i class="clock outline icon"></i>
+                    Pending
                 </button>
             </template>
             <template v-slot:actions="{row}">
-                <button class="ui negative button icon" v-on:click="">
+                <button class="ui negative button icon" v-on:click="cancelRequest(row)">
                     <i class="remove alternate icon"></i>
                     Cancel
                 </button>
             </template>
 
         </data-table>
+        <tmodal-confirm
+                ref="confirmModal"
+                title="Cancel vacation request ?"
+                icon="close"
+        ></tmodal-confirm>
+
         <tmodal
                 title="Request vacation"
                 id="newVacation">

@@ -40,7 +40,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
 import timeboard.core.model.VacationRequest;
 import timeboard.core.model.VacationRequestStatus;
 import timeboard.core.security.TimeboardAuthentication;
@@ -52,7 +51,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/vacation")
@@ -152,7 +150,7 @@ public class VacationsController {
         } else {
             ResponseEntity.badRequest().body("Unkwown request ID");
         }
-        return this.listRequests(authentication) ;
+        return this.listToValidateRequests(authentication) ;
     }
 
     @PatchMapping(value = "/reject/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -167,7 +165,7 @@ public class VacationsController {
         } else {
             ResponseEntity.badRequest().body("Unkwown request ID");
         }
-        return this.listRequests(authentication) ;
+        return this.listToValidateRequests(authentication) ;
     }
 
     @DeleteMapping(value = "/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -207,7 +205,7 @@ public class VacationsController {
             this.end = DATE_FORMAT.format(r.getEndDate());
             this.halfStart = r.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON);
             this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
-            this.status = r.getStatus().getLabel();
+            this.status = r.getStatus().name();
 
             if(r.getAssignee() != null) {
                 this.assigneeID = r.getAssignee().getId();

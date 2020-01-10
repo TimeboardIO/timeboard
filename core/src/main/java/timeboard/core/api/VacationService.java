@@ -27,7 +27,6 @@ package timeboard.core.api;
  */
 
 import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
 import timeboard.core.model.VacationRequest;
 
 import java.util.List;

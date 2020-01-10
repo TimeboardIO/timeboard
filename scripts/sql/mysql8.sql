@@ -104,8 +104,6 @@
 
     insert into hibernate_sequence values ( 1 );
 
-    insert into hibernate_sequence values ( 1 );
-
     create table Imputation (
        id bigint not null,
         organizationID bigint,
@@ -237,7 +235,7 @@
         label varchar(255),
         startDate date,
         startHalfDay integer,
-        validated bit,
+        status integer,
         applicant_id bigint,
         assignee_id bigint,
         primary key (id)

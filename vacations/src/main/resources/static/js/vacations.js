@@ -22,6 +22,7 @@ const formValidationRules = {
 let app = new Vue({
     el: '#vacationApp',
     data: {
+        formError : "",
         vacationRequest: {
             start : "",
             end : "",
@@ -143,6 +144,8 @@ let app = new Vue({
                     url: "/vacation",
                     success: function (d) {
                         // do something
+                        self.myRequests.data = d;
+                        $('#newVacation').modal('hide');
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         $('.ui.error.message').text(jqXHR.responseText);
@@ -150,6 +153,55 @@ let app = new Vue({
                     }
                 });
             }
+        },
+        approveRequest : function(request) {
+            let self = this;
+            $.ajax({
+                type: "PATCH",
+                dataType: "json",
+                data: self.vacationRequest,
+                url: "/vacation/approve/"+request.id,
+                success: function (d) {
+                    self.toValidateRequests.data = d;
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    self.formError = jqXHR.responseText;
+                }
+            });
+        },
+        rejectRequest : function(request) {
+            let self = this;
+            $.ajax({
+                type: "PATCH",
+                dataType: "json",
+                data: self.vacationRequest,
+                url: "/vacation/reject/"+request.id,
+                success: function (d) {
+                    self.toValidateRequests.data = d;
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    self.formError = jqXHR.responseText;
+                }
+            });
+        },
+        cancelRequest : function(request) {
+            this.$refs.confirmModal.confirm("Are you sure you want to delete vacation request "
+                + request.label !== 'null' ? request.label : '' + "? This action is definitive.",
+                function() {
+                    $.ajax({
+                        type: "DELETE",
+                        dataType: "json",
+                        data: self.vacationRequest,
+                        url: "/vacation/"+request.id,
+                        success: function (d) {
+                            self.myRequests.data = d;
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            self.formError = jqXHR.responseText;
+                        }
+                    });
+                });
+
         },
         dayCount : function(request) {
             let t1 = new Date(request.start).getTime();
