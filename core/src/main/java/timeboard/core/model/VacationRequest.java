@@ -40,7 +40,7 @@ public class VacationRequest {
     private String label;
 
     @Column
-    private boolean validated = true;
+    private VacationRequestStatus status;
 
     @Temporal(TemporalType.DATE)
     private Date startDate;
@@ -76,12 +76,12 @@ public class VacationRequest {
         this.label = description;
     }
 
-    public boolean isValidated() {
-        return validated;
+    public VacationRequestStatus getStatus() {
+        return status;
     }
 
-    public void setValidated(boolean validated) {
-        this.validated = validated;
+    public void setStatus(VacationRequestStatus status) {
+        this.status = status;
     }
 
     public Date getStartDate() {

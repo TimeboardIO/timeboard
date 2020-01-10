@@ -31,19 +31,69 @@
                 New Vacation
             </a>
         </div>
+        <div class="ui horizontal divider"><i class="boxes icon"></i>
+            Vacations requests to Validate
+        </div>
+        <data-table v-bind:config="toValidateRequests">
+            <template v-slot:sum="{row}">
 
-        <data-table v-bind:config="table">
+                <div class="ui circular label large day-badge"><p>{{ dayCount(row) }}</p></div>
+            </template>
             <template v-slot:label="{row}">
                 {{ row.label }}
             </template>
             <template v-slot:start="{row}">
-                {{ row.start  + ' ' + (row.halfStart ? 'Afternoon' : 'Morning') }}
+                {{ new Date(row.start).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
             </template>
             <template v-slot:end="{row}">
-                {{ row.end + ' ' + (row.halfEnd ? 'Morning' : 'Afternoon') }}
+                {{ new Date(row.end).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
+            </template>
+            <template v-slot:applicant="{row}">
+                {{ row.applicantName }}
+            </template>
+            <template v-slot:actions="{row}">
+                <button class="ui positive button icon" v-on:click="">
+                    <i class="check alternate icon"></i>
+                    Approve
+                </button>
+                <button class="ui negative button icon" v-on:click="">
+                    <i class="remove alternate icon"></i>
+                    Deny
+                </button>
+            </template>
+
+        </data-table>
+        <div class="ui horizontal divider"><i class="boxes icon"></i>
+            My vacation requests
+        </div>
+        <data-table v-bind:config="myRequests">
+            <template v-slot:sum="{row}">
+
+                <div class="ui circular label large day-badge"><p>{{ dayCount(row) }}</p></div>
+            </template>
+            <template v-slot:label="{row}">
+                {{ row.label }}
+            </template>
+            <template v-slot:start="{row}">
+                {{ new Date(row.start).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
+            </template>
+            <template v-slot:end="{row}">
+                {{ new Date(row.end).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
             </template>
             <template v-slot:assignee="{row}">
                 {{ row.assigneeName }}
+            </template>
+            <template v-slot:status="{row}">
+                <button v-if="row.status"   class="ui green icon button">
+                    <i class="check icon"></i>
+                </button>
+                <button v-else   class="ui yellow icon button">
+                    <i class="clock outline icon"></i>
+                </button>
             </template>
             <template v-slot:actions="{row}">
                 <button class="ui negative button icon" v-on:click="">
