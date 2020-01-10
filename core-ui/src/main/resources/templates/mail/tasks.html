@@ -6,167 +6,167 @@
 </head>
 <body>
 <div th:fragment="tasks">
-<table align="left" border="0" cellpadding="0" cellspacing="0" class="col380"
-       style="width: 100%; max-width: 800px;" th:each="project : ${projects}">
-    <tr>
-        <td class=" title bodycopy borderbottom" style="font-size:30px"><b
-                th:text="${project.project.name}">New Project</b></td>
-    </tr>
+    <table align="left" border="0" cellpadding="0" cellspacing="0" class="col380"
+           style="width: 100%; max-width: 800px;" th:each="project : ${projects}">
+        <tr>
+            <td class=" title bodycopy borderbottom" style="font-size:30px">
+                <b th:text="${project.project.name}">New Project</b>
+            </td>
+        </tr>
 
-    <tr th:if="${project.createdTasks.size() > 0}">
-        <td class=" title bodycopy borderbottom" style="color:#32B232"><b>Tasks created</b></td>
-    </tr>
-    <tr th:each="createdTask : ${project.createdTasks}">
-        <td class="borderbottom">
-            <table border="0" cellpadding="4" cellspacing="2" width="100%">
-                <tr>
-                    <td class="bodycopy " colspan="5">
-                        <b th:text="${createdTask.task.name}">Task #1</b>
-                    </td>
-                </tr>
-                <tr>
+        <tr th:if="${project.createdTasks.size() > 0}">
+            <td class=" title bodycopy borderbottom" style="color:#32B232"><b>Tasks created</b></td>
+        </tr>
+        <tr th:each="createdTask : ${project.createdTasks}">
+            <td class="borderbottom">
+                <table border="0" cellpadding="4" cellspacing="2" width="100%">
+                    <tr>
+                        <td class="bodycopy " colspan="5">
+                            <b th:text="${createdTask.task.name}">Task #1</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bodycopy" colspan="5" th:text="${createdTask.task.comments}">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Actor</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${createdTask.actor.firstName}">Maggie</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${createdTask.actor.name}">Smith</td>
+                                </tr>
+                            </table>
 
-                    <td class="bodycopy" colspan="5" th:text="${createdTask.task.comments}">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="bodycopy center">
-                        <table>
-                            <tr>
-                                <td><b>Actor</b></td>
-                            </tr>
-                            <tr>
-                                <td th:text="${createdTask.actor.firstName}">Maggie</td>
-                            </tr>
-                            <tr>
-                                <td th:text="${createdTask.actor.name}">Smith</td>
-                            </tr>
-                        </table>
+                        </td>
+                        <td class="bodycopy center" th:if="${createdTask.task.assigned != null}">
+                            <table>
+                                <tr>
+                                    <td><b>Assignee</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${createdTask.task.assigned.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${createdTask.task.assigned.name}">Doe</td>
+                                </tr>
+                            </table>
 
-                    </td>
-                    <td class="bodycopy center" th:if="${createdTask.task.assigned != null}">
-                        <table>
-                            <tr>
-                                <td><b>Assignee</b></td>
-                            </tr>
-                            <tr>
-                                <td th:text="${createdTask.task.assigned.firstName}">John</td>
-                            </tr>
-                            <tr>
-                                <td th:text="${createdTask.task.assigned.name}">Doe</td>
-                            </tr>
-                        </table>
+                        </td>
+                        <td class="bodycopy">
+                            <table>
+                                <tr>
+                                    <td style="text-align: center;"><b>Start/End</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(createdTask.task.startDate, 'dd/MM/yyyy')}">
+                                        01/11/2019
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(createdTask.task.endDate, 'dd/MM/yyyy')}">
+                                        13/11/2019
+                                    </td>
+                                </tr>
+                            </table>
 
-                    </td>
-                    <td class="bodycopy">
-                        <table>
-                            <tr>
-                                <td style="text-align: center;"><b>Start/End</b></td>
-                            </tr>
-                            <tr>
-                                <td th:text="${#dates.format(createdTask.task.startDate, 'dd/MM/yyyy')}">
-                                    01/11/2019
-                                </td>
-                            </tr>
-                            <tr>
-                                <td th:text="${#dates.format(createdTask.task.endDate, 'dd/MM/yyyy')}">
-                                    13/11/2019
-                                </td>
-                            </tr>
-                        </table>
+                        </td>
 
-                    </td>
+                        <td class="bodycopy ">
+                            <div class="circle" th:text="${createdTask.task.originalEstimate}">
+                                5.0
+                            </div>
+                        </td>
+                    </tr>
 
-                    <td class="bodycopy ">
-                        <div class="circle" th:text="${createdTask.task.originalEstimate}">
-                            5.0
-                        </div>
-                    </td>
-                </tr>
+                </table>
+            </td>
+        </tr>
+        <tr th:if="${project.deletedTasks.size() > 0}">
+            <td class="bodycopy borderbottom title" style=" color: #DC143C;"><b>Tasks deleted</b>
+            </td>
+        </tr>
+        <tr th:each="task : ${project.deletedTasks}">
+            <td class="borderbottom">
+                <table border="0" cellpadding="4" cellspacing="2" width="100%">
+                    <tr>
+                        <td class="bodycopy" colspan="5">
+                            <b th:text="${task.task.name}">Task #1</b>
+                        </td>
+                    </tr>
+                    <tr>
 
-            </table>
-        </td>
-    </tr>
-    <tr th:if="${project.deletedTasks.size() > 0}">
-        <td class="bodycopy borderbottom title" style=" color: #DC143C;"><b>Tasks deleted</b>
-        </td>
-    </tr>
-    <tr th:each="task : ${project.deletedTasks}">
-        <td class="borderbottom">
-            <table border="0" cellpadding="4" cellspacing="2" width="100%">
-                <tr>
-                    <td class="bodycopy" colspan="5">
-                        <b th:text="${task.task.name}">Task #1</b>
-                    </td>
-                </tr>
-                <tr>
+                        <td class="bodycopy" colspan="5" th:text="${task.task.comments}">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+                            tempor incididunt ut labore et dolore magna aliqua.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bodycopy">
+                            <table>
+                                <tr>
+                                    <td><b>Actor</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${task.actor.firstName}">Maggie</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${task.actor.name}">Smith</td>
+                                </tr>
+                            </table>
 
-                    <td class="bodycopy" colspan="5" th:text="${task.task.comments}">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                        tempor incididunt ut labore et dolore magna aliqua.
-                    </td>
-                </tr>
-                <tr>
-                    <td class="bodycopy">
-                        <table>
-                            <tr>
-                                <td><b>Actor</b></td>
-                            </tr>
-                            <tr>
-                                <td th:text="${task.actor.firstName}">Maggie</td>
-                            </tr>
-                            <tr>
-                                <td th:text="${task.actor.name}">Smith</td>
-                            </tr>
-                        </table>
+                        </td>
+                        <td class="bodycopy" th:if="${task.task.assigned != null}">
+                            <table>
+                                <tr>
+                                    <td><b>Assignee</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${task.task.assigned.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${task.task.assigned.name}">Doe</td>
+                                </tr>
+                            </table>
 
-                    </td>
-                    <td class="bodycopy" th:if="${task.task.assigned != null}">
-                        <table>
-                            <tr>
-                                <td><b>Assignee</b></td>
-                            </tr>
-                            <tr>
-                                <td th:text="${task.task.assigned.firstName}">John</td>
-                            </tr>
-                            <tr>
-                                <td th:text="${task.task.assigned.name}">Doe</td>
-                            </tr>
-                        </table>
+                        </td>
+                        <td class="bodycopy">
+                            <table>
+                                <tr>
+                                    <td style="text-align: center;"><b>Start/End</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(task.task.startDate, 'dd/MM/yyyy')}">
+                                        01/11/2019
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(task.task.endDate, 'dd/MM/yyyy')}">
+                                        13/11/2019
+                                    </td>
+                                </tr>
+                            </table>
 
-                    </td>
-                    <td class="bodycopy">
-                        <table>
-                            <tr>
-                                <td style="text-align: center;"><b>Start/End</b></td>
-                            </tr>
-                            <tr>
-                                <td th:text="${#dates.format(task.task.startDate, 'dd/MM/yyyy')}">
-                                    01/11/2019
-                                </td>
-                            </tr>
-                            <tr>
-                                <td th:text="${#dates.format(task.task.endDate, 'dd/MM/yyyy')}">
-                                    13/11/2019
-                                </td>
-                            </tr>
-                        </table>
+                        </td>
 
-                    </td>
-
-                    <td class="bodycopy ">
-                        <div class="circle" th:text="${task.task.originalEstimate}"> 5.0</div>
-                    </td>
+                        <td class="bodycopy ">
+                            <div class="circle" th:text="${task.task.originalEstimate}"> 5.0</div>
+                        </td>
 
 
-                </tr>
+                    </tr>
 
-            </table>
-        </td>
-    </tr>
-</table>
+                </table>
+            </td>
+        </tr>
+    </table>
 </div>
 </body>
 </html>

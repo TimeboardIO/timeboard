@@ -33,10 +33,7 @@ import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.internal.TemplateGenerator;
 import timeboard.core.internal.events.*;
-import timeboard.core.model.Account;
-import timeboard.core.model.Task;
-import timeboard.core.model.VacationRequest;
-import timeboard.core.model.ValidatedTimesheet;
+import timeboard.core.model.*;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -45,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 
 @Component
@@ -59,7 +57,7 @@ public class SendSummaryEmail {
     public void activate() {
         TimeboardSubjects.TIMEBOARD_EVENTS // Listen for all timeboard app events
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10))) // Observe on 10 threads
-                .buffer(60, TimeUnit.SECONDS) // Aggregate mails every 5 minutes TODO add configuration
+                .buffer(20, TimeUnit.SECONDS) // Aggregate mails every 5 minutes TODO add configuration
                 .map(this::notificationEventToUserEvent) // Rebalance events by user to notify/inform
                 .flatMapIterable(l -> l) // transform user list to single events
                 .subscribe(struc -> this.emailService.sendMessage(generateMailFromEventList(struc))); //create and send individual summary
@@ -77,28 +75,35 @@ public class SendSummaryEmail {
         Map<String, Object> data = new HashMap<>();
 
         List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
-        List<VacationRequest> vacationRequests = new ArrayList<>();
-        Map<Long, EmailSummaryModel> projects = new HashMap<>();
+        List<VacationEvent> vacationEvents = new ArrayList<>();
+        Map<Long, ProjectEmailSummaryModel> projects = new HashMap<>();
 
         for (TimeboardEvent event : userNotificationStructure.getNotificationEventList()) {
             if (event instanceof TaskEvent) {
                 Task t = ((TaskEvent) event).getTask();
                 if (((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) {
-                    projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
+                    projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
                 }
                 if (((TaskEvent) event).getEventType() == TimeboardEventType.DELETE) {
-                    projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
+                    projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
+                }
+                if (((TaskEvent) event).getEventType() == TimeboardEventType.UPDATE) {
+                    if(((TaskEvent) event).getTask().getTaskStatus() == TaskStatus.REFUSED)projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addDeniedTask((TaskEvent) event);
+                    else projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addApprovedTask((TaskEvent) event);
                 }
             } else if (event instanceof TimesheetEvent) {
                 validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             } else if (event instanceof VacationEvent) {
-                vacationRequests.add(((VacationEvent) event).getRequest());
+                vacationEvents.add(((VacationEvent) event));
             }
 
         }
         data.put("projects", projects.values());
         data.put("validatedTimesheets", validatedTimesheets);
-        data.put("vacationRequests", vacationRequests);
+        data.put("vacationEventsCreated", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.CREATE)).toArray());
+        data.put("vacationEventsApproved", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.APPROVE)).toArray());
+        data.put("vacationEventsDenied", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DENY)).toArray());
+        data.put("vacationEventsDeleted", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DELETE)).toArray());
 
         String message = templateGenerator.getTemplateString("mail/summary.html", data);
         ArrayList<String> list = new ArrayList<>();

@@ -5,42 +5,142 @@
 
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-    <title>A Simple Responsive HTML Email</title>
+    <title>Timeboard HTML email template</title>
     <style type="text/css">
-  body {margin: 0; padding: 0; min-width: 100%!important;}
-  img {height: auto;}
-  .content {width: 100%; max-width: 600px;}
-  .header {padding: 40px 30px 20px 30px;}
-  .innerpadding {padding: 30px 30px 30px 30px;}
-  .borderbottom {border-bottom: 1px solid #f2eeed;}
-  .subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
-  .h1, .h2, .bodycopy {color: #393939; font-family: sans-serif;}
-  .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
-  .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
-  .bodycopy {font-size: 16px; line-height: 22px;}
-  .center {text-align: center;}
-  .button {text-align: center; font-size: 12px; font-family: sans-serif; font-weight: bold; padding: 0 20px 0 20px;}
-  .button a {color: #ffffff; text-decoration: none;}
-  .footer {padding: 20px 30px 15px 30px;}
-  .footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
-  .footercopy a {color: #ffffff; text-decoration: underline;}
-  .title{  padding-top: 15px; padding-bottom: 5px; font-size: 22px; text-align: center; }
-    .circle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      color: grey;
-      line-height: 40px;
-      text-align: center;
-      background-color: lightgrey;
-    }
-  @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
-  body[yahoo] .hide {display: none!important;}
-  body[yahoo] .buttonwrapper {background-color: transparent!important;}
-  body[yahoo] .button {padding: 0px!important;}
-  body[yahoo] .button a {background-color: #e05443; padding: 10px 10px 10px!important;}
-  body[yahoo] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #393939; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
-  }
+        body {
+            margin: 0;
+            padding: 0;
+            min-width: 100% !important;
+        }
+
+        img {
+            height: auto;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            padding: 40px 30px 20px 30px;
+        }
+
+        .innerpadding {
+            padding: 30px 30px 30px 30px;
+        }
+
+        .borderbottom {
+            border-bottom: 1px solid #f2eeed;
+        }
+
+        .subhead {
+            font-size: 15px;
+            color: #ffffff;
+            font-family: sans-serif;
+            letter-spacing: 10px;
+        }
+
+        .h1, .h2, .bodycopy {
+            color: #393939;
+            font-family: sans-serif;
+        }
+
+        .h1 {
+            font-size: 33px;
+            line-height: 38px;
+            font-weight: bold;
+        }
+
+        .h2 {
+            padding: 0 0 15px 0;
+            font-size: 24px;
+            line-height: 28px;
+            font-weight: bold;
+        }
+
+        .bodycopy {
+            font-size: 16px;
+            line-height: 22px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .button {
+            text-align: center;
+            font-size: 12px;
+            font-family: sans-serif;
+            font-weight: bold;
+            padding: 0 20px 0 20px;
+        }
+
+        .button a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .footer {
+            padding: 20px 30px 15px 30px;
+        }
+
+        .footercopy {
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .footercopy a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .title {
+            padding-top: 15px;
+            padding-bottom: 5px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: grey;
+            line-height: 40px;
+            text-align: center;
+            background-color: lightgrey;
+        }
+
+        @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
+            body[yahoo] .hide {
+                display: none !important;
+            }
+
+            body[yahoo] .buttonwrapper {
+                background-color: transparent !important;
+            }
+
+            body[yahoo] .button {
+                padding: 0px !important;
+            }
+
+            body[yahoo] .button a {
+                background-color: #e05443;
+                padding: 10px 10px 10px !important;
+            }
+
+            body[yahoo] .unsubscribe {
+                display: block;
+                margin-top: 20px;
+                padding: 10px 50px;
+                background: #393939;
+                border-radius: 5px;
+                text-decoration: none !important;
+                font-weight: bold;
+            }
+        }
 
 
     </style>
@@ -108,150 +208,9 @@
                                 <td>
                         <![endif]-->
 
-
-
                         <div th:include="mail/tasks.html :: tasks"></div>
-
-
-
-
-                        <table align="left" border="0" cellpadding="0" cellspacing="0"
-                               class="col380" style="width: 100%; max-width: 800px;" th:if="${validatedTimesheets.size() > 0}">
-                            <tr>
-                                <td class=" title bodycopy " style="font-size:30px"><b>Timesheet Validations</b></td>
-                            </tr>
-                            <tr>
-                                <td class=" bodycopy borderbottom" style="text-align:center;">These users have validated their timesheet
-                                </td>
-                            </tr>
-                            <tr th:each="ts : ${validatedTimesheets}">
-                                <td class="borderbottom">
-                                    <table border="0" cellpadding="4" cellspacing="2" width="100%">
-
-                                        <tr>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>User</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.account.firstName}">John</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.account.name}">Doe</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy">
-                                                <table>
-                                                    <tr>
-                                                        <td style="text-align: center;"><b>Week</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.week}">42 of</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.year}">2019</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Validated by</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${validatedTimesheet.validatedBy.firstName}">
-                                                            Maggie
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${validatedTimesheet.validatedBy.name}">Smith</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-
-
-                                            <td class="bodycopy ">
-                                                <div class="circle">OK</div>
-                                            </td>
-                                        </tr>
-
-                                    </table>
-                                </td>
-                            </tr>
-
-                        </table>
-
-                        <table align="left" border="0" cellpadding="0" cellspacing="0"
-                               class="col380" style="width: 100%; max-width: 800px;" th:if="${vacationRequests.size() > 0}">
-                            <tr>
-                                <td class=" title bodycopy " style="font-size:30px"><b>Vacation Requests</b></td>
-                            </tr>
-                            <tr>
-                                <td class=" bodycopy borderbottom" style="text-align:center;">Here is vacation requests
-                                </td>
-                            </tr>
-                            <tr th:each="request : ${vacationRequests}">
-                                <td class="borderbottom">
-                                    <table border="0" cellpadding="4" cellspacing="2" width="100%">
-
-                                        <tr>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Applicant</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${request.applicant.firstName}">John</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${request.applicant.name}">Doe</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Dates</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${#dates.format(request.endDate, 'dd/MM/yyyy') + request.endHalfDay}">
-                                                            01/11/2019 MORNING
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${#dates.format(request.startDate, 'dd/MM/yyyy') + request.startHalfDay}" > 05/11/2019 AFTERNOON</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Pending</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${request.assignee.firstName}">John</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${request.assignee.name}">Doe</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-
-                                        </tr>
-
-                                    </table>
-                                </td>
-                            </tr>
-
-                        </table>
+                        <div th:include="mail/timesheet.html :: timesheet"></div>
+                        <div th:include="mail/vacation.html :: vacation"></div>
 
                         <!--[if (gte mso 9)|(IE)]>
                         </td>
@@ -260,7 +219,6 @@
                         <![endif]-->
                     </td>
                 </tr>
-
                 <tr>
                     <td class="innerpadding bodycopy">
                         Best regards from the My Timeboard team.
@@ -272,8 +230,8 @@
                             <tr>
                                 <td align="center" class="footercopy">
                                     My Timeboard, 2020<br/>
-                                    <i> <span
-                                            class="hide">Automatically generated email, please do not reply.</span></i>
+                                    <i> <span class="hide"> Automatically generated email, please do not reply. </span>
+                                    </i>
                                 </td>
                             </tr>
 

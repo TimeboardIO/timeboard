@@ -32,23 +32,34 @@ import timeboard.core.model.Project;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmailSummaryModel {
+public class ProjectEmailSummaryModel {
 
     private Project project;
     private List<TaskEvent> createdTasks = new ArrayList<>();
 
     private List<TaskEvent> deletedTasks = new ArrayList<>();
 
-    public EmailSummaryModel(Project p) {
+    private List<TaskEvent> approvedTasks = new ArrayList<>();
+
+    private List<TaskEvent> deniedTasks = new ArrayList<>();
+
+    public ProjectEmailSummaryModel(Project p) {
         this.project = p;
     }
 
     public void addCreatedTask(TaskEvent e) {
         createdTasks.add(e);
     }
-
     public void addDeletedTask(TaskEvent e) {
         deletedTasks.add(e);
+    }
+
+    public void addApprovedTask(TaskEvent e) {
+        approvedTasks.add(e);
+    }
+
+    public void addDeniedTask(TaskEvent e) {
+        deniedTasks.add(e);
     }
 
     public Project getProject() {
@@ -61,5 +72,13 @@ public class EmailSummaryModel {
 
     public List<TaskEvent> getDeletedTasks() {
         return deletedTasks;
+    }
+
+    public List<TaskEvent> getApprovedTasks() {
+        return approvedTasks;
+    }
+
+    public List<TaskEvent> getDeniedTasks() {
+        return deniedTasks;
     }
 }

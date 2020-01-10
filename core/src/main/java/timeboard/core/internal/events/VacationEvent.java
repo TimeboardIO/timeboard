@@ -30,6 +30,8 @@ import timeboard.core.model.*;
 
 import java.util.Date;
 
+import static timeboard.core.internal.events.TimeboardEventType.*;
+
 
 public class VacationEvent extends TimeboardEvent {
     private VacationRequest request;
@@ -64,8 +66,13 @@ public class VacationEvent extends TimeboardEvent {
         Account applicantAccount = request.getApplicant();
         Account assignedAccount = request.getAssignee();
 
-        usersToNotify.add(assignedAccount);
-        usersToInform.add(applicantAccount);
+       if(eventType == CREATE || eventType == DELETE) {
+           usersToNotify.add(assignedAccount);
+           usersToInform.add(applicantAccount);
+       } else {
+           usersToNotify.add(applicantAccount);
+           usersToInform.add(assignedAccount);
+       }
 
     }
 
