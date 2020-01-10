@@ -40,6 +40,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 import timeboard.core.model.VacationRequest;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -49,6 +50,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/vacation")
@@ -74,7 +76,16 @@ public class VacationsController {
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VacationRequestWrapper>> listRequests(TimeboardAuthentication authentication) throws BusinessException {
 
-        return ResponseEntity.ok(new ArrayList<VacationRequestWrapper>());
+        final Account actor = authentication.getDetails();
+
+        List<VacationRequest> list =  this.vacationService.listUserVacations(actor);
+        List<VacationRequestWrapper> returnList = new ArrayList<>();
+
+        for (VacationRequest v : list) {
+            returnList.add(new VacationRequestWrapper(v));
+        }
+
+        return ResponseEntity.ok(returnList);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -106,7 +117,7 @@ public class VacationsController {
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setValidated(false);
 
-        vacationService.createVacationRequest(actor, request);
+        this.vacationService.createVacationRequest(actor, request);
 
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.CREATE, request));
 
@@ -133,6 +144,7 @@ public class VacationsController {
         public String end;
         public boolean halfStart;
         public boolean halfEnd;
+        public boolean status;
         public long assigneeID;
         public String assigneeName;
         public String label;
@@ -145,8 +157,14 @@ public class VacationsController {
             this.end = DATE_FORMAT.format(r.getEndDate());
             this.halfStart = r.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON);
             this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
-            this.assigneeID = r.getAssignee().getId();
-            this.assigneeName = r.getAssignee().getName();
+            this.status = r.isValidated();
+            if(r.getAssignee() != null) {
+                this.assigneeID = r.getAssignee().getId();
+                this.assigneeName = r.getAssignee().getScreenName();
+            } else {
+                this.assigneeID = 0;
+                this.assigneeName = "";
+            }
         }
 
         public long getId() {

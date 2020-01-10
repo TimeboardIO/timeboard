@@ -30,10 +30,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.VacationService;
 import timeboard.core.model.Account;
+import timeboard.core.model.Task;
 import timeboard.core.model.VacationRequest;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Component
 @Transactional
@@ -45,12 +48,28 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
 
-
         em.persist(request);
-
         em.flush();
 
         return request;
+    }
+
+    @Override
+    public List<VacationRequest> listUserVacations(Account applicant) {
+
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.applicant = :applicant", VacationRequest.class);
+        q.setParameter("applicant", applicant);
+
+        return q.getResultList();
+    }
+
+    @Override
+    public List<VacationRequest> listVacationsToValidateByUser(Account assignee) {
+
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee", VacationRequest.class);
+        q.setParameter("assignee", assignee);
+
+        return q.getResultList();
     }
 
 }

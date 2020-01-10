@@ -32,6 +32,27 @@
             </a>
         </div>
 
+        <data-table v-bind:config="table">
+            <template v-slot:label="{row}">
+                {{ row.label }}
+            </template>
+            <template v-slot:start="{row}">
+                {{ row.start  + ' ' + (row.halfStart ? 'Afternoon' : 'Morning') }}
+            </template>
+            <template v-slot:end="{row}">
+                {{ row.end + ' ' + (row.halfEnd ? 'Morning' : 'Afternoon') }}
+            </template>
+            <template v-slot:assignee="{row}">
+                {{ row.assigneeName }}
+            </template>
+            <template v-slot:actions="{row}">
+                <button class="ui negative button icon" v-on:click="">
+                    <i class="remove alternate icon"></i>
+                    Cancel
+                </button>
+            </template>
+
+        </data-table>
         <tmodal
                 title="Request vacation"
                 id="newVacation">

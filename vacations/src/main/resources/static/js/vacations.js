@@ -27,9 +27,53 @@ let app = new Vue({
             end : "",
             halfStart : false,
             halfEnd : false,
+            status : false,
             label : "",
             assigneeName : "",
             assigneeID : 0,
+        },
+        table: {
+            cols: [
+                {
+                    "slot": "label",
+                    "label": "Label",
+                    "sortKey": "label",
+                    "primary" : false
+
+                },
+                {
+                    "slot": "start",
+                    "label": "From",
+                    "sortKey": "start",
+                    "primary" : true
+
+                },
+                {
+                    "slot": "end",
+                    "label": "To",
+                    "sortKey": "start",
+                    "primary" : true
+                },
+                {
+                    "slot": "assignee",
+                    "label": "Validation",
+                    "sortKey": "start",
+                    "primary" : true
+                },
+                {
+                    "slot": "status",
+                    "label": "Status",
+                    "sortKey": "status",
+                    "primary" : true
+                },
+                {
+                    "slot": "actions",
+                    "label": "Actions",
+                    "primary" : true
+                }],
+            data: [],
+            name: 'tableVacation',
+            configurable : true
         }
     },
     methods:  {
@@ -56,6 +100,17 @@ let app = new Vue({
                 });
             }
         }
+    },
+    mounted: function () {
+        let self = this;
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "vacation/list",
+            success: function (d) {
+                self.table.data = d;
+            }
+        });
     }
 });
 

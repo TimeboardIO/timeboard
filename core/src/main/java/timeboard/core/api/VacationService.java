@@ -29,9 +29,16 @@ package timeboard.core.api;
 import timeboard.core.model.Account;
 import timeboard.core.model.VacationRequest;
 
+import java.util.List;
+
 public interface VacationService {
 
 
     public VacationRequest createVacationRequest(Account actor, VacationRequest request);
+
+    List<VacationRequest> listUserVacations(Account user);
+
+    List<VacationRequest> listVacationsToValidateByUser(Account user);
+
 
 }
