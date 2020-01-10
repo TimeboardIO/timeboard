@@ -117,6 +117,8 @@
 
     insert into hibernate_sequence values ( 1 );
 
+    insert into hibernate_sequence values ( 1 );
+
     create table Imputation (
        id bigint not null,
         organizationID bigint,
@@ -235,8 +237,22 @@
 
     create table TaskType (
        id bigint not null,
+        organizationID bigint,
         enable bit,
         typeName varchar(255),
+        primary key (id)
+    ) engine=InnoDB;
+
+    create table VacationRequest (
+       id bigint not null,
+        endDate date,
+        endHalfDay integer,
+        label varchar(255),
+        startDate date,
+        startHalfDay integer,
+        validated bit,
+        applicant_id bigint,
+        assignee_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -350,6 +366,16 @@
        add constraint FKq0s3frhsv5jms3r14ax9jtnnh 
        foreign key (task_id) 
        references Task (id);
+
+    alter table VacationRequest 
+       add constraint FKf501udnxw766cpsw730g0jhxn 
+       foreign key (applicant_id) 
+       references Account (id);
+
+    alter table VacationRequest 
+       add constraint FK28esu0dtlr0he4ie5j5oipsck 
+       foreign key (assignee_id) 
+       references Account (id);
 
     alter table ValidatedTimesheet 
        add constraint FKfwotsv2gieci2khm1c1aub4uf 

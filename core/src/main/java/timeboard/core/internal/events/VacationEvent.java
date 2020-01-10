@@ -1,4 +1,4 @@
-package timeboard.core.model;
+package timeboard.core.internal.events;
 
 /*-
  * #%L
@@ -26,45 +26,46 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
+import timeboard.core.model.*;
 
-@Entity
-public class TaskType extends OrganizationEntity  {
+import java.util.Date;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
 
-    @Column
-    private String typeName;
+public class VacationEvent extends TimeboardEvent {
+    private VacationRequest request;
+    private TimeboardEventType eventType;
 
-    @Column
-    private boolean enable = true;
+    public VacationEvent(TimeboardEventType eventType, VacationRequest request) {
+        super(new Date());
+        this.eventType = eventType;
+        this.request = request;
 
-    public TaskType() {
+        this.constructUsersList();
     }
 
-    public Long getId() {
-        return id;
+    public TimeboardEventType getEventType() {
+        return eventType;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setEventType(TimeboardEventType eventType) {
+        this.eventType = eventType;
     }
 
-    public String getTypeName() {
-        return typeName;
+    public VacationRequest getRequest() {
+        return request;
     }
 
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
+    public void setRequest(VacationRequest request) {
+        this.request = request;
     }
 
-    public boolean isEnable() {
-        return enable;
+    private void constructUsersList() {
+        Account applicantAccount = request.getApplicant();
+        Account assignedAccount = request.getAssignee();
+
+        usersToNotify.add(assignedAccount);
+        usersToInform.add(applicantAccount);
+
     }
 
-    public void setEnable(boolean active) {
-        this.enable = active;
-    }
 }

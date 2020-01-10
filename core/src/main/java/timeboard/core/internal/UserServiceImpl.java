@@ -127,8 +127,8 @@ public class UserServiceImpl implements UserService {
 
         TypedQuery<Account> q = em
                 .createQuery(
-                        "select h.member from AccountHierarchy h " +
-                                "where h.member.email LIKE CONCAT('%',:prefix,'%') and h.organization = :org",
+                        "select m.member from OrganizationMembership m " +
+                                "where m.member.email LIKE CONCAT('%',:prefix,'%') and m.organization = :org",
                         Account.class);
         q.setParameter("prefix", email);
         q.setParameter("org", org);

@@ -242,8 +242,8 @@ let app = new Vue({
             let self = this;
             $('.create-task.modal').modal({
                 onApprove : function($element) {
-                    var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
-                    var object = {};
+                    let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    let object = {};
                     if(validated) {
                         $('.ui.error.message').hide();
                         $.ajax({

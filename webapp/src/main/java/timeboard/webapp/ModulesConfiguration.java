@@ -35,13 +35,14 @@ import timeboard.account.AccountConfiguration;
 import timeboard.core.CoreConfiguration;
 import timeboard.core.ui.CoreUIConfiguration;
 import timeboard.home.HomeConfiguration;
+import timeboard.organization.OrganizationsConfiguration;
+import timeboard.organization.TimesheetConfiguration;
 import timeboard.plugin.project.imp.jira.JiraPluginConfiguration;
 import timeboard.plugin.project.sync.github.GithubPluginConfiguration;
 import timeboard.projects.ProjectsConfiguration;
 import timeboard.reports.ReportsConfiguration;
 import timeboard.theme.ThemeConfiguration;
-import timeboard.organization.OrganizationsConfiguration;
-import timeboard.organization.TimesheetConfiguration;
+import timeboard.vacations.VacationsConfiguration;
 
 @Configuration
 @Import({
@@ -55,7 +56,8 @@ import timeboard.organization.TimesheetConfiguration;
         ProjectsConfiguration.class,
         JiraPluginConfiguration.class,
         GithubPluginConfiguration.class,
-        OrganizationsConfiguration.class
+        OrganizationsConfiguration.class,
+        VacationsConfiguration.class
 })
 public class ModulesConfiguration {
 

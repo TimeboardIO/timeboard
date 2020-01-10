@@ -98,5 +98,13 @@ public class TimeboardAuthentication implements Authentication {
                 .count() > 0;
     }
 
+    @Transient
+    public boolean isPublicCurrentOrganization() {
+        return account.getOrganizations().stream()
+                .map(o -> o.getOrganization())
+                .filter(o->o.getId() == this.currentOrganization)
+                .allMatch(o->o.isPublicOrganisation());
+    }
+
 
 }

@@ -1,8 +1,8 @@
-package timeboard.core.model;
+package timeboard.vacations;
 
 /*-
  * #%L
- * core
+ * account
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,45 +26,10 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
-@Entity
-public class TaskType extends OrganizationEntity  {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    @Column
-    private String typeName;
-
-    @Column
-    private boolean enable = true;
-
-    public TaskType() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTypeName() {
-        return typeName;
-    }
-
-    public void setTypeName(String typeName) {
-        this.typeName = typeName;
-    }
-
-    public boolean isEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean active) {
-        this.enable = active;
-    }
+@Configuration
+@ComponentScan("timeboard.vacations")
+public class VacationsConfiguration {
 }

@@ -33,10 +33,10 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Organization;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.organization.OrganizationSelectController;
 
 import javax.servlet.*;

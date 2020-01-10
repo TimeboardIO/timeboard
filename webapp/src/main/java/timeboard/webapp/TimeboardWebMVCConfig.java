@@ -28,9 +28,11 @@ package timeboard.webapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import timeboard.projects.converters.LongToProjectConverter;
 
 @Configuration
 public class TimeboardWebMVCConfig implements WebMvcConfigurer {
@@ -40,6 +42,9 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
 
     @Autowired
     private OrganizationFilter organizationInterceptor;
+
+    @Autowired
+    private LongToProjectConverter longToProjectConverter;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -51,5 +56,10 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addWebRequestInterceptor(this.webRessourcesInterceptor);
+    }
+
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        registry.addConverter(this.longToProjectConverter);
     }
 }

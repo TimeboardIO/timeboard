@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{projectID}/snapshots")
+@RequestMapping("/projects/{project}/snapshots")
 public class ProjectSnapshotsController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -64,11 +65,16 @@ public class ProjectSnapshotsController {
     private ProjectSnapshotService projectSnapshotService;
 
 
+
+
     @GetMapping
-    public String display(TimeboardAuthentication authentication, @PathVariable Long projectID, Model model) throws BusinessException {
+    @PreAuthorize("hasPermission(#project,'PROJECT_SNAPSHOT')")
+    public String display(TimeboardAuthentication authentication,
+                          @PathVariable("project") Project project,
+                          Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+        //final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
 
@@ -77,50 +83,46 @@ public class ProjectSnapshotsController {
 
     @GetMapping(value = "/chart", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity getDatasForChart(TimeboardAuthentication authentication,
-                                           @PathVariable Long projectID) throws BusinessException, JsonProcessingException {
+                                           Project project) throws BusinessException, JsonProcessingException {
 
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        final ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
+         final ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projectSnapshotGraphWrapper));
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectSnapshotsController.ProjectSnapshotWrapper>>
     listProjectSnapshots(TimeboardAuthentication authentication,
-                         @PathVariable Long projectID) throws BusinessException {
+                         Project project) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        return ResponseEntity.ok(project.getSnapshots().stream().map(projectSnapshot ->
+         return ResponseEntity.ok(project.getSnapshots().stream().map(projectSnapshot ->
                 new ProjectSnapshotsController.ProjectSnapshotWrapper(projectSnapshot)).collect(Collectors.toList()));
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectSnapshotWrapper>> createSnapshot(
-            @PathVariable Long projectID,
+            Project project,
             TimeboardAuthentication authentication) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        final ProjectSnapshot projectSnapshot = this.projectSnapshotService.createProjectSnapshot(actor, project);
+         final ProjectSnapshot projectSnapshot = this.projectSnapshotService.createProjectSnapshot(actor, project);
         projectSnapshot.setProject(project);
         project.getSnapshots().add(projectSnapshot);
         this.projectService.updateProject(actor, project);
-        return this.listProjectSnapshots(authentication, projectID);
+        return this.listProjectSnapshots(authentication, project);
     }
 
     @DeleteMapping(value = "/{snapshotID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectSnapshotWrapper>>
     deleteSnapshot(TimeboardAuthentication authentication,
-                   @PathVariable Long projectID, @PathVariable Long snapshotID) throws BusinessException {
+                   Project project, @PathVariable Long snapshotID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        project.getSnapshots().removeIf(projectSnapshot -> projectSnapshot.getId().equals(snapshotID));
+         project.getSnapshots().removeIf(projectSnapshot -> projectSnapshot.getId().equals(snapshotID));
         this.projectService.updateProject(actor, project);
-        return this.listProjectSnapshots(authentication, projectID);
+        return this.listProjectSnapshots(authentication, project);
     }
 
     public Collection<Double> quotationValuesForGraph(List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList,

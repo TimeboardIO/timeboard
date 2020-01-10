@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/account')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title layout:fragment="title">Account</title>
+</head>
+
+<body>
+
+
+<div layout:fragment="content">
+
+    <div class="ui negative message" th:if="${error}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${error}">
+        </div>
+    </div>
+    <div class="ui positive message" th:if="${message}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${message}">
+        </div>
+    </div>
+    <div id="vacationApp">
+        <div class="ui menu">
+            <a class="item"  v-on:click="openModal" >
+                <i class="plus icon"></i>
+                New Vacation
+            </a>
+        </div>
+
+        <tmodal
+                title="Request vacation"
+                id="newVacation">
+            <template v-slot:content>
+                <form class="ui form">
+                    <div v-bind="formError" class="ui error message"></div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Departure Date</label>
+                            <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
+                            <div class="inline fields" style="padding-top: 1rem;">
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-start" v-bind:value="false" v-model="vacationRequest.halfStart">
+                                        <label>Morning</label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-start" v-bind:value="true" v-model="vacationRequest.halfStart">
+                                        <label>Afternoon</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Return Date</label>
+                            <input type="date" name="end-date" placeholder="Return date" v-model="vacationRequest.end">
+                            <div class="inline fields" style="padding-top: 1rem;">
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-end" v-bind:value="true" v-model="vacationRequest.halfEnd">
+                                        <label>Morning</label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-end" v-bind:value="false" v-model="vacationRequest.halfEnd" >
+                                        <label>Afternoon</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Label</label>
+                            <input type="text" name="label" placeholder="Label" v-model="vacationRequest.label">
+                        </div>
+                        <div class="field">
+                            <label>User to notify</label>
+                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID" name="assignee" type="text">
+                            <div class="ui category search">
+                                <div class="ui icon input">
+                                    <input class="prompt" name="assignee" placeholder="Search account..." type="text">
+                                    <i class="search icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <button class="ui positive button"  @click="addVacationRequest">Request new vacation</button>
+
+            </template>
+        </tmodal>
+    </div>
+
+    <script src="/js/vacations.js"></script>
+
+</div>
+</div>
+
+</body>
+</html>

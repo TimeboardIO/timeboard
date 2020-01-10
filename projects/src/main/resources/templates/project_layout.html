@@ -2,6 +2,7 @@
 
 <html layout:decorate="~{layouts/general.html(path='/projects')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:th="http://www.thymeleaf.org">
 
 
@@ -22,6 +23,7 @@
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"
            th:href="@{/projects/{projectID}/tags(projectID=${project.id})}" data-cy="project-menu-tags">Tags</a>
         <a class="item" th:classappend="${tab} == 'six'  ? 'active':''"
+           sec:authorize="${hasPermission(#vars.project,'PROJECT_SNAPSHOT')}"
            th:href="@{/projects/{projectID}/snapshots(projectID=${project.id})}" data-cy="project-menu-tags">Snapshots</a>
     </div>
     <div class="ui bottom attached tab segment controls active" data-tab="first" style="border-top : none !important;" layout:fragment="placeholder">
