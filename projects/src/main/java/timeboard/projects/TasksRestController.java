@@ -34,6 +34,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.TimeboardSubjects;
+import timeboard.core.internal.events.TaskEvent;
+import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
@@ -267,6 +270,7 @@ public class TasksRestController {
             task = (Task) this.projectService.getTaskByID(actor, taskID);
             task.setTaskStatus(status);
             this.projectService.updateTask(actor, task);
+
         } catch (ClassCastException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");
         } catch (Exception e) {

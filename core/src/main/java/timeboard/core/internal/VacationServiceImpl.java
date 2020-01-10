@@ -28,7 +28,10 @@ package timeboard.core.internal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.VacationService;
+import timeboard.core.internal.events.TimeboardEventType;
+import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
@@ -74,6 +77,7 @@ public class VacationServiceImpl implements VacationService {
         q.setParameter("applicant", applicant);
 
         return q.getResultList();
+
     }
 
     @Override
@@ -90,6 +94,8 @@ public class VacationServiceImpl implements VacationService {
     public void deleteVacationRequest(Account actor, VacationRequest request) {
         em.remove(request);
         em.flush();
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
+
     }
 
     @Override
@@ -97,6 +103,9 @@ public class VacationServiceImpl implements VacationService {
         request.setStatus(VacationRequestStatus.ACCEPTED);
         em.merge(request);
         em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
+
         return request;
     }
 
@@ -105,6 +114,9 @@ public class VacationServiceImpl implements VacationService {
         request.setStatus(VacationRequestStatus.REJECTED);
         em.merge(request);
         em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DENY, request));
+
         return request;
     }
 

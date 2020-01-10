@@ -51,7 +51,6 @@ public class EmailSummaryModel {
         deletedTasks.add(e);
     }
 
-
     public Project getProject() {
         return project;
     }

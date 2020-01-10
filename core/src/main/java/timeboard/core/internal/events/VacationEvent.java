@@ -36,6 +36,7 @@ public class VacationEvent extends TimeboardEvent {
     private TimeboardEventType eventType;
 
     public VacationEvent(TimeboardEventType eventType, VacationRequest request) {
+        
         super(new Date());
         this.eventType = eventType;
         this.request = request;
