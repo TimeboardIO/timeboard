@@ -160,8 +160,8 @@
                 Filters
             </div>
             <div class="right menu">
-                <div class="ui orange label item" th:if="${import} > 0">
-                    <i class="sync icon rotating"></i> Sync with Jira in progress
+                <div id="jobInProgress" class="ui orange label item" style="display:none">
+                    <i class="sync icon rotating"></i> Sync with Jira or Github in progress
                 </div>
 
                 <div class="ui dropdown item" tabindex="0" id="view">

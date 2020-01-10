@@ -11,19 +11,6 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table AsyncJobState (
-       id bigint not null,
-        organizationID bigint,
-        endDate datetime(6),
-        error varchar(1000),
-        ownerID bigint,
-        result varchar(1000),
-        startDate datetime(6),
-        state varchar(255),
-        title varchar(255),
-        primary key (id)
-    ) engine=InnoDB;
-
     create table Batch (
        id bigint not null,
         organizationID bigint,

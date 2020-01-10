@@ -29,6 +29,8 @@ package timeboard.plugin.project.sync.github;
 import org.eclipse.egit.github.core.Issue;
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EncryptionService;
@@ -48,6 +50,8 @@ import java.util.List;
 
 @Component
 public class GithubImportPlugin implements ProjectSyncPlugin {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(GithubImportPlugin.class);
 
     private static final String GITHUB_TOKEN_KEY = "github.token";
     private static final String GITHUB_REPO_OWNER_KEY = "github.repo.owner";
@@ -84,6 +88,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
 
     @Override
     public List<RemoteTask> getRemoteTasks(Account currentUser, List<ProjectSyncCredentialField> credentials) throws BusinessException {
+
         final List<RemoteTask> remoteTasks = new ArrayList<>();
 
         try {//handle github connexion issues
@@ -115,6 +120,8 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
         }catch (Exception e){
             e.printStackTrace();
         }
+
+        LOGGER.info("Import {} tasks from github", remoteTasks.size());
 
         return remoteTasks;
     }
