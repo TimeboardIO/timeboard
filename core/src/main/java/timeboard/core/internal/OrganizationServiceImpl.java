@@ -213,8 +213,8 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<Organization> orgs = q.getResultList();
 
         for (Organization o : orgs) {
-            DefaultTask vacationTask = o.getVacationTask();
-            if (vacationTask == null) {
+            Optional vacationTask = o.getDefaultTasks().stream().filter(t-> t.getName().matches(defaultVacationTaskName)).findFirst();
+            if (!vacationTask.isPresent()) {
                 try {
                     this.createDefaultTask(o, defaultVacationTaskName);
                 } catch (Exception e) {

@@ -47,9 +47,6 @@ public class Organization {
     public static final String FIND_BY_NAME = "org_find_by_name";
     public static final String SETUP_PUBLIC = "org_public";
 
-    @Value("${timeboard.tasks.default.vacation}")
-    private String defaultVacationTaskName;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
@@ -159,15 +156,4 @@ public class Organization {
                 .collect(Collectors.toList());
     }
 
-    @Transient
-    public DefaultTask getVacationTask() {
-        Optional<DefaultTask> task = this.getDefaultTasks().stream().filter(t -> {
-            return t.getName().matches(defaultVacationTaskName);
-        }).findFirst();
-        if(task.isPresent()) {
-            return task.get();
-        } else {
-            return null;
-        }
-    }
 }

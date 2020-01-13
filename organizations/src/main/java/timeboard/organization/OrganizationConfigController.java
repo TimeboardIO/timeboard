@@ -29,6 +29,7 @@ package timeboard.organization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -60,10 +61,12 @@ import java.util.stream.Collectors;
 public class OrganizationConfigController {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
+
     @Autowired
     public OrganizationService organizationService;
-
-
 
     @Autowired
     public EncryptionService encryptionService;
@@ -94,7 +97,7 @@ public class OrganizationConfigController {
     public ResponseEntity<List<TaskWrapper>> listDefaultTasks(TimeboardAuthentication authentication) throws BusinessException {
         final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
                 new Date(), new Date());
-        return ResponseEntity.ok(defaultTasks.stream().map(TaskWrapper::new).collect(Collectors.toList()));
+        return ResponseEntity.ok(defaultTasks.stream().filter(t -> !t.getName().matches(defaultVacationTaskName)).map(TaskWrapper::new).collect(Collectors.toList()));
     }
 
     @GetMapping(value = "/task-type/list", produces = MediaType.APPLICATION_JSON_VALUE)

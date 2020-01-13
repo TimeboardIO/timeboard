@@ -29,6 +29,7 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -61,6 +62,9 @@ import java.util.stream.Collectors;
 public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
 
     @Autowired
     private UserService userService;
@@ -1027,7 +1031,7 @@ public class ProjectServiceImpl implements ProjectService {
         Optional<Organization> organization = this.organizationService.getOrganizationByID(user, project.getOrganizationID());
 
         Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(),
-                user, organization.get().getVacationTask());
+                user, organization.get().getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get());
         Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(),
                 user, project);
         Map<Integer, String> comments = new HashMap<>();

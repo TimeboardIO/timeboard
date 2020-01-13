@@ -27,9 +27,13 @@ package timeboard.core.internal;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.VacationService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.*;
@@ -37,15 +41,27 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 @Component
 @Transactional
-public class VacationServiceImpl implements VacationService {
+public class VacationServiceImpl extends OrganizationEntity implements VacationService {
 
     @Autowired
     private EntityManager em;
+
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
+
+    @Autowired
+    private OrganizationService organizationService;
+
+    @Autowired
+    private ProjectService projectservice;
 
     @Override
     public Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID) {
@@ -92,23 +108,73 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public void deleteVacationRequest(Account actor, VacationRequest request) {
+    public void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException {
+        this.updateImputations(actor,request,  0);
+
         em.remove(request);
         em.flush();
+
+
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
 
     }
 
     @Override
-    public VacationRequest approveVacationRequest(Account actor, VacationRequest request) {
+    public VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException {
         request.setStatus(VacationRequestStatus.ACCEPTED);
         em.merge(request);
         em.flush();
 
+        this.updateImputations(actor,request,  1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
     }
+
+    private void updateImputations(Account actor, VacationRequest request, double sign ) throws BusinessException {
+
+        DefaultTask vacationTask = this.getVacationTask(actor, request);
+
+        java.util.Calendar c = java.util.Calendar.getInstance();
+        c.setTime(request.getStartDate());
+        double value = 1 * sign;
+
+        if(request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
+            value = 0.5 * sign;
+        }
+
+        while (c.getTime().getTime() < request.getEndDate().getTime()) {
+            this.updateTaskImputation(actor,vacationTask, c.getTime(), value);
+            value = 1;
+            c.roll(Calendar.DAY_OF_YEAR, 1);
+        }
+        if(request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
+            value = 0.5 * sign;
+        }
+        this.updateTaskImputation(actor,vacationTask, c.getTime(), value);
+
+    }
+
+    private DefaultTask getVacationTask(Account actor, VacationRequest request) {
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, request.getOrganizationID());
+
+        if(organization.isPresent()) {
+            Optional<DefaultTask> vacationTask = organization.get().getDefaultTasks().stream()
+                    .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst();
+
+            if(vacationTask.isPresent()) {
+                return vacationTask.get();
+            }
+        }
+
+        return null;
+    }
+
+    private void updateTaskImputation(Account user, DefaultTask task, Date day, double val) throws BusinessException {
+      this.projectservice.updateTaskImputation(user, task, day, val);
+
+    }
+
 
     @Override
     public VacationRequest rejectVacationRequest(Account actor, VacationRequest request) {
