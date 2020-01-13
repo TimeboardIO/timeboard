@@ -118,7 +118,6 @@
     create table Organization (
        id bigint not null,
         createdDate datetime(6),
-        defaultVacationTaskName varchar(255),
         enabled bit,
         name varchar(255) not null,
         setup TEXT,
@@ -232,6 +231,7 @@
 
     create table VacationRequest (
        id bigint not null,
+        organizationID bigint,
         endDate date,
         endHalfDay integer,
         label varchar(255),

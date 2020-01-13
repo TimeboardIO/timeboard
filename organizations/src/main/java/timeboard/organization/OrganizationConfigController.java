@@ -97,7 +97,8 @@ public class OrganizationConfigController {
     public ResponseEntity<List<TaskWrapper>> listDefaultTasks(TimeboardAuthentication authentication) throws BusinessException {
         final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
                 new Date(), new Date());
-        return ResponseEntity.ok(defaultTasks.stream().filter(t -> !t.getName().matches(defaultVacationTaskName)).map(TaskWrapper::new).collect(Collectors.toList()));
+        return ResponseEntity.ok(defaultTasks.stream().filter(
+                t -> !t.getName().matches(defaultVacationTaskName)).map(TaskWrapper::new).collect(Collectors.toList()));
     }
 
     @GetMapping(value = "/task-type/list", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -26,7 +26,6 @@ package timeboard.core.model;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Value;
 import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
