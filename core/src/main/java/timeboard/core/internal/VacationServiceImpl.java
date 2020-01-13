@@ -77,8 +77,8 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
 
     @Override
     public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
-        request.setStartDate(new Date(request.getStartDate().getTime()+60000));
-        request.setEndDate(new Date(request.getEndDate().getTime()+60000));
+        request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
+        request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
 
         em.persist(request);
         em.flush();
