@@ -3,13 +3,13 @@
     "name": "User can create project",
     "description": "Any user with role OWNER membership on current org can create projects",
     "target": "action == 'PROJECTS_CREATE'",
-    "condition": "subject.currentOrganizationRole('OWNER') && environment.get(\"businessPolicyEvaluator\").checkProjectByUserLimit(subject)"
+    "condition": "subject.currentOrganizationRole('OWNER') && environment.get('businessPolicyEvaluator').checkProjectByUserLimit(subject.getDetails())"
   },
   {
     "name": "User can create task in a project",
     "description": "Any user belonging to the project can create tasks in this project",
     "target": "action == 'TASKS_CREATE'",
-    "condition": "resource.isMember(subject.getDetails()) && environment.get(\"businessPolicyEvaluator\").checkTaskByProjectLimit(subject, resource)"
+    "condition": "resource.isMember(subject.getDetails()) && environment.get('businessPolicyEvaluator').checkTaskByProjectLimit(subject.getDetails(), resource)"
   },
   {
     "name": "Org owner can setup org",

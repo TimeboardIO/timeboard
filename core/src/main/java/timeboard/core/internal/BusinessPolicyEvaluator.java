@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.exceptions.CommercialException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.security.TimeboardAuthentication;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -51,8 +50,7 @@ public class BusinessPolicyEvaluator {
     @Value("${timeboard.quotas.project.tasks}")
     private int limitTasksByProject;
 
-    public boolean checkProjectByUserLimit(TimeboardAuthentication actorAuthentication) throws CommercialException {
-        Account actor = actorAuthentication.getDetails();
+    public boolean checkProjectByUserLimit(Account actor) throws CommercialException {
         final int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
             throw new CommercialException("Limit reached",
@@ -62,8 +60,7 @@ public class BusinessPolicyEvaluator {
         return true;
     }
 
-    public boolean checkTaskByProjectLimit(TimeboardAuthentication actorAuthentication, Project project) throws CommercialException {
-        Account actor = actorAuthentication.getDetails();
+    public boolean checkTaskByProjectLimit(Account actor, Project project) throws CommercialException {
         final int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
             throw new CommercialException("Limit reached",
