@@ -247,7 +247,7 @@ ui.input.error > input {
   color: #e55151 !important;
 }
 .day-badge {
-  width: 2.5rem;
+  min-width: 2.5rem !important;
   height: 2.5rem;
 }
 .ui.statistic .value {
