@@ -77,6 +77,8 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
 
     @Override
     public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
+        request.setStartDate(new Date(request.getStartDate().getTime()+60000));
+        request.setEndDate(new Date(request.getEndDate().getTime()+60000));
 
         em.persist(request);
         em.flush();
@@ -135,23 +137,35 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
 
         DefaultTask vacationTask = this.getVacationTask(actor, request);
 
-        java.util.Calendar c = java.util.Calendar.getInstance();
-        c.setTime(request.getStartDate());
+        java.util.Calendar c1 = java.util.Calendar.getInstance();
+        c1.setTime(request.getStartDate());
+        c1.set(Calendar.HOUR_OF_DAY, 2);
+        c1.set(Calendar.MINUTE, 0);
+        c1.set(Calendar.SECOND, 0);
+        c1.set(Calendar.MILLISECOND, 0);
+        c1.setFirstDayOfWeek(Calendar.MONDAY);
+
         double value = 1 * sign;
+        java.util.Calendar c2 = java.util.Calendar.getInstance();
+        c2.setTime(request.getEndDate());
 
         if(request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
             value = 0.5 * sign;
         }
 
-        while (c.getTime().getTime() < request.getEndDate().getTime()) {
-            this.updateTaskImputation(actor,vacationTask, c.getTime(), value);
-            value = 1;
-            c.roll(Calendar.DAY_OF_YEAR, 1);
+        while (c1.before(c2)) {
+            if (c1.get(Calendar.DAY_OF_WEEK) <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1) {
+                this.updateTaskImputation(actor,vacationTask, c1.getTime(), value);
+            }
+            value = 1 * sign;
+            c1.add(Calendar.DATE, 1);
         }
         if(request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
             value = 0.5 * sign;
         }
-        this.updateTaskImputation(actor,vacationTask, c.getTime(), value);
+        if (c1.get(Calendar.DAY_OF_WEEK)  <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1 ) {
+            this.updateTaskImputation(actor,vacationTask, c1.getTime(), value);
+        }
 
     }
 
