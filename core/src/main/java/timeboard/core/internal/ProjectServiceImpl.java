@@ -29,8 +29,6 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -63,7 +61,6 @@ import java.util.stream.Collectors;
 public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
-    private static final String VACATION_TASK_NAME = "Congés";
 
     @Autowired
     private UserService userService;
@@ -77,32 +74,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private EntityManager em;
 
-    private DefaultTask vacationTask;
-
-
-
-    @Transactional
-    @EventListener()
-    protected void init(ContextRefreshedEvent ctx) {
-        //TODO change when vacation model totally implemented
-
-        AbstractTask taskFromDB = this.getTasksByName(VACATION_TASK_NAME);
-        if (taskFromDB == null) {
-            DefaultTask task = new DefaultTask();
-            task.setName(VACATION_TASK_NAME);
-            task.setStartDate(new Date());
-            task.setEndDate(new Date(new Date().getTime() + 999999999999L));
-            task.setOrigin("timeboard");
-            try {
-                em.persist(task);
-                vacationTask = task;
-            } catch (Exception e) {
-                LOGGER.error("Error in vacation task singleton instantiation.");
-            }
-        } else {
-            vacationTask = (DefaultTask) taskFromDB;
-        }
-    }
 
     @Override
     @Transactional
@@ -354,12 +325,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
-    public List<TaskType> listTaskType(Long orgID) {
-        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
-        q.setParameter("orgID", orgID);
-        return q.getResultList();
-    }
+
 
 
     @Override
@@ -381,7 +347,7 @@ public class ProjectServiceImpl implements ProjectService {
                            Batch batch
     ) {
         Task newTask = new Task();
-        newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
+        newTask.setTaskType(this.organizationService.findTaskTypeByID(taskTypeID));
         newTask.setOrigin(origin);
         newTask.setRemotePath(remotePath);
         newTask.setRemoteId(remoteId);
@@ -424,15 +390,7 @@ public class ProjectServiceImpl implements ProjectService {
         return task;
     }
 
-    @Override
-    public DefaultTask updateDefaultTask(Account actor, final DefaultTask task) {
-        Optional<Organization> org = this.organizationService.getOrganizationByID(actor, task.getOrganizationID());
-        if (org.isPresent()) {
-            em.merge(task);
-            em.flush();
-        }
-        return task;
-    }
+
 
     @Override
     public void createTasks(final Account actor, final List<Task> taskList) {
@@ -482,6 +440,25 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return task;
+    }
+
+    public Optional<DefaultTask> getDefaultTaskByName(String name) {
+        DefaultTask data;
+        try {
+
+            TypedQuery<DefaultTask> query = em.createQuery(
+                    "select distinct t from DefaultTask t left join fetch t.imputations  where t.name = :name",
+                    DefaultTask.class);
+            query.setParameter("name", name);
+
+            data = query.getSingleResult();
+
+        } catch (Exception e) {
+            // handle JPA Exceptions
+            data = null;
+        }
+
+        return Optional.ofNullable(data);
     }
 
     private AbstractTask getTasksByName(String name) {
@@ -714,23 +691,6 @@ public class ProjectServiceImpl implements ProjectService {
                 task.getOriginalEstimate(), task.getRealEffort());
     }
 
-    @Override
-    public TaskType findTaskTypeByID(Long taskTypeID) {
-        if (taskTypeID == null) {
-            return null;
-        }
-        return em.find(TaskType.class, taskTypeID);
-    }
-
-    @Override
-    public TaskType updateTaskType(Account actor, TaskType type) {
-        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, type.getOrganizationID());
-        if(organization.isPresent()){
-            em.merge(type);
-            em.flush();
-        }
-        return type;
-    }
 
 
     @Override
@@ -765,35 +725,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectTasks;
     }
 
-    @Override
-    public List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de) {
-        TypedQuery<DefaultTask> q = em
-                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
-                        + "t.endDate > :ds "
-                        + "and t.startDate <= :de "
-                        + "and t.startDate < t.endDate "
-                        + "and t.organizationID = :orgID", DefaultTask.class);
-        q.setParameter("ds", ds);
-        q.setParameter("de", de);
-        q.setParameter("orgID", orgID);
-        List<DefaultTask> tasks = q.getResultList();
 
-        return q.getResultList();
-
-    }
-
-    @Override
-    public List<DefaultTask> listDefaultTasks(Long orgID) {
-        TypedQuery<DefaultTask> q = em
-                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
-                        + "t.organizationID = :orgID", DefaultTask.class);
-
-        q.setParameter("orgID", orgID);
-        List<DefaultTask> tasks = q.getResultList();
-
-        return q.getResultList();
-
-    }
 
     @Override
     public void deleteTaskByID(Account actor, long taskID) throws BusinessException {
@@ -874,38 +806,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public DefaultTask createDefaultTask(Account actor, Long orgID, String name) throws BusinessException {
-        try {
-            DefaultTask task = new DefaultTask();
-            task.setStartDate(new Date());
-            Calendar c = Calendar.getInstance();
-            c.set(9999, Calendar.DECEMBER, 31);
-            task.setEndDate(c.getTime());
-            task.setOrigin(actor.getScreenName() + "/" + System.nanoTime());
-            task.setName(name);
-            task.setOrganizationID(orgID);
-            em.persist(task);
-            em.flush();
-            LOGGER.info("Default task " + task.getName() + " is created.");
-            return task;
-        } catch (Exception e) {
-            throw new BusinessException(e);
-        }
-    }
 
-
-    @Override
-    public void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException {
-
-        DefaultTask task = em.find(DefaultTask.class, taskID);
-        task.setEndDate(new Date());
-
-        em.merge(task);
-        em.flush();
-
-        LOGGER.info("Default Task " + taskID + " deleted by " + actor.getName());
-    }
 
     @Override
     public Map<String, Task> searchExistingTasksFromOrigin(Account actor,
@@ -1095,31 +996,6 @@ public class ProjectServiceImpl implements ProjectService {
         return b;
     }
 
-    @Override
-    public TaskType createTaskType(Account actor, Long orgID, String name) {
-        TaskType taskType = new TaskType();
-        taskType.setTypeName(name);
-        taskType.setOrganizationID(orgID);
-        em.persist(taskType);
-        em.flush();
-        LOGGER.info("User " + actor.getScreenName() + " create task type " + name);
-
-        return taskType;
-    }
-
-
-
-    @Override
-    public void disableTaskType(Account actor, TaskType type) {
-
-        type.setEnable(false);
-
-        em.merge(type);
-        em.flush();
-        LOGGER.info("User " + actor.getScreenName() + " disable task type " + type.getTypeName());
-
-    }
-
 
     @Override
     public boolean isProjectOwner(Account account, Project project) {
@@ -1146,8 +1022,12 @@ public class ProjectServiceImpl implements ProjectService {
         Calendar end = Calendar.getInstance();
         end.set(year, month, 1, 2, 0);
 
-        Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(), user, vacationTask);
-        Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(), user, project);
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(user, project.getOrganizationID());
+
+        Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(),
+                user, organization.get().getVacationTask());
+        Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(),
+                user, project);
         Map<Integer, String> comments = new HashMap<>();
         Map<Integer, Double> otherProjectImputations = new HashMap<>();
         List<Integer> dayMonthNums = new ArrayList<>();

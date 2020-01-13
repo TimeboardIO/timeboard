@@ -61,14 +61,13 @@
         remoteId varchar(255),
         remotePath varchar(255),
         startDate date,
+        organization_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
-
-    insert into hibernate_sequence values ( 1 );
 
     insert into hibernate_sequence values ( 1 );
 
@@ -119,6 +118,7 @@
     create table Organization (
        id bigint not null,
         createdDate datetime(6),
+        defaultVacationTaskName varchar(255),
         enabled bit,
         name varchar(255) not null,
         setup TEXT,
@@ -278,6 +278,11 @@
        add constraint FKmyycwm902xvsapnqmv1y3r4gj 
        foreign key (user_id) 
        references Account (id);
+
+    alter table DefaultTask 
+       add constraint FKih2ta8adxqd0nv2sx4cdkp2n 
+       foreign key (organization_id) 
+       references Organization (id);
 
     alter table Imputation 
        add constraint FKicayo4omi1a8krucb5t7kipva 

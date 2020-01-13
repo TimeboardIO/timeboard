@@ -37,7 +37,6 @@ import org.springframework.web.bind.annotation.*;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
@@ -64,8 +63,7 @@ public class OrganizationConfigController {
     @Autowired
     public OrganizationService organizationService;
 
-    @Autowired
-    public ProjectService projectService;
+
 
     @Autowired
     public EncryptionService encryptionService;
@@ -78,8 +76,9 @@ public class OrganizationConfigController {
 
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
-        final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(authentication.getCurrentOrganization(), new Date(), new Date());
-        final List<TaskType> taskTypes = this.projectService.listTaskType(authentication.getCurrentOrganization());
+        final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
+                new Date(), new Date());
+        final List<TaskType> taskTypes = this.organizationService.listTaskType(authentication.getCurrentOrganization());
 
         model.addAttribute("taskTypes", taskTypes);
         model.addAttribute("defaultTasks", defaultTasks);
@@ -93,13 +92,14 @@ public class OrganizationConfigController {
 
     @GetMapping(value = "/default-task/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TaskWrapper>> listDefaultTasks(TimeboardAuthentication authentication) throws BusinessException {
-        final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(authentication.getCurrentOrganization(), new Date(), new Date());
+        final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
+                new Date(), new Date());
         return ResponseEntity.ok(defaultTasks.stream().map(TaskWrapper::new).collect(Collectors.toList()));
     }
 
     @GetMapping(value = "/task-type/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TypeWrapper>> listTaskTypes(TimeboardAuthentication authentication) throws BusinessException {
-        final List<TaskType> taskTypes = this.projectService.listTaskType(authentication.getCurrentOrganization());
+        final List<TaskType> taskTypes = this.organizationService.listTaskType(authentication.getCurrentOrganization());
         return ResponseEntity.ok(taskTypes.stream().map(TypeWrapper::new).collect(Collectors.toList()));
     }
 
@@ -109,7 +109,7 @@ public class OrganizationConfigController {
         Account actor = authentication.getDetails();
         Long orID = authentication.getCurrentOrganization();
 
-        this.projectService.createDefaultTask(actor, orID, taskWrapper.getName());
+        this.organizationService.createDefaultTask(actor, orID, taskWrapper.getName());
 
         return this.listDefaultTasks(authentication);
     }
@@ -120,10 +120,10 @@ public class OrganizationConfigController {
 
         Account actor = authentication.getDetails();
 
-        DefaultTask task = (DefaultTask) this.projectService.getTaskByID(actor, taskWrapper.getId());
+        DefaultTask task = (DefaultTask) this.organizationService.getDefaultTaskByID(actor, taskWrapper.getId());
 
         task.setName(taskWrapper.getName());
-        this.projectService.updateDefaultTask(actor, task);
+        this.organizationService.updateDefaultTask(actor, task);
 
         return this.listDefaultTasks(authentication);
     }
@@ -134,7 +134,7 @@ public class OrganizationConfigController {
         Account actor = authentication.getDetails();
         Long orgID = authentication.getCurrentOrganization();
 
-        this.projectService.disableDefaultTaskByID(actor, orgID, taskID);
+        this.organizationService.disableDefaultTaskByID(actor, orgID, taskID);
 
         return this.listDefaultTasks(authentication);
     }
@@ -147,7 +147,7 @@ public class OrganizationConfigController {
         Account actor = authentication.getDetails();
         Long orID = authentication.getCurrentOrganization();
 
-        this.projectService.createTaskType(actor, orID, typeWrapper.getName());
+        this.organizationService.createTaskType(actor, orID, typeWrapper.getName());
 
         return this.listTaskTypes(authentication);
     }
@@ -158,10 +158,10 @@ public class OrganizationConfigController {
 
         Account actor = authentication.getDetails();
 
-        TaskType type =  this.projectService.findTaskTypeByID(typeWrapper.getId());
+        TaskType type =  this.organizationService.findTaskTypeByID(typeWrapper.getId());
 
         type.setTypeName(typeWrapper.getName());
-        this.projectService.updateTaskType(actor, type);
+        this.organizationService.updateTaskType(actor, type);
 
         return this.listTaskTypes(authentication);
     }
@@ -170,8 +170,8 @@ public class OrganizationConfigController {
     public ResponseEntity deleteTaskType(TimeboardAuthentication authentication, @PathVariable Long typeID) throws BusinessException {
 
         Account actor = authentication.getDetails();
-        TaskType type = projectService.findTaskTypeByID(typeID);
-        this.projectService.disableTaskType(actor, type);
+        TaskType type = organizationService.findTaskTypeByID(typeID);
+        this.organizationService.disableTaskType(actor, type);
 
         return this.listTaskTypes(authentication);
     }

@@ -34,6 +34,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
@@ -61,6 +62,9 @@ public class TasksRestController {
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Autowired
     private UserService userService;
@@ -416,7 +420,7 @@ public class TasksRestController {
         task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
         task.setStartDate(DATE_FORMAT.parse(taskWrapper.getStartDate()));
         task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
-        final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
+        final TaskType taskType = this.organizationService.findTaskTypeByID(taskWrapper.getTypeID());
         task.setTaskType(taskType);
         task.setBatches(batches);
         task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);

@@ -26,6 +26,7 @@ package timeboard.core.model;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Value;
 import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
@@ -45,6 +46,9 @@ public class Organization {
 
     public static final String FIND_BY_NAME = "org_find_by_name";
     public static final String SETUP_PUBLIC = "org_public";
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -73,6 +77,13 @@ public class Organization {
     )
     private Set<OrganizationMembership> members = new HashSet<>();
 
+    @OneToMany(targetEntity = DefaultTask.class,
+            mappedBy = "organization",
+            orphanRemoval = true,
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.EAGER
+    )
+    private Set<DefaultTask> defaultTasks = new HashSet<>();
 
     public Date getCreatedDate() {
         return createdDate;
@@ -122,6 +133,14 @@ public class Organization {
         this.setup = setup;
     }
 
+    public Set<DefaultTask> getDefaultTasks() {
+        return defaultTasks;
+    }
+
+    public void setDefaultTasks(Set<DefaultTask> defaultTasks) {
+        this.defaultTasks = defaultTasks;
+    }
+
 
     /**
      * Test if current org is public
@@ -138,5 +157,17 @@ public class Organization {
                 .stream().filter(om -> om.getMember().getId() == target.getId())
                 .map(om -> om.getRole())
                 .collect(Collectors.toList());
+    }
+
+    @Transient
+    public DefaultTask getVacationTask() {
+        Optional<DefaultTask> task = this.getDefaultTasks().stream().filter(t -> {
+            return t.getName().matches(defaultVacationTaskName);
+        }).findFirst();
+        if(task.isPresent()) {
+            return task.get();
+        } else {
+            return null;
+        }
     }
 }

@@ -34,11 +34,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.*;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.ProjectTasks;
-import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
@@ -66,6 +63,9 @@ public class TimesheetController {
 
     @Autowired
     private  TimesheetService timesheetService;
+
+    @Autowired
+    private OrganizationService organizationService;
 
 
     private int findLastWeekYear(Calendar c, int week, int year) {
@@ -130,7 +130,7 @@ public class TimesheetController {
         model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekValidated", lastWeekValidated);
 
-        model.addAttribute("taskTypes", this.projectService.listTaskType(authentication.getCurrentOrganization()));
+        model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
 
         model.addAttribute("projectList",
                 this.projectService.listProjects(
