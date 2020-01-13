@@ -160,7 +160,7 @@ public class TasksRestController {
                         task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
                         batchIDs, batchNames,
-                        task.getTaskStatus().getLabel(),
+                        task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
                 ));
 
