@@ -26,10 +26,14 @@ package timeboard.core.security;
  * #L%
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import timeboard.core.api.exceptions.CommercialException;
+import timeboard.core.internal.BusinessPolicyEvaluator;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Project;
 
 import javax.persistence.Transient;
 import java.security.Principal;
@@ -40,6 +44,9 @@ public class TimeboardAuthentication implements Authentication {
     private Principal p;
     private Account account;
     private Long currentOrganization;
+
+    @Autowired
+    private BusinessPolicyEvaluator businessPolicyEvaluator;
 
     public  TimeboardAuthentication(Account a){
         this.account = a;
@@ -104,6 +111,16 @@ public class TimeboardAuthentication implements Authentication {
                 .map(o -> o.getOrganization())
                 .filter(o->o.getId() == this.currentOrganization)
                 .allMatch(o->o.isPublicOrganisation());
+    }
+
+    @Transient
+    public boolean checkProjectByUserLimit() throws CommercialException {
+        return businessPolicyEvaluator.checkProjectByUserLimit(account);
+    }
+
+    @Transient
+    public boolean checkTaskByProjectLimit(final Project project) throws CommercialException {
+        return businessPolicyEvaluator.checkTaskByProjectLimit(account, project);
     }
 
 
