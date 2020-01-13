@@ -359,8 +359,8 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setRemoteId(remoteId);
         newTask.setName(taskName);
         newTask.setComments(taskComment);
-        newTask.setStartDate(startDate);
-        newTask.setEndDate(endDate);
+        newTask.setStartDate(new Date(startDate.getTime()+60000));
+        newTask.setEndDate(new Date(endDate.getTime()+60000));
         newTask.setComments(taskComment);
         newTask.setEffortLeft(originalEstimate);
         newTask.setOriginalEstimate(originalEstimate);

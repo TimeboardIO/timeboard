@@ -379,6 +379,7 @@ public class TasksRestController {
             assignee = userService.findUserByID(taskWrapper.assigneeID);
         }
 
+
         return projectService.createTask(actor, project,
                 name, comment, startDate,
                 endDate, oe, typeID, assignee,
