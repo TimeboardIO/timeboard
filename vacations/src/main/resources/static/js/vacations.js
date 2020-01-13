@@ -22,7 +22,7 @@ const formValidationRules = {
 let app = new Vue({
     el: '#vacationApp',
     data: {
-        formError : "",
+        formError : '',
         vacationRequest: {
             start : "",
             end : "",
@@ -148,8 +148,8 @@ let app = new Vue({
                         $('#newVacation').modal('hide');
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        $('.ui.error.message').text(jqXHR.responseText);
-                        $('.ui.error.message').show();
+                        $('.ui.message').text(jqXHR.responseText);
+                        $('.ui.message').show();
                     }
                 });
             }
@@ -166,6 +166,7 @@ let app = new Vue({
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
+                    $('.ui.message').show();
                 }
             });
         },
@@ -181,6 +182,7 @@ let app = new Vue({
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
+                    $('.ui.message').show();
                 }
             });
         },
@@ -199,6 +201,7 @@ let app = new Vue({
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             self.formError = jqXHR.responseText;
+                            $('.ui.message').show();
                         }
                     });
                 });

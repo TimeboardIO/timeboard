@@ -10,21 +10,28 @@
 </head>
 
 <body>
+<div class="ui negative message" th:if="${error}">
+    <i class="close icon"></i>
+    <div class="header" th:text="${error}">
+    </div>
+</div>
+<div class="ui positive message" th:if="${message}">
+    <i class="close icon"></i>
+    <div class="header" th:text="${message}">
 
+    </div>
+</div>
 
 <div layout:fragment="content">
-
-    <div class="ui negative message" th:if="${error}">
-        <i class="close icon"></i>
-        <div class="header" th:text="${error}">
-        </div>
-    </div>
-    <div class="ui positive message" th:if="${message}">
-        <i class="close icon"></i>
-        <div class="header" th:text="${message}">
-        </div>
-    </div>
     <div id="vacationApp">
+        <div class="ui negative hidden message ">
+            <i class="close icon"></i>
+            <div class="header" >
+                {{ formError }}
+            </div>
+        </div>
+
+
         <div class="ui menu">
             <a class="item"  v-on:click="openModal" >
                 <i class="plus icon"></i>
@@ -119,7 +126,6 @@
                 id="newVacation">
             <template v-slot:content>
                 <form class="ui form">
-                    <div v-bind="formError" class="ui error message"></div>
                     <div class="two fields">
                         <div class="field">
                             <label>Departure Date</label>
@@ -182,10 +188,8 @@
             </template>
         </tmodal>
     </div>
-
-
+    <script src="/js/vacations.js"></script>
 </div>
-<script src="/js/vacations.js"></script>
 </div>
 
 </body>
