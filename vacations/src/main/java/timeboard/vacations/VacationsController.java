@@ -118,6 +118,10 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
         }
 
+        if(startDate.before(new Date())) {
+            return ResponseEntity.badRequest().body("You can not submit vacation request in the past.");
+        }
+
         if(assignee == null){
             return ResponseEntity.badRequest().body("Please enter user to notify. ");
         }
@@ -131,6 +135,10 @@ public class VacationsController {
         request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setStatus(VacationRequestStatus.PENDING);
+
+        if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
+            return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
+        }
 
         this.vacationService.createVacationRequest(actor, request);
 
@@ -174,9 +182,11 @@ public class VacationsController {
         Account actor = authentication.getDetails();
         Optional<VacationRequest> vacationRequest = this.vacationService.getVacationRequestByID(actor, requestID);
         if(vacationRequest.isPresent()) {
-
-            this.vacationService.deleteVacationRequest(actor, vacationRequest.get());
-
+            if(vacationRequest.get().getStartDate().after(new Date())){
+                ResponseEntity.badRequest().body("Cannot cancel started vacation.");
+            } else {
+                this.vacationService.deleteVacationRequest(actor, vacationRequest.get());
+            }
         } else {
             ResponseEntity.badRequest().body("Unkwown request ID");
         }

@@ -48,4 +48,6 @@ public interface VacationService {
     VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException;
 
     VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
+
+    List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
 }

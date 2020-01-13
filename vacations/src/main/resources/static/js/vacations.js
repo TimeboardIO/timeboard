@@ -185,6 +185,7 @@ let app = new Vue({
             });
         },
         cancelRequest : function(request) {
+            let self = this;
             this.$refs.confirmModal.confirm("Are you sure you want to delete vacation request "
                 + request.label !== 'null' ? request.label : '' + "? This action is definitive.",
                 function() {

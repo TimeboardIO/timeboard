@@ -92,7 +92,6 @@ public class OrganizationConfigController {
 
     }
 
-
     @GetMapping(value = "/default-task/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<TaskWrapper>> listDefaultTasks(TimeboardAuthentication authentication) throws BusinessException {
         final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),

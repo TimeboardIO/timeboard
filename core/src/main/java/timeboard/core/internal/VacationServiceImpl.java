@@ -39,12 +39,11 @@ import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.*;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Component
 @Transactional
@@ -110,8 +109,47 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     }
 
     @Override
+    public List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request) {
+
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
+                        "where v.assignee = :assignee and v.startDate <= :startDate and v.endDate >= :endDate",
+                VacationRequest.class);
+        q.setParameter("assignee", assignee);
+        q.setParameter("startDate", request.getStartDate(), TemporalType.DATE);
+        q.setParameter("endDate", request.getEndDate(), TemporalType.DATE);
+
+        List<VacationRequest> resultList = q.getResultList();
+        List<VacationRequest> copyList = new ArrayList<>(resultList);
+
+        for (VacationRequest r :resultList) {
+            if (
+                (r.getStartDate().compareTo(request.getEndDate()) == 1)
+                    && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                    &&  r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
+            ) {
+                    copyList.remove(r);
+            }
+
+            if (
+                (r.getEndDate().compareTo(request.getStartDate()) == 1)
+                && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
+            ) {
+                    copyList.remove(r);
+            }
+        }
+
+
+        return copyList;
+    }
+
+
+    @Override
     public void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException {
-        this.updateImputations(actor,request,  0);
+
+        if(request.getStatus() == VacationRequestStatus.ACCEPTED) {
+            this.updateImputations(actor,request,  0);
+        }
 
         em.remove(request);
         em.flush();
@@ -200,6 +238,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
 
         return request;
     }
+
 
 
 }
