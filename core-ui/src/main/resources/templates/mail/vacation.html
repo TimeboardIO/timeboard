@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div th:fragment="vacation">
+    <table align="left" border="0" cellpadding="0" cellspacing="0"
+           class="col380" style="width: 100%; max-width: 800px;" >
+        <tr>
+            <td class=" title bodycopy " style="font-size:30px"><b>Vacation Requests</b></td>
+        </tr>
+        <tr th:if="${vacationEventsCreated.length > 0 }" >
+            <td class=" title bodycopy "  style="color:#5BCA7E" ><b>Pending validation</b></td>
+        </tr>
+        <tr th:each="event : ${vacationEventsCreated}">
+            <td   class="borderbottom">
+                <table border="0" cellpadding="4" cellspacing="2" width="100%">
+                    <tr>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Applicant</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Dates</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.endDate, 'dd/MM/yyyy') + event.request.endHalfDay}">
+                                        01/11/2019 MORNING
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.startDate, 'dd/MM/yyyy') + event.request.startHalfDay}">
+                                        05/11/2019 AFTERNOON
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Pending</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+
+        <!-- APPROVED -->
+
+        <tr th:if="${vacationEventsApproved.length > 0 }" >
+            <td class=" title bodycopy "  style="color:#5BCA7E" ><b>Approved</b></td>
+        </tr>
+        <tr th:each="event : ${vacationEventsApproved}">
+            <td   class="borderbottom">
+                <table border="0" cellpadding="4" cellspacing="2" width="100%">
+                    <tr>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Applicant</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Dates</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.endDate, 'dd/MM/yyyy') + event.request.endHalfDay}">
+                                        01/11/2019 MORNING
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.startDate, 'dd/MM/yyyy') + event.request.startHalfDay}">
+                                        05/11/2019 AFTERNOON
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Pending</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+
+        <!-- REJECTED -->
+
+        <tr th:if="${vacationEventsDenied.length > 0 }" >
+            <td class=" title bodycopy "  style="color:#e55151" ><b>Rejected</b></td>
+        </tr>
+        <tr th:each="event : ${vacationEventsDenied}">
+            <td   class="borderbottom">
+                <table border="0" cellpadding="4" cellspacing="2" width="100%">
+                    <tr>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Applicant</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Dates</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.endDate, 'dd/MM/yyyy') + event.request.endHalfDay}">
+                                        01/11/2019 MORNING
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.startDate, 'dd/MM/yyyy') + event.request.startHalfDay}">
+                                        05/11/2019 AFTERNOON
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Pending</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+
+        <!-- CANCELED -->
+
+        <tr th:if="${vacationEventsDeleted.length > 0 }" >
+            <td class=" title bodycopy " style="color:#e55151" ><b>Canceled</b></td>
+        </tr>
+        <tr th:each="event : ${vacationEventsDeleted}">
+            <td   class="borderbottom">
+                <table border="0" cellpadding="4" cellspacing="2" width="100%">
+                    <tr>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Applicant</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.applicant.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Dates</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.endDate, 'dd/MM/yyyy') + event.request.endHalfDay}">
+                                        01/11/2019 MORNING
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${#dates.format(event.request.startDate, 'dd/MM/yyyy') + event.request.startHalfDay}">
+                                        05/11/2019 AFTERNOON
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>Pending</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.firstName}">John</td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${event.request.assignee.name}">Doe</td>
+                                </tr>
+                            </table>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+
+
+
+    </table>
+
+</div>
+
+</body>
+</html>

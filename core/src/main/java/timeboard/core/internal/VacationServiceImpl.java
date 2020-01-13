@@ -28,12 +28,17 @@ package timeboard.core.internal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.VacationService;
-import timeboard.core.model.Account;
-import timeboard.core.model.VacationRequest;
+import timeboard.core.internal.events.TimeboardEventType;
+import timeboard.core.internal.events.VacationEvent;
+import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 
 @Component
 @Transactional
@@ -43,14 +48,78 @@ public class VacationServiceImpl implements VacationService {
     private EntityManager em;
 
     @Override
+    public Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID) {
+        VacationRequest data;
+        try {
+            data = em.find(VacationRequest.class, requestID);
+        } catch (Exception nre) {
+            data = null;
+        }
+        return Optional.ofNullable(data);
+
+    }
+
+    @Override
     public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
 
-
         em.persist(request);
-
         em.flush();
 
         return request;
     }
+
+    @Override
+    public List<VacationRequest> listUserVacations(Account applicant) {
+
+        TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v where v.applicant = :applicant "
+                , VacationRequest.class);
+        q.setParameter("applicant", applicant);
+
+        return q.getResultList();
+
+    }
+
+    @Override
+    public List<VacationRequest> listVacationsToValidateByUser(Account assignee) {
+
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee and v.status = :status",
+                VacationRequest.class);
+        q.setParameter("assignee", assignee);
+        q.setParameter("status", VacationRequestStatus.PENDING);
+
+        return q.getResultList();
+    }
+
+    @Override
+    public void deleteVacationRequest(Account actor, VacationRequest request) {
+        em.remove(request);
+        em.flush();
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
+
+    }
+
+    @Override
+    public VacationRequest approveVacationRequest(Account actor, VacationRequest request) {
+        request.setStatus(VacationRequestStatus.ACCEPTED);
+        em.merge(request);
+        em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
+
+        return request;
+    }
+
+    @Override
+    public VacationRequest rejectVacationRequest(Account actor, VacationRequest request) {
+        request.setStatus(VacationRequestStatus.REJECTED);
+        em.merge(request);
+        em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DENY, request));
+
+        return request;
+    }
+
 
 }

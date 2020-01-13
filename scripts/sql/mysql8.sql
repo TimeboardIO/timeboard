@@ -237,7 +237,7 @@
         label varchar(255),
         startDate date,
         startHalfDay integer,
-        validated bit,
+        status integer,
         applicant_id bigint,
         assignee_id bigint,
         primary key (id)
