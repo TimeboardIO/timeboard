@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import timeboard.core.internal.BusinessPolicyEvaluator;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -42,6 +43,9 @@ public class AbacPermissionEvaluator implements PermissionEvaluator {
     @Autowired
     PolicyEnforcement policy;
 
+    @Autowired
+    BusinessPolicyEvaluator businessPolicyEvaluator;
+
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         //Getting subject
@@ -49,6 +53,7 @@ public class AbacPermissionEvaluator implements PermissionEvaluator {
         //Getting environment
         Map<String, Object> environment = new HashMap<>();
         environment.put("time", new Date());
+        environment.put("businessPolicyEvaluator", businessPolicyEvaluator);
         return policy.check(user, targetDomainObject, permission, environment);
     }
 
