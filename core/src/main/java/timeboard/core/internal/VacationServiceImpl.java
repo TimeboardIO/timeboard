@@ -83,7 +83,8 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public List<VacationRequest> listVacationsToValidateByUser(Account assignee) {
 
-        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee and v.status = :status", VacationRequest.class);
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee and v.status = :status",
+                VacationRequest.class);
         q.setParameter("assignee", assignee);
         q.setParameter("status", VacationRequestStatus.PENDING);
 

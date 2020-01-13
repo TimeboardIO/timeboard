@@ -42,8 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
-
 
 @Component
 public class SendSummaryEmail {
@@ -82,15 +80,14 @@ public class SendSummaryEmail {
             if (event instanceof TaskEvent) {
                 Task t = ((TaskEvent) event).getTask();
                 if (((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) {
-                    projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
+                    projects.computeIfAbsent(t.getProject().getId(), e ->
+                            new ProjectEmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
                 }
                 if (((TaskEvent) event).getEventType() == TimeboardEventType.DELETE) {
-                    projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
+                    projects.computeIfAbsent(t.getProject().getId(), e ->
+                            new ProjectEmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
                 }
-                if (((TaskEvent) event).getEventType() == TimeboardEventType.UPDATE) {
-                    if(((TaskEvent) event).getTask().getTaskStatus() == TaskStatus.REFUSED)projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addDeniedTask((TaskEvent) event);
-                    else projects.computeIfAbsent(t.getProject().getId(), e -> new ProjectEmailSummaryModel(t.getProject())).addApprovedTask((TaskEvent) event);
-                }
+
             } else if (event instanceof TimesheetEvent) {
                 validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             } else if (event instanceof VacationEvent) {
