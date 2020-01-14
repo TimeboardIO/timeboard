@@ -50,7 +50,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/vacation")
@@ -71,7 +70,6 @@ public class VacationsController {
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
         return "vacations.html";
     }
-
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<VacationRequestWrapper>> listRequests(TimeboardAuthentication authentication) {
@@ -149,47 +147,32 @@ public class VacationsController {
 
     @PatchMapping(value = "/approve/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity approveRequest(TimeboardAuthentication authentication,
-                                                            @PathVariable Long requestID) throws BusinessException {
+                                                            @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
-        Optional<VacationRequest> vacationRequest = this.vacationService.getVacationRequestByID(actor, requestID);
-        if(vacationRequest.isPresent()) {
-            this.vacationService.approveVacationRequest(actor, vacationRequest.get());
+        this.vacationService.approveVacationRequest(actor, vacationRequest);
 
-        } else {
-            return ResponseEntity.badRequest().body("Unkwown request ID");
-        }
         return this.listToValidateRequests(authentication) ;
     }
 
     @PatchMapping(value = "/reject/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity rejectRequest(TimeboardAuthentication authentication,
-                                                                       @PathVariable Long requestID) throws BusinessException {
+                                                                       @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
-        Optional<VacationRequest> vacationRequest = this.vacationService.getVacationRequestByID(actor, requestID);
-        if(vacationRequest.isPresent()) {
+        this.vacationService.rejectVacationRequest(actor, vacationRequest);
 
-            this.vacationService.rejectVacationRequest(actor, vacationRequest.get());
-
-        } else {
-            return ResponseEntity.badRequest().body("Unkwown request ID");
-        }
         return this.listToValidateRequests(authentication) ;
     }
 
     @DeleteMapping(value = "/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity deleteRequest(TimeboardAuthentication authentication,
-                                                                  @PathVariable Long requestID) throws BusinessException {
+                                                                  @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
-        Optional<VacationRequest> vacationRequest = this.vacationService.getVacationRequestByID(actor, requestID);
-        if(vacationRequest.isPresent()) {
-            if(vacationRequest.get().getStatus() == VacationRequestStatus.ACCEPTED && vacationRequest.get().getStartDate().before(new Date())){
-                return ResponseEntity.badRequest().body("Cannot cancel started vacation.");
-            } else {
-                this.vacationService.deleteVacationRequest(actor, vacationRequest.get());
-            }
+        if(vacationRequest.getStatus() == VacationRequestStatus.ACCEPTED && vacationRequest.getStartDate().before(new Date())){
+            return ResponseEntity.badRequest().body("Cannot cancel started vacation.");
         } else {
-            ResponseEntity.badRequest().body("Unkwown request ID");
+            this.vacationService.deleteVacationRequest(actor, vacationRequest);
         }
+
         return this.listRequests(authentication) ;
     }
 
