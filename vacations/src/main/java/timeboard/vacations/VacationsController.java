@@ -145,7 +145,7 @@ public class VacationsController {
         return this.listRequests(authentication) ;
     }
 
-    @PatchMapping(value = "/approve/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/approve/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity approveRequest(TimeboardAuthentication authentication,
                                                             @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
@@ -154,7 +154,7 @@ public class VacationsController {
         return this.listToValidateRequests(authentication) ;
     }
 
-    @PatchMapping(value = "/reject/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/reject/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity rejectRequest(TimeboardAuthentication authentication,
                                                                        @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
@@ -163,7 +163,7 @@ public class VacationsController {
         return this.listToValidateRequests(authentication) ;
     }
 
-    @DeleteMapping(value = "/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity deleteRequest(TimeboardAuthentication authentication,
                                                                   @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
