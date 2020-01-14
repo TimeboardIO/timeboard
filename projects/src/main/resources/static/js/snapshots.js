@@ -73,6 +73,19 @@ $(document).ready(function () {
                     }
                 });
             },
+            polynomialRegression: function(dates, data){
+                let polyData = [];
+                for (let i = 0; i<dates.length; i++){
+                    polyData.push([i, data[i]]);
+                }
+                const result = regression('polynomial', polyData, 3);
+                let polyDataForGraph = [];
+                for (let i = 0; i<result.points.length; i++){
+                    polyDataForGraph.push(result.points[i][1]);
+                }
+                return polyDataForGraph;
+            },
+
             showGraph: function() {
                 var self = this;
                 $.ajax({
@@ -80,50 +93,85 @@ $(document).ready(function () {
                     dataType: "json",
                     url: "projects/" + projectID + "/snapshots/chart",
                     success: function (d) {
-                        let listOfProjectSnapshotDates = d.listOfProjectSnapshotDates;
-                        let quotationDataForChart = d.quotationData;
-                        let originalDataForChart = d.originalEstimateData;
-                        let realEffortDataForChart = d.realEffortData;
-                        let effortLeftDataForChart = d.effortLeftData;
-                        let effortSpentDataForChart = d.effortSpentData;
+
+                        let polyQuotationData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.quotationData);
+                        let polyOriginalEstimateData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.originalEstimateData);
+                        let polyRealEffortData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.realEffortData);
+                        let polyEffortLeftData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.effortLeftData);
+                        let polyEffortSpentData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.effortSpentData);
 
                         //chart config
                         let chart = new Chart($("#lineChart"), {
                             type: 'line',
                             data: {
-                                labels: listOfProjectSnapshotDates,
+                                labels: d.listOfProjectSnapshotDates,
                                 datasets: [{
-                                    data: quotationDataForChart,
+                                    data: d.quotationData,
                                     label: "QT",
                                     borderColor: "#3e95cd",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
                                 } , {
-                                    data: originalDataForChart,
+                                    data: polyQuotationData,
+                                    label: "Poly_QT",
+                                    borderColor: "#3e95cd",
+                                    fill: false,
+                                    steppedLine: true,
+                                    borderDash:[5, 15]
+                                } , {
+                                    data: d.originalEstimateData,
                                     label: "OE",
                                     borderColor: "#ff6384",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
-                                 } , {
-                                    data: realEffortDataForChart,
+                                } , {
+                                    data: polyOriginalEstimateData,
+                                    label: "Poly_OE",
+                                    borderColor: "#ff6384",
+                                    fill: false,
+                                    steppedLine: true,
+                                    borderDash:[5, 15]
+                                } , {
+                                    data: d.realEffortData,
                                     label: "RE",
                                     borderColor: "#00CC00",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
-                                 } , {
-                                     data: effortLeftDataForChart,
+                                } , {
+                                     data: polyRealEffortData,
+                                     label: "Poly_RE",
+                                     borderColor: "#00CC00",
+                                     fill: false,
+                                     steppedLine: true,
+                                     borderDash:[5, 15]
+                                } , {
+                                     data: d.effortLeftData,
                                      label: "EL",
                                      borderColor: "#FF00CC",
-                                     fill: true,
+                                     fill: false,
                                      steppedLine: true
-                                 } , {
-                                    data: effortSpentDataForChart,
+                                } , {
+                                     data: polyEffortLeftData,
+                                     label: "Poly_EL",
+                                     borderColor: "#FF00CC",
+                                     fill: false,
+                                     steppedLine: true,
+                                     borderDash:[5, 15]
+                                } , {
+                                    data: d.effortSpentData,
                                     label: "ES",
                                     borderColor: "#FFFF00",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
-                                  }
-                                 ]
+                                } , {
+                                    data: polyEffortSpentData,
+                                    label: "Poly_ES",
+                                    borderColor: "#FFFF00",
+                                    fill: false,
+                                    steppedLine: true,
+                                    borderDash:[5, 15]
+                                }
+                                ]
                             },
                             options: {
                                 title: { display: true, text: 'Project' },
