@@ -53,7 +53,9 @@ Vue.component('calendar', {
                 days.push( {
                     date : new Date(date.getTime()),
                     event : this.events.find(e => {
-                        return e.date.toDateString() === date.toDateString();
+                        return (e.date.getFullYear() === date.getFullYear() &&
+                            e.date.getMonth() === date.getMonth() &&
+                            e.date.getDate() === date.getDate());
                     })
                 });
                 date.setDate(date.getDate() + 1);
