@@ -5,48 +5,142 @@
 
 <head>
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-    <title>A Simple Responsive HTML Email</title>
+    <title>Timeboard HTML email template</title>
     <style type="text/css">
-  body {margin: 0; padding: 0; min-width: 100%!important;}
-  img {height: auto;}
-  .content {width: 100%; max-width: 600px;}
-  .header {padding: 40px 30px 20px 30px;}
-  .innerpadding {padding: 30px 30px 30px 30px;}
-  .borderbottom {border-bottom: 1px solid #f2eeed;}
-  .subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
-  .h1, .h2, .bodycopy {color: #153643; font-family: sans-serif;}
-  .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
-  .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
-  .bodycopy {font-size: 16px; line-height: 22px;}
-  .center {text-align: center;}
-  .button {text-align: center; font-size: 12px; font-family: sans-serif; font-weight: bold; padding: 0 20px 0 20px;}
-  .button a {color: #ffffff; text-decoration: none;}
-  .footer {padding: 20px 30px 15px 30px;}
-  .footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
-  .footercopy a {color: #ffffff; text-decoration: underline;}
-  .title{  padding-top: 15px; padding-bottom: 5px; font-size: 22px; text-align: center; }
-    .circle {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      color: grey;
-      line-height: 40px;
-      text-align: center;
-      background-color: lightgrey;
-    }
-  @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
-  body[yahoo] .hide {display: none!important;}
-  body[yahoo] .buttonwrapper {background-color: transparent!important;}
-  body[yahoo] .button {padding: 0px!important;}
-  body[yahoo] .button a {background-color: #e05443; padding: 10px 10px 10px!important;}
-  body[yahoo] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #2f3942; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
-  }
+        body {
+            margin: 0;
+            padding: 0;
+            min-width: 100% !important;
+        }
 
-  /*@media only screen and (min-device-width: 601px) {
-    .content {width: 600px !important;}
-    .col425 {width: 425px!important;}
-    .col380 {width: 380px!important;}
-    }*/
+        img {
+            height: auto;
+        }
+
+        .content {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .header {
+            padding: 40px 30px 20px 30px;
+        }
+
+        .innerpadding {
+            padding: 30px 30px 30px 30px;
+        }
+
+        .borderbottom {
+            border-bottom: 1px solid #f2eeed;
+        }
+
+        .subhead {
+            font-size: 15px;
+            color: #ffffff;
+            font-family: sans-serif;
+            letter-spacing: 10px;
+        }
+
+        .h1, .h2, .bodycopy {
+            color: #393939;
+            font-family: sans-serif;
+        }
+
+        .h1 {
+            font-size: 33px;
+            line-height: 38px;
+            font-weight: bold;
+        }
+
+        .h2 {
+            padding: 0 0 15px 0;
+            font-size: 24px;
+            line-height: 28px;
+            font-weight: bold;
+        }
+
+        .bodycopy {
+            font-size: 16px;
+            line-height: 22px;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .button {
+            text-align: center;
+            font-size: 12px;
+            font-family: sans-serif;
+            font-weight: bold;
+            padding: 0 20px 0 20px;
+        }
+
+        .button a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .footer {
+            padding: 20px 30px 15px 30px;
+        }
+
+        .footercopy {
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .footercopy a {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .title {
+            padding-top: 15px;
+            padding-bottom: 5px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        .circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: grey;
+            line-height: 40px;
+            text-align: center;
+            background-color: lightgrey;
+        }
+
+        @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
+            body[yahoo] .hide {
+                display: none !important;
+            }
+
+            body[yahoo] .buttonwrapper {
+                background-color: transparent !important;
+            }
+
+            body[yahoo] .button {
+                padding: 0px !important;
+            }
+
+            body[yahoo] .button a {
+                background-color: #e05443;
+                padding: 10px 10px 10px !important;
+            }
+
+            body[yahoo] .unsubscribe {
+                display: block;
+                margin-top: 20px;
+                padding: 10px 50px;
+                background: #393939;
+                border-radius: 5px;
+                text-decoration: none !important;
+                font-weight: bold;
+            }
+        }
 
 
     </style>
@@ -63,7 +157,7 @@
             <![endif]-->
             <table align="center" bgcolor="#ffffff" border="0" cellpadding="0" cellspacing="0" class="content">
                 <tr>
-                    <td bgcolor="#70bbd9" class="header">
+                    <td bgcolor="#00bfd8" class="header">
                         <!--[if (gte mso 9)|(IE)]>
                         <table width="425" align="left" cellpadding="0" cellspacing="0" border="0">
                             <tr>
@@ -81,7 +175,7 @@
                                         </tr>
                                         <tr>
                                             <td class="h1" style="padding: 5px 0 0 0;">
-                                                Timeboard
+                                                My Timeboard
                                             </td>
                                         </tr>
                                     </table>
@@ -113,239 +207,11 @@
                             <tr>
                                 <td>
                         <![endif]-->
-                        <table align="left" border="0" cellpadding="0" cellspacing="0" class="col380"
-                               style="width: 100%; max-width: 800px;" th:each="project : ${projects}">
-                            <tr>
-                                <td class=" title bodycopy borderbottom" style="font-size:30px"><b
-                                        th:text="${project.project.name}">New Project</b></td>
-                            </tr>
 
-                            <tr th:if="${project.createdTasks.size() > 0}">
-                                <td class=" title bodycopy borderbottom" style="color:#32B232"><b>Tasks created</b></td>
-                            </tr>
-                            <tr th:each="createdTask : ${project.createdTasks}">
-                                <td class="borderbottom">
-                                    <table border="0" cellpadding="4" cellspacing="2" width="100%">
-                                        <tr>
-                                            <td class="bodycopy " colspan="5">
-                                                <b th:text="${createdTask.task.name}">Task #1</b>
-                                            </td>
-                                        </tr>
-                                        <tr>
+                        <div th:include="mail/tasks.html :: tasks"></div>
+                        <div th:include="mail/timesheet.html :: timesheet"></div>
+                        <div th:include="mail/vacation.html :: vacation"></div>
 
-                                            <td class="bodycopy" colspan="5" th:text="${createdTask.task.comments}">
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                                                tempor incididunt ut labore et dolore magna aliqua.
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Actor</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${createdTask.actor.firstName}">Maggie</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${createdTask.actor.name}">Smith</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy center" th:if="${createdTask.task.assigned != null}">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Assignee</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${createdTask.task.assigned.firstName}">John</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${createdTask.task.assigned.name}">Doe</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy">
-                                                <table>
-                                                    <tr>
-                                                        <td style="text-align: center;"><b>Start/End</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${#dates.format(createdTask.task.startDate, 'dd/MM/yyyy')}">
-                                                            01/11/2019
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${#dates.format(createdTask.task.endDate, 'dd/MM/yyyy')}">
-                                                            13/11/2019
-                                                        </td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-
-                                            <td class="bodycopy ">
-                                                <div class="circle" th:text="${createdTask.task.originalEstimate}">
-                                                    5.0
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr th:if="${project.deletedTasks.size() > 0}">
-                                <td class="bodycopy borderbottom title" style=" color: #DC143C;"><b>Tasks deleted</b>
-                                </td>
-                            </tr>
-                            <tr th:each="task : ${project.deletedTasks}">
-                                <td class="borderbottom">
-                                    <table border="0" cellpadding="4" cellspacing="2" width="100%">
-                                        <tr>
-                                            <td class="bodycopy" colspan="5">
-                                                <b th:text="${task.task.name}">Task #1</b>
-                                            </td>
-                                        </tr>
-                                        <tr>
-
-                                            <td class="bodycopy" colspan="5" th:text="${task.task.comments}">
-                                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-                                                tempor incididunt ut labore et dolore magna aliqua.
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="bodycopy">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Actor</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${task.actor.firstName}">Maggie</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${task.actor.name}">Smith</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy" th:if="${task.task.assigned != null}">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Assignee</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${task.task.assigned.firstName}">John</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${task.task.assigned.name}">Doe</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy">
-                                                <table>
-                                                    <tr>
-                                                        <td style="text-align: center;"><b>Start/End</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${#dates.format(task.task.startDate, 'dd/MM/yyyy')}">
-                                                            01/11/2019
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${#dates.format(task.task.endDate, 'dd/MM/yyyy')}">
-                                                            13/11/2019
-                                                        </td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-
-                                            <td class="bodycopy ">
-                                                <div class="circle" th:text="${task.task.originalEstimate}"> 5.0</div>
-                                            </td>
-
-
-                                        </tr>
-
-                                    </table>
-                                </td>
-                            </tr>
-
-                        </table>
-                        <table align="left" border="0" cellpadding="0" cellspacing="0"
-                               class="col380" style="width: 100%; max-width: 800px;" th:if="${validatedTimesheets.size() > 0}">
-                            <tr>
-                                <td class=" title bodycopy " style="font-size:30px"><b>Timesheet Validations</b></td>
-                            </tr>
-                            <tr>
-                                <td class=" bodycopy borderbottom" style="text-align:center;">Those accounts validated
-                                    there timesheets
-                                </td>
-                            </tr>
-                            <tr th:each="ts : ${validatedTimesheets}">
-                                <td class="borderbottom">
-                                    <table border="0" cellpadding="4" cellspacing="2" width="100%">
-
-                                        <tr>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>User</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.account.firstName}">John</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.account.name}">Doe</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy">
-                                                <table>
-                                                    <tr>
-                                                        <td style="text-align: center;"><b>Week</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.week}">42 of</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${ts.year}">2019</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-                                            <td class="bodycopy center">
-                                                <table>
-                                                    <tr>
-                                                        <td><b>Validated by</b></td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${validatedTimesheet.validatedBy.firstName}">
-                                                            Maggie
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td th:text="${validatedTimesheet.validatedBy.name}">Smith</td>
-                                                    </tr>
-                                                </table>
-
-                                            </td>
-
-
-                                            <td class="bodycopy ">
-                                                <div class="circle">OK</div>
-                                            </td>
-                                        </tr>
-
-                                    </table>
-                                </td>
-                            </tr>
-
-                        </table>
                         <!--[if (gte mso 9)|(IE)]>
                         </td>
                         </tr>
@@ -353,20 +219,19 @@
                         <![endif]-->
                     </td>
                 </tr>
-
                 <tr>
                     <td class="innerpadding bodycopy">
-                        Best regards from the TimeboardIO team.
+                        Best regards from the My Timeboard team.
                     </td>
                 </tr>
                 <tr>
-                    <td bgcolor="#44525f" class="footer">
+                    <td bgcolor="#393939" class="footer">
                         <table border="0" cellpadding="0" cellspacing="0" width="100%">
                             <tr>
                                 <td align="center" class="footercopy">
-                                    TimeboardIO, 2020<br/>
-                                    <i> <span
-                                            class="hide">Automatically generated email, please do not reply.</span></i>
+                                    My Timeboard, 2020<br/>
+                                    <i> <span class="hide"> Automatically generated email, please do not reply. </span>
+                                    </i>
                                 </td>
                             </tr>
 

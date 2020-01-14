@@ -39,9 +39,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.web.filter.GenericFilterBean;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
 
 import javax.servlet.FilterChain;

@@ -1,10 +1,10 @@
-package timeboard.core.observers.emails;
+package timeboard.core.api;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.core.observers.emails;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,41 +26,25 @@ package timeboard.core.observers.emails;
  * #L%
  */
 
-import timeboard.core.internal.events.TaskEvent;
-import timeboard.core.model.Project;
+import timeboard.core.model.Account;
+import timeboard.core.model.VacationRequest;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-public class EmailSummaryModel {
+public interface VacationService {
 
-    private Project project;
-    private List<TaskEvent> createdTasks = new ArrayList<>();
+    Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID);
 
-    private List<TaskEvent> deletedTasks = new ArrayList<>();
+    VacationRequest createVacationRequest(Account actor, VacationRequest request);
 
-    public EmailSummaryModel(Project p) {
-        this.project = p;
-    }
+    List<VacationRequest> listUserVacations(Account user);
 
-    public void addCreatedTask(TaskEvent e) {
-        createdTasks.add(e);
-    }
+    List<VacationRequest> listVacationsToValidateByUser(Account user);
 
-    public void addDeletedTask(TaskEvent e) {
-        deletedTasks.add(e);
-    }
+    void deleteVacationRequest(Account actor, VacationRequest request);
 
+    VacationRequest approveVacationRequest(Account actor, VacationRequest request);
 
-    public Project getProject() {
-        return project;
-    }
-
-    public List<TaskEvent> getCreatedTasks() {
-        return createdTasks;
-    }
-
-    public List<TaskEvent> getDeletedTasks() {
-        return deletedTasks;
-    }
+    VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
 }

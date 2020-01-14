@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/account')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title layout:fragment="title">Vacation</title>
+</head>
+
+<body>
+
+
+<div layout:fragment="content">
+
+    <div class="ui negative message" th:if="${error}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${error}">
+        </div>
+    </div>
+    <div class="ui positive message" th:if="${message}">
+        <i class="close icon"></i>
+        <div class="header" th:text="${message}">
+        </div>
+    </div>
+    <div id="vacationApp">
+        <div class="ui menu">
+            <a class="item"  v-on:click="openModal" >
+                <i class="plus icon"></i>
+                New Vacation
+            </a>
+        </div>
+        <div v-if="toValidateRequests.data.length" class="ui horizontal divider"><i class="clock icon"></i>
+            Vacations requests to Validate
+        </div>
+        <data-table v-bind:config="toValidateRequests">
+            <template v-slot:sum="{row}">
+
+                <div class="ui circular label large day-badge"><p>{{ dayCount(row) }}</p></div>
+            </template>
+            <template v-slot:label="{row}">
+                {{ row.label }}
+            </template>
+            <template v-slot:start="{row}">
+                {{ new Date(row.start).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
+            </template>
+            <template v-slot:end="{row}">
+                {{ new Date(row.end).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
+            </template>
+            <template v-slot:applicant="{row}">
+                {{ row.applicantName }}
+            </template>
+            <template v-slot:actions="{row}">
+                <button class="ui positive button icon" v-on:click="approveRequest(row)">
+                    <i class="check alternate icon"></i>
+                    Approve
+                </button>
+                <button class="ui negative button icon" v-on:click="rejectRequest(row)">
+                    <i class="remove alternate icon"></i>
+                    Deny
+                </button>
+            </template>
+        </data-table>
+        <div v-if="myRequests.data.length" class="ui horizontal divider"><i class="boxes icon"></i>
+            My vacation requests
+        </div>
+        <data-table v-bind:config="myRequests">
+            <template v-slot:sum="{row}">
+
+                <div class="ui circular label large day-badge"><p>{{ dayCount(row) }}</p></div>
+            </template>
+            <template v-slot:label="{row}">
+                {{ row.label }}
+            </template>
+            <template v-slot:start="{row}">
+                {{ new Date(row.start).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
+            </template>
+            <template v-slot:end="{row}">
+                {{ new Date(row.end).toLocaleString().substring(0,10) }}
+                <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
+            </template>
+            <template v-slot:assignee="{row}">
+                {{ row.assigneeName }}
+            </template>
+            <template v-slot:status="{row}">
+                <button v-if="row.status == 'ACCEPTED'"   class="ui disabled green icon button">
+                    <i class="check icon"></i>
+                    Accepted
+                </button>
+                <button v-else-if="row.status == 'REJECTED'" class="ui disabled negative icon button">
+                    <i class="close icon"></i>
+                    Rejected
+                </button>
+                <button v-else class="ui disabled yellow icon button">
+                    <i class="clock outline icon"></i>
+                    Pending
+                </button>
+            </template>
+            <template v-slot:actions="{row}">
+                <button class="ui negative button icon" v-on:click="cancelRequest(row)">
+                    <i class="remove alternate icon"></i>
+                    Cancel
+                </button>
+            </template>
+
+        </data-table>
+        <tmodal-confirm
+                ref="confirmModal"
+                title="Cancel vacation request ?"
+                icon="close"
+        ></tmodal-confirm>
+
+        <tmodal
+                title="Request vacation"
+                id="newVacation">
+            <template v-slot:content>
+                <form class="ui form">
+                    <div v-bind="formError" class="ui error message"></div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Departure Date</label>
+                            <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
+                            <div class="inline fields" style="padding-top: 1rem;">
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-start" v-bind:value="false" v-model="vacationRequest.halfStart">
+                                        <label>Morning</label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-start" v-bind:value="true" v-model="vacationRequest.halfStart">
+                                        <label>Afternoon</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label>Return Date</label>
+                            <input type="date" name="end-date" placeholder="Return date" v-model="vacationRequest.end">
+                            <div class="inline fields" style="padding-top: 1rem;">
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-end" v-bind:value="true" v-model="vacationRequest.halfEnd">
+                                        <label>Morning</label>
+                                    </div>
+                                </div>
+                                <div class="field">
+                                    <div class="ui radio checkbox">
+                                        <input type="radio" name="halfday-end" v-bind:value="false" v-model="vacationRequest.halfEnd" >
+                                        <label>Afternoon</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Label</label>
+                            <input type="text" name="label" placeholder="Label" v-model="vacationRequest.label">
+                        </div>
+                        <div class="field">
+                            <label>User to notify</label>
+                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID" name="assignee" type="text">
+                            <div class="ui category search">
+                                <div class="ui icon input">
+                                    <input class="prompt" name="assignee" placeholder="Search account..." type="text">
+                                    <i class="search icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <button class="ui positive button"  @click="addVacationRequest">Request new vacation</button>
+
+            </template>
+        </tmodal>
+    </div>
+
+    <script src="/js/vacations.js"></script>
+
+</div>
+</div>
+
+</body>
+</html>

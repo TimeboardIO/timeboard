@@ -6,6 +6,12 @@
     "condition": "subject.currentOrganizationRole('OWNER')"
   },
   {
+    "name": "User can create task in a project",
+    "description": "Any user belonging to the project can create tasks in this project",
+    "target": "action == 'TASKS_CREATE'",
+    "condition": "resource.isMember(subject.getDetails())"
+  },
+  {
     "name": "Org owner can setup org",
     "description": "Only user with role OWNER on org can setup org",
     "target": "action == 'ORG_SETUP'",
@@ -16,6 +22,12 @@
     "description": "Only user with role OWNER on org can archive project",
     "target": "action == 'PROJECTS_ARCHIVE'",
     "condition": "subject.currentOrganizationRole('OWNER') && resource.getOrganizationID() == subject.getCurrentOrganization()"
+  },
+  {
+    "name": "Project owner can view snapshot",
+    "description": "Only user with role OWNER on current project",
+    "target": "action == 'PROJECT_SNAPSHOT'",
+    "condition": "resource.isMember(subject.getDetails(), 'OWNER')"
   },
   {
     "name": "Project owner can view snapshot",

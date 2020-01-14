@@ -32,13 +32,8 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.internal.TemplateGenerator;
-import timeboard.core.internal.events.TaskEvent;
-import timeboard.core.internal.events.TimeboardEvent;
-import timeboard.core.internal.events.TimeboardEventType;
-import timeboard.core.internal.events.TimesheetEvent;
-import timeboard.core.model.Account;
-import timeboard.core.model.Task;
-import timeboard.core.model.ValidatedTimesheet;
+import timeboard.core.internal.events.*;
+import timeboard.core.model.*;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -47,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 
 @Component
 public class SendSummaryEmail {
@@ -79,23 +73,34 @@ public class SendSummaryEmail {
         Map<String, Object> data = new HashMap<>();
 
         List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
-        Map<Long, EmailSummaryModel> projects = new HashMap<>();
+        List<VacationEvent> vacationEvents = new ArrayList<>();
+        Map<Long, ProjectEmailSummaryModel> projects = new HashMap<>();
 
         for (TimeboardEvent event : userNotificationStructure.getNotificationEventList()) {
             if (event instanceof TaskEvent) {
                 Task t = ((TaskEvent) event).getTask();
                 if (((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) {
-                    projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
+                    projects.computeIfAbsent(t.getProject().getId(), e ->
+                            new ProjectEmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
                 }
                 if (((TaskEvent) event).getEventType() == TimeboardEventType.DELETE) {
-                    projects.computeIfAbsent(t.getProject().getId(), e -> new EmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
+                    projects.computeIfAbsent(t.getProject().getId(), e ->
+                            new ProjectEmailSummaryModel(t.getProject())).addDeletedTask((TaskEvent) event);
                 }
+
             } else if (event instanceof TimesheetEvent) {
                 validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
+            } else if (event instanceof VacationEvent) {
+                vacationEvents.add(((VacationEvent) event));
             }
+
         }
         data.put("projects", projects.values());
         data.put("validatedTimesheets", validatedTimesheets);
+        data.put("vacationEventsCreated", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.CREATE)).toArray());
+        data.put("vacationEventsApproved", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.APPROVE)).toArray());
+        data.put("vacationEventsDenied", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DENY)).toArray());
+        data.put("vacationEventsDeleted", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DELETE)).toArray());
 
         String message = templateGenerator.getTemplateString("mail/summary.html", data);
         ArrayList<String> list = new ArrayList<>();

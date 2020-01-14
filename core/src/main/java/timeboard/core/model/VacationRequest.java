@@ -1,10 +1,10 @@
-package timeboard.core.async;
+package timeboard.core.model;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,44 +26,62 @@ package timeboard.core.async;
  * #L%
  */
 
-import timeboard.core.model.OrganizationEntity;
-
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class AsyncJobState extends OrganizationEntity {
+public class VacationRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column
-    public Long ownerID;
+    private String label;
 
     @Column
-    @Enumerated(EnumType.STRING)
-    public State state;
+    private VacationRequestStatus status;
 
-    @Column
-    public String title;
-
-    @Column(length=1000)
-    private String error;
-
-    @Column(length=1000)
-    private String result;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column
+    @Temporal(TemporalType.DATE)
     private Date startDate;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column
+    @Temporal(TemporalType.DATE)
     private Date endDate;
 
-    public void setOwnerID(Long ownerID) {
-        this.ownerID = ownerID;
+    @Column
+    private HalfDay startHalfDay;
+
+    @Column
+    private HalfDay endHalfDay;
+
+    @OneToOne
+    private Account applicant;
+
+    @OneToOne
+    private Account assignee;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String description) {
+        this.label = description;
+    }
+
+    public VacationRequestStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(VacationRequestStatus status) {
+        this.status = status;
     }
 
     public Date getStartDate() {
@@ -82,57 +100,45 @@ public class AsyncJobState extends OrganizationEntity {
         this.endDate = endDate;
     }
 
-    public long getId() {
-        return id;
+    public HalfDay getStartHalfDay() {
+        return startHalfDay;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setStartHalfDay(HalfDay startHalfDay) {
+        this.startHalfDay = startHalfDay;
     }
 
-    public long getOwnerID() {
-        return ownerID;
+    public HalfDay getEndHalfDay() {
+        return endHalfDay;
     }
 
-    public void setOwnerID(long ownerID) {
-        this.ownerID = ownerID;
+    public void setEndHalfDay(HalfDay endHalfDay) {
+        this.endHalfDay = endHalfDay;
     }
 
-    public State getState() {
-        return state;
+    public Account getAssignee() {
+        return assignee;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void setAssignee(Account assignee) {
+        this.assignee = assignee;
     }
 
-    public String getError() {
-        return error;
+    public Account getApplicant() {
+        return applicant;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setApplicant(Account applicant) {
+        this.applicant = applicant;
     }
 
-    public String getResult() {
-        return result;
+    public enum HalfDay {
+        MORNING,
+        AFTERNOON
     }
 
-    public void setResult(String result) {
-        this.result = result;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public enum State{
-        IN_PROGRESS,
-        DONE,
-        FAILED
-    }
 }
+
+
+
+

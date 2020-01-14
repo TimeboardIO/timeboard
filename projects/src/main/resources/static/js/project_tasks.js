@@ -21,6 +21,34 @@ Vue.component('graph-modal', {
     }
 });
 
+// SYnc in progress or not
+var interval = 5000;  // 5000 = 5 seconds
+function showStateSync() {
+    $.ajax({
+        method: "GET",
+        url: "/projects/"+currentProjectID+"/tasks/sync/inProgress",
+        contentType: "application/json",
+        dataType: "json",
+        success: function (data) {
+            if(data == "IN_PROGRESS" && $('#jobInProgress').is(':hidden')){
+                $("#jobInProgress").show();
+            }
+            if(data == "NO_JOB" && $('#jobInProgress').is(':visible')){
+                $("#jobInProgress").hide();
+                document.location.reload(true);
+            }
+        },
+        error: function(data) {
+            console.log(data);
+        },
+        complete: function () {
+            // Schedule the next
+            setTimeout(showStateSync, interval);
+        }
+    });
+}
+showStateSync();
+
 
 // Form validations rules
 const formValidationRules = {
@@ -242,8 +270,8 @@ let app = new Vue({
             let self = this;
             $('.create-task.modal').modal({
                 onApprove : function($element) {
-                    var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
-                    var object = {};
+                    let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    let object = {};
                     if(validated) {
                         $('.ui.error.message').hide();
                         $.ajax({

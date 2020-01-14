@@ -129,7 +129,7 @@ public class TimesheetRESTApi {
             });
 
             //Default tasks
-            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, imputations, ds, de, days);
+            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, authentication.getCurrentOrganization(), imputations, ds, de, days);
 
             projects.add(new ProjectWrapper(
                     (long) 0,
@@ -148,10 +148,11 @@ public class TimesheetRESTApi {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
     }
 
-    private List<TaskWrapper> getDefaultTasks(Account currentAccount, List<ImputationWrapper> imputations, Date ds, Date de, List<DateWrapper> days) {
+    private List<TaskWrapper> getDefaultTasks(Account currentAccount, Long orgID, List<ImputationWrapper> imputations,
+                                              Date ds, Date de, List<DateWrapper> days) {
         List<TaskWrapper> tasks = new ArrayList<>();
 
-        this.projectService.listDefaultTasks(ds, de).stream().forEach(task -> {
+        this.projectService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
             tasks.add(new TaskWrapper(
                     task.getId(),
                     task.getName(), task.getComments(),

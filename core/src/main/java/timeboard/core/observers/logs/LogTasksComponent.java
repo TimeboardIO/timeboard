@@ -47,9 +47,9 @@ public class LogTasksComponent {
     @PostConstruct
     private void init() {
         this.disposable = TimeboardSubjects.TASK_EVENTS.subscribe(taskEvent -> {
-            LOGGER.info(String.format("User % has %s task %s",
+          /*  LOGGER.info(String.format("User % has %s task %s",
                     taskEvent.getActor().getScreenName(), taskEvent.getEventType(), taskEvent.getTask().getId())
-            );
+            );*/
         });
     }
 

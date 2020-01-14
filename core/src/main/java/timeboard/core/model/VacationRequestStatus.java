@@ -1,10 +1,10 @@
-package timeboard.core.async;
+package timeboard.core.model;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,9 @@ package timeboard.core.async;
  * #L%
  */
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.UUID;
-
-@Repository
-public interface AsyncJobRepository extends CrudRepository<AsyncJobState, UUID> {
-
-    public List<AsyncJobState> findByOwnerID(Long accountID);
-
+public enum VacationRequestStatus {
+    PENDING,
+    ACCEPTED,
+    REJECTED;
 
 }

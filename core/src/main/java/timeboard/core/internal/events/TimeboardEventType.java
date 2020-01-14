@@ -30,5 +30,7 @@ public enum TimeboardEventType {
 
     CREATE,
     UPDATE,
-    DELETE
+    DELETE,
+    APPROVE,
+    DENY
 }

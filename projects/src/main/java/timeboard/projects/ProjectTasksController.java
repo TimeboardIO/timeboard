@@ -26,23 +26,17 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
-import timeboard.core.api.sync.ProjectSyncService;
-import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -63,12 +57,6 @@ public class ProjectTasksController {
     @Autowired
     public DataTableService dataTableService;
 
-    @Autowired
-    public AsyncJobService asyncJobService;
-
-    @Autowired
-    public ProjectSyncService projectSyncService;
-
     @Autowired(required = false)
     public List<ProjectSyncPlugin> projectImportServiceList;
 
@@ -83,10 +71,10 @@ public class ProjectTasksController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("task", new TaskForm(task));
-        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), actor, project);
 
         model.addAttribute("batchType", "Default");
         return "project_tasks.html";
@@ -108,18 +96,18 @@ public class ProjectTasksController {
         model.addAttribute("batchList", this.projectService.getBatchList(actor, project, javaBatchType));
 
         model.addAttribute("task", new TaskForm(task));
-        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), actor, project);
 
         return "project_tasks.html";
     }
 
-    private void fillModel(Model model, Account actor, Project project) throws BusinessException {
+    private void fillModel(Model model, Long orgID, Account actor, Project project) throws BusinessException {
         model.addAttribute("project", project);
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
-        model.addAttribute("taskTypes", this.projectService.listTaskType());
+        model.addAttribute("taskTypes", this.projectService.listTaskType(orgID));
         model.addAttribute("allTaskStatus", TaskStatus.values());
         model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
@@ -142,34 +130,10 @@ public class ProjectTasksController {
 
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), actor, project);
 
 
         return "project_tasks.html";
-    }
-
-    @PostMapping(value = "/tasks/sync/{serviceName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    protected String importFromJIRA(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID,
-            @PathVariable String serviceName,
-            @RequestBody MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
-
-        final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-
-        final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
-
-        creds.forEach(field -> {
-            if(formBody.containsKey(field.getFieldKey())){
-                field.setValue(formBody.get(field.getFieldKey()).get(0));
-            }
-        });
-
-        this.projectSyncService.syncProjectTasks(actor, actor, project, serviceName, creds);
-
-
-        return "redirect:/projects/"+projectID+"/tasks";
     }
 
     @PostMapping("/tasks")
