@@ -563,10 +563,24 @@ public class ProjectServiceImpl implements ProjectService {
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
 
+        boolean timesheetValidated = this.timesheetService.isTimesheetValidated(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+
         if (task instanceof Task) {
-            return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
+            if (!timesheetValidated) {
+                return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
+            } else {
+                Task projectTask = (Task) task;
+                return new UpdatedTaskResult(projectTask.getProject().getId(),
+                        projectTask.getId(), projectTask.getEffortSpent(),
+                        projectTask.getEffortLeft(), projectTask.getOriginalEstimate(),
+                        projectTask.getRealEffort());
+            }
         } else {
-            return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
+            if (!timesheetValidated) {
+                return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
+            } else {
+                return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
+            }
         }
     }
 

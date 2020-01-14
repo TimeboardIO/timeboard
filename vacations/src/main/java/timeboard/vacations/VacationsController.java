@@ -182,7 +182,7 @@ public class VacationsController {
         Account actor = authentication.getDetails();
         Optional<VacationRequest> vacationRequest = this.vacationService.getVacationRequestByID(actor, requestID);
         if(vacationRequest.isPresent()) {
-            if(vacationRequest.get().getStatus() == VacationRequestStatus.ACCEPTED && vacationRequest.get().getStartDate().after(new Date())){
+            if(vacationRequest.get().getStatus() == VacationRequestStatus.ACCEPTED && vacationRequest.get().getStartDate().before(new Date())){
                 return ResponseEntity.badRequest().body("Cannot cancel started vacation.");
             } else {
                 this.vacationService.deleteVacationRequest(actor, vacationRequest.get());

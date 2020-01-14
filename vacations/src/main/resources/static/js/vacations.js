@@ -38,12 +38,6 @@ let app = new Vue({
         myRequests: {
             cols: [
                 {
-                    "slot": "sum",
-                    "label": "Total",
-                    "primary" : false
-
-                },
-                {
                     "slot": "label",
                     "label": "Label",
                     "sortKey": "label",
@@ -148,8 +142,8 @@ let app = new Vue({
                         $('#newVacation').modal('hide');
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
-                        $('.ui.message').text(jqXHR.responseText);
-                        $('.ui.message').show();
+                        $('.ui.error.message').text(jqXHR.responseText);
+                        $('.ui.error.message').show();
                     }
                 });
             }
