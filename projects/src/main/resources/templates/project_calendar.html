@@ -16,12 +16,8 @@
 
     <!-- MAIN COMPONENT-->
     <div id="teamCalendar">
-        <calendar name="Team" year="2020" month="0"></calendar>
-        <calendar name="Team" year="2020" month="1" show-header="false"></calendar>
-        <calendar name="Team" year="2020" month="2" show-header="false"></calendar>
-        <calendar name="Team" year="2020" month="3" show-header="false"></calendar>
-        <calendar name="Team" year="2020" month="4" show-header="false"></calendar>
-        <calendar v-for="calendar in teamCalendars" :name="calendar.name" :show-header="false" year="2020" month="0"></calendar>
+        <year-calendar :year="2020" ></year-calendar>
+        <calendar v-for="calendar in teamCalendars" :name="calendar.name" :show-header="false" :year="2020" :month="0"></calendar>
     </div>
 
     <script src="/js/project_calendar.js"></script>

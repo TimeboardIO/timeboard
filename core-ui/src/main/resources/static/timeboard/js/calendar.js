@@ -1,7 +1,7 @@
 Vue.component('calendar', {
     props: {
-        year : String,
-        month : String,
+        year : Number,
+        month : Number,
         name : String,
         showHeader : {
             type : Boolean,
@@ -10,31 +10,52 @@ Vue.component('calendar', {
         showColName : {
             type : Boolean,
             default : true
+        },
+        events :  {
+            type : Array,
+            default : () => ([
+                {
+                    date : new Date(),
+                    color : "lightblue",
+                    type : 1
+                }
+            ])
         }
     },
     template: `
         <table style="margin: 0;" class="ui celled table ">
             <tr v-if="showHeader === true">
-              <th style="width: 10rem;"  v-if="showNameCol === true" >Name</th>
-              <th v-for="day in daysInMonth" v-bind:data-label="day.toDateString()" >{{ day.getDate() }}</th>    
+              <th style="width: 8rem;"  v-if="showColName === true" >Name</th>
+              <th v-for="day in daysInMonth" v-bind:data-label="day.date.toDateString()" >{{ day.date.getDate() }}</th>    
               <th v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: grey"></th>        
             </tr>
             <tr>
-              <td style="width: 10rem;" rowspan="2" v-if="showNameCol === true" > {{ name }}</td>
-              <td v-for="day in daysInMonth" v-bind:style="[ day.getDay() === 0 || day.getDay() === 6 ? { 'background-color' : 'lightgrey' } : { 'background-color' : 'white' } ] " v-bind:data-label="day.toDateString()" ></td>        
-              <td v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: grey" rowspan="2"></td>        
+              <td style="width: 8rem;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
+              <td v-for="day in daysInMonth" v-bind:style="[
+               (day.event !== undefined && day.event.type <= 1) ? {'background-color' : day.event.color } : {},
+               (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {} 
+               ] " v-bind:data-label="day.date.toDateString()" ></td>  
+               <td v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: grey" rowspan="2"></td>        
             </tr>
             <tr>
-              <td v-for="day in daysInMonth" v-bind:style="[ day.getDay() === 0 || day.getDay() === 6 ? { 'background-color' : 'lightgrey' } : { 'background-color' : 'white' } ] " v-bind:data-label="day.toDateString()" ></td>        
+              <td v-for="day in daysInMonth" v-bind:style="[
+               (day.event !== undefined && day.event.type >= 1) ? {'background-color' : day.event.color } : {},
+               (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {} 
+               ] " v-bind:data-label="day.date.toDateString()" ></td>        
             </tr>
         </table>
        `,
     computed: {
         daysInMonth : function() {
-            let date = new Date(this.y, this.m, 1);
+            let date = new Date(this.year, this.month, 1);
             let days = [];
-            while (date.getMonth() === this.m) {
-                days.push(new Date(date.getTime()));
+            while (date.getMonth() === this.month) {
+                days.push( {
+                    date : new Date(date.getTime()),
+                    event : this.events.find(e => {
+                        return e.date.toDateString() === date.toDateString();
+                    })
+                });
                 date.setDate(date.getDate() + 1);
             }
             return days;
@@ -46,8 +67,36 @@ Vue.component('calendar', {
     },
     data : function () {
         return {
-            y : parseInt(this.year, 10),
-            m : parseInt(this.month, 10),
+        }
+
+    }
+});
+
+Vue.component('year-calendar', {
+    props: {
+        year : Number
+    },
+    template: `
+        <div>
+            <calendar v-for="month in monthsInYear" :name="monthNames[month]" :show-header="month === 0" :year="year" :month="month"></calendar>
+        </div>
+       `,
+    computed: {
+        monthsInYear : function() {
+            let date = new Date(this.year, 0, 1);
+            let months = [];
+            while (date.getFullYear() === this.year) {
+                months.push(date.getMonth());
+                date.setMonth(date.getMonth() + 1);
+            }
+            return months;
+        },
+    },
+    data : function () {
+        return {
+            monthNames : ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            ]
         }
 
     }
