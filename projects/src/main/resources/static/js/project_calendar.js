@@ -7,12 +7,12 @@ let app = new Vue({
                 events : [
                     {
                         date : new Date('2020-01-20'),
-                        color : "yellow",
+                        color : "lightgreen",
                         type : 0
                     },
                     {
                         date : new Date('2020-01-17'),
-                        color : "yellow",
+                        color : "lightgreen",
                         type : 1
                     },
 
@@ -23,12 +23,12 @@ let app = new Vue({
                 events : [
                     {
                         date : new Date('2020-01-03'),
-                        color : "blue",
+                        color : "lightgreen",
                         type : 1
                     },
                     {
                         date : new Date('2020-01-11'),
-                        color : "yellow",
+                        color : "lightgreen",
                         type : 2
                     },
 
