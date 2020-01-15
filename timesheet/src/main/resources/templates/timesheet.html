@@ -150,8 +150,9 @@
                                 <div v-if="(day.day != 'Sat') && (day.day != 'Sun')"
                                      v-bind:id="day.date"
                                      v-bind:class="{'ui circular label large day-badge':true,
-                                      'green':(getImputationSum(day.date).toFixed(1) >= 1),
-                                      'red':(getImputationSum(day.date).toFixed(1) < 1)}"
+                                      'green':(getImputationSum(day.date).toFixed(1) == 1),
+                                      'yellow':(getImputationSum(day.date).toFixed(1) < 1),
+                                      'red':(getImputationSum(day.date).toFixed(1) > 1)}"
                                      style="margin-top: 5px;"
                                      v-bind:day-badge="day.date">
                                     <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
@@ -159,7 +160,8 @@
                                 <div v-if="(day.day == 'Sat') || (day.day == 'Sun')"
                                      v-bind:id="day.date"
                                      v-bind:class="{'ui circular label large day-badge':true,
-                                      'green':(getImputationSum(day.date).toFixed(1) >= 1)}"
+                                      'green':(getImputationSum(day.date).toFixed(1) == 1),
+                                      'red':(getImputationSum(day.date).toFixed(1) > 1)}"
                                      style="margin-top: 5px;"
                                      v-bind:day-badge="day.date">
                                     <p>{{ getImputationSum(day.date).toFixed(1) }}</p>

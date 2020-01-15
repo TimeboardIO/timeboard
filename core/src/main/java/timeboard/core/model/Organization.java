@@ -73,6 +73,13 @@ public class Organization {
     )
     private Set<OrganizationMembership> members = new HashSet<>();
 
+    @OneToMany(targetEntity = DefaultTask.class,
+            mappedBy = "organization",
+            orphanRemoval = true,
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.EAGER
+    )
+    private Set<DefaultTask> defaultTasks = new HashSet<>();
 
     public Date getCreatedDate() {
         return createdDate;
@@ -122,6 +129,14 @@ public class Organization {
         this.setup = setup;
     }
 
+    public Set<DefaultTask> getDefaultTasks() {
+        return defaultTasks;
+    }
+
+    public void setDefaultTasks(Set<DefaultTask> defaultTasks) {
+        this.defaultTasks = defaultTasks;
+    }
+
 
     /**
      * Test if current org is public
@@ -139,4 +154,5 @@ public class Organization {
                 .map(om -> om.getRole())
                 .collect(Collectors.toList());
     }
+
 }

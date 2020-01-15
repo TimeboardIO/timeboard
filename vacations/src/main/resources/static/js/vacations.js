@@ -22,7 +22,7 @@ const formValidationRules = {
 let app = new Vue({
     el: '#vacationApp',
     data: {
-        formError : "",
+        formError : '',
         vacationRequest: {
             start : "",
             end : "",
@@ -37,12 +37,6 @@ let app = new Vue({
         },
         myRequests: {
             cols: [
-                {
-                    "slot": "sum",
-                    "label": "Total",
-                    "primary" : false
-
-                },
                 {
                     "slot": "label",
                     "label": "Label",
@@ -166,6 +160,7 @@ let app = new Vue({
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
+                    $('.ui.message').show();
                 }
             });
         },
@@ -181,10 +176,12 @@ let app = new Vue({
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
+                    $('.ui.message').show();
                 }
             });
         },
         cancelRequest : function(request) {
+            let self = this;
             this.$refs.confirmModal.confirm("Are you sure you want to delete vacation request "
                 + request.label !== 'null' ? request.label : '' + "? This action is definitive.",
                 function() {
@@ -198,6 +195,7 @@ let app = new Vue({
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             self.formError = jqXHR.responseText;
+                            $('.ui.message').show();
                         }
                     });
                 });

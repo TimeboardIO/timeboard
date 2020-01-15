@@ -27,6 +27,8 @@ package timeboard.core.model;
  */
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import java.io.Serializable;
 
@@ -35,8 +37,18 @@ import java.io.Serializable;
 @PrimaryKeyJoinColumn(name = "id")
 public class DefaultTask extends AbstractTask implements Serializable {
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Organization organization;
+
     public DefaultTask() {
         super();
     }
 
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
 }
