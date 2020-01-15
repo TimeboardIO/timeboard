@@ -109,12 +109,18 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request) {
+    public List<VacationRequest> listVacationRequestsByPeriod(Account applicant, VacationRequest request) {
 
         TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
-                        "where v.assignee = :assignee and v.startDate <= :startDate and v.endDate >= :endDate",
+                        "where v.applicant = :applicant " +
+                        "and ( " +
+                            "(v.startDate >= :startDate and :startDate <= v.endDate)" +
+                            " or " +
+                            "(v.startDate >= :endDate and :endDate <= v.endDate)" +
+                        ")",
                 VacationRequest.class);
-        q.setParameter("assignee", assignee);
+
+        q.setParameter("applicant", applicant);
         q.setParameter("startDate", request.getStartDate(), TemporalType.DATE);
         q.setParameter("endDate", request.getEndDate(), TemporalType.DATE);
 
@@ -148,7 +154,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     public void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException {
 
         if(request.getStatus() == VacationRequestStatus.ACCEPTED) {
-            this.updateImputations(actor,request,  0);
+            this.updateImputations(actor, request,0);
         }
 
         em.remove(request);
@@ -165,7 +171,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         em.merge(request);
         em.flush();
 
-        this.updateImputations(actor,request,  1);
+        this.updateImputations(actor, request,1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
