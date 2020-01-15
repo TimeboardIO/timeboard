@@ -1029,23 +1029,16 @@ public class ProjectServiceImpl implements ProjectService {
 
         Long orgID = p.getOrganizationID();
 
-        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
-        DefaultTask vacationTask;
+        Organization organization = this.organizationService.getOrganizationByID(actor, orgID).get();
 
-        if(organization.isPresent()) {
-            Optional<DefaultTask> optionalVacationTask = organization.get().getDefaultTasks().stream()
-                    .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst();
+        DefaultTask vacationTask = organization.getDefaultTasks().stream()
+                    .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst().get();
 
-            if(optionalVacationTask.isPresent()) {
-                vacationTask = optionalVacationTask.get();
-                vacationTask.getImputations().stream().filter(i -> {
-                   return p.getMembers().stream().filter(m -> return m.getMember().getId() == i.getAccount().getId()).count() > 0
-                });
-            }
-        }
-
-
-        return null;
+        return vacationTask.getImputations().stream()
+                .filter(i -> p.getMembers().stream()
+                        .anyMatch(m ->
+                                m.getMember().getId() == i.getAccount().getId()))
+                .collect(Collectors.toList());
     }
 
 
