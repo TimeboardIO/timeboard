@@ -1025,18 +1025,25 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public List<Imputation> listTeamVacations(Project p, int month) {
+    public List<Imputation> listTeamVacations(Account actor, Project p, int month) {
 
         Long orgID = p.getOrganizationID();
 
-        this.organizationService.getDefaultTaskByID()
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
+        DefaultTask vacationTask;
 
-        TypedQuery<Batch> q = em.createQuery(
-                "select distinct i from Imputation i join b.tasks t where t.project = :project and b.type = :type",
-                Batch.class);
-        q.setParameter("project", project);
-        q.setParameter("type", batchType);
-        return q.getResultList();
+        if(organization.isPresent()) {
+            Optional<DefaultTask> optionalVacationTask = organization.get().getDefaultTasks().stream()
+                    .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst();
+
+            if(optionalVacationTask.isPresent()) {
+                vacationTask = optionalVacationTask.get();
+                vacationTask.getImputations().stream().filter(i -> {
+                   return p.getMembers().stream().filter(m -> return m.getMember().getId() == i.getAccount().getId()).count() > 0
+                });
+            }
+        }
+
 
         return null;
     }
