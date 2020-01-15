@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='second')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-for="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Project  Calendar</title>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+
+    <!-- MAIN COMPONENT-->
+    <div id="teamCalendar">
+        <calendar v-for="(calendar, i) in teamCalendars" :name="calendar.name" :events="calendar.events" :show-header="i == 0" :year="2020" :month="0"></calendar>
+    </div>
+
+    <script src="/js/project_calendar.js"></script>
+
+</div>
+
+</body>
+</html>
