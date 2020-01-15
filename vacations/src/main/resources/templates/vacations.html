@@ -67,6 +67,8 @@
                 </button>
             </template>
         </data-table>
+
+
         <div v-if="myRequests.data.length" class="ui horizontal divider"><i class="boxes icon"></i>
             My vacation requests
         </div>
@@ -107,6 +109,10 @@
             </template>
 
         </data-table>
+
+        <year-calendar :year="2020" ></year-calendar>
+
+
         <tmodal-confirm
                 ref="confirmModal"
                 title="Cancel vacation request ?"
