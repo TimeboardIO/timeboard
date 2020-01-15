@@ -81,12 +81,6 @@ let app = new Vue({
         toValidateRequests: {
             cols: [
                 {
-                    "slot": "sum",
-                    "label": "Total",
-                    "primary" : false
-
-                },
-                {
                     "slot": "label",
                     "label": "Label",
                     "sortKey": "label",
