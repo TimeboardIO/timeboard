@@ -84,7 +84,7 @@ public class UsersSearchRestController {
 
         Long orgID = null;
         if (req.getParameter("orgID") != null) {
-            orgID = Long.parseLong(req.getParameter("orgID"));
+            orgID = authentication.getCurrentOrganization();
         }
 
         Set<Account> accounts = new HashSet<>();
