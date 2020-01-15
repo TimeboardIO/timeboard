@@ -45,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -97,6 +98,49 @@ public class UsersSearchRestController {
             accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
         } else {
             accounts.addAll(this.userService.searchUserByEmail(actor,  query));
+        }
+        SearchResults searchResults = new SearchResults(accounts.size(), accounts);
+
+        MAPPER.writeValue(resp.getWriter(), searchResults);
+    }
+
+    @GetMapping("/MyManagers")
+    protected void doGetManagerOfMyProjects(TimeboardAuthentication authentication,
+                         HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+
+        String query = req.getParameter("q");
+        Account actor = authentication.getDetails();
+
+        if (query.isBlank() || query.isEmpty()) {
+            throw new BusinessException("Query is empty");
+        }
+
+        Long orgID = null;
+        if (req.getParameter("orgID") != null) {
+            orgID = authentication.getCurrentOrganization();
+        }
+
+        Set<Account> accounts = new HashSet<>();
+
+        if (orgID != null) {
+            Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
+            List<Project> myProjects = projectService.listProjects(actor, orgID)
+                    .stream()
+                    .filter(project -> project.isMember(actor))
+                    .collect(Collectors.toList());
+            List<Account> myManagers = myProjects
+                    .stream()
+                    .map(Project::getMembers)
+                    .map(projectMemberships ->
+                            projectMemberships
+                                    .stream()
+                                    .filter(member -> member.getRole().equals("OWNER"))
+                                    .toArray())
+                    .toArray();
+
+            accounts.addAll(myManagers);
+        } else {
+            throw new BusinessException("OrganizationID is null");
         }
         SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
