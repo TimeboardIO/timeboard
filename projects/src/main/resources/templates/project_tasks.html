@@ -106,7 +106,7 @@
                             <select class="ui status dropdown" v-model="task.status" name="taskStatus" data-cy="task-status"
                                     v-bind:class="{disabled: (task.taskID == 0)}">
                                 <option th:each="status: ${allTaskStatus}"
-                                        th:text="${status.label}"
+                                        th:text="${status}"
                                         th:value="${status}"
                                 ></option>
                             </select>
@@ -233,7 +233,7 @@
                     <label>Status </label>
                     <select v-model="table.filters.status.filterValue" class="ui status multiple selection fluid dropdown" >
                         <option th:each="status: ${allTaskStatus}"
-                                th:text="${status.label}"
+                                th:text="${status}"
                                 th:value="${status}"
                         ></option>
                     </select>

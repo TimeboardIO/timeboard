@@ -26,12 +26,28 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.VacationRequest;
 
+import java.util.List;
+import java.util.Optional;
+
 public interface VacationService {
 
+    Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID);
 
-    public VacationRequest createVacationRequest(Account actor, VacationRequest request);
+    VacationRequest createVacationRequest(Account actor, VacationRequest request);
 
+    List<VacationRequest> listUserVacations(Account user);
+
+    List<VacationRequest> listVacationsToValidateByUser(Account user);
+
+    void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+
+    VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+
+    VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
+
+    List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
 }

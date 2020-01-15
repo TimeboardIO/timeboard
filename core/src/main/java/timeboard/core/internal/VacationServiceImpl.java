@@ -27,30 +27,218 @@ package timeboard.core.internal;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.VacationService;
-import timeboard.core.model.Account;
-import timeboard.core.model.VacationRequest;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.events.TimeboardEventType;
+import timeboard.core.internal.events.VacationEvent;
+import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.*;
+import java.util.Calendar;
 
 @Component
 @Transactional
-public class VacationServiceImpl implements VacationService {
+public class VacationServiceImpl extends OrganizationEntity implements VacationService {
 
     @Autowired
     private EntityManager em;
 
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
+
+    @Autowired
+    private OrganizationService organizationService;
+
+    @Autowired
+    private ProjectService projectservice;
+
+    @Override
+    public Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID) {
+        VacationRequest data;
+        try {
+            data = em.find(VacationRequest.class, requestID);
+        } catch (Exception nre) {
+            data = null;
+        }
+        return Optional.ofNullable(data);
+
+    }
+
     @Override
     public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
-
+        request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
+        request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
 
         em.persist(request);
-
         em.flush();
 
         return request;
     }
+
+    @Override
+    public List<VacationRequest> listUserVacations(Account applicant) {
+
+        TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v where v.applicant = :applicant "
+                , VacationRequest.class);
+        q.setParameter("applicant", applicant);
+
+        return q.getResultList();
+
+    }
+
+    @Override
+    public List<VacationRequest> listVacationsToValidateByUser(Account assignee) {
+
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee and v.status = :status",
+                VacationRequest.class);
+        q.setParameter("assignee", assignee);
+        q.setParameter("status", VacationRequestStatus.PENDING);
+
+        return q.getResultList();
+    }
+
+    @Override
+    public List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request) {
+
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
+                        "where v.assignee = :assignee and v.startDate <= :startDate and v.endDate >= :endDate",
+                VacationRequest.class);
+        q.setParameter("assignee", assignee);
+        q.setParameter("startDate", request.getStartDate(), TemporalType.DATE);
+        q.setParameter("endDate", request.getEndDate(), TemporalType.DATE);
+
+        List<VacationRequest> resultList = q.getResultList();
+        List<VacationRequest> copyList = new ArrayList<>(resultList);
+
+        for (VacationRequest r :resultList) {
+            if (
+                (r.getStartDate().compareTo(request.getEndDate()) == 1)
+                    && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                    &&  r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
+            ) {
+                    copyList.remove(r);
+            }
+
+            if (
+                (r.getEndDate().compareTo(request.getStartDate()) == 1)
+                && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
+            ) {
+                    copyList.remove(r);
+            }
+        }
+
+
+        return copyList;
+    }
+
+
+    @Override
+    public void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException {
+
+        if(request.getStatus() == VacationRequestStatus.ACCEPTED) {
+            this.updateImputations(actor,request,  0);
+        }
+
+        em.remove(request);
+        em.flush();
+
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
+
+    }
+
+    @Override
+    public VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException {
+        request.setStatus(VacationRequestStatus.ACCEPTED);
+        em.merge(request);
+        em.flush();
+
+        this.updateImputations(actor,request,  1);
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
+
+        return request;
+    }
+
+    private void updateImputations(Account actor, VacationRequest request, double sign ) throws BusinessException {
+
+        DefaultTask vacationTask = this.getVacationTask(actor, request);
+
+        java.util.Calendar c1 = java.util.Calendar.getInstance();
+        c1.setTime(request.getStartDate());
+        c1.set(Calendar.HOUR_OF_DAY, 2);
+        c1.set(Calendar.MINUTE, 0);
+        c1.set(Calendar.SECOND, 0);
+        c1.set(Calendar.MILLISECOND, 0);
+        c1.setFirstDayOfWeek(Calendar.MONDAY);
+
+        double value = 1 * sign;
+        java.util.Calendar c2 = java.util.Calendar.getInstance();
+        c2.setTime(request.getEndDate());
+
+        if(request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
+            value = 0.5 * sign;
+        }
+
+        while (c1.before(c2)) {
+            if (c1.get(Calendar.DAY_OF_WEEK) <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1) {
+                this.updateTaskImputation(actor,vacationTask, c1.getTime(), value);
+            }
+            value = 1 * sign;
+            c1.add(Calendar.DATE, 1);
+        }
+        if(request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
+            value = 0.5 * sign;
+        }
+        if (c1.get(Calendar.DAY_OF_WEEK)  <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1 ) {
+            this.updateTaskImputation(actor,vacationTask, c1.getTime(), value);
+        }
+
+    }
+
+    private DefaultTask getVacationTask(Account actor, VacationRequest request) {
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, request.getOrganizationID());
+
+        if(organization.isPresent()) {
+            Optional<DefaultTask> vacationTask = organization.get().getDefaultTasks().stream()
+                    .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst();
+
+            if(vacationTask.isPresent()) {
+                return vacationTask.get();
+            }
+        }
+
+        return null;
+    }
+
+    private void updateTaskImputation(Account user, DefaultTask task, Date day, double val) throws BusinessException {
+      this.projectservice.updateTaskImputation(user, task, day, val);
+
+    }
+
+
+    @Override
+    public VacationRequest rejectVacationRequest(Account actor, VacationRequest request) {
+        request.setStatus(VacationRequestStatus.REJECTED);
+        em.merge(request);
+        em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DENY, request));
+
+        return request;
+    }
+
+
 
 }

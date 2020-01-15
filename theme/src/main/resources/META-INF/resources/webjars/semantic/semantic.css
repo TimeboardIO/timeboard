@@ -818,7 +818,7 @@ ui.input.error > input {
 }
 
 .day-badge {
-  width: 2.5rem;
+  min-width: 2.5rem !important;
   height: 2.5rem;
 }
 
@@ -901,6 +901,11 @@ table,
 #timesheet th.project {
   font-size: 1em !important;
   font-weight: normal;
+}
+
+.calendar.ui.celled.table tr td,
+.calendar.ui.celled.table tr th {
+  border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
 }
 
 /** PROJECT **/

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.ProjectService;
@@ -53,6 +54,9 @@ public class ProjectTasksController {
 
     @Autowired
     public ProjectService projectService;
+
+    @Autowired
+    public OrganizationService organizationService;
 
     @Autowired
     public DataTableService dataTableService;
@@ -107,7 +111,7 @@ public class ProjectTasksController {
     private void fillModel(Model model, Long orgID, Account actor, Project project) throws BusinessException {
         model.addAttribute("project", project);
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
-        model.addAttribute("taskTypes", this.projectService.listTaskType(orgID));
+        model.addAttribute("taskTypes", this.organizationService.listTaskType(orgID));
         model.addAttribute("allTaskStatus", TaskStatus.values());
         model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
