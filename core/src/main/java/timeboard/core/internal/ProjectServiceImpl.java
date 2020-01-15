@@ -1024,6 +1024,22 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
+    @Override
+    public List<Imputation> listTeamVacations(Project p, int month) {
+
+        Long orgID = p.getOrganizationID();
+
+        this.organizationService.getDefaultTaskByID()
+
+        TypedQuery<Batch> q = em.createQuery(
+                "select distinct i from Imputation i join b.tasks t where t.project = :project and b.type = :type",
+                Batch.class);
+        q.setParameter("project", project);
+        q.setParameter("type", batchType);
+        return q.getResultList();
+
+        return null;
+    }
 
 
     @Override
