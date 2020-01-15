@@ -193,7 +193,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
 
         while (c1.before(c2)) {
             if (c1.get(Calendar.DAY_OF_WEEK) <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1) {
-                this.updateTaskImputation(actor,vacationTask, c1.getTime(), value);
+                this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
             }
             value = 1 * sign;
             c1.add(Calendar.DATE, 1);
@@ -202,7 +202,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
             value = 0.5 * sign;
         }
         if (c1.get(Calendar.DAY_OF_WEEK)  <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1 ) {
-            this.updateTaskImputation(actor,vacationTask, c1.getTime(), value);
+            this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
         }
 
     }
