@@ -39,15 +39,14 @@ public class AbacPermissionEvaluator implements PermissionEvaluator {
     PolicyEnforcement policy;
 
     @Autowired
-    MyEnvironment myEnvironment;
+    PolicyEnvironment policyEnvironment;
 
     @Override
     public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
         // Getting subject
         TimeboardAuthentication user = (TimeboardAuthentication) authentication;
-        // Getting environment
-        //MyEnvironment myEnvironment = new MyEnvironment();
-        return policy.check(user, targetDomainObject, permission, myEnvironment);
+
+        return policy.check(user, targetDomainObject, permission, policyEnvironment);
     }
 
     @Override

@@ -35,12 +35,12 @@ import timeboard.core.model.Project;
 import java.util.Date;
 
 @Component
-public class MyEnvironment {
+public class PolicyEnvironment {
 
     @Autowired
     BusinessPolicyEvaluator businessPolicyEvaluator;
 
-    public MyEnvironment(){
+    public PolicyEnvironment(){
     }
 
     public Date getDate() {
