@@ -29,7 +29,7 @@
         <div class="card">
             <div class="ui top large primary attached label user-card">
                 <h4><i class="icon account "></i>
-                    <span th:text="${vacations.firstName} + ' ' + ${vacations.name}"></span></h4>
+                    <span th:text="${account.firstName} + ' ' + ${account.name}"></span></h4>
             </div>
 
             <div class="content">
@@ -38,13 +38,13 @@
                         <div class="item">
                             <i class="clock outline icon"></i>
                             <div class="content">
-                                Member since <i th:text="${vacations.accountCreationTime}"></i>
+                                Member since <i th:text="${account.accountCreationTime}"></i>
                             </div>
                         </div>
                         <div class="item">
                             <i class="mail icon"></i>
                             <div class="content">
-                                <a th:href="'mailto:' + ${vacations.email}" th:text="${vacations.email}"></a>
+                                <a th:href="'mailto:' + ${account.email}" th:text="${account.email}"></a>
                             </div>
                         </div>
 
@@ -66,18 +66,18 @@
                         <label>Name</label>
                         <div class="two fields">
                             <div class="field">
-                                <input name="firstName" placeholder="First Name" th:value="${vacations.firstName}"
+                                <input name="firstName" placeholder="First Name" th:value="${account.firstName}"
                                        type="text">
                             </div>
                             <div class="field">
-                                <input name="name" placeholder="Last Name" th:value="${vacations.name}" type="text">
+                                <input name="name" placeholder="Last Name" th:value="${account.name}" type="text">
                             </div>
                         </div>
                         <div class="two fields">
 
                             <div class="field">
                                 <label>E-mail</label>
-                                <input name="email" placeholder="john@mygroup.io" th:value="${vacations.email}"
+                                <input name="email" placeholder="john@mygroup.io" th:value="${account.email}"
                                        type="email">
                             </div>
                         </div>
@@ -112,10 +112,10 @@
                             <tr th:attr="data-key=${element}" th:each="element :  ${externalTools}">
                                 <td th:text="${element}"><i class="github icon"> </i> Github</td>
                                 <td>
-                                    <input th:if="${vacations.externalIDs != null}" th:name="'attr-'+${element}"
-                                           th:value="${vacations.externalIDs.containsKey(element)} ? ${vacations.externalIDs.get(element)} : '' "
+                                    <input th:if="${account.externalIDs != null}" th:name="'attr-'+${element}"
+                                           th:value="${account.externalIDs.containsKey(element)} ? ${account.externalIDs.get(element)} : '' "
                                            type="text"/>
-                                    <input th:if="${vacations.externalIDs == null}" th:name="'attr-'+${element}"
+                                    <input th:if="${account.externalIDs == null}" th:name="'attr-'+${element}"
                                            type="text"/>
                                 </td>
                             </tr>
@@ -134,7 +134,7 @@
             <div class="content">
                 <h4 class="ui dividing header">Exports Reports</h4>
 
-                <form action="/timeboard/account/exportTAS" class="ui form account" enctype="application/x-www-form-urlencoded"
+                <form action="/account/exportTAS" class="ui form account" enctype="application/x-www-form-urlencoded"
                       method="post">
                     <div class="field">
                         <div class="two fields">

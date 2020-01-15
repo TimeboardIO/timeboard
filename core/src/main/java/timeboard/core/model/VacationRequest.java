@@ -30,7 +30,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class VacationRequest {
+public class VacationRequest extends OrganizationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

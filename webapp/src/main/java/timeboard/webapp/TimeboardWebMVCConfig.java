@@ -33,6 +33,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import timeboard.projects.converters.LongToProjectConverter;
+import timeboard.vacations.converters.LongToVacationRequestConverter;
 
 @Configuration
 public class TimeboardWebMVCConfig implements WebMvcConfigurer {
@@ -45,6 +46,9 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
 
     @Autowired
     private LongToProjectConverter longToProjectConverter;
+
+    @Autowired
+    private LongToVacationRequestConverter longToVacationRequestConverter;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
@@ -61,5 +65,6 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(this.longToProjectConverter);
+        registry.addConverter(this.longToVacationRequestConverter);
     }
 }

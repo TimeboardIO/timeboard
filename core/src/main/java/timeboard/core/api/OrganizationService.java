@@ -27,10 +27,10 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Organization;
+import timeboard.core.model.*;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -66,5 +66,53 @@ public interface OrganizationService {
                                             Organization organization,
                                             Account member,
                                             MembershipRole role) throws BusinessException;
+
+    /*
+    == Default Tasks ==
+    */
+    List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de);
+    List<DefaultTask> listDefaultTasks(Long orgID);
+
+    /**
+     * Create a default task.
+     *
+     * @return DefaultTask
+     */
+    DefaultTask createDefaultTask(Account actor, Long orgID, String task) throws BusinessException;
+
+
+
+    /**
+     * default tasks can not be deleted, so they are set disabled and hidden from UI
+     *
+     * @param actor
+     * @param taskID
+     * @throws BusinessException
+     */
+    void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException;
+
+
+    DefaultTask updateDefaultTask(Account actor, DefaultTask task);
+
+    DefaultTask getDefaultTaskByID(Account actor, long id);
+
+
+    /**
+     * Return task types.
+     *
+     * @return List all task types.
+     */
+    List<TaskType> listTaskType(Long orgID);
+
+    TaskType findTaskTypeByID(Long taskTypeID);
+
+    TaskType updateTaskType(Account actor, TaskType type);
+
+    TaskType createTaskType(Account actor, Long orgID, String name);
+
+    void disableTaskType(Account actor, TaskType type);
+
+    //TODO remove when migration is ok
+    boolean checkOrganizationVacationTask(String taskName) ;
 
 }
