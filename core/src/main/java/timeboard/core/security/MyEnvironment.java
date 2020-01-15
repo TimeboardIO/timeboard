@@ -27,31 +27,34 @@ package timeboard.core.security;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.PermissionEvaluator;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import java.io.Serializable;
+import timeboard.core.api.exceptions.CommercialException;
+import timeboard.core.internal.BusinessPolicyEvaluator;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
+import java.util.Date;
 
 @Component
-public class AbacPermissionEvaluator implements PermissionEvaluator {
+public class MyEnvironment {
 
     @Autowired
-    PolicyEnforcement policy;
+    BusinessPolicyEvaluator businessPolicyEvaluator;
 
-    @Autowired
-    MyEnvironment myEnvironment;
-
-    @Override
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
-        // Getting subject
-        TimeboardAuthentication user = (TimeboardAuthentication) authentication;
-        // Getting environment
-        //MyEnvironment myEnvironment = new MyEnvironment();
-        return policy.check(user, targetDomainObject, permission, myEnvironment);
+    public MyEnvironment(){
     }
 
-    @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
-        return false;
+    public Date getDate() {
+        return new Date();
     }
+
+    public boolean checkProjectByUserLimit(final Account account) throws CommercialException {
+        return businessPolicyEvaluator.checkProjectByUserLimit(account);
+    }
+
+    public boolean checkTaskByProjectLimit(final Account account, final Project project) throws CommercialException {
+        return businessPolicyEvaluator.checkTaskByProjectLimit(account, project);
+    }
+
+
+
 }
