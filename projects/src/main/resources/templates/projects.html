@@ -66,7 +66,7 @@
                             class="ui primary icon button">
                             <i class="tasks icon"></i>
                         </a>
-                        <a @click="archive(project)" class="ui negative icon button" data-cy="archive" sec:authorize="hasPermission(null,'PROJECTS_ARCHIVE')">
+                        <a @click="archive(project)" class="ui negative icon button" data-cy="archive">
                             <i class="archive icon"></i>
                         </a>
                     </div>
@@ -107,7 +107,7 @@
                         <i class="tasks icon"></i>
                         Task
                     </a>
-                    <a class="ui right labeled negative icon button" @click="archive(row)" data-cy="archive" sec:authorize="hasPermission(null,'PROJECTS_ARCHIVE')">
+                    <a class="ui right labeled negative icon button" @click="archive(row)" data-cy="archive">
                         <i class="archive icon"></i>
                         Archive
                     </a>
