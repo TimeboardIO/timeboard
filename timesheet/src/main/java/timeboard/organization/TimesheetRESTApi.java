@@ -138,7 +138,7 @@ public class TimesheetRESTApi {
         }
 
         if (this.timesheetService != null) {
-            validated = this.timesheetService.isTimesheetValidated(currentAccount, year, week);
+            validated = this.timesheetService.isTimesheetSubmitted(currentAccount, year, week);
         }
 
         c.setTime(authentication.getDetails().getBeginWorkDate());
@@ -231,7 +231,7 @@ public class TimesheetRESTApi {
 
         try{
             Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
-            this.timesheetService.validateTimesheet(actor, actor, currentOrg, year, week);
+            this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
             return ResponseEntity.status(201).build();
         }catch (Exception e){ // TimesheetException
             return ResponseEntity.status(412).build();

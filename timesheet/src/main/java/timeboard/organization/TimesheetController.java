@@ -72,6 +72,9 @@ public class TimesheetController {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        if(c.get(Calendar.WEEK_OF_YEAR) > week){
+            c.roll(Calendar.YEAR, -1);  // remove one year
+        }
         return c.get(Calendar.YEAR);
     }
 
@@ -104,11 +107,14 @@ public class TimesheetController {
 
 
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
+        Account acc = authentication.getDetails();
 
         final Calendar c = Calendar.getInstance();
+        c.setTime(acc.getBeginWorkDate());
+
+
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
-        c.setFirstDayOfWeek(Calendar.MONDAY);
         c.set(Calendar.HOUR_OF_DAY, 2);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
@@ -123,7 +129,7 @@ public class TimesheetController {
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
         final boolean lastWeekValidated =
-                this.timesheetService.isTimesheetValidated(authentication.getDetails(), lastWeekYear, lastWeek);
+                    this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), lastWeekYear, lastWeek);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);

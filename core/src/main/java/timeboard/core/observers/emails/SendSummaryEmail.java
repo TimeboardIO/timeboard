@@ -63,7 +63,7 @@ public class SendSummaryEmail {
 
     /**
      * Transform user with his notifications to email structure.
-     * Work for task create/delete events and timesheet validation events
+     * Work for task create/delete events and timesheet submission events
      *
      * @param userNotificationStructure structure user 1 -- * events to notify/inform
      * @return email ready structure
@@ -72,7 +72,7 @@ public class SendSummaryEmail {
 
         Map<String, Object> data = new HashMap<>();
 
-        List<ValidatedTimesheet> validatedTimesheets = new ArrayList<>();
+        List<SubmittedTimesheet> submittedTimesheets = new ArrayList<>();
         List<VacationEvent> vacationEvents = new ArrayList<>();
         Map<Long, ProjectEmailSummaryModel> projects = new HashMap<>();
 
@@ -89,14 +89,14 @@ public class SendSummaryEmail {
                 }
 
             } else if (event instanceof TimesheetEvent) {
-                validatedTimesheets.add(((TimesheetEvent) event).getTimesheet());
+                submittedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             } else if (event instanceof VacationEvent) {
                 vacationEvents.add(((VacationEvent) event));
             }
 
         }
         data.put("projects", projects.values());
-        data.put("validatedTimesheets", validatedTimesheets);
+        data.put("submittedTimesheets", submittedTimesheets);
         data.put("vacationEventsCreated", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.CREATE)).toArray());
         data.put("vacationEventsApproved", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.APPROVE)).toArray());
         data.put("vacationEventsDenied", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DENY)).toArray());

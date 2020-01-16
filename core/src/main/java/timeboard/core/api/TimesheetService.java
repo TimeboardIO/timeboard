@@ -39,7 +39,7 @@ import java.util.Map;
 public interface TimesheetService {
 
     /**
-     * Validate user timesheet.
+     * Submit user timesheet.
      *
      * @param actor            user who trigger this function.
      * @param accountTimesheet user which be used to build timehseet to validate
@@ -47,17 +47,17 @@ public interface TimesheetService {
      * @param week             timesheet week
      * @return true if timesheet is validate else, false.
      */
-    void validateTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException;
+    void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException;
 
     /**
-     * Is timesheet validated.
+     * Is timesheet submitted.
      *
-     * @param accountTimesheet user used to check timesheet validation state.
+     * @param accountTimesheet user used to check timesheet sumbit state.
      * @param week             timesheet week
      * @param year             timesheet year
      * @return true if timesheet is already validated
      */
-    boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
+    boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week);
 
 
     /**

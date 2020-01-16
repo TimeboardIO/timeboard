@@ -7,15 +7,15 @@
 <body>
 <div th:fragment="timesheet">
     <table align="left" border="0" cellpadding="0" cellspacing="0"
-           class="col380" style="width: 100%; max-width: 800px;" th:if="${validatedTimesheets.size() > 0}">
+           class="col380" style="width: 100%; max-width: 800px;" th:if="${submittedTimesheets.size() > 0}">
         <tr>
-            <td class=" title bodycopy " style="font-size:30px"><b>Timesheet Validations</b></td>
+            <td class=" title bodycopy " style="font-size:30px"><b>Timesheet Submission</b></td>
         </tr>
         <tr>
-            <td class=" bodycopy borderbottom" style="text-align:center;">These users have validated their timesheet
+            <td class=" bodycopy borderbottom" style="text-align:center;">These users have submitted their timesheet
             </td>
         </tr>
-        <tr th:each="ts : ${validatedTimesheets}">
+        <tr th:each="ts : ${submittedTimesheets}">
             <td class="borderbottom">
                 <table border="0" cellpadding="4" cellspacing="2" width="100%">
                     <tr>
@@ -43,22 +43,6 @@
                                 </tr>
                                 <tr>
                                     <td th:text="${ts.year}">2019</td>
-                                </tr>
-                            </table>
-
-                        </td>
-                        <td class="bodycopy center">
-                            <table>
-                                <tr>
-                                    <td><b>Validated by</b></td>
-                                </tr>
-                                <tr>
-                                    <td th:text="${validatedTimesheet.validatedBy.firstName}">
-                                        Maggie
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td th:text="${validatedTimesheet.validatedBy.name}">Smith</td>
                                 </tr>
                             </table>
 

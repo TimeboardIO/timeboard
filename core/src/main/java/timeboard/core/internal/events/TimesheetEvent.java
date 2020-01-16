@@ -35,10 +35,10 @@ import java.util.List;
 
 public class TimesheetEvent extends TimeboardEvent {
 
-    private ValidatedTimesheet timesheet;
+    private SubmittedTimesheet timesheet;
 
 
-    public TimesheetEvent(ValidatedTimesheet timesheet, ProjectService projectService, Organization currentOrg) {
+    public TimesheetEvent(SubmittedTimesheet timesheet, ProjectService projectService, Organization currentOrg) {
         super(new Date());
 
         this.timesheet = timesheet;
@@ -54,7 +54,7 @@ public class TimesheetEvent extends TimeboardEvent {
     }
 
 
-    public ValidatedTimesheet getTimesheet() {
+    public SubmittedTimesheet getTimesheet() {
         return timesheet;
     }
 }
