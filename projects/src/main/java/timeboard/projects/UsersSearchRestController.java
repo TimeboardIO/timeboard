@@ -133,7 +133,9 @@ public class UsersSearchRestController {
                 .map(project -> project.getMemberShipsByRole(MembershipRole.OWNER))
                 .forEach(projectMembershipOwners -> {
                     for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
-                        myManagers.add(projectMembershipOwner.getMember());
+                        if(projectMembershipOwner.getMember().getEmail().startsWith(query)) {
+                            myManagers.add(projectMembershipOwner.getMember());
+                        }
                     }
                 });
 
