@@ -68,8 +68,7 @@ public class OrganizationsRestAPI {
     @Autowired
     private UserService userService;
 
-
-    @GetMapping("/members")
+    @GetMapping("/members/list")
     public ResponseEntity getMembers(TimeboardAuthentication authentication,
                                      HttpServletRequest request) throws JsonProcessingException {
 

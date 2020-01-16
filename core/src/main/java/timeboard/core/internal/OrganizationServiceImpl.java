@@ -160,6 +160,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                     .getMembers()
                     .removeIf(om -> om.getMember().getId() == member.getId());
 
+            em.merge(org);
             em.flush();
 
             LOGGER.info("Member " + actor.getName() + " is removed from organisation "+org.get().getName());

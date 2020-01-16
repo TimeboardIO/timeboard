@@ -598,7 +598,7 @@ public class ProjectServiceImpl implements ProjectService {
             Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask);
             double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
-            Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), em);
+            Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
             Task updatedTask = em.find(Task.class, projectTask.getId());
             double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);
@@ -627,7 +627,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
         Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), defaultTask);
-        this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), em);
+        this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime());
 
         em.flush();
         LOGGER.info("User " + actor.getScreenName() + " updated imputations for default task "
@@ -650,8 +650,7 @@ public class ProjectServiceImpl implements ProjectService {
                                           AbstractTask task,
                                           Account actor,
                                           double val,
-                                          Date date,
-                                          EntityManager entityManager) {
+                                          Date date) {
 
         if (imputation == null) {
             //No imputation for current task and day
@@ -660,19 +659,22 @@ public class ProjectServiceImpl implements ProjectService {
             imputation.setTask(task);
             imputation.setAccount(actor);
             imputation.setValue(val);
-            entityManager.persist(imputation);
+            em.persist(imputation);
         } else {
             // There is an existing imputation for this day and task
-            imputation.setValue(val);
             if (val == 0) {
                 //if value equal to 0 then remove imputation
-                entityManager.remove(imputation);
+                Long imputationID = imputation.getId();
+                task.getImputations().removeIf(i -> i.getId() == imputationID);
+                em.remove(imputation);
+                em.merge(task);
             } else {
+                imputation.setValue(val);
                 // else save new value
-                entityManager.persist(imputation);
+                em.persist(imputation);
             }
         }
-        entityManager.flush();
+        em.flush();
 
         return imputation;
     }
