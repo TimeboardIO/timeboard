@@ -193,10 +193,13 @@ public class Project extends OrganizationEntity implements Serializable {
 
     @Transient
     public Set<ProjectMembership> getMemberShipsByRole(MembershipRole role) {
-        return this.getMembers()
-                .stream()
-                .filter(projectMembership -> projectMembership.getRole() == role)
-                .collect(Collectors.toSet());
+        if(role != null) {
+            return this.getMembers()
+                    .stream()
+                    .filter(projectMembership -> projectMembership.getRole() == role)
+                    .collect(Collectors.toSet());
+        }
+        return this.getMembers();
     }
 
     @Transient

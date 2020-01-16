@@ -28,6 +28,7 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,8 +67,8 @@ public class UsersSearchRestController {
     private ProjectService projectService;
 
     @GetMapping
-    protected void doGet(TimeboardAuthentication authentication,
-                         HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+    protected ResponseEntity<SearchResults> doGet(TimeboardAuthentication authentication,
+                                                  HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
 
         String query = req.getParameter("q");
         Account actor = authentication.getDetails();
@@ -97,18 +98,19 @@ public class UsersSearchRestController {
         } else {
             accounts.addAll(this.userService.searchUserByEmail(actor,  query));
         }
+
         SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
-        MAPPER.writeValue(resp.getWriter(), searchResults);
+        return ResponseEntity.ok(searchResults);
     }
 
-    @GetMapping("/myManagers")
-    protected void doGetManagerOfMyProjects(TimeboardAuthentication authentication,
-                         HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+    @GetMapping("/byRole")
+    protected ResponseEntity<SearchResults> doGetMembersProjects(TimeboardAuthentication authentication,
+                    HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
 
-        String query = req.getParameter("q");
         Account actor = authentication.getDetails();
 
+        String query = req.getParameter("q");
         if (query.isBlank() || query.isEmpty()) {
             throw new BusinessException("Query is empty");
         }
@@ -118,8 +120,12 @@ public class UsersSearchRestController {
             orgID = authentication.getCurrentOrganization();
         }
 
-        Set<Account> accounts = new HashSet<>();
+        MembershipRole role = null;
+        if (req.getParameter("role") != null) {
+            role = req.getParameter("role").equals("OWNER") ? MembershipRole.OWNER : MembershipRole.CONTRIBUTOR;
+        }
 
+        List<Account> accounts = new ArrayList<>();
         if (orgID != null) {
             List<Project> myProjects = projectService.listProjects(actor, orgID)
                     .stream()
@@ -127,9 +133,10 @@ public class UsersSearchRestController {
                     .collect(Collectors.toList());
 
             List<Account> myManagers = new ArrayList<>();
+            MembershipRole finalRole = role;
             myProjects
                 .stream()
-                .map(project -> project.getMemberShipsByRole(MembershipRole.OWNER))
+                .map(project -> project.getMemberShipsByRole(finalRole))
                 .forEach(projectMembershipOwners -> {
                     for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
                         if(projectMembershipOwner.getMember().getEmail().startsWith(query)
@@ -144,9 +151,10 @@ public class UsersSearchRestController {
         } else {
             throw new BusinessException("OrganizationID is null");
         }
+
         SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
-        MAPPER.writeValue(resp.getWriter(), searchResults);
+        return ResponseEntity.ok(searchResults);
     }
 
     public static class SearchResult implements Serializable {
