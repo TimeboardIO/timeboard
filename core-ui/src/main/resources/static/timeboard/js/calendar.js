@@ -15,11 +15,16 @@ Vue.component('calendar', {
             type : Array,
             default : () => ([
                 {
-                    date : new Date(),
-                    color : "lightblue",
+                    date : new Date().toDateString().substr(0,10),
+                    value : 1,
                     type : 1
                 }
             ])
+        }
+    },
+    methods : {
+        selectColor : function(event) {
+            return "lightblue";
         }
     },
     template: `
@@ -34,7 +39,7 @@ Vue.component('calendar', {
               <td style="width: 8rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
               <td v-for="day in daysInMonth" v-bind:style="[
                (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {}, 
-               (day.event !== undefined && day.event.type <= 1) ? {'background-color' : day.event.color } : {}
+               (day.event !== undefined && day.event.type <= 1 && selectColor(day.event)) ? {'background-color' : selectColor(day.event) } : {}
                ] " v-bind:data-label="day.date.toDateString()" ></td>  
               
                <td v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: grey" rowspan="2"></td>        
@@ -42,7 +47,7 @@ Vue.component('calendar', {
             <tr>
               <td v-for="day in daysInMonth" v-bind:style="[
                (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {}, 
-               (day.event !== undefined && day.event.type >= 1) ? {'background-color' : day.event.color } : {}
+               (day.event !== undefined && day.event.type >= 1 && selectColor(day.event)) ? {'background-color' : selectColor(day.event) } : {}
                ] " v-bind:data-label="day.date.toDateString()" ></td>        
             </tr>
         </table>
@@ -55,19 +60,16 @@ Vue.component('calendar', {
                 days.push( {
                     date : new Date(date.getTime()),
                     event : this.events.find(e => {
-                        return (e.date.getFullYear() === date.getFullYear() &&
-                            e.date.getMonth() === date.getMonth() &&
-                            e.date.getDate() === date.getDate());
+                        let jDate = new Date(e.date);
+                        return (jDate.getFullYear() === date.getFullYear() &&
+                            jDate.getMonth() === date.getMonth() &&
+                            jDate.getDate() === date.getDate());
                     })
                 });
                 date.setDate(date.getDate() + 1);
             }
             return days;
         }
-    },
-    methods: {
-
-
     },
     data : function () {
         return {

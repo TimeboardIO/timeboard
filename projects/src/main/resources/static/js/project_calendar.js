@@ -1,11 +1,33 @@
 const projectID = $("meta[name='projectID']").attr('content');
 
+const BaseCalendar = Vue.options.components["calendar"];
+
+const CustomCalendar = BaseCalendar.extend({
+    methods : {
+        selectColor: function(event) {
+            let color = "";
+            if (event.value > 0) {
+                color = "orange";
+            }
+            if (event.value >= 1) {
+                color = "lightgreen";
+            }
+            return color;
+        }
+    }
+});
+
+Vue.component("calendar", CustomCalendar);
+
+
+
+
 let app = new Vue({
     el: '#teamCalendar',
     data: {
         teamCalendars : [
             {
-                name : "Bob Moranne",
+                name : "User 1",
                 events : [
                     {
                         date : new Date('2020-01-20'),
@@ -21,7 +43,7 @@ let app = new Vue({
                 ]
             },
             {
-                name : "Léa Chacal",
+                name : "User 2",
                 events : [
                     {
                         date : new Date('2020-01-03'),

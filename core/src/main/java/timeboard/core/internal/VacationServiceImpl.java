@@ -44,6 +44,8 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.Calendar;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -106,6 +108,19 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         q.setParameter("status", VacationRequestStatus.PENDING);
 
         return q.getResultList();
+    }
+
+    @Override
+    public Map<Account, List<VacationRequest>> listTeamVacationRequests(Account actor, Project project) {
+
+        TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v where v.applicant IN :applicants "
+                , VacationRequest.class);
+
+        q.setParameter("applicants", project.getMembers().stream().map(m -> m.getMember()).collect(Collectors.toList()));
+
+        return q.getResultList().stream().collect(Collectors.groupingBy(VacationRequest::getApplicant,
+                Collectors.mapping(r -> r,Collectors.toList())));
     }
 
     @Override

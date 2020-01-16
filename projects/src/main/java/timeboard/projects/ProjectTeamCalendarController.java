@@ -35,14 +35,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.VacationService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.Imputation;
-import timeboard.core.model.Project;
+import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -57,6 +59,9 @@ public class ProjectTeamCalendarController {
 
     @Autowired
     public ProjectService projectService;
+
+    @Autowired
+    public VacationService vacationService;
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -77,33 +82,76 @@ public class ProjectTeamCalendarController {
     public ResponseEntity<Map<String, List<CalendarEventWrapper>>> listTags(TimeboardAuthentication authentication,
                                                                             @PathVariable Long projectID) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 
         List<Imputation> imputations = this.projectService.listTeamVacations(actor, project, 0);
 
-        return ResponseEntity.ok(imputations.stream()
-                .map(imputation -> new CalendarEventWrapper(imputation))
-                .collect(Collectors.groupingBy(CalendarEventWrapper::getName)));
+        Map<Account, List<VacationRequest>> accountVacationRequestMap = this.vacationService.listTeamVacationRequests(actor, project);
+
+        Map<String, List<CalendarEventWrapper>> newMap = accountVacationRequestMap.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> requestToWrapperList(e.getValue())));
+
+
+        return ResponseEntity.ok(newMap);
+    }
+
+
+    private List<CalendarEventWrapper> requestToWrapperList(List<VacationRequest> requests) {
+        List<CalendarEventWrapper> results = new ArrayList<>();
+
+        for (VacationRequest r : requests) {
+            results.addAll(requestToWrapper(r));
+        }
+
+        return results;
+    }
+
+
+    private List<CalendarEventWrapper> requestToWrapper(VacationRequest request) {
+        LinkedList<CalendarEventWrapper> results = new LinkedList<>();
+
+        java.util.Calendar start = java.util.Calendar.getInstance();
+        java.util.Calendar end = java.util.Calendar.getInstance();
+
+        start.setTime(request.getStartDate());
+        end.setTime(request.getEndDate());
+
+        while(start.before(end)) {
+            CalendarEventWrapper wrapper = new CalendarEventWrapper();
+
+            wrapper.setName(request.getApplicant().getScreenName());
+            wrapper.setDate (DATE_FORMAT.format(start.getTime()));
+            wrapper.setValue(request.getStatus() == VacationRequestStatus.ACCEPTED ? 1 : 0.5);
+            wrapper.setType(1);
+
+            results.add(wrapper);
+
+            start.roll(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
+            results.getFirst().setType(0);
+        }
+
+        if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
+            results.getLast().setType(2);
+        }
+
+        return results;
     }
 
     public static class CalendarEventWrapper {
 
-
         private String name;
-
-
         private String date;
-        private String color;
+        private double value;
         private int type;
 
         public CalendarEventWrapper() { }
 
         public CalendarEventWrapper(Imputation imputation) {
             this.date = DATE_FORMAT.format(imputation.getDay());
-            this.color = "lightgreen";
-            if(imputation.getValue() < 1 ){
-                this.color = "orange";
-            }
+            this.value = imputation.getValue();
             this.type = 1;
             this.name = imputation.getAccount().getScreenName();
         }
@@ -120,12 +168,24 @@ public class ProjectTeamCalendarController {
             return date;
         }
 
-        public String getColor() {
-            return color;
-        }
-
         public int getType() {
             return type;
+        }
+
+        public double getValue() {
+            return value;
+        }
+
+        public void setDate(String date) {
+            this.date = date;
+        }
+
+        public void setValue(double value) {
+            this.value = value;
+        }
+
+        public void setType(int type) {
+            this.type = type;
         }
 
 

@@ -1036,8 +1036,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return vacationTask.getImputations().stream()
                 .filter(i -> p.getMembers().stream()
-                        .anyMatch(m ->
-                                m.getMember().getId() == i.getAccount().getId()))
+                        .anyMatch(m -> m.getMember().getId() == i.getAccount().getId()))
                 .collect(Collectors.toList());
     }
 
