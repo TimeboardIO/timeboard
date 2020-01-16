@@ -146,7 +146,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request) {
+    public List<VacationRequest> listVacationRequestsByPeriod(Account applicant, VacationRequest request) {
 
         TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
                         "where v.applicant = :applicant " +
