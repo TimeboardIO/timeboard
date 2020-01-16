@@ -121,7 +121,14 @@ public class ProjectTeamCalendarController {
 
             wrapper.setName(request.getApplicant().getScreenName());
             wrapper.setDate (DATE_FORMAT.format(start.getTime()));
-            wrapper.setValue(request.getStatus() == VacationRequestStatus.ACCEPTED ? 1 : 0.5);
+            if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
+                wrapper.setValue(1);
+            }
+            else if (request.getStatus() == VacationRequestStatus.PENDING ) {
+                wrapper.setValue(0.5);
+            } else {
+                wrapper.setValue(0);
+            }
             wrapper.setType(1);
 
             results.add(wrapper);
