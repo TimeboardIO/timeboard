@@ -30,19 +30,19 @@ Vue.component('calendar', {
     template: `
         <table style="margin: 0; table-layout:fixed;" class="ui celled table calendar">
             <tr v-if="showHeader === true">
-              <th style="width: 8rem; white-space: nowrap;"  v-if="showColName === true" ></th>
+              <th style="width: 10rem; white-space: nowrap;"  v-if="showColName === true" ></th>
               <th v-for="day in daysInMonth" v-bind:data-label="day.date.toDateString()" >{{ day.date.getDate() }}</th>    
               
-              <th v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: grey"></th>        
+              <th v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)"></th>        
             </tr>
             <tr>
-              <td style="width: 8rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
+              <td style="width: 10rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
               <td v-for="day in daysInMonth" v-bind:style="[
                (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {}, 
                (day.event !== undefined && day.event.type <= 1 && selectColor(day.event)) ? {'background-color' : selectColor(day.event) } : {}
                ] " v-bind:data-label="day.date.toDateString()" ></td>  
               
-               <td v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: grey" rowspan="2"></td>        
+               <td v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)" rowspan="2"></td>        
             </tr>
             <tr>
               <td v-for="day in daysInMonth" v-bind:style="[

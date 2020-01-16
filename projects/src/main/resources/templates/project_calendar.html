@@ -8,7 +8,7 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-for="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title>Project  Calendar</title>
+    <title>Project Calendar</title>
     <meta name="projectID" th:content="${project.id}"/>
 
 </head>
@@ -16,9 +16,43 @@
 
 <div layout:fragment="placeholder">
 
+
     <!-- MAIN COMPONENT-->
     <div id="teamCalendar">
-        <calendar v-for="(calendar, i) in teamCalendars" :name="calendar.name" :events="calendar.events" :show-header="i == 0" :year="2020" :month="0"></calendar>
+
+
+        <div class="ui three item menu">
+            <a @click="lastMonth" class="active item">
+                <i class="icon big arrow circle left"></i>
+            </a>
+            <a class="item">
+                {{ monthNames[month] + ' ' + year }}
+            </a>
+            <a @click="nextMonth" class="item">
+                <i class="icon big arrow circle right"></i>
+            </a>
+        </div>
+
+        <calendar v-for="(calendar, i) in teamCalendars"
+                  :name="calendar.name"
+                  :events="calendar.events"
+                  :show-header="i == 0"
+                  :year="year"
+                  :month="month">
+        </calendar>
+
+        <div class="ui segment">
+            <div class="ui two column very relaxed grid">
+                <div class="column">
+                    <div><a class="ui green empty circular label" style="background-color: #5BCA7E"></a>  Occasional vacation (Scheduled)</div>
+                    <div><a class="ui yellow empty circular label" style="background-color: #FBBD08"></a>  Saved vacation Occasional/Recursive (awaiting planning)</div>
+                </div>
+                <div class="column">
+                    <div><a class="ui white empty circular label " style="background-color:  white; border: 1px solid rgba(34,36,38,.1);"></a>  Available</div>
+                    <div><a class="ui lightgrey empty circular label" style="background-color:  lightgrey;" ></a>  Week-ends / Recurrent vacation(Scheduled)</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="/js/project_calendar.js"></script>

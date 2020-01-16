@@ -7,10 +7,10 @@ const CustomCalendar = BaseCalendar.extend({
         selectColor: function(event) {
             let color = "";
             if (event.value > 0) {
-                color = "orange";
+                color = "#FBBD08";
             }
             if (event.value >= 1) {
-                color = "lightgreen";
+                color = "#5BCA7E";
             }
             return color;
         }
@@ -19,47 +19,31 @@ const CustomCalendar = BaseCalendar.extend({
 
 Vue.component("calendar", CustomCalendar);
 
-
-
-
 let app = new Vue({
     el: '#teamCalendar',
     data: {
-        teamCalendars : [
-            {
-                name : "User 1",
-                events : [
-                    {
-                        date : new Date('2020-01-20'),
-                        type : 0,
-                        value : 0
-                    },
-                    {
-                        date : new Date('2020-01-17'),
-                        type : 1,
-                        value : 0
-                    },
-
-                ]
-            },
-            {
-                name : "User 2",
-                events : [
-                    {
-                        date : new Date('2020-01-03'),
-                        color : "lightgreen",
-                        type : 1,
-                        value : 0
-                    },
-                    {
-                        date : new Date('2020-01-11'),
-                        type : 2,
-                        value : 0
-                    },
-
-                ]
-            },
+        year : new Date().getFullYear(),
+        month : new Date().getMonth(),
+        teamCalendars : [],
+        monthNames : ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
         ]
+    },
+    methods : {
+        lastMonth : function() {
+            this.month--;
+            if(this.month < 0) {
+                this.year --;
+                this.month = 11;
+            }
+        },
+        nextMonth : function() {
+            this.month++;
+            if(this.month > 11) {
+                this.year ++;
+                this.month = 0;
+            }
+        }
     },
     mounted : function () {
         let self = this;
