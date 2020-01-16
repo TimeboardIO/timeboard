@@ -104,8 +104,6 @@
 
     insert into hibernate_sequence values ( 1 );
 
-    insert into hibernate_sequence values ( 1 );
-
     create table Imputation (
        id bigint not null,
         organizationID bigint,

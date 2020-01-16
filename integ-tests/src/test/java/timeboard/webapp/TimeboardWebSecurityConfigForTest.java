@@ -26,8 +26,9 @@ package timeboard.webapp;
  * #L%
  */
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,37 +38,26 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.web.filter.GenericFilterBean;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.home.HomeController;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Configuration()
+@Configuration
 @EnableWebSecurity
-@Profile("prod")
-public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
+@Profile("test")
+public class TimeboardWebSecurityConfigForTest extends WebSecurityConfigurerAdapter {
 
-    @Value("${cognito.logout}")
-    private String logoutEndpoint;
-
-
-    @Value("${app.url}")
-    private String appLogout;
-
-
-    @Value("${oauth.clientid}")
-    private String clientid;
 
     @Autowired
     private UserService userService;
@@ -77,56 +67,50 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(
-                "/public/**", "/","/onboarding/**");
+                "/public/**", "/", "/onboarding/**");
 
     }
 
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        final String logoutURL = String.format("%s?client_id=%s&logout_uri=%s",
-                this.logoutEndpoint,
-                this.clientid,
-                this.appLogout);
+
 
         http.authorizeRequests()
 
                 .anyRequest()
-                    .authenticated()
-                        .and()
-                            .oauth2Login()
-                            .defaultSuccessUrl(HomeController.URI, true)
+                .authenticated()
+                .and()
+                .formLogin().successForwardUrl("/home");
+        http.userDetailsService(username -> {
+            return new User("test", "test", Collections.emptyList());
+        });
 
-                        .and()
-                            .logout()
-                            .logoutUrl("/logout")
-                            .logoutSuccessUrl(logoutURL);
-
-        http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
         http.addFilterAfter(new CustomFilter(), OAuth2LoginAuthenticationFilter.class);
 
         http.csrf().disable();
 
 
-     }
-
-
-
-    public class RedirectFilter extends GenericFilterBean {
-
-        @Override
-        public void doFilter(ServletRequest servletRequest,
-                             ServletResponse servletResponse,
-                             FilterChain filterChain) throws IOException, ServletException {
-
-            if(((HttpServletRequest)servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")){
-                ((HttpServletResponse) servletResponse).sendRedirect(HomeController.URI);
-                return;
-            }else{
-                filterChain.doFilter(servletRequest, servletResponse);
-            }
-        }
     }
+
+
+    @Bean
+    public PasswordEncoder createPasswordEncoder() {
+        return new PasswordEncoder() {
+
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return rawPassword.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return rawPassword.toString().equals(encodedPassword);
+            }
+        };
+    }
+
+
 
 
 
@@ -139,7 +123,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(auth != null && (auth instanceof TimeboardAuthentication) == false) {
+            if (auth != null && (auth instanceof TimeboardAuthentication) == false) {
                 Account account = null;
 
                 if (auth instanceof UsernamePasswordAuthenticationToken) {
