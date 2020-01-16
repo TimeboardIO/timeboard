@@ -77,20 +77,27 @@ public class ProjectTeamCalendarController {
 
         return "project_calendar.html";
     }
-
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, List<CalendarEventWrapper>>> listTags(TimeboardAuthentication authentication,
-                                                                            @PathVariable Long projectID) throws BusinessException {
+                                                                            @PathVariable Long projectID,
+                                                                            @PathVariable Integer yearNum,
+                                                                            @PathVariable Integer monthNum) throws BusinessException {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 
-        List<Imputation> imputations = this.projectService.listTeamVacations(actor, project, 0);
+        // get existing vacation request for month/year
+        final Map<Account, List<VacationRequest>> accountVacationRequestMap
+                = this.vacationService.listTeamVacationRequests(actor, project, monthNum, yearNum);
 
-        Map<Account, List<VacationRequest>> accountVacationRequestMap = this.vacationService.listTeamVacationRequests(actor, project);
+        // add member with no vacation request in interval
+        project.getMembers().stream()
+                .map(ProjectMembership::getMember)
+                .forEach(m ->
+                        accountVacationRequestMap.computeIfAbsent(m, t -> new ArrayList<VacationRequest>()) );
 
-        Map<String, List<CalendarEventWrapper>> newMap = accountVacationRequestMap.entrySet().stream()
+        // re-balance key to user screen name and wrap request to ui calendar
+        final Map<String, List<CalendarEventWrapper>> newMap = accountVacationRequestMap.entrySet().stream()
                 .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> requestToWrapperList(e.getValue())));
-
 
         return ResponseEntity.ok(newMap);
     }
@@ -153,7 +160,7 @@ public class ProjectTeamCalendarController {
         private String name;
         private String date;
         private double value;
-        private int type;
+        private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
 
         public CalendarEventWrapper() { }
 

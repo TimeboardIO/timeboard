@@ -36,6 +36,7 @@ let app = new Vue({
                 this.year --;
                 this.month = 11;
             }
+            this.loadMonthData();
         },
         nextMonth : function() {
             this.month++;
@@ -43,46 +44,50 @@ let app = new Vue({
                 this.year ++;
                 this.month = 0;
             }
+            this.loadMonthData();
+        },
+        loadMonthData : function () {
+            let self = this;
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "projects/" + projectID + "/calendar/list/" + this.year + "/" + this.month,
+                success: function (d) {
+                    self.teamCalendars = [];
+                    for (let [key, value] of Object.entries(d)) {
+                        let mergedEvents = [];
+                        value.forEach(e1 => {
+                            let duplicatesEvents = value.filter(e2 => e1.date === e2.date);
+                            if(duplicatesEvents.length > 1) {
+                                let mergedEvent = {};
+                                duplicatesEvents.forEach(e2 => {
+                                    mergedEvent.date = e2.date;
+                                    mergedEvent.value = e2.value;
+                                    if((e2.type === 1)
+                                        || (e2.type === 0 && mergedEvent.type !== undefined && mergedEvent.type === 2)
+                                        || (e2.type === 2 && mergedEvent.type !== undefined && mergedEvent.type === 0)) {
+                                        mergedEvent.type = 1;
+                                    }
+                                    if(mergedEvent.type === undefined){
+                                        mergedEvent.type = e2.type;
+                                    }
+                                });
+                                mergedEvents.push(mergedEvent);
+                            } else {
+                                mergedEvents.push(e1);
+                            }
+                        });
+
+                        self.teamCalendars.push({
+                            name : key,
+                            events : mergedEvents
+                        });
+                    }
+                }
+            });
         }
     },
     mounted : function () {
-        let self = this;
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "projects/" + projectID + "/calendar/list",
-            success: function (d) {
-                self.teamCalendars = [];
-                for (let [key, value] of Object.entries(d)) {
-                    let mergedEvents = [];
-                    value.forEach(e1 => {
-                        let duplicatesEvents = value.filter(e2 => e1.date === e2.date);
-                        if(duplicatesEvents.length > 1) {
-                            let mergedEvent = {};
-                            duplicatesEvents.forEach(e2 => {
-                                mergedEvent.date = e2.date;
-                                mergedEvent.value = e2.value;
-                                if((e2.type === 1)
-                                    || (e2.type === 0 && mergedEvent.type !== undefined && mergedEvent.type === 2)
-                                    || (e2.type === 2 && mergedEvent.type !== undefined && mergedEvent.type === 0)) {
-                                    mergedEvent.type = 1;
-                                }
-                                if(mergedEvent.type === undefined){
-                                    mergedEvent.type = e2.type;
-                                }
-                            });
-                            mergedEvents.push(mergedEvent);
-                        } else {
-                            mergedEvents.push(e1);
-                        }
-                    });
-
-                    self.teamCalendars.push({
-                        name : key,
-                        events : mergedEvents
-                    });
-                }
-            }
-        });
+        this.loadMonthData();
     }
 });
