@@ -247,7 +247,7 @@ $(document).ready(function(){
     $('.ui.search')
         .search({
             apiSettings: {
-                url: '/api/search?q={query}&orgID='+$("meta[name=orgID]").attr("content")
+                url: '/api/search/myManagers?q={query}&orgID='+$("meta[name=orgID]").attr("content")
             },
             fields: {
                 results : 'items',

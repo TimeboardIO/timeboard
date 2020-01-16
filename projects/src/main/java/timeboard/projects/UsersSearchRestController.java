@@ -31,14 +31,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.model.Project;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -104,7 +102,7 @@ public class UsersSearchRestController {
         MAPPER.writeValue(resp.getWriter(), searchResults);
     }
 
-    @GetMapping("/MyManagers")
+    @GetMapping("/myManagers")
     protected void doGetManagerOfMyProjects(TimeboardAuthentication authentication,
                          HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
 
@@ -128,17 +126,19 @@ public class UsersSearchRestController {
                     .stream()
                     .filter(project -> project.isMember(actor))
                     .collect(Collectors.toList());
-            List<Account> myManagers = myProjects
-                    .stream()
-                    .map(Project::getMembers)
-                    .map(projectMemberships ->
-                            projectMemberships
-                                    .stream()
-                                    .filter(member -> member.getRole().equals("OWNER"))
-                                    .toArray())
-                    .toArray();
+
+            List<Account> myManagers = new ArrayList<>();
+            myProjects
+                .stream()
+                .map(project -> project.getMemberShipsByRole(MembershipRole.OWNER))
+                .forEach(projectMembershipOwners -> {
+                    for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
+                        myManagers.add(projectMembershipOwner.getMember());
+                    }
+                });
 
             accounts.addAll(myManagers);
+
         } else {
             throw new BusinessException("OrganizationID is null");
         }
