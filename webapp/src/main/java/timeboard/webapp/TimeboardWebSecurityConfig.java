@@ -77,7 +77,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(
-                "/public/**", "/","/onboarding/**");
+                "/public/**");
 
     }
 
@@ -90,12 +90,11 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 this.appLogout);
 
         http.authorizeRequests()
-
+                .antMatchers("/","/onboarding/**").permitAll()
                 .anyRequest()
                     .authenticated()
                         .and()
                             .oauth2Login()
-                            .defaultSuccessUrl(HomeController.URI, true)
 
                         .and()
                             .logout()

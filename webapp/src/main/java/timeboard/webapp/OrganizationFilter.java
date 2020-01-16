@@ -93,7 +93,7 @@ public class OrganizationFilter implements Filter {
                                             HttpServletResponse servletResponse) throws IOException {
 
         Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
-        if (orgCookie.isPresent()) {
+        if (orgCookie.isPresent() && authentication!= null) {
             try {
                 final Long organizationID = Long.parseLong(orgCookie.get().getValue());
 
