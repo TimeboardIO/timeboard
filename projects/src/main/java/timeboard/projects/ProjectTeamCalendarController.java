@@ -115,8 +115,8 @@ public class ProjectTeamCalendarController {
 
         start.setTime(request.getStartDate());
         end.setTime(request.getEndDate());
-
-        while(start.before(end)) {
+        boolean last = true;
+        while(last) {
             CalendarEventWrapper wrapper = new CalendarEventWrapper();
 
             wrapper.setName(request.getApplicant().getScreenName());
@@ -126,15 +126,16 @@ public class ProjectTeamCalendarController {
 
             results.add(wrapper);
 
+            last = start.before(end);
             start.roll(Calendar.DAY_OF_YEAR, 1);
         }
 
         if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
-            results.getFirst().setType(0);
+            results.getFirst().setType(2);
         }
 
         if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
-            results.getLast().setType(2);
+            results.getLast().setType(0);
         }
 
         return results;
