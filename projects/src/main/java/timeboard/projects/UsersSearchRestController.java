@@ -121,7 +121,6 @@ public class UsersSearchRestController {
         Set<Account> accounts = new HashSet<>();
 
         if (orgID != null) {
-            Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
             List<Project> myProjects = projectService.listProjects(actor, orgID)
                     .stream()
                     .filter(project -> project.isMember(actor))
@@ -133,7 +132,8 @@ public class UsersSearchRestController {
                 .map(project -> project.getMemberShipsByRole(MembershipRole.OWNER))
                 .forEach(projectMembershipOwners -> {
                     for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
-                        if(projectMembershipOwner.getMember().getEmail().startsWith(query)) {
+                        if(projectMembershipOwner.getMember().getEmail().startsWith(query)
+                                && !myManagers.contains(projectMembershipOwner.getMember())) {
                             myManagers.add(projectMembershipOwner.getMember());
                         }
                     }
