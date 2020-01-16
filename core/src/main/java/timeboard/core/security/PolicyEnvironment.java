@@ -30,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.exceptions.CommercialException;
 import timeboard.core.internal.BusinessPolicyEvaluator;
-import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import java.util.Date;
 
@@ -47,12 +46,12 @@ public class PolicyEnvironment {
         return new Date();
     }
 
-    public boolean checkProjectByUserLimit(final Account account) throws CommercialException {
-        return businessPolicyEvaluator.checkProjectByUserLimit(account);
+    public boolean checkProjectByUserLimit(final TimeboardAuthentication authentication) throws CommercialException {
+        return businessPolicyEvaluator.checkProjectByUserLimit(authentication.getDetails());
     }
 
-    public boolean checkTaskByProjectLimit(final Account account, final Project project) throws CommercialException {
-        return businessPolicyEvaluator.checkTaskByProjectLimit(account, project);
+    public boolean checkTaskByProjectLimit(final TimeboardAuthentication authentication, final Project project) throws CommercialException {
+        return businessPolicyEvaluator.checkTaskByProjectLimit(authentication.getDetails(), project);
     }
 
 
