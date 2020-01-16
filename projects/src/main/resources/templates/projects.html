@@ -39,7 +39,7 @@
             <div class="ui five stackable cards">
                 <div v-for="project in table.data.slice(0, 4)" class="ui project card" data-cy="project" >
                     <div class="image"  v-bind:style="'background-color:' + project.color" >
-                        <a v-bind:href="'/projects/'+project.id+'/setup'">
+                        <a v-bind:href="'/projects/'+project.id+'/tasks'">
                             <div class="badge" >
                                 {{ project.name.charAt(0) + '' + project.name.charAt(1)  }}
                             </div>
