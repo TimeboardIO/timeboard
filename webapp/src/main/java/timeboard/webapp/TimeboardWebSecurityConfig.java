@@ -101,7 +101,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
                             .logoutUrl("/logout")
                             .logoutSuccessUrl(logoutURL);
 
-        http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
+        //http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
         http.addFilterAfter(new CustomFilter(), OAuth2LoginAuthenticationFilter.class);
 
         http.csrf().disable();

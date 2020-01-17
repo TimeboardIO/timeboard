@@ -104,18 +104,18 @@ public class OrganizationFilter implements Filter {
                     ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
                 } else {
                     servletResponse.sendRedirect(OrganizationSelectController.URI);
-                    LOGGER.debug("Wrong or missing org cookie, redirect to login");
+                    LOGGER.info("Wrong or missing org cookie, redirect to login");
                     return true;
                 }
             } catch (AccessDeniedException ex) {
                 servletResponse.sendRedirect(OrganizationSelectController.URI);
-                LOGGER.debug("Wrong or missing org cookie, redirect to login");
+                LOGGER.info("Wrong or missing org cookie, redirect to login");
                 return true;
             }
 
         } else {
             servletResponse.sendRedirect(OrganizationSelectController.URI);
-            LOGGER.debug("Wrong or missing org cookie, redirect to login");
+            LOGGER.info("Wrong or missing org cookie, redirect to login");
             return true;
         }
         return false;
