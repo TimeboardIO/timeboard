@@ -128,13 +128,13 @@ public class TimesheetController {
         final Date de = findEndDate(c, week, year);
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
-        final boolean lastWeekValidated =
+        final boolean lastWeekSubmitted =
                     this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), lastWeekYear, lastWeek);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("actorID", authentication.getDetails().getId());
-        model.addAttribute("lastWeekValidated", lastWeekValidated);
+        model.addAttribute("lastWeekSubmitted", lastWeekSubmitted);
 
         model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
 
