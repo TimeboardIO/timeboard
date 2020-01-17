@@ -31,14 +31,15 @@ import timeboard.core.model.converters.JSONToProjectAttributsConverter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Entity
 @NamedQueries(
     {
             @NamedQuery(name = Project.PROJECT_LIST, query =
-                    "select p from Project p join fetch p.members m " +
-                    "where (p.enable = true or p.enable is null) and m.member = :user and p.organizationID = :orgID"),
+                    "select p from Project p join p.members m " +
+                    "where (p.enable = true or p.enable is null) and :user in m.member and p.organizationID = :orgID"),
 
             @NamedQuery(name = Project.PROJECT_GET_BY_ID, query =
                     "select p from Project p join fetch p.members m " +
@@ -148,7 +149,6 @@ public class Project extends OrganizationEntity implements Serializable {
     public Set<ProjectMembership> getMembers() {
         return members;
     }
-
     public void setMembers(Set<ProjectMembership> members) {
         this.members = members;
     }
@@ -188,6 +188,18 @@ public class Project extends OrganizationEntity implements Serializable {
 
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+
+    @Transient
+    public Set<ProjectMembership> getMemberShipsByRole(MembershipRole role) {
+        if(role != null) {
+            return this.getMembers()
+                    .stream()
+                    .filter(projectMembership -> projectMembership.getRole() == role)
+                    .collect(Collectors.toSet());
+        }
+        return this.getMembers();
     }
 
     @Transient
