@@ -78,7 +78,7 @@ public class ProjectSnapshotsController {
 
         model.addAttribute("project", project);
 
-        return "details_project_snapshots";
+        return "project_snapshots";
     }
 
     @GetMapping(value = "/chart", produces = MediaType.APPLICATION_JSON_VALUE)

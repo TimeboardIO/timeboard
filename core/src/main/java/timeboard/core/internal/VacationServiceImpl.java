@@ -44,6 +44,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.Calendar;
+import java.util.stream.Collectors;
 
 @Component
 @Transactional
@@ -106,6 +107,42 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         q.setParameter("status", VacationRequestStatus.PENDING);
 
         return q.getResultList();
+    }
+
+    @Override
+    public Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year) {
+
+        // include next and previous to enhance month loading
+
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.MONTH, month+1);
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        c.add(Calendar.MONTH, -2);
+
+        Date startDate = c.getTime();
+        c.set(Calendar.DAY_OF_MONTH, 31);
+        c.add(Calendar.MONTH, 2);
+        Date endDate = c.getTime();
+
+        TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v where v.applicant IN :applicants " +
+                        "AND (" +
+                            "   (v.startDate BETWEEN :start AND :end) " +
+                            "OR (v.endDate   BETWEEN :start AND :end) " +
+                            "OR ( (:start BETWEEN v.startDate AND v.endDate) AND (:end BETWEEN v.startDate AND v.endDate) )" +
+                        ")"
+                , VacationRequest.class);
+
+        q.setParameter("start", startDate);
+        q.setParameter("end", endDate);
+
+        // push project members list to request
+        q.setParameter("applicants", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
+
+        // group vacation request by account and return map account -> requests list
+        return q.getResultList().stream().collect(Collectors.groupingBy(VacationRequest::getApplicant,
+                Collectors.mapping(r -> r,Collectors.toList())));
     }
 
     @Override
