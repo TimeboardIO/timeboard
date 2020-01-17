@@ -1,4 +1,4 @@
-package timeboard.webapp;
+package timeboard.core.api;
 
 /*-
  * #%L
