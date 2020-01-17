@@ -1026,6 +1026,26 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
+    @Override
+    public List<Imputation> listProjectMembersVacations(Account actor, Project p, int month, int year) throws BusinessException {
+
+        Long orgID = p.getOrganizationID();
+
+
+        Optional<Organization> organizationOptional = this.organizationService.getOrganizationByID(actor, orgID);
+
+        if (organizationOptional.isEmpty()) {
+            throw new BusinessException("Can not find organization from project.");
+        }
+        Organization organization = organizationOptional.get();
+        DefaultTask vacationTask = organization.getDefaultTasks().stream()
+                    .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst().get();
+
+        return vacationTask.getImputations().stream()
+                .filter(i -> p.getMembers().stream()
+                        .anyMatch(m -> m.getMember().getId() == i.getAccount().getId()))
+                .collect(Collectors.toList());
+    }
 
 
     @Override

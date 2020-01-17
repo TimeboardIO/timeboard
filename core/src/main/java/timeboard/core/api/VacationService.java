@@ -28,9 +28,11 @@ package timeboard.core.api;
 
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 import timeboard.core.model.VacationRequest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface VacationService {
@@ -42,6 +44,8 @@ public interface VacationService {
     List<VacationRequest> listUserVacations(Account user);
 
     List<VacationRequest> listVacationsToValidateByUser(Account user);
+
+    Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
     void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;
 

@@ -25,6 +25,8 @@
         <a class="item" th:classappend="${tab} == 'six'  ? 'active':''"
            sec:authorize="${hasPermission(#vars.project,'PROJECT_SNAPSHOT')}"
            th:href="@{/projects/{projectID}/snapshots(projectID=${project.id})}" data-cy="project-menu-tags">Snapshots</a>
+        <a class="item" th:classappend="${tab} == 'seven'  ? 'active':''"
+           th:href="@{/projects/{projectID}/calendar(projectID=${project.id})}" data-cy="project-menu-calendar">Calendar</a>
     </div>
     <div class="ui bottom attached tab segment controls active" data-tab="first" style="border-top : none !important;" layout:fragment="placeholder">
 
