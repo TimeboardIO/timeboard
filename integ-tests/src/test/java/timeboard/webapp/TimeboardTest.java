@@ -2,9 +2,9 @@ package timeboard.webapp;
 
 /*-
  * #%L
- * webapp
+ * integ-tests
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,24 +26,40 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
+import timeboard.home.HomeController;
 
 
-@Controller(OnboardingController.URI)
-public class OnboardingController {
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+        classes = App.class
+)
+@ActiveProfiles("test")
+@ContextConfiguration
+@AutoConfigureMockMvc
+public class TimeboardTest {
 
-    public static final String URI = "/";
+    @Autowired
+    protected MockMvc mvc;
 
-    @GetMapping("/")
-    public String onboarding(Authentication authentication){
+    @Autowired
+    protected HomeController controller;
 
-        if(authentication != null){
-            return "redirect:/home";
-        }
+    @Autowired
+    protected ProjectService projectService;
 
-        return "onboarding/index";
-    }
+    @Autowired
+    protected UserService userService;
+
+    @Autowired
+    protected OrganizationService organizationService;
 
 }

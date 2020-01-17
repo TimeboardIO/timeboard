@@ -142,7 +142,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
             em.flush();
 
-            LOGGER.info("Member " + actor.getName() + " is added to organisation "+org.get().getName());
+            LOGGER.info("Member " + actor.getScreenName() + " is added to organisation "+org.get().getName());
         }
 
 

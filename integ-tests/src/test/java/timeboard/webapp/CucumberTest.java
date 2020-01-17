@@ -2,9 +2,9 @@ package timeboard.webapp;
 
 /*-
  * #%L
- * webapp
+ * integ-tests
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,24 +26,11 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import cucumber.api.CucumberOptions;
+import cucumber.api.junit.Cucumber;
+import org.junit.runner.RunWith;
 
-
-@Controller(OnboardingController.URI)
-public class OnboardingController {
-
-    public static final String URI = "/";
-
-    @GetMapping("/")
-    public String onboarding(Authentication authentication){
-
-        if(authentication != null){
-            return "redirect:/home";
-        }
-
-        return "onboarding/index";
-    }
-
+@RunWith(Cucumber.class)
+@CucumberOptions(features = "src/test/resources", strict = true, plugin = {"json:target/cucumber.json", "pretty", "html:target/site/cucumber"})
+public class CucumberTest extends TimeboardTest {
 }
