@@ -36,7 +36,7 @@ public class SubmittedTimesheet {
     private long id;
 
     @Column
-    private boolean isSubmitted;
+    private boolean isValidated;
 
     @OneToOne(targetEntity = Account.class)
     private Account account;
@@ -55,11 +55,9 @@ public class SubmittedTimesheet {
         this.id = id;
     }
 
-    public boolean getIsSubmitted() { return isSubmitted; }
+    public boolean isValidated() { return isValidated; }
 
-    public void setIsSubmitted(boolean isSubmitted) {
-        this.isSubmitted = isSubmitted;
-    }
+    public void setValidated(boolean isValidated) { this.isValidated = isValidated; }
 
     public long getYear() {
         return year;

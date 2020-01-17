@@ -42,10 +42,10 @@ public interface TimesheetService {
      * Submit user timesheet.
      *
      * @param actor            user who trigger this function.
-     * @param accountTimesheet user which be used to build timehseet to validate
+     * @param accountTimesheet user which be used to build timehseet to submit
      * @param year             timesheet year
      * @param week             timesheet week
-     * @return true if timesheet is validate else, false.
+     * @return true if timesheet is submit else, false.
      */
     void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException;
 
@@ -55,7 +55,7 @@ public interface TimesheetService {
      * @param accountTimesheet user used to check timesheet sumbit state.
      * @param week             timesheet week
      * @param year             timesheet year
-     * @return true if timesheet is already validated
+     * @return true if timesheet is already submitted
      */
     boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week);
 

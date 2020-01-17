@@ -62,12 +62,13 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException {
+    public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
+            throws TimesheetException {
 
 
-        //check if validation is possible
+        //check if submission is possible
 
-        //1 - last week is validated
+        //1 - last week is submitted
 
         final Calendar c = Calendar.getInstance();
 
@@ -86,12 +87,12 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
-        boolean lastWeekValidated = this.isTimesheetSubmitted(
+        boolean lastWeekSubmitted = this.isTimesheetSubmitted(
                 accountTimesheet,
                 c.get(Calendar.YEAR),
                 c.get(Calendar.WEEK_OF_YEAR));
 
-        if (!firstWeek && !lastWeekValidated) {
+        if (!firstWeek && !lastWeekSubmitted) {
             throw new TimesheetException("Can not submit this week, previous week is not submitted");
         }
 
@@ -135,7 +136,6 @@ public class TimesheetServiceImpl implements TimesheetService {
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
-        submittedTimesheet.setIsSubmitted(true);
 
         em.persist(submittedTimesheet);
 
