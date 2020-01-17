@@ -154,12 +154,32 @@ public class OrganizationServiceImpl implements OrganizationService {
         final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 
         if(org.isPresent()){
+            /*Long idToRemove = org.get()
+                    .getMembers()
+                    .stream()
+                    .filter(om -> om.getMember().getId() == member.getId())
+                    .map(om -> om.getId())
+                    .findAny()
+                    .get();*/
 
             org.get()
                     .getMembers()
                     .removeIf(om -> om.getMember().getId() == member.getId());
+            em.merge(org.get());
 
-            em.merge(org);
+            /*OrganizationMembership omToRemove = em.find(OrganizationMembership.class, idToRemove);
+            if (omToRemove != null) {
+                em.remove(omToRemove);
+            }*/
+
+           /* Optional<OrganizationMembership> test =
+                    org.get()
+                            .getMembers()
+                            .stream()
+                            .filter(organizationMembership -> organizationMembership.getMember().getId() == member.getId())
+                            .findFirst();
+            em.remove(test.get());*/
+
             em.flush();
 
             LOGGER.info("Member " + actor.getName() + " is removed from organisation "+org.get().getName());
