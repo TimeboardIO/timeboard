@@ -205,5 +205,5 @@ public interface ProjectService {
 
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 
-    List<Imputation> listTeamVacations(Account actor, Project p, int month);
+    List<Imputation> listProjectMembersVacations(Account actor, Project p, int month, int year) throws BusinessException;
 }

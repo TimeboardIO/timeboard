@@ -87,7 +87,7 @@ public class ProjectTeamCalendarController {
 
         // get existing vacation request for month/year
         final Map<Account, List<VacationRequest>> accountVacationRequestMap
-                = this.vacationService.listTeamVacationRequests(actor, project, monthNum, yearNum);
+                = this.vacationService.listProjectMembersVacationRequests(actor, project, monthNum, yearNum);
 
         // add member with no vacation request in interval
         project.getMembers().stream()

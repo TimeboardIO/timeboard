@@ -110,7 +110,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     }
 
     @Override
-    public Map<Account, List<VacationRequest>> listTeamVacationRequests(Account actor, Project project, int month, int year) {
+    public Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year) {
 
         // include next and previous to enhance month loading
 

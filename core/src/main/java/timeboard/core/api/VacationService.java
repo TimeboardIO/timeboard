@@ -45,7 +45,7 @@ public interface VacationService {
 
     List<VacationRequest> listVacationsToValidateByUser(Account user);
 
-    Map<Account, List<VacationRequest>> listTeamVacationRequests(Account actor, Project project, int month, int year);
+    Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
     void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;
 
