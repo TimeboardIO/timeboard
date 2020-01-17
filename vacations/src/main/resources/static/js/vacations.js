@@ -24,10 +24,13 @@ let app = new Vue({
     data: {
         formError : '',
         vacationRequest: {
+            recursive : false,
             start : "",
             end : "",
             halfStart : false,
             halfEnd : false,
+            recurrenceDay : 1,
+            recurrenceType : "FULL",
             status : "",
             label : "",
             assigneeName : "",
@@ -118,7 +121,12 @@ let app = new Vue({
     },
     methods:  {
         openModal: function() {
+            this.vacationRequest.recursive = false;
             $('#newVacation').modal('show');
+        },
+        openRecursiveModal: function() {
+            this.vacationRequest.recursive = true;
+            $('#newRecursiveVacation').modal('show');
         },
         addVacationRequest: function () {
             let validated = $('.ui.form').form(formValidationRules).form('validate form');

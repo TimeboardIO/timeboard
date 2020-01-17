@@ -118,10 +118,10 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listUserVacations(Account applicant) {
+    public List<VacationRequest> listVacationRequestsByUser(Account applicant) {
 
         TypedQuery<VacationRequest> q = em.createQuery(
-                "select v from VacationRequest v where v.applicant = :applicant "
+                "select v from VacationRequest v where v.applicant = :applicant and v.parent IS NULL"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
 
@@ -130,7 +130,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listVacationsToValidateByUser(Account assignee) {
+    public List<VacationRequest> listVacationRequestsToValidateByUser(Account assignee) {
 
         TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee and v.status = :status",
                 VacationRequest.class);
@@ -172,7 +172,8 @@ public class VacationServiceImpl implements VacationService {
         q.setParameter("applicants", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
 
         // group vacation request by account and return map account -> requests list
-        return q.getResultList().stream().collect(Collectors.groupingBy(VacationRequest::getApplicant,
+        return q.getResultList().stream().filter(r -> !(r instanceof RecursiveVacationRequest))
+                .collect(Collectors.groupingBy(VacationRequest::getApplicant,
                 Collectors.mapping(r -> r,Collectors.toList())));
     }
 

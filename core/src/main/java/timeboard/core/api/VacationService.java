@@ -43,9 +43,18 @@ public interface VacationService {
     VacationRequest createVacationRequest(Account actor, VacationRequest request);
     RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request);
 
-    List<VacationRequest> listUserVacations(Account user);
-    List<VacationRequest> listVacationsToValidateByUser(Account user);
+    List<VacationRequest> listVacationRequestsByUser(Account user);
+    List<VacationRequest> listVacationRequestsToValidateByUser(Account user);
+
+    /**
+     *  List conflicting vacation request for period
+     * @param assignee
+     * @param request VacationRequest period
+     * @return
+     */
     List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
+
+
     Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
     void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;

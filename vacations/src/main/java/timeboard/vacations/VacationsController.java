@@ -40,6 +40,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.events.TimeboardEventType;
 import timeboard.core.internal.events.VacationEvent;
 import timeboard.core.model.Account;
+import timeboard.core.model.RecursiveVacationRequest;
 import timeboard.core.model.VacationRequest;
 import timeboard.core.model.VacationRequestStatus;
 import timeboard.core.security.TimeboardAuthentication;
@@ -76,7 +77,7 @@ public class VacationsController {
 
         final Account actor = authentication.getDetails();
 
-        List<VacationRequest> list =  this.vacationService.listUserVacations(actor);
+        List<VacationRequest> list =  this.vacationService.listVacationRequestsByUser(actor);
         List<VacationRequestWrapper> returnList = new ArrayList<>();
 
         for (VacationRequest v : list) {
@@ -91,7 +92,7 @@ public class VacationsController {
 
         final Account actor = authentication.getDetails();
 
-        List<VacationRequest> list =  this.vacationService.listVacationsToValidateByUser(actor);
+        List<VacationRequest> list =  this.vacationService.listVacationRequestsToValidateByUser(actor);
         List<VacationRequestWrapper> returnList = new ArrayList<>();
 
         for (VacationRequest v : list) {
@@ -112,6 +113,7 @@ public class VacationsController {
         Date endDate = DATE_FORMAT.parse(requestWrapper.end);
 
 
+
         if(startDate.getTime() > endDate.getTime()){
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
         }
@@ -124,7 +126,14 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("Please enter user to notify. ");
         }
 
-        VacationRequest request = new VacationRequest();
+        VacationRequest request;
+        if (requestWrapper.isRecursive()) {
+            request = new RecursiveVacationRequest();
+            RecursiveVacationRequest recursiveRequest = (RecursiveVacationRequest) request;
+            recursiveRequest.setRecurrenceDay(requestWrapper.getRecurrenceDay());
+        } else {
+            request = new VacationRequest();
+        }
         request.setApplicant(actor);
         request.setAssignee(assignee);
         request.setLabel(requestWrapper.label);
@@ -138,7 +147,13 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
         }
 
-        this.vacationService.createVacationRequest(actor, request);
+        if (requestWrapper.isRecursive()) {
+            assert request instanceof RecursiveVacationRequest;
+            this.vacationService.createRecursiveVacationRequest(actor, (RecursiveVacationRequest) request);
+        } else {
+            this.vacationService.createVacationRequest(actor, request);
+        }
+
 
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.CREATE, request));
 
@@ -179,10 +194,14 @@ public class VacationsController {
     public static class VacationRequestWrapper {
 
         public long id;
+
+        public boolean recursive;
         public String start;
         public String end;
         public boolean halfStart;
         public boolean halfEnd;
+        public int recurrenceDay;
+        public String recurrenceType;
         public String label;
         public String status;
         public long assigneeID;
@@ -200,6 +219,21 @@ public class VacationsController {
             this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
             this.status = r.getStatus().name();
             this.label = r.getLabel();
+
+            this.recursive = RecursiveVacationRequest.class.isInstance(r);
+            if (recursive) {
+                RecursiveVacationRequest rr = (RecursiveVacationRequest) r;
+                recurrenceDay = rr.getRecurrenceDay();
+
+                if (r.getStartHalfDay() == VacationRequest.HalfDay.MORNING) {
+                    recurrenceType = "MORNING";
+                } else {
+                    recurrenceType = "AFTERNOON";
+                }
+                if (r.getStartHalfDay() != r.getEndHalfDay()) {
+                    recurrenceType = "FULL";
+                }
+            }
 
             if(r.getAssignee() != null) {
                 this.assigneeID = r.getAssignee().getId();
@@ -279,6 +313,22 @@ public class VacationsController {
 
         public void setLabel(String label) {
             this.label = label;
+        }
+
+        public int getRecurrenceDay() {
+            return recurrenceDay;
+        }
+
+        public String getRecurrenceType() {
+            return recurrenceType;
+        }
+
+        public boolean isRecursive() {
+            return recursive;
+        }
+
+        public void setRecursive(boolean recursive) {
+            this.recursive = recursive;
         }
 
     }

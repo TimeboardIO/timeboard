@@ -27,6 +27,7 @@ package timeboard.core.model;
  */
 
 import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -44,9 +45,11 @@ public class RecursiveVacationRequest extends VacationRequest {
 
     public RecursiveVacationRequest() {
         super();
+        this.children = new HashSet<>();
     }
     public RecursiveVacationRequest(VacationRequest other) {
         super(other);
+        this.children = new HashSet<>();
     }
 
     @Override
