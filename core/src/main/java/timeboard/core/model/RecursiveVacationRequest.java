@@ -34,13 +34,20 @@ import java.util.Set;
 public class RecursiveVacationRequest extends VacationRequest {
 
     @Column
-    private String recurrenceRule;
+    private int recurrenceDay;
 
     @OneToMany(targetEntity = VacationRequest.class,
             mappedBy = "parent", fetch = FetchType.EAGER,
             cascade = CascadeType.ALL,
             orphanRemoval = true)
     private Set<VacationRequest> children;
+
+    public RecursiveVacationRequest() {
+        super();
+    }
+    public RecursiveVacationRequest(VacationRequest other) {
+        super(other);
+    }
 
     @Override
     public RecursiveVacationRequest getParent() {
@@ -51,6 +58,24 @@ public class RecursiveVacationRequest extends VacationRequest {
     public void setParent(RecursiveVacationRequest parent) {
         //Do nothing
     }
+
+    public int getRecurrenceDay() {
+        return recurrenceDay;
+    }
+
+    public void setRecurrenceDay(int recurrenceRule) {
+        this.recurrenceDay = recurrenceRule;
+    }
+
+    public Set<VacationRequest> getChildren() {
+        return children;
+    }
+
+    public void setChildren(Set<VacationRequest> children) {
+        this.children = children;
+    }
+
+
 }
 
 

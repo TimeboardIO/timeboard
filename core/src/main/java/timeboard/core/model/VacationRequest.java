@@ -29,6 +29,7 @@ package timeboard.core.model;
 import javax.persistence.*;
 import java.util.Date;
 
+@Entity
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class VacationRequest extends OrganizationEntity {
 
@@ -62,6 +63,18 @@ public class VacationRequest extends OrganizationEntity {
 
     @ManyToOne(targetEntity = RecursiveVacationRequest.class)
     private RecursiveVacationRequest parent;
+
+    public VacationRequest() {}
+    public VacationRequest(VacationRequest other) {
+        this.label = other.label;
+        this.status = other.status;
+        this.startDate = other.startDate;
+        this.endDate = other.endDate;
+        this.startHalfDay = other.startHalfDay;
+        this.endHalfDay = other.endHalfDay;
+        this.applicant = other.applicant;
+        this.assignee = other.assignee;
+    }
 
     public Long getId() {
         return id;
@@ -145,7 +158,7 @@ public class VacationRequest extends OrganizationEntity {
 
     public enum HalfDay {
         MORNING,
-        AFTERNOON
+        AFTERNOON,
     }
 
 }

@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Transactional
-public class VacationServiceImpl extends OrganizationEntity implements VacationService {
+public class VacationServiceImpl implements VacationService {
 
     @Autowired
     private EntityManager em;
@@ -79,6 +79,37 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
         request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
         request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
+
+        em.persist(request);
+        em.flush();
+
+        return request;
+    }
+
+
+    @Override
+    public RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request) {
+        request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
+        request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
+
+        Calendar start = Calendar.getInstance();
+        start.setTime(request.getStartDate());
+
+        Calendar end = Calendar.getInstance();
+        end.setTime(request.getEndDate());
+
+
+        while (start.before(end)) {
+            start.set(Calendar.DAY_OF_WEEK, request.getRecurrenceDay());
+            if (start.getTime().after(request.getStartDate()) && start.getTime().before(request.getEndDate())) {
+                VacationRequest child = new VacationRequest(request);
+                child.setParent(request);
+                child.setStartDate(start.getTime());
+                child.setEndDate(start.getTime());
+                request.getChildren().add(child);
+            }
+            start.add(Calendar.WEEK_OF_YEAR, 1);
+        }
 
         em.persist(request);
         em.flush();
@@ -182,13 +213,31 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
             }
         }
 
-
         return copyList;
     }
 
 
     @Override
     public void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException {
+
+        if(request.getStatus() == VacationRequestStatus.ACCEPTED) {
+            this.updateImputations(actor, request,0);
+        }
+
+        em.remove(request);
+        em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
+
+    }
+
+    @Override
+    public void deleteVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
+
+
+        for(VacationRequest r : request.getChildren()) {
+            this.deleteVacationRequest(actor, r);
+        }
 
         if(request.getStatus() == VacationRequestStatus.ACCEPTED) {
             this.updateImputations(actor, request,0);
@@ -205,6 +254,23 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     @Override
     public VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException {
         request.setStatus(VacationRequestStatus.ACCEPTED);
+        em.merge(request);
+        em.flush();
+
+        this.updateImputations(actor, request,1);
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
+
+        return request;
+    }
+
+    @Override
+    public RecursiveVacationRequest approveVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
+        request.setStatus(VacationRequestStatus.ACCEPTED);
+
+        for(VacationRequest r : request.getChildren()) {
+            this.approveVacationRequest(actor, r);
+        }
+
         em.merge(request);
         em.flush();
 
@@ -273,6 +339,22 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
 
     @Override
     public VacationRequest rejectVacationRequest(Account actor, VacationRequest request) {
+        request.setStatus(VacationRequestStatus.REJECTED);
+        em.merge(request);
+        em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DENY, request));
+
+        return request;
+    }
+
+    @Override
+    public RecursiveVacationRequest rejectVacationRequest(Account actor, RecursiveVacationRequest request) {
+
+        for(VacationRequest r : request.getChildren()) {
+            this.rejectVacationRequest(actor, r);
+        }
+
         request.setStatus(VacationRequestStatus.REJECTED);
         em.merge(request);
         em.flush();
