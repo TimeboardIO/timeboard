@@ -564,10 +564,10 @@ public class ProjectServiceImpl implements ProjectService {
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
 
-        boolean timesheetValidated = this.timesheetService.isTimesheetSubmitted(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+        boolean timesheetSubmitted = this.timesheetService.isTimesheetSubmitted(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
 
         if (task instanceof Task) {
-            if (!timesheetValidated) {
+            if (!timesheetSubmitted) {
                 return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
             } else {
                 Task projectTask = (Task) task;
@@ -577,7 +577,7 @@ public class ProjectServiceImpl implements ProjectService {
                         projectTask.getRealEffort());
             }
         } else {
-            if (!timesheetValidated) {
+            if (!timesheetSubmitted) {
                 return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
             } else {
                 return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);

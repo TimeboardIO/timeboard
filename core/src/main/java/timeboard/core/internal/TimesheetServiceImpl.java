@@ -145,8 +145,8 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week) {
-        TypedQuery<SubmittedTimesheet> q = em.createQuery("select vt from SubmittedTimesheet vt "
-                + "where vt.account = :user and vt.year = :year and vt.week = :week", SubmittedTimesheet.class);
+        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
         q.setParameter("week", week);
         q.setParameter("year", year);
         q.setParameter("user", accountTimesheet);
