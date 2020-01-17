@@ -27,7 +27,7 @@ package timeboard.projects;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.api.NavigationExtPoint;
 
 
 @Component

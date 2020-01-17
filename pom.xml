@@ -11,7 +11,6 @@
     <modules>
             <module>core</module>
             <module>theme</module>
-            <module>core-ui</module>
             <module>home</module>
             <module>projects</module>
             <module>organizations</module>
@@ -19,8 +18,8 @@
             <module>sample-data</module>
             <module>account</module>
             <module>reports</module>
+        <module>vacations</module>
             <module>webapp</module>
-            <module>vacations</module>
             <module>plugins/project-jira-import-plugin</module>
             <module>plugins/project-github-import-plugin</module>
             <module>plugins/project-xls-export-plugin</module>
@@ -48,6 +47,12 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit</artifactId>
+                <version>0.13.0</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>

@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.webapp;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,22 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+public interface NavigationExtPoint {
 
+    public String getNavigationLabel();
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+    public String getNavigationPath();
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
-    }
-
-    @Override
-    public String getNavigationPath() {
-        return "/home";
-    }
-
-    @Override
-    public int getNavigationWeight() {
+    public default int getNavigationWeight() {
         return 0;
     }
 
-    @Override
-    public String getNavigationLogo() {
-        return "home";
+    public default String getNavigationLogo() {
+        return "hourglass";
     }
+
+    public default String getNavigationParams() {
+        return "";
+    }
+
 }

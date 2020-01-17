@@ -1,10 +1,10 @@
-package timeboard.home;
+package timeboard.core.api;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.home;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,30 +26,16 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.api.exceptions.CommercialException;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 
+public interface BusinessPolicyEvaluator {
+    boolean checkProjectByUserLimit(Account actor) throws CommercialException;
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+    boolean checkTaskByProjectLimit(Account actor, Project project) throws CommercialException;
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
-    }
+    int getNumberProjectsByUser(Account account);
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
-    }
-
-    @Override
-    public int getNavigationWeight() {
-        return 0;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "home";
-    }
+    int getNumberTasksByProject(Account account, Project project);
 }

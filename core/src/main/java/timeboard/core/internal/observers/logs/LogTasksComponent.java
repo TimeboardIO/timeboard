@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.core.internal.observers.logs;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,39 @@ package timeboard.home;
  * #L%
  */
 
+import io.reactivex.disposables.Disposable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.api.TimeboardSubjects;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 
 @Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+public class LogTasksComponent {
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogTasksComponent.class);
+
+    private Disposable disposable;
+
+
+    @PostConstruct
+    private void init() {
+        this.disposable = TimeboardSubjects.TASK_EVENTS.subscribe(taskEvent -> {
+          /*  LOGGER.info(String.format("User % has %s task %s",
+                    taskEvent.getActor().getScreenName(), taskEvent.getEventType(), taskEvent.getTask().getId())
+            );*/
+        });
     }
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
-    }
+    @PreDestroy
+    private void destroy() {
 
-    @Override
-    public int getNavigationWeight() {
-        return 0;
-    }
+        if (this.disposable != null && !this.disposable.isDisposed()) {
+            this.disposable.dispose();
+        }
 
-    @Override
-    public String getNavigationLogo() {
-        return "home";
     }
 }

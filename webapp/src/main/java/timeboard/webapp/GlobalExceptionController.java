@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.webapp;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,24 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import timeboard.core.api.exceptions.CommercialException;
 
+@ControllerAdvice
+public class GlobalExceptionController extends ResponseEntityExceptionHandler {
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+    @ExceptionHandler(CommercialException.class)
+    public ModelAndView handleCommercialException(CommercialException ex) {
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
+        ModelAndView model = new ModelAndView("commercial_error.html");
+        model.addObject("errCause", ex.getCause());
+        model.addObject("errMsg", ex.getMessage());
+
+        return model;
+
     }
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
-    }
-
-    @Override
-    public int getNavigationWeight() {
-        return 0;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "home";
-    }
 }

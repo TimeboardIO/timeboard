@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.core.internal.observers.emails;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,46 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.templatemode.TemplateMode;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+
+import java.util.Locale;
+import java.util.Map;
+
+public class TemplateGenerator {
+
+    private ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
+
+    private boolean init = false;
+
+    public void init() {
+
+        resolver.setTemplateMode(TemplateMode.HTML);
+        resolver.setPrefix("/templates/");
+        resolver.setCacheable(true);
+        resolver.setCacheTTLMs(50000L);
+        resolver.setCharacterEncoding("utf-8");
 
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
-
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
+        init = true;
     }
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
+
+    public String getTemplateString(String templateName, Map<String, Object> templateData) {
+        if (!init) {
+            init();
+        }
+
+        TemplateEngine engine = new TemplateEngine();
+        engine.setTemplateResolver(resolver);
+        final Context ctx = new Context(Locale.FRANCE);
+
+        templateData.forEach(ctx::setVariable);
+
+        return engine.process(templateName, ctx);
+
     }
 
-    @Override
-    public int getNavigationWeight() {
-        return 0;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "home";
-    }
 }

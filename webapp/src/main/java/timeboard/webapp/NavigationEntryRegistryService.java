@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.webapp;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,23 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.NavigationExtPoint;
 
+import java.util.Comparator;
+import java.util.List;
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+@org.springframework.stereotype.Component
+public class NavigationEntryRegistryService {
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
+
+    @Autowired(required = false)
+    private List<NavigationExtPoint> entries;
+
+    //ex : @PostFilter("hasPermission(filterObject,'NAVIGATION_VIEW')")
+    public List<NavigationExtPoint> getEntries() {
+        this.entries.sort(Comparator.comparing(o -> ((Integer) o.getNavigationWeight())));
+        return this.entries;
     }
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
-    }
-
-    @Override
-    public int getNavigationWeight() {
-        return 0;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "home";
-    }
 }

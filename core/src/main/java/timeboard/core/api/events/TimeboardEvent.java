@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.core.api.events;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,36 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.model.Account;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+public class TimeboardEvent implements Serializable {
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
+    protected Date eventDate;
+
+    protected List<Account> usersToNotify;
+    protected List<Account> usersToInform;
+
+    protected TimeboardEvent(Date date) {
+        this.eventDate = date;
+        usersToNotify = new ArrayList<>();
+        usersToInform = new ArrayList<>();
     }
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
+    public Date getEventDate() {
+        return eventDate;
     }
 
-    @Override
-    public int getNavigationWeight() {
-        return 0;
+    public List<Account> getUsersToNotify() {
+        return usersToNotify;
     }
 
-    @Override
-    public String getNavigationLogo() {
-        return "home";
+    public List<Account> getUsersToInform() {
+        return usersToInform;
     }
+
 }

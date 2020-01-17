@@ -28,8 +28,8 @@ package timeboard.core.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.BusinessPolicyEvaluator;
 import timeboard.core.api.exceptions.CommercialException;
-import timeboard.core.internal.BusinessPolicyEvaluator;
 import timeboard.core.model.Project;
 import java.util.Date;
 

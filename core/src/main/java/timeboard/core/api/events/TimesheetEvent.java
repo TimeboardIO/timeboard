@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.core.api.events;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,35 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.api.ProjectService;
+import timeboard.core.model.*;
+
+import java.util.Date;
+import java.util.List;
 
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+public class TimesheetEvent extends TimeboardEvent {
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
+    private SubmittedTimesheet timesheet;
+
+
+    public TimesheetEvent(SubmittedTimesheet timesheet, ProjectService projectService, Organization currentOrg) {
+        super(new Date());
+
+        this.timesheet = timesheet;
+
+        final List<Project> projects = projectService.listProjects(timesheet.getAccount(), currentOrg.getId());
+
+        projects.forEach(project -> project.getMembers()
+                .stream()
+                .filter(member -> member.getRole() == MembershipRole.OWNER)
+                .forEach(member -> this.usersToNotify.add(member.getMember())));
+
+        usersToInform.add(timesheet.getAccount());
     }
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
-    }
 
-    @Override
-    public int getNavigationWeight() {
-        return 0;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "home";
+    public SubmittedTimesheet getTimesheet() {
+        return timesheet;
     }
 }

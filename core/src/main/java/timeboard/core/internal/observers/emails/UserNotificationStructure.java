@@ -1,8 +1,8 @@
-package timeboard.home;
+package timeboard.core.internal.observers.emails;
 
 /*-
  * #%L
- * timesheet
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,30 +26,44 @@ package timeboard.home;
  * #L%
  */
 
-import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.api.events.TimeboardEvent;
+import timeboard.core.model.Account;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
-@Component
-public class HomeNavigationProvider implements NavigationExtPoint {
+public class UserNotificationStructure {
 
-    @Override
-    public String getNavigationLabel() {
-        return "Home";
+    private Account targetAccount;
+    private List<TimeboardEvent> notificationEventList;
+    private List<TimeboardEvent> informEventList;
+
+    public UserNotificationStructure(Account targetAccount) {
+        this.targetAccount = targetAccount;
+        notificationEventList = new ArrayList<>();
+        informEventList = new ArrayList<>();
+
     }
 
-    @Override
-    public String getNavigationPath() {
-        return "/home";
+    public void notify(TimeboardEvent event) {
+        notificationEventList.add(event);
     }
 
-    @Override
-    public int getNavigationWeight() {
-        return 0;
+    public void inform(TimeboardEvent event) {
+        informEventList.add(event);
     }
 
-    @Override
-    public String getNavigationLogo() {
-        return "home";
+    public Account getTargetAccount() {
+        return targetAccount;
     }
+
+    public List<TimeboardEvent> getNotificationEventList() {
+        return notificationEventList;
+    }
+
+    public List<TimeboardEvent> getInformEventList() {
+        return informEventList;
+    }
+
 }
