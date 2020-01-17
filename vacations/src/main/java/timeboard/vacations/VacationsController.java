@@ -131,6 +131,24 @@ public class VacationsController {
             request = new RecursiveVacationRequest();
             RecursiveVacationRequest recursiveRequest = (RecursiveVacationRequest) request;
             recursiveRequest.setRecurrenceDay(requestWrapper.getRecurrenceDay());
+            switch (requestWrapper.getRecurrenceType()){
+                case "FULL" :
+                    recursiveRequest.setStartHalfDay(VacationRequest.HalfDay.MORNING);
+                    recursiveRequest.setEndHalfDay(VacationRequest.HalfDay.AFTERNOON);
+                    break;
+                case "MORNING" :
+                    recursiveRequest.setStartHalfDay(VacationRequest.HalfDay.MORNING);
+                    recursiveRequest.setEndHalfDay(VacationRequest.HalfDay.MORNING);
+                    break;
+                case "AFTERNOON" :
+                    recursiveRequest.setStartHalfDay(VacationRequest.HalfDay.AFTERNOON);
+                    recursiveRequest.setEndHalfDay(VacationRequest.HalfDay.AFTERNOON);
+                    break;
+                default:
+                    return ResponseEntity.badRequest().body("Unexpected value: " + requestWrapper.getRecurrenceType());
+            }
+
+            recursiveRequest.generateChildren();
         } else {
             request = new VacationRequest();
         }
@@ -142,6 +160,7 @@ public class VacationsController {
         request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setStatus(VacationRequestStatus.PENDING);
+
 
         if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
             return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
@@ -164,7 +183,11 @@ public class VacationsController {
     public ResponseEntity approveRequest(TimeboardAuthentication authentication,
                                                             @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
-        this.vacationService.approveVacationRequest(actor, vacationRequest);
+        if (vacationRequest instanceof RecursiveVacationRequest) {
+            this.vacationService.approveVacationRequest(actor, (RecursiveVacationRequest) vacationRequest);
+        } else {
+            this.vacationService.approveVacationRequest(actor, vacationRequest);
+        }
 
         return this.listToValidateRequests(authentication) ;
     }
@@ -173,8 +196,12 @@ public class VacationsController {
     public ResponseEntity rejectRequest(TimeboardAuthentication authentication,
                                                                        @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
-        this.vacationService.rejectVacationRequest(actor, vacationRequest);
 
+        if (vacationRequest instanceof RecursiveVacationRequest) {
+            this.vacationService.rejectVacationRequest(actor, (RecursiveVacationRequest) vacationRequest);
+        } else {
+            this.vacationService.rejectVacationRequest(actor, vacationRequest);
+        }
         return this.listToValidateRequests(authentication) ;
     }
 
@@ -185,7 +212,11 @@ public class VacationsController {
         if(vacationRequest.getStatus() == VacationRequestStatus.ACCEPTED && vacationRequest.getStartDate().before(new Date())){
             return ResponseEntity.badRequest().body("Cannot cancel started vacation.");
         } else {
-            this.vacationService.deleteVacationRequest(actor, vacationRequest);
+            if (vacationRequest instanceof RecursiveVacationRequest) {
+                this.vacationService.deleteVacationRequest(actor, (RecursiveVacationRequest) vacationRequest);
+            } else {
+                this.vacationService.deleteVacationRequest(actor, vacationRequest);
+            }
         }
 
         return this.listRequests(authentication) ;
@@ -325,6 +356,11 @@ public class VacationsController {
         public String getRecurrenceType() {
             return recurrenceType;
         }
+
+        public void setRecurrenceType(String recurrenceType) {
+            this.recurrenceType = recurrenceType;
+        }
+
 
         public boolean isRecursive() {
             return recursive;

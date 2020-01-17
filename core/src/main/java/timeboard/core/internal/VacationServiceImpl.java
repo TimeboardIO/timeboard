@@ -92,24 +92,9 @@ public class VacationServiceImpl implements VacationService {
         request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
         request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
 
-        Calendar start = Calendar.getInstance();
-        start.setTime(request.getStartDate());
-
-        Calendar end = Calendar.getInstance();
-        end.setTime(request.getEndDate());
-
-        while (start.before(end)) {
-            start.set(Calendar.DAY_OF_WEEK, (request.getRecurrenceDay() + 1)%7 ); //Calendar first day of week is sunday
-            if (start.getTime().after(request.getStartDate()) && start.getTime().before(request.getEndDate())) {
-                VacationRequest child = new VacationRequest(request);
-                child.setParent(request);
-                child.setStartDate(start.getTime());
-                child.setEndDate(start.getTime());
-                request.getChildren().add(child);
-            }
-            start.add(Calendar.WEEK_OF_YEAR, 1);
+        if(request.getChildren().isEmpty()) {
+            request.generateChildren();
         }
-
         em.persist(request);
         em.flush();
 
@@ -198,7 +183,7 @@ public class VacationServiceImpl implements VacationService {
 
         for (VacationRequest r :resultList) {
             if (
-                (r.getStartDate().compareTo(request.getEndDate()) == 1)
+                (r.getStartDate().compareTo(request.getEndDate()) > 0)
                     && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
                     &&  r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
@@ -206,11 +191,14 @@ public class VacationServiceImpl implements VacationService {
             }
 
             if (
-                (r.getEndDate().compareTo(request.getStartDate()) == 1)
+                (r.getEndDate().compareTo(request.getStartDate()) > 0)
                 && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
                 && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
                     copyList.remove(r);
+            }
+            if (r instanceof RecursiveVacationRequest ) {
+                copyList.remove(r);
             }
         }
 
@@ -238,10 +226,6 @@ public class VacationServiceImpl implements VacationService {
 
         for(VacationRequest r : request.getChildren()) {
             this.deleteVacationRequest(actor, r);
-        }
-
-        if(request.getStatus() == VacationRequestStatus.ACCEPTED) {
-            this.updateImputations(actor, request,0);
         }
 
         em.remove(request);
@@ -275,7 +259,6 @@ public class VacationServiceImpl implements VacationService {
         em.merge(request);
         em.flush();
 
-        this.updateImputations(actor, request,1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
