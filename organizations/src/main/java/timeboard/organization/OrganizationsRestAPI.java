@@ -112,6 +112,7 @@ public class OrganizationsRestAPI {
 
         Account actor = authentication.getDetails();
 
+        // Get current organization
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
         if (strOrgID != null) {
@@ -121,6 +122,7 @@ public class OrganizationsRestAPI {
         }
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
+        // Get added member
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
         if (strMemberID != null) {
@@ -128,13 +130,12 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
+        final Account member = this.userService.findUserByID(memberID);
 
-        final Optional<Organization> member = this.organizationService.getOrganizationByID(actor, memberID);
-
+        // Add member in current organization
         try {
-            //Optional<Organization> ah = organizationService.addMember(actor, organization.get(), member.get());
-
-            return ResponseEntity.ok(HttpStatus.OK);
+            Optional<Organization> newOrganization = organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
+            return ResponseEntity.ok(newOrganization);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -178,8 +179,8 @@ public class OrganizationsRestAPI {
         }
 
         try {
-            Optional<Organization> ah = organizationService.updateMemberRole(actor, organization.get(), member, role);
-            return ResponseEntity.ok().build();
+            Optional<Organization> newOrganization = organizationService.updateMemberRole(actor, organization.get(), member, role);
+            return ResponseEntity.ok(newOrganization);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -213,12 +214,12 @@ public class OrganizationsRestAPI {
         final Account member = this.userService.findUserByID(memberID);
 
         try {
-            organizationService.removeMember(actor, organization.get(), member);
+            Optional<Organization> newOrganization = organizationService.removeMember(actor, organization.get(), member);
+
+            return ResponseEntity.ok(newOrganization);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     public static class MemberWrapper implements Serializable {

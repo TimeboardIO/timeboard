@@ -136,13 +136,12 @@ public class OrganizationServiceImpl implements OrganizationService {
             om.setOrganization(org.get());
             om.setMember(member);
             om.setRole(role);
-            this.em.persist(om);
 
+            em.persist(om);
             org.get().getMembers().add(om);
-
             em.flush();
 
-            LOGGER.info("Member " + actor.getScreenName() + " is added to organisation "+org.get().getName());
+            LOGGER.info("Member " + member.getScreenName() + " is added to organisation "+org.get().getName()+" by +"+actor.getScreenName());
         }
 
 
