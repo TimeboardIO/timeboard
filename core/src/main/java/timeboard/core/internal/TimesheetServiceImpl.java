@@ -65,9 +65,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
             throws TimesheetException {
 
-
         //check if submission is possible
-
         //1 - last week is submitted
 
         final Calendar c = Calendar.getInstance();

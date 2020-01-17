@@ -564,7 +564,7 @@ public class ProjectServiceImpl implements ProjectService {
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
 
-        boolean timesheetValidated = this.timesheetService.isTimesheetValidated(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+        boolean timesheetValidated = this.timesheetService.isTimesheetSubmitted(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
 
         if (task instanceof Task) {
             if (!timesheetValidated) {
