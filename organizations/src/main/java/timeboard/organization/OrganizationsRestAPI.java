@@ -135,7 +135,8 @@ public class OrganizationsRestAPI {
         // Add member in current organization
         try {
             Optional<Organization> newOrganization = organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
-            return ResponseEntity.ok(newOrganization);
+            MemberWrapper memberWrapper = new MemberWrapper(memberID, member.getScreenName(), MembershipRole.CONTRIBUTOR.toString());
+            return ResponseEntity.status(HttpStatus.OK).body(memberWrapper);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -180,7 +181,7 @@ public class OrganizationsRestAPI {
 
         try {
             Optional<Organization> newOrganization = organizationService.updateMemberRole(actor, organization.get(), member, role);
-            return ResponseEntity.ok(newOrganization);
+            return ResponseEntity.status(HttpStatus.OK).body(role);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -216,7 +217,7 @@ public class OrganizationsRestAPI {
         try {
             Optional<Organization> newOrganization = organizationService.removeMember(actor, organization.get(), member);
 
-            return ResponseEntity.ok(newOrganization);
+            return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -224,22 +225,21 @@ public class OrganizationsRestAPI {
 
     public static class MemberWrapper implements Serializable {
 
-        public Long orgID;
+        public Long id;
         public String screenName;
-        public boolean isOrganization;
         public String role;
 
         public MemberWrapper() {
         }
 
         public MemberWrapper(OrganizationMembership h) {
-            this.orgID = h.getMember().getId();
+            this.id = h.getMember().getId();
             this.screenName = h.getMember().getScreenName();
             this.role = h.getRole().name();
         }
 
-        public MemberWrapper(Long orgID, String screenName, String role) {
-            this.orgID = orgID;
+        public MemberWrapper(Long memberID, String screenName, String role) {
+            this.id = memberID;
             this.screenName = screenName;
             this.role = role;
         }
