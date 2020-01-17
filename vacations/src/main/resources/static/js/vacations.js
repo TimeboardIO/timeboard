@@ -47,6 +47,7 @@ let app = new Vue({
                     "primary" : false
 
                 },
+
                 {
                     "slot": "start",
                     "label": "From",
@@ -65,6 +66,13 @@ let app = new Vue({
                     "label": "Validation",
                     "sortKey": "assignee",
                     "primary" : false
+                },
+                {
+                    "slot": "recursive",
+                    "label": "R",
+                    "sortKey": "recurrenceDay",
+                    "primary" : true
+
                 },
                 {
                     "slot": "status",
@@ -110,6 +118,13 @@ let app = new Vue({
                     "primary" : true
                 },
                 {
+                    "slot": "recursive",
+                    "label": "R",
+                    "sortKey": "recurrenceDay",
+                    "primary" : true
+
+                },
+                {
                     "slot": "actions",
                     "label": "Actions",
                     "primary" : true
@@ -123,6 +138,7 @@ let app = new Vue({
         openModal: function() {
             this.vacationRequest.recursive = false;
             $('#newVacation').modal('show');
+
         },
         openRecursiveModal: function() {
             this.vacationRequest.recursive = true;

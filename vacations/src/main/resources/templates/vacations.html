@@ -60,6 +60,14 @@
             <template v-slot:applicant="{row}">
                 {{ row.applicantName }}
             </template>
+            <template v-slot:recursive="{row}">
+                <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
+                <a v-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                <a v-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                <a v-if="row.recurrenceDay === undefined" class="ui circular label">X</a>
+            </template>
             <template v-slot:actions="{row}">
                 <button class="ui positive button icon" v-on:click="approveRequest(row)">
                     <i class="check alternate icon"></i>
@@ -90,6 +98,14 @@
             </template>
             <template v-slot:assignee="{row}">
                 {{ row.assigneeName }}
+            </template>
+            <template v-slot:recursive="{row}">
+                <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
+                <a v-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                <a v-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                <a v-if="row.recurrenceDay === undefined" class="ui circular label">X</a>
             </template>
             <template v-slot:status="{row}">
                 <button v-if="row.status == 'ACCEPTED'"   class="ui disabled green icon button">

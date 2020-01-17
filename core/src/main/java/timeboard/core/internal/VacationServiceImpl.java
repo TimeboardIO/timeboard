@@ -98,9 +98,8 @@ public class VacationServiceImpl implements VacationService {
         Calendar end = Calendar.getInstance();
         end.setTime(request.getEndDate());
 
-
         while (start.before(end)) {
-            start.set(Calendar.DAY_OF_WEEK, request.getRecurrenceDay());
+            start.set(Calendar.DAY_OF_WEEK, (request.getRecurrenceDay() + 1)%7 ); //Calendar first day of week is sunday
             if (start.getTime().after(request.getStartDate()) && start.getTime().before(request.getEndDate())) {
                 VacationRequest child = new VacationRequest(request);
                 child.setParent(request);
@@ -132,7 +131,8 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public List<VacationRequest> listVacationRequestsToValidateByUser(Account assignee) {
 
-        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee and v.status = :status",
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
+                        "where v.assignee = :assignee and v.status = :status and v.parent IS NULL",
                 VacationRequest.class);
         q.setParameter("assignee", assignee);
         q.setParameter("status", VacationRequestStatus.PENDING);

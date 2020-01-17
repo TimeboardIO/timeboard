@@ -318,6 +318,9 @@ public class VacationsController {
         public int getRecurrenceDay() {
             return recurrenceDay;
         }
+        public void setRecurrenceDay(int recurrenceDay) {
+            this.recurrenceDay =  recurrenceDay;
+        }
 
         public String getRecurrenceType() {
             return recurrenceType;
