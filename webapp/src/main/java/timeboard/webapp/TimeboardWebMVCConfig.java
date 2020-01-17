@@ -58,7 +58,7 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
-                .addResourceHandler("/webjars/**", "**/*.js", "**/*.css")
+                .addResourceHandler("/webjars/**")
                     .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
 
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
