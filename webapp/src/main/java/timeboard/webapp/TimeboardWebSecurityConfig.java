@@ -29,6 +29,7 @@ package timeboard.webapp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -52,8 +53,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Configuration
+@Configuration()
 @EnableWebSecurity
+@Profile("prod")
 public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Value("${cognito.logout}")
@@ -75,7 +77,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(
-                "/public/**", "/","/onboarding/**");
+                "/public/**");
 
     }
 
@@ -88,20 +90,18 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 this.appLogout);
 
         http.authorizeRequests()
-
+                .antMatchers("/","/onboarding/**").permitAll()
                 .anyRequest()
                     .authenticated()
-
                         .and()
                             .oauth2Login()
-                            .defaultSuccessUrl(HomeController.URI, true)
 
                         .and()
                             .logout()
                             .logoutUrl("/logout")
                             .logoutSuccessUrl(logoutURL);
 
-        http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
+        //http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
         http.addFilterAfter(new CustomFilter(), OAuth2LoginAuthenticationFilter.class);
 
         http.csrf().disable();

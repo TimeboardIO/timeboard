@@ -29,8 +29,7 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -63,7 +62,9 @@ import java.util.stream.Collectors;
 public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
-    private static final String VACATION_TASK_NAME = "Congés";
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
 
     @Autowired
     private UserService userService;
@@ -77,32 +78,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private EntityManager em;
 
-    private DefaultTask vacationTask;
-
-
-
-    @Transactional
-    @EventListener()
-    protected void init(ContextRefreshedEvent ctx) {
-        //TODO change when vacation model totally implemented
-
-        AbstractTask taskFromDB = this.getTasksByName(VACATION_TASK_NAME);
-        if (taskFromDB == null) {
-            DefaultTask task = new DefaultTask();
-            task.setName(VACATION_TASK_NAME);
-            task.setStartDate(new Date());
-            task.setEndDate(new Date(new Date().getTime() + 999999999999L));
-            task.setOrigin("timeboard");
-            try {
-                em.persist(task);
-                vacationTask = task;
-            } catch (Exception e) {
-                LOGGER.error("Error in vacation task singleton instantiation.");
-            }
-        } else {
-            vacationTask = (DefaultTask) taskFromDB;
-        }
-    }
 
     @Override
     @Transactional
@@ -181,6 +156,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#project,'PROJECTS_ARCHIVE')")
     public Project archiveProjectByID(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
@@ -355,12 +331,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
-    public List<TaskType> listTaskType(Long orgID) {
-        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
-        q.setParameter("orgID", orgID);
-        return q.getResultList();
-    }
+
 
 
     @Override
@@ -383,14 +354,14 @@ public class ProjectServiceImpl implements ProjectService {
                            Batch batch
     ) {
         Task newTask = new Task();
-        newTask.setTaskType(this.findTaskTypeByID(taskTypeID));
+        newTask.setTaskType(this.organizationService.findTaskTypeByID(taskTypeID));
         newTask.setOrigin(origin);
         newTask.setRemotePath(remotePath);
         newTask.setRemoteId(remoteId);
         newTask.setName(taskName);
         newTask.setComments(taskComment);
-        newTask.setStartDate(startDate);
-        newTask.setEndDate(endDate);
+        newTask.setStartDate(new Date(startDate.getTime()+(2 * 60 * 60 * 1000) +1));
+        newTask.setEndDate(new Date(endDate.getTime()+(2 * 60 * 60 * 1000) +1));
         newTask.setComments(taskComment);
         newTask.setEffortLeft(originalEstimate);
         newTask.setOriginalEstimate(originalEstimate);
@@ -426,15 +397,7 @@ public class ProjectServiceImpl implements ProjectService {
         return task;
     }
 
-    @Override
-    public DefaultTask updateDefaultTask(Account actor, final DefaultTask task) {
-        Optional<Organization> org = this.organizationService.getOrganizationByID(actor, task.getOrganizationID());
-        if (org.isPresent()) {
-            em.merge(task);
-            em.flush();
-        }
-        return task;
-    }
+
 
     @Override
     public void createTasks(final Account actor, final List<Task> taskList) {
@@ -484,6 +447,25 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         return task;
+    }
+
+    public Optional<DefaultTask> getDefaultTaskByName(String name) {
+        DefaultTask data;
+        try {
+
+            TypedQuery<DefaultTask> query = em.createQuery(
+                    "select distinct t from DefaultTask t left join fetch t.imputations  where t.name = :name",
+                    DefaultTask.class);
+            query.setParameter("name", name);
+
+            data = query.getSingleResult();
+
+        } catch (Exception e) {
+            // handle JPA Exceptions
+            data = null;
+        }
+
+        return Optional.ofNullable(data);
     }
 
     private AbstractTask getTasksByName(String name) {
@@ -582,10 +564,24 @@ public class ProjectServiceImpl implements ProjectService {
         c.setTime(day);
         c.set(Calendar.HOUR_OF_DAY, 2);
 
+        boolean timesheetValidated = this.timesheetService.isTimesheetValidated(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+
         if (task instanceof Task) {
-            return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
+            if (!timesheetValidated) {
+                return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
+            } else {
+                Task projectTask = (Task) task;
+                return new UpdatedTaskResult(projectTask.getProject().getId(),
+                        projectTask.getId(), projectTask.getEffortSpent(),
+                        projectTask.getEffortLeft(), projectTask.getOriginalEstimate(),
+                        projectTask.getRealEffort());
+            }
         } else {
-            return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
+            if (!timesheetValidated) {
+                return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
+            } else {
+                return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
+            }
         }
     }
 
@@ -602,7 +598,7 @@ public class ProjectServiceImpl implements ProjectService {
             Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask);
             double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
-            Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime(), em);
+            Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
             Task updatedTask = em.find(Task.class, projectTask.getId());
             double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);
@@ -631,7 +627,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
         Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), defaultTask);
-        this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime(), em);
+        this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime());
 
         em.flush();
         LOGGER.info("User " + actor.getScreenName() + " updated imputations for default task "
@@ -654,8 +650,7 @@ public class ProjectServiceImpl implements ProjectService {
                                           AbstractTask task,
                                           Account actor,
                                           double val,
-                                          Date date,
-                                          EntityManager entityManager) {
+                                          Date date) {
 
         if (imputation == null) {
             //No imputation for current task and day
@@ -664,19 +659,22 @@ public class ProjectServiceImpl implements ProjectService {
             imputation.setTask(task);
             imputation.setAccount(actor);
             imputation.setValue(val);
-            entityManager.persist(imputation);
+            em.persist(imputation);
         } else {
             // There is an existing imputation for this day and task
-            imputation.setValue(val);
             if (val == 0) {
                 //if value equal to 0 then remove imputation
-                entityManager.remove(imputation);
+                Long imputationID = imputation.getId();
+                task.getImputations().removeIf(i -> i.getId() == imputationID);
+                em.remove(imputation);
+                em.merge(task);
             } else {
+                imputation.setValue(val);
                 // else save new value
-                entityManager.persist(imputation);
+                em.persist(imputation);
             }
         }
-        entityManager.flush();
+        em.flush();
 
         return imputation;
     }
@@ -716,23 +714,6 @@ public class ProjectServiceImpl implements ProjectService {
                 task.getOriginalEstimate(), task.getRealEffort());
     }
 
-    @Override
-    public TaskType findTaskTypeByID(Long taskTypeID) {
-        if (taskTypeID == null) {
-            return null;
-        }
-        return em.find(TaskType.class, taskTypeID);
-    }
-
-    @Override
-    public TaskType updateTaskType(Account actor, TaskType type) {
-        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, type.getOrganizationID());
-        if(organization.isPresent()){
-            em.merge(type);
-            em.flush();
-        }
-        return type;
-    }
 
 
     @Override
@@ -767,35 +748,7 @@ public class ProjectServiceImpl implements ProjectService {
         return projectTasks;
     }
 
-    @Override
-    public List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de) {
-        TypedQuery<DefaultTask> q = em
-                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
-                        + "t.endDate > :ds "
-                        + "and t.startDate <= :de "
-                        + "and t.startDate < t.endDate "
-                        + "and t.organizationID = :orgID", DefaultTask.class);
-        q.setParameter("ds", ds);
-        q.setParameter("de", de);
-        q.setParameter("orgID", orgID);
-        List<DefaultTask> tasks = q.getResultList();
 
-        return q.getResultList();
-
-    }
-
-    @Override
-    public List<DefaultTask> listDefaultTasks(Long orgID) {
-        TypedQuery<DefaultTask> q = em
-                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
-                        + "t.organizationID = :orgID", DefaultTask.class);
-
-        q.setParameter("orgID", orgID);
-        List<DefaultTask> tasks = q.getResultList();
-
-        return q.getResultList();
-
-    }
 
     @Override
     public void deleteTaskByID(Account actor, long taskID) throws BusinessException {
@@ -876,38 +829,7 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public DefaultTask createDefaultTask(Account actor, Long orgID, String name) throws BusinessException {
-        try {
-            DefaultTask task = new DefaultTask();
-            task.setStartDate(new Date());
-            Calendar c = Calendar.getInstance();
-            c.set(9999, Calendar.DECEMBER, 31);
-            task.setEndDate(c.getTime());
-            task.setOrigin(actor.getScreenName() + "/" + System.nanoTime());
-            task.setName(name);
-            task.setOrganizationID(orgID);
-            em.persist(task);
-            em.flush();
-            LOGGER.info("Default task " + task.getName() + " is created.");
-            return task;
-        } catch (Exception e) {
-            throw new BusinessException(e);
-        }
-    }
 
-
-    @Override
-    public void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException {
-
-        DefaultTask task = em.find(DefaultTask.class, taskID);
-        task.setEndDate(new Date());
-
-        em.merge(task);
-        em.flush();
-
-        LOGGER.info("Default Task " + taskID + " deleted by " + actor.getName());
-    }
 
     @Override
     public Map<String, Task> searchExistingTasksFromOrigin(Account actor,
@@ -1097,31 +1019,6 @@ public class ProjectServiceImpl implements ProjectService {
         return b;
     }
 
-    @Override
-    public TaskType createTaskType(Account actor, Long orgID, String name) {
-        TaskType taskType = new TaskType();
-        taskType.setTypeName(name);
-        taskType.setOrganizationID(orgID);
-        em.persist(taskType);
-        em.flush();
-        LOGGER.info("User " + actor.getScreenName() + " create task type " + name);
-
-        return taskType;
-    }
-
-
-
-    @Override
-    public void disableTaskType(Account actor, TaskType type) {
-
-        type.setEnable(false);
-
-        em.merge(type);
-        em.flush();
-        LOGGER.info("User " + actor.getScreenName() + " disable task type " + type.getTypeName());
-
-    }
-
 
     @Override
     public boolean isProjectOwner(Account account, Project project) {
@@ -1148,8 +1045,12 @@ public class ProjectServiceImpl implements ProjectService {
         Calendar end = Calendar.getInstance();
         end.set(year, month, 1, 2, 0);
 
-        Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(), user, vacationTask);
-        Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(), user, project);
+        Optional<Organization> organization = this.organizationService.getOrganizationByID(user, project.getOrganizationID());
+
+        Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(),
+                user, organization.get().getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get());
+        Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(),
+                user, project);
         Map<Integer, String> comments = new HashMap<>();
         Map<Integer, Double> otherProjectImputations = new HashMap<>();
         List<Integer> dayMonthNums = new ArrayList<>();

@@ -10,21 +10,28 @@
 </head>
 
 <body>
+<div class="ui negative message" th:if="${error}">
+    <i class="close icon"></i>
+    <div class="header" th:text="${error}">
+    </div>
+</div>
+<div class="ui positive message" th:if="${message}">
+    <i class="close icon"></i>
+    <div class="header" th:text="${message}">
 
+    </div>
+</div>
 
 <div layout:fragment="content">
-
-    <div class="ui negative message" th:if="${error}">
-        <i class="close icon"></i>
-        <div class="header" th:text="${error}">
-        </div>
-    </div>
-    <div class="ui positive message" th:if="${message}">
-        <i class="close icon"></i>
-        <div class="header" th:text="${message}">
-        </div>
-    </div>
     <div id="vacationApp">
+        <div class="ui negative hidden message " >
+            <i class="close icon"></i>
+            <div class="header" >
+                {{ formError }}
+            </div>
+        </div>
+
+
         <div class="ui menu">
             <a class="item"  v-on:click="openModal" >
                 <i class="plus icon"></i>
@@ -35,10 +42,6 @@
             Vacations requests to Validate
         </div>
         <data-table v-bind:config="toValidateRequests">
-            <template v-slot:sum="{row}">
-
-                <div class="ui circular label large day-badge"><p>{{ dayCount(row) }}</p></div>
-            </template>
             <template v-slot:label="{row}">
                 {{ row.label }}
             </template>
@@ -64,14 +67,12 @@
                 </button>
             </template>
         </data-table>
+
+
         <div v-if="myRequests.data.length" class="ui horizontal divider"><i class="boxes icon"></i>
             My vacation requests
         </div>
         <data-table v-bind:config="myRequests">
-            <template v-slot:sum="{row}">
-
-                <div class="ui circular label large day-badge"><p>{{ dayCount(row) }}</p></div>
-            </template>
             <template v-slot:label="{row}">
                 {{ row.label }}
             </template>
@@ -108,6 +109,10 @@
             </template>
 
         </data-table>
+
+        <year-calendar :year="2020" ></year-calendar>
+
+
         <tmodal-confirm
                 ref="confirmModal"
                 title="Cancel vacation request ?"
@@ -119,7 +124,7 @@
                 id="newVacation">
             <template v-slot:content>
                 <form class="ui form">
-                    <div v-bind="formError" class="ui error message"></div>
+                    <div class="ui error message"></div>
                     <div class="two fields">
                         <div class="field">
                             <label>Departure Date</label>
@@ -141,7 +146,7 @@
                         </div>
                         <div class="field">
                             <label>Return Date</label>
-                            <input type="date" name="end-date" placeholder="Return date" v-model="vacationRequest.end">
+                            <input type="date" name="end-date" :min="vacationRequest.start" placeholder="Return date" v-model="vacationRequest.end">
                             <div class="inline fields" style="padding-top: 1rem;">
                                 <div class="field">
                                     <div class="ui radio checkbox">
@@ -182,9 +187,7 @@
             </template>
         </tmodal>
     </div>
-
     <script src="/js/vacations.js"></script>
-
 </div>
 </div>
 

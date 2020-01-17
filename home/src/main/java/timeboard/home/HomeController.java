@@ -49,6 +49,9 @@ import java.util.List;
 public class HomeController {
 
     public static final String URI = "/home";
+    public static final String NB_PROJECTS = "nb_projects";
+    public static final String NB_TASKS = "nb_tasks";
+    public static final String WEEKS = "weeks";
 
     @Autowired
     private ProjectService projectService;
@@ -62,7 +65,7 @@ public class HomeController {
     }
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+    public String handleGet(TimeboardAuthentication authentication, Model model) {
 
 
         //load previous weeks data
@@ -90,9 +93,9 @@ public class HomeController {
             }
         }
 
-        model.addAttribute("nb_projects", this.projectService.listProjects(account, authentication.getCurrentOrganization()).size());
-        model.addAttribute("nb_tasks", this.projectService.listUserTasks(account).size());
-        model.addAttribute("weeks", weeks);
+        model.addAttribute(NB_PROJECTS, this.projectService.listProjects(account, authentication.getCurrentOrganization()).size());
+        model.addAttribute(NB_TASKS, this.projectService.listUserTasks(account).size());
+        model.addAttribute(WEEKS, weeks);
 
         return "home.html";
     }

@@ -26,6 +26,7 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.VacationRequest;
 
@@ -42,9 +43,11 @@ public interface VacationService {
 
     List<VacationRequest> listVacationsToValidateByUser(Account user);
 
-    void deleteVacationRequest(Account actor, VacationRequest request);
+    void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;
 
-    VacationRequest approveVacationRequest(Account actor, VacationRequest request);
+    VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException;
 
     VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
+
+    List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
 }

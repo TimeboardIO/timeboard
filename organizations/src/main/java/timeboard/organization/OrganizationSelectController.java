@@ -66,7 +66,11 @@ public class OrganizationSelectController {
         final List<Organization> orgs = authentication.getDetails().getOrganizations()
                 .stream().map(organizationMembership -> organizationMembership.getOrganization()).collect(Collectors.toList());
 
-        orgs.add(this.organizationService.getOrganizationByName(this.defaultOrganisationName).get());
+        final Optional<Organization> defaultOrganisation = this.organizationService.getOrganizationByName(this.defaultOrganisationName);
+
+        if(defaultOrganisation.isPresent()) {
+            orgs.add(defaultOrganisation.get());
+        }
 
         model.addAttribute("organizations", orgs);
 
@@ -82,6 +86,7 @@ public class OrganizationSelectController {
 
         if(selectedOrg.isPresent()) {
             final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));
+            orgCookie.setMaxAge(60 * 60 * 24 * 365 * 10);
             res.addCookie(orgCookie);
         }
         return "redirect:/home";

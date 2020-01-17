@@ -152,7 +152,7 @@ public class TimesheetRESTApi {
                                               Date ds, Date de, List<DateWrapper> days) {
         List<TaskWrapper> tasks = new ArrayList<>();
 
-        this.projectService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
+        this.organizationService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
             tasks.add(new TaskWrapper(
                     task.getId(),
                     task.getName(), task.getComments(),

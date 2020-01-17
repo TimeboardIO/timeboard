@@ -5,7 +5,8 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:v-bind="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/xhtml"
-      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-for="http://www.w3.org/1999/xhtml">
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-for="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <title>Project Tasks details</title>
@@ -105,7 +106,7 @@
                             <select class="ui status dropdown" v-model="task.status" name="taskStatus" data-cy="task-status"
                                     v-bind:class="{disabled: (task.taskID == 0)}">
                                 <option th:each="status: ${allTaskStatus}"
-                                        th:text="${status.label}"
+                                        th:text="${status}"
                                         th:value="${status}"
                                 ></option>
                             </select>
@@ -144,7 +145,7 @@
         <!-- Actions buttons-->
         <div class="ui menu">
             <a class="item" th:if="${isProjectOwner}"  data-cy="create-task"
-               v-on:click="showCreateTaskModal(null, null, $event)">
+               v-on:click="showCreateTaskModal(null, null, $event)" sec:authorize="${hasPermission(#vars.project,'TASKS_CREATE')}">
                 <i class="plus icon"></i>
                 New Task
             </a>
@@ -232,7 +233,7 @@
                     <label>Status </label>
                     <select v-model="table.filters.status.filterValue" class="ui status multiple selection fluid dropdown" >
                         <option th:each="status: ${allTaskStatus}"
-                                th:text="${status.label}"
+                                th:text="${status}"
                                 th:value="${status}"
                         ></option>
                     </select>

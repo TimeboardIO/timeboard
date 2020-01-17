@@ -315,6 +315,10 @@ table,
   font-size: 1em !important;
   font-weight: normal;
 }
+.calendar.ui.celled.table tr td,
+.calendar.ui.celled.table tr th {
+  border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
+}
 /** PROJECT **/
 .badge {
   text-align: center;
