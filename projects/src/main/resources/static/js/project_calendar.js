@@ -55,32 +55,9 @@ let app = new Vue({
                 success: function (d) {
                     self.teamCalendars = [];
                     for (let [key, value] of Object.entries(d)) {
-                        let mergedEvents = [];
-                        value.forEach(e1 => {
-                            let duplicatesEvents = value.filter(e2 => e1.date === e2.date);
-                            if(duplicatesEvents.length > 1) {
-                                let mergedEvent = {};
-                                duplicatesEvents.forEach(e2 => {
-                                    mergedEvent.date = e2.date;
-                                    mergedEvent.value = e2.value;
-                                    if((e2.type === 1)
-                                        || (e2.type === 0 && mergedEvent.type !== undefined && mergedEvent.type === 2)
-                                        || (e2.type === 2 && mergedEvent.type !== undefined && mergedEvent.type === 0)) {
-                                        mergedEvent.type = 1;
-                                    }
-                                    if(mergedEvent.type === undefined){
-                                        mergedEvent.type = e2.type;
-                                    }
-                                });
-                                mergedEvents.push(mergedEvent);
-                            } else {
-                                mergedEvents.push(e1);
-                            }
-                        });
-
                         self.teamCalendars.push({
                             name : key,
-                            events : mergedEvents
+                            events : value
                         });
                     }
                 }

@@ -39,7 +39,7 @@ Vue.component('calendar', {
               <td style="width: 10rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
               <td v-for="day in daysInMonth" v-bind:style="[
                (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {}, 
-               (day.event !== undefined && day.event.type <= 1 && selectColor(day.event)) ? {'background-color' : selectColor(day.event) } : {}
+               (day.morningEvent !== undefined && selectColor(day.morningEvent)) ? {'background-color' : selectColor(day.morningEvent) } : {}
                ] " v-bind:data-label="day.date.toDateString()" ></td>  
               
                <td v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)" rowspan="2"></td>        
@@ -47,7 +47,7 @@ Vue.component('calendar', {
             <tr>
               <td v-for="day in daysInMonth" v-bind:style="[
                (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {}, 
-               (day.event !== undefined && day.event.type >= 1 && selectColor(day.event)) ? {'background-color' : selectColor(day.event) } : {}
+               (day.afternoonEvent !== undefined && selectColor(day.afternoonEvent)) ? {'background-color' : selectColor(day.afternoonEvent) } : {}
                ] " v-bind:data-label="day.date.toDateString()" ></td>        
             </tr>
         </table>
@@ -59,12 +59,14 @@ Vue.component('calendar', {
             while (date.getMonth() === this.month) {
                 days.push( {
                     date : new Date(date.getTime()),
-                    event : this.events.find(e => {
+                    morningEvent : this.events.find(e => {
                         let jDate = new Date(e.date);
-                        return (jDate.getFullYear() === date.getFullYear() &&
-                            jDate.getMonth() === date.getMonth() &&
-                            jDate.getDate() === date.getDate());
-                    })
+                        return (e.type <=1) && (jDate.toDateString() === date.toDateString());
+                    }),
+                    afternoonEvent : this.events.find(e => {
+                        let jDate = new Date(e.date);
+                        return (e.type >=1) && (jDate.toDateString() === date.toDateString());
+                    }),
                 });
                 date.setDate(date.getDate() + 1);
             }
