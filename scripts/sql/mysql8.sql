@@ -183,6 +183,15 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table SubmittedTimesheet (
+       id bigint not null,
+        isValidated bit,
+        week integer,
+        year integer,
+        account_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Task (
        id bigint not null,
         organizationID bigint,
@@ -240,15 +249,6 @@
         status integer,
         applicant_id bigint,
         assignee_id bigint,
-        primary key (id)
-    ) engine=InnoDB;
-
-    create table ValidatedTimesheet (
-       id bigint not null,
-        week integer,
-        year integer,
-        account_id bigint,
-        validatedBy_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -319,6 +319,11 @@
        foreign key (project_id) 
        references Project (id);
 
+    alter table SubmittedTimesheet 
+       add constraint FK8cv07tq7it76qd26wfyewa15y 
+       foreign key (account_id) 
+       references Account (id);
+
     alter table Task 
        add constraint FK26uly7piek733vu0rvs6tkusr 
        foreign key (assigned_id) 
@@ -367,14 +372,4 @@
     alter table VacationRequest 
        add constraint FK28esu0dtlr0he4ie5j5oipsck 
        foreign key (assignee_id) 
-       references Account (id);
-
-    alter table ValidatedTimesheet 
-       add constraint FKfwotsv2gieci2khm1c1aub4uf 
-       foreign key (account_id) 
-       references Account (id);
-
-    alter table ValidatedTimesheet 
-       add constraint FKmw6nt99jgsyfqvnfhpr799tg0 
-       foreign key (validatedBy_id) 
        references Account (id);

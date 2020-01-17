@@ -29,14 +29,14 @@ package timeboard.core.model;
 import javax.persistence.*;
 
 @Entity
-public class ValidatedTimesheet {
+public class SubmittedTimesheet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @OneToOne(targetEntity = Account.class)
-    private Account validatedBy;
+    @Column
+    private boolean isValidated;
 
     @OneToOne(targetEntity = Account.class)
     private Account account;
@@ -55,13 +55,9 @@ public class ValidatedTimesheet {
         this.id = id;
     }
 
-    public Account getValidatedBy() {
-        return validatedBy;
-    }
+    public boolean isValidated() { return isValidated; }
 
-    public void setValidatedBy(Account validatedBy) {
-        this.validatedBy = validatedBy;
-    }
+    public void setValidated(boolean isValidated) { this.isValidated = isValidated; }
 
     public long getYear() {
         return year;

@@ -62,17 +62,17 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public void validateTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException {
+    public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
+            throws TimesheetException {
 
-
-        //check if validation is possible
-
-        //1 - last week is validated
+        //check if submission is possible
+        //1 - last week is submitted
 
         final Calendar c = Calendar.getInstance();
 
         c.setTime(accountTimesheet.getBeginWorkDate());
 
+        int dayInFirstWeek = c.get(Calendar.DAY_OF_WEEK);
         boolean firstWeek = (c.get(Calendar.WEEK_OF_YEAR) == week) && (c.get(Calendar.YEAR) == year);
 
         c.set(Calendar.WEEK_OF_YEAR, week);
@@ -85,13 +85,13 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
-        boolean lastWeekValidated = this.isTimesheetValidated(
+        boolean lastWeekSubmitted = this.isTimesheetSubmitted(
                 accountTimesheet,
                 c.get(Calendar.YEAR),
                 c.get(Calendar.WEEK_OF_YEAR));
 
-        if (!firstWeek && !lastWeekValidated) {
-            throw new TimesheetException("Can not validate this week, previous week is not validated");
+        if (!firstWeek && !lastWeekSubmitted) {
+            throw new TimesheetException("Can not submit this week, previous week is not submitted");
         }
 
         //2 - all imputation day sum == 1
@@ -104,42 +104,49 @@ public class TimesheetServiceImpl implements TimesheetService {
         c.set(Calendar.YEAR, year);
         c.setFirstDayOfWeek(Calendar.MONDAY);
         c.set(Calendar.DAY_OF_WEEK, 2);
+        int firstDay =2;
+        if(firstWeek){
+            c.set(Calendar.DAY_OF_WEEK, dayInFirstWeek);
+            c.setFirstDayOfWeek(dayInFirstWeek);
+            firstDay = dayInFirstWeek;
+        }
 
-        for (int i = 1; i <= 5; i++) {
+        for ( int i = firstDay -1 ; i <= 5; i++) {
 
-            TypedQuery<Double> q = em.createQuery("select sum(value) " +
+            TypedQuery<Double> q = em.createQuery("select COALESCE(sum(value),0) " +
                     "from Imputation i where i.account = :user and i.day = :day ", Double.class);
 
             q.setParameter("user", accountTimesheet);
             q.setParameter("day", c.getTime());
             final List<Double> resultList = q.getResultList();
-            result &= (resultList.get(0) == 1.0);
+            if (!resultList.equals(null)){
+                result &= (resultList.get(0) == 1.0);
+            }
             c.roll(Calendar.DAY_OF_WEEK, 1);
         }
         boolean allDailyImputationTotalsAreOne = result;
 
         if (!allDailyImputationTotalsAreOne) {
-            throw new TimesheetException("Can not validate this week, all daily imputations totals are not equals to 1");
+            throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
 
-        ValidatedTimesheet validatedTimesheet = new ValidatedTimesheet();
-        validatedTimesheet.setValidatedBy(actor);
-        validatedTimesheet.setAccount(accountTimesheet);
-        validatedTimesheet.setYear(year);
-        validatedTimesheet.setWeek(week);
+        SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
+        submittedTimesheet.setAccount(accountTimesheet);
+        submittedTimesheet.setYear(year);
+        submittedTimesheet.setWeek(week);
 
-        em.persist(validatedTimesheet);
+        em.persist(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(validatedTimesheet, projectService, currentOrg));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
-        LOGGER.info("Week " + week + " validated for user" + accountTimesheet.getName() + " by user " + actor.getName());
+        LOGGER.info("Week " + week + " submit for user" + accountTimesheet.getName() + " by user " + actor.getName());
 
     }
 
     @Override
-    public boolean isTimesheetValidated(Account accountTimesheet, int year, int week) {
-        TypedQuery<ValidatedTimesheet> q = em.createQuery("select vt from ValidatedTimesheet vt "
-                + "where vt.account = :user and vt.year = :year and vt.week = :week", ValidatedTimesheet.class);
+    public boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week) {
+        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
         q.setParameter("week", week);
         q.setParameter("year", year);
         q.setParameter("user", accountTimesheet);
