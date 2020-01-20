@@ -585,6 +585,12 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
 
+    @Override
+    public Optional<Imputation> getImputation(Account user, DefaultTask task, Date day) {
+        Imputation existingImputation = this.getImputationByDayByTask(em, day, task, user);
+        return Optional.ofNullable(existingImputation);
+    }
+
     private UpdatedTaskResult updateProjectTaskImputation(Account actor,
                                                           Task task,
                                                           Date day,
@@ -595,7 +601,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
         if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
-            Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask);
+            Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask, actor);
             double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
             Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
@@ -626,7 +632,7 @@ public class ProjectServiceImpl implements ProjectService {
         DefaultTask defaultTask = (DefaultTask) this.getTaskByID(actor, task.getId());
 
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
-        Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), defaultTask);
+        Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), defaultTask, actor);
         this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime());
 
         em.flush();
@@ -637,11 +643,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    private Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task) {
+    private Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task, Account account) {
         TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  " +
-                "where i.task.id = :taskID and i.day = :day", Imputation.class);
+                "where i.task.id = :taskID and i.day = :day and i.account = :account", Imputation.class);
         q.setParameter("taskID", task.getId());
         q.setParameter("day", day);
+        q.setParameter("account", account);
         return q.getResultList().stream().findFirst().orElse(null);
     }
 

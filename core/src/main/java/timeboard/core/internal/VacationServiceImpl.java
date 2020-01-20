@@ -166,7 +166,7 @@ public class VacationServiceImpl implements VacationService {
     public List<VacationRequest> listVacationRequestsByPeriod(Account applicant, VacationRequest request) {
 
         TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
-                        "where v.applicant = :applicant " +
+                        "where v.applicant = :applicant and v.parent is null " +
                         "and ( " +
                             "(v.startDate >= :startDate and :startDate <= v.endDate)" +
                             " or " +
@@ -242,6 +242,7 @@ public class VacationServiceImpl implements VacationService {
         em.merge(request);
         em.flush();
 
+
         this.updateImputations(actor, request,1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
@@ -316,7 +317,51 @@ public class VacationServiceImpl implements VacationService {
     }
 
     private void updateTaskImputation(Account user, DefaultTask task, Date day, double val) throws BusinessException {
-      this.projectservice.updateTaskImputation(user, task, day, val);
+
+        if (val > 0) {
+            //change imputation value only if previous value is smaller than new
+            Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
+            if (old.isPresent() && old.get().getValue() < val) {
+                this.projectservice.updateTaskImputation(user, task, day, val);
+            }
+        } else {
+            // looking for existing vacation request on same day
+            double newValue = val;
+            List<VacationRequest> vacationRequests = this.listVacationRequests(user, day);
+            // keep accepted request
+            vacationRequests = vacationRequests.stream().filter(r -> r.getStatus() == VacationRequestStatus.ACCEPTED).collect(Collectors.toList());
+
+            // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
+            boolean halfDay = vacationRequests.stream().anyMatch( r ->
+                    //current day is first day of request and request is half day started
+                    ((r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0)
+                    //current day is last day of request and request is half day ended
+                 ||  (r.getEndHalfDay()   == VacationRequest.HalfDay.MORNING   && day.compareTo(r.getEndDate()) == 0))
+            );
+
+            if (halfDay) {
+                newValue = 0.5;
+            } else if (!vacationRequests.isEmpty()) {
+                newValue = 1;
+            }
+
+            //update imputation
+            this.projectservice.updateTaskImputation(user, task, day, newValue);
+
+        }
+
+
+    }
+
+    private List<VacationRequest> listVacationRequests(Account applicant, Date day) {
+        TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v where v.applicant = :applicant " +
+                        "and (:day BETWEEN v.startDate  and v.endDate)", VacationRequest.class);
+
+        q.setParameter("applicant", applicant);
+        q.setParameter("day", day);
+
+        return q.getResultList();
 
     }
 

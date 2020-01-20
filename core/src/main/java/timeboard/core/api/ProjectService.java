@@ -206,4 +206,6 @@ public interface ProjectService {
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 
     List<Imputation> listProjectMembersVacations(Account actor, Project p, int month, int year) throws BusinessException;
+
+    Optional<Imputation> getImputation(Account user, DefaultTask task, Date day);
 }
