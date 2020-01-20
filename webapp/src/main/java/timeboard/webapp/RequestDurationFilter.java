@@ -36,41 +36,46 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.*;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 @Component
 public class RequestDurationFilter implements Filter {
 
     @Value("${timeboard.interval.metrics.minutes}")
-    private static long timeIntervalLogs;
+    private long timeIntervalLogs;
 
-    private static final String metricsMarker = "timeboard.marker.metrics";
+    private final String metricsMarker = "timeboard.marker.metrics";
 
-    private static final MetricRegistry metrics = new MetricRegistry();
+    private final MetricRegistry metrics = new MetricRegistry();
 
-    private final Histogram responseSizes = metrics.histogram(MetricRegistry.name( "response"));
+    private final Timer timer = metrics.timer(name(RequestDurationFilter.class, "get-requests"));
 
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        this.startReport();
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
 
-        long timeBefore = System.currentTimeMillis();
-        filterChain.doFilter(servletRequest, servletResponse);
-        long timeAfter = System.currentTimeMillis();
-        long duration = timeAfter - timeBefore;
+        final Timer.Context context = timer.time();
+        try {
+            filterChain.doFilter(servletRequest, servletResponse);
+        } finally {
+            context.stop();
+        }
 
-        responseSizes.update(duration);
-        startReport();
     }
 
 
-    static void startReport() {
+    private void startReport() {
         final Slf4jReporter reporter = Slf4jReporter.forRegistry(metrics)
                 .outputTo(LoggerFactory.getLogger(metricsMarker))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();
-        reporter.start(10, TimeUnit.SECONDS);
-       // reporter.start(timeIntervalLogs, TimeUnit.MINUTES);
+        reporter.start(this.timeIntervalLogs, TimeUnit.MINUTES);
     }
 
 }
