@@ -10,11 +10,24 @@
         <property name="max" value="150"/>
     </module>
 
-
+    <module name="FileLength">
+        <property name="max" value="1000"/>
+    </module>
 
     <module name="TreeWalker">
 
+        <module name="InterfaceIsType"/>
 
+        <module name="OneTopLevelClass"/>
+
+        <module name="BooleanExpressionComplexity">
+            <property name="max" value="2"/>
+        </module>
+
+
+        <module name="StaticVariableName">
+            <property name="format" value="^[A-Z](_?[A-Z0-9]+)*$"/>
+        </module>
 
         <module name="RegexpSinglelineJava">
             <property name="format" value="System\.out\.println"/>
@@ -22,7 +35,18 @@
         </module>
 
         <module name="NPathComplexity">
-            <property name="max" value="550"/>
+            <property name="max" value="280"/>
+        </module>
+
+        <module name="TypeName"/>
+
+        <module name="ThrowsCount">
+            <property name="max" value="2"/>
+        </module>
+
+
+        <module name="AnonInnerLength">
+            <property name="max" value="40"/>
         </module>
 
         <module name="MethodLength">
