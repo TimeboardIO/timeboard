@@ -329,7 +329,8 @@ public class VacationServiceImpl implements VacationService {
             double newValue = val;
             List<VacationRequest> vacationRequests = this.listVacationRequests(user, day);
             // keep accepted request
-            vacationRequests = vacationRequests.stream().filter(r -> r.getStatus() == VacationRequestStatus.ACCEPTED).collect(Collectors.toList());
+            vacationRequests = vacationRequests.stream().filter(r -> r.getStatus() == VacationRequestStatus.ACCEPTED
+                    && !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
 
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
             boolean halfDay = vacationRequests.stream().anyMatch( r ->
