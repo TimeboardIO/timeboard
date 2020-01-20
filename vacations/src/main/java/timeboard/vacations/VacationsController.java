@@ -39,9 +39,7 @@ import timeboard.core.api.VacationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.events.TimeboardEventType;
 import timeboard.core.api.events.VacationEvent;
-import timeboard.core.model.Account;
-import timeboard.core.model.VacationRequest;
-import timeboard.core.model.VacationRequestStatus;
+import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.DateFormat;
@@ -100,6 +98,19 @@ public class VacationsController {
         }
 
         return ResponseEntity.ok(returnList);
+    }
+
+    @GetMapping(value = "/calendar/{yearNum}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CalendarEvent>> listTags(TimeboardAuthentication authentication,
+                                                                     @PathVariable Integer yearNum) throws BusinessException {
+        final Account actor = authentication.getDetails();
+
+        // get existing vacation request for year
+        List<VacationRequest> vacationRequests = this.vacationService.listUserVacations(actor);
+        // re-balance key to user screen name and wrap request to ui calendar
+        final  List<CalendarEvent> newList = CalendarEvent.requestToWrapperList(vacationRequests);
+
+        return ResponseEntity.ok(newList);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)

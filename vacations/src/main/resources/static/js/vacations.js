@@ -1,5 +1,24 @@
 const currentActorID = $("meta[property='vacations']").attr('actorID');
 
+const BaseCalendar = Vue.options.components["calendar"];
+
+const CustomCalendar = BaseCalendar.extend({
+    methods : {
+        selectColor: function(event) {
+            let color = "";
+            if (event.value > 0) {
+                color = "#FBBD08";
+            }
+            if (event.value >= 1) {
+                color = "#5BCA7E";
+            }
+            return color;
+        }
+    }
+});
+
+Vue.component("calendar", CustomCalendar);
+
 
 // Form validations rules
 const formValidationRules = {
@@ -38,6 +57,7 @@ let app = new Vue({
             applicantName : "",
             applicantID : 0,
         },
+        calendarData : [],
         myRequests: {
             cols: [
                 {
@@ -225,7 +245,7 @@ let app = new Vue({
 
             return result;
         },
-        listToValidateRequests: function(){
+        listToValidateRequests: function() {
             let self = this;
             $.ajax({
                 type: "GET",
@@ -236,7 +256,7 @@ let app = new Vue({
                 }
             });
         },
-        listMyRequests: function(){
+        listMyRequests: function() {
             let self = this;
             $.ajax({
                 type: "GET",
@@ -246,12 +266,24 @@ let app = new Vue({
                     self.myRequests.data = d;
                 }
             });
+        },
+        loadCalendar: function() {
+            let self = this;
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "vacation/calendar/2020",
+                success: function (d) {
+                    self.calendarData = d;
+                }
+            });
         }
     },
     mounted: function () {
         let self = this;
         self.listMyRequests();
         self.listToValidateRequests();
+        self.loadCalendar();
     }
 });
 

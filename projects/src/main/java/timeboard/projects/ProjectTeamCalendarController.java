@@ -43,8 +43,6 @@ import timeboard.core.security.TimeboardAuthentication;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -78,7 +76,7 @@ public class ProjectTeamCalendarController {
         return "project_calendar.html";
     }
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<CalendarEventWrapper>>> listTags(TimeboardAuthentication authentication,
+    public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(TimeboardAuthentication authentication,
                                                                             @PathVariable Long projectID,
                                                                             @PathVariable Integer yearNum,
                                                                             @PathVariable Integer monthNum) throws BusinessException {
@@ -96,114 +94,15 @@ public class ProjectTeamCalendarController {
                         accountVacationRequestMap.computeIfAbsent(m, t -> new ArrayList<VacationRequest>()) );
 
         // re-balance key to user screen name and wrap request to ui calendar
-        final Map<String, List<CalendarEventWrapper>> newMap = accountVacationRequestMap.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> requestToWrapperList(e.getValue())));
+        final Map<String, List<CalendarEvent>> newMap = accountVacationRequestMap.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> CalendarEvent.requestToWrapperList(e.getValue())));
 
         return ResponseEntity.ok(newMap);
     }
 
 
-    private List<CalendarEventWrapper> requestToWrapperList(List<VacationRequest> requests) {
-        List<CalendarEventWrapper> results = new ArrayList<>();
-
-        for (VacationRequest r : requests) {
-            results.addAll(requestToWrapper(r));
-        }
-
-        return results;
-    }
+    
 
 
-    private List<CalendarEventWrapper> requestToWrapper(VacationRequest request) {
-        LinkedList<CalendarEventWrapper> results = new LinkedList<>();
-
-        java.util.Calendar start = java.util.Calendar.getInstance();
-        java.util.Calendar end = java.util.Calendar.getInstance();
-
-        start.setTime(request.getStartDate());
-        end.setTime(request.getEndDate());
-        boolean last = true;
-        while(last) {
-            CalendarEventWrapper wrapper = new CalendarEventWrapper();
-
-            wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate (DATE_FORMAT.format(start.getTime()));
-            if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
-                wrapper.setValue(1);
-            }
-            else if (request.getStatus() == VacationRequestStatus.PENDING ) {
-                wrapper.setValue(0.5);
-            } else {
-                wrapper.setValue(0);
-            }
-            wrapper.setType(1);
-
-            results.add(wrapper);
-
-            last = start.before(end);
-            start.roll(Calendar.DAY_OF_YEAR, 1);
-        }
-
-        if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
-            results.getFirst().setType(2);
-        }
-
-        if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
-            results.getLast().setType(0);
-        }
-
-        return results;
-    }
-
-    public static class CalendarEventWrapper {
-
-        private String name;
-        private String date;
-        private double value;
-        private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
-
-        public CalendarEventWrapper() { }
-
-        public CalendarEventWrapper(Imputation imputation) {
-            this.date = DATE_FORMAT.format(imputation.getDay());
-            this.value = imputation.getValue();
-            this.type = 1;
-            this.name = imputation.getAccount().getScreenName();
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getDate() {
-            return date;
-        }
-
-        public int getType() {
-            return type;
-        }
-
-        public double getValue() {
-            return value;
-        }
-
-        public void setDate(String date) {
-            this.date = date;
-        }
-
-        public void setValue(double value) {
-            this.value = value;
-        }
-
-        public void setType(int type) {
-            this.type = type;
-        }
-
-
-    }
 
 }
