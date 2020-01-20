@@ -35,7 +35,7 @@ public class HomeNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Home";
+        return "nav.home";
     }
 
     @Override
