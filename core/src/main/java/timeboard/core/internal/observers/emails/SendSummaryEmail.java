@@ -28,6 +28,7 @@ package timeboard.core.internal.observers.emails;
 
 import io.reactivex.schedulers.Schedulers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
@@ -48,13 +49,16 @@ public class SendSummaryEmail {
     @Autowired
     private EmailService emailService;
 
+    @Value("${timeboard.mail.buffer.time}")
+    private Long bufferTime;
+
     private TemplateGenerator templateGenerator = new TemplateGenerator();
 
     @PostConstruct
     public void activate() {
         TimeboardSubjects.TIMEBOARD_EVENTS // Listen for all timeboard app events
                 .observeOn(Schedulers.from(Executors.newFixedThreadPool(10))) // Observe on 10 threads
-                .buffer(5, TimeUnit.MINUTES) // Aggregate mails every 5 minutes TODO add configuration
+                .buffer(bufferTime, TimeUnit.MINUTES) // Aggregate mails every "bufferTime" minutes
                 .map(this::notificationEventToUserEvent) // Rebalance events by user to notify/inform
                 .flatMapIterable(l -> l) // transform user list to single events
                 .subscribe(struc -> this.emailService.sendMessage(generateMailFromEventList(struc))); //create and send individual summary
