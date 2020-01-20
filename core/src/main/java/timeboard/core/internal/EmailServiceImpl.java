@@ -53,6 +53,10 @@ public class EmailServiceImpl implements EmailService {
     private String host;
     @Value("${timeboard.mail.port}")
     private String port;
+    @Value("${timeboard.smtp.username}")
+    private String username;
+    @Value("${timeboard.smtp.password}")
+    private String password;
 
 
     @Override
@@ -60,6 +64,8 @@ public class EmailServiceImpl implements EmailService {
         Properties props = new Properties();
         props.setProperty("mail.host", host);
         props.setProperty("mail.smtp.port", port);
+        props.setProperty("mail.smtp.username", username);
+        props.setProperty("mail.smtp.password", password);
 
         Session session = Session.getInstance(props, null);
 
