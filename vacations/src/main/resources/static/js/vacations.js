@@ -138,19 +138,20 @@ let app = new Vue({
     },
     methods:  {
         openModal: function() {
+            this.vacationRequest = Object.assign({}, emptyVacationRequest);
             this.vacationRequest.recursive = false;
-            let self = this;
             $('#newVacation').modal('show');
 
         },
         openRecursiveModal: function() {
+            this.vacationRequest = Object.assign({}, emptyVacationRequest);
             this.vacationRequest.recursive = true;
             $('#newRecursiveVacation').modal('show');
         },
         addVacationRequest: function () {
-            let validated = $('.ui.form').form(formValidationRules).form('validate form');
-
             let self = this;
+            let validated = $('.ui.form').form(formValidationRules).form('validate form');
+            console.log(self.vacationRequest);
             if(validated) {
                 $.ajax({
                     type: "POST",
@@ -161,7 +162,7 @@ let app = new Vue({
                         // do something
                         self.myRequests.data = d;
                         $('#newVacation').modal('hide');
-                        self.vacationRequest = Object.assign({}, emptyVacationRequest);
+                        $('.ui.error.message').hide();
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         $('.ui.error.message').text(jqXHR.responseText);
@@ -179,6 +180,7 @@ let app = new Vue({
                 url: "/vacation/approve/"+request.id,
                 success: function (d) {
                     self.toValidateRequests.data = d;
+                    $('.ui.error.message').hide();
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
@@ -195,6 +197,7 @@ let app = new Vue({
                 url: "/vacation/reject/"+request.id,
                 success: function (d) {
                     self.toValidateRequests.data = d;
+                    $('.ui.error.message').hide();
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
@@ -204,8 +207,13 @@ let app = new Vue({
         },
         cancelRequest : function(request) {
             let self = this;
-            this.$refs.confirmModal.confirm("Are you sure you want to delete vacation request "
-                + request.label !== 'null' ? request.label : '' + "? This action is definitive.",
+            let text =  "Are you sure you want to delete vacation request "
+            + request.label !== 'null' ? request.label : '' + "? This action is definitive.";
+            if(request.recursive && request.status === "ACCEPTED" && new Date(request.start).getTime() < new Date().getTime()) {
+                text = "This recursive vacation request has started."
+                +" Canceling it will set the recurrence end date to now and will delete future occurrences. Do you want to continue??"
+            }
+            this.$refs.confirmModal.confirm(text,
                 function() {
                     $.ajax({
                         type: "DELETE",

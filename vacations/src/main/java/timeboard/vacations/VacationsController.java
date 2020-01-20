@@ -146,7 +146,6 @@ public class VacationsController {
                     return ResponseEntity.badRequest().body("Unexpected value: " + requestWrapper.getRecurrenceType());
             }
 
-            recursiveRequest.generateChildren();
         } else {
             request = new VacationRequest();
         }
@@ -207,7 +206,9 @@ public class VacationsController {
     public ResponseEntity deleteRequest(TimeboardAuthentication authentication,
                                                                   @PathVariable VacationRequest vacationRequest) throws BusinessException {
         Account actor = authentication.getDetails();
-        if(vacationRequest.getStatus() == VacationRequestStatus.ACCEPTED && vacationRequest.getStartDate().before(new Date())){
+        if(!(vacationRequest instanceof RecursiveVacationRequest)
+                && vacationRequest.getStatus() == VacationRequestStatus.ACCEPTED
+                && vacationRequest.getStartDate().before(new Date())){
             return ResponseEntity.badRequest().body("Cannot cancel started vacation.");
         } else {
             if (vacationRequest instanceof RecursiveVacationRequest) {

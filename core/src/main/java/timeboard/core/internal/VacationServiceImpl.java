@@ -223,14 +223,20 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public void deleteVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
 
-
+        request.setEndDate(new Date());
+        boolean removeIt = true;
         for(VacationRequest r : request.getChildren()) {
-            this.deleteVacationRequest(actor, r);
+            if(r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
+                removeIt = false;
+            } else {
+                this.deleteVacationRequest(actor, r);
+            }
         }
 
-        em.remove(request);
+        if (removeIt){
+            em.remove(request);
+        }
         em.flush();
-
 
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
 

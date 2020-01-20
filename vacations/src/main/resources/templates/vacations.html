@@ -122,7 +122,8 @@
                 </button>
             </template>
             <template v-slot:actions="{row}">
-                <button class="ui negative button icon" v-on:click="cancelRequest(row)">
+                <button :class="{ disabled : (row.status !== 'ACCEPTED') && (new Date(row.end).getTime() < new Date().getTime()) }"
+                        class="ui negative button icon" v-on:click="cancelRequest(row)">
                     <i class="remove alternate icon"></i>
                     Cancel
                 </button>
