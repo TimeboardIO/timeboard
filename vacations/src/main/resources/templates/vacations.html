@@ -7,9 +7,11 @@
 
 <head>
     <title layout:fragment="title">Vacation</title>
+    <meta property="vacations" th:actorID="${actor.id}"/>
 </head>
 
 <body>
+
 <div class="ui negative message" th:if="${error}">
     <i class="close icon"></i>
     <div class="header" th:text="${error}">
@@ -38,6 +40,7 @@
                 New Vacation
             </a>
         </div>
+
         <div v-if="toValidateRequests.data.length" class="ui horizontal divider"><i class="clock icon"></i>
             Vacations requests to Validate
         </div>
