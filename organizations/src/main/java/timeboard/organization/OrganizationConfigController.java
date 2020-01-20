@@ -40,10 +40,8 @@ import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-
-import javax.servlet.ServletException;
+ 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -73,7 +71,7 @@ public class OrganizationConfigController {
 
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication,
-                               HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
+                               HttpServletRequest request, Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 

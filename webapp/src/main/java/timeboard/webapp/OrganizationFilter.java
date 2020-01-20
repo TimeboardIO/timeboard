@@ -101,7 +101,7 @@ public class OrganizationFilter implements Filter {
                         .getOrganizationByID(authentication.getDetails(), organizationID);
 
                 if (organization.isPresent()) {
-                    ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
+                    ThreadLocalStorage.setCurrentOrgId(organization.get().getId());
                 } else {
                     servletResponse.sendRedirect(OrganizationSelectController.URI);
                     LOGGER.info("Wrong or missing org cookie, redirect to login");

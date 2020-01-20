@@ -47,19 +47,9 @@ public interface ProjectService {
 
     Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
 
-    Project getProjectByName(Account account, String projectArg) throws BusinessException;
-
     Project archiveProjectByID(Account actor, Project project) throws BusinessException;
 
     Project updateProject(Account actor, Project project) throws BusinessException;
-
-    /**
-     * Update a project.
-     *
-     * @param project
-     * @param memberships Key : userID, Value : user role for project param
-     */
-    Project updateProject(Account actor, Project project, Map<Long, MembershipRole> memberships) throws BusinessException;
 
     ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException;
 
@@ -74,8 +64,6 @@ public interface ProjectService {
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
 
     AbstractTask getTaskByID(Account account, long id) throws BusinessException;
-
-    List<AbstractTask> getTasksByName(Account actor, String name);
 
     List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de);
 
@@ -97,18 +85,6 @@ public interface ProjectService {
 
     void deleteTasks(Account actor, List<Task> taskList);
 
-    /**
-     * Search existing task from specific origin.
-     *
-     * @param project    target project
-     * @param origin     source (Github, GitLab, Jira, ...)
-     * @param remotePath string key of source characteristics (owner, repository, ...)
-     * @return list of task corresponding to the origin
-     */
-    Map<String, Task> searchExistingTasksFromOrigin(Account actor,
-                                                    Project project,
-                                                    String origin,
-                                                    String remotePath) throws BusinessException;
 
 
 
@@ -128,7 +104,6 @@ public interface ProjectService {
                                                      Date startTaskDate,
                                                      Date endTaskDate) throws BusinessException;
 
-    List<ValueHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
 
     UpdatedTaskResult updateTaskImputation(Account actor,
                                            AbstractTask task,
@@ -205,5 +180,4 @@ public interface ProjectService {
 
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 
-    List<Imputation> listProjectMembersVacations(Account actor, Project p, int month, int year) throws BusinessException;
 }

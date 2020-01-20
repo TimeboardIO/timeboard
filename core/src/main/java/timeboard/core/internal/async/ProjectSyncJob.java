@@ -26,9 +26,7 @@ package timeboard.core.internal.async;
  * #L%
  */
 
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
+import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -49,6 +47,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution
 public final class ProjectSyncJob implements Job {
 
     @Autowired
