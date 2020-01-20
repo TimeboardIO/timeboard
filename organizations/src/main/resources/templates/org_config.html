@@ -28,9 +28,12 @@
     </div>
 
     <div class="ui stackable two column grid">
+
         <div class="column">
-
-
+            <div v-if="types.data.length" class="ui horizontal divider">
+                <i class="boxes icon"></i>
+                Task Types
+            </div>
             <data-table v-bind:config="types">
                 <template v-slot:name="{row}">
                     <div v-if="row.edition" class="ui input">
@@ -54,12 +57,16 @@
             </data-table>
             <button class="ui positive button" v-on:click="addType()">
                 <i class="plus icon"></i>
-                Add
+                Add task type
             </button>
-
-
         </div>
+
+
         <div class="column">
+            <div v-if="tasks.data.length" class="ui horizontal divider">
+                <i class="boxes icon"></i>
+                Default Tasks
+            </div>
             <data-table v-bind:config="tasks">
                 <template v-slot:name="{row}">
                     <div v-if="row.edition" class="ui input">
@@ -83,9 +90,11 @@
             </data-table>
             <button class="ui positive button" v-on:click="addTask()">
                 <i class="plus icon"></i>
-                Add
+                Add default task
             </button>
         </div>
+
+
         <tmodal-confirm
                 ref="confirmModal"
                 title="Confirm deletion ?"
