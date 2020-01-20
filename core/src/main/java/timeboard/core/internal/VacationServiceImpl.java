@@ -339,12 +339,13 @@ public class VacationServiceImpl implements VacationService {
                     && !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
 
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
-            boolean halfDay = vacationRequests.stream().anyMatch( r ->
-                    //current day is first day of request and request is half day started
-                    ((r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0)
-                    //current day is last day of request and request is half day ended
-                 ||  (r.getEndHalfDay()   == VacationRequest.HalfDay.MORNING   && day.compareTo(r.getEndDate()) == 0))
-            );
+            boolean halfDay = vacationRequests.stream().anyMatch( r -> {
+                //current day is first day of request and request is half day started
+                boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0);
+                //current day is last day of request and request is half day ended
+                boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0);
+                return halfStart || halfEnd;
+            });
 
             if (halfDay) {
                 newValue = 0.5;

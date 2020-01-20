@@ -124,6 +124,32 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("Please enter user to notify. ");
         }
 
+      VacationRequest request = this.createRequest(requestWrapper);
+        request.setApplicant(actor);
+        request.setAssignee(assignee);
+        request.setStartDate(startDate);
+        request.setEndDate(endDate);
+/*
+        if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
+            return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
+        }*/
+
+        if (requestWrapper.isRecursive()) {
+            assert request instanceof RecursiveVacationRequest;
+            this.vacationService.createRecursiveVacationRequest(actor, (RecursiveVacationRequest) request);
+        } else {
+            this.vacationService.createVacationRequest(actor, request);
+        }
+
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.CREATE, request));
+
+        return this.listRequests(authentication) ;
+    }
+
+
+
+    private VacationRequest createRequest(VacationRequestWrapper requestWrapper){
         VacationRequest request;
         if (requestWrapper.isRecursive()) {
             request = new RecursiveVacationRequest();
@@ -142,38 +168,19 @@ public class VacationsController {
                     recursiveRequest.setStartHalfDay(VacationRequest.HalfDay.AFTERNOON);
                     recursiveRequest.setEndHalfDay(VacationRequest.HalfDay.AFTERNOON);
                     break;
-                default:
-                    return ResponseEntity.badRequest().body("Unexpected value: " + requestWrapper.getRecurrenceType());
             }
 
         } else {
             request = new VacationRequest();
         }
-        request.setApplicant(actor);
-        request.setAssignee(assignee);
         request.setLabel(requestWrapper.label);
-        request.setStartDate(startDate);
-        request.setEndDate(endDate);
+
         request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setStatus(VacationRequestStatus.PENDING);
 
-/*
-        if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
-            return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
-        }*/
 
-        if (requestWrapper.isRecursive()) {
-            assert request instanceof RecursiveVacationRequest;
-            this.vacationService.createRecursiveVacationRequest(actor, (RecursiveVacationRequest) request);
-        } else {
-            this.vacationService.createVacationRequest(actor, request);
-        }
-
-
-        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.CREATE, request));
-
-        return this.listRequests(authentication) ;
+        return request;
     }
 
     @PatchMapping(value = "/approve/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
