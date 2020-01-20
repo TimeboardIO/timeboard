@@ -57,6 +57,7 @@ let app = new Vue({
             applicantName : "",
             applicantID : 0,
         },
+        calendarYear : 2020,
         calendarData : [],
         myRequests: {
             cols: [
