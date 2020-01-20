@@ -34,7 +34,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
-import timeboard.core.async.ProjectSyncJob;
+import timeboard.core.internal.async.ProjectSyncJob;
 import timeboard.core.model.*;
 
 import java.util.*;

@@ -35,7 +35,7 @@ import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.TimesheetException;
-import timeboard.core.internal.events.TimesheetEvent;
+import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;

@@ -27,7 +27,7 @@ package timeboard.organization;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.api.NavigationExtPoint;
 
 import java.util.Calendar;
 import java.util.Date;

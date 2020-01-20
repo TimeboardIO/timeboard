@@ -46,7 +46,7 @@ import java.util.Optional;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.async"})
+@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.internal.async"})
 @EnableJpaRepositories
 @EnableTransactionManagement
 public class CoreConfiguration {
