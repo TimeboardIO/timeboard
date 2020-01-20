@@ -79,7 +79,7 @@ public class TimesheetRESTApi {
         final List<ImputationWrapper> imputations = new ArrayList<>();
 
 
-        boolean validated = false;
+        boolean submitted = false;
 
         final Calendar c = Calendar.getInstance();
         c.set(Calendar.WEEK_OF_YEAR, week);
@@ -138,12 +138,12 @@ public class TimesheetRESTApi {
         }
 
         if (this.timesheetService != null) {
-            validated = this.timesheetService.isTimesheetValidated(currentAccount, year, week);
+            submitted = this.timesheetService.isTimesheetSubmitted(currentAccount, year, week);
         }
 
         c.setTime(authentication.getDetails().getBeginWorkDate());
 
-        Timesheet ts = new Timesheet(validated, year, week, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), days, projects, imputations);
+        Timesheet ts = new Timesheet(submitted, year, week, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), days, projects, imputations);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
     }
@@ -152,7 +152,7 @@ public class TimesheetRESTApi {
                                               Date ds, Date de, List<DateWrapper> days) {
         List<TaskWrapper> tasks = new ArrayList<>();
 
-        this.projectService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
+        this.organizationService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
             tasks.add(new TaskWrapper(
                     task.getId(),
                     task.getName(), task.getComments(),
@@ -221,8 +221,8 @@ public class TimesheetRESTApi {
         }
     }
 
-    @GetMapping("/validate")
-    public ResponseEntity validateTimesheet(TimeboardAuthentication authentication, HttpServletRequest request) {
+    @GetMapping("/submit")
+    public ResponseEntity submitTimesheet(TimeboardAuthentication authentication, HttpServletRequest request) {
 
         final Account actor = authentication.getDetails();
 
@@ -231,7 +231,7 @@ public class TimesheetRESTApi {
 
         try{
             Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
-            this.timesheetService.validateTimesheet(actor, actor, currentOrg, year, week);
+            this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
             return ResponseEntity.status(201).build();
         }catch (Exception e){ // TimesheetException
             return ResponseEntity.status(412).build();
@@ -265,7 +265,7 @@ public class TimesheetRESTApi {
 
         public static class Timesheet {
 
-        private final boolean validated;
+        private final boolean submitted;
         private final int year;
         private final int week;
         private final boolean disablePrev;
@@ -274,7 +274,7 @@ public class TimesheetRESTApi {
         private final List<ProjectWrapper> projects;
         private final List<ImputationWrapper> imputations;
 
-        public Timesheet(boolean validated,
+        public Timesheet(boolean submitted,
                          int year,
                          int week,
                          int beginWorkYear,
@@ -288,7 +288,7 @@ public class TimesheetRESTApi {
             final int currentWeek = c.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = c.get(Calendar.YEAR);
 
-            this.validated = validated;
+            this.submitted = submitted;
             this.year = year;
             this.week = week;
             this.days = days;
@@ -298,8 +298,8 @@ public class TimesheetRESTApi {
             this.imputations = imputationWrappers;
         }
 
-        public boolean isValidated() {
-            return validated;
+        public boolean isSubmitted() {
+            return submitted;
         }
 
         public int getYear() {

@@ -28,23 +28,23 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.model.Project;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -67,8 +67,8 @@ public class UsersSearchRestController {
     private ProjectService projectService;
 
     @GetMapping
-    protected void doGet(TimeboardAuthentication authentication,
-                         HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+    protected ResponseEntity<SearchResults> doGet(TimeboardAuthentication authentication,
+                                                  HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
 
         String query = req.getParameter("q");
         Account actor = authentication.getDetails();
@@ -82,7 +82,10 @@ public class UsersSearchRestController {
             projectID = Long.parseLong(req.getParameter("projectID"));
         }
 
-        Long orgID = authentication.getCurrentOrganization();
+        Long orgID = null;
+        if (req.getParameter("orgID") != null) {
+            orgID = authentication.getCurrentOrganization();
+        }
 
         Set<Account> accounts = new HashSet<>();
 
@@ -95,9 +98,63 @@ public class UsersSearchRestController {
         } else {
             accounts.addAll(this.userService.searchUserByEmail(actor,  query));
         }
+
         SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
-        MAPPER.writeValue(resp.getWriter(), searchResults);
+        return ResponseEntity.ok(searchResults);
+    }
+
+    @GetMapping("/byRole")
+    protected ResponseEntity<SearchResults> doGetMembersProjects(TimeboardAuthentication authentication,
+                    HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+
+        Account actor = authentication.getDetails();
+
+        String query = req.getParameter("q");
+        if (query.isBlank() || query.isEmpty()) {
+            throw new BusinessException("Query is empty");
+        }
+
+        Long orgID = null;
+        if (req.getParameter("orgID") != null) {
+            orgID = authentication.getCurrentOrganization();
+        }
+
+        MembershipRole role = null;
+        if (req.getParameter("role") != null) {
+            role = req.getParameter("role").equals("OWNER") ? MembershipRole.OWNER : MembershipRole.CONTRIBUTOR;
+        }
+
+        List<Account> accounts = new ArrayList<>();
+        if (orgID != null) {
+            List<Project> myProjects = projectService.listProjects(actor, orgID)
+                    .stream()
+                    .filter(project -> project.isMember(actor))
+                    .collect(Collectors.toList());
+
+            List<Account> myManagers = new ArrayList<>();
+            MembershipRole finalRole = role;
+            myProjects
+                .stream()
+                .map(project -> project.getMemberShipsByRole(finalRole))
+                .forEach(projectMembershipOwners -> {
+                    for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
+                        if(projectMembershipOwner.getMember().getEmail().startsWith(query)
+                                && !myManagers.contains(projectMembershipOwner.getMember())) {
+                            myManagers.add(projectMembershipOwner.getMember());
+                        }
+                    }
+                });
+
+            accounts.addAll(myManagers);
+
+        } else {
+            throw new BusinessException("OrganizationID is null");
+        }
+
+        SearchResults searchResults = new SearchResults(accounts.size(), accounts);
+
+        return ResponseEntity.ok(searchResults);
     }
 
     public static class SearchResult implements Serializable {

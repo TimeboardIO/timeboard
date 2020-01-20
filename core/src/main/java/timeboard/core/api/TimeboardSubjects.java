@@ -29,10 +29,10 @@ package timeboard.core.api;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import org.springframework.stereotype.Component;
-import timeboard.core.internal.events.TaskEvent;
-import timeboard.core.internal.events.TimeboardEvent;
-import timeboard.core.internal.events.TimesheetEvent;
-import timeboard.core.internal.events.VacationEvent;
+import timeboard.core.api.events.TaskEvent;
+import timeboard.core.api.events.TimeboardEvent;
+import timeboard.core.api.events.TimesheetEvent;
+import timeboard.core.api.events.VacationEvent;
 import timeboard.core.model.Account;
 
 import javax.annotation.PostConstruct;

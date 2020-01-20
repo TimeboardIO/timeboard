@@ -29,10 +29,14 @@ package timeboard.webapp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import timeboard.projects.converters.LongToProjectConverter;
+import timeboard.vacations.converters.LongToVacationRequestConverter;
+
+import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class TimeboardWebMVCConfig implements WebMvcConfigurer {
@@ -46,10 +50,17 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     @Autowired
     private LongToProjectConverter longToProjectConverter;
 
+    @Autowired
+    private LongToVacationRequestConverter longToVacationRequestConverter;
+
+
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry
                 .addResourceHandler("/webjars/**")
+                    .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
+
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
@@ -61,5 +72,6 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(this.longToProjectConverter);
+        registry.addConverter(this.longToVacationRequestConverter);
     }
 }

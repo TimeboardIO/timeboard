@@ -37,10 +37,11 @@ import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.UserService;
 import timeboard.core.api.VacationService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.events.TimeboardEventType;
-import timeboard.core.internal.events.VacationEvent;
+import timeboard.core.api.events.TimeboardEventType;
+import timeboard.core.api.events.VacationEvent;
 import timeboard.core.model.Account;
 import timeboard.core.model.VacationRequest;
+import timeboard.core.model.VacationRequestStatus;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.DateFormat;
@@ -70,11 +71,34 @@ public class VacationsController {
         return "vacations.html";
     }
 
-
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<VacationRequestWrapper>> listRequests(TimeboardAuthentication authentication) throws BusinessException {
+    public ResponseEntity<List<VacationRequestWrapper>> listRequests(TimeboardAuthentication authentication) {
 
-        return ResponseEntity.ok(new ArrayList<VacationRequestWrapper>());
+        final Account actor = authentication.getDetails();
+
+        List<VacationRequest> list =  this.vacationService.listUserVacations(actor);
+        List<VacationRequestWrapper> returnList = new ArrayList<>();
+
+        for (VacationRequest v : list) {
+            returnList.add(new VacationRequestWrapper(v));
+        }
+
+        return ResponseEntity.ok(returnList);
+    }
+
+    @GetMapping(value = "/toValidate/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<VacationRequestWrapper>> listToValidateRequests(TimeboardAuthentication authentication) {
+
+        final Account actor = authentication.getDetails();
+
+        List<VacationRequest> list =  this.vacationService.listVacationsToValidateByUser(actor);
+        List<VacationRequestWrapper> returnList = new ArrayList<>();
+
+        for (VacationRequest v : list) {
+            returnList.add(new VacationRequestWrapper(v));
+        }
+
+        return ResponseEntity.ok(returnList);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -92,6 +116,10 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
         }
 
+        if(startDate.before(new Date(new Date().getTime()-(1000 * 60 * 60 *24)))) { //- 1 Day
+            return ResponseEntity.badRequest().body("You can not submit vacation request in the past.");
+        }
+
         if(assignee == null){
             return ResponseEntity.badRequest().body("Please enter user to notify. ");
         }
@@ -104,25 +132,47 @@ public class VacationsController {
         request.setEndDate(endDate);
         request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
-        request.setValidated(false);
+        request.setStatus(VacationRequestStatus.PENDING);
 
-        vacationService.createVacationRequest(actor, request);
+        if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
+            return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
+        }
+
+        this.vacationService.createVacationRequest(actor, request);
 
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.CREATE, request));
 
         return this.listRequests(authentication) ;
     }
 
-    @PatchMapping(value = "/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<VacationRequestWrapper>> patchRequest(TimeboardAuthentication authentication,
-                                                            @PathVariable Long requestID,
-                                                            @ModelAttribute VacationRequestWrapper requestWrapper) throws BusinessException {
-        return this.listRequests(authentication) ;
+    @PatchMapping(value = "/approve/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity approveRequest(TimeboardAuthentication authentication,
+                                                            @PathVariable VacationRequest vacationRequest) throws BusinessException {
+        Account actor = authentication.getDetails();
+        this.vacationService.approveVacationRequest(actor, vacationRequest);
+
+        return this.listToValidateRequests(authentication) ;
     }
 
-    @DeleteMapping(value = "/{requestID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<VacationRequestWrapper>> deleteTag(TimeboardAuthentication authentication,
-                                                                  @PathVariable Long requestID) throws BusinessException {
+    @PatchMapping(value = "/reject/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity rejectRequest(TimeboardAuthentication authentication,
+                                                                       @PathVariable VacationRequest vacationRequest) throws BusinessException {
+        Account actor = authentication.getDetails();
+        this.vacationService.rejectVacationRequest(actor, vacationRequest);
+
+        return this.listToValidateRequests(authentication) ;
+    }
+
+    @DeleteMapping(value = "/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteRequest(TimeboardAuthentication authentication,
+                                                                  @PathVariable VacationRequest vacationRequest) throws BusinessException {
+        Account actor = authentication.getDetails();
+        if(vacationRequest.getStatus() == VacationRequestStatus.ACCEPTED && vacationRequest.getStartDate().before(new Date())){
+            return ResponseEntity.badRequest().body("Cannot cancel started vacation.");
+        } else {
+            this.vacationService.deleteVacationRequest(actor, vacationRequest);
+        }
+
         return this.listRequests(authentication) ;
     }
 
@@ -133,9 +183,12 @@ public class VacationsController {
         public String end;
         public boolean halfStart;
         public boolean halfEnd;
+        public String label;
+        public String status;
         public long assigneeID;
         public String assigneeName;
-        public String label;
+        public long applicantID;
+        public String applicantName;
 
         public VacationRequestWrapper() { }
 
@@ -145,8 +198,23 @@ public class VacationsController {
             this.end = DATE_FORMAT.format(r.getEndDate());
             this.halfStart = r.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON);
             this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
-            this.assigneeID = r.getAssignee().getId();
-            this.assigneeName = r.getAssignee().getName();
+            this.status = r.getStatus().name();
+            this.label = r.getLabel();
+
+            if(r.getAssignee() != null) {
+                this.assigneeID = r.getAssignee().getId();
+                this.assigneeName = r.getAssignee().getScreenName();
+            } else {
+                this.assigneeID = 0;
+                this.assigneeName = "";
+            }
+            if(r.getApplicant() != null) {
+                this.applicantID = r.getApplicant().getId();
+                this.applicantName = r.getApplicant().getScreenName();
+            } else {
+                this.applicantID = 0;
+                this.applicantName = "";
+            }
         }
 
         public long getId() {

@@ -36,6 +36,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
 import timeboard.core.model.Organization;
 
 import javax.annotation.PostConstruct;
@@ -45,7 +46,7 @@ import java.util.Optional;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.async"})
+@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.internal.async"})
 @EnableJpaRepositories
 @EnableTransactionManagement
 public class CoreConfiguration {
@@ -55,21 +56,30 @@ public class CoreConfiguration {
     @Autowired
     private OrganizationService organizationService;
 
+    @Autowired
+    private ProjectService projectService;
+
     @Value("${timeboard.organizations.default}")
-    private String defaultOrganisationName;
+    private String defaultOrganizationName;
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
 
     @PostConstruct
     private void verifyPublicOrganization(){
 
         final Optional<Organization> defaultOrganization = this.organizationService
-                    .getOrganizationByName(this.defaultOrganisationName);
+                    .getOrganizationByName(this.defaultOrganizationName);
 
         if(!defaultOrganization.isPresent()){
             final Map<String, String> props = new HashMap<>();
             props.put(Organization.SETUP_PUBLIC, "true");
 
-            this.organizationService.createOrganization(this.defaultOrganisationName, props);
+            this.organizationService.createOrganization(this.defaultOrganizationName, props);
         }
+
+        //TODO remove when migration is ok
+        this.organizationService.checkOrganizationVacationTask(defaultVacationTaskName);
 
 
     }

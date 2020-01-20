@@ -11,19 +11,6 @@
         primary key (id)
     ) engine=InnoDB;
 
-    create table AsyncJobState (
-       id bigint not null,
-        organizationID bigint,
-        endDate datetime(6),
-        error varchar(1000),
-        ownerID bigint,
-        result varchar(1000),
-        startDate datetime(6),
-        state varchar(255),
-        title varchar(255),
-        primary key (id)
-    ) engine=InnoDB;
-
     create table Batch (
        id bigint not null,
         organizationID bigint,
@@ -74,14 +61,13 @@
         remoteId varchar(255),
         remotePath varchar(255),
         startDate date,
+        organization_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
     create table hibernate_sequence (
        next_val bigint
     ) engine=InnoDB;
-
-    insert into hibernate_sequence values ( 1 );
 
     insert into hibernate_sequence values ( 1 );
 
@@ -197,6 +183,15 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table SubmittedTimesheet (
+       id bigint not null,
+        isValidated bit,
+        week integer,
+        year integer,
+        account_id bigint,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Task (
        id bigint not null,
         organizationID bigint,
@@ -245,23 +240,15 @@
 
     create table VacationRequest (
        id bigint not null,
+        organizationID bigint,
         endDate date,
         endHalfDay integer,
         label varchar(255),
         startDate date,
         startHalfDay integer,
-        validated bit,
+        status integer,
         applicant_id bigint,
         assignee_id bigint,
-        primary key (id)
-    ) engine=InnoDB;
-
-    create table ValidatedTimesheet (
-       id bigint not null,
-        week integer,
-        year integer,
-        account_id bigint,
-        validatedBy_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -291,6 +278,11 @@
        add constraint FKmyycwm902xvsapnqmv1y3r4gj 
        foreign key (user_id) 
        references Account (id);
+
+    alter table DefaultTask 
+       add constraint FKih2ta8adxqd0nv2sx4cdkp2n 
+       foreign key (organization_id) 
+       references Organization (id);
 
     alter table Imputation 
        add constraint FKicayo4omi1a8krucb5t7kipva 
@@ -326,6 +318,11 @@
        add constraint FKflkgw7xvdg8kc0gnjsj950con 
        foreign key (project_id) 
        references Project (id);
+
+    alter table SubmittedTimesheet 
+       add constraint FK8cv07tq7it76qd26wfyewa15y 
+       foreign key (account_id) 
+       references Account (id);
 
     alter table Task 
        add constraint FK26uly7piek733vu0rvs6tkusr 
@@ -375,14 +372,4 @@
     alter table VacationRequest 
        add constraint FK28esu0dtlr0he4ie5j5oipsck 
        foreign key (assignee_id) 
-       references Account (id);
-
-    alter table ValidatedTimesheet 
-       add constraint FKfwotsv2gieci2khm1c1aub4uf 
-       foreign key (account_id) 
-       references Account (id);
-
-    alter table ValidatedTimesheet 
-       add constraint FKmw6nt99jgsyfqvnfhpr799tg0 
-       foreign key (validatedBy_id) 
        references Account (id);

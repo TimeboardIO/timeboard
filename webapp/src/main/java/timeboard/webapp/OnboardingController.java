@@ -26,6 +26,7 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -36,7 +37,12 @@ public class OnboardingController {
     public static final String URI = "/";
 
     @GetMapping("/")
-    public String onboarding(){
+    public String onboarding(Authentication authentication){
+
+        if(authentication != null){
+            return "redirect:/home";
+        }
+
         return "onboarding/index";
     }
 

@@ -35,11 +35,11 @@
 
         <div class="ui five stackable cards">
         </div>
-        <div id="projects-app">
+        <div id="projectsApp">
             <div class="ui five stackable cards">
                 <div v-for="project in table.data.slice(0, 4)" class="ui project card" data-cy="project" >
                     <div class="image"  v-bind:style="'background-color:' + project.color" >
-                        <a v-bind:href="'/projects/'+project.id+'/setup'">
+                        <a v-bind:href="'/projects/'+project.id+'/tasks'">
                             <div class="badge" >
                                 {{ project.name.charAt(0) + '' + project.name.charAt(1)  }}
                             </div>
@@ -66,7 +66,7 @@
                             class="ui primary icon button">
                             <i class="tasks icon"></i>
                         </a>
-                        <a @click="archive(project)" class="ui negative icon button" data-cy="archive" sec:authorize="hasPermission(null,'PROJECTS_ARCHIVE')">
+                        <a @click="archive(project)" class="ui negative icon button" data-cy="archive">
                             <i class="archive icon"></i>
                         </a>
                     </div>
@@ -107,7 +107,7 @@
                         <i class="tasks icon"></i>
                         Task
                     </a>
-                    <a class="ui right labeled negative icon button" @click="archive(row)" data-cy="archive" sec:authorize="hasPermission(null,'PROJECTS_ARCHIVE')">
+                    <a class="ui right labeled negative icon button" @click="archive(row)" data-cy="archive">
                         <i class="archive icon"></i>
                         Archive
                     </a>

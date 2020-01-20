@@ -46,7 +46,7 @@ class MemberWrapper {
 //Initialization
 $(document).ready(function(){
     //initial data loading
-        $.get("/org/members?orgID="+currentOrgID)
+        $.get("/org/members/list?orgID="+currentOrgID)
         .then(function(data){
             for (var item in data) {
                 app.members.push(new MemberWrapper(data[item]));

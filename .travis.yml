@@ -16,7 +16,7 @@ deploy:
     access_key_id: "$AWS_ACCESS_KEY"
     secret_access_key: "$AWS_SECRET_KEY"
     region: "eu-west-1"
-    app: "TimeboardApplication"
+    app: "DevMyTimeboardApp"
     env: "TimeboardEnvironment"
     zip_file: "build/timeboard.$TRAVIS_COMMIT.zip"
     bucket_name: "$AWS_BUCKET"

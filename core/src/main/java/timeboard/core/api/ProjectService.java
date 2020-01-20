@@ -88,7 +88,6 @@ public interface ProjectService {
     void createTasks(Account actor, List<Task> taskList);
 
     Task updateTask(Account actor, Task task);
-    DefaultTask updateDefaultTask(Account actor, DefaultTask task);
 
     void updateTasks(Account actor, List<Task> taskList);
 
@@ -138,27 +137,6 @@ public interface ProjectService {
     List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList);
 
 
-    /*
-     == Default Tasks ==
-     */
-    List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de);
-    List<DefaultTask> listDefaultTasks(Long orgID);
-
-    /**
-     * Create a default task.
-     *
-     * @return DefaultTask
-     */
-    DefaultTask createDefaultTask(Account actor, Long orgID, String task) throws BusinessException;
-
-    /**
-     * default tasks can not be deleted, so they are set disabled and hidden from UI
-     *
-     * @param actor
-     * @param taskID
-     * @throws BusinessException
-     */
-    void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException;
 
 
     /*
@@ -213,20 +191,7 @@ public interface ProjectService {
                           Batch currentBatch,
                           List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
-    TaskType createTaskType(Account actor, Long orgID, String name);
 
-    void disableTaskType(Account actor, TaskType type);
-
-    /**
-     * Return task types.
-     *
-     * @return List all task types.
-     */
-    List<TaskType> listTaskType(Long orgID);
-
-    TaskType findTaskTypeByID(Long taskTypeID);
-
-    TaskType updateTaskType(Account actor, TaskType type);
 
     TASData generateTasData(Account user, Project project, int month, int year);
 
@@ -239,4 +204,6 @@ public interface ProjectService {
     List<Batch> getBatchList(Account user, Project project, BatchType batchType) throws BusinessException;
 
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
+
+    List<Imputation> listProjectMembersVacations(Account actor, Project p, int month, int year) throws BusinessException;
 }

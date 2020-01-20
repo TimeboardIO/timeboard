@@ -34,11 +34,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.*;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.ProjectTasks;
-import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
@@ -67,11 +64,17 @@ public class TimesheetController {
     @Autowired
     private  TimesheetService timesheetService;
 
+    @Autowired
+    private OrganizationService organizationService;
+
 
     private int findLastWeekYear(Calendar c, int week, int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        if(c.get(Calendar.WEEK_OF_YEAR) > week){
+            c.roll(Calendar.YEAR, -1);  // remove one year
+        }
         return c.get(Calendar.YEAR);
     }
 
@@ -104,11 +107,14 @@ public class TimesheetController {
 
 
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
+        Account acc = authentication.getDetails();
 
         final Calendar c = Calendar.getInstance();
+        c.setTime(acc.getBeginWorkDate());
+
+
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
-        c.setFirstDayOfWeek(Calendar.MONDAY);
         c.set(Calendar.HOUR_OF_DAY, 2);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
@@ -122,15 +128,15 @@ public class TimesheetController {
         final Date de = findEndDate(c, week, year);
         final int lastWeek = findLastWeek(c, week, year);
         final int lastWeekYear = findLastWeekYear(c, week, year);
-        final boolean lastWeekValidated =
-                this.timesheetService.isTimesheetValidated(authentication.getDetails(), lastWeekYear, lastWeek);
+        final boolean lastWeekSubmitted =
+                    this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), lastWeekYear, lastWeek);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("actorID", authentication.getDetails().getId());
-        model.addAttribute("lastWeekValidated", lastWeekValidated);
+        model.addAttribute("lastWeekSubmitted", lastWeekSubmitted);
 
-        model.addAttribute("taskTypes", this.projectService.listTaskType(authentication.getCurrentOrganization()));
+        model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
 
         model.addAttribute("projectList",
                 this.projectService.listProjects(

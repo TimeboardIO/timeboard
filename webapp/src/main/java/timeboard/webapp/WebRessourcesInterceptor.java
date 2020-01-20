@@ -41,9 +41,6 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
-import timeboard.core.ui.CssService;
-import timeboard.core.ui.JavascriptService;
-import timeboard.core.ui.NavigationEntryRegistryService;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
@@ -56,12 +53,6 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
     @Value("${timeboard.appName}")
     private String appName;
-
-    @Autowired
-    private JavascriptService javascriptService;
-
-    @Autowired
-    private CssService cssService;
 
     @Autowired
     private NavigationEntryRegistryService navRegistry;
@@ -99,8 +90,6 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
             modelMap.put("account", account);
             modelMap.put("navs", navRegistry.getEntries());
-            modelMap.put("javascripts", javascriptService.listJavascriptUrls());
-            modelMap.put("CSSs", cssService.listCSSUrls());
             modelMap.put("dataTableService", dataTableService);
             Long orgaID = ThreadLocalStorage.getCurrentOrganizationID();
             if(orgaID != null) {

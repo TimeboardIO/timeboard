@@ -30,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
-import timeboard.core.observers.emails.EmailStructure;
+import timeboard.core.internal.observers.emails.EmailStructure;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;

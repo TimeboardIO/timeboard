@@ -57,7 +57,7 @@ ui.input.error > input {
 }
 
 .day-badge {
-  width: 2.5rem;
+  min-width: 2.5rem !important;
   height: 2.5rem;
 }
 
@@ -139,6 +139,10 @@ table, .controls {
 }
 
 
+.calendar.ui.celled.table tr td, .calendar.ui.celled.table tr th {
+
+  border-left: 1px solid rgba(34,36,38,.1) !important;
+}
 
 
 /** PROJECT **/
