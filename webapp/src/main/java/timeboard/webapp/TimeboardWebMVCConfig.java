@@ -42,6 +42,7 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import timeboard.projects.converters.LongToProjectConverter;
 import timeboard.vacations.converters.LongToVacationRequestConverter;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -69,7 +70,9 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
 
     @Bean
     public LocaleResolver localeResolver() {
-        return new CookieLocaleResolver();
+        final CookieLocaleResolver clr = new CookieLocaleResolver();
+        clr.setDefaultLocale(Locale.ENGLISH);
+        return clr;
     }
 
     @Bean
