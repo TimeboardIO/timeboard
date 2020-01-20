@@ -321,7 +321,7 @@ public class VacationServiceImpl implements VacationService {
         if (val > 0) {
             //change imputation value only if previous value is smaller than new
             Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
-            if (old.isPresent() && old.get().getValue() < val) {
+            if (old.isEmpty() || old.get().getValue() < val) {
                 this.projectservice.updateTaskImputation(user, task, day, val);
             }
         } else {
