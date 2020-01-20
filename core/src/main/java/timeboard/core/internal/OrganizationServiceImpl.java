@@ -151,42 +151,34 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Optional<Organization> removeMember(final Account actor, Organization organization, Account member) {
 
-        final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
+        final Optional<Organization> orgOpt = this.getOrganizationByID(actor, organization.getId());
 
-        if(org.isPresent()){
-            /*Long idToRemove = org.get()
+        if(orgOpt.isPresent()){
+            Organization org = em.merge(orgOpt.get());
+            Long idToRemove = org
                     .getMembers()
                     .stream()
                     .filter(om -> om.getMember().getId() == member.getId())
                     .map(om -> om.getId())
                     .findAny()
-                    .get();*/
+                    .get();
 
-            org.get()
-                    .getMembers()
+            /*org.getMembers()
                     .removeIf(om -> om.getMember().getId() == member.getId());
-            em.merge(org.get());
+            em.merge(org);*/
 
-            /*OrganizationMembership omToRemove = em.find(OrganizationMembership.class, idToRemove);
+            OrganizationMembership omToRemove = em.find(OrganizationMembership.class, idToRemove);
             if (omToRemove != null) {
                 em.remove(omToRemove);
-            }*/
-
-           /* Optional<OrganizationMembership> test =
-                    org.get()
-                            .getMembers()
-                            .stream()
-                            .filter(organizationMembership -> organizationMembership.getMember().getId() == member.getId())
-                            .findFirst();
-            em.remove(test.get());*/
+            }
 
             em.flush();
 
-            LOGGER.info("Member " + actor.getName() + " is removed from organisation "+org.get().getName());
+            LOGGER.info("Member " + member.getScreenName() + " is removed from organisation "+org.getName()+" by "+actor.getScreenName());
 
         }
 
-        return org;
+        return orgOpt;
     }
 
 
