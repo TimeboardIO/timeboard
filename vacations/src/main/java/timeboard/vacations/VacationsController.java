@@ -112,8 +112,6 @@ public class VacationsController {
         Date startDate = DATE_FORMAT.parse(requestWrapper.start);
         Date endDate = DATE_FORMAT.parse(requestWrapper.end);
 
-
-
         if(startDate.getTime() > endDate.getTime()){
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
         }
@@ -161,10 +159,10 @@ public class VacationsController {
         request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setStatus(VacationRequestStatus.PENDING);
 
-
+/*
         if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
             return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
-        }
+        }*/
 
         if (requestWrapper.isRecursive()) {
             assert request instanceof RecursiveVacationRequest;
