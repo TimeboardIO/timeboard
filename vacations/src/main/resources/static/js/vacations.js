@@ -19,25 +19,27 @@ const formValidationRules = {
     }
 };
 
+const emptyVacationRequest = {
+    recursive : false,
+    start : "",
+    end : "",
+    halfStart : false,
+    halfEnd : false,
+    recurrenceDay : 1,
+    recurrenceType : "FULL",
+    status : "",
+    label : "",
+    assigneeName : "",
+    assigneeID : 0,
+    applicantName : "",
+    applicantID : 0,
+};
+
 let app = new Vue({
     el: '#vacationApp',
     data: {
         formError : '',
-        vacationRequest: {
-            recursive : false,
-            start : "",
-            end : "",
-            halfStart : false,
-            halfEnd : false,
-            recurrenceDay : 1,
-            recurrenceType : "FULL",
-            status : "",
-            label : "",
-            assigneeName : "",
-            assigneeID : 0,
-            applicantName : "",
-            applicantID : 0,
-        },
+        vacationRequest: Object.assign({}, emptyVacationRequest),
         myRequests: {
             cols: [
                 {
@@ -137,6 +139,7 @@ let app = new Vue({
     methods:  {
         openModal: function() {
             this.vacationRequest.recursive = false;
+            let self = this;
             $('#newVacation').modal('show');
 
         },
@@ -158,6 +161,7 @@ let app = new Vue({
                         // do something
                         self.myRequests.data = d;
                         $('#newVacation').modal('hide');
+                        self.vacationRequest = Object.assign({}, emptyVacationRequest);
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         $('.ui.error.message').text(jqXHR.responseText);
