@@ -51,7 +51,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr v-for="member in members" v-if="member.isOrganization == false">
+            <tr v-for="member in members">
                 <td>{{member.screenName}}</td>
                 <td>
                     <select @change="updateRole($event, member)" v-model="member.role">

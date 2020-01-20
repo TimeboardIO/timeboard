@@ -39,8 +39,8 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 
 @Component
@@ -106,8 +106,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             TypedQuery<Organization> q = this.em.createNamedQuery(Organization.FIND_BY_NAME, Organization.class);
             q.setParameter("name", orgName);
             org = q.getSingleResult();
-        }catch (Exception e){
-            org=null;
+        } catch (Exception e) {
+            org = null;
         }
         return Optional.ofNullable(org);
     }
@@ -124,25 +124,24 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public Optional<Organization> addMember(final Account actor,
-                                            Organization organization,
-                                            Account member,
-                                            MembershipRole role)  {
+                                            final Organization organization,
+                                            final Account member,
+                                            final MembershipRole role) {
 
         final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 
-        if(org.isPresent()){
+        if (org.isPresent()) {
 
             final OrganizationMembership om = new OrganizationMembership();
             om.setOrganization(org.get());
             om.setMember(member);
             om.setRole(role);
-            this.em.persist(om);
 
+            em.persist(om);
             org.get().getMembers().add(om);
-
             em.flush();
 
-            LOGGER.info("Member " + actor.getScreenName() + " is added to organisation "+org.get().getName());
+            LOGGER.info("Member " + member.getScreenName() + " is added to organisation " + org.get().getName() + " by +" + actor.getScreenName());
         }
 
 
@@ -150,24 +149,24 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Optional<Organization> removeMember(final Account actor, Organization organization, Account member) {
+    public Optional<Organization> removeMember(final Account actor, Organization o, Account member) {
 
-        final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
+        Optional<Organization> organization = this.getOrganizationByID(actor, o.getId());
+        if(organization.isPresent()) {
+            final Optional<OrganizationMembership> membership = organization.get().getMembers()
+                    .stream()
+                    .filter(om -> om.getMember().getId() == member.getId())
+                    .findFirst();
 
-        if(org.isPresent()){
-
-            org.get()
-                    .getMembers()
-                    .removeIf(om -> om.getMember().getId() == member.getId());
-
-            em.merge(org);
-            em.flush();
-
-            LOGGER.info("Member " + actor.getName() + " is removed from organisation "+org.get().getName());
+            if(membership.isPresent()) {
+                em.remove(membership.get());
+                LOGGER.info("Member " + member.getScreenName() + " is removed from organisation " + organization.get().getName()
+                        + " by " + actor.getScreenName());
+            }
 
         }
 
-        return org;
+        return organization;
     }
 
 
@@ -178,7 +177,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 
-        if(org.isPresent()){
+        if (org.isPresent()) {
 
             org.get()
                     .getMembers()
@@ -188,7 +187,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
             em.flush();
 
-            LOGGER.info("Member " + actor.getName() + " has changed role from organization "+org.get().getName() + " to "+role);
+            LOGGER.info("Member " + actor.getName() + " has changed role from organization " + org.get().getName() + " to " + role);
 
         }
 
@@ -214,7 +213,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         List<Organization> orgs = q.getResultList();
 
         for (Organization o : orgs) {
-            Optional vacationTask = o.getDefaultTasks().stream().filter(t-> t.getName().matches(defaultVacationTaskName)).findFirst();
+            Optional vacationTask = o.getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst();
             if (!vacationTask.isPresent()) {
                 try {
                     this.createDefaultTask(o, defaultVacationTaskName);
@@ -322,7 +321,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public TaskType updateTaskType(Account actor, TaskType type) {
         Optional<Organization> organization = this.getOrganizationByID(actor, type.getOrganizationID());
-        if(organization.isPresent()){
+        if (organization.isPresent()) {
             em.merge(type);
             em.flush();
         }
@@ -342,7 +341,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
 
-
     @Override
     public void disableTaskType(Account actor, TaskType type) {
 
@@ -353,9 +351,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         LOGGER.info("User " + actor.getScreenName() + " disable task type " + type.getTypeName());
 
     }
-
-
-
 
 
 }
