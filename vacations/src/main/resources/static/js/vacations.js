@@ -1,3 +1,6 @@
+const currentActorID = $("meta[property='vacations']").attr('actorID');
+
+
 // Form validations rules
 const formValidationRules = {
     fields: {
@@ -122,6 +125,7 @@ let app = new Vue({
         },
         addVacationRequest: function () {
             let validated = $('.ui.form').form(formValidationRules).form('validate form');
+            let assignedToMyself = this.vacationRequest.assigneeID == currentActorID;
 
             let self = this;
             if(validated) {
@@ -131,9 +135,12 @@ let app = new Vue({
                     data: self.vacationRequest,
                     url: "/vacation",
                     success: function (d) {
+                        $('#newVacation').modal('hide');
                         // do something
                         self.myRequests.data = d;
-                        $('#newVacation').modal('hide');
+                        if(assignedToMyself){
+                            self.listToValidateRequests();
+                        }
                     },
                     error: function(jqXHR, textStatus, errorThrown) {
                         $('.ui.error.message').text(jqXHR.responseText);
@@ -143,6 +150,7 @@ let app = new Vue({
             }
         },
         approveRequest : function(request) {
+            let assignedToMyself = request.assigneeID == currentActorID;
             let self = this;
             $.ajax({
                 type: "PATCH",
@@ -151,6 +159,9 @@ let app = new Vue({
                 url: "/vacation/approve/"+request.id,
                 success: function (d) {
                     self.toValidateRequests.data = d;
+                    if(assignedToMyself){
+                        self.listMyRequests();
+                    }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
@@ -159,6 +170,7 @@ let app = new Vue({
             });
         },
         rejectRequest : function(request) {
+            let assignedToMyself = request.assigneeID == currentActorID;
             let self = this;
             $.ajax({
                 type: "PATCH",
@@ -167,6 +179,9 @@ let app = new Vue({
                 url: "/vacation/reject/"+request.id,
                 success: function (d) {
                     self.toValidateRequests.data = d;
+                    if(assignedToMyself){
+                        self.listMyRequests();
+                    }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     self.formError = jqXHR.responseText;
@@ -175,6 +190,7 @@ let app = new Vue({
             });
         },
         cancelRequest : function(request) {
+            let assignedToMyself = request.assigneeID == currentActorID;
             let self = this;
             this.$refs.confirmModal.confirm("Are you sure you want to delete vacation request "
                 + request.label !== 'null' ? request.label : '' + "? This action is definitive.",
@@ -186,6 +202,9 @@ let app = new Vue({
                         url: "/vacation/"+request.id,
                         success: function (d) {
                             self.myRequests.data = d;
+                            if(assignedToMyself){
+                                self.listToValidateRequests();
+                            }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             self.formError = jqXHR.responseText;
@@ -205,26 +224,34 @@ let app = new Vue({
             if (request.halfEnd) result = result - 0.5;
 
             return result;
+        },
+        listToValidateRequests: function(){
+            let self = this;
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "vacation/toValidate/list",
+                success: function (d) {
+                    self.toValidateRequests.data = d;
+                }
+            });
+        },
+        listMyRequests: function(){
+            let self = this;
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "vacation/list",
+                success: function (d) {
+                    self.myRequests.data = d;
+                }
+            });
         }
     },
     mounted: function () {
         let self = this;
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "vacation/list",
-            success: function (d) {
-                self.myRequests.data = d;
-            }
-        });
-        $.ajax({
-            type: "GET",
-            dataType: "json",
-            url: "vacation/toValidate/list",
-            success: function (d) {
-                self.toValidateRequests.data = d;
-            }
-        });
+        self.listMyRequests();
+        self.listToValidateRequests();
     }
 });
 
