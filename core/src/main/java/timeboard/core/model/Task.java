@@ -28,16 +28,12 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @PrimaryKeyJoinColumn(name = "id")
 public class Task extends AbstractTask implements Serializable {
-
-
-    @OneToMany(targetEntity = TaskRevision.class, mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TaskRevision> revisions;
 
     @Column(nullable = false)
     private double originalEstimate;
@@ -54,8 +50,8 @@ public class Task extends AbstractTask implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
     private Project project;
 
-    @ManyToOne(targetEntity = Milestone.class, fetch = FetchType.EAGER, optional = true)
-    private Milestone milestone;
+    @ManyToMany(targetEntity = Batch.class, fetch = FetchType.EAGER)
+    private Set<Batch> batches;
 
     @OneToOne
     private Account assigned;
@@ -63,7 +59,6 @@ public class Task extends AbstractTask implements Serializable {
 
     public Task() {
         super();
-        this.revisions = new ArrayList<>();
     }
 
 
@@ -99,12 +94,19 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
-    public Milestone getMilestone() {
-        return milestone;
+    public Set<Batch>  getBatches() {
+        return batches;
     }
 
-    public void setMilestone(Milestone milestone) {
-        this.milestone = milestone;
+    public void setBatches(Set<Batch> batches) {
+        this.batches = batches;
+    }
+
+    public void addBatch(Batch batch) {
+        if(batch == null) {
+            this.batches = new HashSet<>();
+        }
+        this.batches.add(batch);
     }
 
     public double getEffortLeft() {
@@ -144,15 +146,6 @@ public class Task extends AbstractTask implements Serializable {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
     }
 
-    @Deprecated
-    public List<TaskRevision> getRevisions() {
-        return revisions;
-    }
-
-    @Deprecated
-    public void setRevisions(List<TaskRevision> revisions) {
-        this.revisions = revisions;
-    }
 
 
 }

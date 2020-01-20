@@ -26,31 +26,24 @@ package timeboard.webapp;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import timeboard.core.ui.UserInfo;
 
-import java.security.Principal;
 
 @Controller(OnboardingController.URI)
 public class OnboardingController {
 
     public static final String URI = "/";
 
-    @Autowired
-    public UserInfo userInfo;
-
     @GetMapping("/")
-    public String onboarding(Principal p, Model m){
-        if(p == null){ 
-            return "onboarding/index";
-        }else{
+    public String onboarding(Authentication authentication){
 
+        if(authentication != null){
             return "redirect:/home";
         }
 
+        return "onboarding/index";
     }
 
 }

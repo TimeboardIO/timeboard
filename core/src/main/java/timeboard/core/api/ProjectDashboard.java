@@ -27,6 +27,7 @@ package timeboard.core.api;
  */
 
 import java.io.Serializable;
+import java.util.Date;
 
 public final class ProjectDashboard implements Serializable {
 
@@ -34,12 +35,14 @@ public final class ProjectDashboard implements Serializable {
     private final double effortLeft;
     private final double effortSpent;
     private final double quotation;
+    private final Date date;
 
-    public ProjectDashboard(double quotation, double originalEstimate, double effortLeft, double effortSpent) {
+    public ProjectDashboard(double quotation, double originalEstimate, double effortLeft, double effortSpent, Date date) {
         this.quotation = quotation;
         this.originalEstimate = originalEstimate;
         this.effortLeft = effortLeft;
         this.effortSpent = effortSpent;
+        this.date = date;
     }
 
     public double getQuotation() {
@@ -61,4 +64,6 @@ public final class ProjectDashboard implements Serializable {
     public final double getEffortSpent() {
         return effortSpent;
     }
+
+    public Date getDate() { return date; }
 }

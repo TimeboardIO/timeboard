@@ -34,11 +34,12 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -63,14 +64,61 @@ public class TasksRestController {
     private ProjectService projectService;
 
     @Autowired
-    private UserService userService;
+    private OrganizationService organizationService;
 
     @Autowired
-    private UserInfo userInfo;
+    private UserService userService;
+
+    @GetMapping("/batches")
+    public ResponseEntity getBatches(TimeboardAuthentication authentication,
+                                   HttpServletRequest request) throws JsonProcessingException {
+        Account actor = authentication.getDetails();
+        Project project = null;
+
+        final String strProjectID = request.getParameter("project");
+        final String strBatchType = request.getParameter("batchType");
+
+        Long projectID = null;
+        if (strProjectID != null) {
+            projectID = Long.parseLong(strProjectID);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
+        }
+
+        BatchType batchType = null;
+        if (strBatchType != null) {
+            batchType = BatchType.valueOf(strBatchType.toUpperCase());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect batchType argument");
+        }
+
+        try {
+            project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+        } catch (BusinessException e ) {
+            // just handling exception
+        }
+        if (project == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+        }
+
+        List<Batch> batchList = null;
+        try {
+            batchList = projectService.getBatchList(actor, project, batchType);
+        } catch (BusinessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+        }
+
+        List<BatchWrapper> batchWrapperList = new ArrayList<>();
+        batchList.forEach(batch -> batchWrapperList.add(new BatchWrapper(batch.getId(), batch.getName())));
+
+        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(batchWrapperList.toArray()));
+    }
 
     @GetMapping
-    public ResponseEntity getTasks(HttpServletRequest request) throws JsonProcessingException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity getTasks(TimeboardAuthentication authentication,
+                                   HttpServletRequest request) throws JsonProcessingException {
+
+        Account actor = authentication.getDetails();
 
         final String strProjectID = request.getParameter("project");
         Long projectID = null;
@@ -81,7 +129,7 @@ public class TasksRestController {
         }
 
         try {
-            final Project project = this.projectService.getProjectByID(actor, projectID);
+            final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
             if (project == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
             }
@@ -98,6 +146,13 @@ public class TasksRestController {
                     assignee.setFirstName("");
                 }
 
+                List<Long> batchIDs = new ArrayList<>();
+                List<String> batchNames = new ArrayList<>();
+
+                task.getBatches().stream().forEach(b -> {
+                    batchIDs.add(b.getId());
+                    batchNames.add(b.getName());
+                });
                 result.add(new TaskWrapper(
                         task.getId(),
                         task.getName(),
@@ -108,9 +163,8 @@ public class TasksRestController {
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getId() : 0L),
-                        (task.getMilestone() != null ? task.getMilestone().getName() : ""),
-                        task.getTaskStatus().getLabel(),
+                        batchIDs, batchNames,
+                        task.getTaskStatus().name(),
                         (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
                 ));
 
@@ -123,9 +177,12 @@ public class TasksRestController {
     }
 
     @GetMapping("/chart")
-    public ResponseEntity getDatasForCharts(HttpServletRequest request) throws BusinessException, JsonProcessingException {
+    public ResponseEntity getDatasForCharts(
+            TimeboardAuthentication authentication,
+            HttpServletRequest request) throws BusinessException, JsonProcessingException {
+
         TaskGraphWrapper wrapper = new TaskGraphWrapper();
-        Account actor = this.userInfo.getCurrentAccount();
+        Account actor = authentication.getDetails();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -149,8 +206,8 @@ public class TasksRestController {
         wrapper.setListOfTaskDates(listOfTaskDates);
 
         // Datas for effort spent (Axis Y)
-        List<EffortHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
-        final EffortHistory[] lastEffortSpentSum = {new EffortHistory(task.getStartDate(), 0.0)};
+        List<ValueHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor, task, task.getStartDate(), task.getEndDate());
+        final ValueHistory[] lastEffortSpentSum = {new ValueHistory(task.getStartDate(), 0.0)};
         Map<Date, Double> effortSpentMap = listOfTaskDates
                 .stream()
                 .map(dateString -> {
@@ -160,39 +217,16 @@ public class TasksRestController {
                         .filter(es -> new SimpleDateFormat(formatDateToDisplay)
                                 .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
                         .map(effort -> {
-                            lastEffortSpentSum[0] = new EffortHistory(date, effort.getValue());
+                            lastEffortSpentSum[0] = new ValueHistory(date, effort.getValue());
                             return lastEffortSpentSum[0];
                         })
-                        .findFirst().orElse(new EffortHistory(date, lastEffortSpentSum[0].getValue())))
+                        .findFirst().orElse(new ValueHistory(date, lastEffortSpentSum[0].getValue())))
                 .collect(Collectors.toMap(
                         e -> e.getDate(),
                         e -> e.getValue(),
                         (x, y) -> y, LinkedHashMap::new
                 ));
         wrapper.setEffortSpentData(effortSpentMap.values());
-
-        // Datas for effort estimate (Axis Y)
-        List<EffortHistory> effortLeftDB = this.projectService.getTaskEffortLeftHistory(actor, task);
-        final EffortHistory[] lastEffortEstimate = {new EffortHistory(task.getStartDate(), task.getOriginalEstimate())};
-        Map<Date, Double> effortEstimateMap = listOfTaskDates
-                .stream()
-                .map(dateString -> {
-                    return formatDate(formatDateToDisplay, dateString);
-                })
-                .map(date -> effortLeftDB.stream()
-                        .filter(el -> new SimpleDateFormat(formatDateToDisplay)
-                                .format(el.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
-                        .map(effortLeft -> {
-                            lastEffortEstimate[0] = new EffortHistory(date, effortLeft.getValue() + effortSpentMap.get(date));
-                            return lastEffortEstimate[0];
-                        })
-                        .findFirst().orElse(new EffortHistory(date, lastEffortEstimate[0].getValue())))
-                .collect(Collectors.toMap(
-                        e -> e.getDate(),
-                        e -> e.getValue(),
-                        (x, y) -> y, LinkedHashMap::new
-                ));
-        wrapper.setRealEffortData(effortEstimateMap.values());
 
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
 
@@ -209,14 +243,14 @@ public class TasksRestController {
 
 
     @GetMapping("/approve")
-    public ResponseEntity approveTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity approveTask(TimeboardAuthentication authentication, HttpServletRequest request) {
+        Account actor = authentication.getDetails();
         return this.changeTaskStatus(actor, request, TaskStatus.IN_PROGRESS);
     }
 
     @GetMapping("/deny")
-    public ResponseEntity denyTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity denyTask(TimeboardAuthentication authentication, HttpServletRequest request) {
+        Account actor = authentication.getDetails();
         return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
     }
 
@@ -237,6 +271,7 @@ public class TasksRestController {
             task = (Task) this.projectService.getTaskByID(actor, taskID);
             task.setTaskStatus(status);
             this.projectService.updateTask(actor, task);
+
         } catch (ClassCastException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");
         } catch (Exception e) {
@@ -247,8 +282,9 @@ public class TasksRestController {
     }
 
     @GetMapping("/delete")
-    public ResponseEntity deleteTask(HttpServletRequest request) {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity deleteTask(TimeboardAuthentication authentication,
+                                     HttpServletRequest request) {
+        Account actor = authentication.getDetails();
 
         final String taskIdStr = request.getParameter("task");
         Long taskID = null;
@@ -272,8 +308,10 @@ public class TasksRestController {
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createTask(@RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
-        Account actor = this.userInfo.getCurrentAccount();
+    public ResponseEntity createTask(TimeboardAuthentication authentication,
+                                     @RequestBody TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+
+        Account actor = authentication.getDetails();
         Date startDate = null;
         Date endDate = null;
         try {
@@ -300,30 +338,27 @@ public class TasksRestController {
         Long projectID = taskWrapper.projectID;
         Project project = null;
         try {
-            project = this.projectService.getProjectByID(actor, projectID);
+            project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        final Milestone milestone = getMilestone(taskWrapper, actor);
+        final Set<Batch> batches = getBatches(taskWrapper, actor);
 
         Task task = null;
         Long typeID = taskWrapper.typeID;
         Long taskID = taskWrapper.taskID;
 
-        if (!(taskID != null && taskID == 0)) {
+        if (taskID != null && taskID != 0) {
             try {
-                task = processUpdateTask(taskWrapper, actor, milestone, taskID);
+                task = processUpdateTask(taskWrapper, actor, batches, taskID);
 
             } catch (Exception e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
             }
         } else {
             try {
-                task = projectService.createTask(actor, project,
-                        name, comment, startDate,
-                        endDate, oe, typeID, actor,
-                        ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
+                task = createTask(taskWrapper, actor, startDate, endDate, name, comment, oe, project, typeID);
             } catch (Exception e) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
@@ -337,23 +372,48 @@ public class TasksRestController {
 
     }
 
-    private Milestone getMilestone(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
-        Long milestoneID = taskWrapper.milestoneID;
-        if(milestoneID != null && milestoneID > 0) {
-            return this.projectService.getMilestoneById(actor, milestoneID);
-        }else{
-            return null;
+    private Task createTask(TaskWrapper taskWrapper, Account actor, Date startDate, Date endDate, String name, String comment, double oe,
+                                Project project, Long typeID) {
+        Account assignee = null;
+        if (taskWrapper.assigneeID > 0) {
+            assignee = userService.findUserByID(taskWrapper.assigneeID);
         }
+
+
+        return projectService.createTask(actor, project,
+                name, comment, startDate,
+                endDate, oe, typeID, assignee,
+                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
+    }
+
+    private Set<Batch> getBatches(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
+        Set<Batch> returnList = null;
+        List<Long> batchIDList = taskWrapper.batchIDs;
+
+        if(batchIDList != null && !batchIDList.isEmpty()) {
+            returnList = new HashSet<>();
+            for (Long batchID : batchIDList ) {
+                try {
+                    Batch batch = this.projectService.getBatchById(actor, batchID);
+                    if (batch != null) {
+                        returnList.add(batch);
+                    }
+                } catch (Exception e) {
+                    // Do nothing, just handling the exceptions
+                }
+            }
+        }
+        return returnList;
     }
 
     private Task processUpdateTask(@RequestBody TaskWrapper taskWrapper,
                                    Account actor,
-                                   Milestone milestone,
+                                   Set<Batch> batches,
                                    Long taskID) throws BusinessException, ParseException {
 
         final Task task = (Task) projectService.getTaskByID(actor, taskID);
 
-        if (taskWrapper.assigneeID > 0) {
+        if (taskWrapper.assigneeID != null && taskWrapper.assigneeID > 0) {
             final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
             task.setAssigned(assignee);
         }
@@ -362,9 +422,9 @@ public class TasksRestController {
         task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
         task.setStartDate(DATE_FORMAT.parse(taskWrapper.getStartDate()));
         task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
-        final TaskType taskType = this.projectService.findTaskTypeByID(taskWrapper.getTypeID());
+        final TaskType taskType = this.organizationService.findTaskTypeByID(taskWrapper.getTypeID());
         task.setTaskType(taskType);
-        task.setMilestone(milestone);
+        task.setBatches(batches);
         task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
         projectService.updateTask(actor, task);
@@ -394,6 +454,36 @@ public class TasksRestController {
         }
     }
 
+    public static class BatchWrapper implements Serializable {
+
+
+        public Long batchID;
+        public String batchName;
+
+
+        public BatchWrapper(Long batchID, String batchName) {
+            this.batchID = batchID;
+            this.batchName = batchName;
+        }
+
+        public Long getBatchID() {
+            return batchID;
+        }
+
+        public void setBatchID(Long batchID) {
+            this.batchID = batchID;
+        }
+
+        public String getBatchName() {
+            return batchName;
+        }
+
+        public void setBatchName(String batchName) {
+            this.batchName = batchName;
+        }
+
+
+    }
 
     public static class TaskWrapper implements Serializable {
         public Long taskID;
@@ -416,16 +506,15 @@ public class TasksRestController {
         public String status;
         public String statusName;
 
-        public Long milestoneID;
-        public String milestoneName;
-
+        public List<Long> batchIDs;
+        public List<String> batchNames;
 
         public TaskWrapper() {
         }
 
         public TaskWrapper(Long taskID, String taskName, String taskComments, double originalEstimate,
                            Date startDate, Date endDate, String assignee, Long assigneeID,
-                           String status, Long typeID, Long milestoneID, String milestoneName, String statusName, String typeName) {
+                           String status, Long typeID, List<Long> batchIDs, List<String> batchNames, String statusName, String typeName) {
 
             this.taskID = taskID;
 
@@ -441,18 +530,28 @@ public class TasksRestController {
             this.status = status;
             this.typeID = typeID;
 
-            this.milestoneID = milestoneID;
-            this.milestoneName = milestoneName;
+            this.batchNames = batchNames;
+            this.batchIDs = batchIDs;
+
             this.statusName = statusName;
             this.typeName = typeName;
         }
 
-        public Long getMilestoneID() {
-            return milestoneID;
+
+        public List<Long> getBatchIDs() {
+            return batchIDs;
         }
 
-        public void setMilestoneID(Long milestoneID) {
-            this.milestoneID = milestoneID;
+        public void setBatchIDs(List<Long> batchIDs) {
+            this.batchIDs = batchIDs;
+        }
+
+        public List<String> getBatchNames() {
+            return batchNames;
+        }
+
+        public void setBatchNames(List<String> batchNames) {
+            this.batchNames = batchNames;
         }
 
         public Long getTaskID() {
@@ -535,4 +634,33 @@ public class TasksRestController {
             return this.endDate;
         }
     }
+
+  /*  public static class BatchWrapper {
+
+        public Long batchID;
+        public String batchName;
+
+        public BatchWrapper(Long batchID, String batchName) {
+            this.batchID = batchID;
+            this.batchName = batchName;
+        }
+
+        public Long getBatchID() {
+            return batchID;
+        }
+
+        public void setBatchID(Long batchID) {
+            this.batchID = batchID;
+        }
+
+        public String getBatchName() {
+            return batchName;
+        }
+
+        public void setBatchName(String batchName) {
+            this.batchName = batchName;
+        }
+
+
+    }*/
 }

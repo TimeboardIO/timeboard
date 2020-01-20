@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,13 +26,18 @@ package timeboard.webapp;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.model.Account;
-import timeboard.core.ui.UserInfo;
+import timeboard.core.model.Organization;
+import timeboard.core.security.TimeboardAuthentication;
+import timeboard.organization.OrganizationSelectController;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;
@@ -49,16 +54,18 @@ import java.util.stream.Collectors;
 @Order(1)
 public class OrganizationFilter implements Filter {
 
-    @Autowired
-    private UserInfo userInfo;
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationFilter.class);
 
     @Autowired
     private OrganizationService organizationService;
 
     private static final List<String> whitelist = new ArrayList<>();
+
     static {
         whitelist.add(OrganizationSelectController.URI);
         whitelist.add(OnboardingController.URI);
+        whitelist.add("/org/create");
+        whitelist.add("/login/oauth2/code/cognito");
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2|svg)");
     }
 
@@ -67,10 +74,13 @@ public class OrganizationFilter implements Filter {
                          ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
 
-        if(isWhiteListed((HttpServletRequest)servletRequest)){
+        if (isWhiteListed((HttpServletRequest) servletRequest)) {
             filterChain.doFilter(servletRequest, servletResponse);
-        }else {
-            if (processCookieExtraction((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse)) {
+        } else {
+            if (processCookieExtraction(
+                    (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication(),
+                    (HttpServletRequest) servletRequest,
+                    (HttpServletResponse) servletResponse)) {
                 return;
             }
 
@@ -78,22 +88,34 @@ public class OrganizationFilter implements Filter {
         }
     }
 
-    private boolean processCookieExtraction(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
-        Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
-        if(orgCookie.isPresent()){
-            final Long organizationID = Long.parseLong(orgCookie.get().getValue());
-            Optional<Account> organization =
-                    this.organizationService.getOrganizationByID(this.userInfo.getCurrentAccount(), organizationID);
+    private boolean processCookieExtraction(TimeboardAuthentication authentication,
+                                            HttpServletRequest servletRequest,
+                                            HttpServletResponse servletResponse) throws IOException {
 
-            if(organization.isPresent()){
-                ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
-            }else{
+        Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
+        if (orgCookie.isPresent() && authentication!= null) {
+            try {
+                final Long organizationID = Long.parseLong(orgCookie.get().getValue());
+
+                Optional<Organization> organization = this.organizationService
+                        .getOrganizationByID(authentication.getDetails(), organizationID);
+
+                if (organization.isPresent()) {
+                    ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
+                } else {
+                    servletResponse.sendRedirect(OrganizationSelectController.URI);
+                    LOGGER.info("Wrong or missing org cookie, redirect to login");
+                    return true;
+                }
+            } catch (AccessDeniedException ex) {
                 servletResponse.sendRedirect(OrganizationSelectController.URI);
+                LOGGER.info("Wrong or missing org cookie, redirect to login");
                 return true;
             }
 
-        }else{
+        } else {
             servletResponse.sendRedirect(OrganizationSelectController.URI);
+            LOGGER.info("Wrong or missing org cookie, redirect to login");
             return true;
         }
         return false;

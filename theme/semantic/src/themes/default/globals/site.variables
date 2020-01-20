@@ -449,18 +449,6 @@
 @invertedSelectedTextColor   : rgba(255, 255, 255, 1);
 @invertedDisabledTextColor   : rgba(255, 255, 255, 0.2);
 
-/*-------------------
-     Brand Colors
---------------------*/
-
-@facebookColor   : #3B5998;
-@twitterColor    : #55ACEE;
-@googlePlusColor : #DD4B39;
-@linkedInColor   : #1F88BE;
-@youtubeColor    : #FF0000;
-@pinterestColor  : #BD081C;
-@vkColor         : #4D7198;
-@instagramColor  : #49769C;
 
 /*-------------------
       Borders

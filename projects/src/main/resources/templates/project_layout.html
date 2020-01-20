@@ -2,6 +2,7 @@
 
 <html layout:decorate="~{layouts/general.html(path='/projects')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
       xmlns:th="http://www.thymeleaf.org">
 
 
@@ -16,13 +17,18 @@
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
            th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}" data-cy="project-menu-tasks">Tasks</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
-           th:href="@{/projects/{projectID}/milestones(projectID=${project.id})}" data-cy="project-menu-milestones">Milestones</a>
+           th:href="@{/projects/{projectID}/batches(projectID=${project.id})}" data-cy="project-menu-batches">Batches</a>
         <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
            th:href="@{/projects/{projectID}/dashboard(projectID=${project.id})}" data-cy="project-menu-dashboard" >Dashboard</a>
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"
            th:href="@{/projects/{projectID}/tags(projectID=${project.id})}" data-cy="project-menu-tags">Tags</a>
+        <a class="item" th:classappend="${tab} == 'six'  ? 'active':''"
+           sec:authorize="${hasPermission(#vars.project,'PROJECT_SNAPSHOT')}"
+           th:href="@{/projects/{projectID}/snapshots(projectID=${project.id})}" data-cy="project-menu-tags">Snapshots</a>
+        <a class="item" th:classappend="${tab} == 'seven'  ? 'active':''"
+           th:href="@{/projects/{projectID}/calendar(projectID=${project.id})}" data-cy="project-menu-calendar">Calendar</a>
     </div>
-    <div class="ui bottom attached tab segment active" data-tab="first" layout:fragment="placeholder">
+    <div class="ui bottom attached tab segment controls active" data-tab="first" style="border-top : none !important;" layout:fragment="placeholder">
 
     </div>
 

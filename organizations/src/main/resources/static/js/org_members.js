@@ -9,7 +9,7 @@ let app = new Vue({
     },
     methods: {
         removeMember: function(e, member){
-            $.get("/api/org/members/remove?orgID="+currentOrgID+"&memberID="+member.id)
+            $.get("/org/members/remove?orgID="+currentOrgID+"&memberID="+member.id)
             .done(function(data){
                 let copy = [];
                 for (let i = 0; i < app.members.length; i++) {
@@ -21,13 +21,13 @@ let app = new Vue({
             });
         },
         addMember: function(memberID){
-            $.get("/api/org/members/add?orgID="+currentOrgID+"&memberID="+memberID)
+            $.get("/org/members/add?orgID="+currentOrgID+"&memberID="+memberID)
             .done(function(data){
                 app.members.push(new MemberWrapper(data));
             });
         },
         updateRole: function(e, member){
-            $.get("/api/org/members/updateRole?orgID="+currentOrgID+"&memberID="+member.id+"&role="+member.role)
+            $.get("/org/members/updateRole?orgID="+currentOrgID+"&memberID="+member.id+"&role="+member.role)
             .done(function(data){
                 member.role = data.role;
             });
@@ -46,7 +46,7 @@ class MemberWrapper {
 //Initialization
 $(document).ready(function(){
     //initial data loading
-        $.get("/api/org/members?orgID="+currentOrgID)
+        $.get("/org/members/list?orgID="+currentOrgID)
         .then(function(data){
             for (var item in data) {
                 app.members.push(new MemberWrapper(data[item]));

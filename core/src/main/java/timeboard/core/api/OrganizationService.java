@@ -27,11 +27,11 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.AccountHierarchy;
-import timeboard.core.model.MembershipRole;
+import timeboard.core.model.*;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -39,24 +39,80 @@ import java.util.Optional;
  */
 public interface OrganizationService {
 
-    Account createOrganization(final Account actor, final Account organization) throws BusinessException;
 
-    Optional<Account> getOrganizationByID(final Account actor, long id);
+    Organization createOrganization(String organizationName, Map<String, String> properties);
 
-    Account updateOrganization(final Account actor, Account organization);
+    Organization createOrganization(Account actor,
+                                    String organizationName, Map<String, String> properties) throws BusinessException;
 
-    List<Account> getParents(final Account actor, Account organization);
+    Optional<Organization> getOrganizationByID(final Account actor,
+                                               long id);
 
-    List<Account> getMembers(final Account actor, Account organization);
+    Optional<Organization> getOrganizationByName(String organisationName);
 
-    MembershipRole getRoleInOrganization(final Account actor, final Account target, Account organization);
+    Organization updateOrganization(final Account actor,
+                                    Organization organization);
 
-    AccountHierarchy removeMember(Account actor, Account organization, Account member) throws BusinessException;
+    Optional<Organization> removeMember(Account actor,
+                                        Organization organization,
+                                        Account member) throws BusinessException;
 
-    AccountHierarchy addMember(Account actor, Account organization, Account member) throws BusinessException;
+    Optional<Organization> addMember(Account actor,
+                                     Organization organization,
+                                     Account member,
+                                     MembershipRole role) throws BusinessException;
 
-    AccountHierarchy updateMemberRole(Account actor,
-                                      Account organization,
-                                      Account member,
-                                      MembershipRole role) throws BusinessException;
+    Optional<Organization> updateMemberRole(Account actor,
+                                            Organization organization,
+                                            Account member,
+                                            MembershipRole role) throws BusinessException;
+
+    /*
+    == Default Tasks ==
+    */
+    List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de);
+    List<DefaultTask> listDefaultTasks(Long orgID);
+
+    /**
+     * Create a default task.
+     *
+     * @return DefaultTask
+     */
+    DefaultTask createDefaultTask(Account actor, Long orgID, String task) throws BusinessException;
+
+
+
+    /**
+     * default tasks can not be deleted, so they are set disabled and hidden from UI
+     *
+     * @param actor
+     * @param taskID
+     * @throws BusinessException
+     */
+    void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException;
+
+
+    DefaultTask updateDefaultTask(Account actor, DefaultTask task);
+
+    DefaultTask getDefaultTaskByID(Account actor, long id);
+
+
+    /**
+     * Return task types.
+     *
+     * @return List all task types.
+     */
+    List<TaskType> listTaskType(Long orgID);
+
+    TaskType findTaskTypeByID(Long taskTypeID);
+
+    TaskType updateTaskType(Account actor, TaskType type);
+
+    TaskType createTaskType(Account actor, Long orgID, String name);
+
+    void disableTaskType(Account actor, TaskType type);
+
+    //TODO remove when migration is ok
+    boolean checkOrganizationVacationTask(String taskName) ;
+
 }

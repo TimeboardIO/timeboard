@@ -3,7 +3,7 @@
 */
 
 
-const userID = $("meta[property='timesheet']").attr('userID');
+const actorID = $("meta[property='timesheet']").attr('actorID');
 
 const emptyTask =  {
     taskID: 0,
@@ -33,7 +33,7 @@ const timesheetModel =  {
     week:0,
     year:0,
     sum:0,
-    validated:false,
+    submitted:false,
     days:[],
     projects:  { },
     imputations:  { },
@@ -51,16 +51,16 @@ const timesheetModel =  {
     getImputation: function(date, taskID) { 
         return this.imputations[date][taskID];
     },
-    enableValidateButton: function(week) { 
+    enableSubmitButton: function(week) {
         let result = true;
 
         //check last week
-        const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
-        result = result && (this.disablePrev || lastWeekValidated === 'true');
+        const lastWeekSubmitted = $("meta[property='timesheet']").attr('lastWeekSubmitted');
+        result = result && (this.disablePrev || lastWeekSubmitted === 'true');
 
         //check all days imputations == 1
         this.days.forEach(function(day)  { 
-            if(day.day !== 'Sunday' && day.day !== 'Saturday') {
+            if(day.day !== 'Sun' && day.day !== 'Sat') {
                 let sum = timesheetModel.getImputationSum(day.date);
                 result = result && (sum === 1);
              }
@@ -121,7 +121,7 @@ $(document).ready(function() {
 
     const week = $("meta[property='timesheet']").attr('week');
     const year = $("meta[property='timesheet']").attr('year');
-    const lastWeekValidated = $("meta[property='timesheet']").attr('lastWeekValidated');
+    const lastWeekSubmitted = $("meta[property='timesheet']").attr('lastWeekSubmitted');
 
     const formValidationRules =  { 
         fields:  { 
@@ -168,16 +168,16 @@ let app = new Vue( {
         displaySuccessMessage: function(message) {
             this.successMessages.push({message : message, visible : true});
         },
-        validateMyWeek: function(event) {
+        submitMyWeek: function(event) {
             $.ajax({
                 method: "GET",
-                url: "api/timesheet/validate?week="+app.week+"&year="+app.year,
+                url: "api/timesheet/submit?week="+app.week+"&year="+app.year,
                 success : function(data, textStatus, jqXHR)  {
-                    app.validated=true;
-                    app.displaySuccessMessage("Your timesheet have been validated successfully.");
+                    app.submitted=true;
+                    app.displaySuccessMessage("Your timesheet have been submitted successfully.");
                 },
                 error: function(jqXHR, textStatus, errorThrown)  {
-                   app.displayErrorMessage("Error can not validate your timesheet.");
+                   app.displayErrorMessage("Error can not submit your timesheet.");
                 }
             });
         },
@@ -240,10 +240,12 @@ let app = new Vue( {
                 this.newTask.endDate = task.endDate;
                 this.newTask.originalEstimate = task.originalEstimate;
                 this.newTask.typeID = task.typeID;
+                this.newTask.assigneeID = task.assigneeID;
                 this.modalTitle = "Edit task";
             } else {
                 this.modalTitle = "Create task";
                 Object.assign(this.newTask , emptyTask);
+                this.newTask.assigneeID = actorID;
             }
             let keepThis = this;
             $('.create-task.modal').modal(  {  
@@ -282,7 +284,7 @@ let app = new Vue( {
         .then(function(data) { 
             app.week = data.week;
             app.year = data.year;
-            app.validated = data.validated;
+            app.submitted = data.submitted;
             app.days = data.days;
             app.imputations = data.imputations;
             app.projects = data.projects;

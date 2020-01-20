@@ -38,13 +38,12 @@ import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -67,6 +66,22 @@ public class UserServiceImpl implements UserService {
             LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
         });
         return accounts;
+    }
+
+    @Override
+    public Account findUserByLogin(String name) {
+        if (name == null) {
+            return null;
+        }
+        TypedQuery<Account> q = em.createQuery("from Account u where u.localLogin=:name", Account.class);
+        q.setParameter("name", name);
+        Account account;
+        try {
+            account = q.getSingleResult();
+        } catch (NoResultException e) {
+            account = null;
+        }
+        return account;
     }
 
 
@@ -108,12 +123,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Account> searchUserByEmail(final Account actor, final String email, final Account org) throws BusinessException {
+    public List<Account> searchUserByEmail(final Account actor, final String email, final Organization org) throws BusinessException {
 
         TypedQuery<Account> q = em
                 .createQuery(
-                        "select h.member from AccountHierarchy h " +
-                                "where h.member.email LIKE CONCAT('%',:prefix,'%') and h.organization = :org",
+                        "select m.member from OrganizationMembership m " +
+                                "where m.member.email LIKE CONCAT('%',:prefix,'%') and m.organization = :org",
                         Account.class);
         q.setParameter("prefix", email);
         q.setParameter("org", org);
@@ -212,8 +227,5 @@ public class UserServiceImpl implements UserService {
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(12));
     }
-  /*
-    private boolean checkPassword(String password, String hash) {
-        return BCrypt.checkpfw(password, hash);
-    }*/
+
 }

@@ -26,12 +26,6 @@ package timeboard.core.internal;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +33,19 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.*;
-import timeboard.core.model.*;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.ReportService;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
+import timeboard.core.model.Report;
+import timeboard.core.model.ReportType;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -101,7 +106,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(Account actor, List<String> expressions){
+    public List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions){
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -109,7 +114,7 @@ public class ReportServiceImpl implements ReportService {
                 .stream().map(filter -> expressionParser.parseExpression(filter))
                 .collect(Collectors.toList());
 
-        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor)
+        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor, orgID)
                 .stream()
                 .map(project -> wrapProjectTags(project))
                 .filter(projectWrapper -> {
@@ -127,8 +132,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(Account actor, Report report) {
-        return this.findProjects(actor, Arrays.asList(report.getFilterProject().split("\n")));
+    public List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report) {
+        return this.findProjects(actor, orgID, Arrays.asList(report.getFilterProject().split("\n")));
     }
 
     private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {

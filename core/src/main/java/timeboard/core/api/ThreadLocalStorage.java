@@ -26,6 +26,9 @@ package timeboard.core.api;
  * #L%
  */
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import timeboard.core.security.TimeboardAuthentication;
+
 public class ThreadLocalStorage {
 
     private static ThreadLocal<Long> currentOrganizationID = new ThreadLocal<>();
@@ -36,6 +39,7 @@ public class ThreadLocalStorage {
 
     public static void setCurrentOrganizationID(Long tenantName) {
         currentOrganizationID.set(tenantName);
+        ((TimeboardAuthentication)SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
     }
 
 }

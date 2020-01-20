@@ -33,12 +33,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectTag;
-import timeboard.core.ui.UserInfo;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,14 +51,12 @@ public class ProjectTagsController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
-
     @GetMapping
-    public String display(@PathVariable Long projectID, Model model) throws BusinessException {
+    public String display(TimeboardAuthentication authentication,
+                          @PathVariable Long projectID, Model model) throws BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
 
@@ -66,28 +64,31 @@ public class ProjectTagsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> listTags(@PathVariable Long projectID) throws BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+    public ResponseEntity<List<ProjectTagWrapper>> listTags(TimeboardAuthentication authentication,
+                                                            @PathVariable Long projectID) throws BusinessException {
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new ProjectTagWrapper(projectTag)).collect(Collectors.toList()));
     }
 
     @DeleteMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> deleteTag(@PathVariable Long projectID, @PathVariable Long tagID) throws BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+    public ResponseEntity<List<ProjectTagWrapper>> deleteTag(TimeboardAuthentication authentication,
+                                                             @PathVariable Long projectID, @PathVariable Long tagID) throws BusinessException {
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getTags().removeIf(projectTag -> projectTag.getId().equals(tagID));
         this.projectService.updateProject(actor, project);
-        return this.listTags(projectID);
+        return this.listTags(authentication, projectID);
     }
 
     @PatchMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> patchTag(@PathVariable Long projectID,
+    public ResponseEntity<List<ProjectTagWrapper>> patchTag(TimeboardAuthentication authentication,
+                                                            @PathVariable Long projectID,
                                                             @PathVariable Long tagID,
                                                             @ModelAttribute ProjectTag tag) throws BusinessException {
 
-        final Account actor = this.userInfo.getCurrentAccount();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getTags().stream()
                 .filter(projectTag -> projectTag.getId().equals(tagID))
                 .forEach(projectTag -> {
@@ -95,18 +96,19 @@ public class ProjectTagsController {
                     projectTag.setTagValue(tag.getTagValue());
                 });
         this.projectService.updateProject(actor, project);
-        return this.listTags(projectID);
+        return this.listTags(authentication, projectID);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> createTag(@PathVariable Long projectID,
+    public ResponseEntity<List<ProjectTagWrapper>> createTag(TimeboardAuthentication authentication,
+                                                             @PathVariable Long projectID,
                                                              @ModelAttribute ProjectTag tag) throws BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
-        final Project project = this.projectService.getProjectByID(actor, projectID);
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         tag.setProject(project);
         project.getTags().add(tag);
         this.projectService.updateProject(actor, project);
-        return this.listTags(projectID);
+        return this.listTags(authentication,projectID);
     }
 
     public static class ProjectTagWrapper {

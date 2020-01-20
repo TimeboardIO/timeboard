@@ -26,7 +26,6 @@ package timeboard.reports;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,15 +34,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
-import timeboard.core.ui.UserInfo;
 
-import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -52,20 +51,18 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("/data-chart/report-kpi")
 public class ReportKPIController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     @Autowired
     private ReportService reportService;
 
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping("/{reportID}")
-    protected ResponseEntity getDataChart(@PathVariable long reportID, Model model) throws BusinessException, IOException {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected ResponseEntity getDataChart(TimeboardAuthentication authentication,
+                                          @PathVariable long reportID, Model model)  {
+
+        final Account actor = authentication.getDetails();
         final Report report = this.reportService.getReportByID(actor, reportID);
 
         // If report has no filter, don't show its KPI graph
@@ -73,11 +70,13 @@ public class ReportKPIController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This report has no filter. Modify it to display the graph.");
         }
 
-        final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService.findProjects(actor, report);
-        AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
-        AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
-        AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
-        AtomicReference<Double> quotation = new AtomicReference<>(0.0);
+        final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService
+                .findProjects(actor, authentication.getCurrentOrganization(), report);
+
+        final AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
+        final AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
+        final AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
+        final AtomicReference<Double> quotation = new AtomicReference<>(0.0);
 
         listOfProjectsFiltered.forEach(projectWrapper -> {
             try {
@@ -92,7 +91,7 @@ public class ReportKPIController {
         });
 
         final ProjectDashboard dashboardTotal =
-                new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get());
+                new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get(), new Date());
         return ResponseEntity.status(HttpStatus.OK).body(dashboardTotal);
     }
 

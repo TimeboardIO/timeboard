@@ -3,7 +3,7 @@ $(document).ready(function () {
     const projectID = $("meta[name='projectID']").attr('content');
 
     var app = new Vue({
-        el: '#projects-app',
+        el: '#projectsApp',
         data: {
             table: {
                 cols: [
@@ -11,18 +11,25 @@ $(document).ready(function () {
                         "slot": "name",
                         "label": "Project Name",
                         "primary" : true,
-                        "sortKey" : "name"
+                        "sortKey" : "name",
                     },
                     {
                         "slot": "actions",
                         "label": "Actions",
-                        "primary" : true
+                        "primary" : true,
+                        "class":"right aligned collapsing"
                     }],
                 data: [],
                 name : "tableProjects",
             }
         },
         methods: {
+            archive : function (row){
+                this.$refs.confirmModal.confirm("Are you sure you want to archive project "+ row.name + "? This action is irreversible.",
+                    function(){
+                        document.location.replace('/projects/'+row.id+'/delete');
+                    });
+            }
         },
         mounted: function () {
             let self = this;
@@ -32,6 +39,7 @@ $(document).ready(function () {
                 url: "projects/list",
                 success: function (d) {
                     self.table.data = d;
+                    $('.ui.loading').toggle();
                 }
             });
         }

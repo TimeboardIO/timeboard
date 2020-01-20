@@ -26,23 +26,63 @@ package timeboard.core;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.model.Organization;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.async"})
+@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.internal.async"})
 @EnableJpaRepositories
 @EnableTransactionManagement
-@EnableGlobalMethodSecurity(
-        prePostEnabled = true,
-        securedEnabled = true,
-        jsr250Enabled = true)
 public class CoreConfiguration {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoreConfiguration.class);
+
+    @Autowired
+    private OrganizationService organizationService;
+
+    @Autowired
+    private ProjectService projectService;
+
+    @Value("${timeboard.organizations.default}")
+    private String defaultOrganizationName;
+
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
+
+    @PostConstruct
+    private void verifyPublicOrganization(){
+
+        final Optional<Organization> defaultOrganization = this.organizationService
+                    .getOrganizationByName(this.defaultOrganizationName);
+
+        if(!defaultOrganization.isPresent()){
+            final Map<String, String> props = new HashMap<>();
+            props.put(Organization.SETUP_PUBLIC, "true");
+
+            this.organizationService.createOrganization(this.defaultOrganizationName, props);
+        }
+
+        //TODO remove when migration is ok
+        this.organizationService.checkOrganizationVacationTask(defaultVacationTaskName);
+
+
+    }
 
 
 }

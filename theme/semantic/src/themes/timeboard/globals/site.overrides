@@ -6,14 +6,17 @@
     background-color : white ! important;
 }
 
-body{
-       background: rgba(221,227,232,1);
-       background: linear-gradient(180deg, rgba(110,138,158,1) 0%, rgba(221,227,232,1) 100%);
-       background-repeat: no-repeat;
-}
+
 html{
-       height: 100%;
-       background: rgba(221,227,232,1);
+    height: 100%;
+    background: @primaryColor;
+    //background: linear-gradient(45deg, #00bed8 0%,#007df7 95%) fixed;
+    background: rgba(0,0,0,.05)
+  // background-size: cover;
+  //  background-repeat: no-repeat;
+}
+body{
+  background: transparent;
 }
 
 
@@ -21,20 +24,18 @@ th, td {
     text-align: center;
 }
 
-.ui.primary.button:hover {
-  box-shadow:
-    0px 0px 0px 1px rgba(0, 0, 0, 0.3) inset,
-    0px 2px 3px 0px rgba(0, 0, 0, 0.35) !important
-  ;
+
+.ui.segment {
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
 }
 
-.ui.secondary.button:hover {
-  box-shadow:
-    0px 0px 0px 1px rgba(0, 0, 0, 0.2) inset,
-    0px 2px 3px 0px rgba(0, 0, 0, 0.3) !important
-  ;
+.ui.segment.controls {
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
+  border: 1px solid rgba(34,36,38,.15) !important;
+  background: @white !important;
 }
-
 
 h1.ui.header,
 .ui.huge.header {
@@ -55,79 +56,114 @@ ui.input.error > input {
 
 }
 
+.day-badge {
+  min-width: 2.5rem !important;
+  height: 2.5rem;
+}
 
+.ui.statistic .value {
+  color: @primaryColor !important;
+  padding-bottom: 1rem;
+  font-weight: bold !important;
+}
+
+table, .controls {
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
+}
 
 /** Timesheet **/
 
-#timesheet{
-    table td{
+#timesheet {
 
-        padding: 0.3rem 0.3rem;
+  table td{
+    padding: 0.3rem 0.3rem;
+  }
+
+  fieldset input{
+      text-align: center;
+      border: 0px solid #fff;
+      background-color: rgba(1,0,1,0);
     }
-    fieldset input{
-        text-align: center;
-        border: 0px solid #fff;
-        background-color: rgba(1,0,1,0);
-    }
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
     }
 
-    button.create-task{
-        left: 11em; position: absolute;
-    }
+  .actions {
+      * {
+        display: inline-block;
+      }
+      position: absolute;
+      left: 0;
+      top: 25%;
+      margin-left: 1rem;
+  }
 
-    fieldset{
-        padding: 0px; margin: 0px; border: none;
-    }
-    td:focus {
-        background-color: rgba(128,128,200,0.3);
-    }
-    .timesheet-navigation-controls{
-        margin-bottom: 1em;
-        text-align: right;
-    }
+  fieldset{
+      padding: 0px; margin: 0px; border: none;
+  }
+  td:focus {
+      background-color: rgba(128,128,200,0.3);
+  }
+  .timesheet-navigation-controls{
+      margin-bottom: 1em;
+      text-align: right;
+  }
 
-    .timesheet-validation-controls{
-        margin-top: 1em;
-    }
+  .timesheet-validation-controls{
+      margin-top: 1em;
+  }
 
-    .project{
-        padding: 0.38571429em 0.78571429em !important;
-        background-color: @lightBlue !important;
-        color: @primaryColor !important;
-        font-size: 1.25em !important;
-    }
+  .project {
+      padding: 0.38571429em 0.78571429em !important;
+      background-color: @lightBlue  !important;
+      font-size: 1.25em !important;
+  }
 
-    th.project{
-        font-size: 1em !important;
-        font-weight: normal;
-    }
+  .days th {
+    background-color: @primaryColor !important;
+    color: @white !important;
+  }
+
+  .timesheet-head th{
+    background-color: @white  !important;
+    color : @secondaryColor  !important;
+  }
+
+  th.project{
+      font-size: 1em !important;
+      font-weight: normal;
+  }
 
 }
+
+
+.calendar.ui.celled.table tr td, .calendar.ui.celled.table tr th {
+
+  border-left: 1px solid rgba(34,36,38,.1) !important;
+}
+
 
 /** PROJECT **/
 .badge{
        text-align: center;
         width: 3em;
+        height: 3em;
         margin: 0 auto;
-        background-color: @violet;
+       // background-color: @violet;
         line-height: 3em;
         border-radius: 5em;
         margin-top: 0.5em;
         font-size: 3em;
         color: white;
         margin-bottom: 0.5em;
+        font-weight: bold;
+        text-transform: capitalize;
 }
 
-
-.menu.project{
-    :not(.active){
-        color: white !important;
-        font-weight: bold !important;
-    }
+.ui.form textarea:not([rows]) {
+  height: 8em !important;
 }
 
 .text.primary {
@@ -138,3 +174,12 @@ ui.input.error > input {
   font-: @primaryColor !important;
 }
 
+
+/** Account **/
+
+.user-card {
+  color: @white !important;
+  background-color: @primaryColor !important;
+  padding: 1.1em 1em !important;
+
+}

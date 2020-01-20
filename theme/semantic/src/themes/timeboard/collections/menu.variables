@@ -2,35 +2,27 @@
              Menu
 *******************************/
 
-@fontFamily: 'Roboto', Arial, sans-serif;
-@boxShadow: 0px 1px 6px rgba(0, 0, 0, 0.2);
+/* Menu */
+@boxShadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
 @dividerSize: 0px;
+@itemFontWeight: 600;
 
 @itemVerticalPadding: @relativeLarge;
 @itemHorizontalPadding: @relativeLarge;
 
-
-/* Pointing */
-@secondaryPointingBorderWidth: 2px;
-@secondaryPointingBorderColor: @borderColor;
-@secondaryPointingItemVerticalPadding: @relativeTiny;
-@secondaryPointingItemHorizontalPadding: @relativeLarge;
-
-@secondaryPointingHoverTextColor: @textColor;
-
-@secondaryPointingActiveBorderColor: @primaryColor;
-/*@secondaryPointingActiveTextColor: @selectedTextColor;*/
-@secondaryPointingActiveTextColor: @primaryColor;
-@secondaryPointingActiveFontWeight: @bold;
-
-@secondaryPointingActiveDropdownBorderColor: transparent;
-
-@secondaryPointingActiveHoverBorderColor: @secondaryPointingActiveBorderColor;
-@secondaryPointingActiveHoverTextColor: @secondaryPointingActiveTextColor;
-
-@secondaryPointingHeaderColor: @darkTextColor;
-@secondaryVerticalPointingItemMargin: 0em -@secondaryPointingBorderWidth 0em 0em;
-
 @maxHeight: (@itemVerticalPadding * 2) + 1em;
 
+/* Hovered Item */
+@hoverItemTextColor: @primaryColor;
+@hoverItemBackground: transparent;
 
+  /* Active Item */
+@activeItemBackground: @transparentBlack;
+@activeItemTextColor: @primaryColor;
+@activeItemFontWeight: @bold;
+@activeItemBackground: transparent;
+
+
+/* Active Hovered Item */
+@activeHoverItemBackground: transparent;
+@activeHoverItemTextColor: @primaryColor;

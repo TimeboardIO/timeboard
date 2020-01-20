@@ -27,7 +27,7 @@
         <div class="ui two column grid doubling">
 
             <div class="column center aligned">
-                <div class="ui segment basic middle aligned center aligned grid">
+                <div class="ui segment controls middle aligned center aligned grid" style="padding: 1.5rem 0 1.5rem 0;">
                     <div class="column">
                         <div class="ui statistic">
                             <div class="label">
@@ -72,9 +72,9 @@
                         <td data-label="Days">
                             <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
                                 <div class="ui circular label large day-badge green" th:if="${week.imputationSum >= 5}"
-                                     th:text="${week.imputationSum}"></div>
+                                    ><p th:text="${week.imputationSum}" ></p></div>
                                 <div class="ui circular label large day-badge red" th:if="${week.imputationSum < 5}"
-                                     th:text="${week.imputationSum}"></div>
+                                    ><p th:text="${week.imputationSum}" ></p></div>
                             </a>
                         </td>
                         <td data-label="Validated">

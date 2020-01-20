@@ -26,6 +26,7 @@ package timeboard.projects;
  * #L%
  */
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,14 +37,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
-import timeboard.core.ui.UserInfo;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,15 +55,14 @@ public class ProjectsController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(Model model) {
-        final Account actor = this.userInfo.getCurrentAccount();
-        List<Project> allActorProjects = this.projectService.listProjects(actor);
-        if (allActorProjects.size() > 5) {
-            allActorProjects = allActorProjects.subList(0, 5);
+    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+        final Account actor = authentication.getDetails();
+        List<Project> allActorProjects = this.projectService.listProjects(actor, authentication.getCurrentOrganization());
+        Collections.reverse(allActorProjects);
+        if (allActorProjects.size() > 4) {
+            allActorProjects = allActorProjects.subList(0, 4);
         }
         model.addAttribute("projects", allActorProjects);
 
@@ -71,9 +70,9 @@ public class ProjectsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ProjectDecorator>> projectList(Model model) {
-        final Account actor = this.userInfo.getCurrentAccount();
-        final List<ProjectDecorator> projects = this.projectService.listProjects(actor)
+    protected ResponseEntity<List<ProjectDecorator>> projectList(TimeboardAuthentication authentication, Model model) {
+        final Account actor = authentication.getDetails();
+        final List<ProjectDecorator> projects = this.projectService.listProjects(actor, authentication.getCurrentOrganization())
                 .stream()
                 .map(project -> new ProjectDecorator(project))
                 .collect(Collectors.toList());
@@ -81,9 +80,10 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(HttpServletRequest request, HttpServletResponse response,  RedirectAttributes attributes) throws BusinessException {
-        final Account actor = this.userInfo.getCurrentAccount();
-        this.projectService.createProject(actor, request.getParameter("projectName"));
+    protected String handlePost(TimeboardAuthentication authentication,  HttpServletRequest request,
+                                RedirectAttributes attributes) throws BusinessException {
+        final Account actor = authentication.getDetails();
+        Project prj =  this.projectService.createProject(actor, request.getParameter("projectName"));
         attributes.addFlashAttribute("success", "Project created successfully.");
         return "redirect:/projects";
     }
@@ -94,9 +94,11 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(@PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
-        final Project project = this.projectService.getProjectByID(this.userInfo.getCurrentAccount(), projectID);
-        this.projectService.archiveProjectByID(this.userInfo.getCurrentAccount(), project);
+    protected String deleteProject(TimeboardAuthentication authentication,
+                                   @PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
+
+        final Project project = this.projectService.getProjectByID(authentication.getDetails(), authentication.getCurrentOrganization(), projectID);
+        this.projectService.archiveProjectByID(authentication.getDetails(), project);
         attributes.addFlashAttribute("success", "Project deleted successfully.");
 
         return "redirect:/projects";
@@ -110,13 +112,24 @@ public class ProjectsController {
         public ProjectDecorator(Project project) {
             this.project = project;
         }
-
         public long getID() {
             return this.project.getId();
         }
 
         public String getName() {
             return this.project.getName();
+        }
+
+        public String getColor() {
+            return this.project.getColor();
+        }
+
+        public String getComments() {
+            return this.project.getComments();
+        }
+
+        public String getMemberSize() {
+            return this.project.getMembers().size()+"";
         }
 
     }

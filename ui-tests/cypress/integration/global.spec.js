@@ -10,7 +10,9 @@ describe('Timeboard Test', function() {
 
     it('Connection user', function() {
          cy.url().should('include', '/home')
-         cy.get('.right.menu .title').should('contain', 'user')
+         cy.fixture("user.json").then((user) => {
+            cy.get('.right.menu .title').should('contain', user.email)
+         });
     });
 
 });

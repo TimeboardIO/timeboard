@@ -41,9 +41,9 @@ public interface ProjectService {
 
     Project createProject(Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(Account owner);
+    List<Project> listProjects(Account owner,  Long orgID);
 
-    Project getProjectByID(Account actor, Long projectID) throws BusinessException;
+    Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
 
     Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
 
@@ -83,7 +83,7 @@ public interface ProjectService {
                     Date startDate, Date endDate, double originalEstimate,
                     Long taskTypeID, Account assignedAccountID, String origin,
                     String remotePath, String remoteId,
-                    TaskStatus taskStatus, Milestone milestone);
+                    TaskStatus taskStatus, Batch batch);
 
     void createTasks(Account actor, List<Task> taskList);
 
@@ -110,7 +110,6 @@ public interface ProjectService {
                                                     String origin,
                                                     String remotePath) throws BusinessException;
 
-    List<TaskRevision> findAllTaskRevisionByTaskID(Account actor, Long taskID);
 
 
     Optional<Task> getTaskByRemoteID(Account actor, String id);
@@ -124,12 +123,12 @@ public interface ProjectService {
      *
      * @return List all effort spent for a task.
      */
-    List<EffortHistory> getEffortSpentByTaskAndPeriod(Account actor,
-                                                      Task task,
-                                                      Date startTaskDate,
-                                                      Date endTaskDate) throws BusinessException;
+    List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor,
+                                                     Task task,
+                                                     Date startTaskDate,
+                                                     Date endTaskDate) throws BusinessException;
 
-    List<EffortHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
+    List<ValueHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
 
     UpdatedTaskResult updateTaskImputation(Account actor,
                                            AbstractTask task,
@@ -138,98 +137,73 @@ public interface ProjectService {
     List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList);
 
 
-    /*
-     == Default Tasks ==
-     */
-    List<DefaultTask> listDefaultTasks(Date ds, Date de);
-
-    /**
-     * Create a default task.
-     *
-     * @return DefaultTask
-     */
-    DefaultTask createDefaultTask(Account actor, String task) throws BusinessException;
-
-    /**
-     * default tasks can not be deleted, so they are set disabled and hidden from UI
-     *
-     * @param actor
-     * @param taskID
-     * @throws BusinessException
-     */
-    void disableDefaultTaskByID(Account actor, long taskID) throws BusinessException;
 
 
     /*
-     == Milestones ==
+     == Batches ==
      */
 
     /**
-     * Return all milestones for a project.
+     * Return all batches for a project.
      *
      * @param project project
-     * @return List milestones
+     * @return List batches
      */
-    List<Milestone> listProjectMilestones(Account actor, Project project) throws BusinessException;
+    List<Batch> listProjectBatches(Account actor, Project project) throws BusinessException;
 
     /**
-     * Search milestone by id.
+     * Search batch by id.
      *
-     * @param id milestone's id
-     * @return Milestone
+     * @param id batch's id
+     * @return Batch
      */
-    Milestone getMilestoneById(Account actor, long id) throws BusinessException;
+    Batch getBatchById(Account actor, long id) throws BusinessException;
 
     /**
-     * Create a milestone.
+     * Create a batch.
      *
-     * @return Milestone
+     * @return Batch
      */
-    Milestone createMilestone(Account actor,
-                              String name,
-                              Date date,
-                              MilestoneType type,
-                              Map<String, String> attributes,
-                              Set<Task> tasks, Project project) throws BusinessException;
+    Batch createBatch(Account actor,
+                      String name,
+                      Date date,
+                      BatchType type,
+                      Map<String, String> attributes,
+                      Set<Task> tasks, Project project) throws BusinessException;
 
     /**
-     * Update a milestone.
+     * Update a batch.
      *
-     * @return Milestone
+     * @return Batch
      */
-    Milestone updateMilestone(Account actor, Milestone milestone) throws BusinessException;
+    Batch updateBatch(Account actor, Batch batch) throws BusinessException;
 
     /**
-     * Delete a milestone.
+     * Delete a batch.
      *
-     * @param milestoneID
+     * @param batchID
      */
-    void deleteMilestoneByID(Account actor, long milestoneID) throws BusinessException;
+    void deleteBatchByID(Account actor, long batchID) throws BusinessException;
 
-    List<Task> listTasksByMilestone(Account actor, Milestone milestone) throws BusinessException;
+    List<Task> listTasksByBatch(Account actor, Batch batch) throws BusinessException;
 
-    Milestone addTasksToMilestone(Account actor,
-                                  Milestone currentMilestone,
-                                  List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
+    Batch addTasksToBatch(Account actor,
+                          Batch currentBatch,
+                          List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
-    TaskType createTaskType(Account actor, String name);
 
-    void disableTaskType(Account actor, TaskType type);
-
-    /**
-     * Return task types.
-     *
-     * @return List all task types.
-     */
-    List<TaskType> listTaskType();
-
-    TaskType findTaskTypeByID(Long taskTypeID);
 
     TASData generateTasData(Account user, Project project, int month, int year);
+
     /*
      == Rule ==
      */
 
     boolean isProjectOwner(Account user, Project project);
 
+    List<Batch> getBatchList(Account user, Project project, BatchType batchType) throws BusinessException;
+
+    List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
+
+    List<Imputation> listProjectMembersVacations(Account actor, Project p, int month, int year) throws BusinessException;
 }

@@ -29,72 +29,91 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.AccountHierarchy;
-import timeboard.core.model.MembershipRole;
+import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.Calendar;
 
 
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @Component
 @Transactional
 public class OrganizationServiceImpl implements OrganizationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationServiceImpl.class);
 
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
+
     @Autowired
     private EntityManager em;
 
+
     @Override
-    public Account createOrganization(Account actor, Account organization) throws BusinessException {
+    public Organization createOrganization(final String organizationName, Map<String, String> properties) {
 
-        AccountHierarchy ah = new AccountHierarchy();
-        ah.setMember(actor);
-        ah.setOrganization(organization);
-        ah.setRole(MembershipRole.OWNER);
-        ah.setStartDate(new Date());
-        this.em.persist(ah);
+        final Organization organization = new Organization();
+        organization.setName(organizationName);
+        organization.setCreatedDate(new Date());
+        organization.setSetup(properties);
 
-        organization.setIsOrganization(true);
+
         this.em.persist(organization);
 
-        LOGGER.info("User " + actor.getFirstName() + " " + actor.getName() + " created organization " + organization.getName());
-        this.em.flush();
+        LOGGER.info("Organization " + organization.getName() + " created");
+
+        try {
+            this.createDefaultTask(organization, this.defaultVacationTaskName);
+        } catch (BusinessException e) {
+            e.printStackTrace();
+        }
+
         return organization;
     }
 
     @Override
-    public Optional<Account> getOrganizationByID(Account actor, long id) {
-        Account data;
-        if(actor.getId() == id){
-            return Optional.ofNullable(actor);
-        }
+    public Organization createOrganization(final Account actor, String organizationName, Map<String, String> properties) throws BusinessException {
+
+        final Organization org = this.createOrganization(organizationName, properties);
+        this.addMember(actor, org, actor, MembershipRole.OWNER);
+
+        return org;
+    }
+
+    @Override
+    @PostAuthorize("#actor.isMemberOf(returnObject)")
+    public Optional<Organization> getOrganizationByID(Account actor, long id) {
+        Organization data;
         try {
-            data = em.createQuery("select o from Account o join AccountHierarchy h " +
-                    "on h.organization = o " +
-                    "where o.id = :orgID and h.member = :owner"
-                    , Account.class)
-                    .setParameter("orgID", id)
-                    .setParameter("owner", actor)
-                    .getSingleResult();
-        } catch (NoResultException nre) {
+            data = em.find(Organization.class, id);
+        } catch (Exception nre) {
             data = null;
         }
         return Optional.ofNullable(data);
     }
 
     @Override
-    public Account updateOrganization(Account actor, Account organization) {
+    public Optional<Organization> getOrganizationByName(String orgName) {
+        Organization org = null;
+        try {
+            TypedQuery<Organization> q = this.em.createNamedQuery(Organization.FIND_BY_NAME, Organization.class);
+            q.setParameter("name", orgName);
+            org = q.getSingleResult();
+        }catch (Exception e){
+            org=null;
+        }
+        return Optional.ofNullable(org);
+    }
+
+    @Override
+    public Organization updateOrganization(Account actor, Organization organization) {
 
         em.merge(organization);
         em.flush();
@@ -104,90 +123,239 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public AccountHierarchy addMember(final Account actor, Account organization, Account member) throws BusinessException {
+    public Optional<Organization> addMember(final Account actor,
+                                            Organization organization,
+                                            Account member,
+                                            MembershipRole role)  {
 
-        List<AccountHierarchy> existingAH = em.createQuery("select h from AccountHierarchy h join h.organization o " +
-                "where h.member = :member and h.organization = :organization " +
-                "and o.isOrganization = true", AccountHierarchy.class)
-                .setParameter("member", member)
-                .setParameter("organization", organization)
-                .getResultList();
-        if (!existingAH.isEmpty()) {
-            throw new BusinessException("Organization " + organization.getScreenName() + " already have a parent");
+        final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
+
+        if(org.isPresent()){
+
+            final OrganizationMembership om = new OrganizationMembership();
+            om.setOrganization(org.get());
+            om.setMember(member);
+            om.setRole(role);
+            this.em.persist(om);
+
+            org.get().getMembers().add(om);
+
+            em.flush();
+
+            LOGGER.info("Member " + actor.getScreenName() + " is added to organisation "+org.get().getName());
         }
 
-        AccountHierarchy ah = new AccountHierarchy();
 
-        ah.setMember(member);
-        ah.setOrganization(organization);
-        ah.setRole(MembershipRole.CONTRIBUTOR);
-        ah.setStartDate(new Date());
-        this.em.persist(ah);
-        em.flush();
-
-        return ah;
+        return org;
     }
 
     @Override
-    public AccountHierarchy removeMember(final Account actor, Account organization, Account member) throws BusinessException {
+    public Optional<Organization> removeMember(final Account actor, Organization organization, Account member) {
 
-        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h " +
-                "where h.member = :member and h.organization = :organization", AccountHierarchy.class)
-                .setParameter("member", member)
-                .setParameter("organization", organization)
-                .getSingleResult();
+        final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 
-        if (ah.getRole() == MembershipRole.OWNER) {
-            throw new BusinessException("Can not remove an organization owner");
+        if(org.isPresent()){
+
+            org.get()
+                    .getMembers()
+                    .removeIf(om -> om.getMember().getId() == member.getId());
+
+            em.merge(org);
+            em.flush();
+
+            LOGGER.info("Member " + actor.getName() + " is removed from organisation "+org.get().getName());
+
         }
-        em.remove(ah);
-        organization.getMembers().remove(ah);
-        em.merge(organization);
-        em.flush();
 
-        return ah;
+        return org;
     }
 
 
     @Override
-    public AccountHierarchy updateMemberRole(final Account actor, Account organization, Account member, MembershipRole role) {
-        AccountHierarchy ah = em.createQuery("select h from AccountHierarchy h " +
-                "where h.member = :member and h.organization = :organization", AccountHierarchy.class)
-                .setParameter("member", member)
-                .setParameter("organization", organization)
-                .getSingleResult();
+    public Optional<Organization> updateMemberRole(final Account actor,
+                                                   final Organization organization,
+                                                   final Account member, final MembershipRole role) {
 
-        ah.setRole(role);
-        em.merge(ah);
-        em.flush();
+        final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 
-        return ah;
-    }
+        if(org.isPresent()){
 
-    @Override
-    public List<Account> getParents(Account actor, Account organization) {
-        return this.em.createQuery("select o from AccountHierarchy h " +
-                "join h.member m join h.organization o " +
-                "where m = :member", Account.class)
-                .setParameter("member", organization).getResultList();
-    }
+            org.get()
+                    .getMembers()
+                    .stream()
+                    .filter(om -> om.getMember().getId() == member.getId())
+                    .forEach(om -> om.setRole(role));
 
-    @Override
-    public List<Account> getMembers(Account actor, Account organization) {
-        if (!organization.getIsOrganization()){
-            return new ArrayList<>();
+            em.flush();
+
+            LOGGER.info("Member " + actor.getName() + " has changed role from organization "+org.get().getName() + " to "+role);
+
         }
-        return this.em.createQuery("select m from AccountHierarchy h " +
-                "join h.member m join h.organization o where o = :org", Account.class)
-                .setParameter("org", organization).getResultList();
+
+        return org;
+    }
+
+    @Override
+    public DefaultTask updateDefaultTask(Account actor, final DefaultTask task) {
+        Optional<Organization> org = this.getOrganizationByID(actor, task.getOrganizationID());
+        if (org.isPresent()) {
+            em.merge(task);
+            em.flush();
+        }
+        return task;
+    }
+
+    //TODO remove when migration is ok
+    @Override
+    public boolean checkOrganizationVacationTask(String taskName) {
+        boolean b = true;
+        TypedQuery<Organization> q = em
+                .createQuery("select distinct o from Organization o", Organization.class);
+        List<Organization> orgs = q.getResultList();
+
+        for (Organization o : orgs) {
+            Optional vacationTask = o.getDefaultTasks().stream().filter(t-> t.getName().matches(defaultVacationTaskName)).findFirst();
+            if (!vacationTask.isPresent()) {
+                try {
+                    this.createDefaultTask(o, defaultVacationTaskName);
+                } catch (Exception e) {
+                    b = false;
+                }
+            }
+        }
+
+        return b;
+    }
+
+
+    @Override
+    public List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de) {
+        TypedQuery<DefaultTask> q = em
+                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
+                        + "t.endDate > :ds "
+                        + "and t.startDate <= :de "
+                        + "and t.startDate < t.endDate "
+                        + "and t.organizationID = :orgID", DefaultTask.class);
+        q.setParameter("ds", ds);
+        q.setParameter("de", de);
+        q.setParameter("orgID", orgID);
+        List<DefaultTask> tasks = q.getResultList();
+
+        return q.getResultList();
 
     }
 
     @Override
-    public MembershipRole getRoleInOrganization(Account actor, Account target, Account organization) {
-        return this.em.createQuery("select h.role  from AccountHierarchy h " +
-                "where h.organization = :org and h.member = :member", MembershipRole.class)
-                .setParameter("org", organization)
-                .setParameter("member", target).getSingleResult();
+    public List<DefaultTask> listDefaultTasks(Long orgID) {
+        TypedQuery<DefaultTask> q = em
+                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
+                        + "t.organizationID = :orgID", DefaultTask.class);
+
+        q.setParameter("orgID", orgID);
+        List<DefaultTask> tasks = q.getResultList();
+
+        return q.getResultList();
+
     }
+
+    @Override
+    public DefaultTask createDefaultTask(Account actor, Long orgID, String name) throws BusinessException {
+        Optional<Organization> organization = this.getOrganizationByID(actor, orgID);
+        return this.createDefaultTask(organization.get(), name);
+    }
+
+
+    private DefaultTask createDefaultTask(Organization org, String name) throws BusinessException {
+        try {
+            DefaultTask task = new DefaultTask();
+            task.setStartDate(new Date());
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            c.set(9999, Calendar.DECEMBER, 31);
+            task.setEndDate(c.getTime());
+            task.setOrigin(org.getName() + "/" + System.nanoTime());
+            task.setName(name);
+            task.setOrganizationID(org.getId());
+            task.setOrganization(org);
+            em.persist(task);
+            em.flush();
+            LOGGER.info("Default task " + task.getName() + " is created.");
+            return task;
+        } catch (Exception e) {
+            throw new BusinessException(e);
+        }
+    }
+
+
+    @Override
+    public DefaultTask getDefaultTaskByID(Account account, long id) {
+        DefaultTask task = em.find(DefaultTask.class, id);
+        return task;
+    }
+
+    @Override
+    public void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException {
+
+        DefaultTask task = em.find(DefaultTask.class, taskID);
+        task.setEndDate(new Date());
+
+        em.merge(task);
+        em.flush();
+
+        LOGGER.info("Default Task " + taskID + " deleted by " + actor.getName());
+    }
+
+    @Override
+    public List<TaskType> listTaskType(Long orgID) {
+        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
+        q.setParameter("orgID", orgID);
+        return q.getResultList();
+    }
+
+    @Override
+    public TaskType findTaskTypeByID(Long taskTypeID) {
+        if (taskTypeID == null) {
+            return null;
+        }
+        return em.find(TaskType.class, taskTypeID);
+    }
+
+    @Override
+    public TaskType updateTaskType(Account actor, TaskType type) {
+        Optional<Organization> organization = this.getOrganizationByID(actor, type.getOrganizationID());
+        if(organization.isPresent()){
+            em.merge(type);
+            em.flush();
+        }
+        return type;
+    }
+
+    @Override
+    public TaskType createTaskType(Account actor, Long orgID, String name) {
+        TaskType taskType = new TaskType();
+        taskType.setTypeName(name);
+        taskType.setOrganizationID(orgID);
+        em.persist(taskType);
+        em.flush();
+        LOGGER.info("User " + actor.getScreenName() + " create task type " + name);
+
+        return taskType;
+    }
+
+
+
+    @Override
+    public void disableTaskType(Account actor, TaskType type) {
+
+        type.setEnable(false);
+
+        em.merge(type);
+        em.flush();
+        LOGGER.info("User " + actor.getScreenName() + " disable task type " + type.getTypeName());
+
+    }
+
+
+
+
+
 }

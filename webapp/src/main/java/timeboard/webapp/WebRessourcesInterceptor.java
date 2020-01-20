@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.WebRequest;
@@ -39,10 +40,7 @@ import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
-import timeboard.core.ui.CssService;
-import timeboard.core.ui.JavascriptService;
-import timeboard.core.ui.NavigationEntryRegistryService;
-import timeboard.core.ui.UserInfo;
+import timeboard.core.model.Organization;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
@@ -55,16 +53,6 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
     @Value("${timeboard.appName}")
     private String appName;
-
-
-    @Autowired
-    private JavascriptService javascriptService;
-
-    @Autowired
-    private CssService cssService;
-
-    @Autowired
-    private UserInfo userInfo;
 
     @Autowired
     private NavigationEntryRegistryService navRegistry;
@@ -95,17 +83,17 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
     @Override
     public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
+
+
         if(modelMap != null && webRequest.getUserPrincipal() != null) {
-            modelMap.put("account", userInfo.getCurrentAccount());
+            final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();
+
+            modelMap.put("account", account);
             modelMap.put("navs", navRegistry.getEntries());
-            modelMap.put("javascripts", javascriptService.listJavascriptUrls());
-            modelMap.put("CSSs", cssService.listCSSUrls());
             modelMap.put("dataTableService", dataTableService);
             Long orgaID = ThreadLocalStorage.getCurrentOrganizationID();
             if(orgaID != null) {
-                fillModelWithOrganization(modelMap, orgaID);
-            }else{
-                LOGGER.warn("User : {} try to access to null organisation", userInfo.getCurrentAccount());
+                fillModelWithOrganization(account, modelMap, orgaID);
             }
 
         }
@@ -116,13 +104,13 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
         }
     }
 
-    private void fillModelWithOrganization(ModelMap modelMap, Long orgaID) {
+    private void fillModelWithOrganization(Account account, ModelMap modelMap, Long orgaID) {
         modelMap.put("orgID", orgaID);
-        Optional<Account> organisation = organizationService.getOrganizationByID(userInfo.getCurrentAccount(), orgaID);
+        Optional<Organization> organisation = organizationService.getOrganizationByID(account, orgaID);
         if(organisation.isPresent()){
             modelMap.put("currentOrg", organisation.get());
         }else{
-            LOGGER.warn("User : {} try to access missing org : {}", userInfo.getCurrentAccount(), orgaID);
+            LOGGER.warn("User : {} try to access missing org : {}", account, orgaID);
         }
     }
 

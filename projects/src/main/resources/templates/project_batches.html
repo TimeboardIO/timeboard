@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='third')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title layout:fragment="title">Project Batches</title>
+    <meta name="projectID" th:content="${project.id}"/>
+    <script src="/js/project_batches.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+    <div id="batches-app">
+        <div class="ui menu">
+            <a class="item"
+               v-on:click="openModal">
+                <i class="plus icon"></i>
+                New Batch
+            </a>
+        </div>
+
+        <data-table v-bind:config="table">
+            <template v-slot:name="{row}">
+                {{row.name}}
+            </template>
+            <template v-slot:type="{row}">
+                {{row.type}}
+            </template>
+            <template v-slot:date="{row}">
+                {{row.date}}
+            </template>
+            <template v-slot:tasks="{row}">
+                {{row.tasks}}
+            </template>
+            <template v-slot:actions="{row}">
+                <button class="ui positive basic button" @click="editBatch(row)">
+                    <i class="edit alternate icon"></i>
+                    Edit
+                </button>
+                <a class="ui negative basic button" v-bind:href="deleteURL(row)">
+                    <i class="remove alternate icon"></i>
+                    Remove
+                </a>
+            </template>
+        </data-table>
+
+        <tmodal
+                v-bind:title="'Milestone'"
+                v-bind:id="'editMilestone'">
+            <template v-slot:content>
+
+                <div class="ui form">
+                    <div class="field">
+                        <label>Batch Label</label>
+                        <input v-model="batch.name" type="text" name="batch-label" placeholder="Batch Label">
+                    </div>
+                    <div class="field">
+                        <label>Batch Type</label>
+                        <select v-model="batch.type" class="ui dropdown" name="batch-type">
+                            <option th:each="b : ${batchTypes}" th:text="${b}" th:value="${b}"></option>
+                        </select>
+                    </div>
+
+                    <div class="field" v-if="batch.type!='GROUP'">
+                        <label>Date</label>
+                        <input v-model="batch.date"  type="date" name="batch-date">
+                    </div>
+                    <button v-on:click="saveBatch" class="ui button">Submit</button>
+                </div>
+
+            </template>
+        </tmodal>
+
+    </div>
+</div>
+
+</body>
+</html>

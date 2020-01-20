@@ -1,0 +1,146 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  Route53HostedZone:
+    Type: 'AWS::Route53::HostedZone::Id'
+Resources:
+  InternetGW:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties: {}
+  RouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TimeboardVPC
+  InternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGW
+    Properties:
+      RouteTableId:
+        Ref: RouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: InternetGW
+  GWAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref TimeboardVPC
+      InternetGatewayId: !Ref InternetGW
+  TimeboardVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+  EC2Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: TimeboardVPC
+      CidrBlock: 10.0.40.0/24
+      AvailabilityZone: 'eu-west-1a'
+      MapPublicIpOnLaunch: true
+  EC2SubnetRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref EC2Subnet
+  ELBSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: TimeboardVPC
+      CidrBlock: 10.0.70.0/24
+      AvailabilityZone: 'eu-west-1a'
+  PublicSubnetRouteTable:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref RouteTable
+      SubnetId: !Ref ELBSubnet
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow ZC2 to connect RDS
+      VpcId:
+        Ref: TimeboardVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          SourceSecurityGroupId: !Ref EC2SecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
+  DBSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: TimeboardVPC
+      CidrBlock: 10.0.20.0/24
+      AvailabilityZone: 'eu-west-1a'
+  DBSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId:
+        Ref: TimeboardVPC
+      CidrBlock: 10.0.30.0/24
+      AvailabilityZone: 'eu-west-1b'
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow http to client host
+      VpcId:
+        Ref: TimeboardVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
+Outputs:
+  VPCID:
+    Description: Timeboard VPC ID
+    Value: !Ref TimeboardVPC
+  EC2SG:
+    Description: Timeboard SG for EC2
+    Value: !Ref EC2SecurityGroup
+  DBSG:
+    Description: Timeboard SG for RDS
+    Value: !Ref DBSecurityGroup
+  DBSubnetA:
+    Description: Timeboard subnet A for RDS
+    Value: !Ref DBSubnetA
+  DBSubnetB:
+    Description: Timeboard subnet B for RDS
+    Value: !Ref DBSubnetB
+  ELBSubnet:
+    Description: Timeboard subnet for ELB
+    Value: !Ref ELBSubnet
+  EC2Subnet:
+    Description: Timeboard subnet for EC2
+    Value: !Ref EC2Subnet

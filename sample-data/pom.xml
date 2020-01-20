@@ -7,7 +7,7 @@
         <groupId>timeboard</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>sample-data</artifactId>
@@ -33,29 +33,6 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>4.2.1</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            timeboard.sample
-                        </Export-Package>
-                        <Import-Package>
-                            timeboard.core.api.*,
-                            timeboard.core.model,
-                            org.osgi.*
-                        </Import-Package>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
 
 </project>

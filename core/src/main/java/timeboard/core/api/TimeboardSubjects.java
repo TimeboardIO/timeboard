@@ -29,9 +29,10 @@ package timeboard.core.api;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import org.springframework.stereotype.Component;
-import timeboard.core.internal.events.TaskEvent;
-import timeboard.core.internal.events.TimeboardEvent;
-import timeboard.core.internal.events.TimesheetEvent;
+import timeboard.core.api.events.TaskEvent;
+import timeboard.core.api.events.TimeboardEvent;
+import timeboard.core.api.events.TimesheetEvent;
+import timeboard.core.api.events.VacationEvent;
 import timeboard.core.model.Account;
 
 import javax.annotation.PostConstruct;
@@ -42,8 +43,10 @@ import java.util.Map;
 public class TimeboardSubjects {
 
     public static PublishSubject<TaskEvent> TASK_EVENTS = PublishSubject.create();
+    public static PublishSubject<VacationEvent> VACATION_EVENTS = PublishSubject.create();
     public static PublishSubject<TimesheetEvent> TIMESHEET_EVENTS = PublishSubject.create();
     public static Observable<TimeboardEvent> TIMEBOARD_EVENTS = PublishSubject.create();
+
     //TODO keep this subject ?
     public static PublishSubject<Map<Account, String>> GENERATE_PASSWORD = PublishSubject.create();
 
@@ -52,6 +55,7 @@ public class TimeboardSubjects {
         //Merge all Timeboard app events
         TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TASK_EVENTS);
         TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(TIMESHEET_EVENTS);
+        TIMEBOARD_EVENTS = TIMEBOARD_EVENTS.mergeWith(VACATION_EVENTS);
     }
 
 }

@@ -37,17 +37,16 @@ import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
+import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
-import timeboard.core.ui.UserInfo;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -69,17 +68,15 @@ public class ReportsController {
     @Autowired
     private ProjectService projectService;
 
-    @Autowired
-    private UserInfo userInfo;
 
     @GetMapping
-    protected String handleGet(HttpServletRequest request, HttpServletResponse response, Model model) throws Exception {
+    protected String handleGet()  {
         return "reports.html";
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ReportDecorator>> reportList(Model model) {
-        final Account actor = this.userInfo.getCurrentAccount();
+    protected ResponseEntity<List<ReportDecorator>> reportList(TimeboardAuthentication authentication,  Model model) {
+        final Account actor = authentication.getDetails();
         final List<ReportDecorator> reports = this.reportService.listReports(actor)
                 .stream()
                 .map(report -> new ReportDecorator(report))
@@ -98,9 +95,11 @@ public class ReportsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(@ModelAttribute Report report,  RedirectAttributes attributes) {
-        final Account actor = this.userInfo.getCurrentAccount();
-        Long organizationID = userInfo.getCurrentOrganizationID();
+    protected String handlePost(TimeboardAuthentication authentication,
+                                @ModelAttribute Report report,  RedirectAttributes attributes) {
+
+        final Account actor = authentication.getDetails();
+        Long organizationID = ThreadLocalStorage.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
         String projectFilter = report.getFilterProject();
@@ -118,8 +117,11 @@ public class ReportsController {
     }
 
     @GetMapping("/delete/{reportID}")
-    protected String deleteReport(@PathVariable long reportID,  RedirectAttributes attributes) {
-        this.reportService.deleteReportByID(this.userInfo.getCurrentAccount(), reportID);
+    protected String deleteReport(final TimeboardAuthentication authentication,
+                                  @PathVariable long reportID,
+                                  RedirectAttributes attributes) {
+
+        this.reportService.deleteReportByID(authentication.getDetails(), reportID);
 
         attributes.addFlashAttribute("success", "Report deleted successfully.");
 
@@ -127,18 +129,22 @@ public class ReportsController {
     }
 
     @GetMapping("/edit/{reportID}")
-    protected String editReport(@PathVariable long reportID, Model model) {
+    protected String editReport(final TimeboardAuthentication authentication,
+                                @PathVariable long reportID, Model model) {
         model.addAttribute("allReportTypes", ReportType.values());
         model.addAttribute("reportID", reportID);
         model.addAttribute("action", "edit");
-        model.addAttribute("report", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID));
+        model.addAttribute("report", this.reportService.getReportByID(authentication.getDetails(), reportID));
         return "create_report.html";
     }
 
     @PostMapping("/edit/{reportID}")
-    protected String handlePost(@PathVariable long reportID, @ModelAttribute Report report,  RedirectAttributes attributes) {
-        final Account actor = this.userInfo.getCurrentAccount();
-        Long organizationID = userInfo.getCurrentOrganizationID();
+    protected String handlePost(final TimeboardAuthentication authentication,
+                                @PathVariable long reportID,
+                                @ModelAttribute Report report,  RedirectAttributes attributes) {
+
+        final Account actor = authentication.getDetails();
+        Long organizationID = ThreadLocalStorage.getCurrentOrganizationID();
         Account organization = userService.findUserByID(organizationID);
 
         Report updatedReport = this.reportService.getReportByID(organization, reportID);
@@ -153,9 +159,10 @@ public class ReportsController {
     }
 
     @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity refreshProjectSelection(@RequestBody MultiValueMap<String, String> filterProjectsMap)
+    public ResponseEntity refreshProjectSelection(final TimeboardAuthentication authentication,
+                                                  @RequestBody MultiValueMap<String, String> filterProjectsMap)
             throws JsonProcessingException {
-        final Account actor = this.userInfo.getCurrentAccount();
+        final Account actor = authentication.getDetails();
 
         String filterProjects = filterProjectsMap.getFirst("filter");
 
@@ -165,16 +172,19 @@ public class ReportsController {
         }
 
         final String[] filters = filterProjects.split("\n");
-        final List<ReportService.ProjectWrapper> projects = this.reportService.findProjects(actor, Arrays.asList(filters));
+        final List<ReportService.ProjectWrapper> projects = this.reportService
+                .findProjects(actor, authentication.getCurrentOrganization(), Arrays.asList(filters));
+
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
     }
 
     @GetMapping("/view/{reportID}")
-    protected String viewReport(@PathVariable long reportID, Model model) throws ServletException, IOException {
+    protected String viewReport(final TimeboardAuthentication authentication,
+                                @PathVariable long reportID, Model model) {
         model.addAttribute("reportID", reportID);
-        ReportType type = this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID).getType();
+        ReportType type = this.reportService.getReportByID(authentication.getDetails(), reportID).getType();
         model.addAttribute("reportType", type);
-        model.addAttribute("report", this.reportService.getReportByID(this.userInfo.getCurrentAccount(), reportID));
+        model.addAttribute("report", this.reportService.getReportByID(authentication.getDetails(), reportID));
 
         switch (type) {
             case PROJECT_KPI:

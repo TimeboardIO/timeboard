@@ -32,13 +32,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
-import timeboard.core.ui.UserInfo;
 import timeboard.home.model.Week;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -46,8 +45,13 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("/home")
+@RequestMapping(HomeController.URI)
 public class HomeController {
+
+    public static final String URI = "/home";
+    public static final String NB_PROJECTS = "nb_projects";
+    public static final String NB_TASKS = "nb_tasks";
+    public static final String WEEKS = "weeks";
 
     @Autowired
     private ProjectService projectService;
@@ -55,16 +59,13 @@ public class HomeController {
     @Autowired
     private TimesheetService timesheetService;
 
-    @Autowired
-    private UserInfo userInfo;
-
     @PostMapping
     protected String handlePost() {
         return "home.html";
     }
 
     @GetMapping
-    protected String handleGet(Principal principal, Model model) {
+    public String handleGet(TimeboardAuthentication authentication, Model model) {
 
 
         //load previous weeks data
@@ -72,11 +73,11 @@ public class HomeController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
         List<Week> weeks = new ArrayList<>();
-        Account account = this.userInfo.getCurrentAccount();
+        final Account account = authentication.getDetails();
         int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                boolean weekIsValidated = timesheetService.isTimesheetValidated(
+                boolean weekIsValidated = timesheetService.isTimesheetSubmitted(
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
@@ -92,9 +93,9 @@ public class HomeController {
             }
         }
 
-        model.addAttribute("nb_projects", this.projectService.listProjects(account).size());
-        model.addAttribute("nb_tasks", this.projectService.listUserTasks(account).size());
-        model.addAttribute("weeks", weeks);
+        model.addAttribute(NB_PROJECTS, this.projectService.listProjects(account, authentication.getCurrentOrganization()).size());
+        model.addAttribute(NB_TASKS, this.projectService.listUserTasks(account).size());
+        model.addAttribute(WEEKS, weeks);
 
         return "home.html";
     }

@@ -1,4 +1,5 @@
 const currentProjectID = $("meta[property='tasks']").attr('project');
+const currentBatchType = $("meta[property='tasks']").attr('batchType');
 
 // TASK EDIT/CREATE MODAL VUEJS COMPONENT
 Vue.component('task-modal', {
@@ -19,6 +20,35 @@ Vue.component('graph-modal', {
         modalTitle: String
     }
 });
+
+// SYnc in progress or not
+var interval = 5000;  // 5000 = 5 seconds
+function showStateSync() {
+    $.ajax({
+        method: "GET",
+        url: "/projects/"+currentProjectID+"/tasks/sync/inProgress",
+        contentType: "application/json",
+        dataType: "json",
+        success: function (data) {
+            if(data == "IN_PROGRESS" && $('#jobInProgress').is(':hidden')){
+                $("#jobInProgress").show();
+            }
+            if(data == "NO_JOB" && $('#jobInProgress').is(':visible')){
+                $("#jobInProgress").hide();
+                document.location.reload(true);
+            }
+        },
+        error: function(data) {
+            console.log(data);
+        },
+        complete: function () {
+            // Schedule the next
+            setTimeout(showStateSync, interval);
+        }
+    });
+}
+showStateSync();
+
 
 // Form validations rules
 const formValidationRules = {
@@ -64,8 +94,8 @@ const emptyTask =  {
     assigneeID: 0,
     status: "PENDING",
     statusName: '',
-    milestoneID: '',
-    milestoneName: '',
+    batchNames: [],
+    batchIDs: [],
 };
 
 const projectID = $("meta[name='projectID']").attr('value');
@@ -77,6 +107,7 @@ let app = new Vue({
     data: {
         newTask: Object.assign({}, emptyTask),
         formError: "",
+        batches: [],
         modalTitle: "Create task",
         table: {
             cols: [
@@ -117,10 +148,9 @@ let app = new Vue({
 
                 },
                 {
-                    "slot": "milestone",
-                    "label": "Milestone",
-                    "sortKey": "milestoneID"
-
+                    "slot": "batch",
+                    "label": "Batches",
+                    "sortKey": "batchID"
                 },
                 {
                     "slot": "type",
@@ -131,7 +161,8 @@ let app = new Vue({
                 {
                     "slot": "actions",
                     "label": "Actions",
-                    "primary" : true
+                    "primary" : true,
+                    "class":"right aligned collapsing"
                 }],
             filters: {
                 name:      { filterKey: 'taskName', filterValue: '',
@@ -146,11 +177,11 @@ let app = new Vue({
                                 filterFunction: (filter, row) => parseFloat(row) <= parseFloat(filter) },
                 assignee:  { filterKey: 'assignee', filterValue: '',
                                 filterFunction: (filter, row) => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 },
-                status:    { filterKey: 'status', filterValue: '',
+                status:    { filterKey: 'status', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => row.toLowerCase().indexOf(filter.toLowerCase()) > -1 ) },
-                milestone: { filterKey: 'milestoneID', filterValue: '',
+                batch:     { filterKey: 'batchID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
-                type:      { filterKey: 'typeID', filterValue: '',
+                type:      { filterKey: 'typeID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
             },
             data: [],
@@ -162,7 +193,8 @@ let app = new Vue({
             data: [],
             name: 'pending tasks',
             configurable : true
-        }
+        },
+        tableByBatch : {}
     },
     methods: {
         showGraphModal: function(projectID, task, event){
@@ -174,7 +206,6 @@ let app = new Vue({
 
                     let listOfTaskDates = data.listOfTaskDates;
                     let effortSpentDataForChart = data.effortSpentData;
-                    let realEffortDataForChart = data.realEffortData;
 
                     //chart config
                     let chart = new Chart($("#lineChart"), {
@@ -187,16 +218,10 @@ let app = new Vue({
                                 borderColor: "#3e95cd",
                                 fill: true,
                                 steppedLine: true
-                            } , {
-                                data: realEffortDataForChart,
-                                label: "Real effort for " + task.taskName,
-                                borderColor: "#ff6384",
-                                fill: true,
-                                steppedLine: true
-                            }]
+                            } ]
                         },
                         options: {
-                            title: { display: true, text: 'Task - Real Effort and Effort Spent graph' },
+                            title: { display: true, text: 'Task - Effort Spent graph' },
                             scales: {
                                 yAxes: [{
                                     ticks: {
@@ -224,25 +249,19 @@ let app = new Vue({
                 // load task data in modal
                  this.newTask.projectID = currentProjectID;
                  this.newTask.taskID = task.taskID;
-
                  this.newTask.taskName = task.taskName;
                  this.newTask.taskComments = task.taskComments;
-
                  this.newTask.endDate = task.endDate;
                  this.newTask.startDate = task.startDate;
-
                  this.newTask.originalEstimate = task.originalEstimate;
                  this.newTask.typeID = task.typeID;
-
-                 this.newTask.assignee = task.assignee;
-                 this.newTask.assigneeID = task.assigneeID;
-
                  this.newTask.status = task.status;
-                 this.newTask.milestoneID = task.milestoneID;
-
-                 this.newTask.milestoneName = task.milestoneName;
-                 this.newTask.typeName = task.typeName;
-                 this.newTask.statusName = task.statusName;
+                this.newTask.batchIDs = task.batchIDs;
+                this.newTask.batchNames = task.batchNames;
+                this.newTask.typeName = task.typeName;
+                this.newTask.statusName = task.statusName;
+                this.newTask.assignee = task.assignee;
+                this.newTask.assigneeID = task.assigneeID;
 
             }else{
                  this.modalTitle = "Create task";
@@ -251,8 +270,8 @@ let app = new Vue({
             let self = this;
             $('.create-task.modal').modal({
                 onApprove : function($element) {
-                    var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
-                    var object = {};
+                    let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    let object = {};
                     if(validated) {
                         $('.ui.error.message').hide();
                         $.ajax({
@@ -286,6 +305,18 @@ let app = new Vue({
                     app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 });
         },
+        deleteTask: function(event, task) {
+            this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.taskName + "?",
+                function() {
+                    event.target.classList.toggle('loading');
+                    $.get("/api/tasks/delete?task="+task.taskID)
+                        .then(function(data) {
+                            event.target.classList.toggle('loading');
+                            window.location.reload();
+                        });
+                });
+
+        },
         denyTask: function(event, task) {
             event.target.classList.toggle('loading');
             $.get("/api/tasks/deny?task="+task.taskID)
@@ -294,23 +325,49 @@ let app = new Vue({
                     event.target.classList.toggle('loading');
                     app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 });
+        },
+        toggleFilters : function() {
+            $('.filters').toggle();
         }
     },
     created: function () {
         // copying table config to pending task table config
         this.tablePending.cols = this.table.cols;
+
+        let self = this;
+        if (currentBatchType !== 'Default') {
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "/api/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
+                success: function (d) {
+                    self.batches = d;
+                    d.forEach(function(batch) {
+                        self.tableByBatch[batch.batchID] = Object.assign({}, self.table );
+                    });
+                }
+            });
+        }
+
     },
     updated: function () {
-        this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
+        // ! \\ create a infinite loop
+       // this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
     },
     mounted: function () {
         let self = this;
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/api/tasks?project="+currentProjectID,
+            url: "/api/tasks?project=" + currentProjectID,
             success: function (d) {
                 self.table.data = d;
+                if(currentBatchType !== 'Default') {
+                    // Spliting data by batch
+                    self.batches.forEach(function(batch) {
+                        self.tableByBatch[batch.batchID].data = d.filter(row => { return row.batchIDs.some(b => b === batch.batchID) });
+                    });
+                }
                 self.tablePending.data = d.filter(r => r.status === 'PENDING');
                 $('.ui.dimmer').removeClass('active');
             }
@@ -321,8 +378,9 @@ let app = new Vue({
 //Initialization
 $(document).ready(function(){
     //init dropdown fields
-     $('.ui.multiple.dropdown').dropdown();
+    $('.ui.multiple.dropdown').dropdown();
 
+    $('.ui.accordion').accordion({exclusive : false});
     //init search fields
     $('.ui.search')
     .search({
