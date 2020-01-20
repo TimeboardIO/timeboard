@@ -71,31 +71,36 @@ public class CalendarServiceImpl implements CalendarService {
     @Override
     public boolean importCalendarAsImputationsFromIcs(
             Account actor, String url, AbstractTask task, List<Account> accountList,
-            double value) throws BusinessException, ParseException, IOException {
+            double value) throws BusinessException {
+        try {
+            /* -- Events -- */
+            final Set<Imputation> existingEventList = task.getImputations();
+            final Map<String, List<Event>> newEvents; // imported events
 
-        /* -- Events -- */
-        final Set<Imputation> existingEventList = task.getImputations();
-        final Map<String, List<Event>> newEvents = this.importICS(url); // imported events
+            newEvents = this.importICS(url);
 
-        final List<Imputation> imputationsToUpdate = new ArrayList<>();
+            final List<Imputation> imputationsToUpdate = new ArrayList<>();
 
-        for (final List<Event> newEventList : newEvents.values()) {
-            for (final Event event : newEventList) {
-                if (existingEventList == null || existingEventList.isEmpty()) { // no existing events for this id
-                    imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value)); // so create it
-                } else { //  one or many events exist for this id
-                    final Imputation timeboardImputation = this.getImputationByStartDate(existingEventList, event.getStartDate());
-                    if (timeboardImputation != null) { // event and task match (id & date), so update it
-                        // convert event to imputation
-                        imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));
-                        existingEventList.remove(timeboardImputation); // remove  to retrieve orphan at the end
-                    } else { // no matching imputation found, so create it
-                        imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));
+            for (final List<Event> newEventList : newEvents.values()) {
+                for (final Event event : newEventList) {
+                    if (existingEventList == null || existingEventList.isEmpty()) { // no existing events for this id
+                        imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value)); // so create it
+                    } else { //  one or many events exist for this id
+                        final Imputation timeboardImputation = this.getImputationByStartDate(existingEventList, event.getStartDate());
+                        if (timeboardImputation != null) { // event and task match (id & date), so update it
+                            // convert event to imputation
+                            imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));
+                            existingEventList.remove(timeboardImputation); // remove  to retrieve orphan at the end
+                        } else { // no matching imputation found, so create it
+                            imputationsToUpdate.addAll(this.eventToImputation(event, task, accountList, value));
+                        }
                     }
                 }
             }
+            this.projectService.updateTaskImputations(actor, imputationsToUpdate);
+        } catch (IOException | ParseException e) {
+           throw new BusinessException(e);
         }
-        this.projectService.updateTaskImputations(actor, imputationsToUpdate);
 
         return true;
     }
@@ -106,45 +111,48 @@ public class CalendarServiceImpl implements CalendarService {
             String name,
             String url,
             Project project,
-            boolean deleteOrphan) throws ParseException, IOException {
+            boolean deleteOrphan) throws BusinessException {
 
-        /* -- Calendar -- */
-        final timeboard.core.model.Calendar timeboardCalendar = this.createOrUpdateCalendar(name, url);
+        try {
+            /* -- Calendar -- */
+            final timeboard.core.model.Calendar timeboardCalendar = this.createOrUpdateCalendar(name, url);
 
-        /* -- Events -- */
-        final Map<String, List<Task>> existingEvents = this.findAllEventAsTask(timeboardCalendar, project);
-        final Map<String, List<Event>> newEvents = this.importICS(url); // imported events
+            /* -- Events -- */
+            final Map<String, List<Task>> existingEvents = this.findAllEventAsTask(timeboardCalendar, project);
+            final Map<String, List<Event>> newEvents = this.importICS(url); // imported events
 
-        final List<Task> tasksToCreate = new ArrayList<>();
-        final List<Task> tasksToUpdate = new ArrayList<>();
-        final List<Task> tasksToDelete = new ArrayList<>();
+            final List<Task> tasksToCreate = new ArrayList<>();
+            final List<Task> tasksToUpdate = new ArrayList<>();
+            final List<Task> tasksToDelete = new ArrayList<>();
 
-        for (List<Event> newEventList : newEvents.values()) {
-            List<Task> existingEventList = existingEvents.get(newEventList.get(0).getRemoteId());
-            for (Event event : newEventList) {
-                if (existingEventList == null || existingEventList.isEmpty()) { // no existing events for this id
-                    tasksToCreate.add((Task) this.eventToTask(event, new Task(), project)); // so create it
-                } else { //  one or many events exist for this id
-                    Task timeboardEvent = this.getTaskByStartDate(existingEventList, event.getStartDate());
-                    if (timeboardEvent != null) { // event and task match (id & date), so update it
-                        tasksToUpdate.add((Task) this.eventToTask(event, timeboardEvent, project));// convert event to task
-                        existingEventList.remove(timeboardEvent); // remove  to retrieve orphan at the end
-                    } else { // no matching task found, so create it
-                        tasksToCreate.add((Task) this.eventToTask(event, new Task(), project));
+            for (List<Event> newEventList : newEvents.values()) {
+                List<Task> existingEventList = existingEvents.get(newEventList.get(0).getRemoteId());
+                for (Event event : newEventList) {
+                    if (existingEventList == null || existingEventList.isEmpty()) { // no existing events for this id
+                        tasksToCreate.add((Task) this.eventToTask(event, new Task(), project)); // so create it
+                    } else { //  one or many events exist for this id
+                        Task timeboardEvent = this.getTaskByStartDate(existingEventList, event.getStartDate());
+                        if (timeboardEvent != null) { // event and task match (id & date), so update it
+                            tasksToUpdate.add((Task) this.eventToTask(event, timeboardEvent, project));// convert event to task
+                            existingEventList.remove(timeboardEvent); // remove  to retrieve orphan at the end
+                        } else { // no matching task found, so create it
+                            tasksToCreate.add((Task) this.eventToTask(event, new Task(), project));
+                        }
                     }
                 }
             }
-        }
 
-        if (deleteOrphan) {
-            for (List<Task> remainingEventList : existingEvents.values()) {
-                tasksToDelete.addAll(remainingEventList);
+            if (deleteOrphan) {
+                for (List<Task> remainingEventList : existingEvents.values()) {
+                    tasksToDelete.addAll(remainingEventList);
+                }
+                this.projectService.deleteTasks(actor, tasksToDelete);
             }
-            this.projectService.deleteTasks(actor, tasksToDelete);
+            this.projectService.createTasks(actor, tasksToCreate);
+            this.projectService.updateTasks(actor, tasksToUpdate);
+        }catch (Exception e){
+            throw new BusinessException(e);
         }
-        this.projectService.createTasks(actor, tasksToCreate);
-        this.projectService.updateTasks(actor, tasksToUpdate);
-
         return true;
     }
 

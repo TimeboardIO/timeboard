@@ -33,7 +33,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import timeboard.account.AccountConfiguration;
 import timeboard.core.CoreConfiguration;
-import timeboard.core.ui.CoreUIConfiguration;
 import timeboard.home.HomeConfiguration;
 import timeboard.organization.OrganizationsConfiguration;
 import timeboard.organization.TimesheetConfiguration;
@@ -48,7 +47,6 @@ import timeboard.vacations.VacationsConfiguration;
 @Import({
         ThemeConfiguration.class,
         CoreConfiguration.class,
-        CoreUIConfiguration.class,
         HomeConfiguration.class,
         AccountConfiguration.class,
         ReportsConfiguration.class,
@@ -64,11 +62,24 @@ public class ModulesConfiguration {
     @Autowired
     private OrganizationFilter organizationFilter;
 
+    @Autowired
+    private RequestDurationFilter requestDurationFilter;
+
     @Bean
     public FilterRegistrationBean<OrganizationFilter> loggingFilter(){
         FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(this.organizationFilter);
+        registrationBean.addUrlPatterns("/*");
+
+        return registrationBean;
+    }
+
+    @Bean
+    public FilterRegistrationBean<RequestDurationFilter> loggingRequestDurationFilter(){
+        FilterRegistrationBean<RequestDurationFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(this.requestDurationFilter);
         registrationBean.addUrlPatterns("/*");
 
         return registrationBean;

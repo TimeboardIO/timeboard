@@ -27,7 +27,7 @@ package timeboard.vacations;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.api.NavigationExtPoint;
 
 
 @Component
@@ -35,7 +35,7 @@ public class VacationNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Vacation";
+        return "nav.vacation";
     }
 
     @Override

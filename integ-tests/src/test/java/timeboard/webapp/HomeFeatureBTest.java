@@ -26,7 +26,6 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -36,7 +35,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
@@ -78,17 +76,17 @@ public class HomeFeatureBTest extends TimeboardTest {
 
         this.auth.setCurrentOrganization(this.organisationA.getId());
         SecurityContextHolder.getContext().setAuthentication(this.auth);
-        ThreadLocalStorage.setCurrentOrganizationID(this.organisationA.getId());
+        ThreadLocalStorage.setCurrentOrgId(this.organisationA.getId());
         this.projectService.createProject(this.account, "TestProjectOrgA");
 
         this.auth.setCurrentOrganization(this.organisationB.getId());
-        ThreadLocalStorage.setCurrentOrganizationID(this.organisationB.getId());
+        ThreadLocalStorage.setCurrentOrgId(this.organisationB.getId());
         SecurityContextHolder.getContext().setAuthentication(this.auth);
         this.projectService.createProject(this.account, "TestProjectOrgB");
 
 
         this.auth.setCurrentOrganization(this.organisationA.getId());
-        ThreadLocalStorage.setCurrentOrganizationID(this.organisationA.getId());
+        ThreadLocalStorage.setCurrentOrgId(this.organisationA.getId());
         SecurityContextHolder.getContext().setAuthentication(this.auth);
 
     }

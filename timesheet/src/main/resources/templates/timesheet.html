@@ -6,7 +6,7 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekValidated="${lastWeekValidated}" th:actorID="${actorID}"/>
+    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekSubmitted="${lastWeekSubmitted}" th:actorID="${actorID}"/>
     <style> .hidden { display: none; } </style>
 </head>
 
@@ -100,23 +100,23 @@
 
 
             <div class="actions">
-                <div v-if="validated === false" v-bind:data-tooltip="!enableValidateButton()?' Please validate previous week and make sure every working day imputation day total equals 1' : false"
+                <div v-if="submitted === false" v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
                      data-position="right center">
                     <button
                             v-bind:data-week="week"
                             v-bind:data-year="year"
-                            v-on:click="validateMyWeek"
-                            v-bind:class="{'ui positive button':true, 'disabled':(!enableValidateButton())}"
-                            type="submit" value="Validate My Week">
-                        Validate My Week
+                            v-on:click="submitMyWeek"
+                            v-bind:class="{'ui positive button':true, 'disabled':(!enableSubmitButton())}"
+                            type="submit" th:text="#{timesheet.submit}">
+                        Submit My Week
                     </button>
                 </div>
-                <div v-if="validated === true" >
+                <div v-if="submitted === true" >
                     <button class="ui positive button disabled">
-                        Week validated
+                        Week submitted
                     </button>
                 </div>
-                <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button">
+                <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
                     New Task
                 </button>
             </div>
@@ -132,7 +132,7 @@
                 <i class="right arrow icon"></i>Next week</a>
         </div>
 
-            <fieldset v-bind:disabled="validated === true">
+            <fieldset v-bind:disabled="submitted === true">
                 <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
 
                     <table class="ui celled table" style="text-align:center">

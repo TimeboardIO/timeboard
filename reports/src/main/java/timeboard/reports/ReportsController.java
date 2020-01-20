@@ -99,7 +99,7 @@ public class ReportsController {
                                 @ModelAttribute Report report,  RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        Long organizationID = ThreadLocalStorage.getCurrentOrganizationID();
+        Long organizationID = ThreadLocalStorage.getCurrentOrgId();
         Account organization = userService.findUserByID(organizationID);
 
         String projectFilter = report.getFilterProject();
@@ -144,7 +144,7 @@ public class ReportsController {
                                 @ModelAttribute Report report,  RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        Long organizationID = ThreadLocalStorage.getCurrentOrganizationID();
+        Long organizationID = ThreadLocalStorage.getCurrentOrgId();
         Account organization = userService.findUserByID(organizationID);
 
         Report updatedReport = this.reportService.getReportByID(organization, reportID);

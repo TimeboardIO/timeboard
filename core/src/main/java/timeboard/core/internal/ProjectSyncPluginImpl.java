@@ -34,7 +34,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
-import timeboard.core.async.ProjectSyncJob;
+import timeboard.core.internal.async.ProjectSyncJob;
 import timeboard.core.model.*;
 
 import java.util.*;
@@ -127,60 +127,14 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     private JobDetail buildJobDetails(String serviceName, Project project) {
-        return new JobDetail() {
 
-                private Long key = project.getId();
-
-                @Override
-                public JobKey getKey() {
-                    return new JobKey(key.toString());
-                }
-
-                @Override
-                public String getDescription() {
-                    return serviceName + " Job";
-                }
-
-                @Override
-                public Class<? extends Job> getJobClass() {
-                    return ProjectSyncJob.class;
-                }
-
-                @Override
-                public JobDataMap getJobDataMap() {
-                    return null;
-                }
-
-                @Override
-                public boolean isDurable() {
-                    return true;
-                }
-
-                @Override
-                public boolean isPersistJobDataAfterExecution() {
-                    return true;
-                }
-
-                @Override
-                public boolean isConcurrentExectionDisallowed() {
-                    return true;
-                }
-
-                @Override
-                public boolean requestsRecovery() {
-                    return true;
-                }
-
-                @Override
-                public JobBuilder getJobBuilder() {
-                    return JobBuilder.newJob(getJobClass());
-                }
-
-                @Override
-                public Object clone() {
-                    return this;
-                }
-            };
+        return JobBuilder.newJob()
+                .withIdentity(new JobKey(project.getId().toString()))
+                .withDescription(serviceName + " Job")
+                .ofType(ProjectSyncJob.class)
+                .requestRecovery(false)
+                .storeDurably(true)
+                .build();
     }
 
     @Override

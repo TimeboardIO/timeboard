@@ -38,7 +38,7 @@ public abstract class OrganizationEntity {
     protected Long organizationID;
 
     public OrganizationEntity() {
-        this.organizationID = ThreadLocalStorage.getCurrentOrganizationID();
+        this.organizationID = ThreadLocalStorage.getCurrentOrgId();
     }
 
     public Long getOrganizationID() {

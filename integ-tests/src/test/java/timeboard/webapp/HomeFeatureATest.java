@@ -26,7 +26,6 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -36,7 +35,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
@@ -71,7 +69,7 @@ public class HomeFeatureATest extends TimeboardTest {
         this.auth.setCurrentOrganization(this.organisation.getId());
         this.account.getOrganizations().add(new OrganizationMembership(this.organisation, this.account, MembershipRole.OWNER));
         SecurityContextHolder.getContext().setAuthentication(this.auth);
-        ThreadLocalStorage.setCurrentOrganizationID(this.organisation.getId());
+        ThreadLocalStorage.setCurrentOrgId(this.organisation.getId());
 
         this.projectService.createProject(this.account, "TestProject");
     }

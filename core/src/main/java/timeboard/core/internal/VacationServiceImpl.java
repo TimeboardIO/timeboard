@@ -34,8 +34,8 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.VacationService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.events.TimeboardEventType;
-import timeboard.core.internal.events.VacationEvent;
+import timeboard.core.api.events.TimeboardEventType;
+import timeboard.core.api.events.VacationEvent;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;

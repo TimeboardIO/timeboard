@@ -27,7 +27,7 @@ package timeboard.home;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.api.NavigationExtPoint;
 
 
 @Component
@@ -35,7 +35,7 @@ public class HomeNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Home";
+        return "nav.home";
     }
 
     @Override
