@@ -169,7 +169,7 @@ public class ProjectSetupController {
         pmf.setMemberships(new ArrayList<>(project.getMembers()));
 
         map.put("project", project);
-        map.put("orgID", ThreadLocalStorage.getCurrentOrganizationID());
+        map.put("orgID", ThreadLocalStorage.getCurrentOrgId());
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());

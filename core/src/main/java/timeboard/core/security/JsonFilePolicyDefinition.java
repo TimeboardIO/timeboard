@@ -46,7 +46,7 @@ import java.util.List;
 @Component("jsonFilePolicyDefinition")
 public class JsonFilePolicyDefinition implements PolicyDefinition {
 
-    private static Logger logger = LoggerFactory.getLogger(JsonFilePolicyDefinition.class);
+    private static Logger LOGGER = LoggerFactory.getLogger(JsonFilePolicyDefinition.class);
 
     private static String DEFAULT_POLICY_FILE_NAME = "policy.json";
 
@@ -63,21 +63,21 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
         mapper.registerModule(module);
         try {
             PolicyRule[] rulesArray = null;
-            logger.debug("[init] Checking policy file at: {}", policyFilePath);
+            LOGGER.debug("[init] Checking policy file at: {}", policyFilePath);
             if(policyFilePath != null && !policyFilePath.isEmpty()
                     && Files.exists(Paths.get(policyFilePath))) {
-                logger.info("[init] Loading policy from custom file: {}", policyFilePath);
+                LOGGER.info("[init] Loading policy from custom file: {}", policyFilePath);
                 rulesArray = mapper.readValue(new File(policyFilePath), PolicyRule[].class);
             } else {
-                logger.info("[init] Custom policy file not found. Loading default policy");
+                LOGGER.info("[init] Custom policy file not found. Loading default policy");
                 rulesArray = mapper.readValue(getClass().getClassLoader().getResourceAsStream(DEFAULT_POLICY_FILE_NAME), PolicyRule[].class);
             }
             this.rules = (rulesArray != null? Arrays.asList(rulesArray) : null);
-            logger.info("[init] Policy loaded successfully.");
+            LOGGER.info("[init] Policy loaded successfully.");
         } catch (JsonMappingException e) {
-            logger.error("An error occurred while parsing the policy file.", e);
+            LOGGER.error("An error occurred while parsing the policy file.", e);
         } catch (IOException e) {
-            logger.error("An error occurred while reading the policy file.", e);
+            LOGGER.error("An error occurred while reading the policy file.", e);
         }
     }
 

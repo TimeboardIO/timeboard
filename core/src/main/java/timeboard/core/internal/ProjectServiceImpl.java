@@ -34,9 +34,9 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.events.TaskEvent;
 import timeboard.core.api.events.TimeboardEventType;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
 import timeboard.core.internal.rules.batch.ActorIsProjectMemberByBatch;
@@ -81,10 +81,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    // @PreAuthorize("@bpe.checkProjectByUserLimit(#owner)")
     @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
-    public Project createProject(Account owner, String projectName)  {
+    public Project createProject(Account owner, String projectName) {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
         newProject.setName(projectName);
@@ -110,7 +109,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-        public Project getProjectByID(Account actor, Long orgID, Long projectId) {
+    public Project getProjectByID(Account actor, Long orgID, Long projectId) {
         Project data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
                 .setParameter("user", actor)
                 .setParameter("projectID", projectId)
@@ -135,25 +134,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    @Override
-    public Project getProjectByName(Account actor, String projectName) throws BusinessException {
-
-        Project data = em.createQuery("select p from Project p where p.name = :name", Project.class)
-                .setParameter("name", projectName)
-                .getSingleResult();
-        if (!data.getMembers().contains(actor)) {
-            return null;
-        }
-
-        RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMember());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, data);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
-
-        return data;
-    }
 
     @Override
     @PreAuthorize("hasPermission(#project,'PROJECTS_ARCHIVE')")
@@ -222,72 +202,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-
-    @Override
-    public Project updateProject(Account actor, Project project, Map<Long, MembershipRole> memberships) throws BusinessException {
-
-        RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectOwner());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
-
-        em.merge(project);
-
-        //Update existing membership
-        List<Long> membershipToRemove = new ArrayList<>();
-
-
-        //Update existing membership
-        project.getMembers().forEach(projectMembership -> {
-            if (memberships.containsKey(projectMembership.getMember().getId())) {
-                // Update existing user membership role
-                projectMembership.setRole(memberships.get(projectMembership.getMember().getId()));
-                em.merge(projectMembership);
-            } else {
-                // Store user to removed
-                membershipToRemove.add(projectMembership.getMembershipID());
-            }
-        });
-
-        //Remove old membership
-        membershipToRemove.forEach(idToRemove -> {
-            project.getMembers().removeIf(member -> member.getMembershipID() == idToRemove);
-            ProjectMembership pmToRemove = em.find(ProjectMembership.class, idToRemove);
-            if (pmToRemove != null) {
-                em.remove(pmToRemove);
-            }
-        });
-        em.merge(project);
-
-
-        //Add new membership
-        List<Long> currentMembers = project.getMembers()
-                .stream()
-                .map(pm -> pm.getMember().getId())
-                .collect(Collectors.toList());
-        List<Long> membershipToAdd = memberships.keySet()
-                .stream()
-                .filter(membershipId -> currentMembers.contains(membershipId) == false)
-                .collect(Collectors.toList());
-
-        membershipToAdd.forEach((membershipId) -> {
-            ProjectMembership projectMembership = new ProjectMembership();
-            projectMembership.setProject(project);
-            projectMembership.setRole(memberships.get(membershipId));
-            projectMembership.setMember(this.userService.findUserByID(membershipId));
-            em.persist(projectMembership);
-            project.getMembers().add(projectMembership);
-        });
-
-        em.flush();
-
-        LOGGER.info("Project " + project.getName() + " updated");
-        return project;
-    }
-
-
     @Override
     public void save(Account actor, ProjectMembership projectMembership) throws BusinessException {
 
@@ -332,8 +246,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-
-
     @Override
     @Transactional
     //@PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
@@ -360,8 +272,8 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setRemoteId(remoteId);
         newTask.setName(taskName);
         newTask.setComments(taskComment);
-        newTask.setStartDate(new Date(startDate.getTime()+(2 * 60 * 60 * 1000) +1));
-        newTask.setEndDate(new Date(endDate.getTime()+(2 * 60 * 60 * 1000) +1));
+        newTask.setStartDate(new Date(startDate.getTime() + (2 * 60 * 60 * 1000) + 1));
+        newTask.setEndDate(new Date(endDate.getTime() + (2 * 60 * 60 * 1000) + 1));
         newTask.setComments(taskComment);
         newTask.setEffortLeft(originalEstimate);
         newTask.setOriginalEstimate(originalEstimate);
@@ -396,7 +308,6 @@ public class ProjectServiceImpl implements ProjectService {
 
         return task;
     }
-
 
 
     @Override
@@ -530,6 +441,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         return tasks;
     }
+
     @Override
     public Optional<Task> getTaskByRemoteID(Account actor, String id) {
         Task task = null;
@@ -537,7 +449,7 @@ public class ProjectServiceImpl implements ProjectService {
             final TypedQuery<Task> query = this.em.createQuery("select t from Task t where t.remoteId = :remoteID", Task.class);
             query.setParameter("remoteID", id);
             task = query.getSingleResult();
-        }catch (Exception e){
+        } catch (Exception e) {
         }
         return Optional.ofNullable(task);
     }
@@ -715,7 +627,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
 
-
     @Override
     public List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de) {
         final List<ProjectTasks> projectTasks = new ArrayList<>();
@@ -747,7 +658,6 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectTasks;
     }
-
 
 
     @Override
@@ -788,9 +698,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         TypedQuery<Object[]> query =
                 (TypedQuery<Object[]>) em.createNativeQuery("select "
-                + "i.day as date, SUM(value) " +
+                        + "i.day as date, SUM(value) " +
                         "OVER (ORDER BY day) AS sumPreviousValue "
-                + "from Imputation i  where i.task_id = :taskId " +
+                        + "from Imputation i  where i.task_id = :taskId " +
                         "and i.day >= :startTaskDate and i.day <= :endTaskDate");
         query.setParameter("taskId", task.getId());
         query.setParameter("startTaskDate", startTaskDate);
@@ -802,62 +712,6 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
     }
 
-
-    @Override
-    public List<ValueHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException {
-        RuleSet<Task> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMemberbyTask());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, task);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
-
-        TypedQuery<Object[]> query = (TypedQuery<Object[]>) em.createNativeQuery("select "
-                + "tr.revisionDate as date, tr.effortLeft as effortLeft  "
-                + "from TaskRevision tr "
-                + "where tr.task_id = :taskId and tr.id IN ( "
-                + "SELECT MAX(trBis.id) "
-                + "FROM TaskRevision trBis "
-                + "GROUP BY trBis.task_id, DATE_FORMAT(trBis.revisionDate, \"%d/%m/%Y\")"
-                + ");");
-
-        query.setParameter("taskId", task.getId());
-
-        return query.getResultList()
-                .stream()
-                .map(x -> new ValueHistory((Date) x[0], (Double) x[1]))
-                .collect(Collectors.toList());
-    }
-
-
-
-    @Override
-    public Map<String, Task> searchExistingTasksFromOrigin(Account actor,
-                                                           Project project,
-                                                           String origin,
-                                                           String remotePath) throws BusinessException {
-
-        RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMember());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
-
-        TypedQuery<Task> q = em.createQuery("select t from Task t where t.project = :project "
-                + "and t.origin = :origin "
-                + "and t.remotePath = :remotePath ", Task.class);
-        q.setParameter("project", project);
-        q.setParameter("origin", origin);
-        q.setParameter("remotePath", remotePath);
-
-        Map<String, Task> map = new HashMap<>();
-        q.getResultList().forEach(task -> {
-            map.put(task.getRemoteId(), task);
-        });
-        return map;
-
-    }
 
     @Override
     public List<Batch> listProjectBatches(Account actor, Project project) throws BusinessException {
@@ -925,7 +779,7 @@ public class ProjectServiceImpl implements ProjectService {
         newBatch.setProject(project);
 
         em.persist(newBatch);
-        LOGGER.info("Batch {} created by {} ",newBatch.getName(), actor.getScreenName());
+        LOGGER.info("Batch {} created by {} ", newBatch.getName(), actor.getScreenName());
 
         return newBatch;
 
@@ -1024,29 +878,6 @@ public class ProjectServiceImpl implements ProjectService {
     public boolean isProjectOwner(Account account, Project project) {
         return (new ActorIsProjectOwner()).isSatisfied(account, project);
     }
-
-
-    @Override
-    public List<Imputation> listProjectMembersVacations(Account actor, Project p, int month, int year) throws BusinessException {
-
-        Long orgID = p.getOrganizationID();
-
-
-        Optional<Organization> organizationOptional = this.organizationService.getOrganizationByID(actor, orgID);
-
-        if (organizationOptional.isEmpty()) {
-            throw new BusinessException("Can not find organization from project.");
-        }
-        Organization organization = organizationOptional.get();
-        DefaultTask vacationTask = organization.getDefaultTasks().stream()
-                    .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst().get();
-
-        return vacationTask.getImputations().stream()
-                .filter(i -> p.getMembers().stream()
-                        .anyMatch(m -> m.getMember().getId() == i.getAccount().getId()))
-                .collect(Collectors.toList());
-    }
-
 
     @Override
     public TASData generateTasData(Account user, Project project, int month, int year) {

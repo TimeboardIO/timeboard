@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 import java.io.Serializable;
 
 @Component
-public class AbacPermissionEvaluator implements PermissionEvaluator {
+public final class AbacPermissionEvaluator implements PermissionEvaluator {
 
     @Autowired
     PolicyEnforcement policy;
