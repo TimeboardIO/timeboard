@@ -42,6 +42,7 @@ public interface VacationService {
     VacationRequest createVacationRequest(Account actor, VacationRequest request);
 
     List<VacationRequest> listUserVacations(Account user);
+    List<VacationRequest> listUserVacations(Account user, int year);
 
     List<VacationRequest> listVacationsToValidateByUser(Account user);
 

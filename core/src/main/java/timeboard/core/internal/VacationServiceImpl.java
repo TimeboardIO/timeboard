@@ -97,6 +97,32 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         return q.getResultList();
 
     }
+    @Override
+    public List<VacationRequest> listUserVacations(Account applicant, int year) {
+
+        Calendar startBound = Calendar.getInstance();
+        Calendar endBound = Calendar.getInstance();
+
+
+        endBound.set(Calendar.DAY_OF_MONTH, 1);
+        endBound.set(Calendar.MONTH, Calendar.JANUARY);
+        endBound.set(Calendar.YEAR, year+1);
+
+        startBound.set(Calendar.DAY_OF_MONTH, 31);
+        startBound.set(Calendar.MONTH, Calendar.DECEMBER);
+        startBound.set(Calendar.YEAR, year-1);
+
+        TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v where v.applicant = :applicant " +
+                        "and not (v.endDate < :startBound and v.startDate > :endBound)"
+                , VacationRequest.class);
+        q.setParameter("applicant", applicant);
+        q.setParameter("endBound", endBound);
+        q.setParameter("startBound", startBound);
+
+        return q.getResultList();
+
+    }
 
     @Override
     public List<VacationRequest> listVacationsToValidateByUser(Account assignee) {
