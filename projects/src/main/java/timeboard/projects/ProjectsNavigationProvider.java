@@ -35,7 +35,7 @@ public class ProjectsNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Projects";
+        return "nav.projects";
     }
 
     @Override

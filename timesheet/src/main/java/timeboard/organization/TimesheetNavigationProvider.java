@@ -38,7 +38,7 @@ public class TimesheetNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Timesheet";
+        return "nav.timesheet";
     }
 
     @Override
