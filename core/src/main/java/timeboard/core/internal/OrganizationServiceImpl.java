@@ -160,7 +160,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
             if(membership.isPresent()) {
                 em.remove(membership.get());
-                LOGGER.info("Member " + member.getScreenName() + " is removed from organisation " + organization.get().getName() + " by " + actor.getScreenName());
+                LOGGER.info("Member " + member.getScreenName() + " is removed from organisation " + organization.get().getName()
+                        + " by " + actor.getScreenName());
             }
 
         }
