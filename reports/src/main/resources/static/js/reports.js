@@ -15,7 +15,8 @@ $(document).ready(function () {
                         "slot": "actions",
                         "label": "Actions"
                     }],
-                data: []
+                data: [],
+                name: "tableReports"
             }
         },
         methods: {
