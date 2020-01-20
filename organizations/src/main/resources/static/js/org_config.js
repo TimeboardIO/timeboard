@@ -116,7 +116,7 @@ let app = new Vue({
         },
         removeTask: function (row) {
             let self = this;
-            this.$refs.confirmModal.confirm("Are you sure you want to delete "+ row.tagKey + "?", function() {
+            this.$refs.confirmModal.confirm("Are you sure you want to delete "+ row.name + "?", function() {
                 $.ajax({
                     type: "DELETE",
                     dataType: "json",

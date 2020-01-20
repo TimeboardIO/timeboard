@@ -69,6 +69,7 @@ public class VacationsController {
 
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication, Model model) {
+        model.addAttribute("actor", authentication.getDetails());
         return "vacations.html";
     }
 
