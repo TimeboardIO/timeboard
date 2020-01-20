@@ -30,6 +30,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class VacationRequest extends OrganizationEntity {
 
     @Id
@@ -59,6 +60,21 @@ public class VacationRequest extends OrganizationEntity {
 
     @OneToOne
     private Account assignee;
+
+    @ManyToOne(targetEntity = RecursiveVacationRequest.class)
+    private RecursiveVacationRequest parent;
+
+    public VacationRequest() {}
+    public VacationRequest(VacationRequest other) {
+        this.label = other.label;
+        this.status = other.status;
+        this.startDate = other.startDate;
+        this.endDate = other.endDate;
+        this.startHalfDay = other.startHalfDay;
+        this.endHalfDay = other.endHalfDay;
+        this.applicant = other.applicant;
+        this.assignee = other.assignee;
+    }
 
     public Long getId() {
         return id;
@@ -132,9 +148,17 @@ public class VacationRequest extends OrganizationEntity {
         this.applicant = applicant;
     }
 
+    public RecursiveVacationRequest getParent() {
+        return parent;
+    }
+
+    public void setParent(RecursiveVacationRequest parent) {
+        this.parent = parent;
+    }
+
     public enum HalfDay {
         MORNING,
-        AFTERNOON
+        AFTERNOON,
     }
 
 }

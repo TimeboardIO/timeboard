@@ -39,6 +39,10 @@
                 <i class="plus icon"></i>
                 New Vacation
             </a>
+            <a class="item"  v-on:click="openRecursiveModal" >
+                <i class="plus icon"></i>
+                New Recursive Vacation
+            </a>
         </div>
 
         <div v-if="toValidateRequests.data.length" class="ui horizontal divider"><i class="clock icon"></i>
@@ -58,6 +62,14 @@
             </template>
             <template v-slot:applicant="{row}">
                 {{ row.applicantName }}
+            </template>
+            <template v-slot:recursive="{row}">
+                <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
+                <a v-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                <a v-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                <a v-if="row.recurrenceDay === undefined" class="ui circular label">X</a>
             </template>
             <template v-slot:actions="{row}">
                 <button class="ui positive button icon" v-on:click="approveRequest(row)">
@@ -90,6 +102,14 @@
             <template v-slot:assignee="{row}">
                 {{ row.assigneeName }}
             </template>
+            <template v-slot:recursive="{row}">
+                <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
+                <a v-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                <a v-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                <a v-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                <a v-if="row.recurrenceDay === undefined" class="ui circular label">X</a>
+            </template>
             <template v-slot:status="{row}">
                 <button v-if="row.status == 'ACCEPTED'"   class="ui disabled green icon button">
                     <i class="check icon"></i>
@@ -105,16 +125,14 @@
                 </button>
             </template>
             <template v-slot:actions="{row}">
-                <button class="ui negative button icon" v-on:click="cancelRequest(row)">
+                <button :class="{ disabled : (row.status !== 'ACCEPTED') && (new Date(row.end).getTime() < new Date().getTime()) }"
+                        class="ui negative button icon" v-on:click="cancelRequest(row)">
                     <i class="remove alternate icon"></i>
                     Cancel
                 </button>
             </template>
 
         </data-table>
-
-        <year-calendar :year="2020" ></year-calendar>
-
 
         <tmodal-confirm
                 ref="confirmModal"
@@ -134,15 +152,9 @@
                             <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
                             <div class="inline fields" style="padding-top: 1rem;">
                                 <div class="field">
-                                    <div class="ui radio checkbox">
-                                        <input type="radio" name="halfday-start" v-bind:value="false" v-model="vacationRequest.halfStart">
-                                        <label>Morning</label>
-                                    </div>
-                                </div>
-                                <div class="field">
-                                    <div class="ui radio checkbox">
-                                        <input type="radio" name="halfday-start" v-bind:value="true" v-model="vacationRequest.halfStart">
-                                        <label>Afternoon</label>
+                                    <div class="ui buttons">
+                                        <a @click="vacationRequest.halfStart = false" :class="{ blue : !vacationRequest.halfStart }" class="ui button">Morning</a>
+                                        <a @click="vacationRequest.halfStart = true" :class="{ blue : vacationRequest.halfStart }" class="ui button">Afternoon</a>
                                     </div>
                                 </div>
                             </div>
@@ -152,20 +164,13 @@
                             <input type="date" name="end-date" :min="vacationRequest.start" placeholder="Return date" v-model="vacationRequest.end">
                             <div class="inline fields" style="padding-top: 1rem;">
                                 <div class="field">
-                                    <div class="ui radio checkbox">
-                                        <input type="radio" name="halfday-end" v-bind:value="true" v-model="vacationRequest.halfEnd">
-                                        <label>Morning</label>
-                                    </div>
-                                </div>
-                                <div class="field">
-                                    <div class="ui radio checkbox">
-                                        <input type="radio" name="halfday-end" v-bind:value="false" v-model="vacationRequest.halfEnd" >
-                                        <label>Afternoon</label>
+                                    <div class="ui buttons">
+                                        <a @click="vacationRequest.halfEnd = true" :class="{ blue : vacationRequest.halfEnd }" class="ui button">Morning</a>
+                                        <a @click="vacationRequest.halfEnd = false" :class="{ blue : !vacationRequest.halfEnd }" class="ui button">Afternoon</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                     <div class="two fields">
                         <div class="field">
@@ -189,6 +194,71 @@
 
             </template>
         </tmodal>
+
+        <tmodal
+                title="Request recursive vacation"
+                id="newRecursiveVacation">
+            <template v-slot:content>
+                <form class="ui form">
+                    <div class="ui error message"></div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Start of recurrence</label>
+                            <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
+
+                        </div>
+                        <div class="field">
+                            <label>End of recurrence</label>
+                            <input type="date" name="end-date" :min="vacationRequest.start" placeholder="Return date" v-model="vacationRequest.end">
+
+                        </div>
+
+                    </div>
+                    <div class="two fields">
+                        <div class="inline fields" style="padding-top: 1rem;">
+
+                            <div class="field">
+                                <div class="ui buttons">
+                                    <a @click="vacationRequest.recurrenceType = 'MORNING'" :class="{ blue : vacationRequest.recurrenceType === 'MORNING', active : vacationRequest.recurrenceType === 'FULL'}" class="ui button">Morning</a>
+                                    <a @click="vacationRequest.recurrenceType = 'FULL'" :class="{ blue : vacationRequest.recurrenceType === 'FULL' }" class="ui button">Full day</a>
+                                    <a @click="vacationRequest.recurrenceType = 'AFTERNOON'" :class="{ blue : vacationRequest.recurrenceType === 'AFTERNOON', active : vacationRequest.recurrenceType === 'FULL'}" class="ui button">Afternoon</a>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="field">
+                            <label>Repeat every week on</label>
+                            <a @click="vacationRequest.recurrenceDay = 1" :class="{ blue : (vacationRequest.recurrenceDay === 1) }" class="ui circular label">M</a>
+                            <a @click="vacationRequest.recurrenceDay = 2" :class="{ blue : (vacationRequest.recurrenceDay === 2) }" class="ui circular label">T</a>
+                            <a @click="vacationRequest.recurrenceDay = 3" :class="{ blue : (vacationRequest.recurrenceDay === 3) }" class="ui circular label">W</a>
+                            <a @click="vacationRequest.recurrenceDay = 4" :class="{ blue : (vacationRequest.recurrenceDay === 4) }" class="ui circular label">T</a>
+                            <a @click="vacationRequest.recurrenceDay = 5" :class="{ blue : (vacationRequest.recurrenceDay === 5) }" class="ui circular label">F</a>
+                        </div>
+                    </div>
+                    <div class="two fields">
+                        <div class="field">
+                            <label>Label</label>
+                            <input type="text" name="label" placeholder="Label" v-model="vacationRequest.label">
+                        </div>
+                        <div class="field">
+                            <label>User to notify</label>
+                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID" name="assignee" type="text">
+                            <div class="ui category search">
+                                <div class="ui icon input">
+                                    <input class="prompt" name="assignee" placeholder="Search account..." type="text">
+                                    <i class="search icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <button class="ui positive button"  @click="addVacationRequest">Request new vacation</button>
+
+            </template>
+        </tmodal>
+
     </div>
     <script src="/js/vacations.js"></script>
 </div>

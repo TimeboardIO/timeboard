@@ -22,22 +22,27 @@ const formValidationRules = {
     }
 };
 
+const emptyVacationRequest = {
+    recursive : false,
+    start : "",
+    end : "",
+    halfStart : false,
+    halfEnd : false,
+    recurrenceDay : 1,
+    recurrenceType : "FULL",
+    status : "",
+    label : "",
+    assigneeName : "",
+    assigneeID : 0,
+    applicantName : "",
+    applicantID : 0,
+};
+
 let app = new Vue({
     el: '#vacationApp',
     data: {
         formError : '',
-        vacationRequest: {
-            start : "",
-            end : "",
-            halfStart : false,
-            halfEnd : false,
-            status : "",
-            label : "",
-            assigneeName : "",
-            assigneeID : 0,
-            applicantName : "",
-            applicantID : 0,
-        },
+        vacationRequest: Object.assign({}, emptyVacationRequest),
         myRequests: {
             cols: [
                 {
@@ -47,6 +52,7 @@ let app = new Vue({
                     "primary" : false
 
                 },
+
                 {
                     "slot": "start",
                     "label": "From",
@@ -65,6 +71,13 @@ let app = new Vue({
                     "label": "Validation",
                     "sortKey": "assignee",
                     "primary" : false
+                },
+                {
+                    "slot": "recursive",
+                    "label": "R",
+                    "sortKey": "recurrenceDay",
+                    "primary" : true
+
                 },
                 {
                     "slot": "status",
@@ -110,6 +123,13 @@ let app = new Vue({
                     "primary" : true
                 },
                 {
+                    "slot": "recursive",
+                    "label": "R",
+                    "sortKey": "recurrenceDay",
+                    "primary" : true
+
+                },
+                {
                     "slot": "actions",
                     "label": "Actions",
                     "primary" : true
@@ -121,9 +141,18 @@ let app = new Vue({
     },
     methods:  {
         openModal: function() {
+            this.vacationRequest = Object.assign({}, emptyVacationRequest);
+            this.vacationRequest.recursive = false;
             $('#newVacation').modal('show');
+
+        },
+        openRecursiveModal: function() {
+            this.vacationRequest = Object.assign({}, emptyVacationRequest);
+            this.vacationRequest.recursive = true;
+            $('#newRecursiveVacation').modal('show');
         },
         addVacationRequest: function () {
+            let self = this;
             let validated = $('.ui.form').form(formValidationRules).form('validate form');
             let assignedToMyself = this.vacationRequest.assigneeID == currentActorID;
 
@@ -192,8 +221,13 @@ let app = new Vue({
         cancelRequest : function(request) {
             let assignedToMyself = request.assigneeID == currentActorID;
             let self = this;
-            this.$refs.confirmModal.confirm("Are you sure you want to delete vacation request "
-                + request.label !== 'null' ? request.label : '' + "? This action is definitive.",
+            let text =  "Are you sure you want to delete vacation request "
+            + request.label !== 'null' ? request.label : '' + "? This action is definitive.";
+            if(request.recursive && request.status === "ACCEPTED" && new Date(request.start).getTime() < new Date().getTime()) {
+                text = "This recursive vacation request has started."
+                +" Canceling it will set the recurrence end date to now and will delete future occurrences. Do you want to continue??"
+            }
+            this.$refs.confirmModal.confirm(text,
                 function() {
                     $.ajax({
                         type: "DELETE",
