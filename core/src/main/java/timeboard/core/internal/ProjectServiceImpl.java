@@ -30,6 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
@@ -83,6 +86,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
+    @CacheEvict(value="accountProjectsCache", key="#owner.getId()")
     public Project createProject(Account owner, String projectName) {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
@@ -101,6 +105,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Cacheable(value="accountProjectsCache", key = "#candidate.getId()")
     public List<Project> listProjects(Account candidate, Long orgID) {
         TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
@@ -137,6 +142,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @PreAuthorize("hasPermission(#project,'PROJECTS_ARCHIVE')")
+    @CacheEvict(value="accountProjectsCache", key="#actor.getId()")
     public Project archiveProjectByID(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
@@ -153,6 +159,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @CacheEvict(value="accountProjectsCache", key="#actor.getId()")
     public Project updateProject(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
@@ -238,6 +245,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @Cacheable(value="accountTasksCache")
     public List<Task> listUserTasks(Account account) {
         TypedQuery<Task> q = em.createQuery("select t from Task t where t.assigned = :user", Task.class);
         q.setParameter("user", account);

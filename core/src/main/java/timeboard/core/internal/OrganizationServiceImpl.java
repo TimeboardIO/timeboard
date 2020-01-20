@@ -30,6 +30,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
@@ -89,6 +91,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @PostAuthorize("#actor.isMemberOf(returnObject)")
+    @Cacheable(value="organizationsCache", key = "#id")
     public Optional<Organization> getOrganizationByID(Account actor, long id) {
         Organization data;
         try {
@@ -113,6 +116,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @CacheEvict(value="organizationsCache", key="#organization.getId()")
     public Organization updateOrganization(Account actor, Organization organization) {
 
         em.merge(organization);
@@ -123,6 +127,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    @CacheEvict(value="organizationsCache", key="#organization.getId()")
     public Optional<Organization> addMember(final Account actor,
                                             final Organization organization,
                                             final Account member,
@@ -149,7 +154,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Optional<Organization> removeMember(final Account actor, Organization o, Account member) {
+    @CacheEvict(value="organizationsCache", key="#organization.getId()")
+    public Optional<Organization> removeMember(final Account actor, Organization organization, Account member) {
 
         Optional<Organization> organization = this.getOrganizationByID(actor, o.getId());
         if(organization.isPresent()) {
@@ -171,6 +177,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
+    @CacheEvict(value="organizationsCache", key="#organization.getId()")
     public Optional<Organization> updateMemberRole(final Account actor,
                                                    final Organization organization,
                                                    final Account member, final MembershipRole role) {

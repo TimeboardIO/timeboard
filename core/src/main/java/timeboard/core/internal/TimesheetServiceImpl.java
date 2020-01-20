@@ -29,6 +29,8 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
@@ -62,6 +64,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
+    @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
             throws TimesheetException {
 
@@ -144,6 +147,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
+    @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week) {
         TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
