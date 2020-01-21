@@ -123,10 +123,7 @@ public class TimesheetController {
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-
-        if(c.getTime().getTime() < beginWorkDateForCurrentOrg.getTime() ){
-            throw new BusinessException("You cannot access your timesheet before you register. ");
-        }
+        
 
         final Date ds = findStartDate(c, week, year);
         final Date de = findEndDate(c, week, year);
