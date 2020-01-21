@@ -64,8 +64,6 @@ public class VacationServiceImpl implements VacationService {
     @Autowired
     private ProjectService projectservice;
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
     @Override
     public Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID) {
         VacationRequest data;
@@ -375,10 +373,10 @@ public class VacationServiceImpl implements VacationService {
             boolean halfDay = vacationRequests.stream().anyMatch( r -> {
                 //current day is first day of request and request is half day started
                 boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                        && dateFormat.format(day).equals(dateFormat.format(r.getStartDate())));
+                        && onSameDay(day, r.getStartDate()));
                 //current day is last day of request and request is half day ended
                 boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
-                        && dateFormat.format(day).equals(dateFormat.format(r.getEndDate())));
+                        && onSameDay(day, r.getEndDate()));
                 return halfStart || halfEnd;
             });
 
@@ -392,8 +390,15 @@ public class VacationServiceImpl implements VacationService {
             this.projectservice.updateTaskImputation(user, task, day, newValue);
 
         }
+    }
 
-
+    private boolean onSameDay(Date date1, Date date2) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(date1);
+        cal2.setTime(date2);
+        return cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) &&
+                cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
     }
 
     private List<VacationRequest> listVacationRequests(Account applicant, Date day) {
