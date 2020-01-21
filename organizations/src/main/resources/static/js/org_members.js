@@ -1,11 +1,19 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
+
 let app = new Vue({
 
     el: '#members',
     data: {
         members: [],
+    },
+    filters:{
+        formatDate: function(value) {
+            if (value) {
+                return new Date(value).toDateString();
+            }
+        }
     },
     methods: {
         removeMember: function(e, member){

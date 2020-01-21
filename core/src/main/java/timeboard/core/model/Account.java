@@ -45,10 +45,6 @@ public class Account implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date accountCreationTime;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date beginWorkDate;
-
     @Column(nullable = true)
     private String name;
 
@@ -82,13 +78,12 @@ public class Account implements Serializable {
 
 
     public Account(final String name, final String firstName,
-                   final String email, final Date accountCreationTime, final Date beginWorkDate) {
+                   final String email, final Date accountCreationTime) {
         super();
         this.name = name;
         this.firstName = firstName;
         this.email = email;
         this.accountCreationTime = accountCreationTime;
-        this.beginWorkDate = beginWorkDate;
         this.externalIDs = new HashMap<>();
     }
 
@@ -127,14 +122,6 @@ public class Account implements Serializable {
 
     public void setAccountCreationTime(Date accountCreationTime) {
         this.accountCreationTime = accountCreationTime;
-    }
-
-    public Date getBeginWorkDate() {
-        return beginWorkDate;
-    }
-
-    public void setBeginWorkDate(Date beginWorkDate) {
-        this.beginWorkDate = beginWorkDate;
     }
 
     public String getName() {

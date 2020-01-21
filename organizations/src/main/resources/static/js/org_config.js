@@ -1,6 +1,7 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
+
 let app = new Vue({
     el: '#orgConfig',
     data: {

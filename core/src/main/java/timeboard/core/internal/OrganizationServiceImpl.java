@@ -41,7 +41,6 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.Calendar;
 import java.util.*;
 
 
@@ -202,6 +201,17 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
+    public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Organization organization) throws BusinessException {
+        return this.findOrganizationMembership(actor, organization.getId());
+    }
+
+    @Override
+    public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Long organizationID) throws BusinessException {
+        this.em.merge(actor);
+        return actor.getOrganizations().stream().filter(om -> om.getOrganization().getId() == organizationID).findFirst();
+    }
+
+    @Override
     public DefaultTask updateDefaultTask(Account actor, final DefaultTask task) {
         Optional<Organization> org = this.getOrganizationByID(actor, task.getOrganizationID());
         if (org.isPresent()) {
@@ -238,25 +248,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     public List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de) {
         TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
-                        + "t.endDate > :ds "
-                        + "and t.startDate <= :de "
-                        + "and t.startDate < t.endDate "
-                        + "and t.organizationID = :orgID", DefaultTask.class);
-        q.setParameter("ds", ds);
-        q.setParameter("de", de);
-        q.setParameter("orgID", orgID);
-        List<DefaultTask> tasks = q.getResultList();
-
-        return q.getResultList();
-
-    }
-
-    @Override
-    public List<DefaultTask> listDefaultTasks(Long orgID) {
-        TypedQuery<DefaultTask> q = em
-                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
-                        + "t.organizationID = :orgID", DefaultTask.class);
-
+                        + " t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("orgID", orgID);
         List<DefaultTask> tasks = q.getResultList();
 
@@ -274,10 +266,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     private DefaultTask createDefaultTask(Organization org, String name) throws BusinessException {
         try {
             DefaultTask task = new DefaultTask();
-            task.setStartDate(new Date());
-            java.util.Calendar c = java.util.Calendar.getInstance();
-            c.set(9999, Calendar.DECEMBER, 31);
-            task.setEndDate(c.getTime());
+            task.setStartDate(org.getCreatedDate());
+            task.setEndDate(null);
             task.setOrigin(org.getName() + "/" + System.nanoTime());
             task.setName(name);
             task.setOrganizationID(org.getId());

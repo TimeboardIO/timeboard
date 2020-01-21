@@ -48,10 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RestController
@@ -98,7 +95,8 @@ public class OrganizationsRestAPI {
             result.add(new MemberWrapper(
                     member.getMember().getId(),
                     member.getMember().getScreenName(),
-                    (member.getRole() != null ? member.getRole().name() : "")
+                    (member.getRole() != null ? member.getRole().name() : ""),
+                    member.getCreationDate()
             ));
         }
 
@@ -135,7 +133,7 @@ public class OrganizationsRestAPI {
         // Add member in current organization
         try {
             Optional<Organization> newOrganization = organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
-            MemberWrapper memberWrapper = new MemberWrapper(memberID, member.getScreenName(), MembershipRole.CONTRIBUTOR.toString());
+            MemberWrapper memberWrapper = new MemberWrapper(memberID, member.getScreenName(), MembershipRole.CONTRIBUTOR.toString(), new Date());
             return ResponseEntity.status(HttpStatus.OK).body(memberWrapper);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -228,6 +226,7 @@ public class OrganizationsRestAPI {
         public Long id;
         public String screenName;
         public String role;
+        public java.util.Date creationDate;
 
         public MemberWrapper() {
         }
@@ -236,12 +235,14 @@ public class OrganizationsRestAPI {
             this.id = h.getMember().getId();
             this.screenName = h.getMember().getScreenName();
             this.role = h.getRole().name();
+            this.creationDate = h.getCreationDate();
         }
 
-        public MemberWrapper(Long memberID, String screenName, String role) {
+        public MemberWrapper(Long memberID, String screenName, String role, java.util.Date date) {
             this.id = memberID;
             this.screenName = screenName;
             this.role = role;
+            this.creationDate = date;
         }
 
     }

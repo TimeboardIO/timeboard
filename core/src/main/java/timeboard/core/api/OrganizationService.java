@@ -39,47 +39,70 @@ import java.util.Optional;
  */
 public interface OrganizationService {
 
+    Organization createOrganization(
+            final String organizationName,
+            final Map<String, String> properties);
 
-    Organization createOrganization(String organizationName, Map<String, String> properties);
+    Organization createOrganization(
+            final Account actor,
+            final String organizationName,
+            final Map<String, String> properties) throws BusinessException;
 
-    Organization createOrganization(Account actor,
-                                    String organizationName, Map<String, String> properties) throws BusinessException;
+    Optional<Organization> getOrganizationByID(
+            final Account actor,
+            final long id);
 
-    Optional<Organization> getOrganizationByID(final Account actor,
-                                               long id);
+    Optional<Organization> getOrganizationByName(
+            final String organisationName);
 
-    Optional<Organization> getOrganizationByName(String organisationName);
+    Organization updateOrganization(
+            final Account actor,
+            final Organization organization);
 
-    Organization updateOrganization(final Account actor,
-                                    Organization organization);
+    Optional<Organization> removeMember(
+            final Account actor,
+            final Organization organization,
+            final Account member) throws BusinessException;
 
-    Optional<Organization> removeMember(Account actor,
-                                        Organization organization,
-                                        Account member) throws BusinessException;
+    Optional<Organization> addMember(
+            final Account actor,
+            final Organization organization,
+            final Account member,
+            final MembershipRole role) throws BusinessException;
 
-    Optional<Organization> addMember(final Account actor,
-                                     final Organization organization,
-                                     final Account member,
-                                     final MembershipRole role) throws BusinessException;
+    Optional<Organization> updateMemberRole(
+            final Account actor,
+            final Organization organization,
+            final Account member,
+            final MembershipRole role) throws BusinessException;
 
-    Optional<Organization> updateMemberRole(Account actor,
-                                            Organization organization,
-                                            Account member,
-                                            MembershipRole role) throws BusinessException;
+
+    Optional<OrganizationMembership> findOrganizationMembership(
+            final Account actor,
+            final Organization organization) throws BusinessException;
+
+    Optional<OrganizationMembership> findOrganizationMembership(
+            final Account actor,
+            final Long organizationID) throws BusinessException;
+
 
     /*
     == Default Tasks ==
     */
-    List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de);
-    List<DefaultTask> listDefaultTasks(Long orgID);
+    List<DefaultTask> listDefaultTasks(
+            final Long orgID,
+            final Date ds,
+            final Date de);
 
     /**
      * Create a default task.
      *
      * @return DefaultTask
      */
-    DefaultTask createDefaultTask(Account actor, Long orgID, String task) throws BusinessException;
-
+    DefaultTask createDefaultTask(
+            final Account actor,
+            final Long orgID,
+            final String task) throws BusinessException;
 
 
     /**
@@ -89,12 +112,19 @@ public interface OrganizationService {
      * @param taskID
      * @throws BusinessException
      */
-    void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException;
+    void disableDefaultTaskByID(
+            final Account actor,
+            final Long orgID, final
+            long taskID) throws BusinessException;
 
 
-    DefaultTask updateDefaultTask(Account actor, DefaultTask task);
+    DefaultTask updateDefaultTask(
+            final Account actor,
+            final DefaultTask task);
 
-    DefaultTask getDefaultTaskByID(Account actor, long id);
+    DefaultTask getDefaultTaskByID(
+            final Account actor,
+            final long id);
 
 
     /**
@@ -102,17 +132,27 @@ public interface OrganizationService {
      *
      * @return List all task types.
      */
-    List<TaskType> listTaskType(Long orgID);
+    List<TaskType> listTaskType(
+            final Long orgID);
 
-    TaskType findTaskTypeByID(Long taskTypeID);
+    TaskType findTaskTypeByID(
+            final Long taskTypeID);
 
-    TaskType updateTaskType(Account actor, TaskType type);
+    TaskType updateTaskType(
+            final Account actor,
+            final TaskType type);
 
-    TaskType createTaskType(Account actor, Long orgID, String name);
+    TaskType createTaskType(
+            final Account actor,
+            final Long orgID,
+            final String name);
 
-    void disableTaskType(Account actor, TaskType type);
+    void disableTaskType(
+            final Account actor,
+            final TaskType type);
 
     //TODO remove when migration is ok
-    boolean checkOrganizationVacationTask(String taskName) ;
+    boolean checkOrganizationVacationTask(
+            final String taskName);
 
 }

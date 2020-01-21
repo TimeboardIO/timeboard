@@ -32,10 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.*;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.model.*;
@@ -62,18 +60,21 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private OrganizationService organizationService;
+
 
     @Override
     @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
-            throws TimesheetException {
+            throws BusinessException {
 
         //check if submission is possible
         //1 - last week is submitted
 
         final Calendar c = Calendar.getInstance();
 
-        c.setTime(accountTimesheet.getBeginWorkDate());
+        c.setTime(this.organizationService.findOrganizationMembership(actor, currentOrg).get().getCreationDate());
 
         int dayInFirstWeek = c.get(Calendar.DAY_OF_WEEK);
         boolean firstWeek = (c.get(Calendar.WEEK_OF_YEAR) == week) && (c.get(Calendar.YEAR) == year);
