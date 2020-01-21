@@ -132,8 +132,8 @@ public class VacationServiceImpl implements VacationService {
                         "and not (v.endDate < :startBound and v.startDate > :endBound)"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
-        q.setParameter("endBound", endBound);
-        q.setParameter("startBound", startBound);
+        q.setParameter("endBound", endBound.getTime());
+        q.setParameter("startBound", startBound.getTime());
 
         return q.getResultList();
 

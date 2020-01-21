@@ -177,7 +177,6 @@ let app = new Vue({
             let validated = $('.ui.form').form(formValidationRules).form('validate form');
             let assignedToMyself = this.vacationRequest.assigneeID == currentActorID;
 
-            let self = this;
             if(validated) {
                 $.ajax({
                     type: "POST",
