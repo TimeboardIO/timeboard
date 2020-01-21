@@ -35,11 +35,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.*;
-import timeboard.core.security.TimeboardAuthentication;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -109,8 +108,12 @@ public class TimesheetController {
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
         Account acc = authentication.getDetails();
 
+        final Date beginWorkDateForCurrentOrg = this.organizationService
+                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .get().getCreationDate();
+
         final Calendar c = Calendar.getInstance();
-        c.setTime(acc.getBeginWorkDate());
+        c.setTime(beginWorkDateForCurrentOrg);
 
 
         c.set(Calendar.WEEK_OF_YEAR, week);
@@ -120,9 +123,6 @@ public class TimesheetController {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
 
-        if(c.getTime().getTime() < authentication.getDetails().getBeginWorkDate().getTime() ){
-            throw new BusinessException("You cannot access your timesheet before you register. ");
-        }
 
         final Date ds = findStartDate(c, week, year);
         final Date de = findEndDate(c, week, year);
