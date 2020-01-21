@@ -48,6 +48,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/vacation")
@@ -107,8 +108,12 @@ public class VacationsController {
 
         // get existing vacation request for year
         List<VacationRequest> vacationRequests = this.vacationService.listVacationRequestsByUser(actor, yearNum);
+
+        // remove recursive events (only keep single event)
+        vacationRequests = vacationRequests.stream().filter(r -> !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
+
         // re-balance key to user screen name and wrap request to ui calendar
-        final  List<CalendarEvent> newList = CalendarEvent.requestToWrapperList(vacationRequests);
+        final List<CalendarEvent> newList = CalendarEvent.requestToWrapperList(vacationRequests);
 
         return ResponseEntity.ok(newList);
     }
@@ -183,11 +188,11 @@ public class VacationsController {
 
         } else {
             request = new VacationRequest();
+            request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
+            request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         }
         request.setLabel(requestWrapper.label);
 
-        request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
-        request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setStatus(VacationRequestStatus.PENDING);
 
 
