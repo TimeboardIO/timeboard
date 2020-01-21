@@ -43,6 +43,7 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.Calendar;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -227,6 +228,21 @@ public class TimesheetServiceImpl implements TimesheetService {
         }
 
         return result;
+    }
+
+    @Override
+    public Map<Account, List<SubmittedTimesheet>> getTimesheetsFromProject(Account actor, Project project) {
+
+        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+                + "where st.account in :users and st.isValidated = :notvalidated", SubmittedTimesheet.class);
+
+        q.setParameter("users", project.getMembers());
+        q.setParameter("notvalidated", false);
+
+        List<SubmittedTimesheet> resultList = q.getResultList();
+        return resultList.stream().collect(Collectors.groupingBy(SubmittedTimesheet::getAccount,
+                        Collectors.mapping(r -> r,Collectors.toList())));
+
     }
 
 
