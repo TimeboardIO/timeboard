@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='second')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-for="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title>Project Timesheet Validations</title>
+    <meta property="tasks" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}" th:project="${project.id}"  th:batchtype="${batchType}"/>
+
+</head>
+<body>
+<div layout:fragment="placeholder">
+
+    Timesheets
+</div>
+</body>
+</html>
