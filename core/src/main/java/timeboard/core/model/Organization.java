@@ -68,7 +68,6 @@ public class Organization {
     @OneToMany(targetEntity = OrganizationMembership.class,
             mappedBy = "organization",
             orphanRemoval = true,
-            cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER
     )
     private Set<OrganizationMembership> members = new HashSet<>();

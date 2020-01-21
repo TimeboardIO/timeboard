@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Transactional
-public class VacationServiceImpl extends OrganizationEntity implements VacationService {
+public class VacationServiceImpl implements VacationService {
 
     @Autowired
     private EntityManager em;
@@ -86,11 +86,26 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         return request;
     }
 
+
     @Override
-    public List<VacationRequest> listUserVacations(Account applicant) {
+    public RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request) {
+        request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
+        request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
+
+        if(request.getChildren().isEmpty()) {
+            request.generateChildren();
+        }
+        em.persist(request);
+        em.flush();
+
+        return request;
+    }
+
+    @Override
+    public List<VacationRequest> listVacationRequestsByUser(Account applicant) {
 
         TypedQuery<VacationRequest> q = em.createQuery(
-                "select v from VacationRequest v where v.applicant = :applicant "
+                "select v from VacationRequest v where v.applicant = :applicant and v.parent IS NULL"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
 
@@ -125,9 +140,10 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     }
 
     @Override
-    public List<VacationRequest> listVacationsToValidateByUser(Account assignee) {
+    public List<VacationRequest> listVacationRequestsToValidateByUser(Account assignee) {
 
-        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v where v.assignee = :assignee and v.status = :status",
+        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
+                        "where v.assignee = :assignee and v.status = :status and v.parent IS NULL",
                 VacationRequest.class);
         q.setParameter("assignee", assignee);
         q.setParameter("status", VacationRequestStatus.PENDING);
@@ -167,7 +183,8 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         q.setParameter("applicants", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
 
         // group vacation request by account and return map account -> requests list
-        return q.getResultList().stream().collect(Collectors.groupingBy(VacationRequest::getApplicant,
+        return q.getResultList().stream().filter(r -> !(r instanceof RecursiveVacationRequest))
+                .collect(Collectors.groupingBy(VacationRequest::getApplicant,
                 Collectors.mapping(r -> r,Collectors.toList())));
     }
 
@@ -175,7 +192,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     public List<VacationRequest> listVacationRequestsByPeriod(Account applicant, VacationRequest request) {
 
         TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
-                        "where v.applicant = :applicant " +
+                        "where v.applicant = :applicant and v.parent is null " +
                         "and ( " +
                             "(v.startDate >= :startDate and :startDate <= v.endDate)" +
                             " or " +
@@ -192,7 +209,7 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
 
         for (VacationRequest r :resultList) {
             if (
-                (r.getStartDate().compareTo(request.getEndDate()) == 1)
+                (r.getStartDate().compareTo(request.getEndDate()) > 0)
                     && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
                     &&  r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
@@ -200,14 +217,16 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
             }
 
             if (
-                (r.getEndDate().compareTo(request.getStartDate()) == 1)
+                (r.getEndDate().compareTo(request.getStartDate()) > 0)
                 && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
                 && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
                     copyList.remove(r);
             }
+            if (r instanceof RecursiveVacationRequest ) {
+                copyList.remove(r);
+            }
         }
-
 
         return copyList;
     }
@@ -223,6 +242,27 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         em.remove(request);
         em.flush();
 
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
+
+    }
+
+    @Override
+    public void deleteVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
+
+        request.setEndDate(new Date());
+        boolean removeIt = true;
+        for(VacationRequest r : request.getChildren()) {
+            if(r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
+                removeIt = false;
+            } else {
+                this.deleteVacationRequest(actor, r);
+            }
+        }
+
+        if (removeIt){
+            em.remove(request);
+        }
+        em.flush();
 
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
 
@@ -234,7 +274,24 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
         em.merge(request);
         em.flush();
 
+
         this.updateImputations(actor, request,1);
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
+
+        return request;
+    }
+
+    @Override
+    public RecursiveVacationRequest approveVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
+        request.setStatus(VacationRequestStatus.ACCEPTED);
+
+        for(VacationRequest r : request.getChildren()) {
+            this.approveVacationRequest(actor, r);
+        }
+
+        em.merge(request);
+        em.flush();
+
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
@@ -292,13 +349,75 @@ public class VacationServiceImpl extends OrganizationEntity implements VacationS
     }
 
     private void updateTaskImputation(Account user, DefaultTask task, Date day, double val) throws BusinessException {
-      this.projectservice.updateTaskImputation(user, task, day, val);
+
+        if (val > 0) {
+            //change imputation value only if previous value is smaller than new
+            Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
+            if (old.isEmpty() || old.get().getValue() < val) {
+                this.projectservice.updateTaskImputation(user, task, day, val);
+            }
+        } else {
+            // looking for existing vacation request on same day
+            double newValue = val;
+            List<VacationRequest> vacationRequests = this.listVacationRequests(user, day);
+            // keep accepted request
+            vacationRequests = vacationRequests.stream().filter(r -> r.getStatus() == VacationRequestStatus.ACCEPTED
+                    && !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
+
+            // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
+            boolean halfDay = vacationRequests.stream().anyMatch( r -> {
+                //current day is first day of request and request is half day started
+                boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0);
+                //current day is last day of request and request is half day ended
+                boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0);
+                return halfStart || halfEnd;
+            });
+
+            if (halfDay) {
+                newValue = 0.5;
+            } else if (!vacationRequests.isEmpty()) {
+                newValue = 1;
+            }
+
+            //update imputation
+            this.projectservice.updateTaskImputation(user, task, day, newValue);
+
+        }
+
+
+    }
+
+    private List<VacationRequest> listVacationRequests(Account applicant, Date day) {
+        TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v where v.applicant = :applicant " +
+                        "and (:day BETWEEN v.startDate  and v.endDate)", VacationRequest.class);
+
+        q.setParameter("applicant", applicant);
+        q.setParameter("day", day);
+
+        return q.getResultList();
 
     }
 
 
     @Override
     public VacationRequest rejectVacationRequest(Account actor, VacationRequest request) {
+        request.setStatus(VacationRequestStatus.REJECTED);
+        em.merge(request);
+        em.flush();
+
+        TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DENY, request));
+
+        return request;
+    }
+
+    @Override
+    public RecursiveVacationRequest rejectVacationRequest(Account actor, RecursiveVacationRequest request) {
+
+        for(VacationRequest r : request.getChildren()) {
+            this.rejectVacationRequest(actor, r);
+        }
+
         request.setStatus(VacationRequestStatus.REJECTED);
         em.merge(request);
         em.flush();

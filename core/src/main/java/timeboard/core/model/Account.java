@@ -71,7 +71,6 @@ public class Account implements Serializable {
     @OneToMany(targetEntity = OrganizationMembership.class,
             mappedBy = "member",
             orphanRemoval = true,
-            cascade = {CascadeType.ALL},
             fetch = FetchType.EAGER
     )
     private Set<OrganizationMembership> organizations;

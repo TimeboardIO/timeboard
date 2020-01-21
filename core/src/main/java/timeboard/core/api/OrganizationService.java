@@ -57,10 +57,10 @@ public interface OrganizationService {
                                         Organization organization,
                                         Account member) throws BusinessException;
 
-    Optional<Organization> addMember(Account actor,
-                                     Organization organization,
-                                     Account member,
-                                     MembershipRole role) throws BusinessException;
+    Optional<Organization> addMember(final Account actor,
+                                     final Organization organization,
+                                     final Account member,
+                                     final MembershipRole role) throws BusinessException;
 
     Optional<Organization> updateMemberRole(Account actor,
                                             Organization organization,

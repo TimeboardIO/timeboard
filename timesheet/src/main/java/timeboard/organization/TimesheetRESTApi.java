@@ -67,8 +67,8 @@ public class TimesheetRESTApi {
     private OrganizationService organizationService;
 
 
-    @GetMapping
-    public ResponseEntity getTimesheetData(
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Timesheet> getTimesheetData(
             TimeboardAuthentication authentication,
             @RequestParam("week") int week,
             @RequestParam("year") int year ) throws JsonProcessingException {
@@ -78,18 +78,7 @@ public class TimesheetRESTApi {
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
 
-
-        boolean submitted = false;
-
-        final Calendar c = Calendar.getInstance();
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
-        c.setFirstDayOfWeek(Calendar.MONDAY);
-        c.set(Calendar.HOUR_OF_DAY, 2);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
+        final Calendar c = firstDayOfWeek(week, year);
         final Date ds = findStartDate(c, week, year);
         final Date de = findEndDate(c, week, year);
 
@@ -137,20 +126,39 @@ public class TimesheetRESTApi {
                     tasks));
         }
 
-        if (this.timesheetService != null) {
-            submitted = this.timesheetService.isTimesheetSubmitted(currentAccount, year, week);
-        }
+        final Timesheet ts = new Timesheet(
+                this.timesheetService.isTimesheetSubmitted(currentAccount, year, week),
+                year,
+                week,
+                c.get(Calendar.YEAR),
+                c.get(Calendar.WEEK_OF_YEAR),
+                days,
+                projects,
+                imputations);
 
-        c.setTime(authentication.getDetails().getBeginWorkDate());
-
-        Timesheet ts = new Timesheet(submitted, year, week, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), days, projects, imputations);
-
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(MAPPER.writeValueAsString(ts));
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
     }
 
-    private List<TaskWrapper> getDefaultTasks(Account currentAccount, Long orgID, List<ImputationWrapper> imputations,
-                                              Date ds, Date de, List<DateWrapper> days) {
-        List<TaskWrapper> tasks = new ArrayList<>();
+    private Calendar firstDayOfWeek(int week, int year) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.YEAR, year);
+        c.setFirstDayOfWeek(Calendar.MONDAY);
+        c.set(Calendar.HOUR_OF_DAY, 2);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+        return c;
+    }
+
+    private List<TaskWrapper> getDefaultTasks(final Account currentAccount,
+                                              final Long orgID,
+                                              final List<ImputationWrapper> imputations,
+                                              final Date ds,
+                                              final Date de,
+                                              final List<DateWrapper> days) {
+
+        final List<TaskWrapper> tasks = new ArrayList<>();
 
         this.organizationService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
             tasks.add(new TaskWrapper(
@@ -167,6 +175,7 @@ public class TimesheetRESTApi {
             });
 
         });
+
         return tasks;
     }
 
