@@ -185,8 +185,10 @@ let app = new Vue({
                     url: "/vacation",
                     success: function (d) {
                         $('#newVacation').modal('hide');
+                        $('#newRecursiveVacation').modal('hide');
                         // do something
                         self.myRequests.data = d;
+                        self.loadCalendar();
                         if(assignedToMyself){
                             self.listToValidateRequests();
                         }
@@ -256,6 +258,7 @@ let app = new Vue({
                         url: "/vacation/"+request.id,
                         success: function (d) {
                             self.myRequests.data = d;
+                            self.loadCalendar();
                             if(assignedToMyself){
                                 self.listToValidateRequests();
                             }
@@ -278,7 +281,6 @@ let app = new Vue({
                     self.toValidateRequests.data = d;
                 }
             });
-            self.loadCalendar();
         },
         listMyRequests: function() {
             let self = this;
@@ -290,6 +292,7 @@ let app = new Vue({
                     self.myRequests.data = d;
                 }
             });
+            self.loadCalendar();
         },
         loadCalendar: function() {
             let self = this;
