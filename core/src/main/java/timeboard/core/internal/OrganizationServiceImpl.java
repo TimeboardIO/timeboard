@@ -154,8 +154,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#organization.getId()")
-    public Optional<Organization> removeMember(final Account actor, Organization organization, Account member) {
+    @CacheEvict(value="organizationsCache", key="#o.getId()")
+    public Optional<Organization> removeMember(final Account actor, Organization o, Account member) {
 
         Optional<Organization> organization = this.getOrganizationByID(actor, o.getId());
         if(organization.isPresent()) {
