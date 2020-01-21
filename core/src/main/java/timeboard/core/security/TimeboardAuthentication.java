@@ -30,6 +30,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Project;
+import timeboard.core.model.ProjectMembership;
 
 import javax.persistence.Transient;
 import java.security.Principal;
@@ -95,6 +97,15 @@ public class TimeboardAuthentication implements Authentication {
                 .stream()
                 .filter(o -> o.getOrganization().getId() == currentOrganization)
                 .filter(o -> o.getRole() == role)
+                .count() > 0;
+    }
+
+    @Transient
+    public boolean currentProjectRole(final Project project, final MembershipRole role) {
+        return project.getMembers()
+                .stream()
+                .filter(projectMembership -> projectMembership.getMember().getId() == account.getId())
+                .filter(projectMembership -> projectMembership.getRole() == role)
                 .count() > 0;
     }
 

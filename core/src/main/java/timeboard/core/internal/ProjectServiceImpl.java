@@ -158,6 +158,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#project,'PROJECT_SETUP')")
     @CacheEvict(value="accountProjectsCache", key="#actor.getId()")
     public Project updateProject(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
