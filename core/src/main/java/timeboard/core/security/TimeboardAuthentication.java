@@ -31,7 +31,6 @@ import org.springframework.security.core.GrantedAuthority;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Project;
-import timeboard.core.model.ProjectMembership;
 
 import javax.persistence.Transient;
 import java.security.Principal;
