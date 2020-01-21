@@ -1,16 +1,24 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
+
 let app = new Vue({
 
     el: '#members',
     data: {
         members: [],
     },
+    filters:{
+        formatDate: function(value) {
+            if (value) {
+                return new Date(value).toDateString();
+            }
+        }
+    },
     methods: {
         removeMember: function(e, member){
             $.get("/org/members/remove?orgID="+currentOrgID+"&memberID="+member.id)
-            .done(function(data){
+            .then(function(data){
                 let copy = [];
                 for (let i = 0; i < app.members.length; i++) {
                     if(app.members[i].id !== member.id){
@@ -22,34 +30,27 @@ let app = new Vue({
         },
         addMember: function(memberID){
             $.get("/org/members/add?orgID="+currentOrgID+"&memberID="+memberID)
-            .done(function(data){
-                app.members.push(new MemberWrapper(data));
+            .then(function(data){
+                app.members.push(data);
             });
         },
         updateRole: function(e, member){
             $.get("/org/members/updateRole?orgID="+currentOrgID+"&memberID="+member.id+"&role="+member.role)
-            .done(function(data){
-                member.role = data.role;
+            .then(function(role){
+                member.role = role;
             });
         }
     }
 });
 
-class MemberWrapper {
-    constructor(data) {
-        this.id = data.orgID;
-        this.screenName = data.screenName;
-        this.isOrganization = data.isOrganization;
-        this.role = data.role;
-    }
-}
+
 //Initialization
 $(document).ready(function(){
     //initial data loading
         $.get("/org/members/list?orgID="+currentOrgID)
         .then(function(data){
-            for (var item in data) {
-                app.members.push(new MemberWrapper(data[item]));
+            for (let i = 0; i < data.length; i++) {
+                app.members.push(data[i]);
             }
             $('.ui.dimmer').removeClass('active');
         });

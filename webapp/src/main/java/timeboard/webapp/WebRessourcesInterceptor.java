@@ -91,7 +91,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
             modelMap.put("account", account);
             modelMap.put("navs", navRegistry.getEntries());
             modelMap.put("dataTableService", dataTableService);
-            Long orgaID = ThreadLocalStorage.getCurrentOrganizationID();
+            Long orgaID = ThreadLocalStorage.getCurrentOrgId();
             if(orgaID != null) {
                 fillModelWithOrganization(account, modelMap, orgaID);
             }

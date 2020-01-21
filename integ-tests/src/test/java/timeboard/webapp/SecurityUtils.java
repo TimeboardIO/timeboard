@@ -1,10 +1,10 @@
-package timeboard.core.api;
+package timeboard.webapp;
 
 /*-
  * #%L
- * core
+ * integ-tests
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,19 +27,22 @@ package timeboard.core.api;
  */
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import timeboard.core.api.ThreadLocalStorage;
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
 
-public class ThreadLocalStorage {
+public class SecurityUtils {
 
-    private static ThreadLocal<Long> CURRENT_ORG_ID = new ThreadLocal<>();
+    private SecurityUtils(){
 
-    public static Long getCurrentOrgId() {
-        return CURRENT_ORG_ID.get();
     }
 
-    public static void setCurrentOrgId(Long tenantName) {
-        CURRENT_ORG_ID.set(tenantName);
-        ((TimeboardAuthentication)SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
+    public static TimeboardAuthentication signIn(Organization o, Account a){
+        TimeboardAuthentication auth = new TimeboardAuthentication(a);
+        SecurityContextHolder.getContext().setAuthentication(auth);
+        ThreadLocalStorage.setCurrentOrgId(o.getId());
+        return auth;
     }
 
 }

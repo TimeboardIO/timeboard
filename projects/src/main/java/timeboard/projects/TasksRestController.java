@@ -326,10 +326,8 @@ public class TasksRestController {
         }
 
         String name = taskWrapper.taskName;
-        String comment = taskWrapper.taskComments;
-        if (comment == null) {
-            comment = "";
-        }
+        String comment = commentsValidator(taskWrapper);
+
         double oe = taskWrapper.originalEstimate;
         if (oe <= 0.0) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Original original estimate must be positive ");
@@ -370,6 +368,14 @@ public class TasksRestController {
         taskWrapper.setTaskID(task.getId());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
+    }
+
+    private String commentsValidator(@RequestBody TaskWrapper taskWrapper) {
+        String comment = taskWrapper.taskComments;
+        if (comment == null) {
+            comment = "";
+        }
+        return comment;
     }
 
     private Task createTask(TaskWrapper taskWrapper, Account actor, Date startDate, Date endDate, String name, String comment, double oe,

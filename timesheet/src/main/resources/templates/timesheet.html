@@ -107,7 +107,7 @@
                             v-bind:data-year="year"
                             v-on:click="submitMyWeek"
                             v-bind:class="{'ui positive button':true, 'disabled':(!enableSubmitButton())}"
-                            type="submit" value="Submit My Week">
+                            type="submit" th:text="#{timesheet.submit}">
                         Submit My Week
                     </button>
                 </div>
@@ -116,7 +116,7 @@
                         Week submitted
                     </button>
                 </div>
-                <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button">
+                <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
                     New Task
                 </button>
             </div>
@@ -200,7 +200,7 @@
                                             max="1"
                                             min="0"
                                             step="0.1"
-                                            v-if="(day.date >= task.startDate) && (day.date <= task.endDate)"
+                                            v-if="((day.date >= task.startDate || !task.startDate)) && ((day.date <= task.endDate) || (!task.endDate))"
                                             v-on:focusout="triggerUpdateTask"
                                             v-on:keyup.enter="triggerUpdateTask"
                                             v-bind:data-date="day.date"

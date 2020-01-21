@@ -29,6 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
+import timeboard.core.model.RecursiveVacationRequest;
 import timeboard.core.model.VacationRequest;
 
 import java.util.List;
@@ -40,18 +41,28 @@ public interface VacationService {
     Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID);
 
     VacationRequest createVacationRequest(Account actor, VacationRequest request);
+    RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request);
 
-    List<VacationRequest> listUserVacations(Account user);
+    List<VacationRequest> listVacationRequestsByUser(Account user);
+    List<VacationRequest> listVacationRequestsToValidateByUser(Account user);
 
-    List<VacationRequest> listVacationsToValidateByUser(Account user);
+    /**
+     *  List conflicting vacation request for period
+     * @param assignee
+     * @param request VacationRequest period
+     * @return
+     */
+    List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
+
 
     Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
     void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+    void deleteVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException;
 
     VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+    RecursiveVacationRequest approveVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException;
 
     VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
-
-    List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
+    RecursiveVacationRequest rejectVacationRequest(Account actor, RecursiveVacationRequest request);
 }

@@ -1,6 +1,7 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
+
 let app = new Vue({
     el: '#orgConfig',
     data: {
@@ -116,7 +117,7 @@ let app = new Vue({
         },
         removeTask: function (row) {
             let self = this;
-            this.$refs.confirmModal.confirm("Are you sure you want to delete "+ row.tagKey + "?", function() {
+            this.$refs.confirmModal.confirm("Are you sure you want to delete "+ row.name + "?", function() {
                 $.ajax({
                     type: "DELETE",
                     dataType: "json",

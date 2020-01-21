@@ -48,10 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 @RestController
@@ -98,7 +95,8 @@ public class OrganizationsRestAPI {
             result.add(new MemberWrapper(
                     member.getMember().getId(),
                     member.getMember().getScreenName(),
-                    (member.getRole() != null ? member.getRole().name() : "")
+                    (member.getRole() != null ? member.getRole().name() : ""),
+                    member.getCreationDate()
             ));
         }
 
@@ -112,6 +110,7 @@ public class OrganizationsRestAPI {
 
         Account actor = authentication.getDetails();
 
+        // Get current organization
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
         if (strOrgID != null) {
@@ -121,6 +120,7 @@ public class OrganizationsRestAPI {
         }
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
+        // Get added member
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
         if (strMemberID != null) {
@@ -128,13 +128,13 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
+        final Account member = this.userService.findUserByID(memberID);
 
-        final Optional<Organization> member = this.organizationService.getOrganizationByID(actor, memberID);
-
+        // Add member in current organization
         try {
-            //Optional<Organization> ah = organizationService.addMember(actor, organization.get(), member.get());
-
-            return ResponseEntity.ok(HttpStatus.OK);
+            Optional<Organization> newOrganization = organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
+            MemberWrapper memberWrapper = new MemberWrapper(memberID, member.getScreenName(), MembershipRole.CONTRIBUTOR.toString(), new Date());
+            return ResponseEntity.status(HttpStatus.OK).body(memberWrapper);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -178,8 +178,8 @@ public class OrganizationsRestAPI {
         }
 
         try {
-            Optional<Organization> ah = organizationService.updateMemberRole(actor, organization.get(), member, role);
-            return ResponseEntity.ok().build();
+            Optional<Organization> newOrganization = organizationService.updateMemberRole(actor, organization.get(), member, role);
+            return ResponseEntity.status(HttpStatus.OK).body(role);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -213,34 +213,36 @@ public class OrganizationsRestAPI {
         final Account member = this.userService.findUserByID(memberID);
 
         try {
-            organizationService.removeMember(actor, organization.get(), member);
+            Optional<Organization> newOrganization = organizationService.removeMember(actor, organization.get(), member);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     public static class MemberWrapper implements Serializable {
 
-        public Long orgID;
+        public Long id;
         public String screenName;
-        public boolean isOrganization;
         public String role;
+        public java.util.Date creationDate;
 
         public MemberWrapper() {
         }
 
         public MemberWrapper(OrganizationMembership h) {
-            this.orgID = h.getMember().getId();
+            this.id = h.getMember().getId();
             this.screenName = h.getMember().getScreenName();
             this.role = h.getRole().name();
+            this.creationDate = h.getCreationDate();
         }
 
-        public MemberWrapper(Long orgID, String screenName, String role) {
-            this.orgID = orgID;
+        public MemberWrapper(Long memberID, String screenName, String role, java.util.Date date) {
+            this.id = memberID;
             this.screenName = screenName;
             this.role = role;
+            this.creationDate = date;
         }
 
     }
