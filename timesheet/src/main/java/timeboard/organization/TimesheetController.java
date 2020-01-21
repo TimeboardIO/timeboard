@@ -35,11 +35,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.*;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

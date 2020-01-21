@@ -26,33 +26,27 @@ package timeboard.organization;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 
 @Component
@@ -284,10 +278,7 @@ public class TimesheetRESTApi {
         public long task;
         public double imputation;
 
-        public UpdateRequest(){
-
-
-        };
+        public UpdateRequest(){};
     }
 
 
@@ -375,7 +366,7 @@ public class TimesheetRESTApi {
         }
     }
 
-    public static class DateWrapper {
+    public static class DateWrapper implements Serializable{
 
         private final String day;
         private final Date date;
@@ -394,7 +385,7 @@ public class TimesheetRESTApi {
         }
     }
 
-    public static class ProjectWrapper {
+    public static class ProjectWrapper implements Serializable{
 
         private final Long projectID;
         private final String projectName;

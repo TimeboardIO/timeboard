@@ -125,6 +125,7 @@
 
     create table OrganizationMembership (
        id bigint not null,
+        creationDate date,
         role varchar(255),
         member_id bigint,
         organization_id bigint,
