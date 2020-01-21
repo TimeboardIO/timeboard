@@ -165,6 +165,23 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
+    @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
+    public boolean isTimesheetValidated(Account accountTimesheet, int year, int week) {
+        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week and isValidated = true", SubmittedTimesheet.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", accountTimesheet);
+
+        try {
+            q.getSingleResult();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
     public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, Account account) {
         TypedQuery<Double> q = em.createQuery(
                 "SELECT COALESCE(sum(i.value),0) \n"

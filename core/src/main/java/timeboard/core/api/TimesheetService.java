@@ -59,6 +59,16 @@ public interface TimesheetService {
      */
     boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week);
 
+    /**
+     * Is timesheet validated by manager.
+     *
+     * @param accountTimesheet user used to check timesheet sumbit state.
+     * @param week             timesheet week
+     * @param year             timesheet year
+     * @return true if timesheet is already validated
+     */
+    boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
+
 
     /**
      * Get the sum of all imputations by week by user.

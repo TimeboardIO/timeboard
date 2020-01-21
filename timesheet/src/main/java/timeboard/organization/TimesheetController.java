@@ -133,6 +133,8 @@ public class TimesheetController {
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
+        model.addAttribute("weekSubmitted", this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), year, week));
+        model.addAttribute("weekValidated", this.timesheetService.isTimesheetValidated(authentication.getDetails(), year, week));
         model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekSubmitted", lastWeekSubmitted);
 
