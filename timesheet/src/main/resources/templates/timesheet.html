@@ -200,7 +200,7 @@
                                             max="1"
                                             min="0"
                                             step="0.1"
-                                            v-if="(day.date >= task.startDate) && (day.date <= task.endDate)"
+                                            v-if="((day.date >= task.startDate || !task.startDate)) && ((day.date <= task.endDate) || (!task.endDate))"
                                             v-on:focusout="triggerUpdateTask"
                                             v-on:keyup.enter="triggerUpdateTask"
                                             v-bind:data-date="day.date"

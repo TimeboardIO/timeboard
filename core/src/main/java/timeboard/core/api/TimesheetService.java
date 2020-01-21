@@ -26,6 +26,7 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
@@ -47,7 +48,7 @@ public interface TimesheetService {
      * @param week             timesheet week
      * @return true if timesheet is submit else, false.
      */
-    void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException;
+    void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws BusinessException;
 
     /**
      * Is timesheet submitted.

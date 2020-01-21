@@ -2,7 +2,6 @@
     create table Account (
        id bigint not null,
         accountCreationTime date not null,
-        beginWorkDate date not null,
         email varchar(255) not null,
         externalIDs TEXT,
         firstName varchar(255),
@@ -174,6 +173,22 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table RecursiveVacationRequest (
+       id bigint not null,
+        organizationID bigint,
+        endDate date,
+        endHalfDay integer,
+        label varchar(255),
+        startDate date,
+        startHalfDay integer,
+        status integer,
+        applicant_id bigint,
+        assignee_id bigint,
+        parent_id bigint,
+        recurrenceDay integer,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Report (
        id bigint not null,
         organizationID bigint,
@@ -249,6 +264,7 @@
         status integer,
         applicant_id bigint,
         assignee_id bigint,
+        parent_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -319,6 +335,21 @@
        foreign key (project_id) 
        references Project (id);
 
+    alter table RecursiveVacationRequest 
+       add constraint FK_khc4schw5r1a0hc48j4jwf075 
+       foreign key (applicant_id) 
+       references Account (id);
+
+    alter table RecursiveVacationRequest 
+       add constraint FK_7cxue1ajn4v17uktsuj8cxtpg 
+       foreign key (assignee_id) 
+       references Account (id);
+
+    alter table RecursiveVacationRequest 
+       add constraint FK_pdorxr0o13vxqxtt8lou3t7by 
+       foreign key (parent_id) 
+       references RecursiveVacationRequest (id);
+
     alter table SubmittedTimesheet 
        add constraint FK8cv07tq7it76qd26wfyewa15y 
        foreign key (account_id) 
@@ -373,3 +404,8 @@
        add constraint FK28esu0dtlr0he4ie5j5oipsck 
        foreign key (assignee_id) 
        references Account (id);
+
+    alter table VacationRequest 
+       add constraint FK1tbhfs9wnfdwefermfv9611fx 
+       foreign key (parent_id) 
+       references RecursiveVacationRequest (id);

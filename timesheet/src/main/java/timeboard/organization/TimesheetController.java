@@ -109,8 +109,12 @@ public class TimesheetController {
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
         Account acc = authentication.getDetails();
 
+        final Date beginWorkDateForCurrentOrg = this.organizationService
+                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .get().getCreationDate();
+
         final Calendar c = Calendar.getInstance();
-        c.setTime(acc.getBeginWorkDate());
+        c.setTime(beginWorkDateForCurrentOrg);
 
 
         c.set(Calendar.WEEK_OF_YEAR, week);
@@ -120,7 +124,7 @@ public class TimesheetController {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
 
-        if(c.getTime().getTime() < authentication.getDetails().getBeginWorkDate().getTime() ){
+        if(c.getTime().getTime() < beginWorkDateForCurrentOrg.getTime() ){
             throw new BusinessException("You cannot access your timesheet before you register. ");
         }
 

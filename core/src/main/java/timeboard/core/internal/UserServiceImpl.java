@@ -217,7 +217,7 @@ public class UserServiceImpl implements UserService {
         Account account = this.findUserBySubject(sub);
         if (account == null) {
             //Create user
-            account = new Account(null, null, email, new Date(), new Date());
+            account = new Account(null, null, email, new Date());
             account.setRemoteSubject(sub);
             account = this.createUser(account);
         }

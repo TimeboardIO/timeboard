@@ -32,6 +32,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
@@ -51,8 +53,12 @@ public class AccountController {
     @Autowired
     private UserService userService;
 
+
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private OrganizationService organizationService;
 
 
     @Autowired(
@@ -62,10 +68,12 @@ public class AccountController {
 
 
     @PostMapping
-    protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request, Model model) {
+    protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request, Model model) throws BusinessException {
 
         final String submitButton = request.getParameter("formType");
         final Account actor = authentication.getDetails();
+
+
 
         switch (submitButton) {
 
@@ -114,13 +122,13 @@ public class AccountController {
     }
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+    protected String handleGet(TimeboardAuthentication authentication, Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
         loadPage(model, actor, authentication.getCurrentOrganization());
         return "account.html";
     }
 
-    private void loadPage(Model model, Account actor, Long orgID) {
+    private void loadPage(Model model, Account actor, Long orgID) throws BusinessException {
         model.addAttribute("account", actor);
 
         final List<Project> projects = projectService.listProjects(actor, orgID);
@@ -136,7 +144,7 @@ public class AccountController {
         final Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
         final Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
         final Calendar end = Calendar.getInstance();
-        end.setTime(actor.getBeginWorkDate());
+        end.setTime(this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate());
         final Calendar start = Calendar.getInstance();
         start.setTime(new Date());
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);

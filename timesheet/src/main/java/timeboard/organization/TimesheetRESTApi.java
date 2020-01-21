@@ -26,14 +26,20 @@ package timeboard.organization;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
@@ -69,11 +75,16 @@ public class TimesheetRESTApi {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Timesheet> getTimesheetData(
-            TimeboardAuthentication authentication,
-            @RequestParam("week") int week,
-            @RequestParam("year") int year ) throws JsonProcessingException {
+            final TimeboardAuthentication authentication,
+            final @RequestParam("week") int week,
+            final @RequestParam("year") int year ) throws BusinessException {
 
-        Account currentAccount = authentication.getDetails();
+        final Account currentAccount = authentication.getDetails();
+
+        final Calendar beginWorkDate = Calendar.getInstance();
+        beginWorkDate.setTime(this.organizationService
+                        .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                        .get().getCreationDate());
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
@@ -130,8 +141,8 @@ public class TimesheetRESTApi {
                 this.timesheetService.isTimesheetSubmitted(currentAccount, year, week),
                 year,
                 week,
-                c.get(Calendar.YEAR),
-                c.get(Calendar.WEEK_OF_YEAR),
+                beginWorkDate.get(Calendar.YEAR),
+                beginWorkDate.get(Calendar.WEEK_OF_YEAR),
                 days,
                 projects,
                 imputations);
@@ -156,17 +167,20 @@ public class TimesheetRESTApi {
                                               final List<ImputationWrapper> imputations,
                                               final Date ds,
                                               final Date de,
-                                              final List<DateWrapper> days) {
+                                              final List<DateWrapper> days) throws BusinessException {
 
         final List<TaskWrapper> tasks = new ArrayList<>();
+
 
         this.organizationService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
             tasks.add(new TaskWrapper(
                     task.getId(),
                     task.getName(), task.getComments(),
                     0, 0,0, 0,
-                    task.getStartDate(),
-                    task.getEndDate(), TaskStatus.IN_PROGRESS.name(), 0L)
+                    organizationService.getOrganizationByID(currentAccount, orgID).get().getCreatedDate(),
+                    null,
+                    TaskStatus.IN_PROGRESS.name(),
+                    0L)
             );
 
             days.forEach(dateWrapper -> {
@@ -180,11 +194,17 @@ public class TimesheetRESTApi {
     }
 
     private List<DateWrapper> createDaysForCurrentWeek(
-            TimeboardAuthentication authentication, Calendar c, Date ds) {
+            TimeboardAuthentication authentication, Calendar c, Date ds) throws BusinessException {
+
+        final Date beginWorkDateForCurrentOrg = this.organizationService
+                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .get().getCreationDate();
+
+
         final List<DateWrapper> days = new ArrayList<>();
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
-            if(c.getTime().getTime() >= authentication.getDetails().getBeginWorkDate().getTime()) {
+            if(c.getTime().getTime() >= beginWorkDateForCurrentOrg.getTime()) {
                 DateWrapper dw = new DateWrapper(
                         c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).substring(0,3),
                         c.getTime()
@@ -271,8 +291,7 @@ public class TimesheetRESTApi {
     }
 
 
-
-        public static class Timesheet {
+        public static class Timesheet implements Serializable {
 
         private final boolean submitted;
         private final int year;
@@ -437,11 +456,12 @@ public class TimesheetRESTApi {
         }
 
         public String getStartDate() {
-            return DATE_FORMAT.format(startDate);
+            return startDate==null?null:DATE_FORMAT.format(startDate);
+
         }
 
         public String getEndDate() {
-            return DATE_FORMAT.format(endDate);
+            return endDate==null?null:DATE_FORMAT.format(endDate);
         }
 
         public double getEffortLeft() {
