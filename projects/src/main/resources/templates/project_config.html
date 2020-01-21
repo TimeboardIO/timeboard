@@ -8,11 +8,12 @@
     <title layout:fragment="title">Project</title>
     <meta name="projectID" th:content="${project.id}"/>
     <meta name="orgID" th:content="${orgID}"/>
+    <meta name="roleActor" th:content="${roleActor}"/>
 </head>
 <body>
 
 
-<div layout:fragment="placeholder">
+<div layout:fragment="placeholder" id="projectConfigForm">
 
     <div class="ui stackable two column grid">
         <div class="column">

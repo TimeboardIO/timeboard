@@ -47,21 +47,26 @@ $('.delete[data-key]').click(function(){
 
 // User search
 $('.ui.search')
-    .search({
-        apiSettings: {
-            url: '/api/search?q={query}&orgID='+$("meta[name=orgID]").attr("content")
-        },
-        fields: {
-            results : 'items',
-            title   : 'screenName',
-            description :'email'
-        },
-        onSelect: function(result, response) {
-            $.post('/projects/'+$("meta[name=projectID]").attr("content")+'/setup/memberships', {
-                memberID: result.id
-            }).done(function(){
-                document.location.reload(true);
-            });
-        },
-        minCharacters : 3
-    });
+.search({
+    apiSettings: {
+        url: '/api/search?q={query}&orgID='+$("meta[name=orgID]").attr("content")
+    },
+    fields: {
+        results : 'items',
+        title   : 'screenName',
+        description :'email'
+    },
+    onSelect: function(result, response) {
+        $.post('/projects/'+$("meta[name=projectID]").attr("content")+'/setup/memberships', {
+            memberID: result.id
+        }).done(function(){
+            document.location.reload(true);
+        });
+    },
+    minCharacters : 3
+});
+
+let roleActor = $("meta[name=roleActor]").attr("content")
+$('#projectConfigForm :input').prop('disabled', roleActor != 'OWNER');
+$('#projectConfigForm :button').css('display', roleActor != 'OWNER' ? 'none' : 'block');
+

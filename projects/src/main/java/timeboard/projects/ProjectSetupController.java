@@ -83,7 +83,7 @@ public class ProjectSetupController {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         final Map<String, Object> map = new HashMap<>();
-        this.prepareTemplateData(project, map);
+        this.prepareTemplateData(project, map, actor);
         model.addAllAttributes(map);
         return "project_config.html";
     }
@@ -158,7 +158,7 @@ public class ProjectSetupController {
         return "redirect:/projects/" + projectID + "/setup";
     }
 
-    private void prepareTemplateData(final Project project, final Map<String, Object> map) {
+    private void prepareTemplateData(final Project project, final Map<String, Object> map, final Account actor) {
 
         final ProjectConfigForm pcf = new ProjectConfigForm();
         pcf.setName(project.getName());
@@ -173,6 +173,13 @@ public class ProjectSetupController {
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());
+        MembershipRole roleActor = pmf.getMemberships()
+                .stream()
+                .filter(member -> member.getMember().getId() == actor.getId())
+                .map(ProjectMembership::getRole)
+                .findFirst()
+                .get();
+        map.put("roleActor", roleActor);
 
     }
 
