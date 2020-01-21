@@ -113,7 +113,7 @@ public class VacationServiceImpl implements VacationService {
 
     }
     @Override
-    public List<VacationRequest> listUserVacations(Account applicant, int year) {
+    public List<VacationRequest> listVacationRequestsByUser(Account applicant, int year) {
 
         Calendar startBound = Calendar.getInstance();
         Calendar endBound = Calendar.getInstance();

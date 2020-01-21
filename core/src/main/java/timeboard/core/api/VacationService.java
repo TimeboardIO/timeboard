@@ -44,6 +44,7 @@ public interface VacationService {
     RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request);
 
     List<VacationRequest> listVacationRequestsByUser(Account user);
+    List<VacationRequest> listVacationRequestsByUser(Account user, int year);
     List<VacationRequest> listVacationRequestsToValidateByUser(Account user);
 
     /**
