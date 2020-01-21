@@ -42,6 +42,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.stream.Collectors;
@@ -62,6 +63,8 @@ public class VacationServiceImpl implements VacationService {
 
     @Autowired
     private ProjectService projectservice;
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 
     @Override
     public Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID) {
@@ -319,7 +322,7 @@ public class VacationServiceImpl implements VacationService {
 
         while (c1.before(c2)) {
             if (c1.get(Calendar.DAY_OF_WEEK) <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1) {
-                this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
+                this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value, request);
             }
             value = 1 * sign;
             c1.add(Calendar.DATE, 1);
@@ -328,7 +331,7 @@ public class VacationServiceImpl implements VacationService {
             value = 0.5 * sign;
         }
         if (c1.get(Calendar.DAY_OF_WEEK)  <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1 ) {
-            this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
+            this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value, request);
         }
 
     }
@@ -348,28 +351,34 @@ public class VacationServiceImpl implements VacationService {
         return null;
     }
 
-    private void updateTaskImputation(Account user, DefaultTask task, Date day, double val) throws BusinessException {
+    private void updateTaskImputation(Account user, DefaultTask task, Date day, double val, VacationRequest request) throws BusinessException {
 
         if (val > 0) {
             //change imputation value only if previous value is smaller than new
             Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
-            if (old.isEmpty() || old.get().getValue() < val) {
-                this.projectservice.updateTaskImputation(user, task, day, val);
+            if (old.isPresent()) {
+                val= Double.min(1, val + old.get().getValue());
             }
+            this.projectservice.updateTaskImputation(user, task, day, val);
         } else {
             // looking for existing vacation request on same day
-            double newValue = val;
+            double newValue = 0;
             List<VacationRequest> vacationRequests = this.listVacationRequests(user, day);
             // keep accepted request
-            vacationRequests = vacationRequests.stream().filter(r -> r.getStatus() == VacationRequestStatus.ACCEPTED
-                    && !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
+            vacationRequests = vacationRequests.stream().filter(r ->
+                    r.getStatus() == VacationRequestStatus.ACCEPTED
+                    && !(r instanceof RecursiveVacationRequest)
+                    && !r.getId().equals(request.getId()))
+                    .collect(Collectors.toList());
 
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
             boolean halfDay = vacationRequests.stream().anyMatch( r -> {
                 //current day is first day of request and request is half day started
-                boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0);
+                boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                        && dateFormat.format(day).equals(dateFormat.format(r.getStartDate())));
                 //current day is last day of request and request is half day ended
-                boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0);
+                boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
+                        && dateFormat.format(day).equals(dateFormat.format(r.getEndDate())));
                 return halfStart || halfEnd;
             });
 

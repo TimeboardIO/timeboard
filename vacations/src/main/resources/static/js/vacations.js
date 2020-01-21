@@ -268,17 +268,6 @@ let app = new Vue({
                 });
 
         },
-        dayCount : function(request) {
-            let t1 = new Date(request.start).getTime();
-            let t2 = new Date(request.end).getTime();
-
-            let intResult = parseInt((t2-t1)/(24*3600*1000));
-            let result = intResult + 1.0;
-            if (request.halfStart) result = result - 0.5;
-            if (request.halfEnd) result = result - 0.5;
-
-            return result;
-        },
         listToValidateRequests: function() {
             let self = this;
             $.ajax({
@@ -289,6 +278,7 @@ let app = new Vue({
                     self.toValidateRequests.data = d;
                 }
             });
+            self.loadCalendar();
         },
         listMyRequests: function() {
             let self = this;
