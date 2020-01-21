@@ -70,7 +70,8 @@
                             <td th:text="${membership.member.screenName}"></td>
                             <td>
                                 <select th:field="${projectMembersForm.memberships[__${status.index}__].role}"
-                                        th:onchange="'updateUser('+${membership.membershipID}+', this.value)'">
+                                        th:onchange="'updateUser('+${membership.membershipID}+', this.value)'"
+                                        th:classappend="${membership.member.id == account.id} ? 'ui dropdown disabled' : ''">
                                     <option th:each="role : ${roles}" th:selected="${role == membership.role}"
                                             th:text="${role}"
                                             th:value="${role}"></option>
