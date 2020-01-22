@@ -68,7 +68,7 @@ public class TimesheetRESTApi {
 
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Timesheet> getTimesheetData(
+    public ResponseEntity<TimesheetWrapper> getTimesheetData(
             final TimeboardAuthentication authentication,
             final @RequestParam("week") int week,
             final @RequestParam("year") int year ) throws BusinessException {
@@ -131,8 +131,9 @@ public class TimesheetRESTApi {
                     tasks));
         }
 
-        final Timesheet ts = new Timesheet(
-                this.timesheetService.isTimesheetSubmitted(currentAccount, year, week),
+        final TimesheetWrapper ts = new TimesheetWrapper(
+                this.timesheetService.getTimesheetSubmissionStatus(currentAccount, c, year, week),
+                this.timesheetService.getTimesheetValidationStatus(currentAccount, year, week),
                 year,
                 week,
                 beginWorkDate.get(Calendar.YEAR),
@@ -282,9 +283,10 @@ public class TimesheetRESTApi {
     }
 
 
-        public static class Timesheet implements Serializable {
+        public static class TimesheetWrapper implements Serializable {
 
-        private final boolean submitted;
+        private final SubmissionStatus submissionStatus;
+        private final ValidationStatus validationStatus;
         private final int year;
         private final int week;
         private final boolean disablePrev;
@@ -292,22 +294,27 @@ public class TimesheetRESTApi {
         private final List<DateWrapper> days;
         private final List<ProjectWrapper> projects;
         private final List<ImputationWrapper> imputations;
+        private final boolean submitted;
 
-        public Timesheet(boolean submitted,
-                         int year,
-                         int week,
-                         int beginWorkYear,
-                         int beginWorkWeek,
-                         List<DateWrapper> days,
-                         List<ProjectWrapper> projects,
-                         List<ImputationWrapper> imputationWrappers) {
+        public TimesheetWrapper(SubmissionStatus submissionStatus,
+                    ValidationStatus validationStatus,
+                    int year,
+                    int week,
+                    int beginWorkYear,
+                    int beginWorkWeek,
+                    List<DateWrapper> days,
+                    List<ProjectWrapper> projects,
+                    List<ImputationWrapper> imputationWrappers
+                    ) {
 
 
             Calendar c = Calendar.getInstance();
             final int currentWeek = c.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = c.get(Calendar.YEAR);
 
-            this.submitted = submitted;
+            this.submissionStatus = submissionStatus;
+            this.validationStatus = validationStatus;
+            this.submitted = submissionStatus == SubmissionStatus.SUBMITTED ? true : false;
             this.year = year;
             this.week = week;
             this.days = days;
@@ -319,6 +326,14 @@ public class TimesheetRESTApi {
 
         public boolean isSubmitted() {
             return submitted;
+        }
+
+        public SubmissionStatus getSubmissionStatus() {
+            return submissionStatus;
+        }
+
+        public ValidationStatus getValidationStatus() {
+            return validationStatus;
         }
 
         public int getYear() {

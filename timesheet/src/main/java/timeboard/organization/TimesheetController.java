@@ -66,34 +66,6 @@ public class TimesheetController {
     @Autowired
     private OrganizationService organizationService;
 
-
-    private int findLastWeekYear(Calendar c, int week, int year) {
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
-        if(c.get(Calendar.WEEK_OF_YEAR) > week){
-            c.roll(Calendar.YEAR, -1);  // remove one year
-        }
-        return c.get(Calendar.YEAR);
-    }
-
-    private int findLastWeek(Calendar c, int week, int year) {
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
-        return c.get(Calendar.WEEK_OF_YEAR);
-    }
-
-    private Date findStartDate(Calendar c, int week, int year) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        return c.getTime();
-    }
-
-    private Date findEndDate(Calendar c, int week, int year) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        return c.getTime();
-    }
-
     @GetMapping
     protected String currentWeekTimesheet(TimeboardAuthentication authentication, Model model) throws Exception {
         Calendar c = Calendar.getInstance();
@@ -124,20 +96,15 @@ public class TimesheetController {
         c.set(Calendar.MILLISECOND, 0);
 
 
-        final Date ds = findStartDate(c, week, year);
-        final Date de = findEndDate(c, week, year);
-        final int lastWeek = findLastWeek(c, week, year);
-        final int lastWeekYear = findLastWeekYear(c, week, year);
-        final boolean lastWeekSubmitted =
-                    this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), lastWeekYear, lastWeek);
+        final Date ds = this.timesheetService.findStartDate(c, week, year);
+        final Date de = this.timesheetService.findEndDate(c, week, year);
+        final int lastWeek = this.timesheetService.findLastWeek(c, week, year);
+        final int lastWeekYear = this.timesheetService.findLastWeekYear(c, week, year);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
-        model.addAttribute("weekSubmitted", this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), year, week));
-        model.addAttribute("weekValidated", this.timesheetService.isTimesheetValidated(authentication.getDetails(), year, week));
         model.addAttribute("actorID", authentication.getDetails().getId());
-        model.addAttribute("lastWeekSubmitted", lastWeekSubmitted);
-
+        model.addAttribute("lastWeekSubmitted", this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), lastWeekYear, lastWeek));
         model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
 
         model.addAttribute("projectList",

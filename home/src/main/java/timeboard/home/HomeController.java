@@ -77,7 +77,7 @@ public class HomeController {
         int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                boolean weekIsValidated = timesheetService.isTimesheetSubmitted(
+                boolean weekIsSubmitted = timesheetService.isTimesheetSubmitted(
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
@@ -87,7 +87,7 @@ public class HomeController {
                 Date lastDayOfWeek = calendar.getTime();
                 Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, account);
 
-                Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsValidated);
+                Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsSubmitted);
                 weeks.add(week);
                 calendar.roll(Calendar.WEEK_OF_YEAR, -1);
             }

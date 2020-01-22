@@ -26,30 +26,8 @@ package timeboard.core.model;
  * #L%
  */
 
-public enum TimesheetWeekIndicator {
-    SUBMISSION_DONE("Timesheet has been submitted by the user", "green"),
-    SUBMISSION_PENDING("Timesheet's submission by the user is pending", "red"),
-    SUBMISSION_PREVIOUS_PENDING("Some previous week are pending submission", "yellow"),
-    //SUBMISSION_PENDING("", "grey"),
-    VALIDATION_DONE("Timesheet has been validated by the manager", "green"),
-    VALIDATION_PENDING("Timesheet's validation by the manager is pending", "red"),
-    //VALIDATION_DONE("", "yellow"),
-    VALIDATION_SUBMISSION_PENDING("Timesheet's submission by the user is pending", "grey");
-
-
-    public final String label;
-    public final String color;
-
-    private TimesheetWeekIndicator(String label, String color) {
-        this.label = label;
-        this.color = color;
-    }
-
-    String getLabel() {
-        return this.label;
-    }
-
-    String getColor() {
-        return this.color;
-    }
+public enum ValidationStatus {
+    PENDING_VALIDATION,
+    PENDING_SUBMISSION,
+    VALIDATED;
 }

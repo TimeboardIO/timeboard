@@ -64,6 +64,39 @@ public class TimesheetServiceImpl implements TimesheetService {
     private OrganizationService organizationService;
 
 
+
+    @Override
+    public int findLastWeekYear(Calendar c, int week, int year) {
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        if(c.get(Calendar.WEEK_OF_YEAR) > week){
+            c.roll(Calendar.YEAR, -1);  // remove one year
+        }
+        return c.get(Calendar.YEAR);
+    }
+
+    @Override
+    public int findLastWeek(Calendar c, int week, int year) {
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        return c.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    @Override
+    public Date findStartDate(Calendar c, int week, int year) {
+        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        return c.getTime();
+    }
+
+    @Override
+    public Date findEndDate(Calendar c, int week, int year) {
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        return c.getTime();
+    }
+
+
     @Override
     @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
@@ -138,6 +171,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
+        submittedTimesheet.setValidated(ValidationStatus.PENDING_VALIDATION);
 
         em.persist(submittedTimesheet);
 
@@ -178,6 +212,44 @@ public class TimesheetServiceImpl implements TimesheetService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+    }
+
+    @Override
+    public SubmissionStatus getTimesheetSubmissionStatus(Account currentAccount, Calendar calendar, int year, int week){
+        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", currentAccount);
+
+        try {
+            q.getSingleResult();
+            return SubmissionStatus.SUBMITTED;
+        } catch (Exception e) {
+            final int previousWeek = findLastWeek(calendar, week, year);
+            final int previousWeekYear = findLastWeekYear(calendar, week, year);
+            final boolean isPreviousTimesheetSubmitted = this.isTimesheetSubmitted(currentAccount, previousWeekYear, previousWeek);
+            if (isPreviousTimesheetSubmitted) {
+                return SubmissionStatus.PENDING_SUBMISSION;
+            } else{
+                return SubmissionStatus.PENDING_PREVIOUS_SUBMISSION;
+            }
+        }
+    }
+
+    @Override
+    public ValidationStatus getTimesheetValidationStatus(Account currentAccount, int year, int week){
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.validationStatus from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week", ValidationStatus.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", currentAccount);
+
+        try {
+            return q.getSingleResult();
+        } catch (Exception e) {
+            return ValidationStatus.PENDING_SUBMISSION;
         }
     }
 

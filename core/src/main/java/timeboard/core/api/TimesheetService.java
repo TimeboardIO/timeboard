@@ -27,16 +27,22 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.model.Project;
+import timeboard.core.model.*;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
 
 public interface TimesheetService {
+
+    int findLastWeekYear(Calendar c, int week, int year);
+
+    int findLastWeek(Calendar c, int week, int year);
+
+    Date findStartDate(Calendar c, int week, int year);
+
+    Date findEndDate(Calendar c, int week, int year);
 
     /**
      * Submit user timesheet.
@@ -68,6 +74,27 @@ public interface TimesheetService {
      * @return true if timesheet is already validated
      */
     boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
+
+
+    /**
+     * Get timesheet submission status.
+     *
+     * @param currentAccount user used to check timesheet sumbit state.
+     * @param week             timesheet week
+     * @param year             timesheet year
+     * @return SubmissionStatus
+     */
+    SubmissionStatus getTimesheetSubmissionStatus(Account currentAccount, Calendar calendar, int year, int week);
+
+    /**
+     * Get timesheet validation status.
+     *
+     * @param currentAccount user used to check timesheet sumbit state.
+     * @param week             timesheet week
+     * @param year             timesheet year
+     * @return ValidationStatus
+     */
+    ValidationStatus getTimesheetValidationStatus(Account currentAccount, int year, int week);
 
 
     /**

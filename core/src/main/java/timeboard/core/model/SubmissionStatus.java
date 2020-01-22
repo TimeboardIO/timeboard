@@ -26,60 +26,10 @@ package timeboard.core.model;
  * #L%
  */
 
-import javax.persistence.*;
+public enum SubmissionStatus {
+    PENDING_SUBMISSION,
+    PENDING_PREVIOUS_SUBMISSION,
+    SUBMITTED;
 
-@Entity
-public class SubmittedTimesheet {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-
-    @Column
-    private ValidationStatus validationStatus;
-
-    @OneToOne(targetEntity = Account.class)
-    private Account account;
-
-    @Column
-    private int year;
-
-    @Column
-    private int week;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public ValidationStatus isValidated() { return validationStatus; }
-
-    public void setValidated(ValidationStatus validationStatus) { this.validationStatus = validationStatus; }
-
-    public long getYear() {
-        return year;
-    }
-
-    public void setYear(int y) {
-        this.year = y;
-    }
-
-    public long getWeek() {
-        return week;
-    }
-
-    public void setWeek(int w) {
-        this.week = w;
-    }
-
-    public Account getAccount() {
-        return account;
-    }
-
-    public void setAccount(Account account) {
-        this.account = account;
-    }
 }

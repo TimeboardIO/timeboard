@@ -23,6 +23,8 @@ const emptyTask =  {
 }
 
 const timesheetModel =  {
+    indicatorSubmission: {},
+    indicatorValidation: {},
     successMessages: [],
     errorMessages: [],
     newTask: Object.assign( { } , emptyTask),
@@ -149,134 +151,134 @@ $(document).ready(function() {
         }
     };
 
-Vue.component('task-modal',  { 
-    template: '#task-modal-template',
-    props:  { 
-        task: Object,
-        formError: String,
-        modalTitle: String
-    }
-});
-
-let app = new Vue( { 
-    el: '#timesheet',
-    data: timesheetModel,
-    methods:  {
-        displayErrorMessage : function(message) {
-            this.errorMessages.push({message : message, visible : true});
-        },
-        displaySuccessMessage: function(message) {
-            this.successMessages.push({message : message, visible : true});
-        },
-        submitMyWeek: function(event) {
-            $.ajax({
-                method: "GET",
-                url: "api/timesheet/submit?week="+app.week+"&year="+app.year,
-                success : function(data, textStatus, jqXHR)  {
-                    app.submitted=true;
-                    app.displaySuccessMessage("Your timesheet have been submitted successfully.");
-                },
-                error: function(jqXHR, textStatus, errorThrown)  {
-                   app.displayErrorMessage("Error can not submit your timesheet.");
-                }
-            });
-        },
-        triggerUpdateEffortLeft: function(event) {
-
-            $(event.target).parent().addClass('left icon loading').removeClass('error');
-            const taskID = $(event.target).attr('data-task-effortLeft');
-            const val = $(event.target).val();
-            this.updateTask(null, taskID, 'effortLeft', val)
-            .then(function(updateTask) { 
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
-                $(event.target).parent().removeClass('left icon loading');
-            });
-        },
-        triggerUpdateTask: function (event)  { 
-
-            $(event.target).parent().addClass('left icon loading').removeClass('error');
-            const date = $(event.target).attr('data-date');
-            const taskID = $(event.target).attr('data-task');
-
-            const currentSum = app.getImputationSum(date);
-            let newval = parseFloat($(event.target).val());
-            let oldVal = app.imputations[date][taskID];
-
-            if(newval > 1) { 
-                newval = 1;
-            }
-            if(newval < 0) { 
-                newval = 0;
-            }
-            if(currentSum + (newval - oldVal) <= 1.0) { 
-                $(event.target).val(newval);
-                this.updateTask(date, taskID, 'imputation', newval)
-                .then(function(updateTask) { 
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
-                app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
-                app.imputations[date][taskID] = newval;
-                $(event.target).parent().removeClass('left icon loading');
-                });
-            }else {
-                $(event.target).val(oldVal);
-                $(event.target).parent().removeClass('left icon loading').addClass('error');
-                this.displayErrorMessage("you cannot charge more than one day a day.");
-
-            }
-        },
-        showCreateTaskModal: function(projectID, task, event) {
-            event.preventDefault();
-            if(task) {
-                this.newTask.projectID = projectID;
-                this.newTask.taskID = task.taskID;
-                this.newTask.taskName = task.taskName;
-                this.newTask.taskComments = task.taskComments;
-                this.newTask.startDate = task.startDate;
-                this.newTask.endDate = task.endDate;
-                this.newTask.originalEstimate = task.originalEstimate;
-                this.newTask.typeID = task.typeID;
-                this.newTask.assigneeID = task.assigneeID;
-                this.modalTitle = "Edit task";
-            } else {
-                this.modalTitle = "Create task";
-                Object.assign(this.newTask , emptyTask);
-                this.newTask.assigneeID = actorID;
-            }
-            let keepThis = this;
-            $('.create-task.modal').modal(  {  
-                onApprove : function($element) { 
-                    let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
-                    if(validated) { 
-                    $('.ui.error.message').hide();
-                    $.ajax( { 
-                        method: "POST",
-                        url: "/api/tasks",
-                        data: JSON.stringify(app.newTask),
-                        contentType: "application/json",
-                        dataType: "json",
-                        success : function(data, textStatus, jqXHR)  { 
-                            updateTimesheet();
-                            $('.create-task .ui.form').form('reset');
-                            $('.create-task.modal').modal('hide');
-                        },
-                        error: function(jqXHR, textStatus, errorThrown)  { 
-                            $('.ui.error.message').text(jqXHR.responseText);
-                            $('.ui.error.message').show();
-                        }
-                    });
-                }
-                return false;
-            },
-            detachable : true, centered: true
-        }).modal('show');
+    Vue.component('task-modal',  {
+        template: '#task-modal-template',
+        props:  {
+            task: Object,
+            formError: String,
+            modalTitle: String
         }
-    }
-})
+    });
+
+    let app = new Vue( {
+        el: '#timesheet',
+        data: timesheetModel,
+        methods:  {
+            displayErrorMessage : function(message) {
+                this.errorMessages.push({message : message, visible : true});
+            },
+            displaySuccessMessage: function(message) {
+                this.successMessages.push({message : message, visible : true});
+            },
+            submitMyWeek: function(event) {
+                $.ajax({
+                    method: "GET",
+                    url: "api/timesheet/submit?week="+app.week+"&year="+app.year,
+                    success : function(data, textStatus, jqXHR)  {
+                        app.submitted=true;
+                        app.displaySuccessMessage("Your timesheet have been submitted successfully.");
+                    },
+                    error: function(jqXHR, textStatus, errorThrown)  {
+                       app.displayErrorMessage("Error can not submit your timesheet.");
+                    }
+                });
+            },
+            triggerUpdateEffortLeft: function(event) {
+
+                $(event.target).parent().addClass('left icon loading').removeClass('error');
+                const taskID = $(event.target).attr('data-task-effortLeft');
+                const val = $(event.target).val();
+                this.updateTask(null, taskID, 'effortLeft', val)
+                .then(function(updateTask) {
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
+                    $(event.target).parent().removeClass('left icon loading');
+                });
+            },
+            triggerUpdateTask: function (event)  {
+
+                $(event.target).parent().addClass('left icon loading').removeClass('error');
+                const date = $(event.target).attr('data-date');
+                const taskID = $(event.target).attr('data-task');
+
+                const currentSum = app.getImputationSum(date);
+                let newval = parseFloat($(event.target).val());
+                let oldVal = app.imputations[date][taskID];
+
+                if(newval > 1) {
+                    newval = 1;
+                }
+                if(newval < 0) {
+                    newval = 0;
+                }
+                if(currentSum + (newval - oldVal) <= 1.0) {
+                    $(event.target).val(newval);
+                    this.updateTask(date, taskID, 'imputation', newval)
+                    .then(function(updateTask) {
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
+                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
+                    app.imputations[date][taskID] = newval;
+                    $(event.target).parent().removeClass('left icon loading');
+                    });
+                }else {
+                    $(event.target).val(oldVal);
+                    $(event.target).parent().removeClass('left icon loading').addClass('error');
+                    this.displayErrorMessage("you cannot charge more than one day a day.");
+
+                }
+            },
+            showCreateTaskModal: function(projectID, task, event) {
+                event.preventDefault();
+                if(task) {
+                    this.newTask.projectID = projectID;
+                    this.newTask.taskID = task.taskID;
+                    this.newTask.taskName = task.taskName;
+                    this.newTask.taskComments = task.taskComments;
+                    this.newTask.startDate = task.startDate;
+                    this.newTask.endDate = task.endDate;
+                    this.newTask.originalEstimate = task.originalEstimate;
+                    this.newTask.typeID = task.typeID;
+                    this.newTask.assigneeID = task.assigneeID;
+                    this.modalTitle = "Edit task";
+                } else {
+                    this.modalTitle = "Create task";
+                    Object.assign(this.newTask , emptyTask);
+                    this.newTask.assigneeID = actorID;
+                }
+                let keepThis = this;
+                $('.create-task.modal').modal(  {
+                    onApprove : function($element) {
+                        let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                        if(validated) {
+                        $('.ui.error.message').hide();
+                        $.ajax( {
+                            method: "POST",
+                            url: "/api/tasks",
+                            data: JSON.stringify(app.newTask),
+                            contentType: "application/json",
+                            dataType: "json",
+                            success : function(data, textStatus, jqXHR)  {
+                                updateTimesheet();
+                                $('.create-task .ui.form').form('reset');
+                                $('.create-task.modal').modal('hide');
+                            },
+                            error: function(jqXHR, textStatus, errorThrown)  {
+                                $('.ui.error.message').text(jqXHR.responseText);
+                                $('.ui.error.message').show();
+                            }
+                        });
+                    }
+                    return false;
+                },
+                detachable : true, centered: true
+            }).modal('show');
+            }
+        }
+    })
 
     let updateTimesheet = function() { 
         $('.ui.dimmer').addClass('active');
@@ -290,6 +292,8 @@ let app = new Vue( {
             app.projects = data.projects;
             app.disableNext = data.disableNext;
             app.disablePrev = data.disablePrev;
+            app.indicatorSubmission = getSubmissionIndicator(data.submissionStatus);
+            app.indicatorValidation = getValidationIndicator(data.validationStatus);
         }).then(function() {
 
             $('.ui.dimmer').removeClass('active');
@@ -307,10 +311,43 @@ let app = new Vue( {
     };
     updateTimesheet();
 
+
+
+    // TODO: To Move functions
+
+    let getSubmissionIndicator = function(status) {
+        switch (status) {
+            case 'PENDING_SUBMISSION':
+                return {label:"Timesheet's submission by the user is pending", color:"red"};
+                break;
+            case 'PENDING_PREVIOUS_SUBMISSION':
+                return {label:"Some previous week are pending submission", color:"yellow"};
+                break;
+            case 'SUBMITTED':
+                return {label:"Timesheet has been submitted by the user", color:"green"};
+                break;
+            default:
+                return {label:"", color:""};
+        }
+    }
+
+    let getValidationIndicator = function(status) {
+        switch (status) {
+            case 'PENDING_VALIDATION':
+                return {label:"Timesheet's validation by the manager is pending", color:"red"};
+                break;
+            case 'PENDING_SUBMISSION':
+                return {label:"Timesheet's submission by the user is pending", color:"grey"};
+                break;
+            case 'VALIDATED':
+                return {label:"Timesheet has been validated by the manager", color:"green"};
+                break;
+            default:
+                return {label:"", color:""};
+        }
+    }
+
 });
-
-
-
 
 
 
