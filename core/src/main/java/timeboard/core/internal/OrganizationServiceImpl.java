@@ -176,28 +176,13 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#organization.getId()")
-    public Optional<Organization> updateMemberRole(final Account actor,
-                                                   final Organization organization,
-                                                   final Account member, final MembershipRole role) {
+    @CacheEvict(value="organizationsCache", key="#membership.getOrganization().getId()")
+    public Optional<Organization> updateMembership(final Account actor,
+                                                   final OrganizationMembership membership) {
 
-        final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
+        this.em.merge(membership);
 
-        if (org.isPresent()) {
-
-            org.get()
-                    .getMembers()
-                    .stream()
-                    .filter(om -> om.getMember().getId() == member.getId())
-                    .forEach(om -> om.setRole(role));
-
-            em.flush();
-
-            LOGGER.info("Member " + actor.getName() + " has changed role from organization " + org.get().getName() + " to " + role);
-
-        }
-
-        return org;
+        return Optional.ofNullable(membership.getOrganization());
     }
 
     @Override
@@ -209,6 +194,17 @@ public class OrganizationServiceImpl implements OrganizationService {
     public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Long organizationID) throws BusinessException {
         this.em.merge(actor);
         return actor.getOrganizations().stream().filter(om -> om.getOrganization().getId() == organizationID).findFirst();
+    }
+
+    @Override
+    public Optional<OrganizationMembership> findOrganizationMembershipById(Account details, Long membershipID) {
+        OrganizationMembership om;
+        try {
+            om = this.em.find(OrganizationMembership.class, membershipID);
+        }catch (Exception e){
+            om = null;
+        }
+        return Optional.ofNullable(om);
     }
 
     @Override
