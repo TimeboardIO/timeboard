@@ -201,7 +201,7 @@
 
     create table SubmittedTimesheet (
        id bigint not null,
-        isValidated bit,
+        validationStatus integer,
         week integer,
         year integer,
         account_id bigint,
