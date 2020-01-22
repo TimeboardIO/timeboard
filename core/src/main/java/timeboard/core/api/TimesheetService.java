@@ -53,7 +53,7 @@ public interface TimesheetService {
      * @param week             timesheet week
      * @return true if timesheet is submit else, false.
      */
-    void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws BusinessException;
+    SubmittedTimesheet submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws BusinessException;
 
     /**
      * Is timesheet submitted.

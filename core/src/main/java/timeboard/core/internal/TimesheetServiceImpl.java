@@ -99,7 +99,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
-    public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
+    public SubmittedTimesheet submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
             throws BusinessException {
 
         //check if submission is possible
@@ -135,7 +135,6 @@ public class TimesheetServiceImpl implements TimesheetService {
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
 
-
         Boolean result = true;
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
@@ -148,21 +147,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             firstDay = dayInFirstWeek;
         }
 
-        for ( int i = firstDay -1 ; i <= 5; i++) {
-
-            TypedQuery<Double> q = em.createQuery("select COALESCE(sum(value),0) " +
-                    "from Imputation i where i.account = :user and i.day = :day ", Double.class);
-
-            q.setParameter("user", accountTimesheet);
-            q.setParameter("day", c.getTime());
-            final List<Double> resultList = q.getResultList();
-            if (!resultList.equals(null)){
-                result &= (resultList.get(0) == 1.0);
-            }
-            c.roll(Calendar.DAY_OF_WEEK, 1);
-        }
-        boolean allDailyImputationTotalsAreOne = result;
-
+        boolean allDailyImputationTotalsAreOne = checkDailyImputationTotal(firstDay, accountTimesheet, c, result);
         if (!allDailyImputationTotalsAreOne) {
             throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
@@ -171,20 +156,40 @@ public class TimesheetServiceImpl implements TimesheetService {
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
-
-        final int previousWeek = this.findLastWeek(c, week, year);
-        final int previousWeekYear = this.findLastWeekYear(c, week, year);
-        ValidationStatus previousWeekValidationStatus = this.getTimesheetValidationStatus(actor, previousWeekYear, previousWeek);
-        ValidationStatus weekValidationStatus = previousWeekValidationStatus == ValidationStatus.VALIDATED ?
-                ValidationStatus.PENDING_VALIDATION :  ValidationStatus.PENDING_PREVIOUS_VALIDATION;
-        submittedTimesheet.setValidated(weekValidationStatus);
+        submittedTimesheet.setValidationStatus(this.getWeekValidationStatusAfterSubmission(actor, c, year, week));
 
         em.persist(submittedTimesheet);
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
-
         LOGGER.info("Week " + week + " submit for user" + accountTimesheet.getName() + " by user " + actor.getName());
 
+        return submittedTimesheet;
+
+    }
+
+    Boolean checkDailyImputationTotal(int firstDay, Account accountTimesheet, Calendar c, Boolean result){
+        for ( int i = firstDay -1 ; i <= 5; i++) {
+
+            TypedQuery<Double> q = em.createQuery("select COALESCE(sum(value),0) " +
+                    "from Imputation i where i.account = :user and i.day = :day ", Double.class);
+
+            q.setParameter("user", accountTimesheet);
+            q.setParameter("day", c.getTime());
+            final List<Double> resultList = q.getResultList();
+            if (resultList != null){
+                result &= (resultList.get(0) == 1.0);
+            }
+            c.roll(Calendar.DAY_OF_WEEK, 1);
+        }
+        return result;
+    }
+
+    ValidationStatus getWeekValidationStatusAfterSubmission(Account actor, Calendar c, int year, int week){
+        final int previousWeek = this.findLastWeek(c, week, year);
+        final int previousWeekYear = this.findLastWeekYear(c, week, year);
+        ValidationStatus previousWeekValidationStatus = this.getTimesheetValidationStatus(actor, previousWeekYear, previousWeek);
+        return previousWeekValidationStatus == ValidationStatus.VALIDATED ?
+                ValidationStatus.PENDING_VALIDATION :  ValidationStatus.PENDING_PREVIOUS_VALIDATION;
     }
 
     @Override

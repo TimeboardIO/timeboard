@@ -55,9 +55,13 @@ public class SubmittedTimesheet {
         this.id = id;
     }
 
-    public ValidationStatus isValidated() { return validationStatus; }
+    public ValidationStatus getValidationStatus() {
+        return validationStatus;
+    }
 
-    public void setValidated(ValidationStatus validationStatus) { this.validationStatus = validationStatus; }
+    public void setValidationStatus(ValidationStatus validationStatus) {
+        this.validationStatus = validationStatus;
+    }
 
     public long getYear() {
         return year;
