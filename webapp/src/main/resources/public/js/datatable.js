@@ -1,5 +1,5 @@
 Vue.component('data-table', {
-    props: ['config'],
+    props: ['config', 'table'],
     template: `
             <table class="ui celled table" v-if="config.data.length > 0">
                 <thead>
@@ -52,6 +52,9 @@ Vue.component('data-table', {
 
 `,
     data: function () {
+        if(this.table) {
+            this.config.data = this.table;
+        }
         let sortOrders = {};
         let finalCols = [];
         this.config.cols.forEach(function (key) {

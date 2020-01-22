@@ -252,11 +252,12 @@ public class TimesheetRESTApi {
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
 
-        try{
+        try {
             Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
             this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
+
             return ResponseEntity.status(201).build();
-        }catch (Exception e){ // TimesheetException
+        } catch (Exception e){ // TimesheetException
             return ResponseEntity.status(412).build();
         }
     }

@@ -234,10 +234,9 @@ public class TimesheetServiceImpl implements TimesheetService {
     public Map<Account, List<SubmittedTimesheet>> getTimesheetsFromProject(Account actor, Project project) {
 
         TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
-                + "where st.account in :users and st.isValidated = :notvalidated", SubmittedTimesheet.class);
+                + "where st.account in :users", SubmittedTimesheet.class);
 
-        q.setParameter("users", project.getMembers());
-        q.setParameter("notvalidated", false);
+        q.setParameter("users", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
 
         List<SubmittedTimesheet> resultList = q.getResultList();
         return resultList.stream().collect(Collectors.groupingBy(SubmittedTimesheet::getAccount,
