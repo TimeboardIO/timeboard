@@ -256,7 +256,16 @@ public class TimesheetRESTApi {
         try{
             Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
             this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
-            return ResponseEntity.status(201).build();
+
+            final Calendar c = firstDayOfWeek(week, year);
+            final int previousWeek = this.timesheetService.findLastWeek(c, week, year);
+            final int previousWeekYear = this.timesheetService.findLastWeekYear(c, week, year);
+
+            ValidationStatus previousWeekValidationStatus = this.timesheetService.getTimesheetValidationStatus(actor, previousWeekYear, previousWeek);
+            ValidationStatus weekValidationStatus = previousWeekValidationStatus == ValidationStatus.VALIDATED ?
+                    ValidationStatus.PENDING_VALIDATION :  ValidationStatus.PENDING_PREVIOUS_VALIDATION;
+
+            return ResponseEntity.ok(weekValidationStatus);
         }catch (Exception e){ // TimesheetException
             return ResponseEntity.status(412).build();
         }

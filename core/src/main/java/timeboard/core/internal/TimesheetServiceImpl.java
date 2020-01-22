@@ -171,7 +171,13 @@ public class TimesheetServiceImpl implements TimesheetService {
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
-        submittedTimesheet.setValidated(ValidationStatus.PENDING_VALIDATION);
+
+        final int previousWeek = this.findLastWeek(c, week, year);
+        final int previousWeekYear = this.findLastWeekYear(c, week, year);
+        ValidationStatus previousWeekValidationStatus = this.getTimesheetValidationStatus(actor, previousWeekYear, previousWeek);
+        ValidationStatus weekValidationStatus = previousWeekValidationStatus == ValidationStatus.VALIDATED ?
+                ValidationStatus.PENDING_VALIDATION :  ValidationStatus.PENDING_PREVIOUS_VALIDATION;
+        submittedTimesheet.setValidated(weekValidationStatus);
 
         em.persist(submittedTimesheet);
 
@@ -201,15 +207,14 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public boolean isTimesheetValidated(Account accountTimesheet, int year, int week) {
-        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year and st.week = :week and isValidated = true", SubmittedTimesheet.class);
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.validationStatus from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week", ValidationStatus.class);
         q.setParameter("week", week);
         q.setParameter("year", year);
         q.setParameter("user", accountTimesheet);
 
         try {
-            q.getSingleResult();
-            return true;
+            return q.getSingleResult() == ValidationStatus.VALIDATED;
         } catch (Exception e) {
             return false;
         }
@@ -227,14 +232,12 @@ public class TimesheetServiceImpl implements TimesheetService {
             q.getSingleResult();
             return SubmissionStatus.SUBMITTED;
         } catch (Exception e) {
+
             final int previousWeek = findLastWeek(calendar, week, year);
             final int previousWeekYear = findLastWeekYear(calendar, week, year);
             final boolean isPreviousTimesheetSubmitted = this.isTimesheetSubmitted(currentAccount, previousWeekYear, previousWeek);
-            if (isPreviousTimesheetSubmitted) {
-                return SubmissionStatus.PENDING_SUBMISSION;
-            } else{
-                return SubmissionStatus.PENDING_PREVIOUS_SUBMISSION;
-            }
+
+            return isPreviousTimesheetSubmitted ? SubmissionStatus.PENDING_SUBMISSION: SubmissionStatus.PENDING_PREVIOUS_SUBMISSION;
         }
     }
 

@@ -174,9 +174,11 @@ $(document).ready(function() {
                 $.ajax({
                     method: "GET",
                     url: "api/timesheet/submit?week="+app.week+"&year="+app.year,
-                    success : function(data, textStatus, jqXHR)  {
+                    success : function(weekValidationStatus, textStatus, jqXHR)  {
                         app.submitted=true;
                         app.displaySuccessMessage("Your timesheet have been submitted successfully.");
+                        app.indicatorSubmission = getSubmissionIndicator("SUBMITTED");
+                        app.indicatorValidation = getValidationIndicator(weekValidationStatus);
                     },
                     error: function(jqXHR, textStatus, errorThrown)  {
                        app.displayErrorMessage("Error can not submit your timesheet.");
@@ -338,6 +340,9 @@ $(document).ready(function() {
                 break;
             case 'PENDING_SUBMISSION':
                 return {label:"Timesheet's submission by the user is pending", color:"grey"};
+                break;
+            case 'PENDING_PREVIOUS_VALIDATION':
+                return {label:"Some previous week are pending validation", color:"yellow"};
                 break;
             case 'VALIDATED':
                 return {label:"Timesheet has been validated by the manager", color:"green"};
