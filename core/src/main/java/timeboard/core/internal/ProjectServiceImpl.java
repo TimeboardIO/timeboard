@@ -481,7 +481,6 @@ public class ProjectServiceImpl implements ProjectService {
     public UpdatedTaskResult updateTaskImputation(Account actor, AbstractTask task, Date day, double val) throws BusinessException {
         Calendar c = Calendar.getInstance();
         c.setTime(day);
-        c.set(Calendar.HOUR_OF_DAY, 2);
 
         boolean timesheetSubmitted = this.timesheetService.isTimesheetSubmitted(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
 

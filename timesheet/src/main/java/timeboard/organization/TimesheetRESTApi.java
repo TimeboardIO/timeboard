@@ -75,10 +75,9 @@ public class TimesheetRESTApi {
 
         final Account currentAccount = authentication.getDetails();
 
-        final Calendar beginWorkDate = Calendar.getInstance();
-        beginWorkDate.setTime(this.organizationService
+        final Calendar beginWorkDate = this.organizationService
                         .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
-                        .get().getCreationDate());
+                        .get().getCreationDate();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
@@ -190,7 +189,7 @@ public class TimesheetRESTApi {
     private List<DateWrapper> createDaysForCurrentWeek(
             TimeboardAuthentication authentication, Calendar c, Date ds) throws BusinessException {
 
-        final Date beginWorkDateForCurrentOrg = this.organizationService
+        final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
                 .get().getCreationDate();
 
@@ -198,7 +197,7 @@ public class TimesheetRESTApi {
         final List<DateWrapper> days = new ArrayList<>();
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
-            if(c.getTime().getTime() >= beginWorkDateForCurrentOrg.getTime()) {
+            if(c.getTime().getTime() >= beginWorkDateForCurrentOrg.getTime().getTime()) {
                 DateWrapper dw = new DateWrapper(
                         c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).substring(0,3),
                         c.getTime()

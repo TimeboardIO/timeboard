@@ -189,6 +189,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         this.em.merge(membership);
 
+        LOGGER.info("Update membership for member {}", membership.getMember().getScreenName());
+
         return Optional.ofNullable(membership.getOrganization());
     }
 
@@ -198,9 +200,16 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Long organizationID) throws BusinessException {
+    public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Long organizationID) {
         final Account localActor = this.em.find(Account.class, actor.getId());
-        return localActor.getOrganizations().stream().filter(om -> om.getOrganization().getId() == organizationID).findFirst();
+        final Optional<OrganizationMembership> o = localActor.getOrganizations()
+                .stream()
+                .filter(om -> om.getOrganization().getId() == organizationID).findFirst();
+
+        if(o.isPresent()){
+            this.em.detach(o.get());
+        }
+        return o;
     }
 
     @Override
