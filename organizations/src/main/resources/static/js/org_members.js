@@ -35,10 +35,16 @@ let app = new Vue({
             });
         },
         updateRole: function(e, member){
-            $.get("/org/members/updateRole?orgID="+currentOrgID+"&memberID="+member.id+"&role="+member.role)
-            .then(function(role){
-                member.role = role;
-            });
+
+            $.ajax({
+                type: "patch",
+                url: "/org/members/"+member.id,
+                data: JSON.stringify(member),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8'
+            }).then(function(role){
+                              member.role = role;
+                          });
         }
     }
 });
