@@ -133,8 +133,15 @@ public class OrganizationsRestAPI {
 
         // Add member in current organization
         try {
-            Optional<Organization> newOrganization = organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
-            MemberWrapper memberWrapper = new MemberWrapper(memberID, member.getScreenName(), MembershipRole.CONTRIBUTOR.toString(), new Date());
+            final Optional<Organization> newOrganization = organizationService
+                    .addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
+
+            final MemberWrapper memberWrapper = new MemberWrapper(
+                    memberID,
+                    member.getScreenName(),
+                    MembershipRole.CONTRIBUTOR.toString(),
+                    Calendar.getInstance());
+
             return ResponseEntity.status(HttpStatus.OK).body(memberWrapper);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -188,7 +195,7 @@ public class OrganizationsRestAPI {
         public String role;
 
         @JsonFormat(pattern="yyyy-MM-dd")
-        public java.util.Date creationDate;
+        public java.util.Calendar creationDate;
 
         public MemberWrapper() {
         }
@@ -200,7 +207,7 @@ public class OrganizationsRestAPI {
             this.creationDate = h.getCreationDate();
         }
 
-        public MemberWrapper(Long memberID, String screenName, String role, java.util.Date date) {
+        public MemberWrapper(Long memberID, String screenName, String role, java.util.Calendar date) {
             this.id = memberID;
             this.screenName = screenName;
             this.role = role;

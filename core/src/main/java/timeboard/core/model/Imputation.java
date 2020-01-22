@@ -31,10 +31,19 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@NamedQueries(
+        {
+                @NamedQuery(name = Imputation.SUM_IMPUTATIONS_BY_USER_AND_WEEK, query =
+                        "select COALESCE(sum(value),0) from Imputation i " +
+                                "where i.account = :user and i.day IN (:days) and i.organizationID = :orgID")
+        }
+)
 @Table(
         uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
 )
 public class Imputation extends OrganizationEntity implements Serializable {
+
+    public static final String SUM_IMPUTATIONS_BY_USER_AND_WEEK = "SUM_IMPUTATIONS_BY_USER_AND_WEEK";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

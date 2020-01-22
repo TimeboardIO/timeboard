@@ -143,8 +143,7 @@ public class AccountController {
 
         final Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
         final Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
-        final Calendar end = Calendar.getInstance();
-        end.setTime(this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate());
+        final Calendar end = this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate();
         final Calendar start = Calendar.getInstance();
         start.setTime(new Date());
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);

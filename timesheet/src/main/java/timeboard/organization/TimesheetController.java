@@ -80,12 +80,11 @@ public class TimesheetController {
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
         Account acc = authentication.getDetails();
 
-        final Date beginWorkDateForCurrentOrg = this.organizationService
+        final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
                 .get().getCreationDate();
 
-        final Calendar c = Calendar.getInstance();
-        c.setTime(beginWorkDateForCurrentOrg);
+        final Calendar c = beginWorkDateForCurrentOrg;
 
 
         c.set(Calendar.WEEK_OF_YEAR, week);
