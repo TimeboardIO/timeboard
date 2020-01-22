@@ -27,7 +27,6 @@ package timeboard.projects;
  */
 
 import edu.emory.mathcs.backport.java.util.Collections;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +43,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -87,11 +87,14 @@ public class ProjectsController {
         try {
             Project prj = this.projectService.createProject(actor, request.getParameter("projectName"));
             attributes.addFlashAttribute("success", "Project created successfully.");
-        }catch(ConstraintViolationException e){
-            attributes.addFlashAttribute("error", "This name is already used by another project");
+            return "redirect:/projects";
+        }catch(PersistenceException e){
+            attributes.addFlashAttribute("errorCreateProject", "This name is already used by another project");
+            return "redirect:/projects/create";
+        }catch(Exception e){
+            attributes.addFlashAttribute("errorCreateProject", "Error while project's creation");
             return "redirect:/projects/create";
         }
-        return "redirect:/projects";
     }
 
     @GetMapping("/create")
