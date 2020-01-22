@@ -60,7 +60,7 @@
                     </div>
                 </td>
                 <td>
-                    <select @change="updateRole($event, member)" v-model="member.role">
+                    <select class="ui dropdown" @change="updateRole($event, member)" v-model="member.role">
                         <option th:each="role : ${roles}"
                                 th:text="${role}"
                                 th:value="${role}"></option>

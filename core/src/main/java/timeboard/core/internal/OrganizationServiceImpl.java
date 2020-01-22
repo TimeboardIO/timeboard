@@ -192,8 +192,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Long organizationID) throws BusinessException {
-        this.em.merge(actor);
-        return actor.getOrganizations().stream().filter(om -> om.getOrganization().getId() == organizationID).findFirst();
+        final Account localActor = this.em.find(Account.class, actor.getId());
+        return localActor.getOrganizations().stream().filter(om -> om.getOrganization().getId() == organizationID).findFirst();
     }
 
     @Override
