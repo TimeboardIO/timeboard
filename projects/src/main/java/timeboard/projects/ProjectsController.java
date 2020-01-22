@@ -27,6 +27,7 @@ package timeboard.projects;
  */
 
 import edu.emory.mathcs.backport.java.util.Collections;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -83,8 +84,13 @@ public class ProjectsController {
     protected String handlePost(TimeboardAuthentication authentication,  HttpServletRequest request,
                                 RedirectAttributes attributes) throws BusinessException {
         final Account actor = authentication.getDetails();
-        Project prj =  this.projectService.createProject(actor, request.getParameter("projectName"));
-        attributes.addFlashAttribute("success", "Project created successfully.");
+        try {
+            Project prj = this.projectService.createProject(actor, request.getParameter("projectName"));
+            attributes.addFlashAttribute("success", "Project created successfully.");
+        }catch(ConstraintViolationException e){
+            attributes.addFlashAttribute("error", "This name is already used by another project");
+            return "redirect:/projects/create";
+        }
         return "redirect:/projects";
     }
 
