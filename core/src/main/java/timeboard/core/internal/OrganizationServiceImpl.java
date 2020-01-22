@@ -42,6 +42,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.Calendar;
 
 
 @Component
@@ -62,7 +63,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         final Organization organization = new Organization();
         organization.setName(organizationName);
-        organization.setCreatedDate(new Date());
+        organization.setCreatedDate(Calendar.getInstance());
         organization.setSetup(properties);
 
 
@@ -116,13 +117,19 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @CacheEvict(value="organizationsCache", key="#organization.getId()")
-    public Organization updateOrganization(Account actor, Organization organization) {
+    public Optional<Organization> updateOrganization(Account actor, Organization organization) {
 
-        em.merge(organization);
-        em.flush();
+        Optional<Organization> orgdb = this.getOrganizationByID(actor, organization.getId());
+        if(orgdb.isPresent()){
+            orgdb.get().setName(organization.getName());
+            orgdb.get().setCreatedDate(organization.getCreatedDate());
+            this.em.merge(orgdb.get());
+            this.em.flush();
+            LOGGER.info("Organization " + organization.getName() + " is updated");
+            return Optional.ofNullable(orgdb.get());
+        }
 
-        LOGGER.info("Project " + organization.getName() + " updated");
-        return organization;
+        return Optional.empty();
     }
 
     @Override
@@ -262,7 +269,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private DefaultTask createDefaultTask(Organization org, String name) throws BusinessException {
         try {
             DefaultTask task = new DefaultTask();
-            task.setStartDate(org.getCreatedDate());
+            task.setStartDate(org.getCreatedDate().getTime());
             task.setEndDate(null);
             task.setOrigin(org.getName() + "/" + System.nanoTime());
             task.setName(name);

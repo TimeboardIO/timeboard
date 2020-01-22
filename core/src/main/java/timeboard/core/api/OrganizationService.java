@@ -55,7 +55,7 @@ public interface OrganizationService {
     Optional<Organization> getOrganizationByName(
             final String organisationName);
 
-    Organization updateOrganization(
+    Optional<Organization> updateOrganization(
             final Account actor,
             final Organization organization);
 

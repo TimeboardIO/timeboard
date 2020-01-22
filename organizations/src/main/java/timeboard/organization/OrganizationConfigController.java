@@ -35,12 +35,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.security.TimeboardAuthentication;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
- 
+import timeboard.core.model.Account;
+import timeboard.core.model.DefaultTask;
+import timeboard.core.model.Organization;
+import timeboard.core.model.TaskType;
+import timeboard.core.security.TimeboardAuthentication;
+
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Date;
@@ -106,7 +110,7 @@ public class OrganizationConfigController {
 
     @PostMapping(value = "/default-task", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity addDefaultTask(TimeboardAuthentication authentication,
-                                            @ModelAttribute TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+                                         @ModelAttribute TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
         Account actor = authentication.getDetails();
         Long orID = authentication.getCurrentOrganization();
 
@@ -117,7 +121,7 @@ public class OrganizationConfigController {
 
     @PatchMapping(value = "/default-task/{taskID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateDefaultTask(TimeboardAuthentication authentication, @PathVariable Long taskID,
-                                    @ModelAttribute TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+                                            @ModelAttribute TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
 
         Account actor = authentication.getDetails();
 
@@ -141,10 +145,9 @@ public class OrganizationConfigController {
     }
 
 
-
     @PostMapping(value = "/task-type", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity addTaskType(TimeboardAuthentication authentication,
-                                         @ModelAttribute TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
+                                      @ModelAttribute TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
         Account actor = authentication.getDetails();
         Long orID = authentication.getCurrentOrganization();
 
@@ -155,11 +158,11 @@ public class OrganizationConfigController {
 
     @PatchMapping(value = "/task-type/{typeID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateTaskType(TimeboardAuthentication authentication, @PathVariable Long typeID,
-                                            @ModelAttribute TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
+                                         @ModelAttribute TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
 
         Account actor = authentication.getDetails();
 
-        TaskType type =  this.organizationService.findTaskTypeByID(typeWrapper.getId());
+        TaskType type = this.organizationService.findTaskTypeByID(typeWrapper.getId());
 
         type.setTypeName(typeWrapper.getName());
         this.organizationService.updateTaskType(actor, type);
@@ -178,63 +181,58 @@ public class OrganizationConfigController {
     }
 
 
-
     @PostMapping
-    protected String handlePost(TimeboardAuthentication authentication,
-                                HttpServletRequest request, Model model) throws Exception {
+    protected String handlePost(
+            final TimeboardAuthentication authentication,
+            final RedirectAttributes redirectAttributes,
+            final @ModelAttribute Organization model) throws Exception {
 
         final Account actor = authentication.getDetails();
-
-        String action = request.getParameter("action");
-        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
-
-        switch (action) {
-            case "CONFIG":
-                organization.get().setName(request.getParameter("organizationName"));
-                this.organizationService.updateOrganization(actor, organization.get());
-                break;
+        Optional<Organization> updatedOrg = this.organizationService.updateOrganization(actor, model);
+        if(updatedOrg.isPresent()) {
+            redirectAttributes.addFlashAttribute("success", "Successfully updated..");
         }
-
-        //Extract organization
-        return this.handleGet(authentication, request, model);
+        return "redirect:/org/setup";
     }
-
 
 
     public static class TaskWrapper implements Serializable {
         public String name;
         public long id;
 
-        public TaskWrapper(){}
+        public TaskWrapper() {
+        }
 
         public TaskWrapper(DefaultTask task) {
             this.name = task.getName();
             this.id = task.getId();
         }
 
-        public String getName(){
+        public String getName() {
             return name;
         }
 
-        public long getId(){
+        public long getId() {
             return this.id;
         }
 
-        public void setName(String name){
+        public void setName(String name) {
             this.name = name;
         }
 
-        public void  setId(long id){
+        public void setId(long id) {
             this.id = id;
         }
 
 
     }
+
     public static class TypeWrapper {
         public String name;
         public long id;
 
-        public TypeWrapper(){}
+        public TypeWrapper() {
+        }
 
 
         public TypeWrapper(TaskType type) {
@@ -242,19 +240,19 @@ public class OrganizationConfigController {
             this.id = type.getId();
         }
 
-        public String getName(){
+        public String getName() {
             return name;
         }
 
-        public long getId(){
+        public long getId() {
             return this.id;
         }
 
-        public void setName(String name){
+        public void setName(String name) {
             this.name = name;
         }
 
-        public void  setId(long id){
+        public void setId(long id) {
             this.id = id;
         }
     }

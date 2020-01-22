@@ -171,7 +171,7 @@ public class TimesheetRESTApi {
                     task.getId(),
                     task.getName(), task.getComments(),
                     0, 0,0, 0,
-                    organizationService.getOrganizationByID(currentAccount, orgID).get().getCreatedDate(),
+                    organizationService.getOrganizationByID(currentAccount, orgID).get().getCreatedDate().getTime(),
                     null,
                     TaskStatus.IN_PROGRESS.name(),
                     0L)
