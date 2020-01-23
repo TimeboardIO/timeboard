@@ -148,32 +148,12 @@ public class ProjectBatchesController {
         model.addAttribute("batch", new Batch());
 
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        fillModelWithBatches(model, actor, project);
+        this.fillModelWithBatches(model, actor, project);
 
         return "project_batches_config.html";
 
     }
 
-
-    private Map<String, String> getCurrentBatchAttributes(final HttpServletRequest request) {
-        final Map<String, String> attributes = new HashMap<>();
-
-        final String newAttrKey = request.getParameter("newAttrKey");
-        final String newAttrValue = request.getParameter("newAttrValue");
-        if (!newAttrKey.isEmpty()) {
-            attributes.put(newAttrKey, newAttrValue);
-        }
-        final Enumeration<String> paramNames = request.getParameterNames();
-        while (paramNames.hasMoreElements()) {
-            final String param = paramNames.nextElement();
-            if (param.startsWith("attr-")) {
-                final String key = param.substring(5);
-                final String value = request.getParameter(param);
-                attributes.put(key, value);
-            }
-        }
-        return attributes;
-    }
 
     private void fillModelWithBatches(final Model model, final Account actor, final Project project) throws BusinessException {
         model.addAttribute("project", project);
@@ -204,14 +184,14 @@ public class ProjectBatchesController {
 
         } catch (final Exception e) {
             model.addAttribute("error", e);
-        } finally {
-
-            model.addAttribute("project", project);
-            model.addAttribute("batches", this.projectService.listProjectBatches(actor, project));
-            model.addAttribute("allBatchTypes", BatchType.values());
-            model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, currentBatch));
-            return "details_project_batches_config_links.html";
         }
+
+        model.addAttribute("project", project);
+        model.addAttribute("batches", this.projectService.listProjectBatches(actor, project));
+        model.addAttribute("allBatchTypes", BatchType.values());
+        model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, currentBatch));
+        return "details_project_batches_config_links.html";
+
     }
 
     private Batch addTasksToBatch(final Account actor,
@@ -227,9 +207,9 @@ public class ProjectBatchesController {
                         t = (Task) projectService.getTaskByID(actor, Long.getLong(id));
                     } catch (Exception e) {
                         e.printStackTrace();
-                    } finally {
-                        return t;
                     }
+                    return t;
+
                 }).collect(Collectors.toList());
         final List<Task> oldTasks = this.projectService.listTasksByBatch(actor, currentBatch);
 

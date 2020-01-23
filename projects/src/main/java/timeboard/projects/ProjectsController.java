@@ -81,11 +81,9 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(final TimeboardAuthentication authentication, final HttpServletRequest request,
+    protected String handlePost(final HttpServletRequest request,
                                 final RedirectAttributes attributes) throws BusinessException {
-        final Account actor = authentication.getDetails();
         try {
-            final Project prj = this.projectService.createProject(actor, request.getParameter("projectName"));
             attributes.addFlashAttribute("success", "Project created successfully.");
             return "redirect:/projects";
         } catch (final PersistenceException e) {

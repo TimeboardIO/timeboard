@@ -26,7 +26,6 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +33,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Project;
@@ -57,18 +54,6 @@ import java.util.Map;
 @RequestMapping("/projects/{projectID}/setup")
 public class ProjectSetupController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    @Autowired(
-            required = false
-    )
-    private List<ProjectExportService> projectExportServices;
-
-    @Autowired(
-            required = false
-    )
-    private List<ProjectSyncPlugin> projectImportServices;
-
     @Autowired
     private ProjectService projectService;
 
@@ -77,8 +62,11 @@ public class ProjectSetupController {
 
 
     @GetMapping
-    protected String configProject(final TimeboardAuthentication authentication,
-                                   @PathVariable final long projectID, final Model model) throws BusinessException {
+    protected String configProject(
+            final TimeboardAuthentication authentication,
+            @PathVariable final long projectID,
+            final Model model) throws BusinessException {
+
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         final Map<String, Object> map = new HashMap<>();

@@ -27,7 +27,6 @@ package timeboard.organization;
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -45,7 +44,6 @@ import timeboard.core.model.Organization;
 import timeboard.core.model.TaskType;
 import timeboard.core.security.TimeboardAuthentication;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +60,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/org/setup")
 public class OrganizationConfigController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     @Autowired
     public OrganizationService organizationService;
     @Autowired
@@ -72,7 +69,7 @@ public class OrganizationConfigController {
 
     @GetMapping
     protected String handleGet(final TimeboardAuthentication authentication,
-                               final HttpServletRequest request, final Model model) throws BusinessException {
+                               final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 

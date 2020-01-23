@@ -71,9 +71,6 @@ public class ProjectSnapshotsController {
                           @PathVariable("project") final Project project,
                           final Model model) throws BusinessException {
 
-        final Account actor = authentication.getDetails();
-        //final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-
         model.addAttribute("project", project);
 
         return "project_snapshots";
@@ -84,7 +81,6 @@ public class ProjectSnapshotsController {
                                            final Project project) throws BusinessException, JsonProcessingException {
 
 
-        final Account actor = authentication.getDetails();
         final ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projectSnapshotGraphWrapper));
     }
@@ -94,7 +90,6 @@ public class ProjectSnapshotsController {
     listProjectSnapshots(final TimeboardAuthentication authentication,
                          final Project project) throws BusinessException {
 
-        final Account actor = authentication.getDetails();
         return ResponseEntity.ok(project.getSnapshots().stream().map(projectSnapshot ->
                 new ProjectSnapshotsController.ProjectSnapshotWrapper(projectSnapshot)).collect(Collectors.toList()));
     }

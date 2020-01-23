@@ -162,10 +162,10 @@ public class TasksRestController {
                         task.getEndDate(),
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
-                        (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
+                        task.getTaskType() != null ? task.getTaskType().getId() : 0L,
                         batchIDs, batchNames,
                         task.getTaskStatus().name(),
-                        (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
+                        task.getTaskType() != null ? task.getTaskType().getTypeName() : ""
                 ));
 
             }
