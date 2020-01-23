@@ -92,7 +92,7 @@ public class OrganizationMembersController {
     public ResponseEntity getMembers(TimeboardAuthentication authentication,
                                      HttpServletRequest request) throws JsonProcessingException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -118,7 +118,7 @@ public class OrganizationMembersController {
             result.add(new MemberWrapper(
                     member.getId(),
                     member.getMember().getScreenName(),
-                    (member.getRole() != null ? member.getRole().name() : ""),
+                    member.getRole() != null ? member.getRole().name() : "",
                     member.getCreationDate()
             ));
         }
@@ -159,7 +159,7 @@ public class OrganizationMembersController {
     public ResponseEntity addMember(TimeboardAuthentication authentication,
                                     HttpServletRequest request) throws JsonProcessingException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         // Get current organization
         final String strOrgID = request.getParameter("orgID");
@@ -183,8 +183,7 @@ public class OrganizationMembersController {
 
         // Add member in current organization
         try {
-            final Optional<Organization> newOrganization = organizationService
-                    .addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
+            organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
 
             final MemberWrapper memberWrapper = new MemberWrapper(
                     memberID,
@@ -204,7 +203,7 @@ public class OrganizationMembersController {
     public ResponseEntity removeMember(TimeboardAuthentication authentication,
                                        HttpServletRequest request) {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -227,7 +226,7 @@ public class OrganizationMembersController {
         final Account member = organizationMembership.getMember();
 
         try {
-            Optional<Organization> newOrganization = organizationService.removeMember(actor, organization.get(), member);
+            organizationService.removeMember(actor, organization.get(), member);
 
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e) {

@@ -41,15 +41,11 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RestController
