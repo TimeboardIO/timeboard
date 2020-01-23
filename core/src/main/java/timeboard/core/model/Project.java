@@ -36,17 +36,22 @@ import java.util.stream.Collectors;
 
 @Entity
 @NamedQueries(
-    {
-            @NamedQuery(name = Project.PROJECT_LIST, query =
-                    "select p from Project p join p.members m " +
-                    "where (p.enable = true or p.enable is null) and :user in m.member and p.organizationID = :orgID"),
+        {
+                @NamedQuery(name = Project.PROJECT_LIST, query =
+                        "select p from Project p join p.members m " +
+                                "where (p.enable = true or p.enable is null) and :user in m.member and p.organizationID = :orgID"),
 
-            @NamedQuery(name = Project.PROJECT_GET_BY_ID, query =
-                    "select p from Project p join fetch p.members m " +
-                    "where p.id = :projectID and m.member = :user and p.organizationID = :orgID"),
+                @NamedQuery(name = Project.PROJECT_GET_BY_ID, query =
+                        "select p from Project p join fetch p.members m " +
+                                "where p.id = :projectID and m.member = :user and p.organizationID = :orgID"),
 
-    }
+        }
 )
+@Table(name = "Project", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+                "name", "organizationID"
+        })
+})
 public class Project extends OrganizationEntity implements Serializable {
 
     public static final String PROJECT_COLOR_ATTR = "project.color";
@@ -149,6 +154,7 @@ public class Project extends OrganizationEntity implements Serializable {
     public Set<ProjectMembership> getMembers() {
         return members;
     }
+
     public void setMembers(Set<ProjectMembership> members) {
         this.members = members;
     }
@@ -178,9 +184,13 @@ public class Project extends OrganizationEntity implements Serializable {
         this.tags = tags;
     }
 
-    public List<ProjectSnapshot> getSnapshots() { return snapshots; }
+    public List<ProjectSnapshot> getSnapshots() {
+        return snapshots;
+    }
 
-    public void setSnapshots(List<ProjectSnapshot> snapshots) { this.snapshots = snapshots; }
+    public void setSnapshots(List<ProjectSnapshot> snapshots) {
+        this.snapshots = snapshots;
+    }
 
     public boolean isEnable() {
         return enable;
@@ -193,7 +203,7 @@ public class Project extends OrganizationEntity implements Serializable {
 
     @Transient
     public Set<ProjectMembership> getMemberShipsByRole(MembershipRole role) {
-        if(role != null) {
+        if (role != null) {
             return this.getMembers()
                     .stream()
                     .filter(projectMembership -> projectMembership.getRole() == role)

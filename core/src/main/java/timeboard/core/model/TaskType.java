@@ -29,7 +29,7 @@ package timeboard.core.model;
 import javax.persistence.*;
 
 @Entity
-public class TaskType extends OrganizationEntity  {
+public class TaskType extends OrganizationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

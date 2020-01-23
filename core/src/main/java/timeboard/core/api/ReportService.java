@@ -84,7 +84,7 @@ public interface ReportService {
         }
 
         @Transient
-        public Project getProject(){
+        public Project getProject() {
             return this.project;
         }
     }

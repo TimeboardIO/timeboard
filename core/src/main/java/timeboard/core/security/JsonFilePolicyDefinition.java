@@ -12,10 +12,10 @@ package timeboard.core.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -56,7 +56,7 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
     private List<PolicyRule> rules;
 
     @PostConstruct
-    private void init(){
+    private void init() {
         ObjectMapper mapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addDeserializer(Expression.class, new SpelDeserializer());
@@ -64,7 +64,7 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
         try {
             PolicyRule[] rulesArray = null;
             LOGGER.debug("[init] Checking policy file at: {}", policyFilePath);
-            if(policyFilePath != null && !policyFilePath.isEmpty()
+            if (policyFilePath != null && !policyFilePath.isEmpty()
                     && Files.exists(Paths.get(policyFilePath))) {
                 LOGGER.info("[init] Loading policy from custom file: {}", policyFilePath);
                 rulesArray = mapper.readValue(new File(policyFilePath), PolicyRule[].class);
@@ -72,7 +72,7 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
                 LOGGER.info("[init] Custom policy file not found. Loading default policy");
                 rulesArray = mapper.readValue(getClass().getClassLoader().getResourceAsStream(DEFAULT_POLICY_FILE_NAME), PolicyRule[].class);
             }
-            this.rules = (rulesArray != null? Arrays.asList(rulesArray) : null);
+            this.rules = (rulesArray != null ? Arrays.asList(rulesArray) : null);
             LOGGER.info("[init] Policy loaded successfully.");
         } catch (JsonMappingException e) {
             LOGGER.error("An error occurred while parsing the policy file.", e);

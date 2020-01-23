@@ -94,7 +94,7 @@ public class Task extends AbstractTask implements Serializable {
         this.project = project;
     }
 
-    public Set<Batch>  getBatches() {
+    public Set<Batch> getBatches() {
         return batches;
     }
 
@@ -103,7 +103,7 @@ public class Task extends AbstractTask implements Serializable {
     }
 
     public void addBatch(Batch batch) {
-        if(batch == null) {
+        if (batch == null) {
             this.batches = new HashSet<>();
         }
         this.batches.add(batch);
@@ -145,7 +145,6 @@ public class Task extends AbstractTask implements Serializable {
     public double getEffortSpent() {
         return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
     }
-
 
 
 }

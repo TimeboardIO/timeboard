@@ -37,7 +37,6 @@ import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.ThreadLocalStorage;
@@ -45,6 +44,7 @@ import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.model.ReportType;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
@@ -70,12 +70,12 @@ public class ReportsController {
 
 
     @GetMapping
-    protected String handleGet()  {
+    protected String handleGet() {
         return "reports.html";
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ReportDecorator>> reportList(TimeboardAuthentication authentication,  Model model) {
+    protected ResponseEntity<List<ReportDecorator>> reportList(TimeboardAuthentication authentication, Model model) {
         final Account actor = authentication.getDetails();
         final List<ReportDecorator> reports = this.reportService.listReports(actor)
                 .stream()
@@ -96,7 +96,7 @@ public class ReportsController {
 
     @PostMapping("/create")
     protected String handlePost(TimeboardAuthentication authentication,
-                                @ModelAttribute Report report,  RedirectAttributes attributes) {
+                                @ModelAttribute Report report, RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
         Long organizationID = ThreadLocalStorage.getCurrentOrgId();
@@ -141,7 +141,7 @@ public class ReportsController {
     @PostMapping("/edit/{reportID}")
     protected String handlePost(final TimeboardAuthentication authentication,
                                 @PathVariable long reportID,
-                                @ModelAttribute Report report,  RedirectAttributes attributes) {
+                                @ModelAttribute Report report, RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
         Long organizationID = ThreadLocalStorage.getCurrentOrgId();
@@ -167,7 +167,7 @@ public class ReportsController {
         String filterProjects = filterProjectsMap.getFirst("filter");
 
         // If there is no filter, don't display all the projects
-        if(filterProjects == null || filterProjects.isEmpty()) {
+        if (filterProjects == null || filterProjects.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to display the projects. Give a filter.");
         }
 

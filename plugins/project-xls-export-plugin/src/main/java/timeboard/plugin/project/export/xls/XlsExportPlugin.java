@@ -12,10 +12,10 @@ package timeboard.plugin.project.export.xls;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -66,25 +66,25 @@ public class XlsExportPlugin implements ProjectExportService {
 
         String sheetName = project.getName();
 
-       try(HSSFWorkbook wb = new HSSFWorkbook()) {
-           HSSFSheet sheet = wb.createSheet(sheetName);
+        try (HSSFWorkbook wb = new HSSFWorkbook()) {
+            HSSFSheet sheet = wb.createSheet(sheetName);
 
-           HSSFRow headerRow = sheet.createRow(0);
-           headerRow.createCell(0).setCellValue("Task name");
-           headerRow.createCell(1).setCellValue("Task Original Estimate");
+            HSSFRow headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Task name");
+            headerRow.createCell(1).setCellValue("Task Original Estimate");
 
-           int rowNum = 1;
-           for (Task task : this.projectService.listProjectTasks(actor, project)) {
+            int rowNum = 1;
+            for (Task task : this.projectService.listProjectTasks(actor, project)) {
 
-               HSSFRow taskRow = sheet.createRow(rowNum);
+                HSSFRow taskRow = sheet.createRow(rowNum);
 
-               taskRow.createCell(0).setCellValue(task.getName());
-               taskRow.createCell(1).setCellValue(task.getOriginalEstimate());
-               rowNum++;
-           }
+                taskRow.createCell(0).setCellValue(task.getName());
+                taskRow.createCell(1).setCellValue(task.getOriginalEstimate());
+                rowNum++;
+            }
 
-           wb.write(output);
-       }
+            wb.write(output);
+        }
 
     }
 

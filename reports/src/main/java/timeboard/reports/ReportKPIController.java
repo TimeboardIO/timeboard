@@ -34,13 +34,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.util.Date;
 import java.util.List;
@@ -60,13 +60,13 @@ public class ReportKPIController {
 
     @GetMapping("/{reportID}")
     protected ResponseEntity getDataChart(TimeboardAuthentication authentication,
-                                          @PathVariable long reportID, Model model)  {
+                                          @PathVariable long reportID, Model model) {
 
         final Account actor = authentication.getDetails();
         final Report report = this.reportService.getReportByID(actor, reportID);
 
         // If report has no filter, don't show its KPI graph
-        if(report.getFilterProject() == null || report.getFilterProject().isEmpty()) {
+        if (report.getFilterProject() == null || report.getFilterProject().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This report has no filter. Modify it to display the graph.");
         }
 

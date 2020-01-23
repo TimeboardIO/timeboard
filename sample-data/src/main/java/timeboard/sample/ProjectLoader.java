@@ -41,7 +41,7 @@ public class ProjectLoader {
     ProjectService projectService;
     UserService userService;
 
-    ProjectLoader(ProjectService projectService, UserService userService){
+    ProjectLoader(ProjectService projectService, UserService userService) {
         this.projectService = projectService;
         this.userService = userService;
     }
@@ -52,7 +52,7 @@ public class ProjectLoader {
         for (int i = 0; i < usersSaved.size(); i++) {
             Account owner = usersSaved.get(i);
 
-            if(owner != null) {
+            if (owner != null) {
                 for (int j = 0; j < nbProjectsByUsers; j++) {
                     try {
                         // On créé "nbProjectsByUsers" projets pour chacun des utilisateurs
@@ -64,7 +64,7 @@ public class ProjectLoader {
                 }
             }
         }
-         return projectsSaved;
+        return projectsSaved;
     }
 
 

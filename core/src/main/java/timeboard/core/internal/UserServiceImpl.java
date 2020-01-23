@@ -43,7 +43,9 @@ import timeboard.core.model.Project;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 

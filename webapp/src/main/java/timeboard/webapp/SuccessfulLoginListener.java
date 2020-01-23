@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -51,14 +51,14 @@ public class SuccessfulLoginListener {
 
         final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-        if(account == null){
-            if(event.getSource() instanceof OAuth2AuthenticationToken) {
+        if (account == null) {
+            if (event.getSource() instanceof OAuth2AuthenticationToken) {
                 final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) event.getSource();
                 this.userService.userProvisionning((String) token.getPrincipal().getAttributes().get("sub"),
                         (String) token.getPrincipal().getAttributes().get("email"));
             }
 
-            if(event.getSource() instanceof UsernamePasswordAuthenticationToken) {
+            if (event.getSource() instanceof UsernamePasswordAuthenticationToken) {
                 final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) event.getSource();
                 this.userService.userProvisionning(token.getName(), token.getName());
             }

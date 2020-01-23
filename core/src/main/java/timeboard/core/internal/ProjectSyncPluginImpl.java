@@ -35,9 +35,11 @@ import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.internal.async.ProjectSyncJob;
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ProjectSyncPluginImpl implements ProjectSyncService {
@@ -56,11 +58,11 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
 
     @Override
     public void syncProjectTasksWithSchedule(final Long orgID,
-                                 final Account actor,
-                                 final Project project,
-                                 final String serviceName,
-                                 final List<ProjectSyncCredentialField> jiraCredentials,
-                                 final CronScheduleBuilder cronScheduleBuilder) {
+                                             final Account actor,
+                                             final Project project,
+                                             final String serviceName,
+                                             final List<ProjectSyncCredentialField> jiraCredentials,
+                                             final CronScheduleBuilder cronScheduleBuilder) {
 
 
         final JobDetail jobDetails = buildJobDetails(serviceName, project);

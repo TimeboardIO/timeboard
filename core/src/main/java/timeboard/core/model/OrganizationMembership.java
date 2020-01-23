@@ -31,9 +31,9 @@ import java.util.Calendar;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames={"member_id", "organization_id"})
+        @UniqueConstraint(columnNames = {"member_id", "organization_id"})
 })
-public class OrganizationMembership  {
+public class OrganizationMembership {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

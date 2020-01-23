@@ -27,10 +27,7 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.model.Project;
+import timeboard.core.model.*;
 
 import java.util.Date;
 import java.util.Map;
@@ -47,7 +44,7 @@ public interface TimesheetService {
      * @param week             timesheet week
      * @return true if timesheet is submit else, false.
      */
-    void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws BusinessException;
+    SubmittedTimesheet submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws BusinessException;
 
     /**
      * Is timesheet submitted.
@@ -58,6 +55,27 @@ public interface TimesheetService {
      * @return true if timesheet is already submitted
      */
     boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week);
+
+    /**
+     * Is timesheet validated by manager.
+     *
+     * @param accountTimesheet user used to check timesheet sumbit state.
+     * @param week             timesheet week
+     * @param year             timesheet year
+     * @return true if timesheet is already validated
+     */
+    boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
+
+
+    /**
+     * Get timesheet validation status.
+     *
+     * @param currentAccount user used to check timesheet sumbit state.
+     * @param week           timesheet week
+     * @param year           timesheet year
+     * @return ValidationStatus
+     */
+    ValidationStatus getTimesheetValidationStatus(Long orgID, Account currentAccount, int year, int week);
 
 
     /**

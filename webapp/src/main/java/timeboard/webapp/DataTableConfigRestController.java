@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,10 +32,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
 import timeboard.core.model.Account;
 import timeboard.core.model.DataTableConfig;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -89,6 +89,7 @@ public class DataTableConfigRestController {
         public DataTableConfigWrapper() {
             colNames = new ArrayList<String>();
         }
+
         public DataTableConfigWrapper(DataTableConfig data) {
             this.colNames = data.getColumns();
             this.tableID = data.getTableInstanceId();

@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -48,6 +48,7 @@ public class RecursiveVacationRequest extends VacationRequest {
         super();
         this.children = new HashSet<>();
     }
+
     public RecursiveVacationRequest(VacationRequest other) {
         super(other);
         this.children = new HashSet<>();
@@ -72,7 +73,7 @@ public class RecursiveVacationRequest extends VacationRequest {
         end.setTime(this.getEndDate());
 
         while (start.before(end)) {
-            start.set(java.util.Calendar.DAY_OF_WEEK, (this.getRecurrenceDay() + 1)%7 ); //Calendar first day of week is sunday
+            start.set(java.util.Calendar.DAY_OF_WEEK, (this.getRecurrenceDay() + 1) % 7); //Calendar first day of week is sunday
             if (start.getTime().after(this.getStartDate()) && start.getTime().before(this.getEndDate())) {
                 VacationRequest child = new VacationRequest(this);
                 child.setParent(this);

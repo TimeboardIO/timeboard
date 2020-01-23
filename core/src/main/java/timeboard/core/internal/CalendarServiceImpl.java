@@ -99,7 +99,7 @@ public class CalendarServiceImpl implements CalendarService {
             }
             this.projectService.updateTaskImputations(actor, imputationsToUpdate);
         } catch (IOException | ParseException e) {
-           throw new BusinessException(e);
+            throw new BusinessException(e);
         }
 
         return true;
@@ -150,7 +150,7 @@ public class CalendarServiceImpl implements CalendarService {
             }
             this.projectService.createTasks(actor, tasksToCreate);
             this.projectService.updateTasks(actor, tasksToUpdate);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BusinessException(e);
         }
         return true;

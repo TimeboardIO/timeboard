@@ -13,12 +13,12 @@
     <div class="ui segment">
         <h4 class="ui dividing header">Create project</h4>
 
-        <div class="ui negative message" th:if="${error}">
+        <div class="ui negative message" th:if="${errorCreateProject}">
             <i class="close icon"></i>
             <div class="header">
                 Failed to create project
             </div>
-            <p th:text="${error}">:(</p>
+            <p th:text="${errorCreateProject}">:(</p>
         </div>
         <form action="" class="ui form" enctype="application/x-www-form-urlencoded" method="post">
             <div class="field">
