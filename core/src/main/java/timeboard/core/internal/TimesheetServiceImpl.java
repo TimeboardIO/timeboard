@@ -44,7 +44,6 @@ import javax.transaction.Transactional;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.*;
-import java.util.Calendar;
 import java.util.stream.Collectors;
 
 
@@ -295,12 +294,12 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     public Map<Account, List<SubmittedTimesheet>> getTimesheetsFromProject(Account actor, Project project) {
 
-        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+       final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
                 + "where st.account in :users", SubmittedTimesheet.class);
 
         q.setParameter("users", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
 
-        List<SubmittedTimesheet> resultList = q.getResultList();
+        final List<SubmittedTimesheet> resultList = q.getResultList();
         return resultList.stream().collect(Collectors.groupingBy(SubmittedTimesheet::getAccount,
                         Collectors.mapping(r -> r,Collectors.toList())));
 

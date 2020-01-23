@@ -1,5 +1,31 @@
 package timeboard.projects;
 
+/*-
+ * #%L
+ * projects
+ * %%
+ * Copyright (C) 2019 - 2020 Timeboard
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,7 +78,7 @@ public class ProjectTimesheetValidationController {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 
-        Map<Account, List<SubmittedTimesheet>> timesheetsFromProject = this.timesheetService.getTimesheetsFromProject(actor, project);
+        final Map<Account, List<SubmittedTimesheet>> timesheetsFromProject = this.timesheetService.getTimesheetsFromProject(actor, project);
 
         // add member with no submitted week
         project.getMembers().stream()
@@ -73,24 +99,24 @@ public class ProjectTimesheetValidationController {
 
         if(!submittedTimesheets.isEmpty()) {
             //user already have submitted at least one week
-            Optional<SubmittedTimesheet> lastValidatedSubmittedTimesheet = submittedTimesheets
+            final Optional<SubmittedTimesheet> lastValidatedSubmittedTimesheet = submittedTimesheets
                     .stream()
                     .filter(SubmittedTimesheet::isValidated)
                     .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
 
-            Optional<SubmittedTimesheet> lastSubmittedTimesheet = submittedTimesheets
+            final Optional<SubmittedTimesheet> lastSubmittedTimesheet = submittedTimesheets
                     .stream()
                     .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
 
             // user have at least one non validated week.
-            SubmittedTimesheet t = lastValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
+            final SubmittedTimesheet t = lastValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
 
             return generateSubmittedTimesheets((int) t.getYear(),(int) t.getWeek(),
                     submittedTimesheets);
 
         } else {
             // user NEVER submitted a single week
-            Calendar current = Calendar.getInstance();
+            final Calendar current = Calendar.getInstance();
 
             current.setTime(a.getAccountCreationTime());
 
@@ -103,19 +129,19 @@ public class ProjectTimesheetValidationController {
 
     List<TimesheetWeekWrapper> generateSubmittedTimesheets(int firstYear, int firstWeek, List<SubmittedTimesheet> submittedTimesheets) {
 
-        List<TimesheetWeekWrapper> returnList = new LinkedList<>();
-        long todayAbsoluteWeekNumber = absoluteWeekNumber(Calendar.getInstance());
-        Calendar current = Calendar.getInstance();
+        final List<TimesheetWeekWrapper> returnList = new LinkedList<>();
+        final long todayAbsoluteWeekNumber = absoluteWeekNumber(Calendar.getInstance());
+        final Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, firstWeek);
         current.set(Calendar.YEAR, firstYear);
-        long weekNumber = todayAbsoluteWeekNumber - absoluteWeekNumber(firstYear,firstWeek);
+        final long weekNumber = todayAbsoluteWeekNumber - absoluteWeekNumber(firstYear,firstWeek);
         if ( weekNumber <= 1 ) { //Min two weeks
             current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));
         }
         while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
-            int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
-            int currentYear = current.get(Calendar.YEAR);
-            Optional<TimesheetWeekWrapper> existingWeek = submittedTimesheets
+            final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
+            final int currentYear = current.get(Calendar.YEAR);
+            final Optional<TimesheetWeekWrapper> existingWeek = submittedTimesheets
                     .stream()
                     .filter(t -> t.getWeek() == currentWeek && t.getYear() == currentYear)
                     .map(t -> new TimesheetWeekWrapper(t, true))
@@ -145,7 +171,7 @@ public class ProjectTimesheetValidationController {
 
 
     private Calendar calendarFromWeek (long year, long week) {
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.set(Calendar.YEAR, (int) year);
         c.set(Calendar.WEEK_OF_YEAR, (int) week);
         return c;
