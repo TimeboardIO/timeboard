@@ -53,7 +53,7 @@
                     </tr>
                     <tr class="ui content">
                         <td colspan="5">
-                            <data-table v-bind:config="config" v-bind:table="account.weeks">
+                            <data-table v-bind:config="Object.assign({}, config)" v-bind:table="account.weeks">
                                 <template v-slot:week="{row}">
                                     {{ row.week }}
                                 </template>
@@ -62,10 +62,10 @@
                                 </template>
 
                                 <template v-slot:validated="{row}">
-                                     <div class="ui circular label large "></div>
+                                     <div :class="{red:  row.submitted && !row.validated, green: row.validated}" class="ui circular label large "></div>
                                 </template>
                                 <template v-slot:submitted="{row}">
-                                     <div class="ui circular label large "></div>
+                                    <div :class="{red:  !row.submitted, green: row.submitted}" class="ui circular label large "></div>
                                 </template>
                             </data-table>
                         </td>

@@ -87,8 +87,7 @@ public class ProjectTimesheetValidationController {
                 SubmittedTimesheet t = lastNonValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
 
                 return generateSubmittedTimesheets((int) t.getYear(),(int) t.getWeek(),
-                        submittedTimesheets.stream()
-                        .filter(e -> !e.isValidated()).collect(Collectors.toList()));
+                        submittedTimesheets);
             } else {
                 // user have all his weeks validated so return 2 first weeks
                 return submittedTimesheets
