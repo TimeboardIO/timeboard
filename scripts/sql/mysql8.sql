@@ -116,7 +116,7 @@
 
     create table Organization (
        id bigint not null,
-        createdDate datetime(6),
+        createdDate date,
         enabled bit,
         name varchar(255) not null,
         setup TEXT,

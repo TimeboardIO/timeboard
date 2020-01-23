@@ -27,7 +27,7 @@ package timeboard.core.model;
  */
 
 import javax.persistence.*;
-import java.util.Date;
+import java.util.Calendar;
 
 @Entity
 @Table(uniqueConstraints = {
@@ -51,10 +51,10 @@ public class OrganizationMembership  {
 
     @Column
     @Temporal(TemporalType.DATE)
-    private java.util.Date creationDate;
+    private Calendar creationDate;
 
     public OrganizationMembership() {
-        this.creationDate = new Date();
+        this.creationDate = Calendar.getInstance();
     }
 
 
@@ -62,7 +62,7 @@ public class OrganizationMembership  {
         this.member = owner;
         this.role = role;
         this.organization = organization;
-        this.creationDate = new Date();
+        this.creationDate = Calendar.getInstance();
     }
 
     public Long getId() {
@@ -99,11 +99,11 @@ public class OrganizationMembership  {
         this.role = role;
     }
 
-    public Date getCreationDate() {
-        return this.creationDate != null ? this.creationDate : new Date();
+    public Calendar getCreationDate() {
+        return this.creationDate != null ? this.creationDate : Calendar.getInstance();
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(Calendar creationDate) {
         this.creationDate = creationDate;
     }
 }

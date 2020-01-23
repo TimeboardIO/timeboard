@@ -55,7 +55,7 @@ public interface OrganizationService {
     Optional<Organization> getOrganizationByName(
             final String organisationName);
 
-    Organization updateOrganization(
+    Optional<Organization> updateOrganization(
             final Account actor,
             final Organization organization);
 
@@ -70,11 +70,9 @@ public interface OrganizationService {
             final Account member,
             final MembershipRole role) throws BusinessException;
 
-    Optional<Organization> updateMemberRole(
+    Optional<Organization> updateMembership(
             final Account actor,
-            final Organization organization,
-            final Account member,
-            final MembershipRole role) throws BusinessException;
+            final OrganizationMembership membership) throws BusinessException;
 
 
     Optional<OrganizationMembership> findOrganizationMembership(
@@ -83,7 +81,11 @@ public interface OrganizationService {
 
     Optional<OrganizationMembership> findOrganizationMembership(
             final Account actor,
-            final Long organizationID) throws BusinessException;
+            final Long organizationID);
+
+    Optional<OrganizationMembership> findOrganizationMembershipById(
+            final Account details,
+            final Long membershipID);
 
 
     /*

@@ -26,6 +26,7 @@ package timeboard.core.model;
  * #L%
  */
 
+import org.springframework.format.annotation.DateTimeFormat;
 import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
@@ -62,8 +63,9 @@ public class Organization {
     private Map<String, String> setup;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private java.util.Calendar createdDate;
 
     @OneToMany(targetEntity = OrganizationMembership.class,
             mappedBy = "organization",
@@ -80,11 +82,11 @@ public class Organization {
     )
     private Set<DefaultTask> defaultTasks = new HashSet<>();
 
-    public Date getCreatedDate() {
+    public java.util.Calendar getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(java.util.Calendar createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -121,7 +123,7 @@ public class Organization {
     }
 
     public Map<String, String> getSetup() {
-        return setup;
+        return setup!=null?setup:Collections.emptyMap();
     }
 
     public void setSetup(Map<String, String> setup) {
