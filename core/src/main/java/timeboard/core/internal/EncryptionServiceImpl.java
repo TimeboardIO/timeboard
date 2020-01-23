@@ -56,7 +56,7 @@ public class EncryptionServiceImpl implements EncryptionService {
                 cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"));
                 value = new String(cipher.doFinal(Base64.getDecoder().decode(value)));
             } catch (final Exception e) {
-                // Catch error empty
+                LOGGER.error(e.getMessage(), e);
             }
         }
         return value;
@@ -69,6 +69,7 @@ public class EncryptionServiceImpl implements EncryptionService {
             cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"));
             return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
         } catch (final Exception e) {
+            LOGGER.error(e.getMessage(), e);
             return null;
         }
     }

@@ -56,9 +56,6 @@ public class TimesheetServiceImpl implements TimesheetService {
     private EntityManager em;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private ProjectService projectService;
 
     @Autowired
@@ -79,7 +76,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Calendar beginWorkDate = this.organizationService.findOrganizationMembership(actor, currentOrg).get().getCreationDate();
 
         final int dayInFirstWeek = beginWorkDate.get(Calendar.DAY_OF_WEEK);
-        final boolean firstWeek = (beginWorkDate.get(Calendar.WEEK_OF_YEAR) == week) && (beginWorkDate.get(Calendar.YEAR) == year);
+        final boolean firstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR) == week && beginWorkDate.get(Calendar.YEAR) == year;
 
         final Calendar previousWeek = Calendar.getInstance();
         previousWeek.set(Calendar.WEEK_OF_YEAR, week);

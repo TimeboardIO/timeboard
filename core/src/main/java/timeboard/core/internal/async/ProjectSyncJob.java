@@ -60,8 +60,6 @@ public final class ProjectSyncJob implements Job {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private OrganizationService organizationService;
 
 
     @Override
@@ -83,18 +81,16 @@ public final class ProjectSyncJob implements Job {
 
             SecurityContextHolder.getContext().setAuthentication(new TimeboardAuthentication(actor));
 
-            final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, orgID);
             final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
 
-            context.setResult(this.syncProjectTasks(org.get(), actor, project, syncService, credentials));
+            context.setResult(this.syncProjectTasks(actor, project, syncService, credentials));
 
         } catch (final Exception e) {
             context.setResult(e);
         }
     }
 
-    private Object syncProjectTasks(final Organization org,
-                                    final Account actor,
+    private Object syncProjectTasks(final Account actor,
                                     final Project project,
                                     final ProjectSyncPlugin syncService,
                                     final List<ProjectSyncCredentialField> jiraCrendentials) throws Exception {
@@ -120,14 +116,14 @@ public final class ProjectSyncJob implements Job {
     private void syncTasks(final Account actor, final Project project, final List<RemoteTask> remoteTasks) throws BusinessException {
         final List<RemoteTask> newTasks = new ArrayList<>();
         for (final RemoteTask task1 : remoteTasks) {
-            if (isNewTask(actor, project.getId(), task1)) {
+            if (isNewTask(actor, task1)) {
                 newTasks.add(task1);
             }
         }
 
         final List<RemoteTask> updatedTasks = new ArrayList<>();
         for (final RemoteTask task1 : remoteTasks) {
-            if (isUpdated(actor, project.getId(), task1)) {
+            if (isUpdated(actor, task1)) {
                 updatedTasks.add(task1);
             }
         }
@@ -169,11 +165,11 @@ public final class ProjectSyncJob implements Job {
     }
 
 
-    private boolean isUpdated(final Account actor, final long projectID, final RemoteTask task) throws BusinessException {
-        return !this.isNewTask(actor, projectID, task);
+    private boolean isUpdated(final Account actor, final RemoteTask task) throws BusinessException {
+        return !this.isNewTask(actor, task);
     }
 
-    private boolean isNewTask(final Account actor, final long projectID, final RemoteTask task) throws BusinessException {
+    private boolean isNewTask(final Account actor, final RemoteTask task) throws BusinessException {
         final Optional<Task> existingTask = this.projectService.getTaskByRemoteID(actor, task.getId());
         return !existingTask.isPresent();
     }

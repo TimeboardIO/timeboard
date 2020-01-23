@@ -69,9 +69,6 @@ public class ProjectServiceImpl implements ProjectService {
     private String defaultVacationTaskName;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private TimesheetService timesheetService;
 
     @Autowired
@@ -397,70 +394,6 @@ public class ProjectServiceImpl implements ProjectService {
         return Optional.ofNullable(data);
     }
 
-    private AbstractTask getTasksByName(final String name) {
-
-        final List<AbstractTask> tasks = new ArrayList<>();
-        try {
-
-            final TypedQuery<Task> query = em.createQuery("select distinct t " +
-                    "from Task t left join fetch t.imputations  where t.name = :name", Task.class);
-            query.setParameter("name", name);
-
-            tasks.addAll(query.getResultList());
-
-        } catch (final Exception e) {
-            // handle JPA Exceptions
-        }
-
-        try {
-            final TypedQuery<DefaultTask> query = em.createQuery("select distinct t " +
-                    "from DefaultTask t left join fetch t.imputations where t.name = :name", DefaultTask.class);
-
-            query.setParameter("name", name);
-            tasks.addAll(query.getResultList());
-        } catch (final Exception e) {
-            //handle JPA Exceptions
-        }
-
-        if (tasks.isEmpty()) {
-            return null;
-        }
-
-        return tasks.get(0);
-
-    }
-
-    public List<AbstractTask> getTasksByName(final Account account, final String name) {
-
-        final List<AbstractTask> tasks = new ArrayList<>();
-        try {
-
-            final TypedQuery<Task> query = em.createQuery("select distinct t " +
-                    "from Task t left join fetch t.imputations  " +
-                    "where t.name = :name", Task.class);
-
-            query.setParameter("name", name);
-
-            tasks.addAll(query.getResultList());
-
-        } catch (final Exception e) {
-            // handle JPA Exceptions
-        }
-
-        try {
-            final TypedQuery<DefaultTask> query = em.createQuery("select distinct t " +
-                    "from DefaultTask t left join fetch t.imputations " +
-                    "where t.name = :name", DefaultTask.class);
-
-            query.setParameter("name", name);
-            tasks.addAll(query.getResultList());
-        } catch (final Exception e) {
-            //handle JPA Exceptions
-        }
-
-        return tasks;
-    }
-
     @Override
     public Optional<Task> getTaskByRemoteID(final Account actor, final String id) {
         Task task = null;
@@ -538,7 +471,6 @@ public class ProjectServiceImpl implements ProjectService {
             final Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask, actor);
             final double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
-            final Imputation updatedImputation = this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
             final Task updatedTask = em.find(Task.class, projectTask.getId());
             final double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);

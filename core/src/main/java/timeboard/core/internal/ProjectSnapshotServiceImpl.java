@@ -68,6 +68,7 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
             projectSnapshot.setProjectSnapshotDate(new Date());
             return projectSnapshot;
         } catch (final Exception e) {
+            LOGGER.error(e.getMessage());
             throw new BusinessException(e);
         }
     }

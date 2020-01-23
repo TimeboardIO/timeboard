@@ -226,8 +226,5 @@ public class UserServiceImpl implements UserService {
         return account;
     }
 
-    private String hashPassword(final String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt(12));
-    }
 
 }

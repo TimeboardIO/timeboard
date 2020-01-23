@@ -39,7 +39,6 @@ import javax.annotation.PreDestroy;
 @Component
 public class LogTasksComponent {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LogTasksComponent.class);
 
     private Disposable disposable;
 

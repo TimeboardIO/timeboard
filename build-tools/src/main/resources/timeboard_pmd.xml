@@ -17,12 +17,9 @@
         </properties>
     </rule>
     <rule ref="category/java/codestyle.xml/DontImportJavaLang"/>
-    <rule ref="category/java/codestyle.xml/DuplicateImports"/>
     <rule ref="category/java/codestyle.xml/ExtendsObject"/>
     <rule ref="category/java/codestyle.xml/ForLoopShouldBeWhileLoop"/>
     <rule ref="category/java/codestyle.xml/TooManyStaticImports"/>
-    <rule ref="category/java/codestyle.xml/UnnecessaryFullyQualifiedName"/>
-    <rule ref="category/java/codestyle.xml/UnnecessaryModifier"/>
     <rule ref="category/java/codestyle.xml/UnnecessaryReturn"/>
     <rule ref="category/java/codestyle.xml/UselessParentheses"/>
     <rule ref="category/java/codestyle.xml/UselessQualifiedThis"/>
@@ -37,7 +34,6 @@
     <rule ref="category/java/errorprone.xml/CheckSkipResult"/>
     <rule ref="category/java/errorprone.xml/ClassCastExceptionWithToArray"/>
     <rule ref="category/java/errorprone.xml/DontUseFloatTypeForLoopIndices"/>
-    <rule ref="category/java/errorprone.xml/EmptyCatchBlock"/>
     <rule ref="category/java/errorprone.xml/EmptyFinallyBlock"/>
     <rule ref="category/java/errorprone.xml/EmptyIfStmt"/>
     <rule ref="category/java/errorprone.xml/EmptyInitializer"/>

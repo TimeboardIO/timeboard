@@ -45,12 +45,6 @@ import java.util.List;
 public class ProjectSyncPluginImpl implements ProjectSyncService {
 
     @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
     private Scheduler scheduler;
 
     @Autowired

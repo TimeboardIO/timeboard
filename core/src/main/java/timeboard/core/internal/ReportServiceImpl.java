@@ -64,7 +64,6 @@ public class ReportServiceImpl implements ReportService {
     @Transactional
     public Report createReport(final Account owner, final String reportName, final Account organization,
                                final ReportType type, final String filterProject) {
-        final Account ownerAccount = this.em.find(Account.class, owner.getId());
         final Report newReport = new Report();
         newReport.setName(reportName);
         newReport.setType(type);
@@ -144,10 +143,6 @@ public class ReportServiceImpl implements ReportService {
     }
 
     private ProjectWrapper wrapProjectTags(final Project project) {
-        final List<TagWrapper> tags = project.getTags()
-                .stream()
-                .map(tag -> new TagWrapper(tag.getTagKey(), tag.getTagValue()))
-                .collect(Collectors.toList());
         return new ProjectWrapper(project);
     }
 

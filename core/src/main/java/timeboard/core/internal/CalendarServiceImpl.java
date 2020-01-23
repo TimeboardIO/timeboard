@@ -54,8 +54,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 
 
 @org.springframework.stereotype.Component
@@ -235,7 +235,7 @@ public class CalendarServiceImpl implements CalendarService {
     private AbstractTask eventToTask(final Event event, final Task task, final Project project) {
 
         this.eventToTask(event, task);
-        task.setProject((project));
+        task.setProject(project);
         return task;
 
     }
