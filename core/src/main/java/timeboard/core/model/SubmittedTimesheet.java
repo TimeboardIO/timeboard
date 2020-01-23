@@ -52,7 +52,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -60,7 +60,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
         return timesheetStatus;
     }
 
-    public void setTimesheetStatus(ValidationStatus timesheetStatus) {
+    public void setTimesheetStatus(final ValidationStatus timesheetStatus) {
         this.timesheetStatus = timesheetStatus;
     }
 
@@ -68,7 +68,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
         return year;
     }
 
-    public void setYear(int y) {
+    public void setYear(final int y) {
         this.year = y;
     }
 
@@ -76,7 +76,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
         return week;
     }
 
-    public void setWeek(int w) {
+    public void setWeek(final int w) {
         this.week = w;
     }
 
@@ -84,7 +84,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
         return account;
     }
 
-    public void setAccount(Account account) {
+    public void setAccount(final Account account) {
         this.account = account;
     }
 

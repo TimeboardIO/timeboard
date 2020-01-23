@@ -39,7 +39,7 @@ public class VacationEvent extends TimeboardEvent {
     private VacationRequest request;
     private TimeboardEventType eventType;
 
-    public VacationEvent(TimeboardEventType eventType, VacationRequest request) {
+    public VacationEvent(final TimeboardEventType eventType, final VacationRequest request) {
 
         super(new Date());
         this.eventType = eventType;
@@ -52,7 +52,7 @@ public class VacationEvent extends TimeboardEvent {
         return eventType;
     }
 
-    public void setEventType(TimeboardEventType eventType) {
+    public void setEventType(final TimeboardEventType eventType) {
         this.eventType = eventType;
     }
 
@@ -60,13 +60,13 @@ public class VacationEvent extends TimeboardEvent {
         return request;
     }
 
-    public void setRequest(VacationRequest request) {
+    public void setRequest(final VacationRequest request) {
         this.request = request;
     }
 
     private void constructUsersList() {
-        Account applicantAccount = request.getApplicant();
-        Account assignedAccount = request.getAssignee();
+        final Account applicantAccount = request.getApplicant();
+        final Account assignedAccount = request.getAssignee();
 
         if (eventType == CREATE || eventType == DELETE) {
             usersToNotify.add(assignedAccount);

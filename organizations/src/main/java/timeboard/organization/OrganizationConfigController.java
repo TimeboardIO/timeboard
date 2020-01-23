@@ -27,7 +27,6 @@ package timeboard.organization;
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -45,7 +44,6 @@ import timeboard.core.model.Organization;
 import timeboard.core.model.TaskType;
 import timeboard.core.security.TimeboardAuthentication;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +60,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/org/setup")
 public class OrganizationConfigController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     @Autowired
     public OrganizationService organizationService;
     @Autowired
@@ -71,8 +68,8 @@ public class OrganizationConfigController {
     private String defaultVacationTaskName;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication,
-                               HttpServletRequest request, Model model) throws BusinessException {
+    protected String handleGet(final TimeboardAuthentication authentication,
+                               final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
@@ -92,7 +89,7 @@ public class OrganizationConfigController {
     }
 
     @GetMapping(value = "/default-task/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TaskWrapper>> listDefaultTasks(TimeboardAuthentication authentication) throws BusinessException {
+    public ResponseEntity<List<TaskWrapper>> listDefaultTasks(final TimeboardAuthentication authentication) throws BusinessException {
         final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
                 new Date(), new Date());
         return ResponseEntity.ok(defaultTasks.stream().filter(
@@ -100,16 +97,16 @@ public class OrganizationConfigController {
     }
 
     @GetMapping(value = "/task-type/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<TypeWrapper>> listTaskTypes(TimeboardAuthentication authentication) throws BusinessException {
+    public ResponseEntity<List<TypeWrapper>> listTaskTypes(final TimeboardAuthentication authentication) throws BusinessException {
         final List<TaskType> taskTypes = this.organizationService.listTaskType(authentication.getCurrentOrganization());
         return ResponseEntity.ok(taskTypes.stream().map(TypeWrapper::new).collect(Collectors.toList()));
     }
 
     @PostMapping(value = "/default-task", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity addDefaultTask(TimeboardAuthentication authentication,
-                                         @ModelAttribute TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
-        Account actor = authentication.getDetails();
-        Long orID = authentication.getCurrentOrganization();
+    public ResponseEntity addDefaultTask(final TimeboardAuthentication authentication,
+                                         @ModelAttribute final TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+        final Account actor = authentication.getDetails();
+        final Long orID = authentication.getCurrentOrganization();
 
         this.organizationService.createDefaultTask(actor, orID, taskWrapper.getName());
 
@@ -117,12 +114,12 @@ public class OrganizationConfigController {
     }
 
     @PatchMapping(value = "/default-task/{taskID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateDefaultTask(TimeboardAuthentication authentication, @PathVariable Long taskID,
-                                            @ModelAttribute TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+    public ResponseEntity updateDefaultTask(final TimeboardAuthentication authentication, @PathVariable final Long taskID,
+                                            @ModelAttribute final TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
-        DefaultTask task = (DefaultTask) this.organizationService.getDefaultTaskByID(actor, taskWrapper.getId());
+        final DefaultTask task = (DefaultTask) this.organizationService.getDefaultTaskByID(actor, taskWrapper.getId());
 
         task.setName(taskWrapper.getName());
         this.organizationService.updateDefaultTask(actor, task);
@@ -131,10 +128,10 @@ public class OrganizationConfigController {
     }
 
     @DeleteMapping(value = "/default-task/{taskID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteDefaultTask(TimeboardAuthentication authentication, @PathVariable Long taskID) throws BusinessException {
+    public ResponseEntity deleteDefaultTask(final TimeboardAuthentication authentication, @PathVariable final Long taskID) throws BusinessException {
 
-        Account actor = authentication.getDetails();
-        Long orgID = authentication.getCurrentOrganization();
+        final Account actor = authentication.getDetails();
+        final Long orgID = authentication.getCurrentOrganization();
 
         this.organizationService.disableDefaultTaskByID(actor, orgID, taskID);
 
@@ -143,10 +140,10 @@ public class OrganizationConfigController {
 
 
     @PostMapping(value = "/task-type", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity addTaskType(TimeboardAuthentication authentication,
-                                      @ModelAttribute TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
-        Account actor = authentication.getDetails();
-        Long orID = authentication.getCurrentOrganization();
+    public ResponseEntity addTaskType(final TimeboardAuthentication authentication,
+                                      @ModelAttribute final TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
+        final Account actor = authentication.getDetails();
+        final Long orID = authentication.getCurrentOrganization();
 
         this.organizationService.createTaskType(actor, orID, typeWrapper.getName());
 
@@ -154,12 +151,12 @@ public class OrganizationConfigController {
     }
 
     @PatchMapping(value = "/task-type/{typeID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateTaskType(TimeboardAuthentication authentication, @PathVariable Long typeID,
-                                         @ModelAttribute TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
+    public ResponseEntity updateTaskType(final TimeboardAuthentication authentication, @PathVariable final Long typeID,
+                                         @ModelAttribute final TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
-        TaskType type = this.organizationService.findTaskTypeByID(typeWrapper.getId());
+        final TaskType type = this.organizationService.findTaskTypeByID(typeWrapper.getId());
 
         type.setTypeName(typeWrapper.getName());
         this.organizationService.updateTaskType(actor, type);
@@ -168,10 +165,10 @@ public class OrganizationConfigController {
     }
 
     @DeleteMapping(value = "/task-type/{typeID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteTaskType(TimeboardAuthentication authentication, @PathVariable Long typeID) throws BusinessException {
+    public ResponseEntity deleteTaskType(final TimeboardAuthentication authentication, @PathVariable final Long typeID) throws BusinessException {
 
-        Account actor = authentication.getDetails();
-        TaskType type = organizationService.findTaskTypeByID(typeID);
+        final Account actor = authentication.getDetails();
+        final TaskType type = organizationService.findTaskTypeByID(typeID);
         this.organizationService.disableTaskType(actor, type);
 
         return this.listTaskTypes(authentication);
@@ -185,7 +182,7 @@ public class OrganizationConfigController {
             final @ModelAttribute Organization model) throws Exception {
 
         final Account actor = authentication.getDetails();
-        Optional<Organization> updatedOrg = this.organizationService.updateOrganization(actor, model);
+        final Optional<Organization> updatedOrg = this.organizationService.updateOrganization(actor, model);
         if (updatedOrg.isPresent()) {
             redirectAttributes.addFlashAttribute("success", "Successfully updated..");
         }
@@ -200,7 +197,7 @@ public class OrganizationConfigController {
         public TaskWrapper() {
         }
 
-        public TaskWrapper(DefaultTask task) {
+        public TaskWrapper(final DefaultTask task) {
             this.name = task.getName();
             this.id = task.getId();
         }
@@ -209,7 +206,7 @@ public class OrganizationConfigController {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -217,7 +214,7 @@ public class OrganizationConfigController {
             return this.id;
         }
 
-        public void setId(long id) {
+        public void setId(final long id) {
             this.id = id;
         }
 
@@ -232,7 +229,7 @@ public class OrganizationConfigController {
         }
 
 
-        public TypeWrapper(TaskType type) {
+        public TypeWrapper(final TaskType type) {
             this.name = type.getTypeName();
             this.id = type.getId();
         }
@@ -241,7 +238,7 @@ public class OrganizationConfigController {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -249,7 +246,7 @@ public class OrganizationConfigController {
             return this.id;
         }
 
-        public void setId(long id) {
+        public void setId(final long id) {
             this.id = id;
         }
     }

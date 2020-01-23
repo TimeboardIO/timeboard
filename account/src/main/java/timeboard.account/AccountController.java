@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
@@ -51,10 +50,6 @@ import java.util.*;
 public class AccountController {
 
     @Autowired
-    private UserService userService;
-
-
-    @Autowired
     private ProjectService projectService;
 
     @Autowired
@@ -68,7 +63,10 @@ public class AccountController {
 
 
     @PostMapping
-    protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request, Model model) throws BusinessException {
+    protected String handlePost(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest request,
+            final Model model) throws BusinessException {
 
         final String submitButton = request.getParameter("formType");
         final Account actor = authentication.getDetails();
@@ -87,9 +85,8 @@ public class AccountController {
                 actor.setEmail(email);
 
                 try {
-                    final Account u = userService.updateUser(actor);
                     model.addAttribute("message", "User account changed successfully !");
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     model.addAttribute("error", "Error while updating user information.");
                 }
                 break;
@@ -105,9 +102,8 @@ public class AccountController {
                     }
                 }
                 try {
-                    final Account u = userService.updateUser(actor);
                     model.addAttribute("message", "External tools updated successfully !");
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     model.addAttribute("error", "Error while external tools");
                 }
                 break;
@@ -121,13 +117,13 @@ public class AccountController {
     }
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) throws BusinessException {
+    protected String handleGet(final TimeboardAuthentication authentication, final Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
         loadPage(model, actor, authentication.getCurrentOrganization());
         return "account.html";
     }
 
-    private void loadPage(Model model, Account actor, Long orgID) throws BusinessException {
+    private void loadPage(final Model model, final Account actor, final Long orgID) throws BusinessException {
         model.addAttribute("account", actor);
 
         final List<Project> projects = projectService.listProjects(actor, orgID);
@@ -148,9 +144,9 @@ public class AccountController {
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
         dfs.getLocalPatternChars();
         final String[] months = dfs.getMonths();
-        for (int i = start.get(Calendar.MONTH);
+        for (start.get(Calendar.MONTH);
              start.after(end);
-             start.add(Calendar.MONTH, -1), i = start.get(Calendar.DAY_OF_MONTH)) {
+             start.add(Calendar.MONTH, -1), start.get(Calendar.DAY_OF_MONTH)) {
 
             yearsSinceHiring.add(start.get(Calendar.YEAR));
             if (monthsSinceHiring.size() < 12) {

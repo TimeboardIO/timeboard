@@ -33,7 +33,7 @@ public class ValueHistory {
     private Date date;
     private Double value;
 
-    public ValueHistory(Date date, Double value) {
+    public ValueHistory(final Date date, final Double value) {
         this.date = date;
         this.value = value;
     }
@@ -42,7 +42,7 @@ public class ValueHistory {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(final Date date) {
         this.date = date;
     }
 
@@ -50,7 +50,7 @@ public class ValueHistory {
         return value;
     }
 
-    public void setValue(Double value) {
+    public void setValue(final Double value) {
         this.value = value;
     }
 }

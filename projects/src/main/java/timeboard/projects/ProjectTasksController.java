@@ -26,7 +26,6 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,7 +52,6 @@ import java.util.List;
 @RequestMapping("/projects/{projectID}")
 public class ProjectTasksController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     public ProjectService projectService;
@@ -69,8 +67,8 @@ public class ProjectTasksController {
 
     @GetMapping("/tasks")
     protected String listTasks(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID, Model model) throws BusinessException {
+            final TimeboardAuthentication authentication,
+            @PathVariable final Long projectID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
@@ -90,15 +88,15 @@ public class ProjectTasksController {
 
     @GetMapping("/tasks/group/{batchType}")
     protected String listTasksGroupByBatchType(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID, @PathVariable String batchType, Model model) throws BusinessException {
+            final TimeboardAuthentication authentication,
+            @PathVariable final Long projectID, @PathVariable final String batchType, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
         final Task task = new Task();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
+        final BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
         model.addAttribute("batchType", batchType);
         model.addAttribute("batchList", this.projectService.getBatchList(actor, project, javaBatchType));
 
@@ -111,7 +109,7 @@ public class ProjectTasksController {
         return "project_tasks.html";
     }
 
-    private void fillModel(Model model, Long orgID, Account actor, Project project) throws BusinessException {
+    private void fillModel(final Model model, final Long orgID, final Account actor, final Project project) throws BusinessException {
         model.addAttribute("project", project);
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
         model.addAttribute("taskTypes", this.organizationService.listTaskType(orgID));
@@ -125,9 +123,9 @@ public class ProjectTasksController {
 
     @GetMapping("/tasks/{taskID}")
     protected String editTasks(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID,
-            @PathVariable Long taskID, Model model) throws BusinessException {
+            final TimeboardAuthentication authentication,
+            @PathVariable final Long projectID,
+            @PathVariable final Long taskID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
@@ -145,12 +143,12 @@ public class ProjectTasksController {
 
     @PostMapping("/tasks")
     protected String handlePost(
-            TimeboardAuthentication authentication,
-            HttpServletRequest request, Model model, RedirectAttributes attributes) throws BusinessException {
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest request, final Model model, final RedirectAttributes attributes) throws BusinessException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
-        long projectID = Long.parseLong(request.getParameter("projectID"));
+        final long projectID = Long.parseLong(request.getParameter("projectID"));
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
@@ -174,7 +172,7 @@ public class ProjectTasksController {
         private TaskStatus taskStatus;
         private List<Long> batchesID;
 
-        public TaskForm(Task task) {
+        public TaskForm(final Task task) {
             this.taskID = task.getId();
             this.taskType = task.getTaskType();
             if (task.getBatches() != null) {
@@ -196,7 +194,7 @@ public class ProjectTasksController {
             return taskID;
         }
 
-        public void setTaskID(Long taskID) {
+        public void setTaskID(final Long taskID) {
             this.taskID = taskID;
         }
 
@@ -224,7 +222,7 @@ public class ProjectTasksController {
             return assignedUserID;
         }
 
-        public void setAssignedUserID(Long assignedUserID) {
+        public void setAssignedUserID(final Long assignedUserID) {
             this.assignedUserID = assignedUserID;
         }
 
@@ -232,7 +230,7 @@ public class ProjectTasksController {
             return taskTypeID;
         }
 
-        public void setTaskTypeID(Long taskTypeID) {
+        public void setTaskTypeID(final Long taskTypeID) {
             this.taskTypeID = taskTypeID;
         }
 
@@ -240,7 +238,7 @@ public class ProjectTasksController {
             return taskType;
         }
 
-        public void setTaskType(TaskType taskType) {
+        public void setTaskType(final TaskType taskType) {
             this.taskType = taskType;
         }
 
@@ -248,7 +246,7 @@ public class ProjectTasksController {
             return assignedAccount;
         }
 
-        public void setAssignedAccount(Account assignedAccount) {
+        public void setAssignedAccount(final Account assignedAccount) {
             this.assignedAccount = assignedAccount;
         }
 
@@ -256,7 +254,7 @@ public class ProjectTasksController {
             return taskStatus;
         }
 
-        public void setTaskStatus(TaskStatus taskStatus) {
+        public void setTaskStatus(final TaskStatus taskStatus) {
             this.taskStatus = taskStatus;
         }
 
@@ -264,7 +262,7 @@ public class ProjectTasksController {
             return batchesID;
         }
 
-        public void setBatchesID(List<Long> batchesID) {
+        public void setBatchesID(final List<Long> batchesID) {
             this.batchesID = batchesID;
         }
     }

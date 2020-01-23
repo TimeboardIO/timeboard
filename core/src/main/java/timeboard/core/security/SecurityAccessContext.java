@@ -33,7 +33,7 @@ public class SecurityAccessContext {
     private Object action;
     private Object environment;
 
-    public SecurityAccessContext(Object subject, Object resource, Object action, Object environment) {
+    public SecurityAccessContext(final Object subject, final Object resource, final Object action, final Object environment) {
         super();
         this.subject = subject;
         this.resource = resource;
@@ -45,7 +45,7 @@ public class SecurityAccessContext {
         return subject;
     }
 
-    public void setSubject(Object subject) {
+    public void setSubject(final Object subject) {
         this.subject = subject;
     }
 
@@ -53,7 +53,7 @@ public class SecurityAccessContext {
         return resource;
     }
 
-    public void setResource(Object resource) {
+    public void setResource(final Object resource) {
         this.resource = resource;
     }
 
@@ -61,7 +61,7 @@ public class SecurityAccessContext {
         return action;
     }
 
-    public void setAction(Object action) {
+    public void setAction(final Object action) {
         this.action = action;
     }
 
@@ -69,7 +69,7 @@ public class SecurityAccessContext {
         return environment;
     }
 
-    public void setEnvironment(Object environment) {
+    public void setEnvironment(final Object environment) {
         this.environment = environment;
     }
 
@@ -85,7 +85,7 @@ public class SecurityAccessContext {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -95,7 +95,7 @@ public class SecurityAccessContext {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        SecurityAccessContext other = (SecurityAccessContext) obj;
+        final SecurityAccessContext other = (SecurityAccessContext) obj;
         if (equalsAction(action)) {
             return false;
         }
@@ -112,7 +112,7 @@ public class SecurityAccessContext {
         }
     }
 
-    private boolean equalsAction(Object action) {
+    private boolean equalsAction(final Object action) {
         if (action == null) {
             if (action != null) {
                 return true;

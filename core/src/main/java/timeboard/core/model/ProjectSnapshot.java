@@ -65,8 +65,14 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         this.taskSnapshots = new ArrayList<>();
     }
 
-    public ProjectSnapshot(Long id, Date projectSnapshotDate, List<TaskSnapshot> taskSnapshots, Project project, double originalEstimate,
-                           double effortLeft, double effortSpent, double realEffort, double quotation) {
+    public ProjectSnapshot(final Long id,
+                           final Date projectSnapshotDate,
+                           final List<TaskSnapshot> taskSnapshots,
+                           final Project project,
+                           final double originalEstimate,
+                           final double effortLeft,
+                           final double effortSpent,
+                           final double quotation) {
         this.id = id;
         this.projectSnapshotDate = projectSnapshotDate;
         this.taskSnapshots = taskSnapshots;
@@ -81,7 +87,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -89,7 +95,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return projectSnapshotDate;
     }
 
-    public void setProjectSnapshotDate(Date projectSnapshotDate) {
+    public void setProjectSnapshotDate(final Date projectSnapshotDate) {
         this.projectSnapshotDate = projectSnapshotDate;
     }
 
@@ -97,7 +103,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return taskSnapshots;
     }
 
-    public void setTaskSnapshots(List<TaskSnapshot> taskSnapshots) {
+    public void setTaskSnapshots(final List<TaskSnapshot> taskSnapshots) {
         this.taskSnapshots = taskSnapshots;
     }
 
@@ -105,7 +111,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(final Project project) {
         this.project = project;
     }
 
@@ -113,7 +119,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return originalEstimate;
     }
 
-    public void setOriginalEstimate(double originalEstimate) {
+    public void setOriginalEstimate(final double originalEstimate) {
         this.originalEstimate = originalEstimate;
     }
 
@@ -121,7 +127,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return effortLeft;
     }
 
-    public void setEffortLeft(double effortLeft) {
+    public void setEffortLeft(final double effortLeft) {
         this.effortLeft = effortLeft;
     }
 
@@ -129,7 +135,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return effortSpent;
     }
 
-    public void setEffortSpent(double effortSpent) {
+    public void setEffortSpent(final double effortSpent) {
         this.effortSpent = effortSpent;
     }
 
@@ -141,7 +147,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         return quotation;
     }
 
-    public void setQuotation(double quotation) {
+    public void setQuotation(final double quotation) {
         this.quotation = quotation;
     }
 }

@@ -67,7 +67,7 @@ public class VacationRequest extends OrganizationEntity {
     public VacationRequest() {
     }
 
-    public VacationRequest(VacationRequest other) {
+    public VacationRequest(final VacationRequest other) {
         this.label = other.label;
         this.status = other.status;
         this.startDate = other.startDate;
@@ -82,7 +82,7 @@ public class VacationRequest extends OrganizationEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -90,7 +90,7 @@ public class VacationRequest extends OrganizationEntity {
         return label;
     }
 
-    public void setLabel(String description) {
+    public void setLabel(final String description) {
         this.label = description;
     }
 
@@ -98,7 +98,7 @@ public class VacationRequest extends OrganizationEntity {
         return status;
     }
 
-    public void setStatus(VacationRequestStatus status) {
+    public void setStatus(final VacationRequestStatus status) {
         this.status = status;
     }
 
@@ -106,7 +106,7 @@ public class VacationRequest extends OrganizationEntity {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -114,7 +114,7 @@ public class VacationRequest extends OrganizationEntity {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(final Date endDate) {
         this.endDate = endDate;
     }
 
@@ -122,7 +122,7 @@ public class VacationRequest extends OrganizationEntity {
         return startHalfDay;
     }
 
-    public void setStartHalfDay(HalfDay startHalfDay) {
+    public void setStartHalfDay(final HalfDay startHalfDay) {
         this.startHalfDay = startHalfDay;
     }
 
@@ -130,7 +130,7 @@ public class VacationRequest extends OrganizationEntity {
         return endHalfDay;
     }
 
-    public void setEndHalfDay(HalfDay endHalfDay) {
+    public void setEndHalfDay(final HalfDay endHalfDay) {
         this.endHalfDay = endHalfDay;
     }
 
@@ -138,7 +138,7 @@ public class VacationRequest extends OrganizationEntity {
         return assignee;
     }
 
-    public void setAssignee(Account assignee) {
+    public void setAssignee(final Account assignee) {
         this.assignee = assignee;
     }
 
@@ -146,7 +146,7 @@ public class VacationRequest extends OrganizationEntity {
         return applicant;
     }
 
-    public void setApplicant(Account applicant) {
+    public void setApplicant(final Account applicant) {
         this.applicant = applicant;
     }
 
@@ -154,7 +154,7 @@ public class VacationRequest extends OrganizationEntity {
         return parent;
     }
 
-    public void setParent(RecursiveVacationRequest parent) {
+    public void setParent(final RecursiveVacationRequest parent) {
         this.parent = parent;
     }
 

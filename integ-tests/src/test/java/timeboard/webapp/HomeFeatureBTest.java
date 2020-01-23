@@ -58,7 +58,7 @@ public class HomeFeatureBTest extends TimeboardTest {
 
 
     @Given("^user with an existing account and (\\d+) project in (\\d+) org \\(A\\) and (\\d+) in an other org \\(B\\)$")
-    public void user_with_an_existing_account_and_project_in_org_A_and_in_an_other_org_B(int arg1, int arg2, int arg3) throws Throwable {
+    public void user_with_an_existing_account_and_project_in_org_A_and_in_an_other_org_B(final int arg1, final int arg2, final int arg3) throws Throwable {
         this.model = new ConcurrentModel();
 
         this.organisationA = this.organizationService.createOrganization("Integration A", Collections.emptyMap());
@@ -95,7 +95,7 @@ public class HomeFeatureBTest extends TimeboardTest {
     }
 
     @Then("^the user receives (\\d+) project from org A$")
-    public void the_user_receives_project_form_org_A(int arg1) throws Throwable {
+    public void the_user_receives_project_form_org_A(final int arg1) throws Throwable {
         Assert.assertEquals(this.model.asMap().get(HomeController.NB_PROJECTS), arg1);
     }
 

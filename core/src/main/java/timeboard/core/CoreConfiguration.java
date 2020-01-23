@@ -26,8 +26,6 @@ package timeboard.core;
  * #L%
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -36,7 +34,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
 import timeboard.core.model.Organization;
 
 import javax.annotation.PostConstruct;
@@ -51,13 +48,8 @@ import java.util.Optional;
 @EnableTransactionManagement
 public class CoreConfiguration {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CoreConfiguration.class);
-
     @Autowired
     private OrganizationService organizationService;
-
-    @Autowired
-    private ProjectService projectService;
 
     @Value("${timeboard.organizations.default}")
     private String defaultOrganizationName;
@@ -78,7 +70,6 @@ public class CoreConfiguration {
             this.organizationService.createOrganization(this.defaultOrganizationName, props);
         }
 
-        //TODO remove when migration is ok
         this.organizationService.checkOrganizationVacationTask(defaultVacationTaskName);
 
 

@@ -68,10 +68,10 @@ public class ProjectTasksSyncController {
 
     @PostMapping(value = "/{serviceName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     protected String importFromJIRA(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID,
-            @PathVariable String serviceName,
-            @RequestBody MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
+            final TimeboardAuthentication authentication,
+            @PathVariable final Long projectID,
+            @PathVariable final String serviceName,
+            @RequestBody final MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
@@ -88,7 +88,7 @@ public class ProjectTasksSyncController {
         this.projectSyncService.syncProjectTasks(authentication.getCurrentOrganization(), actor, project, serviceName, creds);
 
         // Job launched recursively
-        CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/1 * 1/1 * ? *");
+        final CronScheduleBuilder cronScheduleBuilder = CronScheduleBuilder.cronSchedule("0 0/1 * 1/1 * ? *");
         this.projectSyncService.syncProjectTasksWithSchedule(authentication.getCurrentOrganization(), actor, project,
                 serviceName, creds, cronScheduleBuilder);
 
@@ -97,11 +97,11 @@ public class ProjectTasksSyncController {
     }
 
     @GetMapping(value = "/inProgress")
-    protected ResponseEntity handleGet(TimeboardAuthentication authentication, @PathVariable Long projectID)
+    protected ResponseEntity handleGet(final TimeboardAuthentication authentication, @PathVariable final Long projectID)
             throws JsonProcessingException, SchedulerException {
 
 
-        Optional<JobExecutionContext> jobInProgress = scheduler.getCurrentlyExecutingJobs()
+        final Optional<JobExecutionContext> jobInProgress = scheduler.getCurrentlyExecutingJobs()
                 .stream()
                 .filter(jobExecutionContext -> jobExecutionContext.getJobDetail().getKey().getName().equals(projectID.toString()))
                 .findFirst();

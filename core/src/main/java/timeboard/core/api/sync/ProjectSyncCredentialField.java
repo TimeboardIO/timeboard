@@ -36,7 +36,7 @@ public class ProjectSyncCredentialField implements Serializable {
     private String value;
     private int weight;
 
-    public ProjectSyncCredentialField(String fieldKey, String fieldName, Type fieldType, int weight) {
+    public ProjectSyncCredentialField(final String fieldKey, final String fieldName, final Type fieldType, final int weight) {
         this.fieldKey = fieldKey;
         this.fieldName = fieldName;
         this.fieldType = fieldType;
@@ -47,7 +47,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
@@ -55,7 +55,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return weight;
     }
 
-    public void setWeight(int weight) {
+    public void setWeight(final int weight) {
         this.weight = weight;
     }
 
@@ -63,7 +63,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return fieldKey;
     }
 
-    public void setFieldKey(String fieldKey) {
+    public void setFieldKey(final String fieldKey) {
         this.fieldKey = fieldKey;
     }
 
@@ -71,7 +71,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return fieldName;
     }
 
-    public void setFieldName(String fieldName) {
+    public void setFieldName(final String fieldName) {
         this.fieldName = fieldName;
     }
 
@@ -79,7 +79,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return fieldType;
     }
 
-    public void setFieldType(Type fieldType) {
+    public void setFieldType(final Type fieldType) {
         this.fieldType = fieldType;
     }
 
@@ -89,7 +89,7 @@ public class ProjectSyncCredentialField implements Serializable {
 
         private String name;
 
-        private Type(String v) {
+        private Type(final String v) {
             this.name = v;
         }
 

@@ -43,7 +43,7 @@ public class TimesheetNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationParams() {
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.setTime(new Date());
 
         return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));

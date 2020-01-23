@@ -45,14 +45,14 @@ public class SpelDeserializer extends StdDeserializer<Expression> {
         this(null);
     }
 
-    protected SpelDeserializer(Class<?> vc) {
+    protected SpelDeserializer(final Class<?> vc) {
         super(vc);
     }
 
     @Override
-    public Expression deserialize(JsonParser jp, DeserializationContext ctxt)
+    public Expression deserialize(final JsonParser jp, final DeserializationContext ctxt)
             throws IOException, JsonProcessingException {
-        String expresionString = jp.getCodec().readValue(jp, String.class);
+        final String expresionString = jp.getCodec().readValue(jp, String.class);
         return elParser.parseExpression(expresionString);
     }
 

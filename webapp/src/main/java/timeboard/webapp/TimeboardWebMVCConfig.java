@@ -52,9 +52,6 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     private WebRessourcesInterceptor webRessourcesInterceptor;
 
     @Autowired
-    private OrganizationFilter organizationInterceptor;
-
-    @Autowired
     private LongToProjectConverter longToProjectConverter;
 
     @Autowired
@@ -62,7 +59,7 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
 
     @Bean
     public MessageSource messageSource() {
-        ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+        final ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
         messageSource.setBasename("i18n/messages");
         messageSource.setDefaultEncoding("UTF-8");
         messageSource.setUseCodeAsDefaultMessage(true);
@@ -78,14 +75,14 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
 
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
-        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        final LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
         lci.setParamName("lang");
         return lci;
     }
 
 
     @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    public void addResourceHandlers(final ResourceHandlerRegistry registry) {
         registry
                 .addResourceHandler("/webjars/**")
                 .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
@@ -94,13 +91,13 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(final InterceptorRegistry registry) {
         registry.addWebRequestInterceptor(this.webRessourcesInterceptor);
         registry.addInterceptor(localeChangeInterceptor());
     }
 
     @Override
-    public void addFormatters(FormatterRegistry registry) {
+    public void addFormatters(final FormatterRegistry registry) {
         registry.addConverter(this.longToProjectConverter);
         registry.addConverter(this.longToVacationRequestConverter);
     }

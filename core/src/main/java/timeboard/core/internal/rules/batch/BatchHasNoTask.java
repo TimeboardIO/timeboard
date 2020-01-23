@@ -38,7 +38,7 @@ public class BatchHasNoTask implements Rule<Batch> {
     }
 
     @Override
-    public boolean isSatisfied(Account u, Batch thing) {
+    public boolean isSatisfied(final Account u, final Batch thing) {
         return thing.getTasks().isEmpty();
     }
 }

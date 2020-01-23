@@ -39,18 +39,18 @@ public class UserNotificationStructure {
     private List<TimeboardEvent> notificationEventList;
     private List<TimeboardEvent> informEventList;
 
-    public UserNotificationStructure(Account targetAccount) {
+    public UserNotificationStructure(final Account targetAccount) {
         this.targetAccount = targetAccount;
         notificationEventList = new ArrayList<>();
         informEventList = new ArrayList<>();
 
     }
 
-    public void notify(TimeboardEvent event) {
+    public void notify(final TimeboardEvent event) {
         notificationEventList.add(event);
     }
 
-    public void inform(TimeboardEvent event) {
+    public void inform(final TimeboardEvent event) {
         informEventList.add(event);
     }
 

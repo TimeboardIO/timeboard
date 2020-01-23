@@ -43,23 +43,23 @@ public class ProjectEmailSummaryModel {
 
     private List<TaskEvent> deniedTasks = new ArrayList<>();
 
-    public ProjectEmailSummaryModel(Project p) {
+    public ProjectEmailSummaryModel(final Project p) {
         this.project = p;
     }
 
-    public void addCreatedTask(TaskEvent e) {
+    public void addCreatedTask(final TaskEvent e) {
         createdTasks.add(e);
     }
 
-    public void addDeletedTask(TaskEvent e) {
+    public void addDeletedTask(final TaskEvent e) {
         deletedTasks.add(e);
     }
 
-    public void addApprovedTask(TaskEvent e) {
+    public void addApprovedTask(final TaskEvent e) {
         approvedTasks.add(e);
     }
 
-    public void addDeniedTask(TaskEvent e) {
+    public void addDeniedTask(final TaskEvent e) {
         deniedTasks.add(e);
     }
 

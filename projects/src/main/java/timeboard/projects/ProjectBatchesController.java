@@ -26,6 +26,8 @@ package timeboard.projects;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,20 +48,22 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects/{projectID}/batches")
 public class ProjectBatchesController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
+
     @Autowired
     public ProjectService projectService;
 
     @GetMapping(value = "/{batchID}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public String deleteBatch(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID,
-            @PathVariable Long batchID,
-            RedirectAttributes attributes) {
+            final TimeboardAuthentication authentication,
+            @PathVariable final Long projectID,
+            @PathVariable final Long batchID,
+            final RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
         try {
             this.projectService.deleteBatchByID(actor, batchID);
-        } catch (BusinessException e) {
+        } catch (final BusinessException e) {
             attributes.addFlashAttribute("error", e.getMessage());
         }
 
@@ -67,8 +71,8 @@ public class ProjectBatchesController {
     }
 
     @GetMapping
-    protected String batchApp(TimeboardAuthentication authentication,
-                              @PathVariable Long projectID, Model model) throws BusinessException {
+    protected String batchApp(final TimeboardAuthentication authentication,
+                              @PathVariable final Long projectID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
@@ -80,9 +84,9 @@ public class ProjectBatchesController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<BatchDecorator> createBatch(TimeboardAuthentication authentication,
-                                                         @ModelAttribute BatchWrapper batch,
-                                                         @PathVariable Long projectID) throws BusinessException {
+    protected ResponseEntity<BatchDecorator> createBatch(final TimeboardAuthentication authentication,
+                                                         @ModelAttribute final BatchWrapper batch,
+                                                         @PathVariable final Long projectID) throws BusinessException {
 
 
         final Account actor = authentication.getDetails();
@@ -111,8 +115,8 @@ public class ProjectBatchesController {
 
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
-    protected ResponseEntity<List<BatchDecorator>> listBatches(TimeboardAuthentication authentication,
-                                                               @PathVariable Long projectID) throws BusinessException {
+    protected ResponseEntity<List<BatchDecorator>> listBatches(final TimeboardAuthentication authentication,
+                                                               @PathVariable final Long projectID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
@@ -124,14 +128,14 @@ public class ProjectBatchesController {
 
 
     @GetMapping(value = "/{batchID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<BatchDecorator> setupBatch(TimeboardAuthentication authentication,
-                                                        @PathVariable Long projectID,
-                                                        @PathVariable Long batchID,
-                                                        Model model) throws BusinessException {
+    protected ResponseEntity<BatchDecorator> setupBatch(final TimeboardAuthentication authentication,
+                                                        @PathVariable final Long projectID,
+                                                        @PathVariable final Long batchID,
+                                                        final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
-        Batch batch = this.projectService.getBatchById(actor, batchID);
+        final Batch batch = this.projectService.getBatchById(actor, batchID);
         model.addAttribute("batch", batch);
         model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, batch));
 
@@ -141,41 +145,21 @@ public class ProjectBatchesController {
 
 
     @GetMapping("/create")
-    protected String createBatchView(TimeboardAuthentication authentication,
-                                     @PathVariable Long projectID, Model model) throws BusinessException {
+    protected String createBatchView(final TimeboardAuthentication authentication,
+                                     @PathVariable final Long projectID, final Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
 
         model.addAttribute("batch", new Batch());
 
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        fillModelWithBatches(model, actor, project);
+        this.fillModelWithBatches(model, actor, project);
 
         return "project_batches_config.html";
 
     }
 
 
-    private Map<String, String> getCurrentBatchAttributes(HttpServletRequest request) {
-        Map<String, String> attributes = new HashMap<>();
-
-        String newAttrKey = request.getParameter("newAttrKey");
-        String newAttrValue = request.getParameter("newAttrValue");
-        if (!newAttrKey.isEmpty()) {
-            attributes.put(newAttrKey, newAttrValue);
-        }
-        Enumeration<String> paramNames = request.getParameterNames();
-        while (paramNames.hasMoreElements()) {
-            String param = paramNames.nextElement();
-            if (param.startsWith("attr-")) {
-                String key = param.substring(5);
-                String value = request.getParameter(param);
-                attributes.put(key, value);
-            }
-        }
-        return attributes;
-    }
-
-    private void fillModelWithBatches(Model model, Account actor, Project project) throws BusinessException {
+    private void fillModelWithBatches(final Model model, final Account actor, final Project project) throws BusinessException {
         model.addAttribute("project", project);
         model.addAttribute("batches", this.projectService.listProjectBatches(actor, project));
         model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
@@ -183,18 +167,18 @@ public class ProjectBatchesController {
     }
 
 
-    protected String createConfigLinks(Account actor,
-                                       long orgID,
-                                       HttpServletRequest request,
-                                       Model model) throws BusinessException {
+    protected String createConfigLinks(final Account actor,
+                                       final long orgID,
+                                       final HttpServletRequest request,
+                                       final Model model) throws BusinessException {
 
-        long projectID = Long.parseLong(request.getParameter("projectID"));
-        Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+        final long projectID = Long.parseLong(request.getParameter("projectID"));
+        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
         Batch currentBatch = null;
 
         try {
 
-            Long batchID = Long.parseLong(request.getParameter("batchID"));
+            final Long batchID = Long.parseLong(request.getParameter("batchID"));
             currentBatch = this.projectService.getBatchById(actor, batchID);
             currentBatch = addTasksToBatch(actor, currentBatch, request);
 
@@ -202,36 +186,36 @@ public class ProjectBatchesController {
 
             model.addAttribute("allProjectTasks", this.projectService.listProjectTasks(actor, project));
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             model.addAttribute("error", e);
-        } finally {
-
-            model.addAttribute("project", project);
-            model.addAttribute("batches", this.projectService.listProjectBatches(actor, project));
-            model.addAttribute("allBatchTypes", BatchType.values());
-            model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, currentBatch));
-            return "details_project_batches_config_links.html";
         }
+
+        model.addAttribute("project", project);
+        model.addAttribute("batches", this.projectService.listProjectBatches(actor, project));
+        model.addAttribute("allBatchTypes", BatchType.values());
+        model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, currentBatch));
+        return "details_project_batches_config_links.html";
+
     }
 
-    private Batch addTasksToBatch(Account actor,
-                                  Batch currentBatch,
-                                  HttpServletRequest request) throws BusinessException {
+    private Batch addTasksToBatch(final Account actor,
+                                  final Batch currentBatch,
+                                  final HttpServletRequest request) throws BusinessException {
 
-        String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
-        List<Task> selectedTasks = Arrays
+        final String[] selectedTaskIdsString = request.getParameterValues("taskSelected");
+        final List<Task> selectedTasks = Arrays
                 .stream(selectedTaskIdsString)
                 .map(id -> {
                     Task t = null;
                     try {
                         t = (Task) projectService.getTaskByID(actor, Long.getLong(id));
                     } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        return t;
+                        LOGGER.error(e.getMessage());
                     }
+                    return t;
+
                 }).collect(Collectors.toList());
-        List<Task> oldTasks = this.projectService.listTasksByBatch(actor, currentBatch);
+        final List<Task> oldTasks = this.projectService.listTasksByBatch(actor, currentBatch);
 
         return this.projectService.addTasksToBatch(actor, currentBatch, selectedTasks, oldTasks);
     }
@@ -247,7 +231,7 @@ public class ProjectBatchesController {
             return id;
         }
 
-        public void setId(Long id) {
+        public void setId(final Long id) {
             this.id = id;
         }
 
@@ -255,7 +239,7 @@ public class ProjectBatchesController {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -263,7 +247,7 @@ public class ProjectBatchesController {
             return type;
         }
 
-        public void setType(BatchType type) {
+        public void setType(final BatchType type) {
             this.type = type;
         }
 
@@ -271,7 +255,7 @@ public class ProjectBatchesController {
             return date;
         }
 
-        public void setDate(Date date) {
+        public void setDate(final Date date) {
             this.date = date;
         }
 
@@ -289,7 +273,7 @@ public class ProjectBatchesController {
         public BatchDecorator() {
         }
 
-        public BatchDecorator(Batch batch) {
+        public BatchDecorator(final Batch batch) {
             this.batch = batch;
         }
 

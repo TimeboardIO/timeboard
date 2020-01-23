@@ -28,19 +28,19 @@ package timeboard.core.api;
 
 public interface NavigationExtPoint {
 
-    public String getNavigationLabel();
+    String getNavigationLabel();
 
-    public String getNavigationPath();
+    String getNavigationPath();
 
-    public default int getNavigationWeight() {
+    default int getNavigationWeight() {
         return 0;
     }
 
-    public default String getNavigationLogo() {
+    default String getNavigationLogo() {
         return "hourglass";
     }
 
-    public default String getNavigationParams() {
+    default String getNavigationParams() {
         return "";
     }
 

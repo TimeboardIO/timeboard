@@ -58,7 +58,7 @@ public class ProjectsController {
 
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+    protected String handleGet(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
         List<Project> allActorProjects = this.projectService.listProjects(actor, authentication.getCurrentOrganization());
         Collections.reverse(allActorProjects);
@@ -71,7 +71,7 @@ public class ProjectsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ProjectDecorator>> projectList(TimeboardAuthentication authentication, Model model) {
+    protected ResponseEntity<List<ProjectDecorator>> projectList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
         final List<ProjectDecorator> projects = this.projectService.listProjects(actor, authentication.getCurrentOrganization())
                 .stream()
@@ -81,18 +81,16 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request,
-                                RedirectAttributes attributes) throws BusinessException {
-        final Account actor = authentication.getDetails();
+    protected String handlePost(final HttpServletRequest request,
+                                final RedirectAttributes attributes) throws BusinessException {
         try {
-            Project prj = this.projectService.createProject(actor, request.getParameter("projectName"));
             attributes.addFlashAttribute("success", "Project created successfully.");
             return "redirect:/projects";
-        }catch(PersistenceException e){
-            attributes.addFlashAttribute("errorCreateProject", "The name \""+ request.getParameter("projectName")
-                    +"\" is already used by another project in this organization");
+        } catch (final PersistenceException e) {
+            attributes.addFlashAttribute("errorCreateProject", "The name \"" + request.getParameter("projectName")
+                    + "\" is already used by another project in this organization");
             return "redirect:/projects/create";
-        }catch(Exception e){
+        } catch (final Exception e) {
             attributes.addFlashAttribute("errorCreateProject", "Error while project's creation");
             return "redirect:/projects/create";
         }
@@ -104,8 +102,8 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(TimeboardAuthentication authentication,
-                                   @PathVariable long projectID, RedirectAttributes attributes) throws BusinessException {
+    protected String deleteProject(final TimeboardAuthentication authentication,
+                                   @PathVariable final long projectID, final RedirectAttributes attributes) throws BusinessException {
 
         final Project project = this.projectService.getProjectByID(authentication.getDetails(), authentication.getCurrentOrganization(), projectID);
         this.projectService.archiveProjectByID(authentication.getDetails(), project);
@@ -119,7 +117,7 @@ public class ProjectsController {
 
         private final Project project;
 
-        public ProjectDecorator(Project project) {
+        public ProjectDecorator(final Project project) {
             this.project = project;
         }
 

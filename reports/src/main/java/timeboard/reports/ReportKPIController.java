@@ -26,6 +26,8 @@ package timeboard.reports;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +53,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequestMapping("/data-chart/report-kpi")
 public class ReportKPIController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportKPIController.class);
+
     @Autowired
     private ReportService reportService;
 
@@ -59,8 +63,8 @@ public class ReportKPIController {
 
 
     @GetMapping("/{reportID}")
-    protected ResponseEntity getDataChart(TimeboardAuthentication authentication,
-                                          @PathVariable long reportID, Model model) {
+    protected ResponseEntity getDataChart(final TimeboardAuthentication authentication,
+                                          @PathVariable final long reportID, final Model model) {
 
         final Account actor = authentication.getDetails();
         final Report report = this.reportService.getReportByID(actor, reportID);
@@ -80,13 +84,13 @@ public class ReportKPIController {
 
         listOfProjectsFiltered.forEach(projectWrapper -> {
             try {
-                ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, projectWrapper.getProject());
-                originalEstimate.updateAndGet(v -> (v + currentProjectDashboard.getOriginalEstimate()));
-                effortLeft.updateAndGet(v -> (v + currentProjectDashboard.getEffortLeft()));
-                effortSpent.updateAndGet(v -> (v + currentProjectDashboard.getEffortSpent()));
-                quotation.updateAndGet(v -> (v + currentProjectDashboard.getQuotation()));
-            } catch (BusinessException e) {
-                e.printStackTrace();
+                final ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, projectWrapper.getProject());
+                originalEstimate.updateAndGet(v -> v + currentProjectDashboard.getOriginalEstimate());
+                effortLeft.updateAndGet(v -> v + currentProjectDashboard.getEffortLeft());
+                effortSpent.updateAndGet(v -> v + currentProjectDashboard.getEffortSpent());
+                quotation.updateAndGet(v -> v + currentProjectDashboard.getQuotation());
+            } catch (final BusinessException e) {
+                LOGGER.error(e.getMessage());
             }
         });
 

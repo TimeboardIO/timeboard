@@ -94,7 +94,7 @@ public interface ReportService {
         private final String tagKey;
         private final String tagValue;
 
-        public TagWrapper(String tagKey, String tagValue) {
+        public TagWrapper(final String tagKey, final String tagValue) {
             this.tagKey = tagKey;
             this.tagValue = tagValue;
         }

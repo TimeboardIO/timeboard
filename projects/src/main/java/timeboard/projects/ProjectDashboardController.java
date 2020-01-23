@@ -52,8 +52,8 @@ public class ProjectDashboardController {
 
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication,
-                               @PathVariable Long projectID, Model model) throws BusinessException {
+    protected String handleGet(final TimeboardAuthentication authentication,
+                               @PathVariable final Long projectID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);

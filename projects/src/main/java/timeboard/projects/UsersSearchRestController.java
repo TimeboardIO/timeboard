@@ -26,7 +26,6 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,7 +40,6 @@ import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,7 +54,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/search")
 public class UsersSearchRestController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     @Autowired
     private UserService userService;
 
@@ -67,11 +64,13 @@ public class UsersSearchRestController {
     private ProjectService projectService;
 
     @GetMapping
-    protected ResponseEntity<SearchResults> doGet(TimeboardAuthentication authentication,
-                                                  HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+    protected ResponseEntity<SearchResults> doGet(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest req,
+            final HttpServletResponse resp) throws BusinessException {
 
-        String query = req.getParameter("q");
-        Account actor = authentication.getDetails();
+        final String query = req.getParameter("q");
+        final Account actor = authentication.getDetails();
 
         if (query.isBlank() || query.isEmpty()) {
             throw new BusinessException("Query is empty");
@@ -87,19 +86,19 @@ public class UsersSearchRestController {
             orgID = authentication.getCurrentOrganization();
         }
 
-        Set<Account> accounts = new HashSet<>();
+        final Set<Account> accounts = new HashSet<>();
 
         if (projectID != null) {
-            Project project = projectService.getProjectByIdWithAllMembers(actor, projectID);
+            final Project project = projectService.getProjectByIdWithAllMembers(actor, projectID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
         } else if (orgID != null) {
-            Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
+            final Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
         } else {
             accounts.addAll(this.userService.searchUserByEmail(actor, query));
         }
 
-        SearchResults searchResults = new SearchResults(accounts.size(), accounts);
+        final SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
         return ResponseEntity.ok(searchResults);
     }
@@ -107,11 +106,11 @@ public class UsersSearchRestController {
     @GetMapping("/byRole")
     protected ResponseEntity<SearchResults> doGetMembersProjects(
             final TimeboardAuthentication authentication,
-            final HttpServletRequest req, HttpServletResponse resp) throws BusinessException {
+            final HttpServletRequest req, final HttpServletResponse resp) throws BusinessException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
-        String query = req.getParameter("q");
+        final String query = req.getParameter("q");
         if (query.isBlank() || query.isEmpty()) {
             throw new BusinessException("Query is empty");
         }
@@ -126,20 +125,20 @@ public class UsersSearchRestController {
             role = req.getParameter("role").equals("OWNER") ? MembershipRole.OWNER : MembershipRole.CONTRIBUTOR;
         }
 
-        List<Account> accounts = new ArrayList<>();
+        final List<Account> accounts = new ArrayList<>();
         if (orgID != null) {
-            List<Project> myProjects = projectService.listProjects(actor, orgID)
+            final List<Project> myProjects = projectService.listProjects(actor, orgID)
                     .stream()
                     .filter(project -> project.isMember(actor))
                     .collect(Collectors.toList());
 
-            List<Account> myManagers = new ArrayList<>();
-            MembershipRole finalRole = role;
+            final List<Account> myManagers = new ArrayList<>();
+            final MembershipRole finalRole = role;
             myProjects
                     .stream()
                     .map(project -> project.getMemberShipsByRole(finalRole))
                     .forEach(projectMembershipOwners -> {
-                        for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
+                        for (final ProjectMembership projectMembershipOwner : projectMembershipOwners) {
                             if (projectMembershipOwner.getMember().getEmail().startsWith(query)
                                     && !myManagers.contains(projectMembershipOwner.getMember())) {
                                 myManagers.add(projectMembershipOwner.getMember());
@@ -153,7 +152,7 @@ public class UsersSearchRestController {
             throw new BusinessException("OrganizationID is null");
         }
 
-        SearchResults searchResults = new SearchResults(accounts.size(), accounts);
+        final SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
         return ResponseEntity.ok(searchResults);
     }
@@ -162,7 +161,7 @@ public class UsersSearchRestController {
         private Long id;
         private String screenName;
 
-        public SearchResult(Account a) {
+        public SearchResult(final Account a) {
             this.id = a.getId();
             this.screenName = a.getScreenName();
         }
@@ -171,7 +170,7 @@ public class UsersSearchRestController {
             return id;
         }
 
-        public void setId(Long id) {
+        public void setId(final Long id) {
             this.id = id;
         }
 
@@ -179,7 +178,7 @@ public class UsersSearchRestController {
             return screenName;
         }
 
-        public void setScreenName(String screenName) {
+        public void setScreenName(final String screenName) {
             this.screenName = screenName;
         }
 
@@ -190,11 +189,11 @@ public class UsersSearchRestController {
         private Integer count;
         private Collection<SearchResult> items;
 
-        public SearchResults(Integer count, Collection<Account> items) {
+        public SearchResults(final Integer count, final Collection<Account> items) {
             this.count = count;
             this.items = new ArrayList<>();
 
-            for (Account a : items) {
+            for (final Account a : items) {
                 this.items.add(new SearchResult(a));
             }
         }
@@ -203,7 +202,7 @@ public class UsersSearchRestController {
             return count;
         }
 
-        public void setCount(Integer count) {
+        public void setCount(final Integer count) {
 
             this.count = count;
         }
@@ -212,7 +211,7 @@ public class UsersSearchRestController {
             return items;
         }
 
-        public void setItems(List<SearchResult> items) {
+        public void setItems(final List<SearchResult> items) {
             this.items = items;
         }
     }

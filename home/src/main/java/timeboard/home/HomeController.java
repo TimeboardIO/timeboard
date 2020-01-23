@@ -65,29 +65,29 @@ public class HomeController {
     }
 
     @GetMapping
-    public String handleGet(TimeboardAuthentication authentication, Model model) {
+    public String handleGet(final TimeboardAuthentication authentication, final Model model) {
 
 
         //load previous weeks data
-        Date d = new Date();
-        Calendar calendar = Calendar.getInstance();
+        final Date d = new Date();
+        final Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
-        List<Week> weeks = new ArrayList<>();
+        final List<Week> weeks = new ArrayList<>();
         final Account account = authentication.getDetails();
-        int weeksToDisplay = 3; // actual week and the two previous ones
+        final int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                boolean weekIsSubmitted = timesheetService.isTimesheetSubmitted(
+                final boolean weekIsSubmitted = timesheetService.isTimesheetSubmitted(
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
                 calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
-                Date firstDayOfWeek = calendar.getTime();
+                final Date firstDayOfWeek = calendar.getTime();
                 calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
-                Date lastDayOfWeek = calendar.getTime();
-                Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, account);
+                final Date lastDayOfWeek = calendar.getTime();
+                final Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, account);
 
-                Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsSubmitted);
+                final Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsSubmitted);
                 weeks.add(week);
                 calendar.roll(Calendar.WEEK_OF_YEAR, -1);
             }

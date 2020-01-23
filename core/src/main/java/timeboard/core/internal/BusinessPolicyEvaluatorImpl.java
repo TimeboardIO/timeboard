@@ -51,7 +51,7 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     private int limitTasksByProject;
 
     @Override
-    public boolean checkProjectByUserLimit(Account actor) throws CommercialException {
+    public boolean checkProjectByUserLimit(final Account actor) throws CommercialException {
         final int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
             throw new CommercialException("Limit reached",
@@ -62,7 +62,7 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     }
 
     @Override
-    public boolean checkTaskByProjectLimit(Account actor, Project project) throws CommercialException {
+    public boolean checkTaskByProjectLimit(final Account actor, final Project project) throws CommercialException {
         final int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
             throw new CommercialException("Limit reached",
@@ -73,7 +73,7 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     }
 
     @Override
-    public int getNumberProjectsByUser(Account account) {
+    public int getNumberProjectsByUser(final Account account) {
         final TypedQuery<Object> query = this.entityManager.createQuery(
                 "select count(p) from " +
                         "Project p join p.members memberships " +
@@ -83,7 +83,7 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     }
 
     @Override
-    public int getNumberTasksByProject(Account account, Project project) {
+    public int getNumberTasksByProject(final Account account, final Project project) {
         final TypedQuery<Object> q = this.entityManager.createQuery(
                 "select count(t) from Task t where t.project = :project", Object.class);
         q.setParameter("project", project);

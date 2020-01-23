@@ -43,15 +43,15 @@ public final class AbacPermissionEvaluator implements PermissionEvaluator {
     PolicyEnvironment policyEnvironment;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+    public boolean hasPermission(final Authentication authentication, final Object targetDomainObject, final Object permission) {
         // Getting subject
-        TimeboardAuthentication user = (TimeboardAuthentication) authentication;
+        final TimeboardAuthentication user = (TimeboardAuthentication) authentication;
 
         return policy.check(user, targetDomainObject, permission, policyEnvironment);
     }
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+    public boolean hasPermission(final Authentication authentication, final Serializable targetId, final String targetType, final Object permission) {
         return false;
     }
 }

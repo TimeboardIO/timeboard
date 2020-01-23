@@ -31,7 +31,7 @@ public class CommercialException extends Exception {
     private String errCause;
     private String errMsg;
 
-    public CommercialException(String errCause, String errMsg) {
+    public CommercialException(final String errCause, final String errMsg) {
         this.errCause = errCause;
         this.errMsg = errMsg;
     }
@@ -40,7 +40,7 @@ public class CommercialException extends Exception {
         return errCause;
     }
 
-    public void setErrCode(String errCode) {
+    public void setErrCode(final String errCode) {
         this.errCause = errCode;
     }
 
@@ -48,7 +48,7 @@ public class CommercialException extends Exception {
         return errMsg;
     }
 
-    public void setErrMsg(String errMsg) {
+    public void setErrMsg(final String errMsg) {
         this.errMsg = errMsg;
     }
 }

@@ -153,7 +153,6 @@ public interface OrganizationService {
             final Account actor,
             final TaskType type);
 
-    //TODO remove when migration is ok
     boolean checkOrganizationVacationTask(
             final String taskName);
 

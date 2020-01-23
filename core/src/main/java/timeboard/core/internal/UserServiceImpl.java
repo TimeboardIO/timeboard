@@ -26,12 +26,10 @@ package timeboard.core.internal;
  * #L%
  */
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
@@ -58,11 +56,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EntityManager em;
 
-    @Autowired
-    private OrganizationService organizationService;
-
     @Override
-    public List<Account> createUsers(List<Account> accounts) {
+    public List<Account> createUsers(final List<Account> accounts) {
         accounts.forEach(user -> {
             em.persist(user);
             LOGGER.info("User " + user.getFirstName() + " " + user.getName() + " created");
@@ -71,16 +66,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Account findUserByLogin(String name) {
+    public Account findUserByLogin(final String name) {
         if (name == null) {
             return null;
         }
-        TypedQuery<Account> q = em.createQuery("from Account u where u.localLogin=:name", Account.class);
+        final TypedQuery<Account> q = em.createQuery("from Account u where u.localLogin=:name", Account.class);
         q.setParameter("name", name);
         Account account;
         try {
             account = q.getSingleResult();
-        } catch (NoResultException e) {
+        } catch (final NoResultException e) {
             account = null;
         }
         return account;
@@ -98,8 +93,8 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Account updateUser(Account account) {
-        Account u = this.findUserByID(account.getId());
+    public Account updateUser(final Account account) {
+        final Account u = this.findUserByID(account.getId());
         if (u != null) {
             u.setFirstName(account.getFirstName());
             u.setName(account.getName());
@@ -115,7 +110,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Account> searchUserByEmail(final Account actor, final String email) throws BusinessException {
 
-        TypedQuery<Account> q = em
+        final TypedQuery<Account> q = em
                 .createQuery(
                         "select u from Account u " +
                                 "where u.email= :prefix ",
@@ -127,7 +122,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Account> searchUserByEmail(final Account actor, final String email, final Organization org) throws BusinessException {
 
-        TypedQuery<Account> q = em
+        final TypedQuery<Account> q = em
                 .createQuery(
                         "select m.member from OrganizationMembership m " +
                                 "where m.member.email LIKE CONCAT('%',:prefix,'%') and m.organization = :org",
@@ -140,14 +135,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<Account> searchUserByEmail(final Account actor, final String prefix, final Project project) throws BusinessException {
 
-        RuleSet<Project> ruleSet = new RuleSet<>();
+        final RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
-        Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        final Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
 
-        List<Account> matchedAccount = project.getMembers().stream()
+        final List<Account> matchedAccount = project.getMembers().stream()
                 .filter(projectMembership -> projectMembership
                         .getMember()
                         .getEmail().startsWith(prefix))
@@ -166,30 +161,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Account findUserByEmail(String email) {
+    public Account findUserByEmail(final String email) {
         if (email == null) {
             return null;
         }
-        TypedQuery<Account> q = em.createQuery("from Account u where u.email=:email", Account.class);
+        final TypedQuery<Account> q = em.createQuery("from Account u where u.email=:email", Account.class);
         q.setParameter("email", email);
         Account account;
         try {
             account = q.getSingleResult();
-        } catch (NoResultException e) {
+        } catch (final NoResultException e) {
             account = null;
         }
         return account;
     }
 
     @Override
-    public Account findUserBySubject(String remoteSubject) {
-        Account u;
+    public Account findUserBySubject(final String remoteSubject) {
+        final Account u;
         try {
-            Query q = em
+            final Query q = em
                     .createQuery("select u from Account u where u.remoteSubject = :sub", Account.class);
             q.setParameter("sub", remoteSubject);
             return (Account) q.getSingleResult();
-        } catch (NoResultException | NonUniqueResultException e) {
+        } catch (final NoResultException | NonUniqueResultException e) {
             u = null;
         }
         return u;
@@ -197,16 +192,16 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public Account findUserByExternalID(String origin, String userExternalID) {
-        Account u;
+    public Account findUserByExternalID(final String origin, final String userExternalID) {
+        final Account u;
         try {
-            Query q = em // MYSQL native for JSON queries
+            final Query q = em // MYSQL native for JSON queries
                     .createNativeQuery("select * from Account "
                             + "where JSON_EXTRACT(externalIDs, '$." + origin + "')"
                             + " = ?", Account.class);
             q.setParameter(1, userExternalID);
             return (Account) q.getSingleResult();
-        } catch (PersistenceException e) {
+        } catch (final PersistenceException e) {
             u = null;
         }
         return u;
@@ -214,7 +209,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public Account userProvisionning(String sub, String email) throws BusinessException {
+    public Account userProvisionning(final String sub, final String email) throws BusinessException {
 
         Account account = this.findUserBySubject(sub);
         if (account == null) {
@@ -226,8 +221,5 @@ public class UserServiceImpl implements UserService {
         return account;
     }
 
-    private String hashPassword(String password) {
-        return BCrypt.hashpw(password, BCrypt.gensalt(12));
-    }
 
 }

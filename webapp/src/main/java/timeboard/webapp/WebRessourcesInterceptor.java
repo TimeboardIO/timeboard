@@ -69,7 +69,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     private void init() throws Exception {
         try (final InputStream versionStream = this.getClass().getClassLoader().getResourceAsStream("version")) {
             if (versionStream != null) {
-                byte[] array = IOUtils.toByteArray(versionStream);
+                final byte[] array = IOUtils.toByteArray(versionStream);
                 version = new String(array, "UTF-8");
                 LOGGER.info("Timeboard version is {}", version);
             }
@@ -77,12 +77,12 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     }
 
     @Override
-    public void preHandle(WebRequest webRequest) throws Exception {
+    public void preHandle(final WebRequest webRequest) throws Exception {
 
     }
 
     @Override
-    public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
+    public void postHandle(final WebRequest webRequest, final ModelMap modelMap) throws Exception {
 
 
         if (modelMap != null && webRequest.getUserPrincipal() != null) {
@@ -91,7 +91,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
             modelMap.put("account", account);
             modelMap.put("navs", navRegistry.getEntries());
             modelMap.put("dataTableService", dataTableService);
-            Long orgaID = ThreadLocalStorage.getCurrentOrgId();
+            final Long orgaID = ThreadLocalStorage.getCurrentOrgId();
             if (orgaID != null) {
                 fillModelWithOrganization(account, modelMap, orgaID);
             }
@@ -104,9 +104,9 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
         }
     }
 
-    private void fillModelWithOrganization(Account account, ModelMap modelMap, Long orgaID) {
+    private void fillModelWithOrganization(final Account account, final ModelMap modelMap, final Long orgaID) {
         modelMap.put("orgID", orgaID);
-        Optional<Organization> organisation = organizationService.getOrganizationByID(account, orgaID);
+        final Optional<Organization> organisation = organizationService.getOrganizationByID(account, orgaID);
         if (organisation.isPresent()) {
             modelMap.put("currentOrg", organisation.get());
         } else {
@@ -115,7 +115,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     }
 
     @Override
-    public void afterCompletion(WebRequest webRequest, Exception e) throws Exception {
+    public void afterCompletion(final WebRequest webRequest, final Exception e) throws Exception {
 
     }
 }

@@ -35,7 +35,7 @@ public class EmailStructure {
     private String subject;
     private String message;
 
-    public EmailStructure(List<String> targetUserList, List<String> targetCCUserList, String subject, String message) {
+    public EmailStructure(final List<String> targetUserList, final List<String> targetCCUserList, final String subject, final String message) {
         this.targetUserList = targetUserList;
         this.targetCCUserList = targetCCUserList;
         this.subject = subject;
@@ -46,7 +46,7 @@ public class EmailStructure {
         return targetUserList;
     }
 
-    public void setTargetUserList(List<String> targetUserList) {
+    public void setTargetUserList(final List<String> targetUserList) {
         this.targetUserList = targetUserList;
     }
 
@@ -54,7 +54,7 @@ public class EmailStructure {
         return targetCCUserList;
     }
 
-    public void setTargetCCUserList(List<String> targetCCUserList) {
+    public void setTargetCCUserList(final List<String> targetCCUserList) {
         this.targetCCUserList = targetCCUserList;
     }
 
@@ -62,7 +62,7 @@ public class EmailStructure {
         return subject;
     }
 
-    public void setSubject(String subject) {
+    public void setSubject(final String subject) {
         this.subject = subject;
     }
 
@@ -70,7 +70,7 @@ public class EmailStructure {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(final String message) {
         this.message = message;
     }
 }

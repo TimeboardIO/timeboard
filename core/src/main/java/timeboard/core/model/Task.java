@@ -66,7 +66,7 @@ public class Task extends AbstractTask implements Serializable {
         return originalEstimate;
     }
 
-    public void setOriginalEstimate(double originalEstimate) {
+    public void setOriginalEstimate(final double originalEstimate) {
         this.originalEstimate = originalEstimate;
     }
 
@@ -74,7 +74,7 @@ public class Task extends AbstractTask implements Serializable {
         return taskStatus;
     }
 
-    public void setTaskStatus(TaskStatus taskStatus) {
+    public void setTaskStatus(final TaskStatus taskStatus) {
         this.taskStatus = taskStatus;
     }
 
@@ -82,7 +82,7 @@ public class Task extends AbstractTask implements Serializable {
         return assigned;
     }
 
-    public void setAssigned(Account assigned) {
+    public void setAssigned(final Account assigned) {
         this.assigned = assigned;
     }
 
@@ -90,7 +90,7 @@ public class Task extends AbstractTask implements Serializable {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(final Project project) {
         this.project = project;
     }
 
@@ -98,11 +98,11 @@ public class Task extends AbstractTask implements Serializable {
         return batches;
     }
 
-    public void setBatches(Set<Batch> batches) {
+    public void setBatches(final Set<Batch> batches) {
         this.batches = batches;
     }
 
-    public void addBatch(Batch batch) {
+    public void addBatch(final Batch batch) {
         if (batch == null) {
             this.batches = new HashSet<>();
         }
@@ -113,7 +113,7 @@ public class Task extends AbstractTask implements Serializable {
         return this.effortLeft;
     }
 
-    public void setEffortLeft(double effortLeft) {
+    public void setEffortLeft(final double effortLeft) {
         this.effortLeft = effortLeft;
     }
 
@@ -121,7 +121,7 @@ public class Task extends AbstractTask implements Serializable {
         return taskType;
     }
 
-    public void setTaskType(TaskType taskType) {
+    public void setTaskType(final TaskType taskType) {
         this.taskType = taskType;
     }
 

@@ -57,8 +57,8 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
 
     @PostConstruct
     private void init() {
-        ObjectMapper mapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
+        final ObjectMapper mapper = new ObjectMapper();
+        final SimpleModule module = new SimpleModule();
         module.addDeserializer(Expression.class, new SpelDeserializer());
         mapper.registerModule(module);
         try {
@@ -72,11 +72,11 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
                 LOGGER.info("[init] Custom policy file not found. Loading default policy");
                 rulesArray = mapper.readValue(getClass().getClassLoader().getResourceAsStream(DEFAULT_POLICY_FILE_NAME), PolicyRule[].class);
             }
-            this.rules = (rulesArray != null ? Arrays.asList(rulesArray) : null);
+            this.rules = rulesArray != null ? Arrays.asList(rulesArray) : null;
             LOGGER.info("[init] Policy loaded successfully.");
-        } catch (JsonMappingException e) {
+        } catch (final JsonMappingException e) {
             LOGGER.error("An error occurred while parsing the policy file.", e);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.error("An error occurred while reading the policy file.", e);
         }
     }

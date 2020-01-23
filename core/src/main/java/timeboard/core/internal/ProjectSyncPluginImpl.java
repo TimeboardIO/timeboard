@@ -27,10 +27,10 @@ package timeboard.core.internal;
  */
 
 import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
@@ -44,11 +44,8 @@ import java.util.List;
 @Component
 public class ProjectSyncPluginImpl implements ProjectSyncService {
 
-    @Autowired
-    private ProjectService projectService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncPluginImpl.class);
 
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private Scheduler scheduler;
@@ -87,8 +84,8 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             this.scheduler.scheduleJob(trigger);
 
 
-        } catch (SchedulerException e) {
-            e.printStackTrace();
+        } catch (final SchedulerException e) {
+            LOGGER.error(e.getMessage());
         }
 
     }
@@ -122,13 +119,13 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             this.scheduler.scheduleJob(trigger);
 
 
-        } catch (SchedulerException e) {
-            e.printStackTrace();
+        } catch (final SchedulerException e) {
+            LOGGER.error(e.getMessage());
         }
 
     }
 
-    private JobDetail buildJobDetails(String serviceName, Project project) {
+    private JobDetail buildJobDetails(final String serviceName, final Project project) {
 
         return JobBuilder.newJob()
                 .withIdentity(new JobKey(project.getId().toString()))
@@ -140,7 +137,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     @Override
-    public List<ProjectSyncCredentialField> getServiceFields(String serviceName) {
+    public List<ProjectSyncCredentialField> getServiceFields(final String serviceName) {
         final ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
                 .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
                 .findFirst().get();

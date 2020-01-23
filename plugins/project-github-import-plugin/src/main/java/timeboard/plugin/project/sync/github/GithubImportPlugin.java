@@ -31,11 +31,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.EncryptionService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
@@ -61,13 +57,6 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
             new ProjectSyncCredentialField(GITHUB_REPO_OWNER_KEY, "Github repo owner", ProjectSyncCredentialField.Type.TEXT, 1),
             new ProjectSyncCredentialField(GITHUB_REPO_NAME_KEY, "Github repo name", ProjectSyncCredentialField.Type.TEXT, 2)
     );
-    private static final String GITHUB_ORIGIN_KEY = "github";
-    @Autowired
-    public EncryptionService encryptionService;
-    @Autowired
-    private ProjectService projectService;
-    @Autowired
-    private UserService userService;
 
     @Override
     public String getServiceName() {
@@ -81,7 +70,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
 
 
     @Override
-    public List<RemoteTask> getRemoteTasks(Account currentUser, List<ProjectSyncCredentialField> credentials) throws BusinessException {
+    public List<RemoteTask> getRemoteTasks(final Account currentUser, final List<ProjectSyncCredentialField> credentials) throws BusinessException {
 
         final List<RemoteTask> remoteTasks = new ArrayList<>();
 
@@ -91,15 +80,15 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
             final String githubRepoName = getFieldByKey(credentials, GITHUB_REPO_NAME_KEY).getValue();
             final String githubOAuthToken = getFieldByKey(credentials, GITHUB_TOKEN_KEY).getValue();
 
-            RepositoryId repositoryId = new RepositoryId(githubRepoOwner, githubRepoName);
+            final RepositoryId repositoryId = new RepositoryId(githubRepoOwner, githubRepoName);
 
-            IssueService issueService = new IssueService();
+            final IssueService issueService = new IssueService();
             issueService.getClient().setOAuth2Token(githubOAuthToken);
-            List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
+            final List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
             issues.stream().forEach(issue -> {
 
-                RemoteTask rt = new RemoteTask();
+                final RemoteTask rt = new RemoteTask();
                 if (issue.getAssignee() != null) {
                     rt.setUserName(issue.getAssignee().getLogin());
                 }
@@ -111,8 +100,8 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
                 rt.setStartDate(issue.getCreatedAt());
                 remoteTasks.add(rt);
             });
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage());
         }
 
         LOGGER.info("Import {} tasks from github", remoteTasks.size());
@@ -120,7 +109,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
         return remoteTasks;
     }
 
-    private ProjectSyncCredentialField getFieldByKey(List<ProjectSyncCredentialField> fields, String key) {
+    private ProjectSyncCredentialField getFieldByKey(final List<ProjectSyncCredentialField> fields, final String key) {
         return fields.stream().filter(field -> field.getFieldKey().equals(key)).findFirst().get();
     }
 

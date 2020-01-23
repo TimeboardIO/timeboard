@@ -52,7 +52,7 @@ public class DataTableConfigRestController {
     private DataTableService dataTableService;
 
     @GetMapping
-    public ResponseEntity<DataTableConfigWrapper> getConfig(TimeboardAuthentication authentication, HttpServletRequest request) {
+    public ResponseEntity<DataTableConfigWrapper> getConfig(final TimeboardAuthentication authentication, final HttpServletRequest request) {
         final Account actor = authentication.getDetails();
 
         final String tableID = request.getParameter("tableID");
@@ -60,7 +60,7 @@ public class DataTableConfigRestController {
         DataTableConfig dataTable = null;
         try {
             dataTable = this.dataTableService.findTableConfigByUserAndTable(tableID, actor);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             // nothing to do except handle exception
         }
         if (dataTable == null) {
@@ -73,10 +73,10 @@ public class DataTableConfigRestController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity updateConfig(TimeboardAuthentication authentication, @RequestBody DataTableConfigWrapper dataConfig) {
+    public ResponseEntity updateConfig(final TimeboardAuthentication authentication, @RequestBody final DataTableConfigWrapper dataConfig) {
         final Account actor = authentication.getDetails();
 
-        DataTableConfig dataTableConfig = dataTableService.addOrUpdateTableConfig(dataConfig.tableID, actor, dataConfig.getColNames());
+        final DataTableConfig dataTableConfig = dataTableService.addOrUpdateTableConfig(dataConfig.tableID, actor, dataConfig.getColNames());
         return ResponseEntity.ok(new DataTableConfigWrapper(dataTableConfig));
     }
 
@@ -90,7 +90,7 @@ public class DataTableConfigRestController {
             colNames = new ArrayList<String>();
         }
 
-        public DataTableConfigWrapper(DataTableConfig data) {
+        public DataTableConfigWrapper(final DataTableConfig data) {
             this.colNames = data.getColumns();
             this.tableID = data.getTableInstanceId();
             this.userID = data.getUser().getId();
@@ -101,7 +101,7 @@ public class DataTableConfigRestController {
             return colNames;
         }
 
-        public void setColNames(List<String> colNames) {
+        public void setColNames(final List<String> colNames) {
             this.colNames = colNames;
         }
 
@@ -109,7 +109,7 @@ public class DataTableConfigRestController {
             return tableID;
         }
 
-        public void setTableID(String tableID) {
+        public void setTableID(final String tableID) {
             this.tableID = tableID;
         }
 
@@ -117,7 +117,7 @@ public class DataTableConfigRestController {
             return userID;
         }
 
-        public void setUserID(Long userID) {
+        public void setUserID(final Long userID) {
             this.userID = userID;
         }
     }

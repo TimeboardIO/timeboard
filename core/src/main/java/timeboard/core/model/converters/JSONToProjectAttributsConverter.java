@@ -28,6 +28,8 @@ package timeboard.core.model.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.ProjectAttributeValueMap;
 
@@ -40,27 +42,29 @@ import java.util.Map;
 @Converter
 public class JSONToProjectAttributsConverter implements AttributeConverter<Map<String, ProjectAttributValue>, String> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONToProjectAttributsConverter.class);
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 
     @Override
-    public String convertToDatabaseColumn(Map<String, ProjectAttributValue> stringProjectAttributValueMap) {
+    public String convertToDatabaseColumn(final Map<String, ProjectAttributValue> stringProjectAttributValueMap) {
         String res = "{}";
         try {
             res = OBJECT_MAPPER.writeValueAsString(stringProjectAttributValueMap);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        } catch (final JsonProcessingException e) {
+            LOGGER.error(e.getMessage());
         }
         return res;
     }
 
     @Override
-    public Map<String, ProjectAttributValue> convertToEntityAttribute(String s) {
+    public Map<String, ProjectAttributValue> convertToEntityAttribute(final String s) {
         final Map<String, ProjectAttributValue> attrs = new HashMap<>();
         try {
             attrs.putAll(OBJECT_MAPPER.readValue(s, ProjectAttributeValueMap.class));
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (final IOException e) {
+            LOGGER.error(e.getMessage());
         }
         return attrs;
     }

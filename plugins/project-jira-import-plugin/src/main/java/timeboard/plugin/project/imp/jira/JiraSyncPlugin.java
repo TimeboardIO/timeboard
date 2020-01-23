@@ -29,9 +29,7 @@ package timeboard.plugin.project.imp.jira;
 import com.atlassian.jira.rest.client.api.JiraRestClient;
 import com.atlassian.jira.rest.client.api.JiraRestClientFactory;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.RemoteTask;
@@ -57,8 +55,6 @@ public class JiraSyncPlugin implements ProjectSyncPlugin {
             new ProjectSyncCredentialField(JIRA_PROJECT_KEY, "JIRA Project name", ProjectSyncCredentialField.Type.TEXT, 3)
     );
     private static final String JIRA_SERVICE_NAME = "JIRA";
-    @Autowired
-    private ProjectService projectService;
 
     @Override
     public String getServiceName() {
@@ -71,12 +67,12 @@ public class JiraSyncPlugin implements ProjectSyncPlugin {
         return FIELDS;
     }
 
-    private ProjectSyncCredentialField getFieldByKey(List<ProjectSyncCredentialField> fields, String key) {
+    private ProjectSyncCredentialField getFieldByKey(final List<ProjectSyncCredentialField> fields, final String key) {
         return fields.stream().filter(field -> field.getFieldKey().equals(key)).findFirst().get();
     }
 
 
-    private JiraRestClient getJiraRestClient(List<ProjectSyncCredentialField> fields) throws URISyntaxException {
+    private JiraRestClient getJiraRestClient(final List<ProjectSyncCredentialField> fields) throws URISyntaxException {
 
         final String jiraUsername = this.getFieldByKey(fields, JIRA_USERNAME_KEY).getValue();
         final String jiraPassword = this.getFieldByKey(fields, JIRA_PASSWORD_KEY).getValue();

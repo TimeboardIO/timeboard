@@ -41,7 +41,7 @@ public class TimesheetEvent extends TimeboardEvent {
     private SubmittedTimesheet timesheet;
 
 
-    public TimesheetEvent(SubmittedTimesheet timesheet, ProjectService projectService, Organization currentOrg) {
+    public TimesheetEvent(final SubmittedTimesheet timesheet, final ProjectService projectService, final Organization currentOrg) {
         super(new Date());
 
         this.timesheet = timesheet;

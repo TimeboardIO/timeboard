@@ -38,8 +38,8 @@ public class SecurityUtils {
 
     }
 
-    public static TimeboardAuthentication signIn(Organization o, Account a) {
-        TimeboardAuthentication auth = new TimeboardAuthentication(a);
+    public static TimeboardAuthentication signIn(final Organization o, final Account a) {
+        final TimeboardAuthentication auth = new TimeboardAuthentication(a);
         SecurityContextHolder.getContext().setAuthentication(auth);
         ThreadLocalStorage.setCurrentOrgId(o.getId());
         return auth;

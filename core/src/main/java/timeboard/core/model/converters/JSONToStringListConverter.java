@@ -29,6 +29,8 @@ package timeboard.core.model.converters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeConverter;
 import java.io.IOException;
@@ -37,35 +39,35 @@ import java.util.List;
 
 public class JSONToStringListConverter
         implements AttributeConverter<List<String>, String> {
-    private static final String DELIMITER = "|";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONToStringListConverter.class);
 
     @Override
-    public String convertToDatabaseColumn(List<String> attributes) {
+    public String convertToDatabaseColumn(final List<String> attributes) {
         if (attributes == null || attributes.isEmpty()) {
             return null;
         }
         try {
             return OBJECT_MAPPER.writeValueAsString(attributes);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        } catch (final JsonProcessingException e) {
+            LOGGER.error(e.getMessage());
             return null;
         }
     }
 
     @Override
-    public List<String> convertToEntityAttribute(String data) {
+    public List<String> convertToEntityAttribute(final String data) {
         if (data == null) {
             return new ArrayList<String>();
         }
         List attrs = null;
-        TypeReference<ArrayList<String>> typeRef = new TypeReference<ArrayList<String>>() {
+        final TypeReference<ArrayList<String>> typeRef = new TypeReference<ArrayList<String>>() {
         };
         try {
             attrs = OBJECT_MAPPER.readValue(data, typeRef);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (final IOException e) {
+            LOGGER.error(e.getMessage());
         }
 
         return attrs;

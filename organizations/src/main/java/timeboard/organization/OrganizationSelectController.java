@@ -59,8 +59,8 @@ public class OrganizationSelectController {
     private String defaultOrganisationName;
 
     @GetMapping
-    public String selectOrganisation(TimeboardAuthentication authentication,
-                                     HttpServletRequest req, TimeboardAuthentication p, Model model) {
+    public String selectOrganisation(final TimeboardAuthentication authentication,
+                                     final HttpServletRequest req, final TimeboardAuthentication p, final Model model) {
 
 
         final List<Organization> orgs = authentication.getDetails().getOrganizations()
@@ -78,8 +78,8 @@ public class OrganizationSelectController {
     }
 
     @PostMapping
-    public String selectOrganisation(TimeboardAuthentication authentication,
-                                     @ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res) {
+    public String selectOrganisation(final TimeboardAuthentication authentication,
+                                     @ModelAttribute("organization") final Long selectedOrgID, final HttpServletResponse res) {
 
         final Optional<Organization> selectedOrg =
                 this.organizationService.getOrganizationByID(authentication.getDetails(), selectedOrgID);
