@@ -12,8 +12,8 @@ $(document).ready(function () {
                         "slot": "week",
                         "label": "Week",
                         "sortKey": "week",
-                        "primary" : true
-
+                        "primary" : true,
+                        "class" : "collapsing"
                     },
                     {
                         "slot": "period",
@@ -26,14 +26,16 @@ $(document).ready(function () {
                         "slot": "submitted",
                         "label": "S",
                         "sortKey": "validated",
-                        "primary" : true
+                        "primary" : true,
+                        "class" : "collapsing"
 
                     },
                     {
                         "slot": "validated",
                         "label": "V",
                         "sortKey": "submitted",
-                        "primary" : true
+                        "primary" : true,
+                        "class" : "collapsing"
 
                     }],
                 data: [],

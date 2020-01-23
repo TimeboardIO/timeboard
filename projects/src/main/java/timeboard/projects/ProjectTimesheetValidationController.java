@@ -64,7 +64,7 @@ public class ProjectTimesheetValidationController {
 
                 .collect(Collectors.toMap(
                         e -> e.getKey().getId(),
-                        e -> new UserWrapper(e.getKey(), fillSubmittedTimesheets(e.getKey(), e.getValue()))));
+                        e -> new UserWrapper(e.getKey(), e.getValue(), fillSubmittedTimesheets(e.getKey(), e.getValue()))));
 
         return ResponseEntity.ok(newMap);
     }
@@ -165,8 +165,7 @@ public class ProjectTimesheetValidationController {
         private String status;
         private List<TimesheetWeekWrapper> weeks;
 
-
-        public UserWrapper(Account account, List<TimesheetWeekWrapper> weeks) {
+        public UserWrapper(Account account,  List<SubmittedTimesheet> rawList, List<TimesheetWeekWrapper> weeks) {
             this.id = account.getId();
             this.name = account.getScreenName();
             this.status = "";
@@ -174,11 +173,11 @@ public class ProjectTimesheetValidationController {
             this.lastSubmittedDate = weeks.stream()
                     .filter(TimesheetWeekWrapper::isSubmitted)
                     .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
-                    .map(t -> DATE_FORMAT.format(calendarFromWeek(t.getYear(), t.getWeek()).getTime())).orElseGet(() -> "");
-            this.lastApprovedDate = weeks.stream()
-                    .filter(TimesheetWeekWrapper::isValidated)
+                    .map(t -> DATE_FORMAT.format(calendarFromWeek(t.getYear(), t.getWeek()).getTime())).orElseGet(() -> "N/A");
+            this.lastApprovedDate = rawList.stream()
+                    .filter(SubmittedTimesheet::isValidated)
                     .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
-                    .map(t -> DATE_FORMAT.format(calendarFromWeek(t.getYear(), t.getWeek()).getTime())).orElseGet(() -> "");
+                    .map(t -> DATE_FORMAT.format(calendarFromWeek(t.getYear(), t.getWeek()).getTime())).orElseGet(() -> "N/A");
         }
 
         public Long getId() {
@@ -200,7 +199,6 @@ public class ProjectTimesheetValidationController {
             return weeks;
         }
     }
-
 
 
     public static class TimesheetWeekWrapper {

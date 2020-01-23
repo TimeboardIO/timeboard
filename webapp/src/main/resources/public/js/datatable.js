@@ -4,7 +4,7 @@ Vue.component('data-table', {
             <table class="ui celled table" v-if="config.data.length > 0">
                 <thead>
                     <tr>
-                        <th v-for="col in finalCols"  v-if="col.visible" @click="sortBy(col.slot)"  class="collapsing" > 
+                        <th v-for="col in finalCols"  v-if="col.visible" @click="sortBy(col.slot)"  v-bind:class="col.class"> 
                             {{col.label}} 
                             <i v-if="col.visible && col.sortKey" class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"></i> 
                         </th>
@@ -13,7 +13,7 @@ Vue.component('data-table', {
                 </thead>
                 <tbody>
                     <tr v-for="(row, i) in finalData">
-                      <td v-for="(col, j) in finalCols" v-if="col.visible" v-bind:class="col.class" class="collapsing" >
+                      <td v-for="(col, j) in finalCols" v-if="col.visible" v-bind:class="col.class"  >
                           <slot :name="col.slot" v-bind:row="finalData[i]">
                           </slot>
                       </td>
