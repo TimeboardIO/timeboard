@@ -95,7 +95,7 @@ public class Account implements Serializable {
         return this.organizations;
     }
 
-    public void setOrganizations(Set<OrganizationMembership> organizations) {
+    public void setOrganizations(final Set<OrganizationMembership> organizations) {
         this.organizations = organizations;
     }
 
@@ -103,7 +103,7 @@ public class Account implements Serializable {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -111,7 +111,7 @@ public class Account implements Serializable {
         return remoteSubject;
     }
 
-    public void setRemoteSubject(String remoteSubject) {
+    public void setRemoteSubject(final String remoteSubject) {
         this.remoteSubject = remoteSubject;
     }
 
@@ -119,7 +119,7 @@ public class Account implements Serializable {
         return accountCreationTime;
     }
 
-    public void setAccountCreationTime(Date accountCreationTime) {
+    public void setAccountCreationTime(final Date accountCreationTime) {
         this.accountCreationTime = accountCreationTime;
     }
 
@@ -127,7 +127,7 @@ public class Account implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -135,7 +135,7 @@ public class Account implements Serializable {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
 
@@ -143,7 +143,7 @@ public class Account implements Serializable {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -185,7 +185,7 @@ public class Account implements Serializable {
         return externalIDs;
     }
 
-    public void setExternalIDs(Map<String, String> externalIDs) {
+    public void setExternalIDs(final Map<String, String> externalIDs) {
         this.externalIDs = externalIDs;
     }
 

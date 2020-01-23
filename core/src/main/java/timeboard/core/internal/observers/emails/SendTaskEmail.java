@@ -43,7 +43,6 @@ import java.util.List;
 
 
 @Component
-//TODO keep this class ?
 public class SendTaskEmail {
 
     @Autowired
@@ -58,20 +57,20 @@ public class SendTaskEmail {
                 .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));*/
     }
 
-    public EmailStructure sendEmailCreatingTask(Account creator, Task newTaskDB) {
-        List<String> to = new ArrayList<>();
-        Project project = newTaskDB.getProject();
-        Account assignedAccount = newTaskDB.getAssigned();
+    public EmailStructure sendEmailCreatingTask(final Account creator, final Task newTaskDB) {
+        final List<String> to = new ArrayList<>();
+        final Project project = newTaskDB.getProject();
+        final Account assignedAccount = newTaskDB.getAssigned();
 
         project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == MembershipRole.OWNER)
                 .forEach(member -> to.add(member.getMember().getEmail()));
 
-        List<String> cc = Arrays.asList(assignedAccount.getEmail(), creator.getEmail());
+        final List<String> cc = Arrays.asList(assignedAccount.getEmail(), creator.getEmail());
 
-        String subject = "Mail de création d'une tâche";
-        String message = "Bonjour,\n"
+        final String subject = "Mail de création d'une tâche";
+        final String message = "Bonjour,\n"
                 + creator.getFirstName() + " " + creator.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
                 + "Nom de la tâche : " + newTaskDB.getName() + "\n"
                 + "Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
@@ -82,7 +81,7 @@ public class SendTaskEmail {
         return new EmailStructure(to, cc, subject, message);
     }
 
-    private String getDisplayFormatDate(Date date) {
+    private String getDisplayFormatDate(final Date date) {
         return new SimpleDateFormat("dd/MM/yyyy").format(date);
     }
 

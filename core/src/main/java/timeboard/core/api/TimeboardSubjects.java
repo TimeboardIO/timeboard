@@ -47,7 +47,6 @@ public class TimeboardSubjects {
     public static PublishSubject<TimesheetEvent> TIMESHEET_EVENTS = PublishSubject.create();
     public static Observable<TimeboardEvent> TIMEBOARD_EVENTS = PublishSubject.create();
 
-    //TODO keep this subject ?
     public static PublishSubject<Map<Account, String>> GENERATE_PASSWORD = PublishSubject.create();
 
     @PostConstruct

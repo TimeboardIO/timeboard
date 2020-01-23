@@ -47,8 +47,8 @@ public class OrganizationCreateController {
 
 
     @PostMapping("create")
-    protected String handlePost(TimeboardAuthentication authentication,
-                                HttpServletRequest request) throws BusinessException {
+    protected String handlePost(final TimeboardAuthentication authentication,
+                                final HttpServletRequest request) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         this.organizationService.createOrganization(actor, request.getParameter("organizationName"), new HashMap<>());

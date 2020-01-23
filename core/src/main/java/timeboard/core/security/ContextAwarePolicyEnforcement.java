@@ -41,11 +41,11 @@ public class ContextAwarePolicyEnforcement {
     @Autowired
     protected PolicyEnforcement policy;
 
-    public void checkPermission(Object resource, String permission) {
+    public void checkPermission(final Object resource, final String permission) {
         //Getting the subject
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         //Getting the environment
-        Map<String, Object> environment = new HashMap<>();
+        final Map<String, Object> environment = new HashMap<>();
         environment.put("time", new Date());
         if (!policy.check(auth.getPrincipal(), resource, permission, environment)) {
             throw new AccessDeniedException("Access is denied");

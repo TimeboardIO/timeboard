@@ -38,13 +38,13 @@ public class ProjectAttributValue {
         this.isEncrypted = false;
     }
 
-    public ProjectAttributValue(String value) {
+    public ProjectAttributValue(final String value) {
         this.value = value;
         this.isPrivate = false;
         this.isEncrypted = false;
     }
 
-    public ProjectAttributValue(String value, Boolean newAttrEncrypted) {
+    public ProjectAttributValue(final String value, final Boolean newAttrEncrypted) {
         this.value = value;
         this.isPrivate = false;
         this.isEncrypted = newAttrEncrypted;
@@ -55,7 +55,7 @@ public class ProjectAttributValue {
         return isEncrypted;
     }
 
-    public void setEncrypted(boolean encrypted) {
+    public void setEncrypted(final boolean encrypted) {
         isEncrypted = encrypted;
     }
 
@@ -63,7 +63,7 @@ public class ProjectAttributValue {
         return isPrivate;
     }
 
-    public void setPrivate(boolean isPrivate) {
+    public void setPrivate(final boolean isPrivate) {
         this.isPrivate = isPrivate;
     }
 
@@ -71,7 +71,7 @@ public class ProjectAttributValue {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 }

@@ -42,29 +42,29 @@ public class JSONToStringListConverter
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(List<String> attributes) {
+    public String convertToDatabaseColumn(final List<String> attributes) {
         if (attributes == null || attributes.isEmpty()) {
             return null;
         }
         try {
             return OBJECT_MAPPER.writeValueAsString(attributes);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
     }
 
     @Override
-    public List<String> convertToEntityAttribute(String data) {
+    public List<String> convertToEntityAttribute(final String data) {
         if (data == null) {
             return new ArrayList<String>();
         }
         List attrs = null;
-        TypeReference<ArrayList<String>> typeRef = new TypeReference<ArrayList<String>>() {
+        final TypeReference<ArrayList<String>> typeRef = new TypeReference<ArrayList<String>>() {
         };
         try {
             attrs = OBJECT_MAPPER.readValue(data, typeRef);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 

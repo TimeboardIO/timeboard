@@ -68,7 +68,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
     }
 
 
-    public TaskSnapshot(Date snapshotDate, Task task, Account assigned) {
+    public TaskSnapshot(final Date snapshotDate, final Task task, final Account assigned) {
         this.snapshotDate = snapshotDate;
         this.task = task;
         this.assigned = assigned;
@@ -81,7 +81,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -89,7 +89,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         return snapshotDate;
     }
 
-    public void setSnapshotDate(Date snapshotDate) {
+    public void setSnapshotDate(final Date snapshotDate) {
         this.snapshotDate = snapshotDate;
     }
 
@@ -97,7 +97,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         return task;
     }
 
-    public void setTask(Task task) {
+    public void setTask(final Task task) {
         this.task = task;
     }
 
@@ -105,7 +105,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         return assigned;
     }
 
-    public void setAssigned(Account assigned) {
+    public void setAssigned(final Account assigned) {
         this.assigned = assigned;
     }
 
@@ -113,7 +113,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         return originalEstimate;
     }
 
-    public void setOriginalEstimate(double originalEstimate) {
+    public void setOriginalEstimate(final double originalEstimate) {
         this.originalEstimate = originalEstimate;
     }
 
@@ -121,7 +121,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         return effortLeft;
     }
 
-    public void setEffortLeft(double effortLeft) {
+    public void setEffortLeft(final double effortLeft) {
         this.effortLeft = effortLeft;
     }
 
@@ -129,7 +129,7 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         return effortSpent;
     }
 
-    public void setEffortSpent(double effortSpent) {
+    public void setEffortSpent(final double effortSpent) {
         this.effortSpent = effortSpent;
     }
 

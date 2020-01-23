@@ -81,7 +81,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
 
 
     @Override
-    public List<RemoteTask> getRemoteTasks(Account currentUser, List<ProjectSyncCredentialField> credentials) throws BusinessException {
+    public List<RemoteTask> getRemoteTasks(final Account currentUser, final List<ProjectSyncCredentialField> credentials) throws BusinessException {
 
         final List<RemoteTask> remoteTasks = new ArrayList<>();
 
@@ -91,15 +91,15 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
             final String githubRepoName = getFieldByKey(credentials, GITHUB_REPO_NAME_KEY).getValue();
             final String githubOAuthToken = getFieldByKey(credentials, GITHUB_TOKEN_KEY).getValue();
 
-            RepositoryId repositoryId = new RepositoryId(githubRepoOwner, githubRepoName);
+            final RepositoryId repositoryId = new RepositoryId(githubRepoOwner, githubRepoName);
 
-            IssueService issueService = new IssueService();
+            final IssueService issueService = new IssueService();
             issueService.getClient().setOAuth2Token(githubOAuthToken);
-            List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
+            final List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
             issues.stream().forEach(issue -> {
 
-                RemoteTask rt = new RemoteTask();
+                final RemoteTask rt = new RemoteTask();
                 if (issue.getAssignee() != null) {
                     rt.setUserName(issue.getAssignee().getLogin());
                 }
@@ -111,7 +111,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
                 rt.setStartDate(issue.getCreatedAt());
                 remoteTasks.add(rt);
             });
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
 
@@ -120,7 +120,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
         return remoteTasks;
     }
 
-    private ProjectSyncCredentialField getFieldByKey(List<ProjectSyncCredentialField> fields, String key) {
+    private ProjectSyncCredentialField getFieldByKey(final List<ProjectSyncCredentialField> fields, final String key) {
         return fields.stream().filter(field -> field.getFieldKey().equals(key)).findFirst().get();
     }
 

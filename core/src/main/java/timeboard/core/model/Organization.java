@@ -86,7 +86,7 @@ public class Organization {
         return createdDate;
     }
 
-    public void setCreatedDate(java.util.Calendar createdDate) {
+    public void setCreatedDate(final java.util.Calendar createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -94,7 +94,7 @@ public class Organization {
         return members;
     }
 
-    public void setMembers(Set<OrganizationMembership> members) {
+    public void setMembers(final Set<OrganizationMembership> members) {
         this.members = members;
     }
 
@@ -102,7 +102,7 @@ public class Organization {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -110,7 +110,7 @@ public class Organization {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -118,7 +118,7 @@ public class Organization {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(final Boolean enabled) {
         this.enabled = enabled;
     }
 
@@ -126,7 +126,7 @@ public class Organization {
         return setup != null ? setup : Collections.emptyMap();
     }
 
-    public void setSetup(Map<String, String> setup) {
+    public void setSetup(final Map<String, String> setup) {
         this.setup = setup;
     }
 
@@ -134,7 +134,7 @@ public class Organization {
         return defaultTasks;
     }
 
-    public void setDefaultTasks(Set<DefaultTask> defaultTasks) {
+    public void setDefaultTasks(final Set<DefaultTask> defaultTasks) {
         this.defaultTasks = defaultTasks;
     }
 
@@ -150,7 +150,7 @@ public class Organization {
     }
 
     @Transient
-    public List<MembershipRole> getAccountRoles(Account target) {
+    public List<MembershipRole> getAccountRoles(final Account target) {
         return this.getMembers()
                 .stream().filter(om -> om.getMember().getId() == target.getId())
                 .map(om -> om.getRole())

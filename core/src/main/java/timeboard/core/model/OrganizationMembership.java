@@ -58,7 +58,7 @@ public class OrganizationMembership {
     }
 
 
-    public OrganizationMembership(Organization organization, Account owner, MembershipRole role) {
+    public OrganizationMembership(final Organization organization, final Account owner, final MembershipRole role) {
         this.member = owner;
         this.role = role;
         this.organization = organization;
@@ -69,7 +69,7 @@ public class OrganizationMembership {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -77,7 +77,7 @@ public class OrganizationMembership {
         return member;
     }
 
-    public void setMember(Account member) {
+    public void setMember(final Account member) {
         this.member = member;
         member.getOrganizations().add(this);
     }
@@ -86,7 +86,7 @@ public class OrganizationMembership {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(final Organization organization) {
         this.organization = organization;
         this.organization.getMembers().add(this);
     }
@@ -95,7 +95,7 @@ public class OrganizationMembership {
         return role;
     }
 
-    public void setRole(MembershipRole role) {
+    public void setRole(final MembershipRole role) {
         this.role = role;
     }
 
@@ -103,7 +103,7 @@ public class OrganizationMembership {
         return this.creationDate != null ? this.creationDate : Calendar.getInstance();
     }
 
-    public void setCreationDate(Calendar creationDate) {
+    public void setCreationDate(final Calendar creationDate) {
         this.creationDate = creationDate;
     }
 }

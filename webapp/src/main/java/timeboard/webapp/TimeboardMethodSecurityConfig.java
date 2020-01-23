@@ -41,7 +41,7 @@ public class TimeboardMethodSecurityConfig extends GlobalMethodSecurityConfigura
 
     @Override
     protected MethodSecurityExpressionHandler createExpressionHandler() {
-        DefaultMethodSecurityExpressionHandler result = new DefaultMethodSecurityExpressionHandler();
+        final DefaultMethodSecurityExpressionHandler result = new DefaultMethodSecurityExpressionHandler();
         result.setPermissionEvaluator(permissionEvaluator);
         return result;
     }

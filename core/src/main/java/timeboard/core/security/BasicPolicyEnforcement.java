@@ -44,38 +44,38 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
     private PolicyDefinition policyDefinition;
 
     @Override
-    public boolean check(Object subject, Object resource, Object action, Object environment) {
+    public boolean check(final Object subject, final Object resource, final Object action, final Object environment) {
         //Get all policy rules
-        List<PolicyRule> allRules = policyDefinition.getAllPolicyRules();
+        final List<PolicyRule> allRules = policyDefinition.getAllPolicyRules();
         //Wrap the context
-        SecurityAccessContext cxt = new SecurityAccessContext(subject, resource, action, environment);
+        final SecurityAccessContext cxt = new SecurityAccessContext(subject, resource, action, environment);
         //Filter the rules according to context.
-        List<PolicyRule> matchedRules = filterRules(allRules, cxt);
+        final List<PolicyRule> matchedRules = filterRules(allRules, cxt);
         //finally, check if any of the rules are satisfied, otherwise return false.
         return checkRules(matchedRules, cxt);
     }
 
-    private List<PolicyRule> filterRules(List<PolicyRule> allRules, SecurityAccessContext cxt) {
-        List<PolicyRule> matchedRules = new ArrayList<>();
-        for (PolicyRule rule : allRules) {
+    private List<PolicyRule> filterRules(final List<PolicyRule> allRules, final SecurityAccessContext cxt) {
+        final List<PolicyRule> matchedRules = new ArrayList<>();
+        for (final PolicyRule rule : allRules) {
             try {
                 if (rule.getTarget().getValue(cxt, Boolean.class)) {
                     matchedRules.add(rule);
                 }
-            } catch (EvaluationException ex) {
+            } catch (final EvaluationException ex) {
                 LOGGER.error("An error occurred while evaluating PolicyRule.", ex);
             }
         }
         return matchedRules;
     }
 
-    private boolean checkRules(List<PolicyRule> matchedRules, SecurityAccessContext cxt) {
-        for (PolicyRule rule : matchedRules) {
+    private boolean checkRules(final List<PolicyRule> matchedRules, final SecurityAccessContext cxt) {
+        for (final PolicyRule rule : matchedRules) {
             try {
                 if (rule.getCondition().getValue(cxt, Boolean.class)) {
                     return true;
                 }
-            } catch (EvaluationException ex) {
+            } catch (final EvaluationException ex) {
                 LOGGER.error("An error occurred while evaluating PolicyRule.", ex);
             }
         }

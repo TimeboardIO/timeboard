@@ -59,8 +59,8 @@ public class ReportKPIController {
 
 
     @GetMapping("/{reportID}")
-    protected ResponseEntity getDataChart(TimeboardAuthentication authentication,
-                                          @PathVariable long reportID, Model model) {
+    protected ResponseEntity getDataChart(final TimeboardAuthentication authentication,
+                                          @PathVariable final long reportID, final Model model) {
 
         final Account actor = authentication.getDetails();
         final Report report = this.reportService.getReportByID(actor, reportID);
@@ -80,12 +80,12 @@ public class ReportKPIController {
 
         listOfProjectsFiltered.forEach(projectWrapper -> {
             try {
-                ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, projectWrapper.getProject());
+                final ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, projectWrapper.getProject());
                 originalEstimate.updateAndGet(v -> (v + currentProjectDashboard.getOriginalEstimate()));
                 effortLeft.updateAndGet(v -> (v + currentProjectDashboard.getEffortLeft()));
                 effortSpent.updateAndGet(v -> (v + currentProjectDashboard.getEffortSpent()));
                 quotation.updateAndGet(v -> (v + currentProjectDashboard.getQuotation()));
-            } catch (BusinessException e) {
+            } catch (final BusinessException e) {
                 e.printStackTrace();
             }
         });

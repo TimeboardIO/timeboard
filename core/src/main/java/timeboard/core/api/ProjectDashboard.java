@@ -37,7 +37,12 @@ public final class ProjectDashboard implements Serializable {
     private final double quotation;
     private final Date date;
 
-    public ProjectDashboard(double quotation, double originalEstimate, double effortLeft, double effortSpent, Date date) {
+    public ProjectDashboard(final double quotation,
+                            final double originalEstimate,
+                            final double effortLeft,
+                            final double effortSpent,
+                            final Date date) {
+
         this.quotation = quotation;
         this.originalEstimate = originalEstimate;
         this.effortLeft = effortLeft;

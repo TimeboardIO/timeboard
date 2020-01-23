@@ -66,7 +66,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -74,7 +74,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return value;
     }
 
-    public void setValue(Double value) {
+    public void setValue(final Double value) {
         this.value = value;
     }
 
@@ -82,7 +82,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(final Date day) {
         this.day = day;
     }
 
@@ -90,7 +90,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return task;
     }
 
-    public void setTask(AbstractTask task) {
+    public void setTask(final AbstractTask task) {
         this.task = task;
     }
 
@@ -98,7 +98,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return account;
     }
 
-    public void setAccount(Account account) {
+    public void setAccount(final Account account) {
         this.account = account;
     }
 }

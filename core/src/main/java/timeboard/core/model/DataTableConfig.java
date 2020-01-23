@@ -56,7 +56,7 @@ public class DataTableConfig extends OrganizationEntity implements Serializable 
         return user;
     }
 
-    public void setUser(Account user) {
+    public void setUser(final Account user) {
         this.user = user;
     }
 
@@ -64,7 +64,7 @@ public class DataTableConfig extends OrganizationEntity implements Serializable 
         return tableInstanceId;
     }
 
-    public void setTableInstanceId(String tableInstanceId) {
+    public void setTableInstanceId(final String tableInstanceId) {
         this.tableInstanceId = tableInstanceId;
     }
 
@@ -72,7 +72,7 @@ public class DataTableConfig extends OrganizationEntity implements Serializable 
         return columns;
     }
 
-    public void setColumns(List<String> columns) {
+    public void setColumns(final List<String> columns) {
         this.columns = columns;
     }
 

@@ -57,7 +57,7 @@ public class OrganizationMembersController {
     public OrganizationService organizationService;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model viewModel) {
+    protected String handleGet(final TimeboardAuthentication authentication, final Model viewModel) {
 
         final Account actor = authentication.getDetails();
 

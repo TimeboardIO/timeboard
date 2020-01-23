@@ -44,18 +44,18 @@ public class EncryptionServiceImpl implements EncryptionService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EncryptionServiceImpl.class);
 
 
-    private static final String SECRET_KEY = "738F26A3C1971235"; //TODO replace by a configuration
+    private static final String SECRET_KEY = "738F26A3C1971235";
 
     @Override
-    public String getProjectAttribute(Project targetProject, String attributeKey) {
-        ProjectAttributValue projectAttributValue = targetProject.getAttributes().get(attributeKey);
+    public String getProjectAttribute(final Project targetProject, final String attributeKey) {
+        final ProjectAttributValue projectAttributValue = targetProject.getAttributes().get(attributeKey);
         String value = projectAttributValue.getValue();
         if (projectAttributValue.isEncrypted()) {
             try {
-                Cipher cipher = Cipher.getInstance("AES");
+                final Cipher cipher = Cipher.getInstance("AES");
                 cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"));
                 value = new String(cipher.doFinal(Base64.getDecoder().decode(value)));
-            } catch (Exception e) {
+            } catch (final Exception e) {
                 // Catch error empty
             }
         }
@@ -63,12 +63,12 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
 
     @Override
-    public String encryptAttribute(String strToEncrypt) {
+    public String encryptAttribute(final String strToEncrypt) {
         try {
-            Cipher cipher = Cipher.getInstance("AES");
+            final Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(SECRET_KEY.getBytes(), "AES"));
             return Base64.getEncoder().encodeToString(cipher.doFinal(strToEncrypt.getBytes("UTF-8")));
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return null;
         }
     }

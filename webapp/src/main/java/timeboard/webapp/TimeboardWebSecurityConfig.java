@@ -74,7 +74,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(final WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(
                 "/public/**");
@@ -83,7 +83,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(final HttpSecurity http) throws Exception {
         final String logoutURL = String.format("%s?client_id=%s&logout_uri=%s",
                 this.logoutEndpoint,
                 this.clientid,
@@ -113,9 +113,9 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public class RedirectFilter extends GenericFilterBean {
 
         @Override
-        public void doFilter(ServletRequest servletRequest,
-                             ServletResponse servletResponse,
-                             FilterChain filterChain) throws IOException, ServletException {
+        public void doFilter(final ServletRequest servletRequest,
+                             final ServletResponse servletResponse,
+                             final FilterChain filterChain) throws IOException, ServletException {
 
             if (((HttpServletRequest) servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")) {
                 ((HttpServletResponse) servletResponse).sendRedirect(HomeController.URI);
@@ -130,11 +130,11 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public class CustomFilter extends GenericFilterBean {
 
         @Override
-        public void doFilter(ServletRequest request,
-                             ServletResponse response,
-                             FilterChain chain) throws IOException, ServletException {
+        public void doFilter(final ServletRequest request,
+                             final ServletResponse response,
+                             final FilterChain chain) throws IOException, ServletException {
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
             if (auth != null && (auth instanceof TimeboardAuthentication) == false) {
                 Account account = null;

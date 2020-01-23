@@ -64,11 +64,11 @@ public class VacationServiceImpl implements VacationService {
     private ProjectService projectservice;
 
     @Override
-    public Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID) {
+    public Optional<VacationRequest> getVacationRequestByID(final Account actor, final Long requestID) {
         VacationRequest data;
         try {
             data = em.find(VacationRequest.class, requestID);
-        } catch (Exception nre) {
+        } catch (final Exception nre) {
             data = null;
         }
         return Optional.ofNullable(data);
@@ -76,7 +76,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
+    public VacationRequest createVacationRequest(final Account actor, final VacationRequest request) {
         request.setStartDate(new Date(request.getStartDate().getTime() + (2 * 60 * 60 * 1000) + 1));
         request.setEndDate(new Date(request.getEndDate().getTime() + (2 * 60 * 60 * 1000) + 1));
 
@@ -88,7 +88,7 @@ public class VacationServiceImpl implements VacationService {
 
 
     @Override
-    public RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request) {
+    public RecursiveVacationRequest createRecursiveVacationRequest(final Account actor, final RecursiveVacationRequest request) {
         request.setStartDate(new Date(request.getStartDate().getTime() + (2 * 60 * 60 * 1000) + 1));
         request.setEndDate(new Date(request.getEndDate().getTime() + (2 * 60 * 60 * 1000) + 1));
 
@@ -102,9 +102,9 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsByUser(Account applicant) {
+    public List<VacationRequest> listVacationRequestsByUser(final Account applicant) {
 
-        TypedQuery<VacationRequest> q = em.createQuery(
+        final TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v where v.applicant = :applicant and v.parent IS NULL"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
@@ -114,9 +114,9 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsToValidateByUser(Account assignee) {
+    public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee) {
 
-        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
+        final TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
                         "where v.assignee = :assignee and v.status = :status and v.parent IS NULL",
                 VacationRequest.class);
         q.setParameter("assignee", assignee);
@@ -126,22 +126,23 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year) {
+    public Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(
+            final Account actor, final Project project, final int month, final int year) {
 
         // include next and previous to enhance month loading
 
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.set(Calendar.MONTH, month + 1);
         c.set(Calendar.YEAR, year);
         c.set(Calendar.DAY_OF_MONTH, 1);
         c.add(Calendar.MONTH, -2);
 
-        Date startDate = c.getTime();
+        final Date startDate = c.getTime();
         c.set(Calendar.DAY_OF_MONTH, 31);
         c.add(Calendar.MONTH, 2);
-        Date endDate = c.getTime();
+        final Date endDate = c.getTime();
 
-        TypedQuery<VacationRequest> q = em.createQuery(
+        final TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v where v.applicant IN :applicants " +
                         "AND (" +
                         "   (v.startDate BETWEEN :start AND :end) " +
@@ -163,9 +164,9 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsByPeriod(Account applicant, VacationRequest request) {
+    public List<VacationRequest> listVacationRequestsByPeriod(final Account applicant, final VacationRequest request) {
 
-        TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
+        final TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
                         "where v.applicant = :applicant and v.parent is null " +
                         "and ( " +
                         "(v.startDate >= :startDate and :startDate <= v.endDate)" +
@@ -178,10 +179,10 @@ public class VacationServiceImpl implements VacationService {
         q.setParameter("startDate", request.getStartDate(), TemporalType.DATE);
         q.setParameter("endDate", request.getEndDate(), TemporalType.DATE);
 
-        List<VacationRequest> resultList = q.getResultList();
-        List<VacationRequest> copyList = new ArrayList<>(resultList);
+        final List<VacationRequest> resultList = q.getResultList();
+        final List<VacationRequest> copyList = new ArrayList<>(resultList);
 
-        for (VacationRequest r : resultList) {
+        for (final VacationRequest r : resultList) {
             if (
                     (r.getStartDate().compareTo(request.getEndDate()) > 0)
                             && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
@@ -207,7 +208,7 @@ public class VacationServiceImpl implements VacationService {
 
 
     @Override
-    public void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Account actor, final VacationRequest request) throws BusinessException {
 
         if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
             this.updateImputations(actor, request, 0);
@@ -221,11 +222,11 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public void deleteVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Account actor, final RecursiveVacationRequest request) throws BusinessException {
 
         request.setEndDate(new Date());
         boolean removeIt = true;
-        for (VacationRequest r : request.getChildren()) {
+        for (final VacationRequest r : request.getChildren()) {
             if (r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
                 removeIt = false;
             } else {
@@ -243,7 +244,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException {
+    public VacationRequest approveVacationRequest(final Account actor, final VacationRequest request) throws BusinessException {
         request.setStatus(VacationRequestStatus.ACCEPTED);
         em.merge(request);
         em.flush();
@@ -256,10 +257,10 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public RecursiveVacationRequest approveVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
+    public RecursiveVacationRequest approveVacationRequest(final Account actor, final RecursiveVacationRequest request) throws BusinessException {
         request.setStatus(VacationRequestStatus.ACCEPTED);
 
-        for (VacationRequest r : request.getChildren()) {
+        for (final VacationRequest r : request.getChildren()) {
             this.approveVacationRequest(actor, r);
         }
 
@@ -271,11 +272,11 @@ public class VacationServiceImpl implements VacationService {
         return request;
     }
 
-    private void updateImputations(Account actor, VacationRequest request, double sign) throws BusinessException {
+    private void updateImputations(final Account actor, final VacationRequest request, final double sign) throws BusinessException {
 
-        DefaultTask vacationTask = this.getVacationTask(actor, request);
+        final DefaultTask vacationTask = this.getVacationTask(actor, request);
 
-        java.util.Calendar c1 = java.util.Calendar.getInstance();
+        final java.util.Calendar c1 = java.util.Calendar.getInstance();
         c1.setTime(request.getStartDate());
         c1.set(Calendar.HOUR_OF_DAY, 2);
         c1.set(Calendar.MINUTE, 0);
@@ -284,7 +285,7 @@ public class VacationServiceImpl implements VacationService {
         c1.setFirstDayOfWeek(Calendar.MONDAY);
 
         double value = 1 * sign;
-        java.util.Calendar c2 = java.util.Calendar.getInstance();
+        final java.util.Calendar c2 = java.util.Calendar.getInstance();
         c2.setTime(request.getEndDate());
 
         if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
@@ -307,11 +308,11 @@ public class VacationServiceImpl implements VacationService {
 
     }
 
-    private DefaultTask getVacationTask(Account actor, VacationRequest request) {
-        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, request.getOrganizationID());
+    private DefaultTask getVacationTask(final Account actor, final VacationRequest request) {
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, request.getOrganizationID());
 
         if (organization.isPresent()) {
-            Optional<DefaultTask> vacationTask = organization.get().getDefaultTasks().stream()
+            final Optional<DefaultTask> vacationTask = organization.get().getDefaultTasks().stream()
                     .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst();
 
             if (vacationTask.isPresent()) {
@@ -322,11 +323,11 @@ public class VacationServiceImpl implements VacationService {
         return null;
     }
 
-    private void updateTaskImputation(Account user, DefaultTask task, Date day, double val) throws BusinessException {
+    private void updateTaskImputation(final Account user, final DefaultTask task, final Date day, final double val) throws BusinessException {
 
         if (val > 0) {
             //change imputation value only if previous value is smaller than new
-            Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
+            final Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
             if (old.isEmpty() || old.get().getValue() < val) {
                 this.projectservice.updateTaskImputation(user, task, day, val);
             }
@@ -339,11 +340,11 @@ public class VacationServiceImpl implements VacationService {
                     && !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
 
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
-            boolean halfDay = vacationRequests.stream().anyMatch(r -> {
+            final boolean halfDay = vacationRequests.stream().anyMatch(r -> {
                 //current day is first day of request and request is half day started
-                boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0);
+                final boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0);
                 //current day is last day of request and request is half day ended
-                boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0);
+                final boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0);
                 return halfStart || halfEnd;
             });
 
@@ -361,8 +362,8 @@ public class VacationServiceImpl implements VacationService {
 
     }
 
-    private List<VacationRequest> listVacationRequests(Account applicant, Date day) {
-        TypedQuery<VacationRequest> q = em.createQuery(
+    private List<VacationRequest> listVacationRequests(final Account applicant, final Date day) {
+        final TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v where v.applicant = :applicant " +
                         "and (:day BETWEEN v.startDate  and v.endDate)", VacationRequest.class);
 
@@ -375,7 +376,7 @@ public class VacationServiceImpl implements VacationService {
 
 
     @Override
-    public VacationRequest rejectVacationRequest(Account actor, VacationRequest request) {
+    public VacationRequest rejectVacationRequest(final Account actor, final VacationRequest request) {
         request.setStatus(VacationRequestStatus.REJECTED);
         em.merge(request);
         em.flush();
@@ -386,9 +387,9 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public RecursiveVacationRequest rejectVacationRequest(Account actor, RecursiveVacationRequest request) {
+    public RecursiveVacationRequest rejectVacationRequest(final Account actor, final RecursiveVacationRequest request) {
 
-        for (VacationRequest r : request.getChildren()) {
+        for (final VacationRequest r : request.getChildren()) {
             this.rejectVacationRequest(actor, r);
         }
 

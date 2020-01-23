@@ -92,7 +92,7 @@ public class TimesheetRESTApi {
         //Get tasks for current week
         if (this.projectService != null) {
             this.projectService.listTasksByProject(currentAccount, ds, de).stream().forEach(projectTasks -> {
-                List<TaskWrapper> tasks = new ArrayList<>();
+                final List<TaskWrapper> tasks = new ArrayList<>();
 
                 projectTasks.getTasks().stream().forEach(task -> {
                     tasks.add(new TaskWrapper(
@@ -110,7 +110,7 @@ public class TimesheetRESTApi {
                     );
 
                     days.forEach(dateWrapper -> {
-                        double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
+                        final double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
                         imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                     });
                 });
@@ -152,8 +152,8 @@ public class TimesheetRESTApi {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
     }
 
-    private Calendar firstDayOfWeek(int week, int year) {
-        Calendar c = Calendar.getInstance();
+    private Calendar firstDayOfWeek(final int week, final int year) {
+        final Calendar c = Calendar.getInstance();
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.set(Calendar.YEAR, year);
         c.setFirstDayOfWeek(Calendar.MONDAY);
@@ -186,7 +186,7 @@ public class TimesheetRESTApi {
             );
 
             days.forEach(dateWrapper -> {
-                double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
+                final double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
                 imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
             });
 
@@ -196,7 +196,7 @@ public class TimesheetRESTApi {
     }
 
     private List<DateWrapper> createDaysForCurrentWeek(
-            TimeboardAuthentication authentication, Calendar c, Date ds) throws BusinessException {
+            final TimeboardAuthentication authentication, final Calendar c, final Date ds) throws BusinessException {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
@@ -207,7 +207,7 @@ public class TimesheetRESTApi {
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
             if (c.getTime().getTime() >= beginWorkDateForCurrentOrg.getTime().getTime()) {
-                DateWrapper dw = new DateWrapper(
+                final DateWrapper dw = new DateWrapper(
                         c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).substring(0, 3),
                         c.getTime()
                 );
@@ -221,21 +221,21 @@ public class TimesheetRESTApi {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateDataFromTimesheet(
-            TimeboardAuthentication authentication,
-            @RequestBody UpdateRequest request) {
+            final TimeboardAuthentication authentication,
+            @RequestBody final UpdateRequest request) {
 
         try {
             final Account actor = authentication.getDetails();
 
             // String type = request.getParameter("type");
 
-            Long taskID = request.task;//Long.parseLong(taskStr);
-            AbstractTask task = this.projectService.getTaskByID(actor, taskID);
+            final Long taskID = request.task;//Long.parseLong(taskStr);
+            final AbstractTask task = this.projectService.getTaskByID(actor, taskID);
 
             UpdatedTaskResult updatedTask = null;
 
             if (request.type.equals("imputation")) {
-                Date day = DATE_FORMAT.parse(request.day);
+                final Date day = DATE_FORMAT.parse(request.day);
                 //double imputation = Double.parseDouble(imputationStr);
                 updatedTask = this.projectService.updateTaskImputation(actor, task, day, request.imputation);
             }
@@ -247,13 +247,13 @@ public class TimesheetRESTApi {
 
             return ResponseEntity.ok().body(MAPPER.writeValueAsString(updatedTask));
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
     @GetMapping("/submit")
-    public ResponseEntity submitTimesheet(TimeboardAuthentication authentication, HttpServletRequest request) {
+    public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication, final HttpServletRequest request) {
 
         final Account actor = authentication.getDetails();
 
@@ -261,21 +261,21 @@ public class TimesheetRESTApi {
         final int year = Integer.parseInt(request.getParameter("year"));
 
         try {
-            Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
-            SubmittedTimesheet submittedTimesheet = this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
+            final Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
+            final SubmittedTimesheet submittedTimesheet = this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
             return ResponseEntity.ok(submittedTimesheet.getTimesheetStatus());
-        } catch (Exception e) { // TimesheetException
+        } catch (final Exception e) { // TimesheetException
             return ResponseEntity.status(412).build();
         }
     }
 
 
-    private Date findStartDate(Calendar c, int week, int year) {
+    private Date findStartDate(final Calendar c, final int week, final int year) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return c.getTime();
     }
 
-    private Date findEndDate(Calendar c, int week, int year) {
+    private Date findEndDate(final Calendar c, final int week, final int year) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         return c.getTime();
     }
@@ -306,19 +306,19 @@ public class TimesheetRESTApi {
         private final List<ImputationWrapper> imputations;
 
         public TimesheetWrapper(
-                ValidationStatus previousWeekSubmissionStatus,
-                ValidationStatus currentWeekValidationStatus,
-                int year,
-                int week,
-                int beginWorkYear,
-                int beginWorkWeek,
-                List<DateWrapper> days,
-                List<ProjectWrapper> projects,
-                List<ImputationWrapper> imputationWrappers
+                final ValidationStatus previousWeekSubmissionStatus,
+                final ValidationStatus currentWeekValidationStatus,
+                final int year,
+                final int week,
+                final int beginWorkYear,
+                final int beginWorkWeek,
+                final List<DateWrapper> days,
+                final List<ProjectWrapper> projects,
+                final List<ImputationWrapper> imputationWrappers
         ) {
 
 
-            Calendar c = Calendar.getInstance();
+            final Calendar c = Calendar.getInstance();
             final int currentWeek = c.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = c.get(Calendar.YEAR);
 
@@ -366,7 +366,7 @@ public class TimesheetRESTApi {
             final Map<String, Map<Long, Double>> res = new HashMap<>();
 
             this.imputations.stream().forEach(d -> {
-                String date = DATE_FORMAT.format(d.date);
+                final String date = DATE_FORMAT.format(d.date);
                 if (res.get(date) == null) {
                     res.put(date, new HashMap<>());
                 }
@@ -391,7 +391,7 @@ public class TimesheetRESTApi {
         private final String day;
         private final Date date;
 
-        public DateWrapper(String day, Date date) {
+        public DateWrapper(final String day, final Date date) {
             this.day = day;
             this.date = date;
         }
@@ -411,7 +411,7 @@ public class TimesheetRESTApi {
         private final String projectName;
         private final List<TaskWrapper> tasks;
 
-        public ProjectWrapper(Long projectID, String projectName, List<TaskWrapper> tasks) {
+        public ProjectWrapper(final Long projectID, final String projectName, final List<TaskWrapper> tasks) {
             this.projectID = projectID;
             this.projectName = projectName;
             this.tasks = tasks;
@@ -450,9 +450,9 @@ public class TimesheetRESTApi {
         private final Date startDate;
         private final Date endDate;
 
-        public TaskWrapper(Long taskID, String taskName, String taskComments,
-                           double effortSpent, double effortLeft, double originalEstimate, double realEffort,
-                           Date startDate, Date endDate, String status, Long typeID) {
+        public TaskWrapper(final Long taskID, final String taskName, final String taskComments,
+                           final double effortSpent, final double effortLeft, final double originalEstimate, final double realEffort,
+                           final Date startDate, final Date endDate, final String status, final Long typeID) {
             this.taskID = taskID;
             this.taskName = taskName;
             this.taskComments = taskComments;
@@ -517,7 +517,7 @@ public class TimesheetRESTApi {
         private final double value;
         private final Date date;
 
-        public ImputationWrapper(Long taskID, double value, Date date) {
+        public ImputationWrapper(final Long taskID, final double value, final Date date) {
             this.taskID = taskID;
             this.value = value;
             this.date = date;

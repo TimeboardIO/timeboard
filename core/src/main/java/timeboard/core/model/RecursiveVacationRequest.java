@@ -49,7 +49,7 @@ public class RecursiveVacationRequest extends VacationRequest {
         this.children = new HashSet<>();
     }
 
-    public RecursiveVacationRequest(VacationRequest other) {
+    public RecursiveVacationRequest(final VacationRequest other) {
         super(other);
         this.children = new HashSet<>();
     }
@@ -60,22 +60,22 @@ public class RecursiveVacationRequest extends VacationRequest {
     }
 
     @Override
-    public void setParent(RecursiveVacationRequest parent) {
+    public void setParent(final RecursiveVacationRequest parent) {
         //Do nothing
     }
 
     @Transient
     public void generateChildren() {
-        java.util.Calendar start = java.util.Calendar.getInstance();
+        final java.util.Calendar start = java.util.Calendar.getInstance();
         start.setTime(this.getStartDate());
 
-        java.util.Calendar end = java.util.Calendar.getInstance();
+        final java.util.Calendar end = java.util.Calendar.getInstance();
         end.setTime(this.getEndDate());
 
         while (start.before(end)) {
             start.set(java.util.Calendar.DAY_OF_WEEK, (this.getRecurrenceDay() + 1) % 7); //Calendar first day of week is sunday
             if (start.getTime().after(this.getStartDate()) && start.getTime().before(this.getEndDate())) {
-                VacationRequest child = new VacationRequest(this);
+                final VacationRequest child = new VacationRequest(this);
                 child.setParent(this);
                 child.setStartDate(start.getTime());
                 child.setEndDate(start.getTime());
@@ -90,7 +90,7 @@ public class RecursiveVacationRequest extends VacationRequest {
         return recurrenceDay;
     }
 
-    public void setRecurrenceDay(int recurrenceRule) {
+    public void setRecurrenceDay(final int recurrenceRule) {
         this.recurrenceDay = recurrenceRule;
     }
 
@@ -98,7 +98,7 @@ public class RecursiveVacationRequest extends VacationRequest {
         return children;
     }
 
-    public void setChildren(Set<VacationRequest> children) {
+    public void setChildren(final Set<VacationRequest> children) {
         this.children = children;
     }
 

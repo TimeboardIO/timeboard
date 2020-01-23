@@ -44,7 +44,7 @@ import java.util.TimeZone;
 @Import({TimeboardWebMVCConfig.class, ModulesConfiguration.class, TimeboardWebSecurityConfig.class})
 public class App {
 
-    public static void main(String... args) {
+    public static void main(final String... args) {
         final ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
     }
 

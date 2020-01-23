@@ -65,64 +65,12 @@ public abstract class AbstractExcelReport {
     /**
      * Update row reference in formula (not implemented in POI).
      */
-    private static void updateRownumInFormula(final HSSFCell cell, final int oldRownum, final int newRownum) {
-        try {
-            cell.setCellFormula(updateRownumInFormula(cell.getCellFormula(), oldRownum, newRownum));
-        } catch (Exception e) {
-            LOGGER.error("problème lors de la mise à jour des formules du rapport excel", e);
-            setCellComment(cell, "Erreur : " + e.getMessage());
-        }
-    }
-
-    /**
-     * Update row reference in formula (not implemented in POI).
-     */
     private static String updateRownumInFormula(final String formula, final int oldRownum, final int newRownum) {
         return formula.replaceAll("([A-Z]{1,2})" + oldRownum, "$1" + newRownum);
     }
 
-    /**
-     * Delete row (not implemented in POI).
-     */
-    private static void deleteRow(final HSSFRow row) {
-        final int rowIndex = row.getRowNum();
-        final HSSFSheet parentSheet = row.getSheet();
-        parentSheet.removeRow(row); // this only deletes all the cell values
 
-        final int lastRowNum = parentSheet.getLastRowNum();
 
-        if ((rowIndex >= 0) && (rowIndex < lastRowNum)) {
-            parentSheet.shiftRows(rowIndex + 1, lastRowNum, -1);
-        }
-    }
-
-    /**
-     * Add comment to cell (not implemented in POI).
-     */
-    private static void setCellComment(final Cell cell, final String message) {
-        if (cell != null) {
-            final Drawing drawing = cell.getSheet().createDrawingPatriarch();
-            final CreationHelper factory = cell.getSheet().getWorkbook().getCreationHelper();
-            // When the comment box is visible, have it show in a 1x3 space
-            final ClientAnchor anchor = factory.createClientAnchor();
-            anchor.setCol1(cell.getColumnIndex());
-            anchor.setCol2(cell.getColumnIndex() + 1);
-            anchor.setRow1(cell.getRowIndex());
-            anchor.setRow2(cell.getRowIndex() + 1);
-            anchor.setDx1(100);
-            anchor.setDx2(100);
-            anchor.setDy1(100);
-            anchor.setDy2(100);
-
-            // Create the comment and set the text+author
-            final Comment comment = drawing.createCellComment(anchor);
-            final RichTextString str = factory.createRichTextString(message);
-            comment.setString(str);
-            comment.setAuthor("Apache POI");
-            // Assign the comment to the cell
-            cell.setCellComment(comment);
-        }
-    }
 
     private static void setCellType(final HSSFCell oldCell, final HSSFCell newCell) {
         // Set the cell data value
@@ -214,7 +162,7 @@ public abstract class AbstractExcelReport {
      * Save current workbook in <code>this.reportFile</code>.
      */
     protected void save() throws IOException {
-        try (OutputStream out = this.reportFile) {
+        try (final OutputStream out = this.reportFile) {
 
             if (this.wb == null) {
                 this.sheet.getWorkbook().write(out);

@@ -67,9 +67,9 @@ public class ProjectSnapshotsController {
 
     @GetMapping
     @PreAuthorize("hasPermission(#project,'PROJECT_SNAPSHOT')")
-    public String display(TimeboardAuthentication authentication,
-                          @PathVariable("project") Project project,
-                          Model model) throws BusinessException {
+    public String display(final TimeboardAuthentication authentication,
+                          @PathVariable("project") final Project project,
+                          final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         //final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
@@ -80,8 +80,8 @@ public class ProjectSnapshotsController {
     }
 
     @GetMapping(value = "/chart", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity getDatasForChart(TimeboardAuthentication authentication,
-                                           Project project) throws BusinessException, JsonProcessingException {
+    public ResponseEntity getDatasForChart(final TimeboardAuthentication authentication,
+                                           final Project project) throws BusinessException, JsonProcessingException {
 
 
         final Account actor = authentication.getDetails();
@@ -91,8 +91,8 @@ public class ProjectSnapshotsController {
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectSnapshotsController.ProjectSnapshotWrapper>>
-    listProjectSnapshots(TimeboardAuthentication authentication,
-                         Project project) throws BusinessException {
+    listProjectSnapshots(final TimeboardAuthentication authentication,
+                         final Project project) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         return ResponseEntity.ok(project.getSnapshots().stream().map(projectSnapshot ->
@@ -101,8 +101,8 @@ public class ProjectSnapshotsController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectSnapshotWrapper>> createSnapshot(
-            Project project,
-            TimeboardAuthentication authentication) throws BusinessException {
+            final Project project,
+            final TimeboardAuthentication authentication) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final ProjectSnapshot projectSnapshot = this.projectSnapshotService.createProjectSnapshot(actor, project);
@@ -114,8 +114,8 @@ public class ProjectSnapshotsController {
 
     @DeleteMapping(value = "/{snapshotID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectSnapshotWrapper>>
-    deleteSnapshot(TimeboardAuthentication authentication,
-                   Project project, @PathVariable Long snapshotID) throws BusinessException {
+    deleteSnapshot(final TimeboardAuthentication authentication,
+                   final Project project, @PathVariable final Long snapshotID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         project.getSnapshots().removeIf(projectSnapshot -> projectSnapshot.getId().equals(snapshotID));
@@ -123,11 +123,11 @@ public class ProjectSnapshotsController {
         return this.listProjectSnapshots(authentication, project);
     }
 
-    public Collection<Double> quotationValuesForGraph(List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList,
-                                                      String formatDateToDisplay, List<ProjectDashboard> projectDashboards) {
+    public Collection<Double> quotationValuesForGraph(final List<String> listOfProjectSnapshotDates, final List<ProjectSnapshot> projectSnapshotList,
+                                                      final String formatDateToDisplay, final List<ProjectDashboard> projectDashboards) {
         final ValueHistory[] quotationSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(),
                 projectSnapshotList.get(0).getQuotation())};
-        Map<Date, Double> quotationMap = listOfProjectSnapshotDates
+        final Map<Date, Double> quotationMap = listOfProjectSnapshotDates
                 .stream()
                 .map(dateString -> {
                     return formatDate(formatDateToDisplay, dateString);
@@ -148,11 +148,15 @@ public class ProjectSnapshotsController {
         return quotationMap.values();
     }
 
-    public Collection<Double> originalEstimateValuesForGraph(List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList,
-                                                             String formatDateToDisplay, List<ProjectDashboard> projectDashboards) {
+    public Collection<Double> originalEstimateValuesForGraph(
+            final List<String> listOfProjectSnapshotDates,
+            final List<ProjectSnapshot> projectSnapshotList,
+            final String formatDateToDisplay,
+            final List<ProjectDashboard> projectDashboards) {
+
         final ValueHistory[] originalEstimateSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(),
                 projectSnapshotList.get(0).getOriginalEstimate())};
-        Map<Date, Double> originalEstimateMap = listOfProjectSnapshotDates
+        final Map<Date, Double> originalEstimateMap = listOfProjectSnapshotDates
                 .stream()
                 .map(dateString -> {
                     return formatDate(formatDateToDisplay, dateString);
@@ -173,11 +177,11 @@ public class ProjectSnapshotsController {
         return originalEstimateMap.values();
     }
 
-    public Collection<Double> realEffortValuesForGraph(List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList,
-                                                       String formatDateToDisplay, List<ProjectDashboard> projectDashboards) {
+    public Collection<Double> realEffortValuesForGraph(final List<String> listOfProjectSnapshotDates, final List<ProjectSnapshot> projectSnapshotList,
+                                                       final String formatDateToDisplay, final List<ProjectDashboard> projectDashboards) {
         final ValueHistory[] realEffortSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(),
                 projectSnapshotList.get(0).getRealEffort())};
-        Map<Date, Double> realEffortMap = listOfProjectSnapshotDates
+        final Map<Date, Double> realEffortMap = listOfProjectSnapshotDates
                 .stream()
                 .map(dateString -> {
                     return formatDate(formatDateToDisplay, dateString);
@@ -198,11 +202,11 @@ public class ProjectSnapshotsController {
         return realEffortMap.values();
     }
 
-    public Collection<Double> effortLeftValuesForGraph(List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList,
-                                                       String formatDateToDisplay, List<ProjectDashboard> projectDashboards) {
+    public Collection<Double> effortLeftValuesForGraph(final List<String> listOfProjectSnapshotDates, final List<ProjectSnapshot> projectSnapshotList,
+                                                       final String formatDateToDisplay, final List<ProjectDashboard> projectDashboards) {
         final ValueHistory[] effortLeftSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(),
                 projectSnapshotList.get(0).getEffortLeft())};
-        Map<Date, Double> effortLeftMap = listOfProjectSnapshotDates
+        final Map<Date, Double> effortLeftMap = listOfProjectSnapshotDates
                 .stream()
                 .map(dateString -> {
                     return formatDate(formatDateToDisplay, dateString);
@@ -223,11 +227,15 @@ public class ProjectSnapshotsController {
         return effortLeftMap.values();
     }
 
-    public Collection<Double> effortSpentValuesForGraph(List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList,
-                                                        String formatDateToDisplay, List<ProjectDashboard> projectDashboards) {
+    public Collection<Double> effortSpentValuesForGraph(
+            final List<String> listOfProjectSnapshotDates,
+            final List<ProjectSnapshot> projectSnapshotList,
+            final String formatDateToDisplay,
+            final List<ProjectDashboard> projectDashboards) {
+
         final ValueHistory[] effortSpentSum = {new ValueHistory(projectSnapshotList.get(0).getProjectSnapshotDate(),
                 projectSnapshotList.get(0).getEffortSpent())};
-        Map<Date, Double> effortSpentMap = listOfProjectSnapshotDates
+        final Map<Date, Double> effortSpentMap = listOfProjectSnapshotDates
                 .stream()
                 .map(dateString -> {
                     return formatDate(formatDateToDisplay, dateString);
@@ -248,9 +256,9 @@ public class ProjectSnapshotsController {
         return effortSpentMap.values();
     }
 
-    public ProjectSnapshotGraphWrapper createGraph(List<ProjectSnapshot> projectSnapshotList) {
+    public ProjectSnapshotGraphWrapper createGraph(final List<ProjectSnapshot> projectSnapshotList) {
 
-        ProjectSnapshotsController.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotsController.ProjectSnapshotGraphWrapper();
+        final ProjectSnapshotsController.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotsController.ProjectSnapshotGraphWrapper();
 
         final String formatDateToDisplay = "yyyy-MM-dd HH:mm:ss.S";
         final List<String> listOfProjectSnapshotDates = new ArrayList<>();
@@ -281,10 +289,10 @@ public class ProjectSnapshotsController {
         return wrapper;
     }
 
-    private Date formatDate(String formatDateToDisplay, String dateString) {
+    private Date formatDate(final String formatDateToDisplay, final String dateString) {
         try {
             return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
-        } catch (ParseException e) {
+        } catch (final ParseException e) {
             e.printStackTrace();
         }
         return null;
@@ -300,7 +308,7 @@ public class ProjectSnapshotsController {
         private Date projectSnapshotDate;
         private Long id;
 
-        public ProjectSnapshotWrapper(ProjectSnapshot projectSnapshot) {
+        public ProjectSnapshotWrapper(final ProjectSnapshot projectSnapshot) {
             this.projectSnapshotDate = projectSnapshot.getProjectSnapshotDate();
             this.originalEstimate = projectSnapshot.getOriginalEstimate();
             this.effortLeft = projectSnapshot.getEffortLeft();
@@ -314,7 +322,7 @@ public class ProjectSnapshotsController {
             return quotation;
         }
 
-        public void setQuotation(double quotation) {
+        public void setQuotation(final double quotation) {
             this.quotation = quotation;
         }
 
@@ -322,7 +330,7 @@ public class ProjectSnapshotsController {
             return realEffort;
         }
 
-        public void setRealEffort(double realEffort) {
+        public void setRealEffort(final double realEffort) {
             this.realEffort = realEffort;
         }
 
@@ -330,7 +338,7 @@ public class ProjectSnapshotsController {
             return effortSpent;
         }
 
-        public void setEffortSpent(double effortSpent) {
+        public void setEffortSpent(final double effortSpent) {
             this.effortSpent = effortSpent;
         }
 
@@ -338,7 +346,7 @@ public class ProjectSnapshotsController {
             return effortLeft;
         }
 
-        public void setEffortLeft(double effortLeft) {
+        public void setEffortLeft(final double effortLeft) {
             this.effortLeft = effortLeft;
         }
 
@@ -346,7 +354,7 @@ public class ProjectSnapshotsController {
             return originalEstimate;
         }
 
-        public void setOriginalEstimate(double originalEstimate) {
+        public void setOriginalEstimate(final double originalEstimate) {
             this.originalEstimate = originalEstimate;
         }
 
@@ -354,7 +362,7 @@ public class ProjectSnapshotsController {
             return projectSnapshotDate;
         }
 
-        public void setProjectSnapshotDate(Date projectSnapshotDate) {
+        public void setProjectSnapshotDate(final Date projectSnapshotDate) {
             this.projectSnapshotDate = projectSnapshotDate;
         }
 
@@ -362,7 +370,7 @@ public class ProjectSnapshotsController {
             return id;
         }
 
-        public void setId(Long id) {
+        public void setId(final Long id) {
             this.id = id;
         }
     }
@@ -378,28 +386,28 @@ public class ProjectSnapshotsController {
         public ProjectSnapshotGraphWrapper() {
         }
 
-        public void setListOfProjectSnapshotDates(List<String> listOfProjectSnapshotDates) {
+        public void setListOfProjectSnapshotDates(final List<String> listOfProjectSnapshotDates) {
             this.listOfProjectSnapshotDates = listOfProjectSnapshotDates;
         }
 
-        public void setQuotationData(Collection<Double> quotationData) {
+        public void setQuotationData(final Collection<Double> quotationData) {
             this.quotationData = quotationData;
 
         }
 
-        public void setRealEffortData(Collection<Double> realEffortData) {
+        public void setRealEffortData(final Collection<Double> realEffortData) {
             this.realEffortData = realEffortData;
         }
 
-        public void setOriginalEstimateData(Collection<Double> originalEstimateData) {
+        public void setOriginalEstimateData(final Collection<Double> originalEstimateData) {
             this.originalEstimateData = originalEstimateData;
         }
 
-        public void setEffortSpentData(Collection<Double> effortSpentData) {
+        public void setEffortSpentData(final Collection<Double> effortSpentData) {
             this.effortSpentData = effortSpentData;
         }
 
-        public void setEffortLeftData(Collection<Double> effortLeftData) {
+        public void setEffortLeftData(final Collection<Double> effortLeftData) {
             this.effortLeftData = effortLeftData;
         }
     }

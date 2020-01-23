@@ -45,13 +45,13 @@ public class PolicyRule {
 
     }
 
-    public PolicyRule(String name, String description, Expression target, Expression condition) {
+    public PolicyRule(final String name, final String description, final Expression target, final Expression condition) {
         this(target, condition);
         this.name = name;
         this.description = description;
     }
 
-    public PolicyRule(Expression target, Expression condition) {
+    public PolicyRule(final Expression target, final Expression condition) {
         super();
         this.target = target;
         this.condition = condition;
@@ -61,7 +61,7 @@ public class PolicyRule {
         return target;
     }
 
-    public void setTarget(Expression target) {
+    public void setTarget(final Expression target) {
         this.target = target;
     }
 
@@ -69,7 +69,7 @@ public class PolicyRule {
         return condition;
     }
 
-    public void setCondition(Expression condition) {
+    public void setCondition(final Expression condition) {
         this.condition = condition;
     }
 
@@ -77,7 +77,7 @@ public class PolicyRule {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -85,7 +85,7 @@ public class PolicyRule {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 }

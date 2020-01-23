@@ -40,7 +40,7 @@ public class ArchitectureTest {
 
     @Test
     public void test_internal_not_imported_outside() {
-        JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard.core");
+        final JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard.core");
 
         final ArchRule rule = classes()
                 .that()
@@ -55,7 +55,7 @@ public class ArchitectureTest {
 
     @Test
     public void test_controller_postfix_with_controller() {
-        JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard");
+        final JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard");
 
         final ArchRule rule = classes()
                 .that()

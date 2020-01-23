@@ -43,9 +43,9 @@ public class LongToVacationRequestConverter implements Converter<String, Vacatio
     private VacationService service;
 
     @Override
-    public VacationRequest convert(String aLong) {
-        TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        Optional<VacationRequest> request = this.service.getVacationRequestByID(auth.getDetails(), Long.parseLong(aLong));
+    public VacationRequest convert(final String aLong) {
+        final TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        final Optional<VacationRequest> request = this.service.getVacationRequestByID(auth.getDetails(), Long.parseLong(aLong));
         if (request.isPresent()) {
             return this.service.getVacationRequestByID(auth.getDetails(), Long.parseLong(aLong)).get();
         } else {

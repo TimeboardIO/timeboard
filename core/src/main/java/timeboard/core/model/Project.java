@@ -112,7 +112,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -123,7 +123,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return quotation;
     }
 
-    public void setQuotation(Double quotation) {
+    public void setQuotation(final Double quotation) {
         this.quotation = quotation;
     }
 
@@ -131,7 +131,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -139,7 +139,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -147,7 +147,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return comments;
     }
 
-    public void setComments(String comments) {
+    public void setComments(final String comments) {
         this.comments = comments;
     }
 
@@ -155,7 +155,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return members;
     }
 
-    public void setMembers(Set<ProjectMembership> members) {
+    public void setMembers(final Set<ProjectMembership> members) {
         this.members = members;
     }
 
@@ -163,7 +163,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return tasks;
     }
 
-    public void setTasks(Set<Task> tasks) {
+    public void setTasks(final Set<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -171,7 +171,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return attributes;
     }
 
-    public void setAttributes(Map<String, ProjectAttributValue> attributes) {
+    public void setAttributes(final Map<String, ProjectAttributValue> attributes) {
         this.attributes = attributes;
     }
 
@@ -180,7 +180,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return tags;
     }
 
-    public void setTags(List<ProjectTag> tags) {
+    public void setTags(final List<ProjectTag> tags) {
         this.tags = tags;
     }
 
@@ -188,7 +188,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return snapshots;
     }
 
-    public void setSnapshots(List<ProjectSnapshot> snapshots) {
+    public void setSnapshots(final List<ProjectSnapshot> snapshots) {
         this.snapshots = snapshots;
     }
 
@@ -196,13 +196,13 @@ public class Project extends OrganizationEntity implements Serializable {
         return enable;
     }
 
-    public void setEnable(boolean enable) {
+    public void setEnable(final boolean enable) {
         this.enable = enable;
     }
 
 
     @Transient
-    public Set<ProjectMembership> getMemberShipsByRole(MembershipRole role) {
+    public Set<ProjectMembership> getMemberShipsByRole(final MembershipRole role) {
         if (role != null) {
             return this.getMembers()
                     .stream()
@@ -213,7 +213,7 @@ public class Project extends OrganizationEntity implements Serializable {
     }
 
     @Transient
-    public boolean isMember(Account actor) {
+    public boolean isMember(final Account actor) {
         return this.getMembers()
                 .stream()
                 .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
@@ -221,7 +221,7 @@ public class Project extends OrganizationEntity implements Serializable {
     }
 
     @Transient
-    public boolean isMember(Account actor, MembershipRole role) {
+    public boolean isMember(final Account actor, final MembershipRole role) {
         return this.getMembers()
                 .stream()
                 .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())

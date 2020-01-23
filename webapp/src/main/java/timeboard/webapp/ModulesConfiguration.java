@@ -67,7 +67,7 @@ public class ModulesConfiguration {
 
     @Bean
     public FilterRegistrationBean<OrganizationFilter> loggingFilter() {
-        FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
+        final FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(this.organizationFilter);
         registrationBean.addUrlPatterns("/*");
@@ -77,7 +77,7 @@ public class ModulesConfiguration {
 
     @Bean
     public FilterRegistrationBean<RequestDurationFilter> loggingRequestDurationFilter() {
-        FilterRegistrationBean<RequestDurationFilter> registrationBean = new FilterRegistrationBean<>();
+        final FilterRegistrationBean<RequestDurationFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(this.requestDurationFilter);
         registrationBean.addUrlPatterns("/*");

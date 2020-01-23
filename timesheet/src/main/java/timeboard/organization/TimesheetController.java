@@ -67,14 +67,17 @@ public class TimesheetController {
     private OrganizationService organizationService;
 
     @GetMapping
-    protected String currentWeekTimesheet(TimeboardAuthentication authentication, Model model) throws Exception {
-        Calendar c = Calendar.getInstance();
+    protected String currentWeekTimesheet(final TimeboardAuthentication authentication, final Model model) throws Exception {
+        final Calendar c = Calendar.getInstance();
         return this.fillAndDisplayTimesheetPage(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
     @GetMapping("/{year}/{week}")
-    protected String fillAndDisplayTimesheetPage(TimeboardAuthentication authentication,
-                                                 @PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
+    protected String fillAndDisplayTimesheetPage(
+            final TimeboardAuthentication authentication,
+            @PathVariable("year") final int year,
+            @PathVariable("week") final int week,
+            final Model model) throws Exception {
 
 
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
@@ -111,25 +114,25 @@ public class TimesheetController {
     }
 
     @PostMapping
-    protected void doPost(TimeboardAuthentication authentication,
-                          HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost(final TimeboardAuthentication authentication,
+                          final HttpServletRequest request, final HttpServletResponse response) {
 
         try {
             final Account actor = authentication.getDetails();
-            String type = request.getParameter("type");
-            Long taskID = Long.parseLong(request.getParameter("task"));
-            AbstractTask task = this.projectService.getTaskByID(actor, taskID);
+            final String type = request.getParameter("type");
+            final Long taskID = Long.parseLong(request.getParameter("task"));
+            final AbstractTask task = this.projectService.getTaskByID(actor, taskID);
 
             UpdatedTaskResult updatedTask = null;
 
             if (type.equals("imputation")) {
-                Date day = DATE_FORMAT.parse(request.getParameter("day"));
-                double imputation = Double.parseDouble(request.getParameter("imputation"));
+                final Date day = DATE_FORMAT.parse(request.getParameter("day"));
+                final double imputation = Double.parseDouble(request.getParameter("imputation"));
                 updatedTask = this.projectService.updateTaskImputation(actor, task, day, imputation);
             }
 
             if (type.equals("effortLeft")) {
-                double effortLeft = Double.parseDouble(request.getParameter("imputation"));
+                final double effortLeft = Double.parseDouble(request.getParameter("imputation"));
                 updatedTask = this.projectService.updateTaskEffortLeft(actor, (Task) task, effortLeft);
             }
 
@@ -137,13 +140,13 @@ public class TimesheetController {
             response.setContentType("application/json");
             MAPPER.writeValue(response.getWriter(), updatedTask);
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             response.setStatus(500);
         }
 
     }
 
-    private int findLastWeekYear(Calendar c, int week, int year) {
+    private int findLastWeekYear(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
@@ -153,7 +156,7 @@ public class TimesheetController {
         return c.get(Calendar.YEAR);
     }
 
-    private int findLastWeek(Calendar c, int week, int year) {
+    private int findLastWeek(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
         c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
@@ -169,7 +172,7 @@ public class TimesheetController {
             return day;
         }
 
-        public void setDay(String day) {
+        public void setDay(final String day) {
             this.day = day;
         }
 
@@ -177,7 +180,7 @@ public class TimesheetController {
             return date;
         }
 
-        public void setDate(Date date) {
+        public void setDate(final Date date) {
             this.date = date;
         }
     }

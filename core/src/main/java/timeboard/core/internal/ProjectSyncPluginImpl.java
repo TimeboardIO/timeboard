@@ -87,7 +87,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             this.scheduler.scheduleJob(trigger);
 
 
-        } catch (SchedulerException e) {
+        } catch (final SchedulerException e) {
             e.printStackTrace();
         }
 
@@ -122,13 +122,13 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             this.scheduler.scheduleJob(trigger);
 
 
-        } catch (SchedulerException e) {
+        } catch (final SchedulerException e) {
             e.printStackTrace();
         }
 
     }
 
-    private JobDetail buildJobDetails(String serviceName, Project project) {
+    private JobDetail buildJobDetails(final String serviceName, final Project project) {
 
         return JobBuilder.newJob()
                 .withIdentity(new JobKey(project.getId().toString()))
@@ -140,7 +140,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     @Override
-    public List<ProjectSyncCredentialField> getServiceFields(String serviceName) {
+    public List<ProjectSyncCredentialField> getServiceFields(final String serviceName) {
         final ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
                 .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
                 .findFirst().get();

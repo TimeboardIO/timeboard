@@ -37,7 +37,7 @@ public class ProjectTasks {
     private final Project project;
     private final List<Task> tasks;
 
-    public ProjectTasks(Project project, List<Task> tasks) {
+    public ProjectTasks(final Project project, final List<Task> tasks) {
         this.project = project;
         this.tasks = tasks;
     }

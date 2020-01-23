@@ -41,7 +41,7 @@ public class TimeboardAuthentication implements Authentication {
     private Account account;
     private Long currentOrganization;
 
-    public TimeboardAuthentication(Account a) {
+    public TimeboardAuthentication(final Account a) {
         this.account = a;
         this.p = () -> account.getEmail();
     }
@@ -72,7 +72,7 @@ public class TimeboardAuthentication implements Authentication {
     }
 
     @Override
-    public void setAuthenticated(boolean b) throws IllegalArgumentException {
+    public void setAuthenticated(final boolean b) throws IllegalArgumentException {
 
     }
 
@@ -80,7 +80,7 @@ public class TimeboardAuthentication implements Authentication {
         return currentOrganization;
     }
 
-    public void setCurrentOrganization(Long currentOrganization) {
+    public void setCurrentOrganization(final Long currentOrganization) {
         this.currentOrganization = currentOrganization;
     }
 

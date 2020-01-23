@@ -60,23 +60,23 @@ public class XlsExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(Account actor, long orgID, long projectID, OutputStream output) throws IOException, BusinessException {
+    public void export(final Account actor, final long orgID, final long projectID, final OutputStream output) throws IOException, BusinessException {
 
         final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
 
-        String sheetName = project.getName();
+        final String sheetName = project.getName();
 
-        try (HSSFWorkbook wb = new HSSFWorkbook()) {
-            HSSFSheet sheet = wb.createSheet(sheetName);
+        try (final HSSFWorkbook wb = new HSSFWorkbook()) {
+            final HSSFSheet sheet = wb.createSheet(sheetName);
 
-            HSSFRow headerRow = sheet.createRow(0);
+            final HSSFRow headerRow = sheet.createRow(0);
             headerRow.createCell(0).setCellValue("Task name");
             headerRow.createCell(1).setCellValue("Task Original Estimate");
 
             int rowNum = 1;
-            for (Task task : this.projectService.listProjectTasks(actor, project)) {
+            for (final Task task : this.projectService.listProjectTasks(actor, project)) {
 
-                HSSFRow taskRow = sheet.createRow(rowNum);
+                final HSSFRow taskRow = sheet.createRow(rowNum);
 
                 taskRow.createCell(0).setCellValue(task.getName());
                 taskRow.createCell(1).setCellValue(task.getOriginalEstimate());

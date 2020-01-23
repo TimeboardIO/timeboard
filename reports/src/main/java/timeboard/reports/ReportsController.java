@@ -75,7 +75,7 @@ public class ReportsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ReportDecorator>> reportList(TimeboardAuthentication authentication, Model model) {
+    protected ResponseEntity<List<ReportDecorator>> reportList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
         final List<ReportDecorator> reports = this.reportService.listReports(actor)
                 .stream()
@@ -85,7 +85,7 @@ public class ReportsController {
     }
 
     @GetMapping("/create")
-    protected String createReport(Model model) throws ServletException, IOException {
+    protected String createReport(final Model model) throws ServletException, IOException {
         model.addAttribute("allReportTypes", ReportType.values());
         model.addAttribute("report", new Report());
         model.addAttribute("action", "create");
@@ -95,14 +95,14 @@ public class ReportsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(TimeboardAuthentication authentication,
-                                @ModelAttribute Report report, RedirectAttributes attributes) {
+    protected String handlePost(final TimeboardAuthentication authentication,
+                                @ModelAttribute final Report report, final RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        Long organizationID = ThreadLocalStorage.getCurrentOrgId();
-        Account organization = userService.findUserByID(organizationID);
+        final Long organizationID = ThreadLocalStorage.getCurrentOrgId();
+        final Account organization = userService.findUserByID(organizationID);
 
-        String projectFilter = report.getFilterProject();
+        final String projectFilter = report.getFilterProject();
 
         this.reportService.createReport(
                 actor,
@@ -118,8 +118,8 @@ public class ReportsController {
 
     @GetMapping("/delete/{reportID}")
     protected String deleteReport(final TimeboardAuthentication authentication,
-                                  @PathVariable long reportID,
-                                  RedirectAttributes attributes) {
+                                  @PathVariable final long reportID,
+                                  final RedirectAttributes attributes) {
 
         this.reportService.deleteReportByID(authentication.getDetails(), reportID);
 
@@ -130,7 +130,7 @@ public class ReportsController {
 
     @GetMapping("/edit/{reportID}")
     protected String editReport(final TimeboardAuthentication authentication,
-                                @PathVariable long reportID, Model model) {
+                                @PathVariable final long reportID, final Model model) {
         model.addAttribute("allReportTypes", ReportType.values());
         model.addAttribute("reportID", reportID);
         model.addAttribute("action", "edit");
@@ -140,14 +140,14 @@ public class ReportsController {
 
     @PostMapping("/edit/{reportID}")
     protected String handlePost(final TimeboardAuthentication authentication,
-                                @PathVariable long reportID,
-                                @ModelAttribute Report report, RedirectAttributes attributes) {
+                                @PathVariable final long reportID,
+                                @ModelAttribute final Report report, final RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        Long organizationID = ThreadLocalStorage.getCurrentOrgId();
-        Account organization = userService.findUserByID(organizationID);
+        final Long organizationID = ThreadLocalStorage.getCurrentOrgId();
+        final Account organization = userService.findUserByID(organizationID);
 
-        Report updatedReport = this.reportService.getReportByID(organization, reportID);
+        final Report updatedReport = this.reportService.getReportByID(organization, reportID);
         updatedReport.setName(report.getName());
         updatedReport.setType(ReportType.PROJECT_KPI);
         updatedReport.setFilterProject(report.getFilterProject());
@@ -160,11 +160,11 @@ public class ReportsController {
 
     @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public ResponseEntity refreshProjectSelection(final TimeboardAuthentication authentication,
-                                                  @RequestBody MultiValueMap<String, String> filterProjectsMap)
+                                                  @RequestBody final MultiValueMap<String, String> filterProjectsMap)
             throws JsonProcessingException {
         final Account actor = authentication.getDetails();
 
-        String filterProjects = filterProjectsMap.getFirst("filter");
+        final String filterProjects = filterProjectsMap.getFirst("filter");
 
         // If there is no filter, don't display all the projects
         if (filterProjects == null || filterProjects.isEmpty()) {
@@ -180,9 +180,9 @@ public class ReportsController {
 
     @GetMapping("/view/{reportID}")
     protected String viewReport(final TimeboardAuthentication authentication,
-                                @PathVariable long reportID, Model model) {
+                                @PathVariable final long reportID, final Model model) {
         model.addAttribute("reportID", reportID);
-        ReportType type = this.reportService.getReportByID(authentication.getDetails(), reportID).getType();
+        final ReportType type = this.reportService.getReportByID(authentication.getDetails(), reportID).getType();
         model.addAttribute("reportType", type);
         model.addAttribute("report", this.reportService.getReportByID(authentication.getDetails(), reportID));
 
@@ -199,7 +199,7 @@ public class ReportsController {
 
         private final Report report;
 
-        public ReportDecorator(Report report) {
+        public ReportDecorator(final Report report) {
             this.report = report;
         }
 

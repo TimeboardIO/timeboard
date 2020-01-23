@@ -53,12 +53,12 @@ public class TemplateGenerator {
     }
 
 
-    public String getTemplateString(String templateName, Map<String, Object> templateData) {
+    public String getTemplateString(final String templateName, final Map<String, Object> templateData) {
         if (!init) {
             init();
         }
 
-        TemplateEngine engine = new TemplateEngine();
+        final TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
         final Context ctx = new Context(Locale.FRANCE);
 

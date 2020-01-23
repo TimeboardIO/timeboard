@@ -46,7 +46,7 @@ public class SuccessfulLoginListener {
 
 
     @EventListener
-    public void doSomething(InteractiveAuthenticationSuccessEvent event) throws BusinessException {
+    public void doSomething(final InteractiveAuthenticationSuccessEvent event) throws BusinessException {
 
 
         final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();

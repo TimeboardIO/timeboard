@@ -10,3 +10,5 @@ build/
 temp/
 ui-tests/cypress/fixtures/projects.json
 webapp/src/main/resources/version
+**/.project
+**/.settings

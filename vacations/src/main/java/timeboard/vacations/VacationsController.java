@@ -65,20 +65,20 @@ public class VacationsController {
     private VacationService vacationService;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+    protected String handleGet(final TimeboardAuthentication authentication, final Model model) {
         model.addAttribute("actor", authentication.getDetails());
         return "vacations.html";
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<VacationRequestWrapper>> listRequests(TimeboardAuthentication authentication) {
+    public ResponseEntity<List<VacationRequestWrapper>> listRequests(final TimeboardAuthentication authentication) {
 
         final Account actor = authentication.getDetails();
 
-        List<VacationRequest> list = this.vacationService.listVacationRequestsByUser(actor);
-        List<VacationRequestWrapper> returnList = new ArrayList<>();
+        final List<VacationRequest> list = this.vacationService.listVacationRequestsByUser(actor);
+        final List<VacationRequestWrapper> returnList = new ArrayList<>();
 
-        for (VacationRequest v : list) {
+        for (final VacationRequest v : list) {
             returnList.add(new VacationRequestWrapper(v));
         }
 
@@ -86,14 +86,14 @@ public class VacationsController {
     }
 
     @GetMapping(value = "/toValidate/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<VacationRequestWrapper>> listToValidateRequests(TimeboardAuthentication authentication) {
+    public ResponseEntity<List<VacationRequestWrapper>> listToValidateRequests(final TimeboardAuthentication authentication) {
 
         final Account actor = authentication.getDetails();
 
-        List<VacationRequest> list = this.vacationService.listVacationRequestsToValidateByUser(actor);
-        List<VacationRequestWrapper> returnList = new ArrayList<>();
+        final List<VacationRequest> list = this.vacationService.listVacationRequestsToValidateByUser(actor);
+        final List<VacationRequestWrapper> returnList = new ArrayList<>();
 
-        for (VacationRequest v : list) {
+        for (final VacationRequest v : list) {
             returnList.add(new VacationRequestWrapper(v));
         }
 
@@ -101,14 +101,14 @@ public class VacationsController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity createRequest(TimeboardAuthentication authentication,
-                                        @ModelAttribute VacationRequestWrapper requestWrapper)
+    public ResponseEntity createRequest(final TimeboardAuthentication authentication,
+                                        @ModelAttribute final VacationRequestWrapper requestWrapper)
             throws BusinessException, ParseException {
 
-        Account actor = authentication.getDetails();
-        Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
-        Date startDate = DATE_FORMAT.parse(requestWrapper.start);
-        Date endDate = DATE_FORMAT.parse(requestWrapper.end);
+        final Account actor = authentication.getDetails();
+        final Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
+        final Date startDate = DATE_FORMAT.parse(requestWrapper.start);
+        final Date endDate = DATE_FORMAT.parse(requestWrapper.end);
 
         if (startDate.getTime() > endDate.getTime()) {
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
@@ -122,7 +122,7 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("Please enter user to notify. ");
         }
 
-        VacationRequest request = this.createRequest(requestWrapper);
+        final VacationRequest request = this.createRequest(requestWrapper);
         request.setApplicant(actor);
         request.setAssignee(assignee);
         request.setStartDate(startDate);
@@ -146,11 +146,11 @@ public class VacationsController {
     }
 
 
-    private VacationRequest createRequest(VacationRequestWrapper requestWrapper) {
-        VacationRequest request;
+    private VacationRequest createRequest(final VacationRequestWrapper requestWrapper) {
+        final VacationRequest request;
         if (requestWrapper.isRecursive()) {
             request = new RecursiveVacationRequest();
-            RecursiveVacationRequest recursiveRequest = (RecursiveVacationRequest) request;
+            final RecursiveVacationRequest recursiveRequest = (RecursiveVacationRequest) request;
             recursiveRequest.setRecurrenceDay(requestWrapper.getRecurrenceDay());
             switch (requestWrapper.getRecurrenceType()) {
                 case "FULL":
@@ -181,9 +181,9 @@ public class VacationsController {
     }
 
     @PatchMapping(value = "/approve/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity approveRequest(TimeboardAuthentication authentication,
-                                         @PathVariable VacationRequest vacationRequest) throws BusinessException {
-        Account actor = authentication.getDetails();
+    public ResponseEntity approveRequest(final TimeboardAuthentication authentication,
+                                         @PathVariable final VacationRequest vacationRequest) throws BusinessException {
+        final Account actor = authentication.getDetails();
         if (vacationRequest instanceof RecursiveVacationRequest) {
             this.vacationService.approveVacationRequest(actor, (RecursiveVacationRequest) vacationRequest);
         } else {
@@ -194,9 +194,9 @@ public class VacationsController {
     }
 
     @PatchMapping(value = "/reject/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity rejectRequest(TimeboardAuthentication authentication,
-                                        @PathVariable VacationRequest vacationRequest) throws BusinessException {
-        Account actor = authentication.getDetails();
+    public ResponseEntity rejectRequest(final TimeboardAuthentication authentication,
+                                        @PathVariable final VacationRequest vacationRequest) throws BusinessException {
+        final Account actor = authentication.getDetails();
 
         if (vacationRequest instanceof RecursiveVacationRequest) {
             this.vacationService.rejectVacationRequest(actor, (RecursiveVacationRequest) vacationRequest);
@@ -207,9 +207,9 @@ public class VacationsController {
     }
 
     @DeleteMapping(value = "/{vacationRequest}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity deleteRequest(TimeboardAuthentication authentication,
-                                        @PathVariable VacationRequest vacationRequest) throws BusinessException {
-        Account actor = authentication.getDetails();
+    public ResponseEntity deleteRequest(final TimeboardAuthentication authentication,
+                                        @PathVariable final VacationRequest vacationRequest) throws BusinessException {
+        final Account actor = authentication.getDetails();
         if (!(vacationRequest instanceof RecursiveVacationRequest)
                 && vacationRequest.getStatus() == VacationRequestStatus.ACCEPTED
                 && vacationRequest.getStartDate().before(new Date())) {
@@ -246,7 +246,7 @@ public class VacationsController {
         public VacationRequestWrapper() {
         }
 
-        public VacationRequestWrapper(VacationRequest r) {
+        public VacationRequestWrapper(final VacationRequest r) {
             this.id = r.getId();
             this.start = DATE_FORMAT.format(r.getStartDate());
             this.end = DATE_FORMAT.format(r.getEndDate());
@@ -257,7 +257,7 @@ public class VacationsController {
 
             this.recursive = RecursiveVacationRequest.class.isInstance(r);
             if (recursive) {
-                RecursiveVacationRequest rr = (RecursiveVacationRequest) r;
+                final RecursiveVacationRequest rr = (RecursiveVacationRequest) r;
                 recurrenceDay = rr.getRecurrenceDay();
 
                 if (r.getStartHalfDay() == VacationRequest.HalfDay.MORNING) {
@@ -290,7 +290,7 @@ public class VacationsController {
             return id;
         }
 
-        public void setId(long id) {
+        public void setId(final long id) {
             this.id = id;
         }
 
@@ -298,7 +298,7 @@ public class VacationsController {
             return start;
         }
 
-        public void setStart(String start) {
+        public void setStart(final String start) {
             this.start = start;
         }
 
@@ -306,7 +306,7 @@ public class VacationsController {
             return end;
         }
 
-        public void setEnd(String end) {
+        public void setEnd(final String end) {
             this.end = end;
         }
 
@@ -314,7 +314,7 @@ public class VacationsController {
             return halfStart;
         }
 
-        public void setHalfStart(boolean halfStart) {
+        public void setHalfStart(final boolean halfStart) {
             this.halfStart = halfStart;
         }
 
@@ -322,7 +322,7 @@ public class VacationsController {
             return halfEnd;
         }
 
-        public void setHalfEnd(boolean halfEnd) {
+        public void setHalfEnd(final boolean halfEnd) {
             this.halfEnd = halfEnd;
         }
 
@@ -330,7 +330,7 @@ public class VacationsController {
             return assigneeID;
         }
 
-        public void setAssigneeID(long assigneeID) {
+        public void setAssigneeID(final long assigneeID) {
             this.assigneeID = assigneeID;
         }
 
@@ -338,7 +338,7 @@ public class VacationsController {
             return assigneeName;
         }
 
-        public void setAssigneeName(String assigneeName) {
+        public void setAssigneeName(final String assigneeName) {
             this.assigneeName = assigneeName;
         }
 
@@ -346,7 +346,7 @@ public class VacationsController {
             return label;
         }
 
-        public void setLabel(String label) {
+        public void setLabel(final String label) {
             this.label = label;
         }
 
@@ -354,7 +354,7 @@ public class VacationsController {
             return recurrenceDay;
         }
 
-        public void setRecurrenceDay(int recurrenceDay) {
+        public void setRecurrenceDay(final int recurrenceDay) {
             this.recurrenceDay = recurrenceDay;
         }
 
@@ -362,7 +362,7 @@ public class VacationsController {
             return recurrenceType;
         }
 
-        public void setRecurrenceType(String recurrenceType) {
+        public void setRecurrenceType(final String recurrenceType) {
             this.recurrenceType = recurrenceType;
         }
 
@@ -371,7 +371,7 @@ public class VacationsController {
             return recursive;
         }
 
-        public void setRecursive(boolean recursive) {
+        public void setRecursive(final boolean recursive) {
             this.recursive = recursive;
         }
 

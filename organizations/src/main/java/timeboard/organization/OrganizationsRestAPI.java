@@ -67,10 +67,10 @@ public class OrganizationsRestAPI {
     private UserService userService;
 
     @GetMapping("/members/list")
-    public ResponseEntity getMembers(TimeboardAuthentication authentication,
-                                     HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity getMembers(final TimeboardAuthentication authentication,
+                                     final HttpServletRequest request) throws JsonProcessingException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -91,7 +91,7 @@ public class OrganizationsRestAPI {
         final Set<OrganizationMembership> members = organization.get().getMembers();
         final List<MemberWrapper> result = new ArrayList<>();
 
-        for (OrganizationMembership member : members) {
+        for (final OrganizationMembership member : members) {
 
             result.add(new MemberWrapper(
                     member.getId(),
@@ -106,10 +106,10 @@ public class OrganizationsRestAPI {
     }
 
     @GetMapping("/members/add")
-    public ResponseEntity addMember(TimeboardAuthentication authentication,
-                                    HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity addMember(final TimeboardAuthentication authentication,
+                                    final HttpServletRequest request) throws JsonProcessingException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         // Get current organization
         final String strOrgID = request.getParameter("orgID");
@@ -143,7 +143,7 @@ public class OrganizationsRestAPI {
                     Calendar.getInstance());
 
             return ResponseEntity.status(HttpStatus.OK).body(memberWrapper);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
@@ -152,10 +152,10 @@ public class OrganizationsRestAPI {
 
 
     @GetMapping("/members/remove")
-    public ResponseEntity removeMember(TimeboardAuthentication authentication,
-                                       HttpServletRequest request) {
+    public ResponseEntity removeMember(final TimeboardAuthentication authentication,
+                                       final HttpServletRequest request) {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -177,10 +177,10 @@ public class OrganizationsRestAPI {
         final Account member = this.userService.findUserByID(memberID);
 
         try {
-            Optional<Organization> newOrganization = organizationService.removeMember(actor, organization.get(), member);
+            final Optional<Organization> newOrganization = organizationService.removeMember(actor, organization.get(), member);
 
             return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
@@ -197,14 +197,14 @@ public class OrganizationsRestAPI {
         public MemberWrapper() {
         }
 
-        public MemberWrapper(OrganizationMembership h) {
+        public MemberWrapper(final OrganizationMembership h) {
             this.id = h.getMember().getId();
             this.screenName = h.getMember().getScreenName();
             this.role = h.getRole().name();
             this.creationDate = h.getCreationDate();
         }
 
-        public MemberWrapper(Long memberID, String screenName, String role, java.util.Calendar date) {
+        public MemberWrapper(final Long memberID, final String screenName, final String role, final java.util.Calendar date) {
             this.id = memberID;
             this.screenName = screenName;
             this.role = role;

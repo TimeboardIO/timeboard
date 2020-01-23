@@ -37,7 +37,7 @@ public class OnboardingController {
     public static final String URI = "/";
 
     @GetMapping("/")
-    public String onboarding(Authentication authentication) {
+    public String onboarding(final Authentication authentication) {
 
         if (authentication != null) {
             return "redirect:/home";

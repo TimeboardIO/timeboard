@@ -61,8 +61,8 @@ public class ProjectTeamCalendarController {
     public VacationService vacationService;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication,
-                               @PathVariable Long projectID, Model model) throws BusinessException {
+    protected String handleGet(final TimeboardAuthentication authentication,
+                               @PathVariable final Long projectID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
@@ -74,10 +74,10 @@ public class ProjectTeamCalendarController {
     }
 
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<CalendarEventWrapper>>> listTags(TimeboardAuthentication authentication,
-                                                                            @PathVariable Long projectID,
-                                                                            @PathVariable Integer yearNum,
-                                                                            @PathVariable Integer monthNum) throws BusinessException {
+    public ResponseEntity<Map<String, List<CalendarEventWrapper>>> listTags(final TimeboardAuthentication authentication,
+                                                                            @PathVariable final Long projectID,
+                                                                            @PathVariable final Integer yearNum,
+                                                                            @PathVariable final Integer monthNum) throws BusinessException {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 
@@ -99,10 +99,10 @@ public class ProjectTeamCalendarController {
     }
 
 
-    private List<CalendarEventWrapper> requestToWrapperList(List<VacationRequest> requests) {
-        List<CalendarEventWrapper> results = new ArrayList<>();
+    private List<CalendarEventWrapper> requestToWrapperList(final List<VacationRequest> requests) {
+        final List<CalendarEventWrapper> results = new ArrayList<>();
 
-        for (VacationRequest r : requests) {
+        for (final VacationRequest r : requests) {
             results.addAll(requestToWrapper(r));
         }
 
@@ -110,17 +110,17 @@ public class ProjectTeamCalendarController {
     }
 
 
-    private List<CalendarEventWrapper> requestToWrapper(VacationRequest request) {
-        LinkedList<CalendarEventWrapper> results = new LinkedList<>();
+    private List<CalendarEventWrapper> requestToWrapper(final VacationRequest request) {
+        final LinkedList<CalendarEventWrapper> results = new LinkedList<>();
 
-        java.util.Calendar start = java.util.Calendar.getInstance();
-        java.util.Calendar end = java.util.Calendar.getInstance();
+        final java.util.Calendar start = java.util.Calendar.getInstance();
+        final java.util.Calendar end = java.util.Calendar.getInstance();
 
         start.setTime(request.getStartDate());
         end.setTime(request.getEndDate());
         boolean last = true;
         while (last) {
-            CalendarEventWrapper wrapper = new CalendarEventWrapper();
+            final CalendarEventWrapper wrapper = new CalendarEventWrapper();
 
             wrapper.setName(request.getApplicant().getScreenName());
             wrapper.setDate(DATE_FORMAT.format(start.getTime()));
@@ -160,7 +160,7 @@ public class ProjectTeamCalendarController {
         public CalendarEventWrapper() {
         }
 
-        public CalendarEventWrapper(Imputation imputation) {
+        public CalendarEventWrapper(final Imputation imputation) {
             this.date = DATE_FORMAT.format(imputation.getDay());
             this.value = imputation.getValue();
             this.type = 1;
@@ -171,7 +171,7 @@ public class ProjectTeamCalendarController {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -179,7 +179,7 @@ public class ProjectTeamCalendarController {
             return date;
         }
 
-        public void setDate(String date) {
+        public void setDate(final String date) {
             this.date = date;
         }
 
@@ -187,7 +187,7 @@ public class ProjectTeamCalendarController {
             return type;
         }
 
-        public void setType(int type) {
+        public void setType(final int type) {
             this.type = type;
         }
 
@@ -195,7 +195,7 @@ public class ProjectTeamCalendarController {
             return value;
         }
 
-        public void setValue(double value) {
+        public void setValue(final double value) {
             this.value = value;
         }
 

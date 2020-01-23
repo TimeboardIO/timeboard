@@ -64,7 +64,7 @@ public class TimeboardWebSecurityConfigForTest extends WebSecurityConfigurerAdap
 
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(final WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(
                 "/public/**", "/", "/onboarding/**");
@@ -73,7 +73,7 @@ public class TimeboardWebSecurityConfigForTest extends WebSecurityConfigurerAdap
 
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(final HttpSecurity http) throws Exception {
 
 
         http.authorizeRequests()
@@ -99,12 +99,12 @@ public class TimeboardWebSecurityConfigForTest extends WebSecurityConfigurerAdap
         return new PasswordEncoder() {
 
             @Override
-            public String encode(CharSequence rawPassword) {
+            public String encode(final CharSequence rawPassword) {
                 return rawPassword.toString();
             }
 
             @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+            public boolean matches(final CharSequence rawPassword, final String encodedPassword) {
                 return rawPassword.toString().equals(encodedPassword);
             }
         };
@@ -114,11 +114,11 @@ public class TimeboardWebSecurityConfigForTest extends WebSecurityConfigurerAdap
     public class CustomFilter extends GenericFilterBean {
 
         @Override
-        public void doFilter(ServletRequest request,
-                             ServletResponse response,
-                             FilterChain chain) throws IOException, ServletException {
+        public void doFilter(final ServletRequest request,
+                             final ServletResponse response,
+                             final FilterChain chain) throws IOException, ServletException {
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
             if (auth != null && (auth instanceof TimeboardAuthentication) == false) {
                 Account account = null;

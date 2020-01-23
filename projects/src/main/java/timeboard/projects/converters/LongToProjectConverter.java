@@ -43,11 +43,11 @@ public class LongToProjectConverter implements Converter<String, Project> {
     private ProjectService service;
 
     @Override
-    public Project convert(String aLong) {
-        TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    public Project convert(final String aLong) {
+        final TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
         try {
             return this.service.getProjectByID(auth.getDetails(), auth.getCurrentOrganization(), Long.parseLong(aLong));
-        } catch (BusinessException e) {
+        } catch (final BusinessException e) {
             return null;
         }
     }

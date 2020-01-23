@@ -42,25 +42,25 @@ public class JSONToStringMapConverter implements AttributeConverter<Map<String, 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(Map<String, String> stringStringMap) {
+    public String convertToDatabaseColumn(final Map<String, String> stringStringMap) {
         String res = "{}";
         try {
             res = OBJECT_MAPPER.writeValueAsString(stringStringMap);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             e.printStackTrace();
         }
         return res;
     }
 
     @Override
-    public Map<String, String> convertToEntityAttribute(String s) {
+    public Map<String, String> convertToEntityAttribute(final String s) {
         Map<String, String> attrs = new HashMap<>();
 
-        TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+        final TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
         };
         try {
             attrs = OBJECT_MAPPER.readValue(s, typeRef);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         return attrs;

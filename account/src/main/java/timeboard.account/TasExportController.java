@@ -53,19 +53,19 @@ public class TasExportController {
 
 
     @PostMapping
-    protected String handlePost(TimeboardAuthentication authentication,
-                                HttpServletRequest request, HttpServletResponse response, Model model) {
+    protected String handlePost(final TimeboardAuthentication authentication,
+                                final HttpServletRequest request, final HttpServletResponse response, final Model model) {
 
         try {
-            Account actor = authentication.getDetails();
-            int month = Integer.parseInt(request.getParameter("month"));
-            int year = Integer.parseInt(request.getParameter("year"));
-            Long projectID = Long.parseLong(request.getParameter("projectID"));
+            final Account actor = authentication.getDetails();
+            final int month = Integer.parseInt(request.getParameter("month"));
+            final int year = Integer.parseInt(request.getParameter("year"));
+            final Long projectID = Long.parseLong(request.getParameter("projectID"));
 
-            Calendar cal = Calendar.getInstance();
+            final Calendar cal = Calendar.getInstance();
             cal.set(year, month - 1, 1, 2, 0);
 
-            try (ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
+            try (final ByteArrayOutputStream buf = new ByteArrayOutputStream()) {
                 final Project project = projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
                 final TASData data = projectService.generateTasData(actor, project, month, year);
                 final ExcelTASReport tasReport = new ExcelTASReport(buf);
@@ -84,7 +84,7 @@ public class TasExportController {
 
             }
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
         }
 
         return ("/account");

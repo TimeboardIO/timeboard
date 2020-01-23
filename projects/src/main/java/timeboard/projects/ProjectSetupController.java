@@ -77,8 +77,8 @@ public class ProjectSetupController {
 
 
     @GetMapping
-    protected String configProject(TimeboardAuthentication authentication,
-                                   @PathVariable long projectID, Model model) throws BusinessException {
+    protected String configProject(final TimeboardAuthentication authentication,
+                                   @PathVariable final long projectID, final Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         final Map<String, Object> map = new HashMap<>();
@@ -89,8 +89,8 @@ public class ProjectSetupController {
 
     @PostMapping("/memberships")
     @ResponseBody
-    protected ResponseEntity updateProjectMembers(TimeboardAuthentication authentication,
-                                                  @PathVariable long projectID, HttpServletRequest request) throws Exception {
+    protected ResponseEntity updateProjectMembers(final TimeboardAuthentication authentication,
+                                                  @PathVariable final long projectID, final HttpServletRequest request) throws Exception {
         final Account actor = authentication.getDetails();
         final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
@@ -105,10 +105,10 @@ public class ProjectSetupController {
     }
 
     @PatchMapping("/memberships/{membershipID}/{role}")
-    protected ResponseEntity updateProjectMembers(TimeboardAuthentication authentication,
-                                                  @PathVariable Long projectID,
-                                                  @PathVariable Long membershipID,
-                                                  @PathVariable MembershipRole role) throws Exception {
+    protected ResponseEntity updateProjectMembers(final TimeboardAuthentication authentication,
+                                                  @PathVariable final Long projectID,
+                                                  @PathVariable final Long membershipID,
+                                                  @PathVariable final MembershipRole role) throws Exception {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
@@ -120,9 +120,9 @@ public class ProjectSetupController {
     }
 
     @DeleteMapping("/memberships/{membershipID}")
-    protected ResponseEntity deleteProjectMembers(TimeboardAuthentication authentication,
-                                                  @PathVariable Long projectID,
-                                                  @PathVariable Long membershipID) throws Exception {
+    protected ResponseEntity deleteProjectMembers(final TimeboardAuthentication authentication,
+                                                  @PathVariable final Long projectID,
+                                                  @PathVariable final Long membershipID) throws Exception {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
@@ -135,10 +135,10 @@ public class ProjectSetupController {
     }
 
     @PostMapping("/informations")
-    protected String updateProjectConfiguration(TimeboardAuthentication authentication,
-                                                @PathVariable long projectID,
-                                                @ModelAttribute ProjectConfigForm projectConfigForm,
-                                                RedirectAttributes attributes) throws Exception {
+    protected String updateProjectConfiguration(final TimeboardAuthentication authentication,
+                                                @PathVariable final long projectID,
+                                                @ModelAttribute final ProjectConfigForm projectConfigForm,
+                                                final RedirectAttributes attributes) throws Exception {
 
         final Account actor = authentication.getDetails();
 
@@ -150,7 +150,7 @@ public class ProjectSetupController {
         try {
             this.projectService.updateProject(actor, project);
             attributes.addFlashAttribute("success", "Project config updated successfully.");
-        } catch (BusinessException e) {
+        } catch (final BusinessException e) {
             attributes.addFlashAttribute("error", e.getMessage());
         }
 
@@ -187,7 +187,7 @@ public class ProjectSetupController {
             return memberships;
         }
 
-        public void setMemberships(List<ProjectMembership> memberships) {
+        public void setMemberships(final List<ProjectMembership> memberships) {
             this.memberships = memberships;
         }
     }
@@ -202,7 +202,7 @@ public class ProjectSetupController {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -210,7 +210,7 @@ public class ProjectSetupController {
             return quotation;
         }
 
-        public void setQuotation(double quotation) {
+        public void setQuotation(final double quotation) {
             this.quotation = quotation;
         }
 
@@ -218,7 +218,7 @@ public class ProjectSetupController {
             return comments;
         }
 
-        public void setComments(String comments) {
+        public void setComments(final String comments) {
             this.comments = comments;
         }
 

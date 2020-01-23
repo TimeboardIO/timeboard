@@ -51,7 +51,7 @@ public class Report extends OrganizationEntity implements Serializable {
         this.type = ReportType.PROJECT_KPI;
     }
 
-    public Report(String name, ReportType type, String filterProject) {
+    public Report(final String name, final ReportType type, final String filterProject) {
         this.name = name;
         this.type = type;
         this.filterProject = filterProject;
@@ -61,7 +61,7 @@ public class Report extends OrganizationEntity implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -69,7 +69,7 @@ public class Report extends OrganizationEntity implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -77,7 +77,7 @@ public class Report extends OrganizationEntity implements Serializable {
         return filterProject;
     }
 
-    public void setFilterProject(String filterProject) {
+    public void setFilterProject(final String filterProject) {
         this.filterProject = filterProject;
     }
 
@@ -85,7 +85,7 @@ public class Report extends OrganizationEntity implements Serializable {
         return type;
     }
 
-    public void setType(ReportType type) {
+    public void setType(final ReportType type) {
         this.type = type;
     }
 }
