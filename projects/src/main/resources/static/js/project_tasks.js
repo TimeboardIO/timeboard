@@ -201,7 +201,7 @@ let app = new Vue({
             $('.graph.modal').modal({ detachable : true, centered: true }).modal('show');
             $.ajax({
                 method: "GET",
-                url: "/api/tasks/chart?task="+task.taskID,
+                url: "/projects/"+currentProjectID+"/tasks/chart?task="+task.taskID,
                 success : function(data, textStatus, jqXHR) {
 
                     let listOfTaskDates = data.listOfTaskDates;
@@ -298,7 +298,7 @@ let app = new Vue({
         },
         approveTask: function(event, task) {
             event.target.classList.toggle('loading');
-            $.get("/api/tasks/approve?task="+task.taskID)
+            $.get("/projects/"+currentProjectID+"/tasks/approve?task="+task.taskID)
                 .then(function(data) {
                     task.status = 'IN_PROGRESS';
                     event.target.classList.toggle('loading');
@@ -309,7 +309,7 @@ let app = new Vue({
             this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.taskName + "?",
                 function() {
                     event.target.classList.toggle('loading');
-                    $.get("/api/tasks/delete?task="+task.taskID)
+                    $.get("/projects/"+currentProjectID+"/tasks/delete?task="+task.taskID)
                         .then(function(data) {
                             event.target.classList.toggle('loading');
                             window.location.reload();
@@ -319,7 +319,7 @@ let app = new Vue({
         },
         denyTask: function(event, task) {
             event.target.classList.toggle('loading');
-            $.get("/api/tasks/deny?task="+task.taskID)
+            $.get("/projects/"+currentProjectID+"/tasks/deny?task="+task.taskID)
                 .then(function(data){
                     task.status = 'REFUSED';
                     event.target.classList.toggle('loading');
@@ -339,7 +339,7 @@ let app = new Vue({
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: "/api/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
+                url: "/projects/"+currentProjectID+"/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
                 success: function (d) {
                     self.batches = d;
                     d.forEach(function(batch) {
@@ -359,7 +359,7 @@ let app = new Vue({
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/api/tasks?project=" + currentProjectID,
+            url: "/projects/"+currentProjectID+"/tasks/list",
             success: function (d) {
                 self.table.data = d;
                 if(currentBatchType !== 'Default') {
