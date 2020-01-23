@@ -31,11 +31,7 @@ import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.service.IssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.EncryptionService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
@@ -61,13 +57,6 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
             new ProjectSyncCredentialField(GITHUB_REPO_OWNER_KEY, "Github repo owner", ProjectSyncCredentialField.Type.TEXT, 1),
             new ProjectSyncCredentialField(GITHUB_REPO_NAME_KEY, "Github repo name", ProjectSyncCredentialField.Type.TEXT, 2)
     );
-    private static final String GITHUB_ORIGIN_KEY = "github";
-    @Autowired
-    public EncryptionService encryptionService;
-    @Autowired
-    private ProjectService projectService;
-    @Autowired
-    private UserService userService;
 
     @Override
     public String getServiceName() {
@@ -112,7 +101,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
                 remoteTasks.add(rt);
             });
         } catch (final Exception e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
 
         LOGGER.info("Import {} tasks from github", remoteTasks.size());

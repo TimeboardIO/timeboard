@@ -29,6 +29,8 @@ package timeboard.core.model.converters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeConverter;
 import java.io.IOException;
@@ -39,6 +41,7 @@ public class JSONToStringListConverter
         implements AttributeConverter<List<String>, String> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONToStringListConverter.class);
 
     @Override
     public String convertToDatabaseColumn(final List<String> attributes) {
@@ -48,7 +51,7 @@ public class JSONToStringListConverter
         try {
             return OBJECT_MAPPER.writeValueAsString(attributes);
         } catch (final JsonProcessingException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
             return null;
         }
     }
@@ -64,7 +67,7 @@ public class JSONToStringListConverter
         try {
             attrs = OBJECT_MAPPER.readValue(data, typeRef);
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
 
         return attrs;

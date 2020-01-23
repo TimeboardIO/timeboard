@@ -414,7 +414,7 @@ public class ProjectServiceImpl implements ProjectService {
             try {
                 updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
             } catch (final BusinessException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
             result.add(updatedTaskResult);
         }
@@ -518,7 +518,7 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
-    public Imputation actionOnImputation(Imputation imputation,
+    public Imputation actionOnImputation( final Imputation imputation,
                                           final AbstractTask task,
                                           final Account actor,
                                           final double val,
@@ -526,12 +526,12 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (imputation == null) {
             //No imputation for current task and day
-            imputation = new Imputation();
-            imputation.setDay(date);
-            imputation.setTask(task);
-            imputation.setAccount(actor);
-            imputation.setValue(val);
-            em.persist(imputation);
+            final Imputation localImputation = new Imputation();
+            localImputation.setDay(date);
+            localImputation.setTask(task);
+            localImputation.setAccount(actor);
+            localImputation.setValue(val);
+            em.persist(localImputation);
         } else {
             // There is an existing imputation for this day and task
             if (val == 0) {

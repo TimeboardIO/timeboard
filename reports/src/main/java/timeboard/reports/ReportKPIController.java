@@ -26,6 +26,8 @@ package timeboard.reports;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +52,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @Controller
 @RequestMapping("/data-chart/report-kpi")
 public class ReportKPIController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportKPIController.class);
 
     @Autowired
     private ReportService reportService;
@@ -81,12 +85,12 @@ public class ReportKPIController {
         listOfProjectsFiltered.forEach(projectWrapper -> {
             try {
                 final ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, projectWrapper.getProject());
-                originalEstimate.updateAndGet(v -> (v + currentProjectDashboard.getOriginalEstimate()));
-                effortLeft.updateAndGet(v -> (v + currentProjectDashboard.getEffortLeft()));
-                effortSpent.updateAndGet(v -> (v + currentProjectDashboard.getEffortSpent()));
-                quotation.updateAndGet(v -> (v + currentProjectDashboard.getQuotation()));
+                originalEstimate.updateAndGet(v -> v + currentProjectDashboard.getOriginalEstimate());
+                effortLeft.updateAndGet(v -> v + currentProjectDashboard.getEffortLeft());
+                effortSpent.updateAndGet(v -> v + currentProjectDashboard.getEffortSpent());
+                quotation.updateAndGet(v -> v + currentProjectDashboard.getQuotation());
             } catch (final BusinessException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage());
             }
         });
 

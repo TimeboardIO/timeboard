@@ -83,7 +83,7 @@ public class ImputationLoader {
                         imputationsSaved.add(imputation);
 
                     } catch (final Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }

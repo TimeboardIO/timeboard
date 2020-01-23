@@ -59,7 +59,7 @@ public class ProjectLoader {
                         projectsSaved.add(this.projectService.createProject(owner, "project owner " + i + " number " + j));
 
                     } catch (final BusinessException e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }

@@ -37,7 +37,6 @@ import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.UserService;
@@ -64,10 +63,6 @@ public class ReportsController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private ProjectService projectService;
-
 
     @GetMapping
     protected String handleGet() {

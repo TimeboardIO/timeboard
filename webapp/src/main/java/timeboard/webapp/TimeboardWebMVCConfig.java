@@ -52,9 +52,6 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     private WebRessourcesInterceptor webRessourcesInterceptor;
 
     @Autowired
-    private OrganizationFilter organizationInterceptor;
-
-    @Autowired
     private LongToProjectConverter longToProjectConverter;
 
     @Autowired
