@@ -160,7 +160,7 @@ public class ProjectSetupController {
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());
-        MembershipRole roleActor = pmf.getMemberships()
+        final MembershipRole roleActor = pmf.getMemberships()
                 .stream()
                 .filter(member -> member.getMember().getId() == actor.getId())
                 .map(ProjectMembership::getRole)
