@@ -59,6 +59,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects/{projectID}/tasks")
 public class ProjectTasksController {
 
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Autowired
     public ProjectService projectService;
