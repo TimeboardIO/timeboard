@@ -12,10 +12,10 @@ package timeboard.projects.converters;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,17 +37,17 @@ import timeboard.core.security.TimeboardAuthentication;
 
 
 @Component
-public class LongToProjectConverter implements Converter<String, Project>{
+public class LongToProjectConverter implements Converter<String, Project> {
 
     @Autowired
     private ProjectService service;
 
     @Override
-    public Project convert(String aLong) {
-        TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
+    public Project convert(final String aLong) {
+        final TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
         try {
             return this.service.getProjectByID(auth.getDetails(), auth.getCurrentOrganization(), Long.parseLong(aLong));
-        } catch (BusinessException e) {
+        } catch (final BusinessException e) {
             return null;
         }
     }

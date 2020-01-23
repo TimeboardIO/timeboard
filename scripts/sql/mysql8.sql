@@ -201,7 +201,8 @@
 
     create table SubmittedTimesheet (
        id bigint not null,
-        isValidated bit,
+        organizationID bigint,
+        timesheetStatus varchar(255),
         week integer,
         year integer,
         account_id bigint,
@@ -280,6 +281,9 @@
 
     alter table OrganizationMembership 
        add constraint UKpaqirhkf66d2aqtd9y6w8jn0p unique (member_id, organization_id);
+
+    alter table Project 
+       add constraint UKuoiyyyl15jr4umh2nb99wx93 unique (name, organizationID);
 
     alter table Batch 
        add constraint FK21pv4fxo1jl876oc1u31wf21n 

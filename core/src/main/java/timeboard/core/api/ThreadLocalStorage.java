@@ -37,9 +37,9 @@ public class ThreadLocalStorage {
         return CURRENT_ORG_ID.get();
     }
 
-    public static void setCurrentOrgId(Long tenantName) {
+    public static void setCurrentOrgId(final Long tenantName) {
         CURRENT_ORG_ID.set(tenantName);
-        ((TimeboardAuthentication)SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
+        ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
     }
 
 }

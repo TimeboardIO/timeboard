@@ -12,10 +12,10 @@ package timeboard.core.model.converters;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,35 +36,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JSONToStringListConverter
-       implements AttributeConverter<List<String>, String> {
-    private static final String DELIMITER = "|";
+        implements AttributeConverter<List<String>, String> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
-    public String convertToDatabaseColumn(List<String> attributes) {
-        if ( attributes == null || attributes.isEmpty() ) {
+    public String convertToDatabaseColumn(final List<String> attributes) {
+        if (attributes == null || attributes.isEmpty()) {
             return null;
         }
         try {
             return OBJECT_MAPPER.writeValueAsString(attributes);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             e.printStackTrace();
             return null;
         }
     }
 
     @Override
-    public List<String> convertToEntityAttribute(String data) {
-      if ( data == null ) {
-        return new ArrayList<String>();
-      }
+    public List<String> convertToEntityAttribute(final String data) {
+        if (data == null) {
+            return new ArrayList<String>();
+        }
         List attrs = null;
-        TypeReference<ArrayList<String>> typeRef = new TypeReference<ArrayList<String>>() {
+        final TypeReference<ArrayList<String>> typeRef = new TypeReference<ArrayList<String>>() {
         };
         try {
             attrs = OBJECT_MAPPER.readValue(data, typeRef);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
 

@@ -66,11 +66,11 @@ public class Batch extends OrganizationEntity implements Serializable {
     private Set<Task> tasks;
 
 
-    public Batch(long id,
-                 String name,
-                 Date date,
-                 BatchType type,
-                 Map<String, String> attributes, Project project, Set<Task> tasks) {
+    public Batch(final long id,
+                 final String name,
+                 final Date date,
+                 final BatchType type,
+                 final Map<String, String> attributes, final Project project, final Set<Task> tasks) {
         this.id = id;
         this.name = name;
         this.date = date;
@@ -88,7 +88,7 @@ public class Batch extends OrganizationEntity implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -96,7 +96,7 @@ public class Batch extends OrganizationEntity implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -104,8 +104,8 @@ public class Batch extends OrganizationEntity implements Serializable {
         return date;
     }
 
-    public void setDate(Date date) {
-        if(this.getType() != BatchType.GROUP) {
+    public void setDate(final Date date) {
+        if (this.getType() != BatchType.GROUP) {
             this.date = date;
         }
     }
@@ -114,7 +114,7 @@ public class Batch extends OrganizationEntity implements Serializable {
         return type;
     }
 
-    public void setType(BatchType type) {
+    public void setType(final BatchType type) {
         this.type = type;
     }
 
@@ -122,7 +122,7 @@ public class Batch extends OrganizationEntity implements Serializable {
         return attributes;
     }
 
-    public void setAttributes(Map<String, String> attributes) {
+    public void setAttributes(final Map<String, String> attributes) {
         this.attributes = attributes;
     }
 
@@ -130,7 +130,7 @@ public class Batch extends OrganizationEntity implements Serializable {
         return tasks;
     }
 
-    public void setTasks(Set<Task> tasks) {
+    public void setTasks(final Set<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -138,7 +138,7 @@ public class Batch extends OrganizationEntity implements Serializable {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(final Project project) {
         this.project = project;
     }
 

@@ -12,10 +12,10 @@ package timeboard.core.api.sync;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -49,7 +49,7 @@ public class RemoteTask {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -57,7 +57,7 @@ public class RemoteTask {
         return title;
     }
 
-    public void setTitle(String summary) {
+    public void setTitle(final String summary) {
         this.title = summary;
     }
 
@@ -65,7 +65,7 @@ public class RemoteTask {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(final String userName) {
         this.userName = userName;
     }
 
@@ -73,7 +73,7 @@ public class RemoteTask {
         return origin;
     }
 
-    public void setOrigin(String o) {
+    public void setOrigin(final String o) {
         this.origin = o;
     }
 
@@ -81,7 +81,7 @@ public class RemoteTask {
         return startDate;
     }
 
-    public void setStartDate(Date date) {
+    public void setStartDate(final Date date) {
         this.startDate = date;
     }
 
@@ -89,7 +89,7 @@ public class RemoteTask {
         return localUserID;
     }
 
-    public void setLocalUserID(Long localUserID) {
+    public void setLocalUserID(final Long localUserID) {
         this.localUserID = localUserID;
     }
 
@@ -97,7 +97,7 @@ public class RemoteTask {
         return comments;
     }
 
-    public void setComments(String comments) {
+    public void setComments(final String comments) {
         this.comments = comments;
     }
 
@@ -105,7 +105,7 @@ public class RemoteTask {
         return stopDate;
     }
 
-    public void setStopDate(Date stopDate) {
+    public void setStopDate(final Date stopDate) {
         this.stopDate = stopDate;
     }
 }

@@ -38,7 +38,7 @@ public class TaskHasNoImputation implements Rule<AbstractTask> {
     }
 
     @Override
-    public boolean isSatisfied(Account u, AbstractTask thing) {
+    public boolean isSatisfied(final Account u, final AbstractTask thing) {
         return thing.getImputations().isEmpty();
     }
 }

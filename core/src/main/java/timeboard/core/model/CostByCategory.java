@@ -57,7 +57,7 @@ public class CostByCategory extends OrganizationEntity {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -65,7 +65,7 @@ public class CostByCategory extends OrganizationEntity {
         return account;
     }
 
-    public void setAccount(Account account) throws BusinessException {
+    public void setAccount(final Account account) throws BusinessException {
         this.account = account;
     }
 
@@ -73,7 +73,7 @@ public class CostByCategory extends OrganizationEntity {
         return costPerHour;
     }
 
-    public void setCostPerHour(double costPerHour) {
+    public void setCostPerHour(final double costPerHour) {
         this.costPerHour = costPerHour;
     }
 
@@ -81,7 +81,7 @@ public class CostByCategory extends OrganizationEntity {
         return costPerDay;
     }
 
-    public void setCostPerDay(double costPerDay) {
+    public void setCostPerDay(final double costPerDay) {
         this.costPerDay = costPerDay;
     }
 
@@ -89,7 +89,7 @@ public class CostByCategory extends OrganizationEntity {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -97,7 +97,7 @@ public class CostByCategory extends OrganizationEntity {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(final Date endDate) {
         this.endDate = endDate;
     }
 }

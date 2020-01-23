@@ -33,12 +33,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectTag;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,8 +52,8 @@ public class ProjectTagsController {
     private ProjectService projectService;
 
     @GetMapping
-    public String display(TimeboardAuthentication authentication,
-                          @PathVariable Long projectID, Model model) throws BusinessException {
+    public String display(final TimeboardAuthentication authentication,
+                          @PathVariable final Long projectID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
@@ -64,16 +64,19 @@ public class ProjectTagsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> listTags(TimeboardAuthentication authentication,
-                                                            @PathVariable Long projectID) throws BusinessException {
+    public ResponseEntity<List<ProjectTagWrapper>> listTags(final TimeboardAuthentication authentication,
+                                                            @PathVariable final Long projectID) throws BusinessException {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new ProjectTagWrapper(projectTag)).collect(Collectors.toList()));
     }
 
     @DeleteMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> deleteTag(TimeboardAuthentication authentication,
-                                                             @PathVariable Long projectID, @PathVariable Long tagID) throws BusinessException {
+    public ResponseEntity<List<ProjectTagWrapper>> deleteTag(
+            final TimeboardAuthentication authentication,
+            @PathVariable final Long projectID,
+            @PathVariable final Long tagID) throws BusinessException {
+
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getTags().removeIf(projectTag -> projectTag.getId().equals(tagID));
@@ -82,10 +85,10 @@ public class ProjectTagsController {
     }
 
     @PatchMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> patchTag(TimeboardAuthentication authentication,
-                                                            @PathVariable Long projectID,
-                                                            @PathVariable Long tagID,
-                                                            @ModelAttribute ProjectTag tag) throws BusinessException {
+    public ResponseEntity<List<ProjectTagWrapper>> patchTag(final TimeboardAuthentication authentication,
+                                                            @PathVariable final Long projectID,
+                                                            @PathVariable final Long tagID,
+                                                            @ModelAttribute final ProjectTag tag) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
@@ -100,15 +103,15 @@ public class ProjectTagsController {
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<ProjectTagWrapper>> createTag(TimeboardAuthentication authentication,
-                                                             @PathVariable Long projectID,
-                                                             @ModelAttribute ProjectTag tag) throws BusinessException {
+    public ResponseEntity<List<ProjectTagWrapper>> createTag(final TimeboardAuthentication authentication,
+                                                             @PathVariable final Long projectID,
+                                                             @ModelAttribute final ProjectTag tag) throws BusinessException {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         tag.setProject(project);
         project.getTags().add(tag);
         this.projectService.updateProject(actor, project);
-        return this.listTags(authentication,projectID);
+        return this.listTags(authentication, projectID);
     }
 
     public static class ProjectTagWrapper {
@@ -117,7 +120,7 @@ public class ProjectTagsController {
         private String tagValue;
         private Long id;
 
-        public ProjectTagWrapper(ProjectTag projectTag) {
+        public ProjectTagWrapper(final ProjectTag projectTag) {
             this.tagKey = projectTag.getTagKey();
             this.tagValue = projectTag.getTagValue();
             this.id = projectTag.getId();
@@ -127,7 +130,7 @@ public class ProjectTagsController {
             return id;
         }
 
-        public void setId(Long id) {
+        public void setId(final Long id) {
             this.id = id;
         }
 
@@ -135,7 +138,7 @@ public class ProjectTagsController {
             return tagKey;
         }
 
-        public void setTagKey(String tagKey) {
+        public void setTagKey(final String tagKey) {
             this.tagKey = tagKey;
         }
 
@@ -143,7 +146,7 @@ public class ProjectTagsController {
             return tagValue;
         }
 
-        public void setTagValue(String tagValue) {
+        public void setTagValue(final String tagValue) {
             this.tagValue = tagValue;
         }
     }

@@ -35,11 +35,11 @@ public class UserException extends BusinessException {
 
     private final Set<Rule> triggeredRules = new HashSet<>();
 
-    public UserException(Exception e) {
+    public UserException(final Exception e) {
         super(e);
     }
 
-    public UserException(String err) {
+    public UserException(final String err) {
         super(err);
     }
 
@@ -49,7 +49,7 @@ public class UserException extends BusinessException {
         if (this.triggeredRules.isEmpty()) {
             return super.getMessage();
         } else {
-            StringBuilder builder = new StringBuilder();
+            final StringBuilder builder = new StringBuilder();
             this.triggeredRules.forEach(rule -> {
                 builder.append(rule.ruleDescription());
                 builder.append("\n");

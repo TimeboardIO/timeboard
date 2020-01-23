@@ -29,24 +29,18 @@ package timeboard.core.internal;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.internal.async.ProjectSyncJob;
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.Project;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @Component
 public class ProjectSyncPluginImpl implements ProjectSyncService {
-
-    @Autowired
-    private ProjectService projectService;
-
-    @Autowired
-    private UserService userService;
 
     @Autowired
     private Scheduler scheduler;
@@ -56,11 +50,11 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
 
     @Override
     public void syncProjectTasksWithSchedule(final Long orgID,
-                                 final Account actor,
-                                 final Project project,
-                                 final String serviceName,
-                                 final List<ProjectSyncCredentialField> jiraCredentials,
-                                 final CronScheduleBuilder cronScheduleBuilder) {
+                                             final Account actor,
+                                             final Project project,
+                                             final String serviceName,
+                                             final List<ProjectSyncCredentialField> jiraCredentials,
+                                             final CronScheduleBuilder cronScheduleBuilder) {
 
 
         final JobDetail jobDetails = buildJobDetails(serviceName, project);
@@ -85,7 +79,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             this.scheduler.scheduleJob(trigger);
 
 
-        } catch (SchedulerException e) {
+        } catch (final SchedulerException e) {
             e.printStackTrace();
         }
 
@@ -120,13 +114,13 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             this.scheduler.scheduleJob(trigger);
 
 
-        } catch (SchedulerException e) {
+        } catch (final SchedulerException e) {
             e.printStackTrace();
         }
 
     }
 
-    private JobDetail buildJobDetails(String serviceName, Project project) {
+    private JobDetail buildJobDetails(final String serviceName, final Project project) {
 
         return JobBuilder.newJob()
                 .withIdentity(new JobKey(project.getId().toString()))
@@ -138,7 +132,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     @Override
-    public List<ProjectSyncCredentialField> getServiceFields(String serviceName) {
+    public List<ProjectSyncCredentialField> getServiceFields(final String serviceName) {
         final ProjectSyncPlugin syncService = this.projectImportServiceList.stream()
                 .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
                 .findFirst().get();

@@ -41,7 +41,7 @@ public interface ProjectService {
 
     Project createProject(Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(Account owner,  Long orgID);
+    List<Project> listProjects(Account owner, Long orgID);
 
     Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
 
@@ -84,8 +84,6 @@ public interface ProjectService {
     void deleteTaskByID(Account actor, long taskID) throws BusinessException;
 
     void deleteTasks(Account actor, List<Task> taskList);
-
-
 
 
     Optional<Task> getTaskByRemoteID(Account actor, String id);
@@ -165,7 +163,6 @@ public interface ProjectService {
     Batch addTasksToBatch(Account actor,
                           Batch currentBatch,
                           List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
-
 
 
     TASData generateTasData(Account user, Project project, int month, int year);

@@ -12,10 +12,10 @@ package timeboard.core.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 
 @Component
@@ -42,15 +43,15 @@ public final class AbacPermissionEvaluator implements PermissionEvaluator {
     PolicyEnvironment policyEnvironment;
 
     @Override
-    public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+    public boolean hasPermission(final Authentication authentication, final Object targetDomainObject, final Object permission) {
         // Getting subject
-        TimeboardAuthentication user = (TimeboardAuthentication) authentication;
+        final TimeboardAuthentication user = (TimeboardAuthentication) authentication;
 
         return policy.check(user, targetDomainObject, permission, policyEnvironment);
     }
 
     @Override
-    public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+    public boolean hasPermission(final Authentication authentication, final Serializable targetId, final String targetType, final Object permission) {
         return false;
     }
 }

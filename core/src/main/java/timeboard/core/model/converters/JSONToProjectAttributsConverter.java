@@ -44,22 +44,22 @@ public class JSONToProjectAttributsConverter implements AttributeConverter<Map<S
 
 
     @Override
-    public String convertToDatabaseColumn(Map<String, ProjectAttributValue> stringProjectAttributValueMap) {
+    public String convertToDatabaseColumn(final Map<String, ProjectAttributValue> stringProjectAttributValueMap) {
         String res = "{}";
         try {
             res = OBJECT_MAPPER.writeValueAsString(stringProjectAttributValueMap);
-        } catch (JsonProcessingException e) {
+        } catch (final JsonProcessingException e) {
             e.printStackTrace();
         }
         return res;
     }
 
     @Override
-    public Map<String, ProjectAttributValue> convertToEntityAttribute(String s) {
+    public Map<String, ProjectAttributValue> convertToEntityAttribute(final String s) {
         final Map<String, ProjectAttributValue> attrs = new HashMap<>();
         try {
             attrs.putAll(OBJECT_MAPPER.readValue(s, ProjectAttributeValueMap.class));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         return attrs;

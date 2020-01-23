@@ -41,8 +41,8 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 
 @Component
@@ -59,7 +59,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    public Organization createOrganization(final String organizationName, Map<String, String> properties) {
+    public Organization createOrganization(final String organizationName, final Map<String, String> properties) {
 
         final Organization organization = new Organization();
         organization.setName(organizationName);
@@ -73,7 +73,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         try {
             this.createDefaultTask(organization, this.defaultVacationTaskName);
-        } catch (BusinessException e) {
+        } catch (final BusinessException e) {
             e.printStackTrace();
         }
 
@@ -81,7 +81,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Organization createOrganization(final Account actor, String organizationName, Map<String, String> properties) throws BusinessException {
+    public Organization createOrganization(
+            final Account actor,
+            final String organizationName,
+            final Map<String, String> properties) throws BusinessException {
 
         final Organization org = this.createOrganization(organizationName, properties);
         this.addMember(actor, org, actor, MembershipRole.OWNER);
@@ -91,36 +94,36 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @PostAuthorize("#actor.isMemberOf(returnObject)")
-    @Cacheable(value="organizationsCache", key = "#id")
-    public Optional<Organization> getOrganizationByID(Account actor, long id) {
+    @Cacheable(value = "organizationsCache", key = "#id")
+    public Optional<Organization> getOrganizationByID(final Account actor, final long id) {
         Organization data;
         try {
             data = em.find(Organization.class, id);
-        } catch (Exception nre) {
+        } catch (final Exception nre) {
             data = null;
         }
         return Optional.ofNullable(data);
     }
 
     @Override
-    public Optional<Organization> getOrganizationByName(String orgName) {
+    public Optional<Organization> getOrganizationByName(final String orgName) {
         Organization org = null;
         try {
-            TypedQuery<Organization> q = this.em.createNamedQuery(Organization.FIND_BY_NAME, Organization.class);
+            final TypedQuery<Organization> q = this.em.createNamedQuery(Organization.FIND_BY_NAME, Organization.class);
             q.setParameter("name", orgName);
             org = q.getSingleResult();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             org = null;
         }
         return Optional.ofNullable(org);
     }
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#organization.getId()")
-    public Optional<Organization> updateOrganization(Account actor, Organization organization) {
+    @CacheEvict(value = "organizationsCache", key = "#organization.getId()")
+    public Optional<Organization> updateOrganization(final Account actor, final Organization organization) {
 
-        Optional<Organization> orgdb = this.getOrganizationByID(actor, organization.getId());
-        if(orgdb.isPresent()){
+        final Optional<Organization> orgdb = this.getOrganizationByID(actor, organization.getId());
+        if (orgdb.isPresent()) {
             orgdb.get().setName(organization.getName());
             orgdb.get().setCreatedDate(organization.getCreatedDate());
             this.em.merge(orgdb.get());
@@ -133,7 +136,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#organization.getId()")
+    @CacheEvict(value = "organizationsCache", key = "#organization.getId()")
     public Optional<Organization> addMember(final Account actor,
                                             final Organization organization,
                                             final Account member,
@@ -160,17 +163,17 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#o.getId()")
-    public Optional<Organization> removeMember(final Account actor, Organization o, Account member) {
+    @CacheEvict(value = "organizationsCache", key = "#o.getId()")
+    public Optional<Organization> removeMember(final Account actor, final Organization o, final Account member) {
 
-        Optional<Organization> organization = this.getOrganizationByID(actor, o.getId());
-        if(organization.isPresent()) {
+        final Optional<Organization> organization = this.getOrganizationByID(actor, o.getId());
+        if (organization.isPresent()) {
             final Optional<OrganizationMembership> membership = organization.get().getMembers()
                     .stream()
                     .filter(om -> om.getMember().getId() == member.getId())
                     .findFirst();
 
-            if(membership.isPresent()) {
+            if (membership.isPresent()) {
                 em.remove(membership.get());
                 LOGGER.info("Member " + member.getScreenName() + " is removed from organisation " + organization.get().getName()
                         + " by " + actor.getScreenName());
@@ -183,7 +186,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#membership.getOrganization().getId()")
+    @CacheEvict(value = "organizationsCache", key = "#membership.getOrganization().getId()")
     public Optional<Organization> updateMembership(final Account actor,
                                                    final OrganizationMembership membership) {
 
@@ -195,37 +198,38 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Organization organization) throws BusinessException {
+    public Optional<OrganizationMembership> findOrganizationMembership(
+            final Account actor, final Organization organization) throws BusinessException {
         return this.findOrganizationMembership(actor, organization.getId());
     }
 
     @Override
-    public Optional<OrganizationMembership> findOrganizationMembership(Account actor, Long organizationID) {
+    public Optional<OrganizationMembership> findOrganizationMembership(final Account actor, final Long organizationID) {
         final Account localActor = this.em.find(Account.class, actor.getId());
         final Optional<OrganizationMembership> o = localActor.getOrganizations()
                 .stream()
                 .filter(om -> om.getOrganization().getId() == organizationID).findFirst();
 
-        if(o.isPresent()){
+        if (o.isPresent()) {
             this.em.detach(o.get());
         }
         return o;
     }
 
     @Override
-    public Optional<OrganizationMembership> findOrganizationMembershipById(Account details, Long membershipID) {
+    public Optional<OrganizationMembership> findOrganizationMembershipById(final Account details, final Long membershipID) {
         OrganizationMembership om;
         try {
             om = this.em.find(OrganizationMembership.class, membershipID);
-        }catch (Exception e){
+        } catch (final Exception e) {
             om = null;
         }
         return Optional.ofNullable(om);
     }
 
     @Override
-    public DefaultTask updateDefaultTask(Account actor, final DefaultTask task) {
-        Optional<Organization> org = this.getOrganizationByID(actor, task.getOrganizationID());
+    public DefaultTask updateDefaultTask(final Account actor, final DefaultTask task) {
+        final Optional<Organization> org = this.getOrganizationByID(actor, task.getOrganizationID());
         if (org.isPresent()) {
             em.merge(task);
             em.flush();
@@ -233,20 +237,19 @@ public class OrganizationServiceImpl implements OrganizationService {
         return task;
     }
 
-    //TODO remove when migration is ok
     @Override
-    public boolean checkOrganizationVacationTask(String taskName) {
+    public boolean checkOrganizationVacationTask(final String taskName) {
         boolean b = true;
-        TypedQuery<Organization> q = em
+        final TypedQuery<Organization> q = em
                 .createQuery("select distinct o from Organization o", Organization.class);
-        List<Organization> orgs = q.getResultList();
+        final List<Organization> orgs = q.getResultList();
 
-        for (Organization o : orgs) {
-            Optional vacationTask = o.getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst();
+        for (final Organization o : orgs) {
+            final Optional vacationTask = o.getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst();
             if (!vacationTask.isPresent()) {
                 try {
                     this.createDefaultTask(o, defaultVacationTaskName);
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     b = false;
                 }
             }
@@ -257,27 +260,26 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    public List<DefaultTask> listDefaultTasks(Long orgID, Date ds, Date de) {
-        TypedQuery<DefaultTask> q = em
+    public List<DefaultTask> listDefaultTasks(final Long orgID, final Date ds, final Date de) {
+        final TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
                         + " t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("orgID", orgID);
-        List<DefaultTask> tasks = q.getResultList();
 
         return q.getResultList();
 
     }
 
     @Override
-    public DefaultTask createDefaultTask(Account actor, Long orgID, String name) throws BusinessException {
-        Optional<Organization> organization = this.getOrganizationByID(actor, orgID);
+    public DefaultTask createDefaultTask(final Account actor, final Long orgID, final String name) throws BusinessException {
+        final Optional<Organization> organization = this.getOrganizationByID(actor, orgID);
         return this.createDefaultTask(organization.get(), name);
     }
 
 
-    private DefaultTask createDefaultTask(Organization org, String name) throws BusinessException {
+    private DefaultTask createDefaultTask(final Organization org, final String name) throws BusinessException {
         try {
-            DefaultTask task = new DefaultTask();
+            final DefaultTask task = new DefaultTask();
             task.setStartDate(org.getCreatedDate().getTime());
             task.setEndDate(null);
             task.setOrigin(org.getName() + "/" + System.nanoTime());
@@ -288,22 +290,22 @@ public class OrganizationServiceImpl implements OrganizationService {
             em.flush();
             LOGGER.info("Default task " + task.getName() + " is created.");
             return task;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new BusinessException(e);
         }
     }
 
 
     @Override
-    public DefaultTask getDefaultTaskByID(Account account, long id) {
-        DefaultTask task = em.find(DefaultTask.class, id);
+    public DefaultTask getDefaultTaskByID(final Account account, final long id) {
+        final DefaultTask task = em.find(DefaultTask.class, id);
         return task;
     }
 
     @Override
-    public void disableDefaultTaskByID(Account actor, Long orgID, long taskID) throws BusinessException {
+    public void disableDefaultTaskByID(final Account actor, final Long orgID, final long taskID) throws BusinessException {
 
-        DefaultTask task = em.find(DefaultTask.class, taskID);
+        final DefaultTask task = em.find(DefaultTask.class, taskID);
         task.setEndDate(new Date());
 
         em.merge(task);
@@ -313,14 +315,15 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public List<TaskType> listTaskType(Long orgID) {
-        TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
+    public List<TaskType> listTaskType(final Long orgID) {
+        final TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt " +
+                "where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
         q.setParameter("orgID", orgID);
         return q.getResultList();
     }
 
     @Override
-    public TaskType findTaskTypeByID(Long taskTypeID) {
+    public TaskType findTaskTypeByID(final Long taskTypeID) {
         if (taskTypeID == null) {
             return null;
         }
@@ -328,8 +331,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public TaskType updateTaskType(Account actor, TaskType type) {
-        Optional<Organization> organization = this.getOrganizationByID(actor, type.getOrganizationID());
+    public TaskType updateTaskType(final Account actor, final TaskType type) {
+        final Optional<Organization> organization = this.getOrganizationByID(actor, type.getOrganizationID());
         if (organization.isPresent()) {
             em.merge(type);
             em.flush();
@@ -338,8 +341,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public TaskType createTaskType(Account actor, Long orgID, String name) {
-        TaskType taskType = new TaskType();
+    public TaskType createTaskType(final Account actor, final Long orgID, final String name) {
+        final TaskType taskType = new TaskType();
         taskType.setTypeName(name);
         taskType.setOrganizationID(orgID);
         em.persist(taskType);
@@ -351,7 +354,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    public void disableTaskType(Account actor, TaskType type) {
+    public void disableTaskType(final Account actor, final TaskType type) {
 
         type.setEnable(false);
 

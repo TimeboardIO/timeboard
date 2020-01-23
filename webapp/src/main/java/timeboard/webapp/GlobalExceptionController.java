@@ -36,9 +36,9 @@ import timeboard.core.api.exceptions.CommercialException;
 public class GlobalExceptionController extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CommercialException.class)
-    public ModelAndView handleCommercialException(CommercialException ex) {
+    public ModelAndView handleCommercialException(final CommercialException ex) {
 
-        ModelAndView model = new ModelAndView("commercial_error.html");
+        final ModelAndView model = new ModelAndView("commercial_error.html");
         model.addObject("errCause", ex.getCause());
         model.addObject("errMsg", ex.getMessage());
 

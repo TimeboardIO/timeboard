@@ -31,20 +31,20 @@ public class Week {
     private int number;
     private int year;
     private double imputationSum;
-    private Boolean isValidated;
+    private Boolean isSubmitted;
 
-    public Week(int number, int year, double imputationSum, Boolean isValidated) {
+    public Week(final int number, final int year, final double imputationSum, final Boolean isSubmitted) {
         this.number = number;
         this.year = year;
         this.imputationSum = imputationSum;
-        this.isValidated = isValidated;
+        this.isSubmitted = isSubmitted;
     }
 
     public int getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(final int number) {
         this.number = number;
     }
 
@@ -52,7 +52,7 @@ public class Week {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(final int year) {
         this.year = year;
     }
 
@@ -60,16 +60,16 @@ public class Week {
         return imputationSum;
     }
 
-    public void setImputationSum(double imputationSum) {
+    public void setImputationSum(final double imputationSum) {
         this.imputationSum = imputationSum;
     }
 
-    public Boolean getIsValidated() {
-        return isValidated;
+    public Boolean getSubmitted() {
+        return isSubmitted;
     }
 
-    public void setIsValidated(Boolean validated) {
-        isValidated = validated;
+    public void setSubmitted(final Boolean isSubmitted) {
+        this.isSubmitted = isSubmitted;
     }
 
 }

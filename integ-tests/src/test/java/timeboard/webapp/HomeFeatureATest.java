@@ -56,9 +56,8 @@ public class HomeFeatureATest extends TimeboardTest {
     private Model model;
 
 
-
     @Given("^user with an existing account and (\\d+) project$")
-    public void user_with_an_existing_account_and_project(int arg1) throws Throwable {
+    public void user_with_an_existing_account_and_project(final int arg1) throws Throwable {
 
         this.model = new ConcurrentModel();
         this.organisation = this.organizationService.createOrganization("Integration", Collections.emptyMap());
@@ -80,7 +79,7 @@ public class HomeFeatureATest extends TimeboardTest {
     }
 
     @Then("^the user receives (\\d+) project$")
-    public void the_user_receives_project(int arg1) throws Throwable {
+    public void the_user_receives_project(final int arg1) throws Throwable {
         Assert.assertEquals(this.model.asMap().get(HomeController.NB_PROJECTS), 1);
     }
 
