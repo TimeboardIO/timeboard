@@ -282,7 +282,7 @@
        add constraint UKpaqirhkf66d2aqtd9y6w8jn0p unique (member_id, organization_id);
 
     alter table Project 
-       add constraint UK_iflk2yk9ma95q0q9ovhftpi63 unique (name);
+       add constraint UKuoiyyyl15jr4umh2nb99wx93 unique (name, organizationID);
 
     alter table Batch 
        add constraint FK21pv4fxo1jl876oc1u31wf21n 

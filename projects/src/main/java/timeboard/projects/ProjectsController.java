@@ -89,7 +89,8 @@ public class ProjectsController {
             attributes.addFlashAttribute("success", "Project created successfully.");
             return "redirect:/projects";
         }catch(PersistenceException e){
-            attributes.addFlashAttribute("errorCreateProject", "This name is already used by another project");
+            attributes.addFlashAttribute("errorCreateProject", "The name \""+ request.getParameter("projectName")
+                    +"\" is already used by another project in this organization");
             return "redirect:/projects/create";
         }catch(Exception e){
             attributes.addFlashAttribute("errorCreateProject", "Error while project's creation");
