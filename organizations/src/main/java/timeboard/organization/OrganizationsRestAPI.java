@@ -26,6 +26,7 @@ package timeboard.organization;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +94,7 @@ public class OrganizationsRestAPI {
         for (OrganizationMembership member : members) {
 
             result.add(new MemberWrapper(
-                    member.getMember().getId(),
+                    member.getId(),
                     member.getMember().getScreenName(),
                     (member.getRole() != null ? member.getRole().name() : ""),
                     member.getCreationDate()
@@ -132,8 +133,15 @@ public class OrganizationsRestAPI {
 
         // Add member in current organization
         try {
-            Optional<Organization> newOrganization = organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
-            MemberWrapper memberWrapper = new MemberWrapper(memberID, member.getScreenName(), MembershipRole.CONTRIBUTOR.toString(), new Date());
+            final Optional<Organization> newOrganization = organizationService
+                    .addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
+
+            final MemberWrapper memberWrapper = new MemberWrapper(
+                    memberID,
+                    member.getScreenName(),
+                    MembershipRole.CONTRIBUTOR.toString(),
+                    Calendar.getInstance());
+
             return ResponseEntity.status(HttpStatus.OK).body(memberWrapper);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -143,48 +151,7 @@ public class OrganizationsRestAPI {
     }
 
 
-    @GetMapping("/members/updateRole")
-    public ResponseEntity updateMemberRole(TimeboardAuthentication authentication,
-                                           HttpServletRequest request) throws JsonProcessingException {
 
-        Account actor = authentication.getDetails();
-
-        final String strOrgID = request.getParameter("orgID");
-        Long orgID = null;
-        if (strOrgID != null) {
-            orgID = Long.parseLong(strOrgID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
-        }
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
-
-        final String strMemberID = request.getParameter("memberID");
-        Long memberID = null;
-        if (strMemberID != null) {
-            memberID = Long.parseLong(strMemberID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
-        }
-
-        final Account member = this.userService.findUserByID(memberID);
-
-
-        final String strRole = request.getParameter("role");
-        MembershipRole role = null;
-        if (strRole != null) {
-            role = MembershipRole.valueOf(strRole);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
-        }
-
-        try {
-            Optional<Organization> newOrganization = organizationService.updateMemberRole(actor, organization.get(), member, role);
-            return ResponseEntity.status(HttpStatus.OK).body(role);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-
-    }
 
 
     @GetMapping("/members/remove")
@@ -226,7 +193,9 @@ public class OrganizationsRestAPI {
         public Long id;
         public String screenName;
         public String role;
-        public java.util.Date creationDate;
+
+        @JsonFormat(pattern="yyyy-MM-dd")
+        public java.util.Calendar creationDate;
 
         public MemberWrapper() {
         }
@@ -238,7 +207,7 @@ public class OrganizationsRestAPI {
             this.creationDate = h.getCreationDate();
         }
 
-        public MemberWrapper(Long memberID, String screenName, String role, java.util.Date date) {
+        public MemberWrapper(Long memberID, String screenName, String role, java.util.Calendar date) {
             this.id = memberID;
             this.screenName = screenName;
             this.role = role;

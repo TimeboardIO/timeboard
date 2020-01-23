@@ -34,6 +34,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.annotation.PostConstruct;
+import java.util.TimeZone;
+
 @SpringBootApplication
 @EnableTransactionManagement
 @EnableWebSecurity(debug = false)
@@ -43,6 +46,11 @@ public class App {
 
     public static void main(String... args){
         final ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
+    }
+
+    @PostConstruct
+    public void started() {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
     }
 
 }
