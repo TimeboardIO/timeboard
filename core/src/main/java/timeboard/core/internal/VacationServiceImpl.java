@@ -208,10 +208,10 @@ public class VacationServiceImpl implements VacationService {
 
 
     @Override
-    public void deleteVacationRequest(final Account actor, final VacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {
 
         if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
-            this.updateImputations(actor, request, 0);
+            this.updateImputations(orgID, actor, request, 0);
         }
 
         em.remove(request);
@@ -222,7 +222,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public void deleteVacationRequest(final Account actor, final RecursiveVacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Long orgID, final Account actor, final RecursiveVacationRequest request) throws BusinessException {
 
         request.setEndDate(new Date());
         boolean removeIt = true;
@@ -230,7 +230,7 @@ public class VacationServiceImpl implements VacationService {
             if (r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
                 removeIt = false;
             } else {
-                this.deleteVacationRequest(actor, r);
+                this.deleteVacationRequest(orgID, actor, r);
             }
         }
 
@@ -244,24 +244,28 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public VacationRequest approveVacationRequest(final Account actor, final VacationRequest request) throws BusinessException {
+    public VacationRequest approveVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {
         request.setStatus(VacationRequestStatus.ACCEPTED);
         em.merge(request);
         em.flush();
 
 
-        this.updateImputations(actor, request, 1);
+        this.updateImputations(orgID, actor, request, 1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
     }
 
     @Override
-    public RecursiveVacationRequest approveVacationRequest(final Account actor, final RecursiveVacationRequest request) throws BusinessException {
+    public RecursiveVacationRequest approveVacationRequest(
+            final Long orgID,
+            final Account actor,
+            final RecursiveVacationRequest request) throws BusinessException {
+
         request.setStatus(VacationRequestStatus.ACCEPTED);
 
         for (final VacationRequest r : request.getChildren()) {
-            this.approveVacationRequest(actor, r);
+            this.approveVacationRequest(orgID, actor, r);
         }
 
         em.merge(request);
@@ -272,7 +276,7 @@ public class VacationServiceImpl implements VacationService {
         return request;
     }
 
-    private void updateImputations(final Account actor, final VacationRequest request, final double sign) throws BusinessException {
+    private void updateImputations(final Long orgID, final Account actor, final VacationRequest request, final double sign) throws BusinessException {
 
         final DefaultTask vacationTask = this.getVacationTask(actor, request);
 
@@ -294,7 +298,7 @@ public class VacationServiceImpl implements VacationService {
 
         while (c1.before(c2)) {
             if (c1.get(Calendar.DAY_OF_WEEK) <= 6 && c1.get(Calendar.DAY_OF_WEEK) > 1) {
-                this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
+                this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, c1.getTime(), value);
             }
             value = 1 * sign;
             c1.add(Calendar.DATE, 1);
@@ -303,7 +307,7 @@ public class VacationServiceImpl implements VacationService {
             value = 0.5 * sign;
         }
         if (c1.get(Calendar.DAY_OF_WEEK) <= 6 && c1.get(Calendar.DAY_OF_WEEK) > 1) {
-            this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
+            this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, c1.getTime(), value);
         }
 
     }
@@ -323,13 +327,16 @@ public class VacationServiceImpl implements VacationService {
         return null;
     }
 
-    private void updateTaskImputation(final Account user, final DefaultTask task, final Date day, final double val) throws BusinessException {
+    private void updateTaskImputation(final Long orgID,
+                                      final Account user,
+                                      final DefaultTask task,
+                                      final Date day, final double val) throws BusinessException {
 
         if (val > 0) {
             //change imputation value only if previous value is smaller than new
             final Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
             if (old.isEmpty() || old.get().getValue() < val) {
-                this.projectservice.updateTaskImputation(user, task, day, val);
+                this.projectservice.updateTaskImputation(orgID, user, task, day, val);
             }
         } else {
             // looking for existing vacation request on same day
@@ -355,7 +362,7 @@ public class VacationServiceImpl implements VacationService {
             }
 
             //update imputation
-            this.projectservice.updateTaskImputation(user, task, day, newValue);
+            this.projectservice.updateTaskImputation(orgID, user, task, day, newValue);
 
         }
 

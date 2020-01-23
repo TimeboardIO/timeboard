@@ -60,13 +60,13 @@ public interface VacationService {
 
     Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
-    void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+    void deleteVacationRequest(Long orgID,  Account actor, VacationRequest request) throws BusinessException;
 
-    void deleteVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException;
+    void deleteVacationRequest(Long orgID, Account actor, RecursiveVacationRequest request) throws BusinessException;
 
-    VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+    VacationRequest approveVacationRequest(Long orgID, Account actor, VacationRequest request) throws BusinessException;
 
-    RecursiveVacationRequest approveVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException;
+    RecursiveVacationRequest approveVacationRequest(Long orgID, Account actor, RecursiveVacationRequest request) throws BusinessException;
 
     VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
 
