@@ -202,7 +202,7 @@
     create table SubmittedTimesheet (
        id bigint not null,
         organizationID bigint,
-        validationStatus varchar(255),
+        timesheetStatus varchar(255),
         week integer,
         year integer,
         account_id bigint,

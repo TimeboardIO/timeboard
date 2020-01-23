@@ -105,8 +105,9 @@ public class UsersSearchRestController {
     }
 
     @GetMapping("/byRole")
-    protected ResponseEntity<SearchResults> doGetMembersProjects(TimeboardAuthentication authentication,
-                                                                 HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+    protected ResponseEntity<SearchResults> doGetMembersProjects(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest req, HttpServletResponse resp) throws BusinessException {
 
         Account actor = authentication.getDetails();
 
