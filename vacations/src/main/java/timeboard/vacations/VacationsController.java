@@ -39,10 +39,7 @@ import timeboard.core.api.VacationService;
 import timeboard.core.api.events.TimeboardEventType;
 import timeboard.core.api.events.VacationEvent;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.RecursiveVacationRequest;
-import timeboard.core.model.VacationRequest;
-import timeboard.core.model.VacationRequestStatus;
+import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.DateFormat;
@@ -145,10 +142,6 @@ public class VacationsController {
         request.setAssignee(assignee);
         request.setStartDate(startDate);
         request.setEndDate(endDate);
-/*
-        if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
-            return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
-        }*/
 
         if (requestWrapper.isRecursive()) {
             assert request instanceof RecursiveVacationRequest;
