@@ -34,7 +34,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.*;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
+import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
@@ -44,10 +47,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 
 @Controller
@@ -80,8 +81,6 @@ public class TimesheetController {
             final Model model) throws Exception {
 
 
-        final List<ProjectTasks> tasksByProject = new ArrayList<>();
-        final Account acc = authentication.getDetails();
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())

@@ -69,7 +69,7 @@ public class TasExportController {
                 final Project project = projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
                 final TASData data = projectService.generateTasData(actor, project, month, year);
                 final ExcelTASReport tasReport = new ExcelTASReport(buf);
-                ;
+
                 tasReport.generateFAT(data);
 
                 final String mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -87,7 +87,7 @@ public class TasExportController {
         } catch (final Exception e) {
         }
 
-        return ("/account");
+        return "/account";
 
     }
 

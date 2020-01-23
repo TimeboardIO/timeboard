@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
@@ -49,10 +48,6 @@ import java.util.*;
 @Controller
 @RequestMapping("/account")
 public class AccountController {
-
-    @Autowired
-    private UserService userService;
-
 
     @Autowired
     private ProjectService projectService;
@@ -90,7 +85,6 @@ public class AccountController {
                 actor.setEmail(email);
 
                 try {
-                    final Account u = userService.updateUser(actor);
                     model.addAttribute("message", "User account changed successfully !");
                 } catch (final Exception e) {
                     model.addAttribute("error", "Error while updating user information.");
@@ -108,7 +102,6 @@ public class AccountController {
                     }
                 }
                 try {
-                    final Account u = userService.updateUser(actor);
                     model.addAttribute("message", "External tools updated successfully !");
                 } catch (final Exception e) {
                     model.addAttribute("error", "Error while external tools");
@@ -151,9 +144,9 @@ public class AccountController {
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
         dfs.getLocalPatternChars();
         final String[] months = dfs.getMonths();
-        for (int i = start.get(Calendar.MONTH);
+        for (start.get(Calendar.MONTH);
              start.after(end);
-             start.add(Calendar.MONTH, -1), i = start.get(Calendar.DAY_OF_MONTH)) {
+             start.add(Calendar.MONTH, -1), start.get(Calendar.DAY_OF_MONTH)) {
 
             yearsSinceHiring.add(start.get(Calendar.YEAR));
             if (monthsSinceHiring.size() < 12) {

@@ -85,7 +85,7 @@ public class ExcelTASReport extends AbstractExcelReport {
             // Hide the excess lines for months that do not have 31 days
             int i = MONTH_DAY_COUNT;
             while (tasData.getDayMonthNames().size() < i) {
-                this.sheet.getRow((START_ROW_DAYS + i) - 1).setHeight((short) 0);
+                this.sheet.getRow(START_ROW_DAYS + i - 1).setHeight((short) 0);
                 i--;
             }
 

@@ -83,8 +83,8 @@ public class TimesheetRESTApi {
         final List<ImputationWrapper> imputations = new ArrayList<>();
 
         final Calendar c = firstDayOfWeek(week, year);
-        final Date ds = findStartDate(c, week, year);
-        final Date de = findEndDate(c, week, year);
+        final Date ds = findStartDate(c);
+        final Date de = findEndDate(c);
 
         // Create days for current week
         final List<DateWrapper> days = createDaysForCurrentWeek(authentication, c, ds);
@@ -270,12 +270,12 @@ public class TimesheetRESTApi {
     }
 
 
-    private Date findStartDate(final Calendar c, final int week, final int year) {
+    private Date findStartDate(final Calendar c) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return c.getTime();
     }
 
-    private Date findEndDate(final Calendar c, final int week, final int year) {
+    private Date findEndDate(final Calendar c) {
         c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         return c.getTime();
     }
@@ -327,8 +327,8 @@ public class TimesheetRESTApi {
             this.year = year;
             this.week = week;
             this.days = days;
-            this.disablePrev = (year < beginWorkYear) || (year == beginWorkYear && week <= beginWorkWeek);
-            this.disableNext = (year > currentYear) || (year == currentYear && week >= currentWeek);
+            this.disablePrev = year < beginWorkYear || year == beginWorkYear && week <= beginWorkWeek;
+            this.disableNext = year > currentYear || year == currentYear && week >= currentWeek;
             this.projects = projects;
             this.imputations = imputationWrappers;
         }
