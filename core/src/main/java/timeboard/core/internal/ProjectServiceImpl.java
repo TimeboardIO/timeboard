@@ -471,6 +471,7 @@ public class ProjectServiceImpl implements ProjectService {
             final Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask, actor);
             final double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
 
+            this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
             final Task updatedTask = em.find(Task.class, projectTask.getId());
             final double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);
@@ -518,7 +519,7 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
-    public Imputation actionOnImputation( final Imputation imputation,
+    public void actionOnImputation( final Imputation imputation,
                                           final AbstractTask task,
                                           final Account actor,
                                           final double val,
@@ -547,8 +548,6 @@ public class ProjectServiceImpl implements ProjectService {
             }
         }
         em.flush();
-
-        return imputation;
     }
 
     private double updateEffortLeftFromImputationValue(
