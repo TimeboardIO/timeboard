@@ -132,7 +132,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
 
-        SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
+        final SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
@@ -141,7 +141,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
-        LOGGER.info("Week " + week + " submit for user" + accountTimesheet.getName() + " by user " + actor.getName());
+        LOGGER.info("Timesheet for " + week + " submit for user" + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
 
     }
 
