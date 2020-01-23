@@ -81,7 +81,7 @@ public interface OrganizationService {
 
     Optional<OrganizationMembership> findOrganizationMembership(
             final Account actor,
-            final Long organizationID) throws BusinessException;
+            final Long organizationID);
 
     Optional<OrganizationMembership> findOrganizationMembershipById(
             final Account details,

@@ -33,12 +33,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectTag;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -108,7 +108,7 @@ public class ProjectTagsController {
         tag.setProject(project);
         project.getTags().add(tag);
         this.projectService.updateProject(actor, project);
-        return this.listTags(authentication,projectID);
+        return this.listTags(authentication, projectID);
     }
 
     public static class ProjectTagWrapper {

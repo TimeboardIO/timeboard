@@ -39,7 +39,7 @@ public class UserLoader {
 
     UserService userService;
 
-    UserLoader(UserService userService){
+    UserLoader(UserService userService) {
         this.userService = userService;
     }
 
@@ -55,9 +55,9 @@ public class UserLoader {
             u.setFirstName("User" + i);
             u.setAccountCreationTime(new Date());
             usersToSave.add(u);
-         }
+        }
 
-            accountSaved = this.userService.createUsers(usersToSave);
+        accountSaved = this.userService.createUsers(usersToSave);
 
 
         return accountSaved;

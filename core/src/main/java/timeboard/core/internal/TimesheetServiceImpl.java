@@ -33,16 +33,17 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
+import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
-import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.*;
 
 
 @Component
@@ -66,56 +67,89 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
-    public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
+    public SubmittedTimesheet submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
             throws BusinessException {
 
-        //check if submission is possible
-        //1 - last week is submitted
 
-        final Calendar c = Calendar.getInstance();
+        final Calendar beginWorkDate = this.organizationService.findOrganizationMembership(actor, currentOrg).get().getCreationDate();
 
-        c.setTime(this.organizationService.findOrganizationMembership(actor, currentOrg).get().getCreationDate());
+        int dayInFirstWeek = beginWorkDate.get(Calendar.DAY_OF_WEEK);
+        boolean firstWeek = (beginWorkDate.get(Calendar.WEEK_OF_YEAR) == week) && (beginWorkDate.get(Calendar.YEAR) == year);
 
-        int dayInFirstWeek = c.get(Calendar.DAY_OF_WEEK);
-        boolean firstWeek = (c.get(Calendar.WEEK_OF_YEAR) == week) && (c.get(Calendar.YEAR) == year);
-
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
-        c.setFirstDayOfWeek(Calendar.MONDAY);
-        c.set(Calendar.HOUR_OF_DAY, 2);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        Calendar previousWeek = Calendar.getInstance();
+        previousWeek.set(Calendar.WEEK_OF_YEAR, week);
+        previousWeek.set(Calendar.YEAR, year);
+        previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
+        previousWeek.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         boolean lastWeekSubmitted = this.isTimesheetSubmitted(
                 accountTimesheet,
-                c.get(Calendar.YEAR),
-                c.get(Calendar.WEEK_OF_YEAR));
+                previousWeek.get(Calendar.YEAR),
+                previousWeek.get(Calendar.WEEK_OF_YEAR));
 
         if (!firstWeek && !lastWeekSubmitted) {
             throw new TimesheetException("Can not submit this week, previous week is not submitted");
         }
 
-        //2 - all imputation day sum == 1
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
+        final Calendar firstDay = Calendar.getInstance();
+        firstDay.set(Calendar.WEEK_OF_YEAR, week);
+        firstDay.set(Calendar.YEAR, year);
+        firstDay.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        firstDay.set(Calendar.HOUR_OF_DAY, 0);
+        firstDay.set(Calendar.MINUTE, 0);
+        firstDay.set(Calendar.SECOND, 0);
+        firstDay.set(Calendar.MILLISECOND, 0);
 
+        final Calendar lastDay = (Calendar) firstDay.clone();
+        lastDay.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
 
-        Boolean result = true;
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
-        c.setFirstDayOfWeek(Calendar.MONDAY);
-        c.set(Calendar.DAY_OF_WEEK, 2);
-        int firstDay =2;
-        if(firstWeek){
-            c.set(Calendar.DAY_OF_WEEK, dayInFirstWeek);
-            c.setFirstDayOfWeek(dayInFirstWeek);
-            firstDay = dayInFirstWeek;
+        if (firstWeek) {
+            firstDay.set(Calendar.DAY_OF_WEEK, dayInFirstWeek);
+            firstDay.setFirstDayOfWeek(dayInFirstWeek);
         }
 
-        for ( int i = firstDay -1 ; i <= 5; i++) {
+        final Calendar currentDay = (Calendar) firstDay.clone();
+
+        long nbDays = ChronoUnit.DAYS.between(firstDay.toInstant(), lastDay.toInstant());
+        final Double expectedSum = (nbDays + 1.0d);
+
+        final List<Date> days = new ArrayList<>();
+
+        for (int i = 0; i <= nbDays; i++) {
+            days.add(currentDay.getTime());
+            currentDay.roll(Calendar.DAY_OF_WEEK, 1);
+        }
+
+        final TypedQuery<Double> q = em.createNamedQuery(
+                Imputation.SUM_IMPUTATIONS_BY_USER_AND_WEEK, Double.class);
+
+        q.setParameter("user", accountTimesheet);
+        q.setParameter("days", days);
+        q.setParameter("orgID", currentOrg.getId());
+        final Double result = q.getSingleResult();
+
+        if (!result.equals(expectedSum)) {
+            throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
+        }
+
+        final SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
+        submittedTimesheet.setAccount(accountTimesheet);
+        submittedTimesheet.setYear(year);
+        submittedTimesheet.setWeek(week);
+        submittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
+
+        em.persist(submittedTimesheet);
+
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
+
+        LOGGER.info("Timesheet for " + week + " submit for user" + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
+
+        return submittedTimesheet;
+
+    }
+
+    Boolean checkDailyImputationTotal(int firstDay, Account accountTimesheet, Calendar c, Boolean result) {
+        for (int i = firstDay - 1; i <= 5; i++) {
 
             TypedQuery<Double> q = em.createQuery("select COALESCE(sum(value),0) " +
                     "from Imputation i where i.account = :user and i.day = :day ", Double.class);
@@ -123,33 +157,35 @@ public class TimesheetServiceImpl implements TimesheetService {
             q.setParameter("user", accountTimesheet);
             q.setParameter("day", c.getTime());
             final List<Double> resultList = q.getResultList();
-            if (!resultList.equals(null)){
+            if (resultList != null) {
                 result &= (resultList.get(0) == 1.0);
             }
             c.roll(Calendar.DAY_OF_WEEK, 1);
         }
-        boolean allDailyImputationTotalsAreOne = result;
-
-        if (!allDailyImputationTotalsAreOne) {
-            throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
-        }
-
-        SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
-        submittedTimesheet.setAccount(accountTimesheet);
-        submittedTimesheet.setYear(year);
-        submittedTimesheet.setWeek(week);
-
-        em.persist(submittedTimesheet);
-
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
-
-        LOGGER.info("Week " + week + " submit for user" + accountTimesheet.getName() + " by user " + actor.getName());
-
+        return result;
     }
+
 
     @Override
     @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week) {
+        final Long currentOrg = ThreadLocalStorage.getCurrentOrgId();
+        final Optional<OrganizationMembership> organizationMembership =
+                this.organizationService.findOrganizationMembership(accountTimesheet, currentOrg);
+
+        if (organizationMembership.isPresent()) {
+
+            Calendar beginWorkDate = organizationMembership.get().getCreationDate();
+            Calendar currentDate = Calendar.getInstance();
+            currentDate.set(Calendar.YEAR, year);
+            currentDate.set(Calendar.WEEK_OF_YEAR, week);
+            currentDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+            if (currentDate.before(beginWorkDate) && !this.isSameWeek(currentDate, beginWorkDate)) {
+                return true;
+            }
+        }
+
         TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
         q.setParameter("week", week);
@@ -161,6 +197,46 @@ public class TimesheetServiceImpl implements TimesheetService {
             return true;
         } catch (Exception e) {
             return false;
+        }
+
+    }
+
+    private boolean isSameWeek(Calendar currentDate, Calendar beginWorkDate) {
+        return
+                currentDate.get(Calendar.YEAR) == beginWorkDate.get(Calendar.YEAR)
+                        && currentDate.get(Calendar.WEEK_OF_YEAR) == beginWorkDate.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    @Override
+    @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
+    public boolean isTimesheetValidated(Account accountTimesheet, int year, int week) {
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week", ValidationStatus.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", accountTimesheet);
+
+        try {
+            return q.getSingleResult() == ValidationStatus.VALIDATED;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public ValidationStatus getTimesheetValidationStatus(Long orgID, Account currentAccount, int year, int week) {
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", currentAccount);
+        q.setParameter("orgID", orgID);
+
+        try {
+            return q.getSingleResult();
+        } catch (Exception e) {
+            return ValidationStatus.DRAFT;
         }
     }
 

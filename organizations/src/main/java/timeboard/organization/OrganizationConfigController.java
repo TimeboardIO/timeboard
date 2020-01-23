@@ -63,15 +63,12 @@ import java.util.stream.Collectors;
 public class OrganizationConfigController {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    @Value("${timeboard.tasks.default.vacation}")
-    private String defaultVacationTaskName;
-
     @Autowired
     public OrganizationService organizationService;
-
     @Autowired
     public EncryptionService encryptionService;
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
 
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication,
@@ -189,7 +186,7 @@ public class OrganizationConfigController {
 
         final Account actor = authentication.getDetails();
         Optional<Organization> updatedOrg = this.organizationService.updateOrganization(actor, model);
-        if(updatedOrg.isPresent()) {
+        if (updatedOrg.isPresent()) {
             redirectAttributes.addFlashAttribute("success", "Successfully updated..");
         }
         return "redirect:/org/setup";
@@ -212,12 +209,12 @@ public class OrganizationConfigController {
             return name;
         }
 
-        public long getId() {
-            return this.id;
-        }
-
         public void setName(String name) {
             this.name = name;
+        }
+
+        public long getId() {
+            return this.id;
         }
 
         public void setId(long id) {
@@ -244,12 +241,12 @@ public class OrganizationConfigController {
             return name;
         }
 
-        public long getId() {
-            return this.id;
-        }
-
         public void setName(String name) {
             this.name = name;
+        }
+
+        public long getId() {
+            return this.id;
         }
 
         public void setId(long id) {

@@ -31,13 +31,13 @@ public class Week {
     private int number;
     private int year;
     private double imputationSum;
-    private Boolean isValidated;
+    private Boolean isSubmitted;
 
-    public Week(int number, int year, double imputationSum, Boolean isValidated) {
+    public Week(int number, int year, double imputationSum, Boolean isSubmitted) {
         this.number = number;
         this.year = year;
         this.imputationSum = imputationSum;
-        this.isValidated = isValidated;
+        this.isSubmitted = isSubmitted;
     }
 
     public int getNumber() {
@@ -64,12 +64,12 @@ public class Week {
         this.imputationSum = imputationSum;
     }
 
-    public Boolean getIsValidated() {
-        return isValidated;
+    public Boolean getSubmitted() {
+        return isSubmitted;
     }
 
-    public void setIsValidated(Boolean validated) {
-        isValidated = validated;
+    public void setSubmitted(Boolean isSubmitted) {
+        this.isSubmitted = isSubmitted;
     }
 
 }

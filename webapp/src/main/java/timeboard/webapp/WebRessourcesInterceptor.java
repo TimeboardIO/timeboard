@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -66,8 +66,8 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     private String version = "";
 
     @PostConstruct
-    private void init() throws Exception{
-        try(final InputStream versionStream = this.getClass().getClassLoader().getResourceAsStream("version")) {
+    private void init() throws Exception {
+        try (final InputStream versionStream = this.getClass().getClassLoader().getResourceAsStream("version")) {
             if (versionStream != null) {
                 byte[] array = IOUtils.toByteArray(versionStream);
                 version = new String(array, "UTF-8");
@@ -85,20 +85,20 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
 
 
-        if(modelMap != null && webRequest.getUserPrincipal() != null) {
+        if (modelMap != null && webRequest.getUserPrincipal() != null) {
             final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
             modelMap.put("account", account);
             modelMap.put("navs", navRegistry.getEntries());
             modelMap.put("dataTableService", dataTableService);
             Long orgaID = ThreadLocalStorage.getCurrentOrgId();
-            if(orgaID != null) {
+            if (orgaID != null) {
                 fillModelWithOrganization(account, modelMap, orgaID);
             }
 
         }
 
-        if(modelMap != null){
+        if (modelMap != null) {
             modelMap.put("appName", appName);
             modelMap.put("appVersion", version);
         }
@@ -107,9 +107,9 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     private void fillModelWithOrganization(Account account, ModelMap modelMap, Long orgaID) {
         modelMap.put("orgID", orgaID);
         Optional<Organization> organisation = organizationService.getOrganizationByID(account, orgaID);
-        if(organisation.isPresent()){
+        if (organisation.isPresent()) {
             modelMap.put("currentOrg", organisation.get());
-        }else{
+        } else {
             LOGGER.warn("User : {} try to access missing org : {}", account, orgaID);
         }
     }

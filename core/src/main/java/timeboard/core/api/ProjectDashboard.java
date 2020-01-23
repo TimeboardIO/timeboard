@@ -65,5 +65,7 @@ public final class ProjectDashboard implements Serializable {
         return effortSpent;
     }
 
-    public Date getDate() { return date; }
+    public Date getDate() {
+        return date;
+    }
 }

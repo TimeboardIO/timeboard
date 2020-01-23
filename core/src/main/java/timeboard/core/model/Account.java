@@ -88,9 +88,8 @@ public class Account implements Serializable {
     }
 
 
-
     public Set<OrganizationMembership> getOrganizations() {
-        if(this.organizations == null){
+        if (this.organizations == null) {
             this.organizations = new HashSet<>();
         }
         return this.organizations;
@@ -149,7 +148,6 @@ public class Account implements Serializable {
     }
 
 
-
     @Transient
     public String getScreenName() {
         if (this.getFirstName() == null && this.getName() == null) {
@@ -170,15 +168,15 @@ public class Account implements Serializable {
 
     @Transient
     public boolean isMemberOf(final Optional<Organization> orgToTest) {
-        if(orgToTest.isPresent()) {
-            if(orgToTest.get().isPublicOrganisation()){
+        if (orgToTest.isPresent()) {
+            if (orgToTest.get().isPublicOrganisation()) {
                 return true;
             }
 
             return orgToTest.get().getMembers()
                     .stream().filter(om -> om.getMember().getId() == this.getId())
                     .count() >= 1;
-        }else{
+        } else {
             return false;
         }
     }
@@ -190,7 +188,6 @@ public class Account implements Serializable {
     public void setExternalIDs(Map<String, String> externalIDs) {
         this.externalIDs = externalIDs;
     }
-
 
 
 }

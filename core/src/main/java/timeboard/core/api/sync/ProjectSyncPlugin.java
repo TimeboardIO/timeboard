@@ -34,12 +34,12 @@ import java.util.List;
 
 public interface ProjectSyncPlugin {
 
-     static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncPlugin.class);
+    static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncPlugin.class);
 
     String getServiceName();
 
-    default String getServiceID(){
-        return this.getServiceName().toLowerCase().replace(" ","");
+    default String getServiceID() {
+        return this.getServiceName().toLowerCase().replace(" ", "");
     }
 
     List<ProjectSyncCredentialField> getSyncCredentialFields();

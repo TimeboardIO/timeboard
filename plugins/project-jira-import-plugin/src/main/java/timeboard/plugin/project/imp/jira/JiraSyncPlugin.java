@@ -50,15 +50,13 @@ public class JiraSyncPlugin implements ProjectSyncPlugin {
     private static final String JIRA_PASSWORD_KEY = "jira.password";
     private static final String JIRA_PROJECT_KEY = "jira.project";
     private static final String JIRA_PROJECT_URL = "jira.url";
-    private static final String JIRA_SERVICE_NAME = "JIRA";
-
     public static final List<ProjectSyncCredentialField> FIELDS = Arrays.asList(
             new ProjectSyncCredentialField(JIRA_USERNAME_KEY, "JIRA Username", ProjectSyncCredentialField.Type.TEXT, 0),
-                new ProjectSyncCredentialField(JIRA_PASSWORD_KEY, "JIRA Password", ProjectSyncCredentialField.Type.PASSWORD, 1),
-                new ProjectSyncCredentialField(JIRA_PROJECT_URL, "JIRA URL", ProjectSyncCredentialField.Type.TEXT, 2),
-                new ProjectSyncCredentialField(JIRA_PROJECT_KEY, "JIRA Project name", ProjectSyncCredentialField.Type.TEXT, 3)
+            new ProjectSyncCredentialField(JIRA_PASSWORD_KEY, "JIRA Password", ProjectSyncCredentialField.Type.PASSWORD, 1),
+            new ProjectSyncCredentialField(JIRA_PROJECT_URL, "JIRA URL", ProjectSyncCredentialField.Type.TEXT, 2),
+            new ProjectSyncCredentialField(JIRA_PROJECT_KEY, "JIRA Project name", ProjectSyncCredentialField.Type.TEXT, 3)
     );
-
+    private static final String JIRA_SERVICE_NAME = "JIRA";
     @Autowired
     private ProjectService projectService;
 
@@ -73,7 +71,7 @@ public class JiraSyncPlugin implements ProjectSyncPlugin {
         return FIELDS;
     }
 
-    private ProjectSyncCredentialField getFieldByKey(List<ProjectSyncCredentialField> fields, String key){
+    private ProjectSyncCredentialField getFieldByKey(List<ProjectSyncCredentialField> fields, String key) {
         return fields.stream().filter(field -> field.getFieldKey().equals(key)).findFirst().get();
     }
 

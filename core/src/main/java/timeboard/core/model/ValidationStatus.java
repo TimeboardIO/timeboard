@@ -1,8 +1,8 @@
-package timeboard.plugin.project.export.xls;
+package timeboard.core.model;
 
 /*-
  * #%L
- * project-xls-export-plugin
+ * core
  * %%
  * Copyright (C) 2019 Timeboard
  * %%
@@ -26,10 +26,9 @@ package timeboard.plugin.project.export.xls;
  * #L%
  */
 
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
-@ComponentScan("timeboard.plugin.project.export.xls")
-public class ExcelPluginConfiguration {
+public enum ValidationStatus {
+    DRAFT,
+    PENDING_VALIDATION,
+    VALIDATED,
+    REJECTED
 }

@@ -33,13 +33,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormatSymbols;
@@ -72,7 +72,6 @@ public class AccountController {
 
         final String submitButton = request.getParameter("formType");
         final Account actor = authentication.getDetails();
-
 
 
         switch (submitButton) {
@@ -143,8 +142,7 @@ public class AccountController {
 
         final Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
         final Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
-        final Calendar end = Calendar.getInstance();
-        end.setTime(this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate());
+        final Calendar end = this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate();
         final Calendar start = Calendar.getInstance();
         start.setTime(new Date());
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);

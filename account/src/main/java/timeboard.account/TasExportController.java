@@ -31,11 +31,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.TASData;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,7 +54,7 @@ public class TasExportController {
 
     @PostMapping
     protected String handlePost(TimeboardAuthentication authentication,
-                                HttpServletRequest request, HttpServletResponse response, Model model)  {
+                                HttpServletRequest request, HttpServletResponse response, Model model) {
 
         try {
             Account actor = authentication.getDetails();
@@ -85,7 +85,7 @@ public class TasExportController {
             }
 
         } catch (Exception e) {
-         }
+        }
 
         return ("/account");
 
