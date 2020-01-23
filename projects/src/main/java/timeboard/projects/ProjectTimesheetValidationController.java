@@ -164,9 +164,9 @@ public class ProjectTimesheetValidationController {
             this.name = account.getScreenName();
 
             if(weeks.stream().anyMatch(e->  !e.isValidated() && e.isSubmitted())){
-                this.statusColor = "orange";
+                this.statusColor = "red";
             } else if(weeks.stream().anyMatch(e->  !e.isValidated())){
-                this.statusColor = "orange";
+                this.statusColor = "yellow";
             } else {
                 this.statusColor = "green";
             }
@@ -199,6 +199,10 @@ public class ProjectTimesheetValidationController {
         public List<TimesheetWeekWrapper> getWeeks() {
             return weeks;
         }
+        public String getStatusColor() {
+            return statusColor;
+        }
+
     }
 
 
