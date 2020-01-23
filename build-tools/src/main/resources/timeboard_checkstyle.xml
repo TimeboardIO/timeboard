@@ -14,9 +14,18 @@
         <property name="max" value="1000"/>
     </module>
 
+
     <module name="TreeWalker">
 
+        <module name="TodoComment">
+            <property name="format" value="(TODO)|(FIXME)"/>
+        </module>
+
+        <module name="RequireThis"/>
+
         <module name="InterfaceIsType"/>
+
+        <module name="FinalLocalVariable"/>
 
         <module name="OneTopLevelClass"/>
 
@@ -73,12 +82,11 @@
         <module name="MultipleVariableDeclarations"/>
 
         <module name="UnusedImports"/>
-        <!--
-        <module name="FinalLocalVariable">
-            <property name="tokens" value="VARIABLE_DEF"/>
-            <property name="validateEnhancedForLoopVariable" value="true"/>
-        </module>
-        -->
+
+        <module name="MultipleVariableDeclarations"/>
+
+
+
 
     </module>
 

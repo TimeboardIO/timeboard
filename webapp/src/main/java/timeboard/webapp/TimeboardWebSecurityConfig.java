@@ -74,7 +74,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Override
-    public void configure(WebSecurity web) throws Exception {
+    public void configure(final WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(
                 "/public/**");
@@ -83,23 +83,23 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    protected void configure(final HttpSecurity http) throws Exception {
         final String logoutURL = String.format("%s?client_id=%s&logout_uri=%s",
                 this.logoutEndpoint,
                 this.clientid,
                 this.appLogout);
 
         http.authorizeRequests()
-                .antMatchers("/","/onboarding/**").permitAll()
+                .antMatchers("/", "/onboarding/**").permitAll()
                 .anyRequest()
-                    .authenticated()
-                        .and()
-                            .oauth2Login()
+                .authenticated()
+                .and()
+                .oauth2Login()
 
-                        .and()
-                            .logout()
-                            .logoutUrl("/logout")
-                            .logoutSuccessUrl(logoutURL);
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl(logoutURL);
 
         //http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
         http.addFilterAfter(new CustomFilter(), OAuth2LoginAuthenticationFilter.class);
@@ -107,38 +107,36 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 
 
-     }
-
+    }
 
 
     public class RedirectFilter extends GenericFilterBean {
 
         @Override
-        public void doFilter(ServletRequest servletRequest,
-                             ServletResponse servletResponse,
-                             FilterChain filterChain) throws IOException, ServletException {
+        public void doFilter(final ServletRequest servletRequest,
+                             final ServletResponse servletResponse,
+                             final FilterChain filterChain) throws IOException, ServletException {
 
-            if(((HttpServletRequest)servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")){
+            if (((HttpServletRequest) servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")) {
                 ((HttpServletResponse) servletResponse).sendRedirect(HomeController.URI);
                 return;
-            }else{
+            } else {
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         }
     }
 
 
-
     public class CustomFilter extends GenericFilterBean {
 
         @Override
-        public void doFilter(ServletRequest request,
-                             ServletResponse response,
-                             FilterChain chain) throws IOException, ServletException {
+        public void doFilter(final ServletRequest request,
+                             final ServletResponse response,
+                             final FilterChain chain) throws IOException, ServletException {
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(auth != null && (auth instanceof TimeboardAuthentication) == false) {
+            if (auth != null && (auth instanceof TimeboardAuthentication) == false) {
                 Account account = null;
 
                 if (auth instanceof UsernamePasswordAuthenticationToken) {

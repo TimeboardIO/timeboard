@@ -41,30 +41,30 @@ public class ProjectLoader {
     ProjectService projectService;
     UserService userService;
 
-    ProjectLoader(ProjectService projectService, UserService userService){
+    ProjectLoader(final ProjectService projectService, final UserService userService) {
         this.projectService = projectService;
         this.userService = userService;
     }
 
 
-    public List<Project> load(List<Account> usersSaved, int nbProjectsByUsers) throws BusinessException {
-        List<Project> projectsSaved = new ArrayList<>();
+    public List<Project> load(final List<Account> usersSaved, final int nbProjectsByUsers) throws BusinessException {
+        final List<Project> projectsSaved = new ArrayList<>();
         for (int i = 0; i < usersSaved.size(); i++) {
-            Account owner = usersSaved.get(i);
+            final Account owner = usersSaved.get(i);
 
-            if(owner != null) {
+            if (owner != null) {
                 for (int j = 0; j < nbProjectsByUsers; j++) {
                     try {
                         // On créé "nbProjectsByUsers" projets pour chacun des utilisateurs
                         projectsSaved.add(this.projectService.createProject(owner, "project owner " + i + " number " + j));
 
-                    } catch (BusinessException e) {
-                        e.printStackTrace();
+                    } catch (final BusinessException e) {
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }
         }
-         return projectsSaved;
+        return projectsSaved;
     }
 
 

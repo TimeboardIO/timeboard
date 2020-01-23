@@ -45,10 +45,6 @@ public class Account implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date accountCreationTime;
 
-    @Column(nullable = false)
-    @Temporal(TemporalType.DATE)
-    private Date beginWorkDate;
-
     @Column(nullable = true)
     private String name;
 
@@ -82,26 +78,24 @@ public class Account implements Serializable {
 
 
     public Account(final String name, final String firstName,
-                   final String email, final Date accountCreationTime, final Date beginWorkDate) {
+                   final String email, final Date accountCreationTime) {
         super();
         this.name = name;
         this.firstName = firstName;
         this.email = email;
         this.accountCreationTime = accountCreationTime;
-        this.beginWorkDate = beginWorkDate;
         this.externalIDs = new HashMap<>();
     }
 
 
-
     public Set<OrganizationMembership> getOrganizations() {
-        if(this.organizations == null){
+        if (this.organizations == null) {
             this.organizations = new HashSet<>();
         }
         return this.organizations;
     }
 
-    public void setOrganizations(Set<OrganizationMembership> organizations) {
+    public void setOrganizations(final Set<OrganizationMembership> organizations) {
         this.organizations = organizations;
     }
 
@@ -109,7 +103,7 @@ public class Account implements Serializable {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -117,7 +111,7 @@ public class Account implements Serializable {
         return remoteSubject;
     }
 
-    public void setRemoteSubject(String remoteSubject) {
+    public void setRemoteSubject(final String remoteSubject) {
         this.remoteSubject = remoteSubject;
     }
 
@@ -125,23 +119,15 @@ public class Account implements Serializable {
         return accountCreationTime;
     }
 
-    public void setAccountCreationTime(Date accountCreationTime) {
+    public void setAccountCreationTime(final Date accountCreationTime) {
         this.accountCreationTime = accountCreationTime;
-    }
-
-    public Date getBeginWorkDate() {
-        return beginWorkDate;
-    }
-
-    public void setBeginWorkDate(Date beginWorkDate) {
-        this.beginWorkDate = beginWorkDate;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -149,7 +135,7 @@ public class Account implements Serializable {
         return firstName;
     }
 
-    public void setFirstName(String firstName) {
+    public void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
 
@@ -157,10 +143,9 @@ public class Account implements Serializable {
         return email;
     }
 
-    public void setEmail(String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
-
 
 
     @Transient
@@ -183,15 +168,15 @@ public class Account implements Serializable {
 
     @Transient
     public boolean isMemberOf(final Optional<Organization> orgToTest) {
-        if(orgToTest.isPresent()) {
-            if(orgToTest.get().isPublicOrganisation()){
+        if (orgToTest.isPresent()) {
+            if (orgToTest.get().isPublicOrganisation()) {
                 return true;
             }
 
             return orgToTest.get().getMembers()
                     .stream().filter(om -> om.getMember().getId() == this.getId())
                     .count() >= 1;
-        }else{
+        } else {
             return false;
         }
     }
@@ -200,10 +185,9 @@ public class Account implements Serializable {
         return externalIDs;
     }
 
-    public void setExternalIDs(Map<String, String> externalIDs) {
+    public void setExternalIDs(final Map<String, String> externalIDs) {
         this.externalIDs = externalIDs;
     }
-
 
 
 }

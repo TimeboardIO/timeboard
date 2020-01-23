@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,39 +27,39 @@ package timeboard.webapp;
  */
 
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Slf4jReporter;
+import com.codahale.metrics.Timer;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.*;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import javax.servlet.*;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
 @Component
 public class RequestDurationFilter implements Filter {
 
+    private final static String METRICS_MARKER = "timeboard.marker.metrics";
+    private final static MetricRegistry METRICS = new MetricRegistry();
+    private final static Timer TIMER = METRICS.timer(name(RequestDurationFilter.class, "get-requests"));
+
     @Value("${timeboard.interval.metrics.minutes}")
     private long timeIntervalLogs;
 
-    private final String metricsMarker = "timeboard.marker.metrics";
-
-    private final MetricRegistry metrics = new MetricRegistry();
-
-    private final Timer timer = metrics.timer(name(RequestDurationFilter.class, "get-requests"));
-
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(final FilterConfig filterConfig) throws ServletException {
         this.startReport();
     }
 
     @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
+    public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse, final FilterChain filterChain)
             throws IOException, ServletException {
 
-        final Timer.Context context = timer.time();
+        final Timer.Context context = TIMER.time();
         try {
             filterChain.doFilter(servletRequest, servletResponse);
         } finally {
@@ -70,8 +70,8 @@ public class RequestDurationFilter implements Filter {
 
 
     private void startReport() {
-        final Slf4jReporter reporter = Slf4jReporter.forRegistry(metrics)
-                .outputTo(LoggerFactory.getLogger(metricsMarker))
+        final Slf4jReporter reporter = Slf4jReporter.forRegistry(METRICS)
+                .outputTo(LoggerFactory.getLogger(METRICS_MARKER))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();

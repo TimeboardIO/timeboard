@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,6 +26,7 @@ package timeboard.core.model;
  * #L%
  */
 
+import org.springframework.format.annotation.DateTimeFormat;
 import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
@@ -54,7 +55,7 @@ public class Organization {
     private String name;
 
     @Column
-    private Boolean enabled=true;
+    private Boolean enabled = true;
 
     @Column(columnDefinition = "TEXT")
     @Convert(converter = JSONToStringMapConverter.class)
@@ -62,8 +63,9 @@ public class Organization {
     private Map<String, String> setup;
 
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdDate;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private java.util.Calendar createdDate;
 
     @OneToMany(targetEntity = OrganizationMembership.class,
             mappedBy = "organization",
@@ -80,11 +82,11 @@ public class Organization {
     )
     private Set<DefaultTask> defaultTasks = new HashSet<>();
 
-    public Date getCreatedDate() {
+    public java.util.Calendar getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Date createdDate) {
+    public void setCreatedDate(final java.util.Calendar createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -92,7 +94,7 @@ public class Organization {
         return members;
     }
 
-    public void setMembers(Set<OrganizationMembership> members) {
+    public void setMembers(final Set<OrganizationMembership> members) {
         this.members = members;
     }
 
@@ -100,7 +102,7 @@ public class Organization {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -108,7 +110,7 @@ public class Organization {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -116,15 +118,15 @@ public class Organization {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
+    public void setEnabled(final Boolean enabled) {
         this.enabled = enabled;
     }
 
     public Map<String, String> getSetup() {
-        return setup;
+        return setup != null ? setup : Collections.emptyMap();
     }
 
-    public void setSetup(Map<String, String> setup) {
+    public void setSetup(final Map<String, String> setup) {
         this.setup = setup;
     }
 
@@ -132,22 +134,23 @@ public class Organization {
         return defaultTasks;
     }
 
-    public void setDefaultTasks(Set<DefaultTask> defaultTasks) {
+    public void setDefaultTasks(final Set<DefaultTask> defaultTasks) {
         this.defaultTasks = defaultTasks;
     }
 
 
     /**
      * Test if current org is public
+     *
      * @return true if setup contain key SETUP_PUBLIC with "true" as value
      */
     @Transient
-    public boolean isPublicOrganisation(){
+    public boolean isPublicOrganisation() {
         return this.getSetup().containsKey(SETUP_PUBLIC) && this.getSetup().get(SETUP_PUBLIC).equals("true");
     }
 
     @Transient
-    public List<MembershipRole> getAccountRoles(Account target) {
+    public List<MembershipRole> getAccountRoles(final Account target) {
         return this.getMembers()
                 .stream().filter(om -> om.getMember().getId() == target.getId())
                 .map(om -> om.getRole())

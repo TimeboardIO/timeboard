@@ -2,7 +2,6 @@
     create table Account (
        id bigint not null,
         accountCreationTime date not null,
-        beginWorkDate date not null,
         email varchar(255) not null,
         externalIDs TEXT,
         firstName varchar(255),
@@ -117,7 +116,7 @@
 
     create table Organization (
        id bigint not null,
-        createdDate datetime(6),
+        createdDate date,
         enabled bit,
         name varchar(255) not null,
         setup TEXT,
@@ -126,6 +125,7 @@
 
     create table OrganizationMembership (
        id bigint not null,
+        creationDate date,
         role varchar(255),
         member_id bigint,
         organization_id bigint,
@@ -174,6 +174,22 @@
         primary key (id)
     ) engine=InnoDB;
 
+    create table RecursiveVacationRequest (
+       id bigint not null,
+        organizationID bigint,
+        endDate date,
+        endHalfDay integer,
+        label varchar(255),
+        startDate date,
+        startHalfDay integer,
+        status integer,
+        applicant_id bigint,
+        assignee_id bigint,
+        parent_id bigint,
+        recurrenceDay integer,
+        primary key (id)
+    ) engine=InnoDB;
+
     create table Report (
        id bigint not null,
         organizationID bigint,
@@ -185,7 +201,8 @@
 
     create table SubmittedTimesheet (
        id bigint not null,
-        isValidated bit,
+        organizationID bigint,
+        timesheetStatus varchar(255),
         week integer,
         year integer,
         account_id bigint,
@@ -249,6 +266,7 @@
         status integer,
         applicant_id bigint,
         assignee_id bigint,
+        parent_id bigint,
         primary key (id)
     ) engine=InnoDB;
 
@@ -263,6 +281,9 @@
 
     alter table OrganizationMembership 
        add constraint UKpaqirhkf66d2aqtd9y6w8jn0p unique (member_id, organization_id);
+
+    alter table Project 
+       add constraint UKuoiyyyl15jr4umh2nb99wx93 unique (name, organizationID);
 
     alter table Batch 
        add constraint FK21pv4fxo1jl876oc1u31wf21n 
@@ -319,6 +340,21 @@
        foreign key (project_id) 
        references Project (id);
 
+    alter table RecursiveVacationRequest 
+       add constraint FK_khc4schw5r1a0hc48j4jwf075 
+       foreign key (applicant_id) 
+       references Account (id);
+
+    alter table RecursiveVacationRequest 
+       add constraint FK_7cxue1ajn4v17uktsuj8cxtpg 
+       foreign key (assignee_id) 
+       references Account (id);
+
+    alter table RecursiveVacationRequest 
+       add constraint FK_pdorxr0o13vxqxtt8lou3t7by 
+       foreign key (parent_id) 
+       references RecursiveVacationRequest (id);
+
     alter table SubmittedTimesheet 
        add constraint FK8cv07tq7it76qd26wfyewa15y 
        foreign key (account_id) 
@@ -373,3 +409,8 @@
        add constraint FK28esu0dtlr0he4ie5j5oipsck 
        foreign key (assignee_id) 
        references Account (id);
+
+    alter table VacationRequest 
+       add constraint FK1tbhfs9wnfdwefermfv9611fx 
+       foreign key (parent_id) 
+       references RecursiveVacationRequest (id);

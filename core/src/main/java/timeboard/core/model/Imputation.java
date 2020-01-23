@@ -31,10 +31,19 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
+@NamedQueries(
+        {
+                @NamedQuery(name = Imputation.SUM_IMPUTATIONS_BY_USER_AND_WEEK, query =
+                        "select COALESCE(sum(value),0) from Imputation i " +
+                                "where i.account = :user and i.day IN (:days) and i.organizationID = :orgID")
+        }
+)
 @Table(
         uniqueConstraints = {@UniqueConstraint(columnNames = {"day", "task_id"})}
 )
 public class Imputation extends OrganizationEntity implements Serializable {
+
+    public static final String SUM_IMPUTATIONS_BY_USER_AND_WEEK = "SUM_IMPUTATIONS_BY_USER_AND_WEEK";
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -57,7 +66,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -65,7 +74,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return value;
     }
 
-    public void setValue(Double value) {
+    public void setValue(final Double value) {
         this.value = value;
     }
 
@@ -73,7 +82,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return day;
     }
 
-    public void setDay(Date day) {
+    public void setDay(final Date day) {
         this.day = day;
     }
 
@@ -81,7 +90,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return task;
     }
 
-    public void setTask(AbstractTask task) {
+    public void setTask(final AbstractTask task) {
         this.task = task;
     }
 
@@ -89,7 +98,7 @@ public class Imputation extends OrganizationEntity implements Serializable {
         return account;
     }
 
-    public void setAccount(Account account) {
+    public void setAccount(final Account account) {
         this.account = account;
     }
 }

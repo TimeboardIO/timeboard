@@ -48,7 +48,7 @@ public class DefaultTask extends AbstractTask implements Serializable {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(final Organization organization) {
         this.organization = organization;
     }
 }

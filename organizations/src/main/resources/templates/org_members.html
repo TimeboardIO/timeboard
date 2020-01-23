@@ -46,6 +46,7 @@
             <thead>
             <tr>
                 <th>First Name</th>
+                <th>Since</th>
                 <th>Role</th>
                 <th>Action</th>
             </tr>
@@ -54,7 +55,12 @@
             <tr v-for="member in members">
                 <td>{{member.screenName}}</td>
                 <td>
-                    <select @change="updateRole($event, member)" v-model="member.role">
+                    <div class="ui input">
+                        <input type="date" @change="updateRole($event, member)" v-model="member.creationDate" class="ui" />
+                    </div>
+                </td>
+                <td>
+                    <select class="ui dropdown" @change="updateRole($event, member)" v-model="member.role">
                         <option th:each="role : ${roles}"
                                 th:text="${role}"
                                 th:value="${role}"></option>

@@ -26,19 +26,21 @@ package timeboard.core.api.events;
  * #L%
  */
 
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.VacationRequest;
 
 import java.util.Date;
 
-import static timeboard.core.api.events.TimeboardEventType.*;
+import static timeboard.core.api.events.TimeboardEventType.CREATE;
+import static timeboard.core.api.events.TimeboardEventType.DELETE;
 
 
 public class VacationEvent extends TimeboardEvent {
     private VacationRequest request;
     private TimeboardEventType eventType;
 
-    public VacationEvent(TimeboardEventType eventType, VacationRequest request) {
-        
+    public VacationEvent(final TimeboardEventType eventType, final VacationRequest request) {
+
         super(new Date());
         this.eventType = eventType;
         this.request = request;
@@ -50,7 +52,7 @@ public class VacationEvent extends TimeboardEvent {
         return eventType;
     }
 
-    public void setEventType(TimeboardEventType eventType) {
+    public void setEventType(final TimeboardEventType eventType) {
         this.eventType = eventType;
     }
 
@@ -58,21 +60,21 @@ public class VacationEvent extends TimeboardEvent {
         return request;
     }
 
-    public void setRequest(VacationRequest request) {
+    public void setRequest(final VacationRequest request) {
         this.request = request;
     }
 
     private void constructUsersList() {
-        Account applicantAccount = request.getApplicant();
-        Account assignedAccount = request.getAssignee();
+        final Account applicantAccount = request.getApplicant();
+        final Account assignedAccount = request.getAssignee();
 
-       if(eventType == CREATE || eventType == DELETE) {
-           usersToNotify.add(assignedAccount);
-           usersToInform.add(applicantAccount);
-       } else {
-           usersToNotify.add(applicantAccount);
-           usersToInform.add(assignedAccount);
-       }
+        if (eventType == CREATE || eventType == DELETE) {
+            usersToNotify.add(assignedAccount);
+            usersToInform.add(applicantAccount);
+        } else {
+            usersToNotify.add(applicantAccount);
+            usersToInform.add(assignedAccount);
+        }
 
     }
 

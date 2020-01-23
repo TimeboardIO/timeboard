@@ -27,12 +27,13 @@ package timeboard.core.model;
  */
 
 import javax.persistence.*;
+import java.util.Calendar;
 
 @Entity
 @Table(uniqueConstraints = {
-        @UniqueConstraint(columnNames={"member_id", "organization_id"})
+        @UniqueConstraint(columnNames = {"member_id", "organization_id"})
 })
-public class OrganizationMembership  {
+public class OrganizationMembership {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,21 +49,27 @@ public class OrganizationMembership  {
     @Enumerated(EnumType.STRING)
     private MembershipRole role;
 
+    @Column
+    @Temporal(TemporalType.DATE)
+    private Calendar creationDate;
+
     public OrganizationMembership() {
+        this.creationDate = Calendar.getInstance();
     }
 
 
-    public OrganizationMembership(Organization organization, Account owner, MembershipRole role) {
+    public OrganizationMembership(final Organization organization, final Account owner, final MembershipRole role) {
         this.member = owner;
         this.role = role;
         this.organization = organization;
+        this.creationDate = Calendar.getInstance();
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -70,7 +77,7 @@ public class OrganizationMembership  {
         return member;
     }
 
-    public void setMember(Account member) {
+    public void setMember(final Account member) {
         this.member = member;
         member.getOrganizations().add(this);
     }
@@ -79,7 +86,7 @@ public class OrganizationMembership  {
         return organization;
     }
 
-    public void setOrganization(Organization organization) {
+    public void setOrganization(final Organization organization) {
         this.organization = organization;
         this.organization.getMembers().add(this);
     }
@@ -88,7 +95,15 @@ public class OrganizationMembership  {
         return role;
     }
 
-    public void setRole(MembershipRole role) {
+    public void setRole(final MembershipRole role) {
         this.role = role;
+    }
+
+    public Calendar getCreationDate() {
+        return this.creationDate != null ? this.creationDate : Calendar.getInstance();
+    }
+
+    public void setCreationDate(final Calendar creationDate) {
+        this.creationDate = creationDate;
     }
 }

@@ -32,12 +32,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.security.TimeboardAuthentication;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.text.DateFormatSymbols;
@@ -49,10 +50,10 @@ import java.util.*;
 public class AccountController {
 
     @Autowired
-    private UserService userService;
+    private ProjectService projectService;
 
     @Autowired
-    private ProjectService projectService;
+    private OrganizationService organizationService;
 
 
     @Autowired(
@@ -62,10 +63,14 @@ public class AccountController {
 
 
     @PostMapping
-    protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request, Model model) {
+    protected String handlePost(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest request,
+            final Model model) throws BusinessException {
 
         final String submitButton = request.getParameter("formType");
         final Account actor = authentication.getDetails();
+
 
         switch (submitButton) {
 
@@ -80,9 +85,8 @@ public class AccountController {
                 actor.setEmail(email);
 
                 try {
-                    final Account u = userService.updateUser(actor);
                     model.addAttribute("message", "User account changed successfully !");
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     model.addAttribute("error", "Error while updating user information.");
                 }
                 break;
@@ -98,9 +102,8 @@ public class AccountController {
                     }
                 }
                 try {
-                    final Account u = userService.updateUser(actor);
                     model.addAttribute("message", "External tools updated successfully !");
-                } catch (Exception e) {
+                } catch (final Exception e) {
                     model.addAttribute("error", "Error while external tools");
                 }
                 break;
@@ -114,13 +117,13 @@ public class AccountController {
     }
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+    protected String handleGet(final TimeboardAuthentication authentication, final Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
         loadPage(model, actor, authentication.getCurrentOrganization());
         return "account.html";
     }
 
-    private void loadPage(Model model, Account actor, Long orgID) {
+    private void loadPage(final Model model, final Account actor, final Long orgID) throws BusinessException {
         model.addAttribute("account", actor);
 
         final List<Project> projects = projectService.listProjects(actor, orgID);
@@ -135,16 +138,15 @@ public class AccountController {
 
         final Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
         final Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
-        final Calendar end = Calendar.getInstance();
-        end.setTime(actor.getBeginWorkDate());
+        final Calendar end = this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate();
         final Calendar start = Calendar.getInstance();
         start.setTime(new Date());
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);
         dfs.getLocalPatternChars();
         final String[] months = dfs.getMonths();
-        for (int i = start.get(Calendar.MONTH);
+        for (start.get(Calendar.MONTH);
              start.after(end);
-             start.add(Calendar.MONTH, -1), i = start.get(Calendar.DAY_OF_MONTH)) {
+             start.add(Calendar.MONTH, -1), start.get(Calendar.DAY_OF_MONTH)) {
 
             yearsSinceHiring.add(start.get(Calendar.YEAR));
             if (monthsSinceHiring.size() < 12) {

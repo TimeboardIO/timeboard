@@ -12,10 +12,10 @@ package timeboard;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,13 +26,10 @@ package timeboard;
  * #L%
  */
 
-import com.tngtech.archunit.base.DescribedPredicate;
-import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.Test;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
@@ -42,14 +39,14 @@ public class ArchitectureTest {
 
 
     @Test
-    public void test_internal_not_imported_outside(){
-        JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard.core");
+    public void test_internal_not_imported_outside() {
+        final JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard.core");
 
         final ArchRule rule = classes()
                 .that()
                 .resideInAPackage("timeboard.core.internal")
                 .should().onlyBeAccessed()
-                    .byClassesThat().resideInAPackage("timeboard.core.internal");
+                .byClassesThat().resideInAPackage("timeboard.core.internal");
 
         rule.check(importedClasses);
 
@@ -57,8 +54,8 @@ public class ArchitectureTest {
 
 
     @Test
-    public void test_controller_postfix_with_controller(){
-        JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard");
+    public void test_controller_postfix_with_controller() {
+        final JavaClasses importedClasses = new ClassFileImporter().importPackages("timeboard");
 
         final ArchRule rule = classes()
                 .that()

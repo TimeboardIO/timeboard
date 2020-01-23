@@ -43,7 +43,7 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
     @Temporal(TemporalType.TIMESTAMP)
     private Date projectSnapshotDate;
 
-    @OneToMany(targetEntity = TaskSnapshot.class, mappedBy="projectSnapshot", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = TaskSnapshot.class, mappedBy = "projectSnapshot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskSnapshot> taskSnapshots;
 
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.EAGER)
@@ -65,8 +65,14 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         this.taskSnapshots = new ArrayList<>();
     }
 
-    public ProjectSnapshot(Long id, Date projectSnapshotDate, List<TaskSnapshot> taskSnapshots, Project project, double originalEstimate,
-                           double effortLeft, double effortSpent, double realEffort, double quotation) {
+    public ProjectSnapshot(final Long id,
+                           final Date projectSnapshotDate,
+                           final List<TaskSnapshot> taskSnapshots,
+                           final Project project,
+                           final double originalEstimate,
+                           final double effortLeft,
+                           final double effortSpent,
+                           final double quotation) {
         this.id = id;
         this.projectSnapshotDate = projectSnapshotDate;
         this.taskSnapshots = taskSnapshots;
@@ -77,37 +83,71 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
         this.quotation = quotation;
     }
 
-    public Long getId() { return id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Date getProjectSnapshotDate() { return projectSnapshotDate; }
+    public void setId(final Long id) {
+        this.id = id;
+    }
 
-    public List<TaskSnapshot> getTaskSnapshots() { return taskSnapshots; }
+    public Date getProjectSnapshotDate() {
+        return projectSnapshotDate;
+    }
 
-    public Project getProject() { return project; }
+    public void setProjectSnapshotDate(final Date projectSnapshotDate) {
+        this.projectSnapshotDate = projectSnapshotDate;
+    }
 
-    public double getOriginalEstimate() { return originalEstimate; }
+    public List<TaskSnapshot> getTaskSnapshots() {
+        return taskSnapshots;
+    }
 
-    public double getEffortLeft() { return effortLeft; }
+    public void setTaskSnapshots(final List<TaskSnapshot> taskSnapshots) {
+        this.taskSnapshots = taskSnapshots;
+    }
 
-    public double getEffortSpent() { return effortSpent; }
+    public Project getProject() {
+        return project;
+    }
 
-    public double getRealEffort() { return effortSpent + effortLeft; }
+    public void setProject(final Project project) {
+        this.project = project;
+    }
 
-    public double getQuotation() { return quotation; }
+    public double getOriginalEstimate() {
+        return originalEstimate;
+    }
 
-    public void setId(Long id) { this.id = id; }
+    public void setOriginalEstimate(final double originalEstimate) {
+        this.originalEstimate = originalEstimate;
+    }
 
-    public void setProjectSnapshotDate(Date projectSnapshotDate) { this.projectSnapshotDate = projectSnapshotDate; }
+    public double getEffortLeft() {
+        return effortLeft;
+    }
 
-    public void setTaskSnapshots(List<TaskSnapshot> taskSnapshots) { this.taskSnapshots = taskSnapshots; }
+    public void setEffortLeft(final double effortLeft) {
+        this.effortLeft = effortLeft;
+    }
 
-    public void setProject(Project project) { this.project = project; }
+    public double getEffortSpent() {
+        return effortSpent;
+    }
 
-    public void setOriginalEstimate(double originalEstimate) { this.originalEstimate = originalEstimate; }
+    public void setEffortSpent(final double effortSpent) {
+        this.effortSpent = effortSpent;
+    }
 
-    public void setEffortLeft(double effortLeft) { this.effortLeft = effortLeft; }
+    public double getRealEffort() {
+        return effortSpent + effortLeft;
+    }
 
-    public void setEffortSpent(double effortSpent) { this.effortSpent = effortSpent; }
+    public double getQuotation() {
+        return quotation;
+    }
 
-    public void setQuotation(double quotation) { this.quotation = quotation; }
+    public void setQuotation(final double quotation) {
+        this.quotation = quotation;
+    }
 }

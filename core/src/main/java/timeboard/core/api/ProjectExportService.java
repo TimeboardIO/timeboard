@@ -34,7 +34,7 @@ import java.io.OutputStream;
 
 public interface ProjectExportService {
 
-    default boolean isCandidate(String mimetype) {
+    default boolean isCandidate(final String mimetype) {
         return mimetype.equals(this.getMimeType());
     }
 

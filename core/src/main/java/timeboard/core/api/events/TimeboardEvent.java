@@ -40,7 +40,7 @@ public class TimeboardEvent implements Serializable {
     protected List<Account> usersToNotify;
     protected List<Account> usersToInform;
 
-    protected TimeboardEvent(Date date) {
+    protected TimeboardEvent(final Date date) {
         this.eventDate = date;
         usersToNotify = new ArrayList<>();
         usersToInform = new ArrayList<>();

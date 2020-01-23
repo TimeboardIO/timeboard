@@ -53,28 +53,29 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
     private EntityManager em;
 
     @Override
-    public ProjectSnapshot createProjectSnapshot(Account actor, Project project) throws BusinessException {
+    public ProjectSnapshot createProjectSnapshot(final Account actor, final Project project) throws BusinessException {
         try {
-            List<Task> listProjectTasks = this.projectService.listProjectTasks(actor, project);
+            final List<Task> listProjectTasks = this.projectService.listProjectTasks(actor, project);
             final ProjectSnapshot projectSnapshot = new ProjectSnapshot();
             listProjectTasks.forEach(task -> {
-                TaskSnapshot taskSnapshot = new TaskSnapshot(new Date(), task, actor);
+                final TaskSnapshot taskSnapshot = new TaskSnapshot(new Date(), task, actor);
                 projectSnapshot.getTaskSnapshots().add(taskSnapshot);
-                projectSnapshot.setOriginalEstimate(projectSnapshot.getOriginalEstimate() +  taskSnapshot.getOriginalEstimate());
+                projectSnapshot.setOriginalEstimate(projectSnapshot.getOriginalEstimate() + taskSnapshot.getOriginalEstimate());
                 projectSnapshot.setEffortLeft(projectSnapshot.getEffortLeft() + taskSnapshot.getEffortLeft());
                 projectSnapshot.setEffortSpent(projectSnapshot.getEffortSpent() + taskSnapshot.getEffortSpent());
             });
             projectSnapshot.setQuotation(project.getQuotation());
             projectSnapshot.setProjectSnapshotDate(new Date());
             return projectSnapshot;
-        } catch (Exception e) {
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage());
             throw new BusinessException(e);
         }
     }
 
     @Override
-    public List<TaskSnapshot> findAllTaskSnapshotByTaskID(Account actor, Long taskID) {
-        TypedQuery<TaskSnapshot> q = em
+    public List<TaskSnapshot> findAllTaskSnapshotByTaskID(final Account actor, final Long taskID) {
+        final TypedQuery<TaskSnapshot> q = em
                 .createQuery("select t from TaskSnapshot t left join fetch t.task where "
                         + "t.task.id = :taskID"
                         + "group by t.task "

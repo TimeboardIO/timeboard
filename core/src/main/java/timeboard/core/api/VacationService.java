@@ -12,10 +12,10 @@ package timeboard.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -41,15 +41,18 @@ public interface VacationService {
     Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID);
 
     VacationRequest createVacationRequest(Account actor, VacationRequest request);
+
     RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request);
 
     List<VacationRequest> listVacationRequestsByUser(Account user);
+
     List<VacationRequest> listVacationRequestsToValidateByUser(Account user);
 
     /**
-     *  List conflicting vacation request for period
+     * List conflicting vacation request for period
+     *
      * @param assignee
-     * @param request VacationRequest period
+     * @param request  VacationRequest period
      * @return
      */
     List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
@@ -58,11 +61,14 @@ public interface VacationService {
     Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
     void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+
     void deleteVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException;
 
     VacationRequest approveVacationRequest(Account actor, VacationRequest request) throws BusinessException;
+
     RecursiveVacationRequest approveVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException;
 
     VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
+
     RecursiveVacationRequest rejectVacationRequest(Account actor, RecursiveVacationRequest request);
 }

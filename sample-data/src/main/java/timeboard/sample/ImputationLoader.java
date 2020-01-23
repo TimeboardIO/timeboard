@@ -42,74 +42,74 @@ public class ImputationLoader {
     UserService userService;
     ProjectService projectService;
 
-    ImputationLoader(ProjectService projectService, UserService userService){
+    ImputationLoader(final ProjectService projectService, final UserService userService) {
         this.projectService = projectService;
         this.userService = userService;
     }
 
     public List<Imputation> load(
-                List<Account> usersSaved,
-                List<Task> tasksSaved,
-                int nbProjectsByUsers,
-                int nbTasksByProjects,
-                int nbImputationsByTasks){
+            final List<Account> usersSaved,
+            final List<Task> tasksSaved,
+            final int nbProjectsByUsers,
+            final int nbTasksByProjects,
+            final int nbImputationsByTasks) {
 
-        List<Imputation> imputationsSaved = new ArrayList<>();
-        Map<String, Double> mapDateSumImput = new HashMap<String, Double>();
+        final List<Imputation> imputationsSaved = new ArrayList<>();
+        final Map<String, Double> mapDateSumImput = new HashMap<String, Double>();
 
         for (int i = 0; i < tasksSaved.size(); i++) {
 
-            Account actor = usersSaved.get(i/(nbProjectsByUsers*nbTasksByProjects));
+            final Account actor = usersSaved.get(i / (nbProjectsByUsers * nbTasksByProjects));
             // car 1 user possède "nbProjectsByUsers" projects possédant chacun "nbTasksByProjects" tâches
-            Task task = tasksSaved.get(i);
+            final Task task = tasksSaved.get(i);
 
-            if(actor != null) {
+            if (actor != null) {
                 // Création de "nbImputationsByTasks" imputations pour simuler un nombre de jours
                 for (int j = 0; j < nbImputationsByTasks; j++) {
-                    Date day = new Date(new Date().getTime() + j * (1000 * 60 * 60 * 24));
-                    double value = this.getRandomValue(mapDateSumImput, day);//matTaskImput);
-                    if(mapDateSumImput.containsKey(this.getSimpleDate(day))) {
+                    final Date day = new Date(new Date().getTime() + j * (1000 * 60 * 60 * 24));
+                    final double value = this.getRandomValue(mapDateSumImput, day);//matTaskImput);
+                    if (mapDateSumImput.containsKey(this.getSimpleDate(day))) {
                         mapDateSumImput.put(this.getSimpleDate(day), mapDateSumImput.get(this.getSimpleDate(day)) + value);
-                    }else{
+                    } else {
                         mapDateSumImput.put(this.getSimpleDate(day), value);
                     }
 
                     try {
                         this.projectService.updateTaskImputation(actor, task, day, value);
-                        Imputation imputation = new Imputation();
+                        final Imputation imputation = new Imputation();
                         imputation.setDay(day);
                         imputation.setTask(task);
                         imputation.setValue(value);
                         imputationsSaved.add(imputation);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (final Exception e) {
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }
 
         }
 
-         return imputationsSaved;
+        return imputationsSaved;
 
     }
 
-    private double getRandomValue(Map<String, Double> mapDateSumImput, Date day){//double[][] matTaskImput){
-        double value = Math.floor(Math.random() * 6)/10; // Value between 0 and 0.5 with 1 décimal max
+    private double getRandomValue(final Map<String, Double> mapDateSumImput, final Date day) {//double[][] matTaskImput){
+        double value = Math.floor(Math.random() * 6) / 10; // Value between 0 and 0.5 with 1 décimal max
 
         // Vérification: Pour une journée la valeur du temps total passé sur les tâches ne doit pas être supérieur à 1
         double sum = 0.0;
-        if(mapDateSumImput.containsKey(this.getSimpleDate(day))){
+        if (mapDateSumImput.containsKey(this.getSimpleDate(day))) {
             sum = mapDateSumImput.get(this.getSimpleDate(day));
         }
-        if(sum + value > 1.0 ){
+        if (sum + value > 1.0) {
             value = 1.0 - sum;
         }
 
         return value;
     }
 
-    private String getSimpleDate(Date day){
+    private String getSimpleDate(final Date day) {
         return new SimpleDateFormat("yyyy-MM-dd").format(day);
     }
 

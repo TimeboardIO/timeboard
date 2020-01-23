@@ -12,10 +12,10 @@ package timeboard.core.api.sync;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,7 +36,7 @@ public class ProjectSyncCredentialField implements Serializable {
     private String value;
     private int weight;
 
-    public ProjectSyncCredentialField(String fieldKey, String fieldName, Type fieldType, int weight) {
+    public ProjectSyncCredentialField(final String fieldKey, final String fieldName, final Type fieldType, final int weight) {
         this.fieldKey = fieldKey;
         this.fieldName = fieldName;
         this.fieldType = fieldType;
@@ -47,7 +47,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
@@ -55,7 +55,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return weight;
     }
 
-    public void setWeight(int weight) {
+    public void setWeight(final int weight) {
         this.weight = weight;
     }
 
@@ -63,7 +63,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return fieldKey;
     }
 
-    public void setFieldKey(String fieldKey) {
+    public void setFieldKey(final String fieldKey) {
         this.fieldKey = fieldKey;
     }
 
@@ -71,7 +71,7 @@ public class ProjectSyncCredentialField implements Serializable {
         return fieldName;
     }
 
-    public void setFieldName(String fieldName) {
+    public void setFieldName(final String fieldName) {
         this.fieldName = fieldName;
     }
 
@@ -79,17 +79,17 @@ public class ProjectSyncCredentialField implements Serializable {
         return fieldType;
     }
 
-    public void setFieldType(Type fieldType) {
+    public void setFieldType(final Type fieldType) {
         this.fieldType = fieldType;
     }
 
-    public enum Type{
+    public enum Type {
         TEXT("text"),
         PASSWORD("password");
 
         private String name;
 
-        private Type(String v) {
+        private Type(final String v) {
             this.name = v;
         }
 

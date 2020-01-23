@@ -1,11 +1,19 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
+
 let app = new Vue({
 
     el: '#members',
     data: {
         members: [],
+    },
+    filters:{
+        formatDate: function(value) {
+            if (value) {
+                return new Date(value).toDateString();
+            }
+        }
     },
     methods: {
         removeMember: function(e, member){
@@ -27,10 +35,16 @@ let app = new Vue({
             });
         },
         updateRole: function(e, member){
-            $.get("/org/members/updateRole?orgID="+currentOrgID+"&memberID="+member.id+"&role="+member.role)
-            .then(function(role){
-                member.role = role;
-            });
+
+            $.ajax({
+                type: "patch",
+                url: "/org/members/"+member.id,
+                data: JSON.stringify(member),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8'
+            }).then(function(role){
+                              member.role = role;
+                          });
         }
     }
 });
