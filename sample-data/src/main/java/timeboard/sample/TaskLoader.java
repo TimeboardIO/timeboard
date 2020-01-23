@@ -80,7 +80,7 @@ public class TaskLoader {
 
 
                     } catch (final Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }

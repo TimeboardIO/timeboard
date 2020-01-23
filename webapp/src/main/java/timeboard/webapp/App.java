@@ -28,7 +28,6 @@ package timeboard.webapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -45,7 +44,7 @@ import java.util.TimeZone;
 public class App {
 
     public static void main(final String... args) {
-        final ConfigurableApplicationContext ctx = SpringApplication.run(App.class, args);
+        SpringApplication.run(App.class, args);
     }
 
     @PostConstruct

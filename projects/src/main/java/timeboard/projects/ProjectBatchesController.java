@@ -26,6 +26,8 @@ package timeboard.projects;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,6 +47,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/projects/{projectID}/batches")
 public class ProjectBatchesController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
 
     @Autowired
     public ProjectService projectService;
@@ -206,7 +210,7 @@ public class ProjectBatchesController {
                     try {
                         t = (Task) projectService.getTaskByID(actor, Long.getLong(id));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        LOGGER.error(e.getMessage());
                     }
                     return t;
 

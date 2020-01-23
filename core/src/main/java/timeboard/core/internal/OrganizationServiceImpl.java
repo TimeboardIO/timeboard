@@ -74,7 +74,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         try {
             this.createDefaultTask(organization, this.defaultVacationTaskName);
         } catch (final BusinessException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
 
         return organization;
