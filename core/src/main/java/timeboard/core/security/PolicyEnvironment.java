@@ -12,10 +12,10 @@ package timeboard.core.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.BusinessPolicyEvaluator;
 import timeboard.core.api.exceptions.CommercialException;
 import timeboard.core.model.Project;
+
 import java.util.Date;
 
 @Component
@@ -39,7 +40,7 @@ public class PolicyEnvironment {
     @Autowired
     BusinessPolicyEvaluator businessPolicyEvaluator;
 
-    public PolicyEnvironment(){
+    public PolicyEnvironment() {
     }
 
     public Date getDate() {
@@ -53,7 +54,6 @@ public class PolicyEnvironment {
     public boolean checkTaskByProjectLimit(final TimeboardAuthentication authentication, final Project project) throws CommercialException {
         return businessPolicyEvaluator.checkTaskByProjectLimit(authentication.getDetails(), project);
     }
-
 
 
 }

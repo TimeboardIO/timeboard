@@ -12,10 +12,10 @@ package timeboard.core.internal;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,17 +33,17 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.VacationService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.events.TimeboardEventType;
 import timeboard.core.api.events.VacationEvent;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -77,8 +77,8 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     public VacationRequest createVacationRequest(Account actor, VacationRequest request) {
-        request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
-        request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
+        request.setStartDate(new Date(request.getStartDate().getTime() + (2 * 60 * 60 * 1000) + 1));
+        request.setEndDate(new Date(request.getEndDate().getTime() + (2 * 60 * 60 * 1000) + 1));
 
         em.persist(request);
         em.flush();
@@ -89,10 +89,10 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     public RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request) {
-        request.setStartDate(new Date(request.getStartDate().getTime()+(2 * 60 * 60 * 1000) +1));
-        request.setEndDate(new Date(request.getEndDate().getTime()+(2 * 60 * 60 * 1000) +1));
+        request.setStartDate(new Date(request.getStartDate().getTime() + (2 * 60 * 60 * 1000) + 1));
+        request.setEndDate(new Date(request.getEndDate().getTime() + (2 * 60 * 60 * 1000) + 1));
 
-        if(request.getChildren().isEmpty()) {
+        if (request.getChildren().isEmpty()) {
             request.generateChildren();
         }
         em.persist(request);
@@ -131,7 +131,7 @@ public class VacationServiceImpl implements VacationService {
         // include next and previous to enhance month loading
 
         Calendar c = Calendar.getInstance();
-        c.set(Calendar.MONTH, month+1);
+        c.set(Calendar.MONTH, month + 1);
         c.set(Calendar.YEAR, year);
         c.set(Calendar.DAY_OF_MONTH, 1);
         c.add(Calendar.MONTH, -2);
@@ -144,9 +144,9 @@ public class VacationServiceImpl implements VacationService {
         TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v where v.applicant IN :applicants " +
                         "AND (" +
-                            "   (v.startDate BETWEEN :start AND :end) " +
-                            "OR (v.endDate   BETWEEN :start AND :end) " +
-                            "OR ( (:start BETWEEN v.startDate AND v.endDate) AND (:end BETWEEN v.startDate AND v.endDate) )" +
+                        "   (v.startDate BETWEEN :start AND :end) " +
+                        "OR (v.endDate   BETWEEN :start AND :end) " +
+                        "OR ( (:start BETWEEN v.startDate AND v.endDate) AND (:end BETWEEN v.startDate AND v.endDate) )" +
                         ")"
                 , VacationRequest.class);
 
@@ -159,7 +159,7 @@ public class VacationServiceImpl implements VacationService {
         // group vacation request by account and return map account -> requests list
         return q.getResultList().stream().filter(r -> !(r instanceof RecursiveVacationRequest))
                 .collect(Collectors.groupingBy(VacationRequest::getApplicant,
-                Collectors.mapping(r -> r,Collectors.toList())));
+                        Collectors.mapping(r -> r, Collectors.toList())));
     }
 
     @Override
@@ -168,9 +168,9 @@ public class VacationServiceImpl implements VacationService {
         TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
                         "where v.applicant = :applicant and v.parent is null " +
                         "and ( " +
-                            "(v.startDate >= :startDate and :startDate <= v.endDate)" +
-                            " or " +
-                            "(v.startDate >= :endDate and :endDate <= v.endDate)" +
+                        "(v.startDate >= :startDate and :startDate <= v.endDate)" +
+                        " or " +
+                        "(v.startDate >= :endDate and :endDate <= v.endDate)" +
                         ")",
                 VacationRequest.class);
 
@@ -181,23 +181,23 @@ public class VacationServiceImpl implements VacationService {
         List<VacationRequest> resultList = q.getResultList();
         List<VacationRequest> copyList = new ArrayList<>(resultList);
 
-        for (VacationRequest r :resultList) {
+        for (VacationRequest r : resultList) {
             if (
-                (r.getStartDate().compareTo(request.getEndDate()) > 0)
-                    && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                    &&  r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
+                    (r.getStartDate().compareTo(request.getEndDate()) > 0)
+                            && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                            && r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
-                    copyList.remove(r);
+                copyList.remove(r);
             }
 
             if (
-                (r.getEndDate().compareTo(request.getStartDate()) > 0)
-                && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
+                    (r.getEndDate().compareTo(request.getStartDate()) > 0)
+                            && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                            && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
-                    copyList.remove(r);
+                copyList.remove(r);
             }
-            if (r instanceof RecursiveVacationRequest ) {
+            if (r instanceof RecursiveVacationRequest) {
                 copyList.remove(r);
             }
         }
@@ -209,8 +209,8 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public void deleteVacationRequest(Account actor, VacationRequest request) throws BusinessException {
 
-        if(request.getStatus() == VacationRequestStatus.ACCEPTED) {
-            this.updateImputations(actor, request,0);
+        if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
+            this.updateImputations(actor, request, 0);
         }
 
         em.remove(request);
@@ -225,15 +225,15 @@ public class VacationServiceImpl implements VacationService {
 
         request.setEndDate(new Date());
         boolean removeIt = true;
-        for(VacationRequest r : request.getChildren()) {
-            if(r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
+        for (VacationRequest r : request.getChildren()) {
+            if (r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
                 removeIt = false;
             } else {
                 this.deleteVacationRequest(actor, r);
             }
         }
 
-        if (removeIt){
+        if (removeIt) {
             em.remove(request);
         }
         em.flush();
@@ -249,7 +249,7 @@ public class VacationServiceImpl implements VacationService {
         em.flush();
 
 
-        this.updateImputations(actor, request,1);
+        this.updateImputations(actor, request, 1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
@@ -259,7 +259,7 @@ public class VacationServiceImpl implements VacationService {
     public RecursiveVacationRequest approveVacationRequest(Account actor, RecursiveVacationRequest request) throws BusinessException {
         request.setStatus(VacationRequestStatus.ACCEPTED);
 
-        for(VacationRequest r : request.getChildren()) {
+        for (VacationRequest r : request.getChildren()) {
             this.approveVacationRequest(actor, r);
         }
 
@@ -271,7 +271,7 @@ public class VacationServiceImpl implements VacationService {
         return request;
     }
 
-    private void updateImputations(Account actor, VacationRequest request, double sign ) throws BusinessException {
+    private void updateImputations(Account actor, VacationRequest request, double sign) throws BusinessException {
 
         DefaultTask vacationTask = this.getVacationTask(actor, request);
 
@@ -287,21 +287,21 @@ public class VacationServiceImpl implements VacationService {
         java.util.Calendar c2 = java.util.Calendar.getInstance();
         c2.setTime(request.getEndDate());
 
-        if(request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
+        if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
             value = 0.5 * sign;
         }
 
         while (c1.before(c2)) {
-            if (c1.get(Calendar.DAY_OF_WEEK) <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1) {
+            if (c1.get(Calendar.DAY_OF_WEEK) <= 6 && c1.get(Calendar.DAY_OF_WEEK) > 1) {
                 this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
             }
             value = 1 * sign;
             c1.add(Calendar.DATE, 1);
         }
-        if(request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
+        if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
             value = 0.5 * sign;
         }
-        if (c1.get(Calendar.DAY_OF_WEEK)  <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1 ) {
+        if (c1.get(Calendar.DAY_OF_WEEK) <= 6 && c1.get(Calendar.DAY_OF_WEEK) > 1) {
             this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value);
         }
 
@@ -310,11 +310,11 @@ public class VacationServiceImpl implements VacationService {
     private DefaultTask getVacationTask(Account actor, VacationRequest request) {
         Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, request.getOrganizationID());
 
-        if(organization.isPresent()) {
+        if (organization.isPresent()) {
             Optional<DefaultTask> vacationTask = organization.get().getDefaultTasks().stream()
                     .filter(t -> t.getName().matches(this.defaultVacationTaskName)).findFirst();
 
-            if(vacationTask.isPresent()) {
+            if (vacationTask.isPresent()) {
                 return vacationTask.get();
             }
         }
@@ -339,7 +339,7 @@ public class VacationServiceImpl implements VacationService {
                     && !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
 
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
-            boolean halfDay = vacationRequests.stream().anyMatch( r -> {
+            boolean halfDay = vacationRequests.stream().anyMatch(r -> {
                 //current day is first day of request and request is half day started
                 boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0);
                 //current day is last day of request and request is half day ended
@@ -388,7 +388,7 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public RecursiveVacationRequest rejectVacationRequest(Account actor, RecursiveVacationRequest request) {
 
-        for(VacationRequest r : request.getChildren()) {
+        for (VacationRequest r : request.getChildren()) {
             this.rejectVacationRequest(actor, r);
         }
 
@@ -400,7 +400,6 @@ public class VacationServiceImpl implements VacationService {
 
         return request;
     }
-
 
 
 }

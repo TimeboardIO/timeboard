@@ -80,12 +80,28 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private EntityManager em;
 
+    public static String generateRandomColor(Color mix) {
+        Random random = new Random();
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+
+        // mix the color
+        if (mix != null) {
+            red = (red + mix.getRed()) / 2;
+            green = (green + mix.getGreen()) / 2;
+            blue = (blue + mix.getBlue()) / 2;
+        }
+
+        Color color = new Color(red, green, blue);
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
+    }
 
     @Override
     @Transactional
     @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
-    @CacheEvict(value="accountProjectsCache", key="#owner.getId()")
+    @CacheEvict(value = "accountProjectsCache", key = "#owner.getId()")
     public Project createProject(Account owner, String projectName) {
         Account ownerAccount = this.em.find(Account.class, owner.getId());
         Project newProject = new Project();
@@ -104,7 +120,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @Cacheable(value="accountProjectsCache", key = "#candidate.getId()")
+    @Cacheable(value = "accountProjectsCache", key = "#candidate.getId()")
     public List<Project> listProjects(Account candidate, Long orgID) {
         TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
@@ -138,10 +154,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-
     @Override
     @PreAuthorize("hasPermission(#project,'PROJECTS_ARCHIVE')")
-    @CacheEvict(value="accountProjectsCache", key="#actor.getId()")
+    @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project archiveProjectByID(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
@@ -158,7 +173,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @CacheEvict(value="accountProjectsCache", key="#actor.getId()")
+    @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project updateProject(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
@@ -208,6 +223,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+
+    /* -- TASKS -- */
+
     @Override
     public void save(Account actor, ProjectMembership projectMembership) throws BusinessException {
 
@@ -223,9 +241,6 @@ public class ProjectServiceImpl implements ProjectService {
         LOGGER.info("User " + projectMembership.getMember().getName() + " add to project " + projectMembership.getProject().getName());
 
     }
-
-
-    /* -- TASKS -- */
 
     @Override
     public List<Task> listProjectTasks(Account actor, Project project) throws BusinessException {
@@ -244,14 +259,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @Cacheable(value="accountTasksCache")
+    @Cacheable(value = "accountTasksCache")
     public List<Task> listUserTasks(Account account) {
         TypedQuery<Task> q = em.createQuery("select t from Task t where t.assigned = :user", Task.class);
         q.setParameter("user", account);
         return q.getResultList();
 
     }
-
 
     @Override
     @Transactional
@@ -316,7 +330,6 @@ public class ProjectServiceImpl implements ProjectService {
         return task;
     }
 
-
     @Override
     public void createTasks(final Account actor, final List<Task> taskList) {
         for (Task newTask : taskList) {  //TODO create task here
@@ -350,7 +363,6 @@ public class ProjectServiceImpl implements ProjectService {
         em.flush();
 
     }
-
 
     @Override
     public AbstractTask getTaskByID(Account account, long id) throws BusinessException {
@@ -570,7 +582,6 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
-
     private Imputation actionOnImputation(Imputation imputation,
                                           AbstractTask task,
                                           Account actor,
@@ -618,7 +629,6 @@ public class ProjectServiceImpl implements ProjectService {
         return Math.max(newEL, 0);
     }
 
-
     @Override
     public UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException {
         RuleSet<Task> ruleSet = new RuleSet<>();
@@ -638,7 +648,6 @@ public class ProjectServiceImpl implements ProjectService {
                 task.getId(), task.getEffortSpent(), task.getEffortLeft(),
                 task.getOriginalEstimate(), task.getRealEffort());
     }
-
 
     @Override
     public List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de) {
@@ -671,7 +680,6 @@ public class ProjectServiceImpl implements ProjectService {
 
         return projectTasks;
     }
-
 
     @Override
     public void deleteTaskByID(Account actor, long taskID) throws BusinessException {
@@ -725,7 +733,6 @@ public class ProjectServiceImpl implements ProjectService {
                 .collect(Collectors.toList());
     }
 
-
     @Override
     public List<Batch> listProjectBatches(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
@@ -740,7 +747,6 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList();
     }
 
-
     @Override
     public List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
@@ -754,8 +760,6 @@ public class ProjectServiceImpl implements ProjectService {
         q.setParameter("project", project);
         return q.getResultList();
     }
-
-
 
     @Override
     public Batch getBatchById(Account account, long id) throws BusinessException {
@@ -849,7 +853,6 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList();
     }
 
-
     @Override
     public List<Batch> getBatchList(Account actor, Project project, BatchType batchType) throws BusinessException {
         RuleSet<Project> ruleSet = new RuleSet<>();
@@ -887,7 +890,6 @@ public class ProjectServiceImpl implements ProjectService {
 
         return b;
     }
-
 
     @Override
     public boolean isProjectOwner(Account account, Project project) {
@@ -952,23 +954,6 @@ public class ProjectServiceImpl implements ProjectService {
         data.setComments(comments);
 
         return data;
-    }
-
-    public static String generateRandomColor(Color mix) {
-        Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
-
-        // mix the color
-        if (mix != null) {
-            red = (red + mix.getRed()) / 2;
-            green = (green + mix.getGreen()) / 2;
-            blue = (blue + mix.getBlue()) / 2;
-        }
-
-        Color color = new Color(red, green, blue);
-        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 
 }

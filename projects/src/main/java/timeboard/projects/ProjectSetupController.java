@@ -34,7 +34,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ThreadLocalStorage;
@@ -45,6 +44,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectMembership;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -76,7 +76,6 @@ public class ProjectSetupController {
     private UserService userService;
 
 
-
     @GetMapping
     protected String configProject(TimeboardAuthentication authentication,
                                    @PathVariable long projectID, Model model) throws BusinessException {
@@ -96,7 +95,7 @@ public class ProjectSetupController {
         final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        if(project.isMember(targetMember)){
+        if (project.isMember(targetMember)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This user is already member of this project");
         }
 
@@ -151,7 +150,7 @@ public class ProjectSetupController {
         try {
             this.projectService.updateProject(actor, project);
             attributes.addFlashAttribute("success", "Project config updated successfully.");
-        } catch(BusinessException e) {
+        } catch (BusinessException e) {
             attributes.addFlashAttribute("error", e.getMessage());
         }
 

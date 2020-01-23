@@ -12,10 +12,10 @@ package timeboard.projects;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -39,13 +39,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +79,7 @@ public class ProjectTasksSyncController {
         final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
 
         creds.forEach(field -> {
-            if(formBody.containsKey(field.getFieldKey())){
+            if (formBody.containsKey(field.getFieldKey())) {
                 field.setValue(formBody.get(field.getFieldKey()).get(0));
             }
         });
@@ -93,8 +93,7 @@ public class ProjectTasksSyncController {
                 serviceName, creds, cronScheduleBuilder);
 
 
-
-        return "redirect:/projects/"+projectID+"/tasks";
+        return "redirect:/projects/" + projectID + "/tasks";
     }
 
     @GetMapping(value = "/inProgress")
@@ -103,13 +102,13 @@ public class ProjectTasksSyncController {
 
 
         Optional<JobExecutionContext> jobInProgress = scheduler.getCurrentlyExecutingJobs()
-                    .stream()
-                    .filter(jobExecutionContext -> jobExecutionContext.getJobDetail().getKey().getName().equals(projectID.toString()))
-                    .findFirst();
+                .stream()
+                .filter(jobExecutionContext -> jobExecutionContext.getJobDetail().getKey().getName().equals(projectID.toString()))
+                .findFirst();
 
-        if(jobInProgress.isPresent()) {
+        if (jobInProgress.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString("IN_PROGRESS"));
-        }else{
+        } else {
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString("NO_JOB"));
         }
     }

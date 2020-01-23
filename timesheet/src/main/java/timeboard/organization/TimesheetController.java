@@ -58,10 +58,10 @@ public class TimesheetController {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
-    private  ProjectService projectService;
+    private ProjectService projectService;
 
     @Autowired
-    private  TimesheetService timesheetService;
+    private TimesheetService timesheetService;
 
     @Autowired
     private OrganizationService organizationService;
@@ -74,7 +74,7 @@ public class TimesheetController {
 
     @GetMapping("/{year}/{week}")
     protected String fillAndDisplayTimesheetPage(TimeboardAuthentication authentication,
-                               @PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
+                                                 @PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
 
 
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
@@ -94,11 +94,8 @@ public class TimesheetController {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
 
-
-        final Date ds = this.timesheetService.findStartDate(c, week, year);
-        final Date de = this.timesheetService.findEndDate(c, week, year);
-        final int lastWeek = this.timesheetService.findLastWeek(c, week, year);
-        final int lastWeekYear = this.timesheetService.findLastWeekYear(c, week, year);
+        final int lastWeek = this.findLastWeek(c, week, year);
+        final int lastWeekYear = this.findLastWeekYear(c, week, year);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
@@ -146,6 +143,22 @@ public class TimesheetController {
 
     }
 
+    private int findLastWeekYear(Calendar c, int week, int year) {
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        if (c.get(Calendar.WEEK_OF_YEAR) > week) {
+            c.roll(Calendar.YEAR, -1);  // remove one year
+        }
+        return c.get(Calendar.YEAR);
+    }
+
+    private int findLastWeek(Calendar c, int week, int year) {
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        return c.get(Calendar.WEEK_OF_YEAR);
+    }
 
     private class DateWrapper {
 

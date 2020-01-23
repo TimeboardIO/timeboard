@@ -37,11 +37,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -80,10 +80,10 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(TimeboardAuthentication authentication,  HttpServletRequest request,
+    protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request,
                                 RedirectAttributes attributes) throws BusinessException {
         final Account actor = authentication.getDetails();
-        Project prj =  this.projectService.createProject(actor, request.getParameter("projectName"));
+        Project prj = this.projectService.createProject(actor, request.getParameter("projectName"));
         attributes.addFlashAttribute("success", "Project created successfully.");
         return "redirect:/projects";
     }
@@ -95,7 +95,7 @@ public class ProjectsController {
 
     @GetMapping("/{projectID}/delete")
     protected String deleteProject(TimeboardAuthentication authentication,
-                                   @PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
+                                   @PathVariable long projectID, RedirectAttributes attributes) throws BusinessException {
 
         final Project project = this.projectService.getProjectByID(authentication.getDetails(), authentication.getCurrentOrganization(), projectID);
         this.projectService.archiveProjectByID(authentication.getDetails(), project);
@@ -112,6 +112,7 @@ public class ProjectsController {
         public ProjectDecorator(Project project) {
             this.project = project;
         }
+
         public long getID() {
             return this.project.getId();
         }
@@ -129,7 +130,7 @@ public class ProjectsController {
         }
 
         public String getMemberSize() {
-            return this.project.getMembers().size()+"";
+            return this.project.getMembers().size() + "";
         }
 
     }

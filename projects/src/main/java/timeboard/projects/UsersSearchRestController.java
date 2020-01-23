@@ -32,12 +32,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import timeboard.core.model.*;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.model.*;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -96,7 +96,7 @@ public class UsersSearchRestController {
             Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
         } else {
-            accounts.addAll(this.userService.searchUserByEmail(actor,  query));
+            accounts.addAll(this.userService.searchUserByEmail(actor, query));
         }
 
         SearchResults searchResults = new SearchResults(accounts.size(), accounts);
@@ -106,7 +106,7 @@ public class UsersSearchRestController {
 
     @GetMapping("/byRole")
     protected ResponseEntity<SearchResults> doGetMembersProjects(TimeboardAuthentication authentication,
-                    HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+                                                                 HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
 
         Account actor = authentication.getDetails();
 
@@ -135,16 +135,16 @@ public class UsersSearchRestController {
             List<Account> myManagers = new ArrayList<>();
             MembershipRole finalRole = role;
             myProjects
-                .stream()
-                .map(project -> project.getMemberShipsByRole(finalRole))
-                .forEach(projectMembershipOwners -> {
-                    for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
-                        if(projectMembershipOwner.getMember().getEmail().startsWith(query)
-                                && !myManagers.contains(projectMembershipOwner.getMember())) {
-                            myManagers.add(projectMembershipOwner.getMember());
+                    .stream()
+                    .map(project -> project.getMemberShipsByRole(finalRole))
+                    .forEach(projectMembershipOwners -> {
+                        for (ProjectMembership projectMembershipOwner : projectMembershipOwners) {
+                            if (projectMembershipOwner.getMember().getEmail().startsWith(query)
+                                    && !myManagers.contains(projectMembershipOwner.getMember())) {
+                                myManagers.add(projectMembershipOwner.getMember());
+                            }
                         }
-                    }
-                });
+                    });
 
             accounts.addAll(myManagers);
 

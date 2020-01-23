@@ -50,6 +50,7 @@ public class ProjectEmailSummaryModel {
     public void addCreatedTask(TaskEvent e) {
         createdTasks.add(e);
     }
+
     public void addDeletedTask(TaskEvent e) {
         deletedTasks.add(e);
     }

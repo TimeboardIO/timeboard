@@ -30,15 +30,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.*;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -122,9 +125,9 @@ public class ProjectTasksController {
 
     @GetMapping("/tasks/{taskID}")
     protected String editTasks(
-                    TimeboardAuthentication authentication,
-                    @PathVariable Long projectID,
-                    @PathVariable Long taskID, Model model) throws BusinessException {
+            TimeboardAuthentication authentication,
+            @PathVariable Long projectID,
+            @PathVariable Long taskID, Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
@@ -143,7 +146,7 @@ public class ProjectTasksController {
     @PostMapping("/tasks")
     protected String handlePost(
             TimeboardAuthentication authentication,
-            HttpServletRequest request, Model model,  RedirectAttributes attributes) throws BusinessException {
+            HttpServletRequest request, Model model, RedirectAttributes attributes) throws BusinessException {
 
         Account actor = authentication.getDetails();
 
@@ -174,7 +177,7 @@ public class ProjectTasksController {
         public TaskForm(Task task) {
             this.taskID = task.getId();
             this.taskType = task.getTaskType();
-            if( task.getBatches() != null){
+            if (task.getBatches() != null) {
                 this.batchesID = new ArrayList<>();
                 task.getBatches().forEach(batch -> batchesID.add(batch.getId()));
             }

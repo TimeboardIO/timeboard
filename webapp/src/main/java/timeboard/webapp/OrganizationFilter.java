@@ -55,10 +55,6 @@ import java.util.stream.Collectors;
 public class OrganizationFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationFilter.class);
-
-    @Autowired
-    private OrganizationService organizationService;
-
     private static final List<String> whitelist = new ArrayList<>();
 
     static {
@@ -68,6 +64,9 @@ public class OrganizationFilter implements Filter {
         whitelist.add("/login/oauth2/code/cognito");
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2|svg)");
     }
+
+    @Autowired
+    private OrganizationService organizationService;
 
     @Override
     public void doFilter(ServletRequest servletRequest,
@@ -93,7 +92,7 @@ public class OrganizationFilter implements Filter {
                                             HttpServletResponse servletResponse) throws IOException {
 
         Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
-        if (orgCookie.isPresent() && authentication!= null) {
+        if (orgCookie.isPresent() && authentication != null) {
             try {
                 final Long organizationID = Long.parseLong(orgCookie.get().getValue());
 

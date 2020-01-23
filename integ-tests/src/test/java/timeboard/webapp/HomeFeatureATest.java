@@ -56,7 +56,6 @@ public class HomeFeatureATest extends TimeboardTest {
     private Model model;
 
 
-
     @Given("^user with an existing account and (\\d+) project$")
     public void user_with_an_existing_account_and_project(int arg1) throws Throwable {
 

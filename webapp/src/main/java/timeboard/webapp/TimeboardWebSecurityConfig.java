@@ -90,16 +90,16 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 this.appLogout);
 
         http.authorizeRequests()
-                .antMatchers("/","/onboarding/**").permitAll()
+                .antMatchers("/", "/onboarding/**").permitAll()
                 .anyRequest()
-                    .authenticated()
-                        .and()
-                            .oauth2Login()
+                .authenticated()
+                .and()
+                .oauth2Login()
 
-                        .and()
-                            .logout()
-                            .logoutUrl("/logout")
-                            .logoutSuccessUrl(logoutURL);
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl(logoutURL);
 
         //http.addFilterAfter(new RedirectFilter(), OAuth2LoginAuthenticationFilter.class);
         http.addFilterAfter(new CustomFilter(), OAuth2LoginAuthenticationFilter.class);
@@ -107,8 +107,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().disable();
 
 
-     }
-
+    }
 
 
     public class RedirectFilter extends GenericFilterBean {
@@ -118,15 +117,14 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
                              ServletResponse servletResponse,
                              FilterChain filterChain) throws IOException, ServletException {
 
-            if(((HttpServletRequest)servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")){
+            if (((HttpServletRequest) servletRequest).getRequestURI().equals("/login/oauth2/code/cognito")) {
                 ((HttpServletResponse) servletResponse).sendRedirect(HomeController.URI);
                 return;
-            }else{
+            } else {
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         }
     }
-
 
 
     public class CustomFilter extends GenericFilterBean {
@@ -138,7 +136,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
-            if(auth != null && (auth instanceof TimeboardAuthentication) == false) {
+            if (auth != null && (auth instanceof TimeboardAuthentication) == false) {
                 Account account = null;
 
                 if (auth instanceof UsernamePasswordAuthenticationToken) {

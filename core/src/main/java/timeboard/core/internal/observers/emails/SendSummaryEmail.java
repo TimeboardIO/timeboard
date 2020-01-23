@@ -33,7 +33,9 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.events.*;
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.SubmittedTimesheet;
+import timeboard.core.model.Task;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;

@@ -6,6 +6,7 @@
 const _ACTOR_ID = $("meta[property='timesheet']").attr('actorID');
 const _YEAR = $("meta[property='timesheet']").attr('year');
 const _WEEK = $("meta[property='timesheet']").attr('week');
+const _LAST_WEEK_SUBMITTED = $("meta[property='timesheet']").attr('lastWeekSubmitted');
 
 const emptyTask = {
     taskID: 0,
@@ -59,8 +60,7 @@ const timesheetModel = {
         let result = true;
 
         //check last week
-        const lastWeekSubmitted = $("meta[property='timesheet']").attr('lastWeekSubmitted');
-        result = result && (this.disablePrev || lastWeekSubmitted === 'true');
+        result = result && (this.disablePrev || _LAST_WEEK_SUBMITTED === 'true');
 
         //check all days imputations == 1
         this.days.forEach(function (day) {
