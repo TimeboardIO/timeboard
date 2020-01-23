@@ -69,16 +69,16 @@ public class TimesheetController {
     @GetMapping
     protected String currentWeekTimesheet(TimeboardAuthentication authentication, Model model) throws Exception {
         Calendar c = Calendar.getInstance();
-        return this.handleGet(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+        return this.fillAndDisplayTimesheetPage(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
     @GetMapping("/{year}/{week}")
-    protected String handleGet(TimeboardAuthentication authentication,
+    protected String fillAndDisplayTimesheetPage(TimeboardAuthentication authentication,
                                @PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
 
 
         final List<ProjectTasks> tasksByProject = new ArrayList<>();
-        Account acc = authentication.getDetails();
+        final Account acc = authentication.getDetails();
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
