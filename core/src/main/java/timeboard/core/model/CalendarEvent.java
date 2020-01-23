@@ -58,7 +58,7 @@ public class CalendarEvent {
     }
 
     public static List<CalendarEvent> requestToWrapperList(List<VacationRequest> requests) {
-        List<CalendarEvent> results = new ArrayList<>();
+        final List<CalendarEvent> results = new ArrayList<>();
 
         for (VacationRequest r : requests) {
             results.addAll(requestToWrapper(r));
@@ -69,16 +69,16 @@ public class CalendarEvent {
 
 
     public static List<CalendarEvent> requestToWrapper(VacationRequest request) {
-        LinkedList<CalendarEvent> results = new LinkedList<>();
+        final LinkedList<CalendarEvent> results = new LinkedList<>();
 
-        java.util.Calendar start = java.util.Calendar.getInstance();
-        java.util.Calendar end = java.util.Calendar.getInstance();
+        final java.util.Calendar start = java.util.Calendar.getInstance();
+        final java.util.Calendar end = java.util.Calendar.getInstance();
 
         start.setTime(request.getStartDate());
         end.setTime(request.getEndDate());
         boolean last = true;
         while(last) {
-            CalendarEvent wrapper = new CalendarEvent();
+            final CalendarEvent wrapper = new CalendarEvent();
 
             wrapper.setName(request.getApplicant().getScreenName());
             wrapper.setDate (DATE_FORMAT.format(start.getTime()));
