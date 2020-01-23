@@ -115,8 +115,8 @@ public class VacationServiceImpl implements VacationService {
     @Override
     public List<VacationRequest> listVacationRequestsByUser(Account applicant, int year) {
 
-        Calendar startBound = Calendar.getInstance();
-        Calendar endBound = Calendar.getInstance();
+        final Calendar startBound = Calendar.getInstance();
+        final Calendar endBound = Calendar.getInstance();
 
 
         endBound.set(Calendar.DAY_OF_MONTH, 1);
@@ -127,7 +127,7 @@ public class VacationServiceImpl implements VacationService {
         startBound.set(Calendar.MONTH, Calendar.DECEMBER);
         startBound.set(Calendar.YEAR, year-1);
 
-        TypedQuery<VacationRequest> q = em.createQuery(
+        final TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v where v.applicant = :applicant " +
                         "and not (v.endDate < :startBound and v.startDate > :endBound)"
                 , VacationRequest.class);
@@ -349,18 +349,19 @@ public class VacationServiceImpl implements VacationService {
         return null;
     }
 
-    private void updateTaskImputation(Account user, DefaultTask task, Date day, double val, VacationRequest request) throws BusinessException {
+    private void updateTaskImputation(final Account user, final DefaultTask task, final Date day,
+                                      final double val, final VacationRequest request) throws BusinessException {
 
-        if (val > 0) {
+        double newValue =  val;
+        if (newValue > 0) {
             //change imputation value only if previous value is smaller than new
-            Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
+            final Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
             if (old.isPresent()) {
-                val= Double.min(1, val + old.get().getValue());
+                newValue = Double.min(1, newValue + old.get().getValue());
             }
-            this.projectservice.updateTaskImputation(user, task, day, val);
         } else {
             // looking for existing vacation request on same day
-            double newValue = 0;
+            newValue = 0;
             List<VacationRequest> vacationRequests = this.listVacationRequests(user, day);
             // keep accepted request
             vacationRequests = vacationRequests.stream().filter(r ->
@@ -372,11 +373,11 @@ public class VacationServiceImpl implements VacationService {
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
             final boolean halfDay = vacationRequests.stream().anyMatch(r -> {
                 //current day is first day of request and request is half day started
-                boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                        && onSameDay(day, r.getStartDate()));
+                final boolean halfStart = r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                        && onSameDay(day, r.getStartDate());
                 //current day is last day of request and request is half day ended
-                boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
-                        && onSameDay(day, r.getEndDate()));
+                final boolean halfEnd = r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
+                        && onSameDay(day, r.getEndDate());
                 return halfStart || halfEnd;
             });
 
@@ -385,16 +386,15 @@ public class VacationServiceImpl implements VacationService {
             } else if (!vacationRequests.isEmpty()) {
                 newValue = 1;
             }
-
-            //update imputation
-            this.projectservice.updateTaskImputation(user, task, day, newValue);
-
         }
+
+        //update imputation
+        this.projectservice.updateTaskImputation(user, task, day, newValue);
     }
 
     private boolean onSameDay(Date date1, Date date2) {
-        Calendar cal1 = Calendar.getInstance();
-        Calendar cal2 = Calendar.getInstance();
+        final Calendar cal1 = Calendar.getInstance();
+        final Calendar cal2 = Calendar.getInstance();
         cal1.setTime(date1);
         cal2.setTime(date2);
         return cal1.compareTo(cal2) == 0;
