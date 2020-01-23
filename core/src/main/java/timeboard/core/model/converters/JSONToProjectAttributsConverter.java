@@ -28,6 +28,8 @@ package timeboard.core.model.converters;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import timeboard.core.model.ProjectAttributValue;
 import timeboard.core.model.ProjectAttributeValueMap;
 
@@ -40,6 +42,8 @@ import java.util.Map;
 @Converter
 public class JSONToProjectAttributsConverter implements AttributeConverter<Map<String, ProjectAttributValue>, String> {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONToProjectAttributsConverter.class);
+
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 
@@ -49,7 +53,7 @@ public class JSONToProjectAttributsConverter implements AttributeConverter<Map<S
         try {
             res = OBJECT_MAPPER.writeValueAsString(stringProjectAttributValueMap);
         } catch (final JsonProcessingException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return res;
     }
@@ -60,7 +64,7 @@ public class JSONToProjectAttributsConverter implements AttributeConverter<Map<S
         try {
             attrs.putAll(OBJECT_MAPPER.readValue(s, ProjectAttributeValueMap.class));
         } catch (final IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return attrs;
     }

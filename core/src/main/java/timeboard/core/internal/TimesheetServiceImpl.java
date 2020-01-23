@@ -150,23 +150,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     }
 
-    Boolean checkDailyImputationTotal(final int firstDay, final Account accountTimesheet, final Calendar c, Boolean result) {
-        for (int i = firstDay - 1; i <= 5; i++) {
-
-            final TypedQuery<Double> q = em.createQuery("select COALESCE(sum(value),0) " +
-                    "from Imputation i where i.account = :user and i.day = :day ", Double.class);
-
-            q.setParameter("user", accountTimesheet);
-            q.setParameter("day", c.getTime());
-            final List<Double> resultList = q.getResultList();
-            if (resultList != null) {
-                result &= resultList.get(0) == 1.0;
-            }
-            c.roll(Calendar.DAY_OF_WEEK, 1);
-        }
-        return result;
-    }
-
 
     @Override
     @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")

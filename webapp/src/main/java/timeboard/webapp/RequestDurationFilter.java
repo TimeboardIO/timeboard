@@ -43,9 +43,10 @@ import static com.codahale.metrics.MetricRegistry.name;
 @Component
 public class RequestDurationFilter implements Filter {
 
-    private final String metricsMarker = "timeboard.marker.metrics";
-    private final MetricRegistry metrics = new MetricRegistry();
-    private final Timer timer = metrics.timer(name(RequestDurationFilter.class, "get-requests"));
+    private final static String METRICS_MARKER = "timeboard.marker.metrics";
+    private final static MetricRegistry METRICS = new MetricRegistry();
+    private final static Timer TIMER = METRICS.timer(name(RequestDurationFilter.class, "get-requests"));
+
     @Value("${timeboard.interval.metrics.minutes}")
     private long timeIntervalLogs;
 
@@ -58,7 +59,7 @@ public class RequestDurationFilter implements Filter {
     public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse, final FilterChain filterChain)
             throws IOException, ServletException {
 
-        final Timer.Context context = timer.time();
+        final Timer.Context context = TIMER.time();
         try {
             filterChain.doFilter(servletRequest, servletResponse);
         } finally {
@@ -69,8 +70,8 @@ public class RequestDurationFilter implements Filter {
 
 
     private void startReport() {
-        final Slf4jReporter reporter = Slf4jReporter.forRegistry(metrics)
-                .outputTo(LoggerFactory.getLogger(metricsMarker))
+        final Slf4jReporter reporter = Slf4jReporter.forRegistry(METRICS)
+                .outputTo(LoggerFactory.getLogger(METRICS_MARKER))
                 .convertRatesTo(TimeUnit.SECONDS)
                 .convertDurationsTo(TimeUnit.MILLISECONDS)
                 .build();

@@ -73,14 +73,14 @@ public class LauncherLoader {
                     .load(usersSaved, tasksSaved, nbProjectsByUsers, nbTasksByProjects, nbImputationsByTasks);
 
         } catch (final BusinessException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
 
         // Stop the sample-data bundle
         try {
             FrameworkUtil.getBundle(LauncherLoader.class).getBundleContext().getBundle().stop();
         } catch (final BundleException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
 
     }
