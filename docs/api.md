@@ -7,9 +7,7 @@
 | api/tasks/delete     | GET    | Delete  task | *long* taskID | ACK
 | api/tasks/approve     | GET    | Approve task  | *long* taskID | ACK
 | api/tasks/deny     | GET    | Deny task  | *long* taskID | ACK
-| api/timesheet | GET    | Get timesheet data  | *int* week, int year | *TimesheetData*
-| api/timesheet | POST    | update imputations  or effort left | *String* type,  *Date* day, *long* task, *String* imputation  | ACK
-| api/timesheet/submit  | GET    | Submit timesheet  | *int* week, int year | ACK
+|
  
 
 ###Normalized JSON data objects

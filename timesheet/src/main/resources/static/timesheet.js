@@ -108,7 +108,7 @@ const timesheetModel = {
     updateTask: function (date, task, type, val) {
         return $.ajax({
             method: "POST",
-            url: "api/timesheet",
+            url: "timesheet",
             data: JSON.stringify({
                 'type': type,
                 'day': date,
@@ -169,7 +169,7 @@ $(document).ready(function () {
         methods: {
             updateTimesheet: function () {
                 $('.ui.dimmer').addClass('active');
-                $.get("/api/timesheet?week=" + _WEEK + "&year=" + _YEAR)
+                $.get("/timesheet/data?week=" + _WEEK + "&year=" + _YEAR)
                     .then(function (data) {
                         app.week = data.week;
                         app.year = data.year;
@@ -207,7 +207,7 @@ $(document).ready(function () {
             submitMyWeek: function (event) {
                 $.ajax({
                     method: "GET",
-                    url: "api/timesheet/submit?week=" + app.week + "&year=" + app.year,
+                    url: "timesheet/submit?week=" + app.week + "&year=" + app.year,
                     success: function (weekValidationStatus, textStatus, jqXHR) {
                         app.submitted = true;
                         app.displaySuccessMessage("Your timesheet have been submitted successfully.");
