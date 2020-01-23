@@ -169,7 +169,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
-        submittedTimesheet.setValidationStatus(ValidationStatus.PENDING_VALIDATION);
+        submittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
 
         em.persist(submittedTimesheet);
 
@@ -242,7 +242,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public boolean isTimesheetValidated(Account accountTimesheet, int year, int week) {
-        TypedQuery<ValidationStatus> q = em.createQuery("select st.validationStatus from SubmittedTimesheet st "
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year and st.week = :week", ValidationStatus.class);
         q.setParameter("week", week);
         q.setParameter("year", year);
@@ -258,7 +258,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public ValidationStatus getTimesheetValidationStatus(Long orgID, Account currentAccount, int year, int week){
-        TypedQuery<ValidationStatus> q = em.createQuery("select st.validationStatus from SubmittedTimesheet st "
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
         q.setParameter("week", week);
         q.setParameter("year", year);
@@ -268,7 +268,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         try {
             return q.getSingleResult();
         } catch (Exception e) {
-            return null;
+            return ValidationStatus.DRAFT;
         }
     }
 

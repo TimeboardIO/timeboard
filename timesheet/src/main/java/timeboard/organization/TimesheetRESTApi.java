@@ -263,7 +263,7 @@ public class TimesheetRESTApi {
         try{
             Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
             SubmittedTimesheet submittedTimesheet = this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
-            return ResponseEntity.ok(submittedTimesheet.getValidationStatus());
+            return ResponseEntity.ok(submittedTimesheet.getTimesheetStatus());
         }catch (Exception e){ // TimesheetException
             return ResponseEntity.status(412).build();
         }

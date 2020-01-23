@@ -101,7 +101,8 @@
 
 
             <div class="actions">
-                <div v-if="submitted === false" v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
+                <div v-if="isTimesheetHasState(['DRAFT','REJECTED'])"
+                     v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
                      data-position="right center">
                     <button
                             v-bind:data-week="week"
@@ -112,30 +113,21 @@
                         Submit My Week
                     </button>
                 </div>
-                <div v-if="submitted === true" >
-                    <button class="ui positive button disabled">
-                        Week submitted
-                    </button>
+                <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
+                    <div class="ui orange button disabled">
+                        Pending validation
+                    </div>
                 </div>
-                <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
+                <div v-if="isTimesheetHasState(['VALIDATED'])">
+                    <div class="ui positive button disabled">
+                        Week validated
+                    </div>
+                </div>
+                <button
+                        v-if="isTimesheetHasState(['DRAFT','REJECTED'])"
+                        v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
                     New Task
                 </button>
-            </div>
-
-            <div id="indicators" style="display:relative; display:inline; margin-right: 2%;">
-                <div id="submissionIndicator"
-                     class="ui circular label large"
-                     v-bind:class="indicatorSubmission.color"
-                     v-bind:data-tooltip="indicatorSubmission.label" data-position="bottom right">
-                    S
-                </div>
-                <div id="validationIndicator"
-                     class="ui circular label large"
-                     v-bind:class="indicatorValidation.color"
-                     v-bind:data-tooltip="indicatorValidation.label" data-position="bottom right">
-                    V
-                </div>
-
             </div>
 
 
