@@ -37,13 +37,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 import timeboard.core.model.OrganizationMembership;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -151,9 +151,6 @@ public class OrganizationsRestAPI {
     }
 
 
-
-
-
     @GetMapping("/members/remove")
     public ResponseEntity removeMember(TimeboardAuthentication authentication,
                                        HttpServletRequest request) {
@@ -194,7 +191,7 @@ public class OrganizationsRestAPI {
         public String screenName;
         public String role;
 
-        @JsonFormat(pattern="yyyy-MM-dd")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         public java.util.Calendar creationDate;
 
         public MemberWrapper() {

@@ -12,10 +12,10 @@ package timeboard.organization;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,9 +34,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Organization;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +60,7 @@ public class OrganizationSelectController {
 
     @GetMapping
     public String selectOrganisation(TimeboardAuthentication authentication,
-                                     HttpServletRequest req, TimeboardAuthentication p, Model model){
+                                     HttpServletRequest req, TimeboardAuthentication p, Model model) {
 
 
         final List<Organization> orgs = authentication.getDetails().getOrganizations()
@@ -68,7 +68,7 @@ public class OrganizationSelectController {
 
         final Optional<Organization> defaultOrganisation = this.organizationService.getOrganizationByName(this.defaultOrganisationName);
 
-        if(defaultOrganisation.isPresent()) {
+        if (defaultOrganisation.isPresent()) {
             orgs.add(defaultOrganisation.get());
         }
 
@@ -79,12 +79,12 @@ public class OrganizationSelectController {
 
     @PostMapping
     public String selectOrganisation(TimeboardAuthentication authentication,
-                                     @ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res){
+                                     @ModelAttribute("organization") Long selectedOrgID, HttpServletResponse res) {
 
         final Optional<Organization> selectedOrg =
                 this.organizationService.getOrganizationByID(authentication.getDetails(), selectedOrgID);
 
-        if(selectedOrg.isPresent()) {
+        if (selectedOrg.isPresent()) {
             final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));
             orgCookie.setMaxAge(60 * 60 * 24 * 365 * 10);
             res.addCookie(orgCookie);

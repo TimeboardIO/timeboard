@@ -111,9 +111,6 @@ public class TimeboardWebSecurityConfigForTest extends WebSecurityConfigurerAdap
     }
 
 
-
-
-
     public class CustomFilter extends GenericFilterBean {
 
         @Override
