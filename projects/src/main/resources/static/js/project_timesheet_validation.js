@@ -58,12 +58,15 @@ $(document).ready(function () {
         },
         mounted: function () {
             let self = this;
+            $('.ui.dimmer').addClass('active');
             $.ajax({
                 type: "GET",
                 dataType: "json",
                 url: "projects/" + projectID + "/timesheets/list",
                 success: function (d) {
                     self.timesheets = d;
+                    $('.ui.dimmer').removeClass('active');
+
                 }
             });
         }

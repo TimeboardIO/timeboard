@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{project_layout.html(tab='eigth')}"
+<html layout:decorate="~{project_layout.html(tab='eight')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:v-bind="http://www.w3.org/1999/xhtml"
@@ -20,8 +20,8 @@
 <body>
 <div layout:fragment="placeholder">
     <div id="timesheetValidationApp">
-        <table class="ui table ">
 
+        <table class="ui table ">
             <thead>
                 <tr>
                     <th> Name </th>
@@ -32,6 +32,9 @@
                 </tr>
             </thead>
             <tbody class="ui accordion" >
+                <div class="ui inverted dimmer">
+                    <div class="ui text loader">Loading</div>
+                </div>
                 <template v-for="account in timesheets" >
                     <tr class="ui title">
                             <td>
@@ -42,7 +45,7 @@
                                 {{ account.lastSubmittedDate }}
                             </td>
                             <td class="collapsing" >
-                                <div class="ui circular label large "></div>
+                                <div class="ui circular label large " :class="account.statusColor"></div>
                             </td>
                             <td>
                                 {{ account.lastApprovedDate }}
@@ -58,7 +61,7 @@
                                     {{ row.week }}
                                 </template>
                                 <template v-slot:period="{row}">
-                                    {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + 'To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}
+                                    {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}
                                 </template>
 
                                 <template v-slot:validated="{row}">

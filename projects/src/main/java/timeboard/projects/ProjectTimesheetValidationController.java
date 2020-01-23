@@ -73,29 +73,21 @@ public class ProjectTimesheetValidationController {
 
         if(!submittedTimesheets.isEmpty()) {
             //user already have submitted at least one week
-            Optional<SubmittedTimesheet> lastNonValidatedSubmittedTimesheet = submittedTimesheets
+            Optional<SubmittedTimesheet> lastValidatedSubmittedTimesheet = submittedTimesheets
                     .stream()
-                    .filter(t -> !t.isValidated())
+                    .filter(SubmittedTimesheet::isValidated)
                     .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
 
             Optional<SubmittedTimesheet> lastSubmittedTimesheet = submittedTimesheets
                     .stream()
                     .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
 
-            if (lastNonValidatedSubmittedTimesheet.isPresent() || lastSubmittedTimesheet.isPresent()) {
-                // user have at least one non validated week.
-                SubmittedTimesheet t = lastNonValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
+            // user have at least one non validated week.
+            SubmittedTimesheet t = lastValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
 
-                return generateSubmittedTimesheets((int) t.getYear(),(int) t.getWeek(),
-                        submittedTimesheets);
-            } else {
-                // user have all his weeks validated so return 2 first weeks
-                return submittedTimesheets
-                        .stream()
-                        .map(t -> new TimesheetWeekWrapper(t, true))
-                        .limit(2)
-                        .collect(Collectors.toList());
-            }
+            return generateSubmittedTimesheets((int) t.getYear(),(int) t.getWeek(),
+                    submittedTimesheets);
+
         } else {
             // user NEVER submitted a single week
             Calendar current = Calendar.getInstance();
@@ -109,15 +101,17 @@ public class ProjectTimesheetValidationController {
 
     }
 
-
     List<TimesheetWeekWrapper> generateSubmittedTimesheets(int firstYear, int firstWeek, List<SubmittedTimesheet> submittedTimesheets) {
 
         List<TimesheetWeekWrapper> returnList = new LinkedList<>();
         long todayAbsoluteWeekNumber = absoluteWeekNumber(Calendar.getInstance());
-
         Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, firstWeek);
         current.set(Calendar.YEAR, firstYear);
+        long weekNumber = todayAbsoluteWeekNumber - absoluteWeekNumber(firstYear,firstWeek);
+        if ( weekNumber <= 1 ) { //Min two weeks
+            current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));
+        }
         while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
             int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
             int currentYear = current.get(Calendar.YEAR);
@@ -162,13 +156,20 @@ public class ProjectTimesheetValidationController {
         private String name;
         private String lastSubmittedDate;
         private String lastApprovedDate;
-        private String status;
+        private String statusColor;
         private List<TimesheetWeekWrapper> weeks;
 
         public UserWrapper(Account account,  List<SubmittedTimesheet> rawList, List<TimesheetWeekWrapper> weeks) {
             this.id = account.getId();
             this.name = account.getScreenName();
-            this.status = "";
+
+            if(weeks.stream().anyMatch(e->  !e.isValidated() && e.isSubmitted())){
+                this.statusColor = "orange";
+            } else if(weeks.stream().anyMatch(e->  !e.isValidated())){
+                this.statusColor = "orange";
+            } else {
+                this.statusColor = "green";
+            }
             this.weeks = weeks;
             this.lastSubmittedDate = weeks.stream()
                     .filter(TimesheetWeekWrapper::isSubmitted)
@@ -193,7 +194,7 @@ public class ProjectTimesheetValidationController {
             return lastApprovedDate;
         }
         public String getStatus() {
-            return status;
+            return statusColor;
         }
         public List<TimesheetWeekWrapper> getWeeks() {
             return weeks;
@@ -206,22 +207,22 @@ public class ProjectTimesheetValidationController {
         private Long id;
         private int year;
         private int week;
-        private boolean validated;
-        private boolean submitted;
+        private boolean isValidated;
+        private boolean isSubmitted;
 
         public TimesheetWeekWrapper(SubmittedTimesheet submittedTimesheet, boolean submitted) {
             this.id = submittedTimesheet.getId();
             this.year = (int) submittedTimesheet.getYear();
             this.week = (int) submittedTimesheet.getWeek();
-            this.validated = submittedTimesheet.isValidated();
-            this.submitted = submitted;
+            this.isValidated = submittedTimesheet.isValidated();
+            this.isSubmitted = submitted;
         }
 
         public TimesheetWeekWrapper(int year, int week, boolean validated, boolean submitted) {
             this.year = year;
             this.week = week;
-            this.validated = validated;
-            this.submitted = submitted;
+            this.isValidated = validated;
+            this.isSubmitted = submitted;
         }
 
         public int getYear() {
@@ -237,11 +238,11 @@ public class ProjectTimesheetValidationController {
         }
 
         public boolean isValidated() {
-            return validated;
+            return isValidated;
         }
 
         public boolean isSubmitted() {
-            return submitted;
+            return isSubmitted;
         }
 
     }
