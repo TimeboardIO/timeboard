@@ -285,7 +285,7 @@ $(document).ready(function () {
                     Object.assign(this.newTask, emptyTask);
                     this.newTask.assigneeID = _ACTOR_ID;
                 }
-                let keepThis = this;
+                let self = this;
                 $('.create-task.modal').modal({
                     onApprove: function ($element) {
                         let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
@@ -298,7 +298,7 @@ $(document).ready(function () {
                                 contentType: "application/json",
                                 dataType: "json",
                                 success: function (data, textStatus, jqXHR) {
-                                    updateTimesheet();
+                                    self.updateTimesheet();
                                     $('.create-task .ui.form').form('reset');
                                     $('.create-task.modal').modal('hide');
                                 },
