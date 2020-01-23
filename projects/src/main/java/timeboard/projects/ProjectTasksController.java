@@ -28,6 +28,8 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,6 +62,7 @@ import java.util.stream.Collectors;
 public class ProjectTasksController {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTasksController.class);
 
     @Autowired
     public ProjectService projectService;
@@ -134,10 +137,10 @@ public class ProjectTasksController {
                         task.getEndDate(),
                         assignee.getScreenName(), assignee.getId(),
                         task.getTaskStatus().name(),
-                        (task.getTaskType() != null ? task.getTaskType().getId() : 0L),
+                        task.getTaskType() != null ? task.getTaskType().getId() : 0L,
                         batchIDs, batchNames,
                         task.getTaskStatus().name(),
-                        (task.getTaskType() != null ? task.getTaskType().getTypeName() : "")
+                        task.getTaskType() != null ? task.getTaskType().getTypeName() : ""
                 ));
 
             }
@@ -375,7 +378,7 @@ public class ProjectTasksController {
         try {
             return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
         } catch (final ParseException e) {
-            e.printStackTrace();
+            LOGGER.error(e.getMessage());
         }
         return null;
     }
