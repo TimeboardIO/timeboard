@@ -35,11 +35,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -71,7 +71,7 @@ public class TasksRestController {
 
     @GetMapping("/batches")
     public ResponseEntity getBatches(TimeboardAuthentication authentication,
-                                   HttpServletRequest request) throws JsonProcessingException {
+                                     HttpServletRequest request) throws JsonProcessingException {
         Account actor = authentication.getDetails();
         Project project = null;
 
@@ -94,7 +94,7 @@ public class TasksRestController {
 
         try {
             project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        } catch (BusinessException e ) {
+        } catch (BusinessException e) {
             // just handling exception
         }
         if (project == null) {
@@ -379,7 +379,7 @@ public class TasksRestController {
     }
 
     private Task createTask(TaskWrapper taskWrapper, Account actor, Date startDate, Date endDate, String name, String comment, double oe,
-                                Project project, Long typeID) {
+                            Project project, Long typeID) {
         Account assignee = null;
         if (taskWrapper.assigneeID > 0) {
             assignee = userService.findUserByID(taskWrapper.assigneeID);
@@ -389,16 +389,16 @@ public class TasksRestController {
         return projectService.createTask(actor, project,
                 name, comment, startDate,
                 endDate, oe, typeID, assignee,
-                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,null);
+                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING, null);
     }
 
     private Set<Batch> getBatches(@RequestBody TaskWrapper taskWrapper, Account actor) throws BusinessException {
         Set<Batch> returnList = null;
         List<Long> batchIDList = taskWrapper.batchIDs;
 
-        if(batchIDList != null && !batchIDList.isEmpty()) {
+        if (batchIDList != null && !batchIDList.isEmpty()) {
             returnList = new HashSet<>();
-            for (Long batchID : batchIDList ) {
+            for (Long batchID : batchIDList) {
                 try {
                     Batch batch = this.projectService.getBatchById(actor, batchID);
                     if (batch != null) {

@@ -27,7 +27,10 @@ package timeboard.core.api.events;
  */
 
 import timeboard.core.api.ProjectService;
-import timeboard.core.model.*;
+import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
+import timeboard.core.model.SubmittedTimesheet;
 
 import java.util.Date;
 import java.util.List;

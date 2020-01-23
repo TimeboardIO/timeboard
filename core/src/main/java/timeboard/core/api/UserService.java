@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Service for users and accounts management.
  */
-public interface UserService  {
+public interface UserService {
     /**
      * Search user by remote subject.
      *
@@ -60,7 +60,7 @@ public interface UserService  {
      * Search user where name start with prefix, limit to project with
      * primary Key projectID.
      *
-     * @param prefix    prefix used to search user
+     * @param prefix  prefix used to search user
      * @param project project
      * @return list of users
      */
@@ -70,7 +70,7 @@ public interface UserService  {
      * Search user where name start with prefix, limit to project with
      * primary Key projectID.
      *
-     * @param prefix    prefix used to search user
+     * @param prefix       prefix used to search user
      * @param organization organization
      * @return list of users
      */

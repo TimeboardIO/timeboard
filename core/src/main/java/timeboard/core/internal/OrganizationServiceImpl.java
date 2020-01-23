@@ -41,8 +41,8 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 
 @Component
@@ -91,7 +91,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @PostAuthorize("#actor.isMemberOf(returnObject)")
-    @Cacheable(value="organizationsCache", key = "#id")
+    @Cacheable(value = "organizationsCache", key = "#id")
     public Optional<Organization> getOrganizationByID(Account actor, long id) {
         Organization data;
         try {
@@ -116,11 +116,11 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#organization.getId()")
+    @CacheEvict(value = "organizationsCache", key = "#organization.getId()")
     public Optional<Organization> updateOrganization(Account actor, Organization organization) {
 
         Optional<Organization> orgdb = this.getOrganizationByID(actor, organization.getId());
-        if(orgdb.isPresent()){
+        if (orgdb.isPresent()) {
             orgdb.get().setName(organization.getName());
             orgdb.get().setCreatedDate(organization.getCreatedDate());
             this.em.merge(orgdb.get());
@@ -133,7 +133,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#organization.getId()")
+    @CacheEvict(value = "organizationsCache", key = "#organization.getId()")
     public Optional<Organization> addMember(final Account actor,
                                             final Organization organization,
                                             final Account member,
@@ -160,17 +160,17 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#o.getId()")
+    @CacheEvict(value = "organizationsCache", key = "#o.getId()")
     public Optional<Organization> removeMember(final Account actor, Organization o, Account member) {
 
         Optional<Organization> organization = this.getOrganizationByID(actor, o.getId());
-        if(organization.isPresent()) {
+        if (organization.isPresent()) {
             final Optional<OrganizationMembership> membership = organization.get().getMembers()
                     .stream()
                     .filter(om -> om.getMember().getId() == member.getId())
                     .findFirst();
 
-            if(membership.isPresent()) {
+            if (membership.isPresent()) {
                 em.remove(membership.get());
                 LOGGER.info("Member " + member.getScreenName() + " is removed from organisation " + organization.get().getName()
                         + " by " + actor.getScreenName());
@@ -183,7 +183,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    @CacheEvict(value="organizationsCache", key="#membership.getOrganization().getId()")
+    @CacheEvict(value = "organizationsCache", key = "#membership.getOrganization().getId()")
     public Optional<Organization> updateMembership(final Account actor,
                                                    final OrganizationMembership membership) {
 
@@ -206,7 +206,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .stream()
                 .filter(om -> om.getOrganization().getId() == organizationID).findFirst();
 
-        if(o.isPresent()){
+        if (o.isPresent()) {
             this.em.detach(o.get());
         }
         return o;
@@ -217,7 +217,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         OrganizationMembership om;
         try {
             om = this.em.find(OrganizationMembership.class, membershipID);
-        }catch (Exception e){
+        } catch (Exception e) {
             om = null;
         }
         return Optional.ofNullable(om);

@@ -105,7 +105,7 @@ public class Batch extends OrganizationEntity implements Serializable {
     }
 
     public void setDate(Date date) {
-        if(this.getType() != BatchType.GROUP) {
+        if (this.getType() != BatchType.GROUP) {
             this.date = date;
         }
     }

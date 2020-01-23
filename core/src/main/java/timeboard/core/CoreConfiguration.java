@@ -66,12 +66,12 @@ public class CoreConfiguration {
     private String defaultVacationTaskName;
 
     @PostConstruct
-    private void verifyPublicOrganization(){
+    private void verifyPublicOrganization() {
 
         final Optional<Organization> defaultOrganization = this.organizationService
-                    .getOrganizationByName(this.defaultOrganizationName);
+                .getOrganizationByName(this.defaultOrganizationName);
 
-        if(!defaultOrganization.isPresent()){
+        if (!defaultOrganization.isPresent()) {
             final Map<String, String> props = new HashMap<>();
             props.put(Organization.SETUP_PUBLIC, "true");
 

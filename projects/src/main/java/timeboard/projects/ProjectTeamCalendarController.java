@@ -42,11 +42,8 @@ import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -57,17 +54,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects/{projectID}/calendar")
 public class ProjectTeamCalendarController {
 
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     public ProjectService projectService;
-
     @Autowired
     public VacationService vacationService;
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     @GetMapping
     protected String handleGet(TimeboardAuthentication authentication,
-                               @PathVariable Long projectID, Model model) throws  BusinessException {
+                               @PathVariable Long projectID, Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
@@ -77,6 +72,7 @@ public class ProjectTeamCalendarController {
 
         return "project_calendar.html";
     }
+
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, List<CalendarEventWrapper>>> listTags(TimeboardAuthentication authentication,
                                                                             @PathVariable Long projectID,
@@ -93,7 +89,7 @@ public class ProjectTeamCalendarController {
         project.getMembers().stream()
                 .map(ProjectMembership::getMember)
                 .forEach(m ->
-                        accountVacationRequestMap.computeIfAbsent(m, t -> new ArrayList<VacationRequest>()) );
+                        accountVacationRequestMap.computeIfAbsent(m, t -> new ArrayList<VacationRequest>()));
 
         // re-balance key to user screen name and wrap request to ui calendar
         final Map<String, List<CalendarEventWrapper>> newMap = accountVacationRequestMap.entrySet().stream()
@@ -123,15 +119,14 @@ public class ProjectTeamCalendarController {
         start.setTime(request.getStartDate());
         end.setTime(request.getEndDate());
         boolean last = true;
-        while(last) {
+        while (last) {
             CalendarEventWrapper wrapper = new CalendarEventWrapper();
 
             wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate (DATE_FORMAT.format(start.getTime()));
+            wrapper.setDate(DATE_FORMAT.format(start.getTime()));
             if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
                 wrapper.setValue(1);
-            }
-            else if (request.getStatus() == VacationRequestStatus.PENDING ) {
+            } else if (request.getStatus() == VacationRequestStatus.PENDING) {
                 wrapper.setValue(0.5);
             } else {
                 wrapper.setValue(0);
@@ -162,7 +157,8 @@ public class ProjectTeamCalendarController {
         private double value;
         private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
 
-        public CalendarEventWrapper() { }
+        public CalendarEventWrapper() {
+        }
 
         public CalendarEventWrapper(Imputation imputation) {
             this.date = DATE_FORMAT.format(imputation.getDay());
@@ -183,24 +179,24 @@ public class ProjectTeamCalendarController {
             return date;
         }
 
+        public void setDate(String date) {
+            this.date = date;
+        }
+
         public int getType() {
             return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
         }
 
         public double getValue() {
             return value;
         }
 
-        public void setDate(String date) {
-            this.date = date;
-        }
-
         public void setValue(double value) {
             this.value = value;
-        }
-
-        public void setType(int type) {
-            this.type = type;
         }
 
 

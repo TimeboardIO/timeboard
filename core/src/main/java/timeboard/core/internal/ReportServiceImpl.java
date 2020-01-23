@@ -106,7 +106,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions){
+    public List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions) {
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 

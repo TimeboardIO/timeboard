@@ -57,8 +57,6 @@ public class HomeFeatureBTest extends TimeboardTest {
     private Model model;
 
 
-
-
     @Given("^user with an existing account and (\\d+) project in (\\d+) org \\(A\\) and (\\d+) in an other org \\(B\\)$")
     public void user_with_an_existing_account_and_project_in_org_A_and_in_an_other_org_B(int arg1, int arg2, int arg3) throws Throwable {
         this.model = new ConcurrentModel();

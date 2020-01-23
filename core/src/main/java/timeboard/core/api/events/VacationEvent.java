@@ -26,11 +26,13 @@ package timeboard.core.api.events;
  * #L%
  */
 
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.VacationRequest;
 
 import java.util.Date;
 
-import static timeboard.core.api.events.TimeboardEventType.*;
+import static timeboard.core.api.events.TimeboardEventType.CREATE;
+import static timeboard.core.api.events.TimeboardEventType.DELETE;
 
 
 public class VacationEvent extends TimeboardEvent {
@@ -38,7 +40,7 @@ public class VacationEvent extends TimeboardEvent {
     private TimeboardEventType eventType;
 
     public VacationEvent(TimeboardEventType eventType, VacationRequest request) {
-        
+
         super(new Date());
         this.eventType = eventType;
         this.request = request;
@@ -66,13 +68,13 @@ public class VacationEvent extends TimeboardEvent {
         Account applicantAccount = request.getApplicant();
         Account assignedAccount = request.getAssignee();
 
-       if(eventType == CREATE || eventType == DELETE) {
-           usersToNotify.add(assignedAccount);
-           usersToInform.add(applicantAccount);
-       } else {
-           usersToNotify.add(applicantAccount);
-           usersToInform.add(assignedAccount);
-       }
+        if (eventType == CREATE || eventType == DELETE) {
+            usersToNotify.add(assignedAccount);
+            usersToInform.add(applicantAccount);
+        } else {
+            usersToNotify.add(applicantAccount);
+            usersToInform.add(assignedAccount);
+        }
 
     }
 

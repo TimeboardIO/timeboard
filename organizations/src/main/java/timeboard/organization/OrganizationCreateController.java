@@ -31,10 +31,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;

@@ -67,7 +67,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
-    public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
+    public SubmittedTimesheet submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
             throws BusinessException {
 
 
@@ -111,7 +111,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Calendar currentDay = (Calendar) firstDay.clone();
 
         long nbDays = ChronoUnit.DAYS.between(firstDay.toInstant(), lastDay.toInstant());
-        final Double expectedSum = (nbDays+1.0d);
+        final Double expectedSum = (nbDays + 1.0d);
 
         final List<Date> days = new ArrayList<>();
 
@@ -136,6 +136,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
+        submittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
 
         em.persist(submittedTimesheet);
 
@@ -143,7 +144,27 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         LOGGER.info("Timesheet for " + week + " submit for user" + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
 
+        return submittedTimesheet;
+
     }
+
+    Boolean checkDailyImputationTotal(int firstDay, Account accountTimesheet, Calendar c, Boolean result) {
+        for (int i = firstDay - 1; i <= 5; i++) {
+
+            TypedQuery<Double> q = em.createQuery("select COALESCE(sum(value),0) " +
+                    "from Imputation i where i.account = :user and i.day = :day ", Double.class);
+
+            q.setParameter("user", accountTimesheet);
+            q.setParameter("day", c.getTime());
+            final List<Double> resultList = q.getResultList();
+            if (resultList != null) {
+                result &= (resultList.get(0) == 1.0);
+            }
+            c.roll(Calendar.DAY_OF_WEEK, 1);
+        }
+        return result;
+    }
+
 
     @Override
     @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
@@ -184,6 +205,39 @@ public class TimesheetServiceImpl implements TimesheetService {
         return
                 currentDate.get(Calendar.YEAR) == beginWorkDate.get(Calendar.YEAR)
                         && currentDate.get(Calendar.WEEK_OF_YEAR) == beginWorkDate.get(Calendar.WEEK_OF_YEAR);
+    }
+
+    @Override
+    @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
+    public boolean isTimesheetValidated(Account accountTimesheet, int year, int week) {
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week", ValidationStatus.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", accountTimesheet);
+
+        try {
+            return q.getSingleResult() == ValidationStatus.VALIDATED;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
+    @Override
+    public ValidationStatus getTimesheetValidationStatus(Long orgID, Account currentAccount, int year, int week) {
+        TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", currentAccount);
+        q.setParameter("orgID", orgID);
+
+        try {
+            return q.getSingleResult();
+        } catch (Exception e) {
+            return ValidationStatus.DRAFT;
+        }
     }
 
     @Override

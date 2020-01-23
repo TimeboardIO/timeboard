@@ -47,16 +47,14 @@ import java.util.List;
 )
 public class LauncherLoader {
 
-    @Reference
-    ProjectService projectService;
-
-    @Reference
-    UserService userService;
-
     private final int nbUsers = 5;
     private final int nbProjectsByUsers = 3;
     private final int nbTasksByProjects = 5;
     private final int nbImputationsByTasks = 10;
+    @Reference
+    ProjectService projectService;
+    @Reference
+    UserService userService;
 
     @Activate
     public void load() throws BundleException, BusinessException {
@@ -74,14 +72,14 @@ public class LauncherLoader {
             List<Imputation> imputationsSaved = new ImputationLoader(this.projectService, this.userService)
                     .load(usersSaved, tasksSaved, nbProjectsByUsers, nbTasksByProjects, nbImputationsByTasks);
 
-        } catch (BusinessException e){
+        } catch (BusinessException e) {
             e.printStackTrace();
         }
 
         // Stop the sample-data bundle
         try {
             FrameworkUtil.getBundle(LauncherLoader.class).getBundleContext().getBundle().stop();
-         } catch (BundleException e) {
+        } catch (BundleException e) {
             e.printStackTrace();
         }
 
