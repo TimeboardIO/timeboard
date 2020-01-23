@@ -140,7 +140,7 @@
                 <i class="right arrow icon"></i>Next week</a>
         </div>
 
-            <fieldset v-bind:disabled="submitted === true">
+            <fieldset v-bind:disabled="isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])">
                 <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
 
                     <table class="ui celled table" style="text-align:center">
