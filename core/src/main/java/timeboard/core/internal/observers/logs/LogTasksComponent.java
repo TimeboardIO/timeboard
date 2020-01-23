@@ -27,8 +27,6 @@ package timeboard.core.internal.observers.logs;
  */
 
 import io.reactivex.disposables.Disposable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.TimeboardSubjects;
 

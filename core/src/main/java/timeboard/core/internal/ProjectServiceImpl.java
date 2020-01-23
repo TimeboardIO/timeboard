@@ -491,7 +491,7 @@ public class ProjectServiceImpl implements ProjectService {
         return null;
     }
 
-    protected UpdatedTaskResult updateDefaultTaskImputation(final Account actor,
+    public UpdatedTaskResult updateDefaultTaskImputation(final Account actor,
                                                           final DefaultTask task,
                                                           final Date day, final double val, final Calendar calendar) throws BusinessException {
 
@@ -518,7 +518,7 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
-    private Imputation actionOnImputation(Imputation imputation,
+    public Imputation actionOnImputation(Imputation imputation,
                                           final AbstractTask task,
                                           final Account actor,
                                           final double val,
@@ -838,7 +838,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public boolean isProjectOwner(final Account account, final Project project) {
-        return (new ActorIsProjectOwner()).isSatisfied(account, project);
+        return new ActorIsProjectOwner().isSatisfied(account, project);
     }
 
     @Override

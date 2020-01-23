@@ -54,8 +54,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 
 @org.springframework.stereotype.Component
@@ -70,7 +70,10 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     public boolean importCalendarAsImputationsFromIcs(
-            final Account actor, final String url, final AbstractTask task, final List<Account> accountList,
+            final Account actor,
+            final String url,
+            final AbstractTask task,
+            final List<Account> accountList,
             final double value) throws BusinessException {
         try {
             /* -- Events -- */
@@ -232,7 +235,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     }
 
-    private AbstractTask eventToTask(final Event event, final Task task, final Project project) {
+    public AbstractTask eventToTask(final Event event, final Task task, final Project project) {
 
         this.eventToTask(event, task);
         task.setProject(project);
@@ -240,7 +243,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     }
 
-    private void eventToTask(final Event event, final AbstractTask task) {
+    public void eventToTask(final Event event, final AbstractTask task) {
 
         task.setRemoteId(event.getRemoteId());
         task.setRemotePath(event.getRemotePath());
