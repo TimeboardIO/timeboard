@@ -13,22 +13,22 @@
     <div class="ui attached pointing menu">
         <a class="item"><span class="primary bold text" th:text="${project.name}"></span></a>
         <a class="item" th:classappend="${tab} == 'first'  ? 'active':''"
-           th:href="@{/projects/{projectID}/setup(projectID=${project.id})}"  data-cy="project-menu-setup">Setup</a>
+           th:href="@{/projects/{projectID}/setup(projectID=${project.id})}"  data-cy="project-menu-setup" th:text="#{project.tab.setup}">Setup</a>
         <a class="item" th:classappend="${tab} == 'second'  ? 'active':''"
-           th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}" data-cy="project-menu-tasks">Tasks</a>
+           th:href="@{/projects/{projectID}/tasks(projectID=${project.id})}" data-cy="project-menu-tasks" th:text="#{project.tab.tasks}">Tasks</a>
         <a class="item" th:classappend="${tab} == 'third'  ? 'active':''"
-           th:href="@{/projects/{projectID}/batches(projectID=${project.id})}" data-cy="project-menu-batches">Batches</a>
+           th:href="@{/projects/{projectID}/batches(projectID=${project.id})}" data-cy="project-menu-batches" th:text="#{project.tab.batches}">Batches</a>
         <a class="item" th:classappend="${tab} == 'fourth'  ? 'active':''"
-           th:href="@{/projects/{projectID}/dashboard(projectID=${project.id})}" data-cy="project-menu-dashboard" >Dashboard</a>
+           th:href="@{/projects/{projectID}/dashboard(projectID=${project.id})}" data-cy="project-menu-dashboard" th:text="#{project.tab.dashboard}">Dashboard</a>
         <a class="item" th:classappend="${tab} == 'five'  ? 'active':''"
-           th:href="@{/projects/{projectID}/tags(projectID=${project.id})}" data-cy="project-menu-tags">Tags</a>
+           th:href="@{/projects/{projectID}/tags(projectID=${project.id})}" data-cy="project-menu-tags" th:text="#{project.tab.tags}">Tags</a>
         <a class="item" th:classappend="${tab} == 'six'  ? 'active':''"
            sec:authorize="${hasPermission(#vars.project,'PROJECT_SNAPSHOT')}"
-           th:href="@{/projects/{projectID}/snapshots(projectID=${project.id})}" data-cy="project-menu-tags">Snapshots</a>
+           th:href="@{/projects/{projectID}/snapshots(projectID=${project.id})}" data-cy="project-menu-tags" th:text="#{project.tab.snapshots}">Snapshots</a>
         <a class="item" th:classappend="${tab} == 'seven'  ? 'active':''"
-           th:href="@{/projects/{projectID}/calendar(projectID=${project.id})}" data-cy="project-menu-calendar">Calendar</a>
+           th:href="@{/projects/{projectID}/calendar(projectID=${project.id})}" data-cy="project-menu-calendar" th:text="#{project.tab.calendar}">Calendar</a>
         <a class="item" th:classappend="${tab} == 'eight'  ? 'active':''"
-           th:href="@{/projects/{projectID}/timesheets(projectID=${project.id})}" data-cy="project-menu-calendar">Timesheets</a>
+           th:href="@{/projects/{projectID}/timesheets(projectID=${project.id})}" data-cy="project-menu-calendar" th:text="#{project.tab.timesheets}">Timesheets</a>
     </div>
     <div class="ui bottom attached tab segment controls active" data-tab="first" style="border-top : none !important;" layout:fragment="placeholder">
 

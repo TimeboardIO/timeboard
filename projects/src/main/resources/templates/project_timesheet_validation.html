@@ -9,7 +9,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title>Project Timesheet Validations</title>
+    <title th:text="#{project.tab.timesheets}"></title>
     <meta name="projectID" th:value="${project.id}"/>
     <style>
         .ui.accordion .accordion .active.content, .ui.accordion .active.content {
@@ -24,15 +24,15 @@
         <table class="ui table ">
             <thead>
                 <tr>
-                    <th> Name </th>
-                    <th> Last Submitted Date </th>
-                    <th> Status </th>
-                    <th> Last Approved Date </th>
+                    <th th:text="#{user.name}" > Name </th>
+                    <th th:text="#{timesheet.last.submitted}"> Last Submitted Date </th>
+                    <th th:text="#{status}"> Status </th>
+                    <th th:text="#{timesheet.last.validated}"> Last Approved Date </th>
                 </tr>
             </thead>
             <tbody class="ui accordion" >
                 <div class="ui inverted dimmer">
-                    <div class="ui text loader">Loading</div>
+                    <div class="ui text loader" th:text="#{loading}" >Loading</div>
                 </div>
                 <template v-for="account in timesheets" >
                     <tr class="ui title">
