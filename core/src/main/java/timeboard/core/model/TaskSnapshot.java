@@ -77,6 +77,14 @@ public class TaskSnapshot extends OrganizationEntity implements Serializable {
         this.effortSpent = task.getEffortSpent();
     }
 
+    public ProjectSnapshot getProjectSnapshot() {
+        return projectSnapshot;
+    }
+
+    public void setProjectSnapshot(final ProjectSnapshot projectSnapshot) {
+        this.projectSnapshot = projectSnapshot;
+    }
+
     public Long getId() {
         return id;
     }

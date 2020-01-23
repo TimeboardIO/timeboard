@@ -265,7 +265,6 @@ public class OrganizationServiceImpl implements OrganizationService {
                 .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
                         + " t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("orgID", orgID);
-        final List<DefaultTask> tasks = q.getResultList();
 
         return q.getResultList();
 

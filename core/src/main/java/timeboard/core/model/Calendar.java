@@ -68,4 +68,11 @@ public class Calendar extends OrganizationEntity {
         this.remoteId = remoteId;
     }
 
+    public String getTargetType() {
+        return targetType;
+    }
+
+    public void setTargetType(final String targetType) {
+        this.targetType = targetType;
+    }
 }

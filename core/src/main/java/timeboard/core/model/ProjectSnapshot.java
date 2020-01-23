@@ -72,7 +72,6 @@ public class ProjectSnapshot extends OrganizationEntity implements Serializable 
                            final double originalEstimate,
                            final double effortLeft,
                            final double effortSpent,
-                           final double realEffort,
                            final double quotation) {
         this.id = id;
         this.projectSnapshotDate = projectSnapshotDate;

@@ -96,7 +96,7 @@ public class SendSummaryEmail {
             } else if (event instanceof TimesheetEvent) {
                 submittedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             } else if (event instanceof VacationEvent) {
-                vacationEvents.add(((VacationEvent) event));
+                vacationEvents.add((VacationEvent) event);
             }
 
         }

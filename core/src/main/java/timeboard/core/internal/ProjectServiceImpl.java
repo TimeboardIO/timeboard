@@ -491,7 +491,7 @@ public class ProjectServiceImpl implements ProjectService {
         return null;
     }
 
-    private UpdatedTaskResult updateDefaultTaskImputation(final Account actor,
+    protected UpdatedTaskResult updateDefaultTaskImputation(final Account actor,
                                                           final DefaultTask task,
                                                           final Date day, final double val, final Calendar calendar) throws BusinessException {
 
@@ -509,7 +509,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
-    private Imputation getImputationByDayByTask(final EntityManager entityManager, final Date day, final AbstractTask task, final Account account) {
+    protected Imputation getImputationByDayByTask(final EntityManager entityManager, final Date day, final AbstractTask task, final Account account) {
         final TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  " +
                 "where i.task.id = :taskID and i.day = :day and i.account = :account", Imputation.class);
         q.setParameter("taskID", task.getId());

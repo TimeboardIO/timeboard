@@ -44,7 +44,7 @@ public interface CalendarService {
     boolean importCalendarAsImputationsFromIcs(
             Account actor,
             String ics,
-            AbstractTask task,
+            AbstractTaCalendarsk task,
             List<Account> accountList,
             double value) throws BusinessException;
 

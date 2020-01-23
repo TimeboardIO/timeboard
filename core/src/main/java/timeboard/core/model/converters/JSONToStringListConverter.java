@@ -37,7 +37,6 @@ import java.util.List;
 
 public class JSONToStringListConverter
         implements AttributeConverter<List<String>, String> {
-    private static final String DELIMITER = "|";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 

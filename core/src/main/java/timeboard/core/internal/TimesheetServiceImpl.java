@@ -113,7 +113,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Calendar currentDay = (Calendar) firstDay.clone();
 
         final long nbDays = ChronoUnit.DAYS.between(firstDay.toInstant(), lastDay.toInstant());
-        final Double expectedSum = (nbDays + 1.0d);
+        final Double expectedSum = nbDays + 1.0d;
 
         final List<Date> days = new ArrayList<>();
 
@@ -160,7 +160,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             q.setParameter("day", c.getTime());
             final List<Double> resultList = q.getResultList();
             if (resultList != null) {
-                result &= (resultList.get(0) == 1.0);
+                result &= resultList.get(0) == 1.0;
             }
             c.roll(Calendar.DAY_OF_WEEK, 1);
         }

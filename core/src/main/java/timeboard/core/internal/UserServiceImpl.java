@@ -58,9 +58,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private EntityManager em;
 
-    @Autowired
-    private OrganizationService organizationService;
-
     @Override
     public List<Account> createUsers(final List<Account> accounts) {
         accounts.forEach(user -> {

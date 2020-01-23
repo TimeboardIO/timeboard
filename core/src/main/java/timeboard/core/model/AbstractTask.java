@@ -158,7 +158,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
     public double findTaskImputationValueByDate(final Date date, final Account account) {
         final Optional<Imputation> imputationOptional = this.getImputations().stream()
                 .filter(imputation -> areDateSameDay(date, imputation.getDay()))
-                .filter(imputation -> (imputation.getAccount().getId() == account.getId()))
+                .filter(imputation -> imputation.getAccount().getId() == account.getId())
                 .findFirst();
         if (imputationOptional.isPresent()) {
             return imputationOptional.get().getValue();

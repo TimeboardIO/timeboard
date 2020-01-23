@@ -184,7 +184,7 @@ public class VacationServiceImpl implements VacationService {
 
         for (final VacationRequest r : resultList) {
             if (
-                    (r.getStartDate().compareTo(request.getEndDate()) > 0)
+                    r.getStartDate().compareTo(request.getEndDate()) > 0
                             && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
                             && r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
@@ -192,7 +192,7 @@ public class VacationServiceImpl implements VacationService {
             }
 
             if (
-                    (r.getEndDate().compareTo(request.getStartDate()) > 0)
+                    r.getEndDate().compareTo(request.getStartDate()) > 0
                             && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
                             && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
             ) {
@@ -342,9 +342,9 @@ public class VacationServiceImpl implements VacationService {
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
             final boolean halfDay = vacationRequests.stream().anyMatch(r -> {
                 //current day is first day of request and request is half day started
-                final boolean halfStart = (r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0);
+                final boolean halfStart = r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0;
                 //current day is last day of request and request is half day ended
-                final boolean halfEnd = (r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0);
+                final boolean halfEnd = r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0;
                 return halfStart || halfEnd;
             });
 
