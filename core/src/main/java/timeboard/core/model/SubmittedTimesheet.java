@@ -36,6 +36,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
     private long id;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private ValidationStatus validationStatus;
 
     @OneToOne(targetEntity = Account.class)
@@ -86,4 +87,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
     public void setAccount(Account account) {
         this.account = account;
     }
+
+
+
 }

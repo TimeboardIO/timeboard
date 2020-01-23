@@ -165,11 +165,11 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
 
-        SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
+        final SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
-        submittedTimesheet.setValidationStatus(this.getWeekValidationStatusAfterSubmission(actor, c, year, week));
+        submittedTimesheet.setValidationStatus(ValidationStatus.PENDING_VALIDATION);
 
         em.persist(submittedTimesheet);
 
@@ -197,13 +197,6 @@ public class TimesheetServiceImpl implements TimesheetService {
         return result;
     }
 
-    ValidationStatus getWeekValidationStatusAfterSubmission(Account actor, Calendar c, int year, int week){
-        final int previousWeek = this.findLastWeek(c, week, year);
-        final int previousWeekYear = this.findLastWeekYear(c, week, year);
-        ValidationStatus previousWeekValidationStatus = this.getTimesheetValidationStatus(actor, previousWeekYear, previousWeek);
-        return previousWeekValidationStatus == ValidationStatus.VALIDATED ?
-                ValidationStatus.PENDING_VALIDATION :  ValidationStatus.PENDING_PREVIOUS_VALIDATION;
-    }
 
     @Override
     @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
@@ -262,39 +255,20 @@ public class TimesheetServiceImpl implements TimesheetService {
         }
     }
 
-    @Override
-    public SubmissionStatus getTimesheetSubmissionStatus(Account currentAccount, Calendar calendar, int year, int week){
-        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
-        q.setParameter("week", week);
-        q.setParameter("year", year);
-        q.setParameter("user", currentAccount);
-
-        try {
-            q.getSingleResult();
-            return SubmissionStatus.SUBMITTED;
-        } catch (Exception e) {
-
-            final int previousWeek = findLastWeek(calendar, week, year);
-            final int previousWeekYear = findLastWeekYear(calendar, week, year);
-            final boolean isPreviousTimesheetSubmitted = this.isTimesheetSubmitted(currentAccount, previousWeekYear, previousWeek);
-
-            return isPreviousTimesheetSubmitted ? SubmissionStatus.PENDING_SUBMISSION: SubmissionStatus.PENDING_PREVIOUS_SUBMISSION;
-        }
-    }
 
     @Override
-    public ValidationStatus getTimesheetValidationStatus(Account currentAccount, int year, int week){
+    public ValidationStatus getTimesheetValidationStatus(Long orgID, Account currentAccount, int year, int week){
         TypedQuery<ValidationStatus> q = em.createQuery("select st.validationStatus from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year and st.week = :week", ValidationStatus.class);
+                + "where st.account = :user and st.year = :year and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
         q.setParameter("week", week);
         q.setParameter("year", year);
         q.setParameter("user", currentAccount);
+        q.setParameter("orgID", orgID);
 
         try {
             return q.getSingleResult();
         } catch (Exception e) {
-            return ValidationStatus.PENDING_SUBMISSION;
+            return null;
         }
     }
 

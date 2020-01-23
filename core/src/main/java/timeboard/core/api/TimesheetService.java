@@ -76,15 +76,6 @@ public interface TimesheetService {
     boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
 
 
-    /**
-     * Get timesheet submission status.
-     *
-     * @param currentAccount user used to check timesheet sumbit state.
-     * @param week             timesheet week
-     * @param year             timesheet year
-     * @return SubmissionStatus
-     */
-    SubmissionStatus getTimesheetSubmissionStatus(Account currentAccount, Calendar calendar, int year, int week);
 
     /**
      * Get timesheet validation status.
@@ -94,7 +85,7 @@ public interface TimesheetService {
      * @param year             timesheet year
      * @return ValidationStatus
      */
-    ValidationStatus getTimesheetValidationStatus(Account currentAccount, int year, int week);
+    ValidationStatus getTimesheetValidationStatus(Long orgID, Account currentAccount, int year, int week);
 
 
     /**

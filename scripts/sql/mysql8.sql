@@ -201,7 +201,8 @@
 
     create table SubmittedTimesheet (
        id bigint not null,
-        validationStatus integer,
+        organizationID bigint,
+        validationStatus varchar(255),
         week integer,
         year integer,
         account_id bigint,

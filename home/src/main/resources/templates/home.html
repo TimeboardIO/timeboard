@@ -79,7 +79,7 @@
                         </td>
                         <td data-label="Validated">
                             <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
-                                <i class="check icon green" th:if="${week.isSubmitted}"></i>
+                                <i class="check icon green" th:if="${week.getSubmitted()}"></i>
                             </a>
                         </td>
                     </tr>
