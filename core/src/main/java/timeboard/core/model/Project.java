@@ -47,6 +47,11 @@ import java.util.stream.Collectors;
 
         }
 )
+@Table(name = "Project", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+                "name", "organizationID"
+        })
+})
 public class Project extends OrganizationEntity implements Serializable {
 
     public static final String PROJECT_COLOR_ATTR = "project.color";

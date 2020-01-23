@@ -43,6 +43,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,9 +84,18 @@ public class ProjectsController {
     protected String handlePost(TimeboardAuthentication authentication, HttpServletRequest request,
                                 RedirectAttributes attributes) throws BusinessException {
         final Account actor = authentication.getDetails();
-        Project prj = this.projectService.createProject(actor, request.getParameter("projectName"));
-        attributes.addFlashAttribute("success", "Project created successfully.");
-        return "redirect:/projects";
+        try {
+            Project prj = this.projectService.createProject(actor, request.getParameter("projectName"));
+            attributes.addFlashAttribute("success", "Project created successfully.");
+            return "redirect:/projects";
+        }catch(PersistenceException e){
+            attributes.addFlashAttribute("errorCreateProject", "The name \""+ request.getParameter("projectName")
+                    +"\" is already used by another project in this organization");
+            return "redirect:/projects/create";
+        }catch(Exception e){
+            attributes.addFlashAttribute("errorCreateProject", "Error while project's creation");
+            return "redirect:/projects/create";
+        }
     }
 
     @GetMapping("/create")
