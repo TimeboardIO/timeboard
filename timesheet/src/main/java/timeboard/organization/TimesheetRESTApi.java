@@ -315,7 +315,7 @@ public class TimesheetRESTApi {
                 final List<DateWrapper> days,
                 final List<ProjectWrapper> projects,
                 final List<ImputationWrapper> imputationWrappers
-        ) {
+        ) {layout
 
 
             final Calendar c = Calendar.getInstance();
