@@ -214,11 +214,10 @@ public class TimesheetController {
 
             UpdatedTaskResult updatedTask = null;
 
-            if (type.equals("imputation")) {
-                final Date day = DATE_FORMAT.parse(request.getParameter("day"));
-                final double imputation = Double.parseDouble(request.getParameter("imputation"));
+            if (request.type.equals("imputation")) {
+                final Date day = DATE_FORMAT.parse(request.day);
                 updatedTask = this.projectService.updateTaskImputation(
-                        authentication.getCurrentOrganization(), actor, task, day, imputation);
+                        authentication.getCurrentOrganization(), actor, task, day, request.imputation);
             }
 
             if (request.type.equals("effortLeft")) {

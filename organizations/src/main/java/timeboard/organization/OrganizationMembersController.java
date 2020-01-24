@@ -183,7 +183,7 @@ public class OrganizationMembersController {
 
         // Add member in current organization
         try {
-            organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
+            organizationService.addMembership(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
 
             final MemberWrapper memberWrapper = new MemberWrapper(
                     memberID,
@@ -226,7 +226,7 @@ public class OrganizationMembersController {
         final Account member = organizationMembership.getMember();
 
         try {
-            organizationService.removeMember(actor, organization.get(), member);
+            organizationService.removeMembership(actor, organization.get(), member);
 
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e) {
