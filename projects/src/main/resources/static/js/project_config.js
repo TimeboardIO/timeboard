@@ -65,8 +65,3 @@ $('.ui.search')
     },
     minCharacters : 3
 });
-
-let roleActor = $("meta[name=roleActor]").attr("content")
-$('#projectConfigForm :input').prop('disabled', roleActor != 'OWNER');
-$('#projectConfigForm :button').css('display', roleActor != 'OWNER' ? 'none' : 'block');
-
