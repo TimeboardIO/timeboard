@@ -30,6 +30,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,9 +82,12 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(final HttpServletRequest request,
-                                final RedirectAttributes attributes) throws BusinessException {
+    protected String createProjectHandler(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest request,
+            final RedirectAttributes attributes) throws BusinessException {
         try {
+            this.projectService.createProject(authentication.getDetails(), request.getParameter("projectName"));
             attributes.addFlashAttribute("success", "Project created successfully.");
             return "redirect:/projects";
         } catch (final PersistenceException e) {
