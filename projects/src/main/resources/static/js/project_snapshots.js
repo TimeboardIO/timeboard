@@ -6,6 +6,7 @@ $(document).ready(function () {
         el: '#projectSnapshots',
         data: {
             table: {
+                name:"table",
                 cols: [
                     {
                         "slot": "snapshotdate",
@@ -73,18 +74,6 @@ $(document).ready(function () {
                     }
                 });
             },
-            polynomialRegression: function(dates, data){
-                let polyData = [];
-                for (let i = 0; i<dates.length; i++){
-                    polyData.push([i, data[i]]);
-                }
-                const result = regression('polynomial', polyData, 3);
-                let polyDataForGraph = [];
-                for (let i = 0; i<result.points.length; i++){
-                    polyDataForGraph.push(result.points[i][1]);
-                }
-                return polyDataForGraph;
-            },
 
             showGraph: function() {
                 var self = this;
@@ -94,11 +83,17 @@ $(document).ready(function () {
                     url: "projects/" + projectID + "/snapshots/chart",
                     success: function (d) {
 
-                        let polyQuotationData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.quotationData);
-                        let polyOriginalEstimateData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.originalEstimateData);
-                        let polyRealEffortData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.realEffortData);
-                        let polyEffortLeftData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.effortLeftData);
-                        let polyEffortSpentData = self.polynomialRegression(d.listOfProjectSnapshotDates, d.effortSpentData);
+                        let polyQuotationData = d.quotationProjection;
+                        let polyOriginalEstimateData = d.originalEstimateProjection;
+                        let polyRealEffortData = d.realEffortProjection;
+                        let polyEffortLeftData = d.effortLeftProjection;
+                        let polyEffortSpentData = d.effortSpentProjection;
+
+                        for(let i = 0; i < d.listOfProjectSnapshotDates.length; i++){
+                            let date = new Date(d.listOfProjectSnapshotDates[i]);
+                            d.listOfProjectSnapshotDates[i] = date.toLocaleString();
+                        }
+
 
                         //chart config
                         let chart = new Chart($("#lineChart"), {
@@ -201,7 +196,10 @@ $(document).ready(function () {
                 success: function (d) {
                     self.formatDate(d);
                     self.table.data = d;
-                    self.showGraph();
+                    if(d.length>0){
+                        self.showGraph();
+                    }
+
                 }
             });
         }
