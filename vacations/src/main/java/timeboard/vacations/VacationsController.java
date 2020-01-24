@@ -71,7 +71,7 @@ public class VacationsController {
 
         final Account actor = authentication.getDetails();
 
-        final List<VacationRequest> list = this.vacationService.listVacationRequestsByUser(actor);
+        final List<VacationRequest> list = this.vacationService.listVacationRequestsByUser(actor, authentication.getCurrentOrganization());
         final List<VacationRequestWrapper> returnList = new ArrayList<>();
 
         for (final VacationRequest v : list) {
@@ -86,7 +86,7 @@ public class VacationsController {
 
         final Account actor = authentication.getDetails();
 
-        final List<VacationRequest> list = this.vacationService.listVacationRequestsToValidateByUser(actor);
+        final List<VacationRequest> list = this.vacationService.listVacationRequestsToValidateByUser(actor, authentication.getCurrentOrganization());
         final List<VacationRequestWrapper> returnList = new ArrayList<>();
 
         for (final VacationRequest v : list) {

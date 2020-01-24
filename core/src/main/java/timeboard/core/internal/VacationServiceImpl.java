@@ -102,18 +102,22 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsByUser(final Account applicant) {
+    public List<VacationRequest> listVacationRequestsByUser(final Account applicant, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
-                "select v from VacationRequest v where v.applicant = :applicant and v.parent IS NULL"
+                "select v from VacationRequest v " +
+                        "where v.applicant = :applicant  " +
+                        "and v.organizationID = :orgID " +
+                        "and v.parent IS NULL"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
+        q.setParameter("orgID", orgID);
 
         return q.getResultList();
 
     }
     @Override
-    public List<VacationRequest> listVacationRequestsByUser(Account applicant, int year) {
+    public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID,  int year) {
 
         final Calendar startBound = Calendar.getInstance();
         final Calendar endBound = Calendar.getInstance();
@@ -128,10 +132,13 @@ public class VacationServiceImpl implements VacationService {
         startBound.set(Calendar.YEAR, year-1);
 
         final TypedQuery<VacationRequest> q = em.createQuery(
-                "select v from VacationRequest v where v.applicant = :applicant " +
+                "select v from VacationRequest v " +
+                        "where v.applicant = :applicant " +
+                        "and v.organizationID = :orgID " +
                         "and not (v.endDate < :startBound and v.startDate > :endBound)"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
+        q.setParameter("orgID", orgID);
         q.setParameter("endBound", endBound.getTime());
         q.setParameter("startBound", startBound.getTime());
 
@@ -140,12 +147,17 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee) {
+    public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee, long orgID) {
 
-        final TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
-                        "where v.assignee = :assignee and v.status = :status and v.parent IS NULL",
+        final TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v " +
+                        "where v.assignee = :assignee " +
+                        "and v.status = :status " +
+                        "and v.organizationID = :orgID " +
+                        "and v.parent IS NULL",
                 VacationRequest.class);
         q.setParameter("assignee", assignee);
+        q.setParameter("orgID", orgID);
         q.setParameter("status", VacationRequestStatus.PENDING);
 
         return q.getResultList();
@@ -306,34 +318,34 @@ public class VacationServiceImpl implements VacationService {
 
         final DefaultTask vacationTask = this.getVacationTask(actor, request);
 
-        final java.util.Calendar c1 = java.util.Calendar.getInstance();
-        c1.setTime(request.getStartDate());
-        c1.set(Calendar.HOUR_OF_DAY, 2);
-        c1.set(Calendar.MINUTE, 0);
-        c1.set(Calendar.SECOND, 0);
-        c1.set(Calendar.MILLISECOND, 0);
-        c1.setFirstDayOfWeek(Calendar.MONDAY);
+        final java.util.Calendar currentCalendar = java.util.Calendar.getInstance();
+        currentCalendar.setTime(request.getStartDate());
+        currentCalendar.set(Calendar.HOUR_OF_DAY, 2);
+        currentCalendar.set(Calendar.MINUTE, 0);
+        currentCalendar.set(Calendar.SECOND, 0);
+        currentCalendar.set(Calendar.MILLISECOND, 0);
+        currentCalendar.setFirstDayOfWeek(Calendar.MONDAY);
 
         double value = 1 * sign;
-        final java.util.Calendar c2 = java.util.Calendar.getInstance();
-        c2.setTime(request.getEndDate());
+        final java.util.Calendar endCalendar = java.util.Calendar.getInstance();
+        endCalendar.setTime(request.getEndDate());
 
         if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
             value = 0.5 * sign;
         }
 
-        while (c1.before(c2)) {
-            if (c1.get(Calendar.DAY_OF_WEEK) <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1) {
-                this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value, request);
+        while (currentCalendar.before(endCalendar)) {
+            if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY  && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
+                this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
             }
             value = 1 * sign;
-            c1.add(Calendar.DATE, 1);
+            currentCalendar.add(Calendar.DATE, 1);
         }
         if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
             value = 0.5 * sign;
         }
-        if (c1.get(Calendar.DAY_OF_WEEK)  <=6  && c1.get(Calendar.DAY_OF_WEEK) > 1 ) {
-            this.updateTaskImputation(request.getApplicant(), vacationTask, c1.getTime(), value, request);
+        if (currentCalendar.get(Calendar.DAY_OF_WEEK)  <= Calendar.FRIDAY  && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY ) {
+            this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
         }
 
     }
@@ -353,7 +365,7 @@ public class VacationServiceImpl implements VacationService {
         return null;
     }
 
-    private void updateTaskImputation(final Account user, final DefaultTask task, final Date day,
+    private void updateTaskImputation(final long orgID, final Account user, final DefaultTask task, final Date day,
                                       final double val, final VacationRequest request) throws BusinessException {
 
         double newValue =  val;
@@ -393,7 +405,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         //update imputation
-        this.projectservice.updateTaskImputation(user, task, day, newValue);
+        this.projectservice.updateTaskImputation(orgID, user, task, day, newValue);
     }
 
     private boolean onSameDay(Date date1, Date date2) {
