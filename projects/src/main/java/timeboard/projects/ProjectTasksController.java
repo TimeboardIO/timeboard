@@ -27,7 +27,6 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +60,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects/{projectID}/tasks")
 public class ProjectTasksController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTasksController.class);
 
     @Autowired
@@ -77,7 +75,7 @@ public class ProjectTasksController {
     public List<ProjectSyncPlugin> projectImportServiceList;
 
     @GetMapping
-    protected String display(
+    protected String handleGet(
             final TimeboardAuthentication authentication,
             @PathVariable final Long projectID, final Model model) throws BusinessException {
 
@@ -144,7 +142,7 @@ public class ProjectTasksController {
                 ));
 
             }
-            return ResponseEntity.status(HttpStatus.OK).body(OBJECT_MAPPER.writeValueAsString(result.toArray()));
+            return ResponseEntity.status(HttpStatus.OK).body(result.toArray());
         } catch (final BusinessException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -314,7 +312,7 @@ public class ProjectTasksController {
         final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
         batchList.forEach(batch -> batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getName())));
 
-        return ResponseEntity.status(HttpStatus.OK).body(OBJECT_MAPPER.writeValueAsString(batchWrapperList.toArray()));
+        return ResponseEntity.status(HttpStatus.OK).body(batchWrapperList.toArray());
     }
 
     @GetMapping("/chart")
@@ -370,7 +368,7 @@ public class ProjectTasksController {
                 ));
         wrapper.setEffortSpentData(effortSpentMap.values());
 
-        return ResponseEntity.status(HttpStatus.OK).body(OBJECT_MAPPER.writeValueAsString(wrapper));
+        return ResponseEntity.status(HttpStatus.OK).body(wrapper);
 
     }
 

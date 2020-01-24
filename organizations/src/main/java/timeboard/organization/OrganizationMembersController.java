@@ -28,7 +28,6 @@ package timeboard.organization;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,12 +40,9 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.OrganizationMembership;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
-import timeboard.core.model.OrganizationMembership;
-import timeboard.core.security.TimeboardAuthentication;
 
 import java.io.Serializable;
 import java.util.*;
@@ -61,8 +57,6 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 @RequestMapping(value = "/org/members", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrganizationMembersController {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     public OrganizationService organizationService;
@@ -123,7 +117,7 @@ public class OrganizationMembersController {
             ));
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(result.toArray()));
+        return ResponseEntity.status(HttpStatus.OK).body(result.toArray());
 
     }
 
