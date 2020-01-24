@@ -104,20 +104,6 @@ const projectID = $("meta[name='projectID']").attr('value');
 // VUEJS MAIN APP
 let app = new Vue({
     el: '#tasksList',
-    computed : {
-        pendingTaskList : function () {
-            return this.taskList.filter(r => r.status === 'PENDING');
-        },
-        tableByBatch: function () {
-            let res = {};
-            this.batches.forEach(function(batch) {
-                res[batch.batchID].data = this.taskList.filter(row => {
-                    return row.batchIDs.some(b => b === batch.batchID)
-                });
-            });
-            return res;
-        }
-    },
     data: {
         taskList : [],
         newTask: Object.assign({}, emptyTask),
@@ -199,16 +185,29 @@ let app = new Vue({
                 type:      { filterKey: 'typeID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
             },
-            data: [],
             name: 'tasks',
             configurable : true
         },
         pendingTaskListConfig : {
             cols: [], //will copy table columns
-            data: [],
             name: 'pending tasks',
             configurable : true
         },
+    },
+    computed : {
+        pendingTaskList : function () {
+            return this.taskList.filter(r => r.status === 'PENDING');
+        },
+        tableByBatch: function () {
+            let self = this;
+            let res = {};
+            this.batches.forEach(function(batch) {
+                res[batch.batchID] = self.taskList.filter(row => {
+                    return row.batchIDs.some(b => b === batch.batchID);
+                });
+            });
+            return res;
+        }
     },
     methods: {
         showGraphModal: function(projectID, task, event){
@@ -318,7 +317,7 @@ let app = new Vue({
                     task.status = 'IN_PROGRESS';
                     self.taskList.find(e => e.taskID === task.taskID).status = 'IN_PROGRESS';
                     event.target.classList.toggle('loading');
-                    self.taskListConfig.data = self.taskList.filter(r => r.status === 'PENDING');
+                   // self.taskListConfig.data = self.taskList.filter(r => r.status === 'PENDING');
                 });
         },
         denyTask: function(event, task) {
@@ -329,7 +328,7 @@ let app = new Vue({
                     self.taskList.find(e => e.taskID === task.taskID).status = 'REFUSED';
                     task.status = 'REFUSED';
                     event.target.classList.toggle('loading');
-                    self.taskListConfig.data = self.taskList.filter(r => r.status === 'PENDING');
+                   // self.taskListConfig.data = self.taskList.filter(r => r.status === 'PENDING');
                 });
         },
         deleteTask: function(event, task) {

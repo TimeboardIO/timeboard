@@ -274,7 +274,7 @@
                 <div v-if="row.typeName !== '' " class="ui blue horizontal label"> {{row.typeName}} </div>
             </template>
             <template v-slot:status="{row}">
-                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                <div class="ui small primary horizontal label"> {{row.status}} </div>
             </template>
 
             <template v-slot:actions="{row}">
@@ -328,7 +328,7 @@
                             <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
                         </template>
                         <template v-slot:status="{row}">
-                            <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                            <div class="ui small primary horizontal label"> {{row.status}} </div>
                         </template>
 
                         <template v-slot:actions="{row}">
@@ -374,7 +374,7 @@
                         <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
                     </template>
                     <template v-slot:status="{row}">
-                        <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                        <div class="ui small primary horizontal label"> {{row.status}} </div>
                     </template>
 
                     <template v-slot:actions="{row}">
