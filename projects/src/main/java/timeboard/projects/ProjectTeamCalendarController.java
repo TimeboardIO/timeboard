@@ -54,8 +54,10 @@ import java.util.stream.Collectors;
 public class ProjectTeamCalendarController {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
     @Autowired
     public ProjectService projectService;
+
     @Autowired
     public VacationService vacationService;
 
@@ -92,7 +94,7 @@ public class ProjectTeamCalendarController {
 
         // re-balance key to user screen name and wrap request to ui calendar
         final Map<String, List<CalendarEvent>> newMap = accountVacationRequestMap.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> CalendarEvent.requestToWrapperList(e.getValue())));
+                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> CalendarEvent.requestToWrapperList(e.getValue(), DATE_FORMAT)));
 
         return ResponseEntity.ok(newMap);
     }

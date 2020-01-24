@@ -40,16 +40,7 @@ public class CalendarEvent {
     private double value;
     private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     public CalendarEvent() { }
-
-    public CalendarEvent(Imputation imputation) {
-        this.date = DATE_FORMAT.format(imputation.getDay());
-        this.value = imputation.getValue();
-        this.type = 1;
-        this.name = imputation.getAccount().getScreenName();
-    }
 
     public String getName() {
         return name;
@@ -83,18 +74,18 @@ public class CalendarEvent {
         this.type = type;
     }
 
-    public static List<CalendarEvent> requestToWrapperList(List<VacationRequest> requests) {
+    public static List<CalendarEvent> requestToWrapperList(List<VacationRequest> requests, DateFormat formatter) {
         final List<CalendarEvent> results = new ArrayList<>();
 
         for (VacationRequest r : requests) {
-            results.addAll(requestToWrapper(r));
+            results.addAll(requestToWrapper(r, formatter));
         }
 
         return results;
     }
 
 
-    public static List<CalendarEvent> requestToWrapper(VacationRequest request) {
+    public static List<CalendarEvent> requestToWrapper(VacationRequest request, DateFormat formatter) {
         final LinkedList<CalendarEvent> results = new LinkedList<>();
 
         final java.util.Calendar start = java.util.Calendar.getInstance();
@@ -107,7 +98,7 @@ public class CalendarEvent {
             final CalendarEvent wrapper = new CalendarEvent();
 
             wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate (DATE_FORMAT.format(start.getTime()));
+            wrapper.setDate (formatter.format(start.getTime()));
             if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
                 wrapper.setValue(1);
             }
