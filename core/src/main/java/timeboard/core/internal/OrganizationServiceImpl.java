@@ -87,7 +87,7 @@ public class OrganizationServiceImpl implements OrganizationService {
             final Map<String, String> properties) throws BusinessException {
 
         final Organization org = this.createOrganization(organizationName, properties);
-        this.addMember(actor, org, actor, MembershipRole.OWNER);
+        this.addMembership(actor, org, actor, MembershipRole.OWNER);
 
         return org;
     }
@@ -137,10 +137,10 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @CacheEvict(value = "organizationsCache", key = "#organization.getId()")
-    public Optional<Organization> addMember(final Account actor,
-                                            final Organization organization,
-                                            final Account member,
-                                            final MembershipRole role) {
+    public Optional<Organization> addMembership(final Account actor,
+                                                final Organization organization,
+                                                final Account member,
+                                                final MembershipRole role) {
 
         final Optional<Organization> org = this.getOrganizationByID(actor, organization.getId());
 
@@ -164,7 +164,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     @CacheEvict(value = "organizationsCache", key = "#o.getId()")
-    public Optional<Organization> removeMember(final Account actor, final Organization o, final Account member) {
+    public Optional<Organization> removeMembership(final Account actor, final Organization o, final Account member) {
 
         final Optional<Organization> organization = this.getOrganizationByID(actor, o.getId());
         if (organization.isPresent()) {

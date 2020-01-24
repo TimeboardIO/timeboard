@@ -408,12 +408,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<UpdatedTaskResult> updateTaskImputations(final Account actor, final List<Imputation> imputationsList) {
+    public List<UpdatedTaskResult> updateTaskImputations(final Long orgID, final Account actor, final List<Imputation> imputationsList) {
         final List<UpdatedTaskResult> result = new ArrayList<>();
         for (final Imputation imputation : imputationsList) {
             UpdatedTaskResult updatedTaskResult = null;
             try {
-                updatedTaskResult = this.updateTaskImputation(actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
+                updatedTaskResult = this.updateTaskImputation(orgID, actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
             } catch (final BusinessException e) {
                 LOGGER.error(e.getMessage());
             }
@@ -425,6 +425,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public UpdatedTaskResult updateTaskImputation(
+            final Long orgID,
             final Account actor,
             final AbstractTask task,
             final Date day,
@@ -432,10 +433,12 @@ public class ProjectServiceImpl implements ProjectService {
         final Calendar c = Calendar.getInstance();
         c.setTime(day);
 
-        final boolean timesheetSubmitted = this.timesheetService.isTimesheetSubmitted(actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+        final ValidationStatus timesheetSubmitted = this.timesheetService.getTimesheetValidationStatus(
+                orgID,
+                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
 
         if (task instanceof Task) {
-            if (!timesheetSubmitted) {
+            if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
                 return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
             } else {
                 final Task projectTask = (Task) task;
@@ -445,7 +448,7 @@ public class ProjectServiceImpl implements ProjectService {
                         projectTask.getRealEffort());
             }
         } else {
-            if (!timesheetSubmitted) {
+            if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
                 return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
             } else {
                 return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
@@ -861,9 +864,9 @@ public class ProjectServiceImpl implements ProjectService {
 
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(user, project.getOrganizationID());
 
-        final Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationForDate(start.getTime(), end.getTime(),
+        final Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
                 user, organization.get().getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get());
-        final Map<Integer, Double> projectImputations = timesheetService.getProjectImputationSumForDate(start.getTime(), end.getTime(),
+        final Map<Integer, Double> projectImputations = timesheetService.getProjectImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
                 user, project);
         final Map<Integer, String> comments = new HashMap<>();
         final Map<Integer, Double> otherProjectImputations = new HashMap<>();
