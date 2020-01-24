@@ -48,16 +48,6 @@ public interface VacationService {
     List<VacationRequest> listVacationRequestsByUser(Account user, long orgID, int year);
     List<VacationRequest> listVacationRequestsToValidateByUser(Account user, long orgID);
 
-    /**
-     * List conflicting vacation request for period
-     *
-     * @param assignee
-     * @param request  VacationRequest period
-     * @return
-     */
-    List<VacationRequest> listVacationRequestsByPeriod(Account assignee, VacationRequest request);
-
-
     Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
     void deleteVacationRequest(Long orgID,  Account actor, VacationRequest request) throws BusinessException;

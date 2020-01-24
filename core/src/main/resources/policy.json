@@ -39,5 +39,17 @@
     "description": "Only user with role OWNER on current project",
     "target": "action == 'PROJECT_SNAPSHOT'",
     "condition": "resource.isMember(subject.getDetails(), 'OWNER')"
-  }
+  },
+  {
+    "name": "User can consult his vacation requests",
+    "description": "Only user  can list all his vacation requests",
+    "target": "action == 'VACATION_LIST'",
+    "condition": "subject.is(resource)"
+  },
+  {
+    "name": "Project owner can view project member vacation requests",
+    "description": "Any user belonging to the project can see project members vacation requests",
+    "target": "action == 'VACATION_TEAM_LIST'",
+    "condition": "resource.isMember(subject.getDetails())"
+  },
 ]

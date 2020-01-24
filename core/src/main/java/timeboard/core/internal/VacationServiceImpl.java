@@ -28,6 +28,7 @@ package timeboard.core.internal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
@@ -39,7 +40,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.Calendar;
@@ -102,6 +102,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#applicant,'LIST_VACATION')")
     public List<VacationRequest> listVacationRequestsByUser(final Account applicant, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
@@ -116,7 +117,9 @@ public class VacationServiceImpl implements VacationService {
         return q.getResultList();
 
     }
+
     @Override
+    @PreAuthorize("hasPermission(#applicant,'LIST_VACATION')")
     public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID,  int year) {
 
         final Calendar startBound = Calendar.getInstance();
@@ -147,6 +150,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#assignee,'LIST_VACATION')")
     public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
@@ -164,6 +168,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#project,'VACATION_TEAM_LIST')")
     public Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(
             final Account actor, final Project project, final int month, final int year) {
 
@@ -200,50 +205,6 @@ public class VacationServiceImpl implements VacationService {
                 .collect(Collectors.groupingBy(VacationRequest::getApplicant,
                         Collectors.mapping(r -> r, Collectors.toList())));
     }
-
-    @Override
-    public List<VacationRequest> listVacationRequestsByPeriod(final Account applicant, final VacationRequest request) {
-
-        final TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
-                        "where v.applicant = :applicant and v.parent is null " +
-                        "and ( " +
-                        "(v.startDate >= :startDate and :startDate <= v.endDate)" +
-                        " or " +
-                        "(v.startDate >= :endDate and :endDate <= v.endDate)" +
-                        ")",
-                VacationRequest.class);
-
-        q.setParameter("applicant", applicant);
-        q.setParameter("startDate", request.getStartDate(), TemporalType.DATE);
-        q.setParameter("endDate", request.getEndDate(), TemporalType.DATE);
-
-        final List<VacationRequest> resultList = q.getResultList();
-        final List<VacationRequest> copyList = new ArrayList<>(resultList);
-
-        for (final VacationRequest r : resultList) {
-            if (
-                    r.getStartDate().compareTo(request.getEndDate()) > 0
-                            && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                            && r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
-            ) {
-                copyList.remove(r);
-            }
-
-            if (
-                    r.getEndDate().compareTo(request.getStartDate()) > 0
-                            && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                            && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
-            ) {
-                copyList.remove(r);
-            }
-            if (r instanceof RecursiveVacationRequest) {
-                copyList.remove(r);
-            }
-        }
-
-        return copyList;
-    }
-
 
     @Override
     public void deleteVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {

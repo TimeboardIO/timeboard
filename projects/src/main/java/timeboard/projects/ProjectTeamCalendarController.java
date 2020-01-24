@@ -73,10 +73,10 @@ public class ProjectTeamCalendarController {
     }
 
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(TimeboardAuthentication authentication,
-                                                                            @PathVariable Long projectID,
-                                                                            @PathVariable Integer yearNum,
-                                                                            @PathVariable Integer monthNum) throws BusinessException {
+    public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(final TimeboardAuthentication authentication,
+                                                                            @PathVariable final Long projectID,
+                                                                            @PathVariable final Integer yearNum,
+                                                                            @PathVariable final Integer monthNum) throws BusinessException {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 

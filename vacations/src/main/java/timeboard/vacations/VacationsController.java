@@ -102,7 +102,8 @@ public class VacationsController {
         final Account actor = authentication.getDetails();
 
         // get existing vacation request for year
-        List<VacationRequest> vacationRequests = this.vacationService.listVacationRequestsByUser(actor, yearNum);
+        List<VacationRequest> vacationRequests =
+                this.vacationService.listVacationRequestsByUser(actor, authentication.getCurrentOrganization(), yearNum);
 
         // remove recursive events (only keep single event)
         vacationRequests = vacationRequests.stream().filter(r -> !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
