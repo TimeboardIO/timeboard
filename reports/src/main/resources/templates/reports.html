@@ -25,10 +25,17 @@
                 <template v-slot:name="{row}">
                     {{row.name}}
                 </template>
+                <template v-slot:async="{row}">
+                    {{row.async}}
+                </template>
                 <template v-slot:actions="{row}">
-                    <a class="ui right labeled success icon button" v-bind:href="'/reports/view/'+row.id">
+                    <a v-if="row.async==false" class="ui right labeled success icon button" v-bind:href="'/reports/view/'+row.id">
                         <i class="right arrow icon"></i>
                         View
+                    </a>
+                    <a v-if="row.async==true" class="ui right labeled success icon button disable" v-bind:href="'/reports/view/'+row.id">
+                        <i class="right arrow icon"></i>
+                        Request report
                     </a>
                     <a class="ui right labeled success icon button" v-bind:href="'/reports/edit/'+row.id">
                         <i class="right arrow icon"></i>

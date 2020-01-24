@@ -31,6 +31,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +46,10 @@ import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -75,7 +78,14 @@ public class ReportsController {
         final Account actor = authentication.getDetails();
         final List<ReportDecorator> reports = this.reportService.listReports(actor)
                 .stream()
-                .map(report -> new ReportDecorator(report))
+                .map(report -> {
+                    final Optional<ReportController> reportController = this.getReportController(report);
+                    if(reportController.isPresent()) {
+                        return new ReportDecorator(report, reportController.get());
+                    }
+                    return null;
+                })
+                .filter(r -> r != null)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(reports);
     }
@@ -186,8 +196,7 @@ public class ReportsController {
 
         final Report report = this.reportService.getReportByID(authentication.getDetails(), reportID);
 
-        final Optional<ReportController> reportController = this.reportControllers.stream()
-                .filter(rc -> rc.reportID().equals(report.getType())).findFirst();
+        final Optional<ReportController> reportController = getReportController(report);
 
         if(reportController.isPresent()){
             mav.getModel().put("fragment", reportController.get().reportView());
@@ -200,19 +209,24 @@ public class ReportsController {
         return mav;
     }
 
-    @GetMapping("/view/{reportID}/data")
-    protected ResponseEntity viewReportData(
+    private Optional<ReportController> getReportController(final Report report) {
+        return this.reportControllers.stream()
+                .filter(rc -> rc.reportID().equals(report.getType())).findFirst();
+    }
+
+    @GetMapping(
+            value = "/view/{reportID}/data",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_XML_VALUE})
+    @ResponseBody
+    public ResponseEntity<Object> viewReportData(
             final TimeboardAuthentication authentication,
             @PathVariable final long reportID) {
 
         final Report report = this.reportService.getReportByID(authentication.getDetails(), reportID);
-        final Optional<ReportController> reportController = this.reportControllers
-                .stream()
-                .filter(rc -> rc.reportID().equals(report.getType()))
-                .findFirst();
+        final Optional<ReportController> reportController = this.getReportController(report);
 
         if(reportController.isPresent()){
-            final Model model = reportController.get().getReportModel(authentication, report);
+            final Serializable model = reportController.get().getReportModel(authentication, report);
             return ResponseEntity.ok(model);
         }
 
@@ -223,9 +237,11 @@ public class ReportsController {
     private static class ReportDecorator {
 
         private final Report report;
+        private final ReportController controller;
 
-        public ReportDecorator(final Report report) {
+        public ReportDecorator(final Report report, ReportController controller) {
             this.report = report;
+            this.controller = controller;
         }
 
         public long getID() {
@@ -236,6 +252,10 @@ public class ReportsController {
             return this.report.getName();
         }
 
+
+        public boolean isAsync() {
+            return this.controller.isAsync();
+        }
     }
 
 }

@@ -1,4 +1,4 @@
-package timeboard.reports;
+package timeboard.reports.controller;
 
 /*-
  * #%L
@@ -32,24 +32,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
-import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
+import timeboard.reports.ReportController;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.io.Serializable;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 
 @Component
-public class ReportKPIController implements ReportController {
+public class GlobalRawDataExportController implements ReportController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReportKPIController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalRawDataExportController.class);
 
     @Autowired
     private ReportService reportService;
@@ -59,43 +56,19 @@ public class ReportKPIController implements ReportController {
 
 
     @Override
-    public Model getReportModel(
+    public Serializable getReportModel(
             final TimeboardAuthentication authentication,
             final Report report) {
 
         final Model model = new ConcurrentModel();
         final Account actor = authentication.getDetails();
 
-
         final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService
                 .findProjects(actor, authentication.getCurrentOrganization(), report);
 
-        final AtomicReference<Double> originalEstimate = new AtomicReference<>(0.0);
-        final AtomicReference<Double> effortLeft = new AtomicReference<>(0.0);
-        final AtomicReference<Double> effortSpent = new AtomicReference<>(0.0);
-        final AtomicReference<Double> quotation = new AtomicReference<>(0.0);
+        model.addAttribute("projets", listOfProjectsFiltered);
 
-        listOfProjectsFiltered.forEach(projectWrapper -> {
-            try {
-                final ProjectDashboard currentProjectDashboard = this.projectService.projectDashboard(actor, projectWrapper.getProject());
-                originalEstimate.updateAndGet(v -> v + currentProjectDashboard.getOriginalEstimate());
-                effortLeft.updateAndGet(v -> v + currentProjectDashboard.getEffortLeft());
-                effortSpent.updateAndGet(v -> v + currentProjectDashboard.getEffortSpent());
-                quotation.updateAndGet(v -> v + currentProjectDashboard.getQuotation());
-            } catch (final BusinessException e) {
-                LOGGER.error(e.getMessage());
-            }
-        });
-
-        model.addAttribute("quotation", quotation.get());
-        model.addAttribute("originalEstimate", originalEstimate.get());
-        model.addAttribute("effortLeft", effortLeft.get());
-        model.addAttribute("effortSpent",effortSpent.get());
-        model.addAttribute("realEffort",effortSpent.get() + effortLeft.get());
-
-        model.addAttribute("date", Calendar.getInstance().getTime());
-
-        return model;
+        return (Serializable) model.asMap();
     }
 
 
@@ -106,11 +79,16 @@ public class ReportKPIController implements ReportController {
 
     @Override
     public String reportLabel() {
-        return "report.kpi";
+        return "report.raw";
     }
 
     @Override
     public String reportView() {
-        return "view_report_kpi.html";
+        return "global_raw_data_export.html";
+    }
+
+    @Override
+    public Boolean isAsync() {
+        return true;
     }
 }

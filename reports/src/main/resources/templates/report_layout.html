@@ -6,12 +6,12 @@
 
 <head>
     <title layout:fragment="title">View Report Page</title>
-    <meta name="reportID" th:content="${report.id}"/>  
+    <meta name="reportID" th:content="${report.id}"/>
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="ui segment" id="create-report">
+    <div class="ui segment">
         <h4 class="ui dividing header">
 
             <a class="ui button" th:href="@{/reports}">
@@ -19,7 +19,7 @@
                 Back
             </a>
 
-            Report:<span th:text="${report.getName()}"></span></h4>
+            Report <span th:text="${report.getName()}"></span></h4>
 
         <h3 style="text-align: center" th:text="#{${reportController.reportLabel()}}"></h3>
 

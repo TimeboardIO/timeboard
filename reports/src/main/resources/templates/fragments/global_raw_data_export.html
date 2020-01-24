@@ -9,12 +9,48 @@
 <body>
 
 <div th:fragment="report">
-    <button class="ui button" id="rawDL">Download</button>
+    <button class="ui button" id="rawJSONDL" th:text="#{report.raw.download.json}">Download as json</button>
+    <button class="ui button" id="rawXMLDL" th:text="#{report.raw.download.xml}">Download as XML</button>
     <script>
-        $("#rawDL").click(function(){
-            $.get("/reports/view/"+$("meta[name='reportID']").attr('content'), function(data){
-                console.log(data);
+        function downloadURI(uri, name) {
+            var link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            delete link;
+        }
+
+        function getRawData(u, reportContentType){
+            return new Promise(function(resolve, reject) {
+
+
+                const options = {
+                    method: "GET",
+                    credentials: "same-origin",
+                    headers: new Headers({'Accept': reportContentType})
+                };
+
+                fetch(u, options)
+                    .then(function(response) {
+                      resolve(response.blob());
+                    });
             });
+        }
+
+        $("#rawJSONDL").click(function(){
+            getRawData("/reports/view/"+$("meta[name='reportID']").attr('content')+"/data", "application/json")
+                .then(function(data){
+                    downloadURI('data:text/csv;charset=utf-8;base64,' + btoa(data), "raw.json");
+                });
+        });
+
+         $("#rawXMLDL").click(function(){
+            getRawData("/reports/view/"+$("meta[name='reportID']").attr('content')+"/data", "text/xml")
+                .then(function(data){
+                    downloadURI('data:text/csv;charset=utf-8;base64,' + btoa(data), "raw.xml");
+                });
         });
     </script>
 </div>

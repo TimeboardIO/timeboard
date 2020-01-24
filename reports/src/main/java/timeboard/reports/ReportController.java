@@ -30,15 +30,35 @@ import org.springframework.ui.Model;
 import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
 
+import java.io.Serializable;
+
 public interface ReportController {
 
-    Model getReportModel(
+    <T extends Serializable> T getReportModel(
             final TimeboardAuthentication authentication,
             final Report report);
 
+    /**
+     * Unique report id
+     * @return unique id as string
+     */
     String reportID();
 
+    /**
+     * i18n report name as code
+     * @return report.*
+     */
     String reportLabel();
 
+    /**
+     * Report template name
+     * @return template name relative to reports/src/main/resources/templates/fragments
+     */
     String reportView();
+
+    /**
+     * if true, report exec is async
+     * @return true if async, false else
+     */
+    Boolean isAsync();
 }

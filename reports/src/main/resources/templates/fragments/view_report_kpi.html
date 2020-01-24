@@ -3,15 +3,12 @@
 <html
       xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta name="reportID" th:content="${report.id}"/>
-    <script src="/js/reportsChartKPI.js" type="text/javascript"></script>
-    <script src="/webjars/chartjs/2.8.0/Chart.js"></script>
-    <link href="/webjars/chartjs/2.8.0/Chart.min.css" rel="stylesheet">
-</head>
 <body>
 
 <div th:fragment="report">
+    <script src="/js/reportsChartKPI.js" type="text/javascript"></script>
+    <script src="/webjars/chartjs/2.8.0/Chart.js"></script>
+    <link href="/webjars/chartjs/2.8.0/Chart.min.css" rel="stylesheet">
     <div id="app-view-report">
         <canvas id="chartKPI"></canvas>
     </div>

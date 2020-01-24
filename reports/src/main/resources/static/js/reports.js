@@ -12,6 +12,10 @@ $(document).ready(function () {
                         "label": "Report Name"
                     },
                     {
+                        "slot": "async",
+                        "label": "Is Async Report"
+                    },
+                    {
                         "slot": "actions",
                         "label": "Actions"
                     }],
