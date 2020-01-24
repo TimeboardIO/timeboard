@@ -34,10 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
@@ -205,24 +202,23 @@ public class ProjectTasksController {
         return "project_tasks.html";
     }
 
-    @GetMapping("/approve")
-    public ResponseEntity approveTask(final TimeboardAuthentication authentication, final HttpServletRequest request) {
+    @PatchMapping("/approve/{taskID}")
+    public ResponseEntity approveTask(final TimeboardAuthentication authentication,
+                                      @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
-        return this.changeTaskStatus(actor, request, TaskStatus.IN_PROGRESS);
+        return this.changeTaskStatus(actor, taskID, TaskStatus.IN_PROGRESS);
     }
 
-    @GetMapping("/deny")
-    public ResponseEntity denyTask(final TimeboardAuthentication authentication, final HttpServletRequest request) {
+    @PatchMapping("/deny/{taskID}")
+    public ResponseEntity denyTask(final TimeboardAuthentication authentication,
+                                   @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
-        return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
+        return this.changeTaskStatus(actor, taskID, TaskStatus.REFUSED);
     }
 
-    private ResponseEntity changeTaskStatus(final Account actor, final HttpServletRequest request, final TaskStatus status) {
-        final String taskIdStr = request.getParameter("task");
-        Long taskID = null;
-        if (taskIdStr != null) {
-            taskID = Long.parseLong(taskIdStr);
-        } else {
+    private ResponseEntity changeTaskStatus(final Account actor, Long taskID, final TaskStatus status) {
+
+        if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
         }
         if (taskID == null) {
@@ -241,21 +237,14 @@ public class ProjectTasksController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task id not found.");
         }
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/delete")
+    @DeleteMapping("/delete/{taskID}")
     public ResponseEntity deleteTask(final TimeboardAuthentication authentication,
-                                     final HttpServletRequest request) {
+                                     @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
 
-        final String taskIdStr = request.getParameter("task");
-        Long taskID = null;
-        if (taskIdStr != null) {
-            taskID = Long.parseLong(taskIdStr);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
-        }
         if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
@@ -266,7 +255,7 @@ public class ProjectTasksController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
 
