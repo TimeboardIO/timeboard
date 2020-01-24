@@ -2,7 +2,8 @@
 
 <html layout:decorate="~{project_layout.html(tab='first')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
     <title layout:fragment="title">Project</title>
@@ -22,17 +23,21 @@
                   th:action="@{projects/{projectID}/setup/informations(projectID=${projectID})}" th:object="${projectConfigForm}">
 
                 <h4 class="ui dividing header">Project Informations</h4>
-                <div class="field">
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
                     <label>Project Name</label>
                     <input name="projectName" placeholder="Project Name" required th:field="*{name}"
-                           type="text" data-cy="project-name" >
+                           class="ui input"
+                           type="text" data-cy="project-name">
                 </div>
-                <div class="field">
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
                     <label>Project Quotation</label>
                     <input name="projectQuotation" required th:field="*{quotation}"
                            type="number" data-cy="project-quotation">
                 </div>
-                <div class="field">
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
                     <label>Project Description</label>
                     <textarea name="projectDescription" placeholder="Project Description"
                               th:field="*{comments}" data-cy="project-description">
@@ -40,14 +45,16 @@
                 </div>
 
 
-                <button class="ui positive button" style="margin-top:1em" type="submit" data-cy="submit" >Save</button>
+                <button class="ui positive button" style="margin-top:1em" type="submit" data-cy="submit"
+                        sec:authorize="${hasPermission(#vars.project,'PROJECT_SETUP')}">Save</button>
             </form>
         </div>
         <div class="column">
             <div class="ui form" name="projectMembers">
 
                 <h4 class="ui dividing header">Members</h4>
-                <div class="field">
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
                     <div class="ui category search">
                         <div class="ui icon input">
                             <input class="prompt" placeholder="Search account..." type="text">
@@ -69,8 +76,9 @@
                             <td th:text="${membership.member.screenName}"></td>
                             <td>
                                 <select th:field="${projectMembersForm.memberships[__${status.index}__].role}"
-                                        th:onchange="'updateUser('+${membership.membershipID}+', this.value)'">
-                                    <option th:each="role : ${roles}" th:selected="${role == membership.role}"
+                                        th:onchange="'updateUser('+${membership.membershipID}+', this.value)'"
+                                        th:classappend="${membership.member.id == account.id} ? 'ui dropdown disabled' : ''">
+                                <option th:each="role : ${roles}" th:selected="${role == membership.role}"
                                             th:text="${role}"
                                             th:value="${role}"></option>
                                 </select>
