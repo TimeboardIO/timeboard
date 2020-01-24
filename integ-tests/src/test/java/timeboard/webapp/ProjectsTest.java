@@ -67,6 +67,7 @@ public class ProjectsTest extends TimeboardTest {
 
         Assert.assertNotNull(project);
         Assert.assertNotNull(project.getId());
+        Assert.assertEquals(project.getName(), "SampleProject");
 
         final Project projectFromDB = this.projectService.getProjectByID(a1, org.getId(), project.getId());
         Assert.assertEquals(project.getId(), projectFromDB.getId());
