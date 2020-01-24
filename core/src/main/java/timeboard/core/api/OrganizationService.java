@@ -59,12 +59,12 @@ public interface OrganizationService {
             final Account actor,
             final Organization organization);
 
-    Optional<Organization> removeMember(
+    Optional<Organization> removeMembership(
             final Account actor,
             final Organization organization,
             final Account member) throws BusinessException;
 
-    Optional<Organization> addMember(
+    Optional<Organization> addMembership(
             final Account actor,
             final Organization organization,
             final Account member,

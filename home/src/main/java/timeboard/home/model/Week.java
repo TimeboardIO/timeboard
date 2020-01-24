@@ -26,18 +26,20 @@ package timeboard.home.model;
  * #L%
  */
 
+import timeboard.core.model.ValidationStatus;
+
 public class Week {
 
     private int number;
     private int year;
     private double imputationSum;
-    private Boolean isSubmitted;
+    private ValidationStatus validationStatus;
 
-    public Week(final int number, final int year, final double imputationSum, final Boolean isSubmitted) {
+    public Week(final int number, final int year, final double imputationSum, final ValidationStatus vs) {
         this.number = number;
         this.year = year;
         this.imputationSum = imputationSum;
-        this.isSubmitted = isSubmitted;
+        this.validationStatus = vs;
     }
 
     public int getNumber() {
@@ -64,12 +66,11 @@ public class Week {
         this.imputationSum = imputationSum;
     }
 
-    public Boolean getSubmitted() {
-        return isSubmitted;
+    public ValidationStatus getValidationStatus() {
+        return validationStatus;
     }
 
-    public void setSubmitted(final Boolean isSubmitted) {
-        this.isSubmitted = isSubmitted;
+    public void setValidationStatus(final ValidationStatus validationStatus) {
+        this.validationStatus = validationStatus;
     }
-
 }

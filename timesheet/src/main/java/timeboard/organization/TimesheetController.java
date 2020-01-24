@@ -183,7 +183,13 @@ public class TimesheetController {
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("actorID", authentication.getDetails().getId());
-        model.addAttribute("lastWeekSubmitted", this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), lastWeekYear, lastWeek));
+        model.addAttribute("lastWeekSubmitted",
+                this.timesheetService.getTimesheetValidationStatus(
+                        authentication.getCurrentOrganization(),
+                        authentication.getDetails(),
+                        lastWeekYear,
+                        lastWeek));
+
         model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
 
         model.addAttribute("projectList",
@@ -208,10 +214,11 @@ public class TimesheetController {
 
             UpdatedTaskResult updatedTask = null;
 
-            if (request.type.equals("imputation")) {
-                final Date day = DATE_FORMAT.parse(request.day);
-                //double imputation = Double.parseDouble(imputationStr);
-                updatedTask = this.projectService.updateTaskImputation(actor, task, day, request.imputation);
+            if (type.equals("imputation")) {
+                final Date day = DATE_FORMAT.parse(request.getParameter("day"));
+                final double imputation = Double.parseDouble(request.getParameter("imputation"));
+                updatedTask = this.projectService.updateTaskImputation(
+                        authentication.getCurrentOrganization(), actor, task, day, imputation);
             }
 
             if (request.type.equals("effortLeft")) {

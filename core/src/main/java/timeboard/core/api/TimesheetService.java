@@ -44,27 +44,12 @@ public interface TimesheetService {
      * @param week             timesheet week
      * @return true if timesheet is submit else, false.
      */
-    SubmittedTimesheet submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws BusinessException;
-
-    /**
-     * Is timesheet submitted.
-     *
-     * @param accountTimesheet user used to check timesheet sumbit state.
-     * @param week             timesheet week
-     * @param year             timesheet year
-     * @return true if timesheet is already submitted
-     */
-    boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week);
-
-    /**
-     * Is timesheet validated by manager.
-     *
-     * @param accountTimesheet user used to check timesheet sumbit state.
-     * @param week             timesheet week
-     * @param year             timesheet year
-     * @return true if timesheet is already validated
-     */
-    boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
+    SubmittedTimesheet submitTimesheet(
+            final Account actor,
+            final Account accountTimesheet,
+            final Organization currentOrg,
+            final int year,
+            final int week) throws BusinessException;
 
 
     /**
@@ -75,7 +60,11 @@ public interface TimesheetService {
      * @param year           timesheet year
      * @return ValidationStatus
      */
-    ValidationStatus getTimesheetValidationStatus(Long orgID, Account currentAccount, int year, int week);
+    ValidationStatus getTimesheetValidationStatus(
+            final Long orgID,
+            final Account currentAccount,
+            final int year,
+            final int week);
 
 
     /**
@@ -86,9 +75,20 @@ public interface TimesheetService {
      * @param account        user used to check timesheet validation state.
      * @return the sum of all imputations of the week
      */
-    double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, Account account);
+    double getAllImputationsForAccountOnDateRange(
+            final Date firstDayOfWeek,
+            final Date lastDayOfWeek,
+            final Account account);
 
-    Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, Account user, Project project);
+    Map<Integer, Double> getProjectImputationsForAccountOnDateRange(
+            final Date startDate,
+            final Date endDate,
+            final Account user,
+            final Project project);
 
-    Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, Account user, AbstractTask task);
+    Map<Integer, Double> getTaskImputationsForAccountOnDateRange(
+            final Date startDate,
+            final Date endDate,
+            final Account user,
+            final AbstractTask task);
 }
