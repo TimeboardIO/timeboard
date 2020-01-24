@@ -60,12 +60,12 @@ public class OrganizationsTest extends TimeboardTest {
 
         final Account a2 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test2@test.fr");
 
-        this.organizationService.addMember(a1, org, a1, MembershipRole.OWNER);
-        this.organizationService.addMember(a1, org, a2, MembershipRole.CONTRIBUTOR);
+        this.organizationService.addMembership(a1, org, a1, MembershipRole.OWNER);
+        this.organizationService.addMembership(a1, org, a2, MembershipRole.CONTRIBUTOR);
 
         Assert.assertEquals(2, this.organizationService.getOrganizationByID(a1, org.getId()).get().getMembers().size());
 
-        this.organizationService.removeMember(a1, org, a2);
+        this.organizationService.removeMembership(a1, org, a2);
 
         Assert.assertEquals(1, this.organizationService.getOrganizationByID(a1, org.getId()).get().getMembers().size());
 

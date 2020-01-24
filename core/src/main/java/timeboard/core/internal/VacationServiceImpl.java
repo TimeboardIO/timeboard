@@ -234,10 +234,10 @@ public class VacationServiceImpl implements VacationService {
 
 
     @Override
-    public void deleteVacationRequest(final Account actor, final VacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {
 
         if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
-            this.updateImputations(actor, request, 0);
+            this.updateImputations(orgID, actor, request, 0);
         }
 
         em.remove(request);
@@ -248,7 +248,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public void deleteVacationRequest(final Account actor, final RecursiveVacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Long orgID, final Account actor, final RecursiveVacationRequest request) throws BusinessException {
 
         request.setEndDate(new Date());
         boolean removeIt = true;
@@ -256,7 +256,7 @@ public class VacationServiceImpl implements VacationService {
             if (r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
                 removeIt = false;
             } else {
-                this.deleteVacationRequest(actor, r);
+                this.deleteVacationRequest(orgID, actor, r);
             }
         }
 
@@ -270,24 +270,28 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public VacationRequest approveVacationRequest(final Account actor, final VacationRequest request) throws BusinessException {
+    public VacationRequest approveVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {
         request.setStatus(VacationRequestStatus.ACCEPTED);
         em.merge(request);
         em.flush();
 
 
-        this.updateImputations(actor, request, 1);
+        this.updateImputations(orgID, actor, request, 1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
     }
 
     @Override
-    public RecursiveVacationRequest approveVacationRequest(final Account actor, final RecursiveVacationRequest request) throws BusinessException {
+    public RecursiveVacationRequest approveVacationRequest(
+            final Long orgID,
+            final Account actor,
+            final RecursiveVacationRequest request) throws BusinessException {
+
         request.setStatus(VacationRequestStatus.ACCEPTED);
 
         for (final VacationRequest r : request.getChildren()) {
-            this.approveVacationRequest(actor, r);
+            this.approveVacationRequest(orgID, actor, r);
         }
 
         em.merge(request);
@@ -298,7 +302,7 @@ public class VacationServiceImpl implements VacationService {
         return request;
     }
 
-    private void updateImputations(final Account actor, final VacationRequest request, final double sign) throws BusinessException {
+    private void updateImputations(final Long orgID, final Account actor, final VacationRequest request, final double sign) throws BusinessException {
 
         final DefaultTask vacationTask = this.getVacationTask(actor, request);
 

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
+import timeboard.core.model.ValidationStatus;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.model.Week;
 
@@ -77,7 +78,8 @@ public class HomeController {
         final int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                final boolean weekIsSubmitted = timesheetService.isTimesheetSubmitted(
+                final ValidationStatus timesheetStatus = timesheetService.getTimesheetValidationStatus(
+                        authentication.getCurrentOrganization(),
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
@@ -85,9 +87,14 @@ public class HomeController {
                 final Date firstDayOfWeek = calendar.getTime();
                 calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
                 final Date lastDayOfWeek = calendar.getTime();
-                final Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, account);
+                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(firstDayOfWeek, lastDayOfWeek, account);
 
-                final Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsSubmitted);
+                final Week week = new Week(
+                        calendar.get(Calendar.WEEK_OF_YEAR),
+                        calendar.get(Calendar.YEAR),
+                        weekSum,
+                        timesheetStatus);
+
                 weeks.add(week);
                 calendar.roll(Calendar.WEEK_OF_YEAR, -1);
             }
