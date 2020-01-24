@@ -66,7 +66,7 @@ public class ExcelTASReport extends AbstractExcelReport {
 
     public void generateFAT(final TASData tasData) throws IOException {
         this.format = true;
-        try (InputStream templatePath = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE_FILE)) {
+        try (final InputStream templatePath = this.getClass().getClassLoader().getResourceAsStream(TEMPLATE_FILE)) {
 
             final POIFSFileSystem fs = new POIFSFileSystem(templatePath);
             this.wb = new HSSFWorkbook(fs, true);
@@ -85,7 +85,7 @@ public class ExcelTASReport extends AbstractExcelReport {
             // Hide the excess lines for months that do not have 31 days
             int i = MONTH_DAY_COUNT;
             while (tasData.getDayMonthNames().size() < i) {
-                this.sheet.getRow((START_ROW_DAYS + i) - 1).setHeight((short) 0);
+                this.sheet.getRow(START_ROW_DAYS + i - 1).setHeight((short) 0);
                 i--;
             }
 
@@ -100,7 +100,7 @@ public class ExcelTASReport extends AbstractExcelReport {
         }
     }
 
-    private void updateMatriculeID(TASData tasData) {
+    private void updateMatriculeID(final TASData tasData) {
         this.sheet.getRow(MATRICULE_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
                 .setCellValue(tasData.getMatriculeID());
         this.sheet.getRow(NAME_ROW).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN).setCellValue(tasData.getName());
@@ -109,11 +109,11 @@ public class ExcelTASReport extends AbstractExcelReport {
         this.sheet.getRow(BUSINESS_CODE).getCell(MATRICULE_NAME_FIRSTNAME_COLUMN)
                 .setCellValue(tasData.getBusinessCode());
 
-        List<String> dayMonthName = tasData.getDayMonthNames();
-        Map<Integer, Double> mapWorkedDAys = tasData.getWorkedDays();
-        Map<Integer, Double> mapOffDays = tasData.getOffDays();
-        Map<Integer, Double> mapOtherDays = tasData.getOtherDays();
-        Map<Integer, String> mapComments = tasData.getComments();
+        final List<String> dayMonthName = tasData.getDayMonthNames();
+        final Map<Integer, Double> mapWorkedDAys = tasData.getWorkedDays();
+        final Map<Integer, Double> mapOffDays = tasData.getOffDays();
+        final Map<Integer, Double> mapOtherDays = tasData.getOtherDays();
+        final Map<Integer, String> mapComments = tasData.getComments();
 
         for (int i = 0; i < tasData.getDayMonthNames().size(); i++) {
 
@@ -138,12 +138,12 @@ public class ExcelTASReport extends AbstractExcelReport {
 
             // Apply the dark yellow style for the first day of the month and weekends
             // The first day of the template month is already dark yellow
-            Calendar calendarSaturday = new GregorianCalendar();
+            final Calendar calendarSaturday = new GregorianCalendar();
             calendarSaturday.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-            Calendar calendarSunday = new GregorianCalendar();
+            final Calendar calendarSunday = new GregorianCalendar();
             calendarSunday.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
-            String currentDayName = tasData.getDayMonthNames().get(i);
+            final String currentDayName = tasData.getDayMonthNames().get(i);
             if (currentDayName.equalsIgnoreCase(
                     new SimpleDateFormat("EEEE", Locale.ENGLISH)
                             .format(calendarSaturday.getTime()).toLowerCase())

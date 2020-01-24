@@ -41,7 +41,7 @@ public interface ProjectService {
 
     Project createProject(Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(Account owner,  Long orgID);
+    List<Project> listProjects(Account owner, Long orgID);
 
     Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
 
@@ -86,8 +86,6 @@ public interface ProjectService {
     void deleteTasks(Account actor, List<Task> taskList);
 
 
-
-
     Optional<Task> getTaskByRemoteID(Account actor, String id);
 
     /*
@@ -105,11 +103,17 @@ public interface ProjectService {
                                                      Date endTaskDate) throws BusinessException;
 
 
-    UpdatedTaskResult updateTaskImputation(Account actor,
-                                           AbstractTask task,
-                                           Date day, double imputation) throws BusinessException;
+    UpdatedTaskResult updateTaskImputation(
+            final Long orgID,
+            final Account actor,
+            final AbstractTask task,
+            final Date day,
+            final double val) throws BusinessException;
 
-    List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList);
+    List<UpdatedTaskResult> updateTaskImputations(
+            final Long orgID,
+            final Account actor,
+            final List<Imputation> imputationsList);
 
 
 
@@ -165,7 +169,6 @@ public interface ProjectService {
     Batch addTasksToBatch(Account actor,
                           Batch currentBatch,
                           List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
-
 
 
     TASData generateTasData(Account user, Project project, int month, int year);

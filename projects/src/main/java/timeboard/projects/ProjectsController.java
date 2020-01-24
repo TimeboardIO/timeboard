@@ -37,12 +37,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
+import timeboard.core.security.TimeboardAuthentication;
 
+import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ public class ProjectsController {
 
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+    protected String handleGet(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
         List<Project> allActorProjects = this.projectService.listProjects(actor, authentication.getCurrentOrganization());
         Collections.reverse(allActorProjects);
@@ -70,7 +71,7 @@ public class ProjectsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ProjectDecorator>> projectList(TimeboardAuthentication authentication, Model model) {
+    protected ResponseEntity<List<ProjectDecorator>> projectList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
         final List<ProjectDecorator> projects = this.projectService.listProjects(actor, authentication.getCurrentOrganization())
                 .stream()
@@ -80,12 +81,19 @@ public class ProjectsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(TimeboardAuthentication authentication,  HttpServletRequest request,
-                                RedirectAttributes attributes) throws BusinessException {
-        final Account actor = authentication.getDetails();
-        Project prj =  this.projectService.createProject(actor, request.getParameter("projectName"));
-        attributes.addFlashAttribute("success", "Project created successfully.");
-        return "redirect:/projects";
+    protected String handlePost(final HttpServletRequest request,
+                                final RedirectAttributes attributes) throws BusinessException {
+        try {
+            attributes.addFlashAttribute("success", "Project created successfully.");
+            return "redirect:/projects";
+        } catch (final PersistenceException e) {
+            attributes.addFlashAttribute("errorCreateProject", "The name \"" + request.getParameter("projectName")
+                    + "\" is already used by another project in this organization");
+            return "redirect:/projects/create";
+        } catch (final Exception e) {
+            attributes.addFlashAttribute("errorCreateProject", "Error while project's creation");
+            return "redirect:/projects/create";
+        }
     }
 
     @GetMapping("/create")
@@ -94,8 +102,8 @@ public class ProjectsController {
     }
 
     @GetMapping("/{projectID}/delete")
-    protected String deleteProject(TimeboardAuthentication authentication,
-                                   @PathVariable long projectID,  RedirectAttributes attributes) throws BusinessException {
+    protected String deleteProject(final TimeboardAuthentication authentication,
+                                   @PathVariable final long projectID, final RedirectAttributes attributes) throws BusinessException {
 
         final Project project = this.projectService.getProjectByID(authentication.getDetails(), authentication.getCurrentOrganization(), projectID);
         this.projectService.archiveProjectByID(authentication.getDetails(), project);
@@ -109,9 +117,10 @@ public class ProjectsController {
 
         private final Project project;
 
-        public ProjectDecorator(Project project) {
+        public ProjectDecorator(final Project project) {
             this.project = project;
         }
+
         public long getID() {
             return this.project.getId();
         }
@@ -129,7 +138,7 @@ public class ProjectsController {
         }
 
         public String getMemberSize() {
-            return this.project.getMembers().size()+"";
+            return this.project.getMembers().size() + "";
         }
 
     }

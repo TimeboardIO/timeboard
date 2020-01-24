@@ -35,15 +35,15 @@ public class BusinessException extends Exception {
 
     private final Set<Rule> triggeredRules = new HashSet<>();
 
-    public BusinessException(Exception e) {
+    public BusinessException(final Exception e) {
         super(e);
     }
 
-    public BusinessException(String err) {
+    public BusinessException(final String err) {
         super(err);
     }
 
-    public BusinessException(Set<Rule> wrongRules) {
+    public BusinessException(final Set<Rule> wrongRules) {
         this.triggeredRules.addAll(wrongRules);
     }
 

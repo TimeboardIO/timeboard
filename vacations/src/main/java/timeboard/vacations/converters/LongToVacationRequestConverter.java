@@ -12,10 +12,10 @@ package timeboard.vacations.converters;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -43,9 +43,9 @@ public class LongToVacationRequestConverter implements Converter<String, Vacatio
     private VacationService service;
 
     @Override
-    public VacationRequest convert(String aLong) {
-        TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        Optional<VacationRequest> request = this.service.getVacationRequestByID(auth.getDetails(), Long.parseLong(aLong));
+    public VacationRequest convert(final String aLong) {
+        final TimeboardAuthentication auth = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        final Optional<VacationRequest> request = this.service.getVacationRequestByID(auth.getDetails(), Long.parseLong(aLong));
         if (request.isPresent()) {
             return this.service.getVacationRequestByID(auth.getDetails(), Long.parseLong(aLong)).get();
         } else {

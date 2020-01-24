@@ -27,15 +27,19 @@ package timeboard.organization;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.security.TimeboardAuthentication;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
+import timeboard.core.model.OrganizationMembership;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.util.Optional;
 
@@ -53,14 +57,14 @@ public class OrganizationMembersController {
     public OrganizationService organizationService;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication,  Model viewModel) {
+    protected String handleGet(final TimeboardAuthentication authentication, final Model viewModel) {
 
         final Account actor = authentication.getDetails();
 
         final Optional<Organization> organization =
                 this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
-        if(organization.isPresent()) {
+        if (organization.isPresent()) {
             viewModel.addAttribute("members", organization.get().getMembers());
         }
 
@@ -68,5 +72,33 @@ public class OrganizationMembersController {
         viewModel.addAttribute("organization", organization.get());
 
         return "org_members";
+    }
+
+    @PatchMapping(
+            value = "/{membershipID}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateMemberRole(
+            final TimeboardAuthentication authentication,
+            final @PathVariable Long membershipID,
+            final @RequestBody OrganizationsRestAPI.MemberWrapper membershipWrapper) throws BusinessException {
+
+
+        final Optional<OrganizationMembership> membershipOpt = this.organizationService
+                .findOrganizationMembershipById(authentication.getDetails(), membershipID);
+
+        if (membershipOpt.isPresent()) {
+
+            final OrganizationMembership membership = membershipOpt.get();
+            membership.setRole(MembershipRole.valueOf(membershipWrapper.role));
+            membership.setCreationDate(membershipWrapper.creationDate);
+
+            final Optional<Organization> updatedOrgMembership = organizationService
+                    .updateMembership(authentication.getDetails(), membership);
+
+            return ResponseEntity.status(HttpStatus.OK).body(updatedOrgMembership.get());
+        }
+
+        return ResponseEntity.badRequest().build();
+
     }
 }

@@ -33,7 +33,9 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.api.TimeboardSubjects;
 import timeboard.core.api.events.*;
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.SubmittedTimesheet;
+import timeboard.core.model.Task;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -71,17 +73,17 @@ public class SendSummaryEmail {
      * @param userNotificationStructure structure user 1 -- * events to notify/inform
      * @return email ready structure
      */
-    private EmailStructure generateMailFromEventList(UserNotificationStructure userNotificationStructure) {
+    private EmailStructure generateMailFromEventList(final UserNotificationStructure userNotificationStructure) {
 
-        Map<String, Object> data = new HashMap<>();
+        final Map<String, Object> data = new HashMap<>();
 
-        List<SubmittedTimesheet> submittedTimesheets = new ArrayList<>();
-        List<VacationEvent> vacationEvents = new ArrayList<>();
-        Map<Long, ProjectEmailSummaryModel> projects = new HashMap<>();
+        final List<SubmittedTimesheet> submittedTimesheets = new ArrayList<>();
+        final List<VacationEvent> vacationEvents = new ArrayList<>();
+        final Map<Long, ProjectEmailSummaryModel> projects = new HashMap<>();
 
-        for (TimeboardEvent event : userNotificationStructure.getNotificationEventList()) {
+        for (final TimeboardEvent event : userNotificationStructure.getNotificationEventList()) {
             if (event instanceof TaskEvent) {
-                Task t = ((TaskEvent) event).getTask();
+                final Task t = ((TaskEvent) event).getTask();
                 if (((TaskEvent) event).getEventType() == TimeboardEventType.CREATE) {
                     projects.computeIfAbsent(t.getProject().getId(), e ->
                             new ProjectEmailSummaryModel(t.getProject())).addCreatedTask((TaskEvent) event);
@@ -94,7 +96,7 @@ public class SendSummaryEmail {
             } else if (event instanceof TimesheetEvent) {
                 submittedTimesheets.add(((TimesheetEvent) event).getTimesheet());
             } else if (event instanceof VacationEvent) {
-                vacationEvents.add(((VacationEvent) event));
+                vacationEvents.add((VacationEvent) event);
             }
 
         }
@@ -105,10 +107,10 @@ public class SendSummaryEmail {
         data.put("vacationEventsDenied", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DENY)).toArray());
         data.put("vacationEventsDeleted", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DELETE)).toArray());
 
-        String message = templateGenerator.getTemplateString("mail/summary.html", data);
-        ArrayList<String> list = new ArrayList<>();
+        final String message = templateGenerator.getTemplateString("mail/summary.html", data);
+        final ArrayList<String> list = new ArrayList<>();
         list.add(userNotificationStructure.getTargetAccount().getEmail());
-        String subject = "[Timeboard] Daily summary";
+        final String subject = "[Timeboard] Daily summary";
         return new EmailStructure(list, null, subject, message);
     }
 
@@ -119,14 +121,14 @@ public class SendSummaryEmail {
      * @param events list of events
      * @return userNotificationStructure structure user 1 -- * events to notify/inform
      */
-    private List<UserNotificationStructure> notificationEventToUserEvent(List<TimeboardEvent> events) {
-        HashMap<Long, UserNotificationStructure> dataList = new HashMap<>();
+    private List<UserNotificationStructure> notificationEventToUserEvent(final List<TimeboardEvent> events) {
+        final HashMap<Long, UserNotificationStructure> dataList = new HashMap<>();
 
-        for (TimeboardEvent event : events) {
-            for (Account account : event.getUsersToNotify()) {
+        for (final TimeboardEvent event : events) {
+            for (final Account account : event.getUsersToNotify()) {
                 dataList.computeIfAbsent(account.getId(), t -> new UserNotificationStructure(account)).notify(event);
             }
-            for (Account account : event.getUsersToInform()) {
+            for (final Account account : event.getUsersToInform()) {
                 dataList.computeIfAbsent(account.getId(), t -> new UserNotificationStructure(account)).inform(event);
             }
         }

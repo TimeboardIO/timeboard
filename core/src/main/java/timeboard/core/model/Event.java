@@ -48,7 +48,7 @@ public class Event {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -56,7 +56,7 @@ public class Event {
         return comments;
     }
 
-    public void setComments(String comments) {
+    public void setComments(final String comments) {
         this.comments = comments;
     }
 
@@ -64,7 +64,7 @@ public class Event {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -72,7 +72,7 @@ public class Event {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(final Date endDate) {
         this.endDate = endDate;
     }
 
@@ -80,7 +80,7 @@ public class Event {
         return origin;
     }
 
-    public void setOrigin(String origin) {
+    public void setOrigin(final String origin) {
         this.origin = origin;
     }
 
@@ -88,7 +88,7 @@ public class Event {
         return remotePath;
     }
 
-    public void setRemotePath(String remotePath) {
+    public void setRemotePath(final String remotePath) {
         this.remotePath = remotePath;
     }
 
@@ -96,12 +96,12 @@ public class Event {
         return remoteId;
     }
 
-    public void setRemoteId(String remoteId) {
+    public void setRemoteId(final String remoteId) {
         this.remoteId = remoteId;
     }
 
     public Object clone() {
-        Event clone = new Event();
+        final Event clone = new Event();
         clone.setName(this.getName());
         clone.setComments(this.getComments());
         clone.setStartDate(this.getStartDate());

@@ -26,6 +26,7 @@ package timeboard.organization;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,18 +37,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 import timeboard.core.model.OrganizationMembership;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Component
@@ -55,7 +55,6 @@ import java.util.*;
 @RequestMapping(value = "/org", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OrganizationsRestAPI {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -66,10 +65,10 @@ public class OrganizationsRestAPI {
     private UserService userService;
 
     @GetMapping("/members/list")
-    public ResponseEntity getMembers(TimeboardAuthentication authentication,
-                                     HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity getMembers(final TimeboardAuthentication authentication,
+                                     final HttpServletRequest request) throws JsonProcessingException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -90,12 +89,12 @@ public class OrganizationsRestAPI {
         final Set<OrganizationMembership> members = organization.get().getMembers();
         final List<MemberWrapper> result = new ArrayList<>();
 
-        for (OrganizationMembership member : members) {
+        for (final OrganizationMembership member : members) {
 
             result.add(new MemberWrapper(
-                    member.getMember().getId(),
+                    member.getId(),
                     member.getMember().getScreenName(),
-                    (member.getRole() != null ? member.getRole().name() : ""),
+                    member.getRole() != null ? member.getRole().name() : "",
                     member.getCreationDate()
             ));
         }
@@ -105,20 +104,10 @@ public class OrganizationsRestAPI {
     }
 
     @GetMapping("/members/add")
-    public ResponseEntity addMember(TimeboardAuthentication authentication,
-                                    HttpServletRequest request) throws JsonProcessingException {
+    public ResponseEntity addMember(final TimeboardAuthentication authentication,
+                                    final HttpServletRequest request) throws JsonProcessingException {
 
-        Account actor = authentication.getDetails();
 
-        // Get current organization
-        final String strOrgID = request.getParameter("orgID");
-        Long orgID = null;
-        if (strOrgID != null) {
-            orgID = Long.parseLong(strOrgID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
-        }
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         // Get added member
         final String strMemberID = request.getParameter("memberID");
@@ -132,10 +121,15 @@ public class OrganizationsRestAPI {
 
         // Add member in current organization
         try {
-            Optional<Organization> newOrganization = organizationService.addMember(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
-            MemberWrapper memberWrapper = new MemberWrapper(memberID, member.getScreenName(), MembershipRole.CONTRIBUTOR.toString(), new Date());
+
+            final MemberWrapper memberWrapper = new MemberWrapper(
+                    memberID,
+                    member.getScreenName(),
+                    MembershipRole.CONTRIBUTOR.toString(),
+                    Calendar.getInstance());
+
             return ResponseEntity.status(HttpStatus.OK).body(memberWrapper);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
@@ -143,11 +137,11 @@ public class OrganizationsRestAPI {
     }
 
 
-    @GetMapping("/members/updateRole")
-    public ResponseEntity updateMemberRole(TimeboardAuthentication authentication,
-                                           HttpServletRequest request) throws JsonProcessingException {
+    @GetMapping("/members/remove")
+    public ResponseEntity removeMember(final TimeboardAuthentication authentication,
+                                       final HttpServletRequest request) throws BusinessException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
         final String strOrgID = request.getParameter("orgID");
         Long orgID = null;
@@ -156,7 +150,6 @@ public class OrganizationsRestAPI {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         final String strMemberID = request.getParameter("memberID");
         Long memberID = null;
@@ -168,55 +161,13 @@ public class OrganizationsRestAPI {
 
         final Account member = this.userService.findUserByID(memberID);
 
-
-        final String strRole = request.getParameter("role");
-        MembershipRole role = null;
-        if (strRole != null) {
-            role = MembershipRole.valueOf(strRole);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
-        }
+        this.organizationService.removeMembership(actor,
+                this.organizationService.getOrganizationByID(actor, orgID).get(),
+                member);
 
         try {
-            Optional<Organization> newOrganization = organizationService.updateMemberRole(actor, organization.get(), member, role);
-            return ResponseEntity.status(HttpStatus.OK).body(role);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-
-    }
-
-
-    @GetMapping("/members/remove")
-    public ResponseEntity removeMember(TimeboardAuthentication authentication,
-                                       HttpServletRequest request) {
-
-        Account actor = authentication.getDetails();
-
-        final String strOrgID = request.getParameter("orgID");
-        Long orgID = null;
-        if (strOrgID != null) {
-            orgID = Long.parseLong(strOrgID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
-        }
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
-
-        final String strMemberID = request.getParameter("memberID");
-        Long memberID = null;
-        if (strOrgID != null) {
-            memberID = Long.parseLong(strMemberID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
-        }
-
-        final Account member = this.userService.findUserByID(memberID);
-
-        try {
-            Optional<Organization> newOrganization = organizationService.removeMember(actor, organization.get(), member);
-
             return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
@@ -226,19 +177,21 @@ public class OrganizationsRestAPI {
         public Long id;
         public String screenName;
         public String role;
-        public java.util.Date creationDate;
+
+        @JsonFormat(pattern = "yyyy-MM-dd")
+        public java.util.Calendar creationDate;
 
         public MemberWrapper() {
         }
 
-        public MemberWrapper(OrganizationMembership h) {
+        public MemberWrapper(final OrganizationMembership h) {
             this.id = h.getMember().getId();
             this.screenName = h.getMember().getScreenName();
             this.role = h.getRole().name();
             this.creationDate = h.getCreationDate();
         }
 
-        public MemberWrapper(Long memberID, String screenName, String role, java.util.Date date) {
+        public MemberWrapper(final Long memberID, final String screenName, final String role, final java.util.Calendar date) {
             this.id = memberID;
             this.screenName = screenName;
             this.role = role;

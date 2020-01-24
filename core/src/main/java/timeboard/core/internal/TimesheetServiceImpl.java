@@ -29,20 +29,22 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.*;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimeboardSubjects;
+import timeboard.core.api.TimesheetService;
+import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
-import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
+import java.util.*;
 
 
 @Component
@@ -55,9 +57,6 @@ public class TimesheetServiceImpl implements TimesheetService {
     private EntityManager em;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private ProjectService projectService;
 
     @Autowired
@@ -65,108 +64,120 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
-    public void submitTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week)
+    public SubmittedTimesheet submitTimesheet(
+            final Account actor,
+            final Account accountTimesheet,
+            final Organization currentOrg,
+            final int year,
+            final int week)
             throws BusinessException {
 
-        //check if submission is possible
-        //1 - last week is submitted
+        final Calendar beginWorkDate = this.organizationService
+                .findOrganizationMembership(actor, currentOrg).get().getCreationDate();
 
-        final Calendar c = Calendar.getInstance();
+        final int dayInFirstWeek = beginWorkDate.get(Calendar.DAY_OF_WEEK);
+        final boolean firstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR)
+                == week && beginWorkDate.get(Calendar.YEAR) == year;
 
-        c.setTime(this.organizationService.findOrganizationMembership(actor, currentOrg).get().getCreationDate());
+        final Calendar previousWeek = Calendar.getInstance();
+        previousWeek.set(Calendar.WEEK_OF_YEAR, week);
+        previousWeek.set(Calendar.YEAR, year);
+        previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
+        previousWeek.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
-        int dayInFirstWeek = c.get(Calendar.DAY_OF_WEEK);
-        boolean firstWeek = (c.get(Calendar.WEEK_OF_YEAR) == week) && (c.get(Calendar.YEAR) == year);
+        final ValidationStatus lastWeekSubmitted = this.getTimesheetValidationStatus(
+                currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
+                previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
-        c.setFirstDayOfWeek(Calendar.MONDAY);
-        c.set(Calendar.HOUR_OF_DAY, 2);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
-
-        boolean lastWeekSubmitted = this.isTimesheetSubmitted(
-                accountTimesheet,
-                c.get(Calendar.YEAR),
-                c.get(Calendar.WEEK_OF_YEAR));
-
-        if (!firstWeek && !lastWeekSubmitted) {
-            throw new TimesheetException("Can not submit this week, previous week is not submitted");
+        if (!firstWeek && lastWeekSubmitted == ValidationStatus.VALIDATED) {
+            throw new TimesheetException("Can not submit this week, previous week is not validated");
         }
 
-        //2 - all imputation day sum == 1
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
+        final Calendar firstDay = Calendar.getInstance();
+        firstDay.set(Calendar.WEEK_OF_YEAR, week);
+        firstDay.set(Calendar.YEAR, year);
+        firstDay.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        firstDay.set(Calendar.HOUR_OF_DAY, 0);
+        firstDay.set(Calendar.MINUTE, 0);
+        firstDay.set(Calendar.SECOND, 0);
+        firstDay.set(Calendar.MILLISECOND, 0);
 
+        final Calendar lastDay = (Calendar) firstDay.clone();
+        lastDay.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
 
-        Boolean result = true;
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
-        c.setFirstDayOfWeek(Calendar.MONDAY);
-        c.set(Calendar.DAY_OF_WEEK, 2);
-        int firstDay =2;
-        if(firstWeek){
-            c.set(Calendar.DAY_OF_WEEK, dayInFirstWeek);
-            c.setFirstDayOfWeek(dayInFirstWeek);
-            firstDay = dayInFirstWeek;
+        if (firstWeek) {
+            firstDay.set(Calendar.DAY_OF_WEEK, dayInFirstWeek);
+            firstDay.setFirstDayOfWeek(dayInFirstWeek);
         }
 
-        for ( int i = firstDay -1 ; i <= 5; i++) {
+        final Calendar currentDay = (Calendar) firstDay.clone();
 
-            TypedQuery<Double> q = em.createQuery("select COALESCE(sum(value),0) " +
-                    "from Imputation i where i.account = :user and i.day = :day ", Double.class);
+        final long nbDays = ChronoUnit.DAYS.between(firstDay.toInstant(), lastDay.toInstant());
+        final Double expectedSum = nbDays + 1.0d;
 
-            q.setParameter("user", accountTimesheet);
-            q.setParameter("day", c.getTime());
-            final List<Double> resultList = q.getResultList();
-            if (!resultList.equals(null)){
-                result &= (resultList.get(0) == 1.0);
-            }
-            c.roll(Calendar.DAY_OF_WEEK, 1);
+        final List<Date> days = new ArrayList<>();
+
+        for (int i = 0; i <= nbDays; i++) {
+            days.add(currentDay.getTime());
+            currentDay.roll(Calendar.DAY_OF_WEEK, 1);
         }
-        boolean allDailyImputationTotalsAreOne = result;
 
-        if (!allDailyImputationTotalsAreOne) {
+        final TypedQuery<Double> q = em.createNamedQuery(
+                Imputation.SUM_IMPUTATIONS_BY_USER_AND_WEEK, Double.class);
+
+        q.setParameter("user", accountTimesheet);
+        q.setParameter("days", days);
+        q.setParameter("orgID", currentOrg.getId());
+        final Double result = q.getSingleResult();
+
+        if (!result.equals(expectedSum)) {
             throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
 
-        SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
+        final SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
         submittedTimesheet.setAccount(accountTimesheet);
         submittedTimesheet.setYear(year);
         submittedTimesheet.setWeek(week);
+        submittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
 
         em.persist(submittedTimesheet);
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
-        LOGGER.info("Week " + week + " submit for user" + accountTimesheet.getName() + " by user " + actor.getName());
+        LOGGER.info("Timesheet for " + week + " submit for user"
+                + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
+
+        return submittedTimesheet;
 
     }
 
+
     @Override
-    @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
-    public boolean isTimesheetSubmitted(Account accountTimesheet, int year, int week) {
-        TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
+    public ValidationStatus getTimesheetValidationStatus(
+            final Long orgID,
+            final Account currentAccount,
+            final int year,
+            final int week) {
+
+        final TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year " +
+                "and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
+
         q.setParameter("week", week);
         q.setParameter("year", year);
-        q.setParameter("user", accountTimesheet);
+        q.setParameter("user", currentAccount);
+        q.setParameter("orgID", orgID);
 
         try {
-            q.getSingleResult();
-            return true;
-        } catch (Exception e) {
-            return false;
+            return q.getSingleResult();
+        } catch (final Exception e) {
+            return ValidationStatus.DRAFT;
         }
     }
 
     @Override
-    public double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, Account account) {
-        TypedQuery<Double> q = em.createQuery(
+    public double getAllImputationsForAccountOnDateRange(final Date firstDayOfWeek, final Date lastDayOfWeek, final Account account) {
+        final TypedQuery<Double> q = em.createQuery(
                 "SELECT COALESCE(sum(i.value),0) \n"
                         + "FROM Imputation i\n"
                         + "WHERE i.account = :user \n"
@@ -180,8 +191,13 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, Account user, Project project) {
-        TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
+    public Map<Integer, Double> getProjectImputationsForAccountOnDateRange(
+            final Date startDate,
+            final Date endDate,
+            final Account user,
+            final Project project) {
+
+        final TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
                 "SELECT DAY(day), COALESCE(sum(i.value),0) \n"
                         + "FROM Imputation i JOIN Task t ON i.task_id = t.id \n"
                         + "WHERE i.account_id = :user \n"
@@ -193,10 +209,10 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("startDate", startDate);
         q.setParameter("endDate", endDate);
         q.setParameter("user", user.getId());
-        List<Object[]> dayImputations = q.getResultList();
+        final List<Object[]> dayImputations = q.getResultList();
 
-        Map<Integer, Double> result = new HashMap<>();
-        for (Object[] o : dayImputations) {
+        final Map<Integer, Double> result = new HashMap<>();
+        for (final Object[] o : dayImputations) {
             result.put((int) o[0], (double) o[1]);
         }
 
@@ -205,8 +221,13 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, Account user, AbstractTask task) {
-        TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
+    public Map<Integer, Double> getTaskImputationsForAccountOnDateRange(
+            final Date startDate,
+            final Date endDate,
+            final Account user,
+            final AbstractTask task) {
+
+        final TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
                 "SELECT DAY(day), COALESCE(i.value,0) \n"
                         + "FROM Imputation i\n"
                         + "WHERE i.account_id = :user \n"
@@ -218,11 +239,11 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("startDate", startDate);
         q.setParameter("endDate", endDate);
         q.setParameter("user", user.getId());
-        List<Object[]> dayImputations = q.getResultList();
+        final List<Object[]> dayImputations = q.getResultList();
 
-        Map<Integer, Double> result = new HashMap<>();
+        final Map<Integer, Double> result = new HashMap<>();
 
-        for (Object[] o : dayImputations) {
+        for (final Object[] o : dayImputations) {
             result.put((int) o[0], (double) o[1]);
         }
 

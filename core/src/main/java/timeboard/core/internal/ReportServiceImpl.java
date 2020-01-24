@@ -62,10 +62,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public Report createReport(Account owner, String reportName, Account organization,
-                               ReportType type, String filterProject) {
-        Account ownerAccount = this.em.find(Account.class, owner.getId());
-        Report newReport = new Report();
+    public Report createReport(final Account owner, final String reportName, final Account organization,
+                               final ReportType type, final String filterProject) {
+        final Report newReport = new Report();
         newReport.setName(reportName);
         newReport.setType(type);
         newReport.setFilterProject(filterProject);
@@ -76,29 +75,29 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> listReports(Account owner) {
-        TypedQuery<Report> query = em.createQuery("select r from Report r", Report.class);
+    public List<Report> listReports(final Account owner) {
+        final TypedQuery<Report> query = em.createQuery("select r from Report r", Report.class);
         return query.getResultList();
     }
 
     @Override
-    public Report updateReport(Account owner, Report report) {
+    public Report updateReport(final Account owner, final Report report) {
         em.merge(report);
         em.flush();
         return report;
     }
 
     @Override
-    public Report getReportByID(Account actor, Long reportId) {
-        Report data = em.createQuery("select r from Report r where r.id = :reportId", Report.class)
+    public Report getReportByID(final Account actor, final Long reportId) {
+        final Report data = em.createQuery("select r from Report r where r.id = :reportId", Report.class)
                 .setParameter("reportId", reportId)
                 .getSingleResult();
         return data;
     }
 
     @Override
-    public void deleteReportByID(Account actor, Long reportId) {
-        Report report = em.find(Report.class, reportId);
+    public void deleteReportByID(final Account actor, final Long reportId) {
+        final Report report = em.find(Report.class, reportId);
         em.remove(report);
         em.flush();
 
@@ -106,7 +105,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions){
+    public List<ProjectWrapper> findProjects(final Account actor, final Long orgID, final List<String> expressions) {
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -132,7 +131,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report) {
+    public List<ProjectWrapper> findProjects(final Account actor, final Long orgID, final Report report) {
         return this.findProjects(actor, orgID, Arrays.asList(report.getFilterProject().split("\n")));
     }
 
@@ -143,11 +142,7 @@ public class ReportServiceImpl implements ReportService {
                 .anyMatch(aBoolean -> aBoolean == true);
     }
 
-    private ProjectWrapper wrapProjectTags(Project project) {
-        List<TagWrapper> tags = project.getTags()
-                .stream()
-                .map(tag -> new TagWrapper(tag.getTagKey(), tag.getTagValue()))
-                .collect(Collectors.toList());
+    private ProjectWrapper wrapProjectTags(final Project project) {
         return new ProjectWrapper(project);
     }
 

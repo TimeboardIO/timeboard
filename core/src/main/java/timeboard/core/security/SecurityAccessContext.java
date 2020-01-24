@@ -12,10 +12,10 @@ package timeboard.core.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,7 +33,7 @@ public class SecurityAccessContext {
     private Object action;
     private Object environment;
 
-    public SecurityAccessContext(Object subject, Object resource, Object action, Object environment) {
+    public SecurityAccessContext(final Object subject, final Object resource, final Object action, final Object environment) {
         super();
         this.subject = subject;
         this.resource = resource;
@@ -45,7 +45,7 @@ public class SecurityAccessContext {
         return subject;
     }
 
-    public void setSubject(Object subject) {
+    public void setSubject(final Object subject) {
         this.subject = subject;
     }
 
@@ -53,7 +53,7 @@ public class SecurityAccessContext {
         return resource;
     }
 
-    public void setResource(Object resource) {
+    public void setResource(final Object resource) {
         this.resource = resource;
     }
 
@@ -61,7 +61,7 @@ public class SecurityAccessContext {
         return action;
     }
 
-    public void setAction(Object action) {
+    public void setAction(final Object action) {
         this.action = action;
     }
 
@@ -69,7 +69,7 @@ public class SecurityAccessContext {
         return environment;
     }
 
-    public void setEnvironment(Object environment) {
+    public void setEnvironment(final Object environment) {
         this.environment = environment;
     }
 
@@ -85,7 +85,7 @@ public class SecurityAccessContext {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
         }
@@ -95,10 +95,16 @@ public class SecurityAccessContext {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        SecurityAccessContext other = (SecurityAccessContext) obj;
-        if (equalsAction(action)) {return false;}
-        if (equalsAction(environment)) {return false;}
-        if (equalsAction(resource)) {return false;}
+        final SecurityAccessContext other = (SecurityAccessContext) obj;
+        if (equalsAction(action)) {
+            return false;
+        }
+        if (equalsAction(environment)) {
+            return false;
+        }
+        if (equalsAction(resource)) {
+            return false;
+        }
         if (subject == null) {
             return other.subject == null;
         } else {
@@ -106,7 +112,7 @@ public class SecurityAccessContext {
         }
     }
 
-    private boolean equalsAction(Object action) {
+    private boolean equalsAction(final Object action) {
         if (action == null) {
             if (action != null) {
                 return true;

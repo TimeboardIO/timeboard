@@ -48,7 +48,7 @@ public class ProjectTag extends OrganizationEntity implements Serializable {
     public ProjectTag() {
     }
 
-    public ProjectTag(String tagKey, String tagValue, Project project) {
+    public ProjectTag(final String tagKey, final String tagValue, final Project project) {
         this.tagKey = tagKey;
         this.tagValue = tagValue;
         this.project = project;
@@ -58,7 +58,7 @@ public class ProjectTag extends OrganizationEntity implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -66,7 +66,7 @@ public class ProjectTag extends OrganizationEntity implements Serializable {
         return tagKey;
     }
 
-    public void setTagKey(String tagKey) {
+    public void setTagKey(final String tagKey) {
         this.tagKey = tagKey;
     }
 
@@ -74,7 +74,7 @@ public class ProjectTag extends OrganizationEntity implements Serializable {
         return tagValue;
     }
 
-    public void setTagValue(String tagValue) {
+    public void setTagValue(final String tagValue) {
         this.tagValue = tagValue;
     }
 
@@ -82,7 +82,7 @@ public class ProjectTag extends OrganizationEntity implements Serializable {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(final Project project) {
         this.project = project;
     }
 }

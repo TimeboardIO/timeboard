@@ -40,7 +40,7 @@ public class TaskEvent extends TimeboardEvent {
     private TimeboardEventType eventType;
 
 
-    public TaskEvent(TimeboardEventType eventType, Task task, Account actor) {
+    public TaskEvent(final TimeboardEventType eventType, final Task task, final Account actor) {
         super(new Date());
         this.eventType = eventType;
         this.task = task;
@@ -53,7 +53,7 @@ public class TaskEvent extends TimeboardEvent {
         return eventType;
     }
 
-    public void setEventType(TimeboardEventType eventType) {
+    public void setEventType(final TimeboardEventType eventType) {
         this.eventType = eventType;
     }
 
@@ -61,7 +61,7 @@ public class TaskEvent extends TimeboardEvent {
         return task;
     }
 
-    public void setTask(Task task) {
+    public void setTask(final Task task) {
         this.task = task;
     }
 
@@ -69,14 +69,14 @@ public class TaskEvent extends TimeboardEvent {
         return actor;
     }
 
-    public void setActor(Account actor) {
+    public void setActor(final Account actor) {
         this.actor = actor;
     }
 
 
     private void constructUsersList() {
-        Project project = task.getProject();
-        Account assignedAccount = task.getAssigned();
+        final Project project = task.getProject();
+        final Account assignedAccount = task.getAssigned();
 
         project.getMembers()
                 .stream()

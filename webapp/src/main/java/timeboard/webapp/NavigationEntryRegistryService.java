@@ -41,7 +41,7 @@ public class NavigationEntryRegistryService {
 
     //ex : @PostFilter("hasPermission(filterObject,'NAVIGATION_VIEW')")
     public List<NavigationExtPoint> getEntries() {
-        this.entries.sort(Comparator.comparing(o -> ((Integer) o.getNavigationWeight())));
+        this.entries.sort(Comparator.comparing(o -> (Integer) o.getNavigationWeight()));
         return this.entries;
     }
 

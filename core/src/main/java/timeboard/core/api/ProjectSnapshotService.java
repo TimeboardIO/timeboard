@@ -40,6 +40,7 @@ public interface ProjectSnapshotService {
     /*
     === ProjectSnapshots ===
     */
+
     /**
      * Create a ProjectSnapshot for the current project
      *

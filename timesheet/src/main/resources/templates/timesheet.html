@@ -82,6 +82,7 @@
         </div>
     </script>
 
+
     <!-- Timesheet Vue App view -->
 
     <div class="ui inverted dimmer">
@@ -100,7 +101,8 @@
 
 
             <div class="actions">
-                <div v-if="submitted === false" v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
+                <div v-if="isTimesheetHasState(['DRAFT','REJECTED'])"
+                     v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
                      data-position="right center">
                     <button
                             v-bind:data-week="week"
@@ -111,16 +113,22 @@
                         Submit My Week
                     </button>
                 </div>
-                <div v-if="submitted === true" >
-                    <button class="ui positive button disabled">
-                        Week submitted
-                    </button>
+                <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
+                    <div class="ui orange label">
+                        Pending validation
+                    </div>
                 </div>
-                <button v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
+                <div v-if="isTimesheetHasState(['VALIDATED'])">
+                    <div class="ui green label">
+                        Week validated
+                    </div>
+                </div>
+                <button
+                        v-if="isTimesheetHasState(['DRAFT','REJECTED'])"
+                        v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
                     New Task
                 </button>
             </div>
-
 
 
             <a class="ui labeled icon button" v-bind:href="'/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week)" :class="{ disabled : disablePrev }">
@@ -132,7 +140,7 @@
                 <i class="right arrow icon"></i>Next week</a>
         </div>
 
-            <fieldset v-bind:disabled="submitted === true">
+            <fieldset v-bind:disabled="isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])">
                 <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
 
                     <table class="ui celled table" style="text-align:center">

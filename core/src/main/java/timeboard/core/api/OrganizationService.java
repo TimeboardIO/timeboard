@@ -55,26 +55,24 @@ public interface OrganizationService {
     Optional<Organization> getOrganizationByName(
             final String organisationName);
 
-    Organization updateOrganization(
+    Optional<Organization> updateOrganization(
             final Account actor,
             final Organization organization);
 
-    Optional<Organization> removeMember(
+    Optional<Organization> removeMembership(
             final Account actor,
             final Organization organization,
             final Account member) throws BusinessException;
 
-    Optional<Organization> addMember(
+    Optional<Organization> addMembership(
             final Account actor,
             final Organization organization,
             final Account member,
             final MembershipRole role) throws BusinessException;
 
-    Optional<Organization> updateMemberRole(
+    Optional<Organization> updateMembership(
             final Account actor,
-            final Organization organization,
-            final Account member,
-            final MembershipRole role) throws BusinessException;
+            final OrganizationMembership membership) throws BusinessException;
 
 
     Optional<OrganizationMembership> findOrganizationMembership(
@@ -83,7 +81,11 @@ public interface OrganizationService {
 
     Optional<OrganizationMembership> findOrganizationMembership(
             final Account actor,
-            final Long organizationID) throws BusinessException;
+            final Long organizationID);
+
+    Optional<OrganizationMembership> findOrganizationMembershipById(
+            final Account details,
+            final Long membershipID);
 
 
     /*
@@ -151,7 +153,6 @@ public interface OrganizationService {
             final Account actor,
             final TaskType type);
 
-    //TODO remove when migration is ok
     boolean checkOrganizationVacationTask(
             final String taskName);
 

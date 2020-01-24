@@ -60,29 +60,29 @@ public class EmailServiceImpl implements EmailService {
 
 
     @Override
-    public void sendMessage(EmailStructure emailStructure) throws MessagingException {
-        Properties props = new Properties();
+    public void sendMessage(final EmailStructure emailStructure) throws MessagingException {
+        final Properties props = new Properties();
         props.setProperty("mail.host", host);
         props.setProperty("mail.smtp.port", port);
         props.setProperty("mail.smtp.username", username);
         props.setProperty("mail.smtp.password", password);
 
-        Session session = Session.getInstance(props, null);
+        final Session session = Session.getInstance(props, null);
 
-        MimeMessage msg = new MimeMessage(session);
+        final MimeMessage msg = new MimeMessage(session);
         msg.setSubject(emailStructure.getSubject());
         msg.setFrom(new InternetAddress(fromEmail));
         msg.setContent(emailStructure.getMessage(), "text/html; charset=utf-8");
 
-        List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList()
+        final List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList()
                 .stream().distinct().collect(Collectors.toList());
-        String targetToEmails = StringUtils.join(listToEmailsWithoutDuplicate, ',');
+        final String targetToEmails = StringUtils.join(listToEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetToEmails));
 
         if (emailStructure.getTargetCCUserList() != null) {
-            List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList()
+            final List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList()
                     .stream().distinct().collect(Collectors.toList());
-            String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
+            final String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
             msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
         }
         Transport.send(msg);

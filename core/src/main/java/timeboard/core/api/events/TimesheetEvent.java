@@ -27,7 +27,10 @@ package timeboard.core.api.events;
  */
 
 import timeboard.core.api.ProjectService;
-import timeboard.core.model.*;
+import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
+import timeboard.core.model.SubmittedTimesheet;
 
 import java.util.Date;
 import java.util.List;
@@ -38,7 +41,7 @@ public class TimesheetEvent extends TimeboardEvent {
     private SubmittedTimesheet timesheet;
 
 
-    public TimesheetEvent(SubmittedTimesheet timesheet, ProjectService projectService, Organization currentOrg) {
+    public TimesheetEvent(final SubmittedTimesheet timesheet, final ProjectService projectService, final Organization currentOrg) {
         super(new Date());
 
         this.timesheet = timesheet;

@@ -34,8 +34,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.*;
-import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
+import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.model.AbstractTask;
 import timeboard.core.model.Account;
 import timeboard.core.model.Task;
@@ -45,10 +47,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 
 @Controller
@@ -59,62 +59,34 @@ public class TimesheetController {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
-    private  ProjectService projectService;
+    private ProjectService projectService;
 
     @Autowired
-    private  TimesheetService timesheetService;
+    private TimesheetService timesheetService;
 
     @Autowired
     private OrganizationService organizationService;
 
-
-    private int findLastWeekYear(Calendar c, int week, int year) {
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
-        if(c.get(Calendar.WEEK_OF_YEAR) > week){
-            c.roll(Calendar.YEAR, -1);  // remove one year
-        }
-        return c.get(Calendar.YEAR);
-    }
-
-    private int findLastWeek(Calendar c, int week, int year) {
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
-        return c.get(Calendar.WEEK_OF_YEAR);
-    }
-
-    private Date findStartDate(Calendar c, int week, int year) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        return c.getTime();
-    }
-
-    private Date findEndDate(Calendar c, int week, int year) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        return c.getTime();
-    }
-
     @GetMapping
-    protected String currentWeekTimesheet(TimeboardAuthentication authentication, Model model) throws Exception {
-        Calendar c = Calendar.getInstance();
-        return this.handleGet(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+    protected String currentWeekTimesheet(final TimeboardAuthentication authentication, final Model model) throws Exception {
+        final Calendar c = Calendar.getInstance();
+        return this.fillAndDisplayTimesheetPage(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
     @GetMapping("/{year}/{week}")
-    protected String handleGet(TimeboardAuthentication authentication,
-                               @PathVariable("year") int year, @PathVariable("week") int week, Model model) throws Exception {
+    protected String fillAndDisplayTimesheetPage(
+            final TimeboardAuthentication authentication,
+            @PathVariable("year") final int year,
+            @PathVariable("week") final int week,
+            final Model model) throws Exception {
 
 
-        final List<ProjectTasks> tasksByProject = new ArrayList<>();
-        Account acc = authentication.getDetails();
 
-        final Date beginWorkDateForCurrentOrg = this.organizationService
+        final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
                 .get().getCreationDate();
 
-        final Calendar c = Calendar.getInstance();
-        c.setTime(beginWorkDateForCurrentOrg);
+        final Calendar c = beginWorkDateForCurrentOrg;
 
 
         c.set(Calendar.WEEK_OF_YEAR, week);
@@ -124,21 +96,18 @@ public class TimesheetController {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
 
-        if(c.getTime().getTime() < beginWorkDateForCurrentOrg.getTime() ){
-            throw new BusinessException("You cannot access your timesheet before you register. ");
-        }
-
-        final Date ds = findStartDate(c, week, year);
-        final Date de = findEndDate(c, week, year);
-        final int lastWeek = findLastWeek(c, week, year);
-        final int lastWeekYear = findLastWeekYear(c, week, year);
-        final boolean lastWeekSubmitted =
-                    this.timesheetService.isTimesheetSubmitted(authentication.getDetails(), lastWeekYear, lastWeek);
+        final int lastWeek = this.findLastWeek(c, week, year);
+        final int lastWeekYear = this.findLastWeekYear(c, week, year);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("actorID", authentication.getDetails().getId());
-        model.addAttribute("lastWeekSubmitted", lastWeekSubmitted);
+        model.addAttribute("lastWeekSubmitted",
+                this.timesheetService.getTimesheetValidationStatus(
+                        authentication.getCurrentOrganization(),
+                        authentication.getDetails(),
+                        lastWeekYear,
+                        lastWeek));
 
         model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
 
@@ -150,25 +119,26 @@ public class TimesheetController {
     }
 
     @PostMapping
-    protected void doPost(TimeboardAuthentication authentication,
-                          HttpServletRequest request, HttpServletResponse response) {
+    protected void doPost(final TimeboardAuthentication authentication,
+                          final HttpServletRequest request, final HttpServletResponse response) {
 
         try {
             final Account actor = authentication.getDetails();
-            String type = request.getParameter("type");
-            Long taskID = Long.parseLong(request.getParameter("task"));
-            AbstractTask task = this.projectService.getTaskByID(actor, taskID);
+            final String type = request.getParameter("type");
+            final Long taskID = Long.parseLong(request.getParameter("task"));
+            final AbstractTask task = this.projectService.getTaskByID(actor, taskID);
 
             UpdatedTaskResult updatedTask = null;
 
             if (type.equals("imputation")) {
-                Date day = DATE_FORMAT.parse(request.getParameter("day"));
-                double imputation = Double.parseDouble(request.getParameter("imputation"));
-                updatedTask = this.projectService.updateTaskImputation(actor, task, day, imputation);
+                final Date day = DATE_FORMAT.parse(request.getParameter("day"));
+                final double imputation = Double.parseDouble(request.getParameter("imputation"));
+                updatedTask = this.projectService.updateTaskImputation(
+                        authentication.getCurrentOrganization(), actor, task, day, imputation);
             }
 
             if (type.equals("effortLeft")) {
-                double effortLeft = Double.parseDouble(request.getParameter("imputation"));
+                final double effortLeft = Double.parseDouble(request.getParameter("imputation"));
                 updatedTask = this.projectService.updateTaskEffortLeft(actor, (Task) task, effortLeft);
             }
 
@@ -176,12 +146,28 @@ public class TimesheetController {
             response.setContentType("application/json");
             MAPPER.writeValue(response.getWriter(), updatedTask);
 
-        } catch (Exception e) {
+        } catch (final Exception e) {
             response.setStatus(500);
         }
 
     }
 
+    private int findLastWeekYear(final Calendar c, final int week, final int year) {
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        if (c.get(Calendar.WEEK_OF_YEAR) > week) {
+            c.roll(Calendar.YEAR, -1);  // remove one year
+        }
+        return c.get(Calendar.YEAR);
+    }
+
+    private int findLastWeek(final Calendar c, final int week, final int year) {
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        return c.get(Calendar.WEEK_OF_YEAR);
+    }
 
     private class DateWrapper {
 
@@ -192,7 +178,7 @@ public class TimesheetController {
             return day;
         }
 
-        public void setDay(String day) {
+        public void setDay(final String day) {
             this.day = day;
         }
 
@@ -200,7 +186,7 @@ public class TimesheetController {
             return date;
         }
 
-        public void setDate(Date date) {
+        public void setDate(final Date date) {
             this.date = date;
         }
     }

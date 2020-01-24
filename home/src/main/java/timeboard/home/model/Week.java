@@ -26,25 +26,27 @@ package timeboard.home.model;
  * #L%
  */
 
+import timeboard.core.model.ValidationStatus;
+
 public class Week {
 
     private int number;
     private int year;
     private double imputationSum;
-    private Boolean isValidated;
+    private ValidationStatus validationStatus;
 
-    public Week(int number, int year, double imputationSum, Boolean isValidated) {
+    public Week(final int number, final int year, final double imputationSum, final ValidationStatus vs) {
         this.number = number;
         this.year = year;
         this.imputationSum = imputationSum;
-        this.isValidated = isValidated;
+        this.validationStatus = vs;
     }
 
     public int getNumber() {
         return number;
     }
 
-    public void setNumber(int number) {
+    public void setNumber(final int number) {
         this.number = number;
     }
 
@@ -52,7 +54,7 @@ public class Week {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(final int year) {
         this.year = year;
     }
 
@@ -60,16 +62,15 @@ public class Week {
         return imputationSum;
     }
 
-    public void setImputationSum(double imputationSum) {
+    public void setImputationSum(final double imputationSum) {
         this.imputationSum = imputationSum;
     }
 
-    public Boolean getIsValidated() {
-        return isValidated;
+    public ValidationStatus getValidationStatus() {
+        return validationStatus;
     }
 
-    public void setIsValidated(Boolean validated) {
-        isValidated = validated;
+    public void setValidationStatus(final ValidationStatus validationStatus) {
+        this.validationStatus = validationStatus;
     }
-
 }
