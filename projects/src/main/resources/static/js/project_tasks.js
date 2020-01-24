@@ -317,7 +317,6 @@ let app = new Vue({
                     task.status = 'IN_PROGRESS';
                     self.taskList.find(e => e.taskID === task.taskID).status = 'IN_PROGRESS';
                     event.target.classList.toggle('loading');
-                   // self.taskListConfig.data = self.taskList.filter(r => r.status === 'PENDING');
                 });
         },
         denyTask: function(event, task) {
@@ -328,7 +327,6 @@ let app = new Vue({
                     self.taskList.find(e => e.taskID === task.taskID).status = 'REFUSED';
                     task.status = 'REFUSED';
                     event.target.classList.toggle('loading');
-                   // self.taskListConfig.data = self.taskList.filter(r => r.status === 'PENDING');
                 });
         },
         deleteTask: function(event, task) {
@@ -359,9 +357,6 @@ let app = new Vue({
                 url: "/api/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
                 success: function (d) {
                     self.batches = d;
-                    /*d.forEach(function(batch) {
-                        self.tableByBatch[batch.batchID] = Object.assign({}, self.table );
-                    });*/
                 }
             });
         }
