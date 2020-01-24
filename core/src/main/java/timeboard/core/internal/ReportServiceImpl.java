@@ -38,7 +38,6 @@ import timeboard.core.api.ReportService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
-import timeboard.core.model.ReportType;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -63,7 +62,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional
     public Report createReport(final Account owner, final String reportName, final Account organization,
-                               final ReportType type, final String filterProject) {
+                               final String type, final String filterProject) {
         final Report newReport = new Report();
         newReport.setName(reportName);
         newReport.setType(type);

@@ -29,7 +29,6 @@ package timeboard.core.api;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
-import timeboard.core.model.ReportType;
 
 import java.beans.Transient;
 import java.util.List;
@@ -39,7 +38,7 @@ public interface ReportService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
-    Report createReport(Account owner, String reportName, Account organization, ReportType type, String filterProject);
+    Report createReport(Account owner, String reportName, Account organization, String type, String filterProject);
 
     List<Report> listReports(Account owner);
 

@@ -26,8 +26,6 @@ package timeboard.reports;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,19 +34,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
-import timeboard.core.model.ReportType;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -56,18 +55,20 @@ import java.util.stream.Collectors;
 @RequestMapping("/reports")
 public class ReportsController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     @Autowired
     private ReportService reportService;
 
     @Autowired
     private UserService userService;
 
+    @Autowired(required = false)
+    private List<ReportController> reportControllers;
+
     @GetMapping
     protected String handleGet() {
         return "reports.html";
     }
+
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<List<ReportDecorator>> reportList(final TimeboardAuthentication authentication, final Model model) {
@@ -81,7 +82,7 @@ public class ReportsController {
 
     @GetMapping("/create")
     protected String createReport(final Model model) throws ServletException, IOException {
-        model.addAttribute("allReportTypes", ReportType.values());
+        model.addAttribute("allReportTypes", this.reportControllers);
         model.addAttribute("report", new Report());
         model.addAttribute("action", "create");
 
@@ -126,7 +127,7 @@ public class ReportsController {
     @GetMapping("/edit/{reportID}")
     protected String editReport(final TimeboardAuthentication authentication,
                                 @PathVariable final long reportID, final Model model) {
-        model.addAttribute("allReportTypes", ReportType.values());
+        model.addAttribute("allReportTypes", this.reportControllers);
         model.addAttribute("reportID", reportID);
         model.addAttribute("action", "edit");
         model.addAttribute("report", this.reportService.getReportByID(authentication.getDetails(), reportID));
@@ -144,7 +145,7 @@ public class ReportsController {
 
         final Report updatedReport = this.reportService.getReportByID(organization, reportID);
         updatedReport.setName(report.getName());
-        updatedReport.setType(ReportType.PROJECT_KPI);
+        updatedReport.setType(report.getType());
         updatedReport.setFilterProject(report.getFilterProject());
 
         this.reportService.updateReport(actor, updatedReport);
@@ -153,10 +154,13 @@ public class ReportsController {
         return "redirect:/reports";
     }
 
-    @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity refreshProjectSelection(final TimeboardAuthentication authentication,
-                                                  @RequestBody final MultiValueMap<String, String> filterProjectsMap)
-            throws JsonProcessingException {
+    @PostMapping(value = "/refreshProjectSelection",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity refreshProjectSelection(
+            final TimeboardAuthentication authentication,
+            @RequestBody final MultiValueMap<String, String> filterProjectsMap) {
+
         final Account actor = authentication.getDetails();
 
         final String filterProjects = filterProjectsMap.getFirst("filter");
@@ -170,27 +174,53 @@ public class ReportsController {
         final List<ReportService.ProjectWrapper> projects = this.reportService
                 .findProjects(actor, authentication.getCurrentOrganization(), Arrays.asList(filters));
 
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
+        return ResponseEntity.ok(projects);
     }
 
     @GetMapping("/view/{reportID}")
-    protected String viewReport(final TimeboardAuthentication authentication,
-                                @PathVariable final long reportID, final Model model) {
-        model.addAttribute("reportID", reportID);
-        final ReportType type = this.reportService.getReportByID(authentication.getDetails(), reportID).getType();
-        model.addAttribute("reportType", type);
-        model.addAttribute("report", this.reportService.getReportByID(authentication.getDetails(), reportID));
+    public ModelAndView viewReport(
+            final TimeboardAuthentication authentication,
+            @PathVariable final long reportID) {
 
-        switch (type) {
-            case PROJECT_KPI:
-                return "view_report_kpi.html";
-            default:
-                return "";
+        final ModelAndView mav = new ModelAndView();
+
+        final Report report = this.reportService.getReportByID(authentication.getDetails(), reportID);
+
+        final Optional<ReportController> reportController = this.reportControllers.stream()
+                .filter(rc -> rc.reportID().equals(report.getType())).findFirst();
+
+        if(reportController.isPresent()){
+            mav.getModel().put("fragment", reportController.get().reportView());
         }
+
+        mav.getModel().put("report", report);
+        mav.getModel().put("reportController", reportController.get());
+        mav.setViewName("report_layout.html");
+
+        return mav;
+    }
+
+    @GetMapping("/view/{reportID}/data")
+    protected ResponseEntity viewReportData(
+            final TimeboardAuthentication authentication,
+            @PathVariable final long reportID) {
+
+        final Report report = this.reportService.getReportByID(authentication.getDetails(), reportID);
+        final Optional<ReportController> reportController = this.reportControllers
+                .stream()
+                .filter(rc -> rc.reportID().equals(report.getType()))
+                .findFirst();
+
+        if(reportController.isPresent()){
+            final Model model = reportController.get().getReportModel(authentication, report);
+            return ResponseEntity.ok(model);
+        }
+
+        return ResponseEntity.badRequest().build();
     }
 
 
-    private class ReportDecorator {
+    private static class ReportDecorator {
 
         private final Report report;
 

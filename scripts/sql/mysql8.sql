@@ -195,7 +195,7 @@
         organizationID bigint,
         filterProject varchar(255),
         name varchar(50),
-        type integer,
+        type varchar(255),
         primary key (id)
     ) engine=InnoDB;
 

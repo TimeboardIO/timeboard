@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+
+<html
+        xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta name="reportID" th:content="${report.id}"/>
+</head>
+<body>
+
+<div th:fragment="report">
+    <button class="ui button" id="rawDL">Download</button>
+    <script>
+        $("#rawDL").click(function(){
+            $.get("/reports/view/"+$("meta[name='reportID']").attr('content'), function(data){
+                console.log(data);
+            });
+        });
+    </script>
+</div>
+</body>
+</html>

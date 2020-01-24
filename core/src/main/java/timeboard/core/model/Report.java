@@ -44,18 +44,13 @@ public class Report extends OrganizationEntity implements Serializable {
     private String filterProject;
 
     @Column
-    private ReportType type;
+    private String type;
 
 
     public Report() {
-        this.type = ReportType.PROJECT_KPI;
     }
 
-    public Report(final String name, final ReportType type, final String filterProject) {
-        this.name = name;
-        this.type = type;
-        this.filterProject = filterProject;
-    }
+
 
     public Long getId() {
         return id;
@@ -81,11 +76,11 @@ public class Report extends OrganizationEntity implements Serializable {
         this.filterProject = filterProject;
     }
 
-    public ReportType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(final ReportType type) {
+    public void setType(final String type) {
         this.type = type;
     }
 }
