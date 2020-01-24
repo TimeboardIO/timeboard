@@ -103,11 +103,17 @@ public interface ProjectService {
                                                      Date endTaskDate) throws BusinessException;
 
 
-    UpdatedTaskResult updateTaskImputation(Account actor,
-                                           AbstractTask task,
-                                           Date day, double imputation) throws BusinessException;
+    UpdatedTaskResult updateTaskImputation(
+            final Long orgID,
+            final Account actor,
+            final AbstractTask task,
+            final Date day,
+            final double val) throws BusinessException;
 
-    List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList);
+    List<UpdatedTaskResult> updateTaskImputations(
+            final Long orgID,
+            final Account actor,
+            final List<Imputation> imputationsList);
 
 
 

@@ -29,10 +29,11 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.*;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimeboardSubjects;
+import timeboard.core.api.TimesheetService;
 import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
@@ -64,7 +65,6 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @CacheEvict(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
     public SubmittedTimesheet submitTimesheet(
             final Account actor,
             final Account accountTimesheet,
@@ -73,11 +73,12 @@ public class TimesheetServiceImpl implements TimesheetService {
             final int week)
             throws BusinessException {
 
-
-        final Calendar beginWorkDate = this.organizationService.findOrganizationMembership(actor, currentOrg).get().getCreationDate();
+        final Calendar beginWorkDate = this.organizationService
+                .findOrganizationMembership(actor, currentOrg).get().getCreationDate();
 
         final int dayInFirstWeek = beginWorkDate.get(Calendar.DAY_OF_WEEK);
-        final boolean firstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR) == week && beginWorkDate.get(Calendar.YEAR) == year;
+        final boolean firstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR)
+                == week && beginWorkDate.get(Calendar.YEAR) == year;
 
         final Calendar previousWeek = Calendar.getInstance();
         previousWeek.set(Calendar.WEEK_OF_YEAR, week);
@@ -85,13 +86,12 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
         previousWeek.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
-        final boolean lastWeekSubmitted = this.isTimesheetSubmitted(
-                accountTimesheet,
-                previousWeek.get(Calendar.YEAR),
+        final ValidationStatus lastWeekSubmitted = this.getTimesheetValidationStatus(
+                currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if (!firstWeek && !lastWeekSubmitted) {
-            throw new TimesheetException("Can not submit this week, previous week is not submitted");
+        if (!firstWeek && lastWeekSubmitted == ValidationStatus.VALIDATED) {
+            throw new TimesheetException("Can not submit this week, previous week is not validated");
         }
 
         final Calendar firstDay = Calendar.getInstance();
@@ -145,7 +145,8 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
-        LOGGER.info("Timesheet for " + week + " submit for user" + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
+        LOGGER.info("Timesheet for " + week + " submit for user"
+                + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
 
         return submittedTimesheet;
 
@@ -153,67 +154,16 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
-    public boolean isTimesheetSubmitted(final Account accountTimesheet, final int year, final int week) {
-        final Long currentOrg = ThreadLocalStorage.getCurrentOrgId();
-        final Optional<OrganizationMembership> organizationMembership =
-                this.organizationService.findOrganizationMembership(accountTimesheet, currentOrg);
+    public ValidationStatus getTimesheetValidationStatus(
+            final Long orgID,
+            final Account currentAccount,
+            final int year,
+            final int week) {
 
-        if (organizationMembership.isPresent()) {
-
-            final Calendar beginWorkDate = organizationMembership.get().getCreationDate();
-            final Calendar currentDate = Calendar.getInstance();
-            currentDate.set(Calendar.YEAR, year);
-            currentDate.set(Calendar.WEEK_OF_YEAR, week);
-            currentDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-
-            if (currentDate.before(beginWorkDate) && !this.isSameWeek(currentDate, beginWorkDate)) {
-                return true;
-            }
-        }
-
-        final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year and st.week = :week", SubmittedTimesheet.class);
-        q.setParameter("week", week);
-        q.setParameter("year", year);
-        q.setParameter("user", accountTimesheet);
-
-        try {
-            q.getSingleResult();
-            return true;
-        } catch (final Exception e) {
-            return false;
-        }
-
-    }
-
-    private boolean isSameWeek(final Calendar currentDate, final Calendar beginWorkDate) {
-        return
-                currentDate.get(Calendar.YEAR) == beginWorkDate.get(Calendar.YEAR)
-                        && currentDate.get(Calendar.WEEK_OF_YEAR) == beginWorkDate.get(Calendar.WEEK_OF_YEAR);
-    }
-
-    @Override
-    @Cacheable(value = "accountTimesheet", key = "#accountTimesheet.getId()+'-'+#year+'-'+#week")
-    public boolean isTimesheetValidated(final Account accountTimesheet, final int year, final int week) {
         final TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year and st.week = :week", ValidationStatus.class);
-        q.setParameter("week", week);
-        q.setParameter("year", year);
-        q.setParameter("user", accountTimesheet);
+                + "where st.account = :user and st.year = :year " +
+                "and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
 
-        try {
-            return q.getSingleResult() == ValidationStatus.VALIDATED;
-        } catch (final Exception e) {
-            return false;
-        }
-    }
-
-
-    @Override
-    public ValidationStatus getTimesheetValidationStatus(final Long orgID, final Account currentAccount, final int year, final int week) {
-        final TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
         q.setParameter("week", week);
         q.setParameter("year", year);
         q.setParameter("user", currentAccount);
@@ -227,7 +177,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public double getSumImputationForWeek(final Date firstDayOfWeek, final Date lastDayOfWeek, final Account account) {
+    public double getAllImputationsForAccountOnDateRange(final Date firstDayOfWeek, final Date lastDayOfWeek, final Account account) {
         final TypedQuery<Double> q = em.createQuery(
                 "SELECT COALESCE(sum(i.value),0) \n"
                         + "FROM Imputation i\n"
@@ -242,7 +192,12 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public Map<Integer, Double> getProjectImputationSumForDate(final Date startDate, final Date endDate, final Account user, final Project project) {
+    public Map<Integer, Double> getProjectImputationsForAccountOnDateRange(
+            final Date startDate,
+            final Date endDate,
+            final Account user,
+            final Project project) {
+
         final TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
                 "SELECT DAY(day), COALESCE(sum(i.value),0) \n"
                         + "FROM Imputation i JOIN Task t ON i.task_id = t.id \n"
@@ -267,7 +222,12 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Map<Integer, Double> getTaskImputationForDate(final Date startDate, final Date endDate, final Account user, final AbstractTask task) {
+    public Map<Integer, Double> getTaskImputationsForAccountOnDateRange(
+            final Date startDate,
+            final Date endDate,
+            final Account user,
+            final AbstractTask task) {
+
         final TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
                 "SELECT DAY(day), COALESCE(i.value,0) \n"
                         + "FROM Imputation i\n"

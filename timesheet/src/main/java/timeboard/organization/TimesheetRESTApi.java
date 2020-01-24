@@ -237,7 +237,12 @@ public class TimesheetRESTApi {
             if (request.type.equals("imputation")) {
                 final Date day = DATE_FORMAT.parse(request.day);
                 //double imputation = Double.parseDouble(imputationStr);
-                updatedTask = this.projectService.updateTaskImputation(actor, task, day, request.imputation);
+                updatedTask = this.projectService.updateTaskImputation(
+                        authentication.getCurrentOrganization(),
+                        actor,
+                        task,
+                        day,
+                        request.imputation);
             }
 
             if (request.type.equals("effortLeft")) {

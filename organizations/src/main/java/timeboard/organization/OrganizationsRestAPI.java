@@ -161,7 +161,7 @@ public class OrganizationsRestAPI {
 
         final Account member = this.userService.findUserByID(memberID);
 
-        this.organizationService.removeMember(actor,
+        this.organizationService.removeMembership(actor,
                 this.organizationService.getOrganizationByID(actor, orgID).get(),
                 member);
 

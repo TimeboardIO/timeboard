@@ -183,9 +183,15 @@ public class VacationsController {
                                          @PathVariable final VacationRequest vacationRequest) throws BusinessException {
         final Account actor = authentication.getDetails();
         if (vacationRequest instanceof RecursiveVacationRequest) {
-            this.vacationService.approveVacationRequest(actor, (RecursiveVacationRequest) vacationRequest);
+            this.vacationService.approveVacationRequest(
+                    authentication.getCurrentOrganization(),
+                    actor,
+                    (RecursiveVacationRequest) vacationRequest);
         } else {
-            this.vacationService.approveVacationRequest(actor, vacationRequest);
+            this.vacationService.approveVacationRequest(
+                    authentication.getCurrentOrganization(),
+                    actor,
+                    vacationRequest);
         }
 
         return this.listToValidateRequests(authentication);
@@ -214,9 +220,15 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("Cannot cancel started vacation.");
         } else {
             if (vacationRequest instanceof RecursiveVacationRequest) {
-                this.vacationService.deleteVacationRequest(actor, (RecursiveVacationRequest) vacationRequest);
+                this.vacationService.deleteVacationRequest(
+                        authentication.getCurrentOrganization(),
+                        actor,
+                        (RecursiveVacationRequest) vacationRequest);
             } else {
-                this.vacationService.deleteVacationRequest(actor, vacationRequest);
+                this.vacationService.deleteVacationRequest(
+                        authentication.getCurrentOrganization(),
+                        actor,
+                        vacationRequest);
             }
         }
 
