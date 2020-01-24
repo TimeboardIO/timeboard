@@ -82,17 +82,13 @@ public class OrganizationMembersController {
         return "org_members";
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list/{orgID}")
     public ResponseEntity getMembers(TimeboardAuthentication authentication,
-                                     HttpServletRequest request) throws JsonProcessingException {
+                                     @PathVariable final Long orgID) throws JsonProcessingException {
 
         final Account actor = authentication.getDetails();
 
-        final String strOrgID = request.getParameter("orgID");
-        Long orgID = null;
-        if (strOrgID != null) {
-            orgID = Long.parseLong(strOrgID);
-        } else {
+        if (orgID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
 
@@ -193,26 +189,19 @@ public class OrganizationMembersController {
 
     }
 
-    @GetMapping("/remove")
+    @GetMapping("/remove/{orgID}/{orgMemberID}")
     public ResponseEntity removeMember(TimeboardAuthentication authentication,
-                                       HttpServletRequest request) {
+                                       @PathVariable final Long orgID,
+                                       @PathVariable final Long orgMemberID) {
 
         final Account actor = authentication.getDetails();
 
-        final String strOrgID = request.getParameter("orgID");
-        Long orgID = null;
-        if (strOrgID != null) {
-            orgID = Long.parseLong(strOrgID);
-        } else {
+        if (orgID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
         }
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
-        final String strOrgMemberID = request.getParameter("memberID");
-        Long orgMemberID = null;
-        if (strOrgID != null) {
-            orgMemberID = Long.parseLong(strOrgMemberID);
-        } else {
+        if (orgMemberID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
         final OrganizationMembership organizationMembership =
