@@ -92,4 +92,8 @@ public interface TimesheetService {
             final Date endDate,
             final Account user,
             final AbstractTask task);
-}
+
+     Map<Account, List<SubmittedTimesheet>> getTimesheetsFromProject(Account actor, Project project);
+
+
+    }
