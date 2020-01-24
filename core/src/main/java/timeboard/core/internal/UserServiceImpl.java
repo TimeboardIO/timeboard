@@ -86,7 +86,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Account createUser(final Account account) throws BusinessException {
         this.em.persist(account);
-        LOGGER.info("User " + account.getFirstName() + " " + account.getName() + " created");
+        LOGGER.info("User " + account.getScreenName() + " created");
         this.em.flush();
         return account;
     }

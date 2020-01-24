@@ -4,6 +4,11 @@
     "description": "Any user with role OWNER membership on current org can create projects",
     "target": "action == 'PROJECTS_CREATE'",
     "condition": "subject.currentOrganizationRole('OWNER') && environment.checkProjectByUserLimit(subject)"
+  },{
+    "name": "Project owner can setup project",
+    "description": "Only user with role OWNER on project can setup project",
+    "target": "action == 'PROJECT_SETUP'",
+    "condition": "subject.currentProjectRole(resource, 'OWNER')"
   },
   {
     "name": "User can create task in a project",
