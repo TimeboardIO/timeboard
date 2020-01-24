@@ -83,17 +83,10 @@ $(document).ready(function () {
                     url: "projects/" + projectID + "/snapshots/chart",
                     success: function (d) {
 
-                        let polyQuotationData = d.quotationProjection;
-                        let polyOriginalEstimateData = d.originalEstimateProjection;
-                        let polyRealEffortData = d.realEffortProjection;
-                        let polyEffortLeftData = d.effortLeftProjection;
-                        let polyEffortSpentData = d.effortSpentProjection;
-
                         for(let i = 0; i < d.listOfProjectSnapshotDates.length; i++){
                             let date = new Date(d.listOfProjectSnapshotDates[i]);
                             d.listOfProjectSnapshotDates[i] = date.toLocaleString();
                         }
-
 
                         //chart config
                         let chart = new Chart($("#lineChart"), {
@@ -107,7 +100,7 @@ $(document).ready(function () {
                                     fill: false,
                                     steppedLine: true
                                 } , {
-                                    data: polyQuotationData,
+                                    data: d.quotationRegressionData,
                                     label: "Poly_QT",
                                     borderColor: "#3e95cd",
                                     fill: false,
@@ -120,7 +113,7 @@ $(document).ready(function () {
                                     fill: false,
                                     steppedLine: true
                                 } , {
-                                    data: polyOriginalEstimateData,
+                                    data: d.originalEstimateRegressionData,
                                     label: "Poly_OE",
                                     borderColor: "#ff6384",
                                     fill: false,
@@ -133,7 +126,7 @@ $(document).ready(function () {
                                     fill: false,
                                     steppedLine: true
                                 } , {
-                                     data: polyRealEffortData,
+                                     data: d.realEffortRegressionData,
                                      label: "Poly_RE",
                                      borderColor: "#00CC00",
                                      fill: false,
@@ -146,7 +139,7 @@ $(document).ready(function () {
                                      fill: false,
                                      steppedLine: true
                                 } , {
-                                     data: polyEffortLeftData,
+                                     data: d.effortLeftRegressionData,
                                      label: "Poly_EL",
                                      borderColor: "#FF00CC",
                                      fill: false,
@@ -159,7 +152,7 @@ $(document).ready(function () {
                                     fill: false,
                                     steppedLine: true
                                 } , {
-                                    data: polyEffortSpentData,
+                                    data: d.effortSpentRegressionData,
                                     label: "Poly_ES",
                                     borderColor: "#FFFF00",
                                     fill: false,
