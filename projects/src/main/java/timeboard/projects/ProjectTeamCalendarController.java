@@ -26,6 +26,7 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,9 +41,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -54,9 +53,10 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects/{projectID}/calendar")
 public class ProjectTeamCalendarController {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
     @Autowired
     public ProjectService projectService;
+
     @Autowired
     public VacationService vacationService;
 
@@ -74,7 +74,7 @@ public class ProjectTeamCalendarController {
     }
 
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<CalendarEventWrapper>>> listTags(final TimeboardAuthentication authentication,
+    public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(final TimeboardAuthentication authentication,
                                                                             @PathVariable final Long projectID,
                                                                             @PathVariable final Integer yearNum,
                                                                             @PathVariable final Integer monthNum) throws BusinessException {
@@ -92,68 +92,18 @@ public class ProjectTeamCalendarController {
                         accountVacationRequestMap.computeIfAbsent(m, t -> new ArrayList<VacationRequest>()));
 
         // re-balance key to user screen name and wrap request to ui calendar
-        final Map<String, List<CalendarEventWrapper>> newMap = accountVacationRequestMap.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> requestToWrapperList(e.getValue())));
+        final Map<String, List<CalendarEvent>> newMap = accountVacationRequestMap.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> CalendarEvent.requestToWrapperList(e.getValue())));
 
         return ResponseEntity.ok(newMap);
     }
 
 
-    private List<CalendarEventWrapper> requestToWrapperList(final List<VacationRequest> requests) {
-        final List<CalendarEventWrapper> results = new ArrayList<>();
-
-        for (final VacationRequest r : requests) {
-            results.addAll(requestToWrapper(r));
-        }
-
-        return results;
-    }
-
-
-    private List<CalendarEventWrapper> requestToWrapper(final VacationRequest request) {
-        final LinkedList<CalendarEventWrapper> results = new LinkedList<>();
-
-        final java.util.Calendar start = java.util.Calendar.getInstance();
-        final java.util.Calendar end = java.util.Calendar.getInstance();
-
-        start.setTime(request.getStartDate());
-        end.setTime(request.getEndDate());
-        boolean last = true;
-        while (last) {
-            final CalendarEventWrapper wrapper = new CalendarEventWrapper();
-
-            wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate(DATE_FORMAT.format(start.getTime()));
-            if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
-                wrapper.setValue(1);
-            } else if (request.getStatus() == VacationRequestStatus.PENDING) {
-                wrapper.setValue(0.5);
-            } else {
-                wrapper.setValue(0);
-            }
-            wrapper.setType(1);
-
-            results.add(wrapper);
-
-            last = start.before(end);
-            start.roll(Calendar.DAY_OF_YEAR, 1);
-        }
-
-        if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
-            results.getFirst().setType(2);
-        }
-
-        if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
-            results.getLast().setType(0);
-        }
-
-        return results;
-    }
-
-    public static class CalendarEventWrapper {
+    public static class CalendarEventWrapper implements Serializable {
 
         private String name;
-        private String date;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private Date date;
         private double value;
         private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
 
@@ -161,7 +111,7 @@ public class ProjectTeamCalendarController {
         }
 
         public CalendarEventWrapper(final Imputation imputation) {
-            this.date = DATE_FORMAT.format(imputation.getDay());
+            this.date = imputation.getDay();
             this.value = imputation.getValue();
             this.type = 1;
             this.name = imputation.getAccount().getScreenName();
@@ -175,11 +125,12 @@ public class ProjectTeamCalendarController {
             this.name = name;
         }
 
-        public String getDate() {
+
+        public Date getDate() {
             return date;
         }
 
-        public void setDate(final String date) {
+        public void setDate(Date date) {
             this.date = date;
         }
 
@@ -187,19 +138,19 @@ public class ProjectTeamCalendarController {
             return type;
         }
 
-        public void setType(final int type) {
-            this.type = type;
-        }
 
         public double getValue() {
             return value;
         }
 
-        public void setValue(final double value) {
+
+        public void setValue(double value) {
             this.value = value;
         }
 
-
+        public void setType(int type) {
+            this.type = type;
+        }
     }
 
 }
