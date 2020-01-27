@@ -6,7 +6,13 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta property="timesheet" th:year="${year}" th:week="${week}" th:lastWeekSubmitted="${lastWeekSubmitted}" th:userID="${userID}"/>
+    <meta property="timesheet"
+          th:year="${year}"
+          th:week="${week}"
+          th:lastWeekSubmitted="${lastWeekSubmitted}"
+          th:userID="${userID}"
+          th:actorID="${actorID}"
+    />
     <style> .hidden { display: none; } </style>
 </head>
 

@@ -103,10 +103,10 @@ public class TimesheetController {
 
         //Get tasks for current week
         if (this.projectService != null) {
-            this.projectService.listTasksByProject(currentAccount, ds, de).stream().forEach(projectTasks -> {
+            this.projectService.listTasksByProject(currentAccount, ds, de).forEach(projectTasks -> {
                 final List<TaskWrapper> tasks = new ArrayList<>();
 
-                projectTasks.getTasks().stream().forEach(task -> {
+                projectTasks.getTasks().forEach(task -> {
                     tasks.add(new TaskWrapper(
                             task.getId(),
                             task.getName(),
