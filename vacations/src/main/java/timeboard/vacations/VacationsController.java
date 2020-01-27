@@ -43,7 +43,6 @@ import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

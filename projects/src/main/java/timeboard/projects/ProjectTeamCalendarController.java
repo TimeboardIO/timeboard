@@ -43,7 +43,6 @@ import timeboard.core.security.TimeboardAuthentication;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.Calendar;
 import java.util.stream.Collectors;
 
 
@@ -99,57 +98,6 @@ public class ProjectTeamCalendarController {
         return ResponseEntity.ok(newMap);
     }
 
-
-    private List<CalendarEventWrapper> requestToWrapperList(final List<VacationRequest> requests) {
-        final List<CalendarEventWrapper> results = new ArrayList<>();
-
-        for (final VacationRequest r : requests) {
-            results.addAll(requestToWrapper(r));
-        }
-
-        return results;
-    }
-
-
-    private List<CalendarEventWrapper> requestToWrapper(final VacationRequest request) {
-        final LinkedList<CalendarEventWrapper> results = new LinkedList<>();
-
-        final java.util.Calendar start = java.util.Calendar.getInstance();
-        final java.util.Calendar end = java.util.Calendar.getInstance();
-
-        start.setTime(request.getStartDate());
-        end.setTime(request.getEndDate());
-        boolean last = true;
-        while (last) {
-            final CalendarEventWrapper wrapper = new CalendarEventWrapper();
-
-            wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate(start.getTime());
-            if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
-                wrapper.setValue(1);
-            } else if (request.getStatus() == VacationRequestStatus.PENDING) {
-                wrapper.setValue(0.5);
-            } else {
-                wrapper.setValue(0);
-            }
-            wrapper.setType(1);
-
-            results.add(wrapper);
-
-            last = start.before(end);
-            start.roll(Calendar.DAY_OF_YEAR, 1);
-        }
-
-        if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
-            results.getFirst().setType(2);
-        }
-
-        if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
-            results.getLast().setType(0);
-        }
-
-        return results;
-    }
 
     public static class CalendarEventWrapper implements Serializable {
 
