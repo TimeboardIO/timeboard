@@ -37,7 +37,7 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
 import timeboard.core.model.ValidationStatus;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.home.model.Week;
+import timeboard.home.model.WeekWrapper;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -73,7 +73,7 @@ public class HomeController {
         final Date d = new Date();
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
-        final List<Week> weeks = new ArrayList<>();
+        final List<WeekWrapper> weeks = new ArrayList<>();
         final Account account = authentication.getDetails();
         final int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
@@ -90,11 +90,13 @@ public class HomeController {
                 final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(firstDayOfWeek, lastDayOfWeek,
                         account).values().stream().reduce(Double::sum).orElse(0.0);
 
-                final Week week = new Week(
+                final WeekWrapper week = new WeekWrapper(
                         calendar.get(Calendar.WEEK_OF_YEAR),
                         calendar.get(Calendar.YEAR),
                         weekSum,
-                        timesheetStatus);
+                        timesheetStatus,
+                        firstDayOfWeek,
+                        lastDayOfWeek);
 
                 weeks.add(week);
                 calendar.roll(Calendar.WEEK_OF_YEAR, -1);
