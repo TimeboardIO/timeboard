@@ -17,6 +17,12 @@
     "condition": "resource.isMember(subject.getDetails()) && environment.checkTaskByProjectLimit(subject, resource)"
   },
   {
+    "name": "User can create task in a project",
+    "description": "Any user belonging to the project can create tasks in this project",
+    "target": "action == 'TASKS_CREATE'",
+    "condition": "resource.isMember(subject.getDetails())"
+  },
+  {
     "name": "Org owner can setup org",
     "description": "Only user with role OWNER on org can setup org",
     "target": "action == 'ORG_SETUP'",

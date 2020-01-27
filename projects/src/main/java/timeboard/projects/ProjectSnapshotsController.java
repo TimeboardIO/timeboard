@@ -48,7 +48,6 @@ import timeboard.core.model.ProjectSnapshot;
 import timeboard.core.model.ValueHistory;
 import timeboard.core.security.TimeboardAuthentication;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -84,7 +83,7 @@ public class ProjectSnapshotsController {
                                            final Project project) throws BusinessException, JsonProcessingException {
 
 
-        final ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
+        final ProjectSnapshotService.ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projectSnapshotGraphWrapper));
     }
 
@@ -254,9 +253,10 @@ public class ProjectSnapshotsController {
         return effortSpentMap.values();
     }
 
-    public ProjectSnapshotGraphWrapper createGraph(final List<ProjectSnapshot> projectSnapshotList) {
 
-        final ProjectSnapshotsController.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotsController.ProjectSnapshotGraphWrapper();
+    public ProjectSnapshotService.ProjectSnapshotGraphWrapper createGraph(final List<ProjectSnapshot> projectSnapshotList) {
+
+        final ProjectSnapshotService.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotService.ProjectSnapshotGraphWrapper();
 
         final String formatDateToDisplay = "yyyy-MM-dd HH:mm:ss.S";
         final List<String> listOfProjectSnapshotDates = new ArrayList<>();
@@ -267,7 +267,6 @@ public class ProjectSnapshotsController {
                     snapshot.getOriginalEstimate(), snapshot.getEffortLeft(), snapshot.getEffortSpent(),
                     snapshot.getProjectSnapshotDate()));
         });
-        wrapper.setListOfProjectSnapshotDates(listOfProjectSnapshotDates);
 
         wrapper.setQuotationData(this.quotationValuesForGraph(listOfProjectSnapshotDates, projectSnapshotList,
                 formatDateToDisplay, projectDashboards));
@@ -283,6 +282,8 @@ public class ProjectSnapshotsController {
 
         wrapper.setEffortSpentData(this.effortSpentValuesForGraph(listOfProjectSnapshotDates, projectSnapshotList,
                 formatDateToDisplay, projectDashboards));
+
+        this.projectSnapshotService.regression(wrapper, listOfProjectSnapshotDates, projectSnapshotList);
 
         return wrapper;
     }
@@ -373,40 +374,5 @@ public class ProjectSnapshotsController {
         }
     }
 
-    public static class ProjectSnapshotGraphWrapper implements Serializable {
-        public List<String> listOfProjectSnapshotDates;
-        public Collection<Double> quotationData;
-        public Collection<Double> originalEstimateData;
-        public Collection<Double> realEffortData;
-        public Collection<Double> effortSpentData;
-        public Collection<Double> effortLeftData;
 
-        public ProjectSnapshotGraphWrapper() {
-        }
-
-        public void setListOfProjectSnapshotDates(final List<String> listOfProjectSnapshotDates) {
-            this.listOfProjectSnapshotDates = listOfProjectSnapshotDates;
-        }
-
-        public void setQuotationData(final Collection<Double> quotationData) {
-            this.quotationData = quotationData;
-
-        }
-
-        public void setRealEffortData(final Collection<Double> realEffortData) {
-            this.realEffortData = realEffortData;
-        }
-
-        public void setOriginalEstimateData(final Collection<Double> originalEstimateData) {
-            this.originalEstimateData = originalEstimateData;
-        }
-
-        public void setEffortSpentData(final Collection<Double> effortSpentData) {
-            this.effortSpentData = effortSpentData;
-        }
-
-        public void setEffortLeftData(final Collection<Double> effortLeftData) {
-            this.effortLeftData = effortLeftData;
-        }
-    }
 }
