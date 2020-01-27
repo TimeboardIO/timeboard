@@ -252,7 +252,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Map<Account, List<SubmittedTimesheet>> getTimesheetsFromProject(Account actor, Project project) {
+    public Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project) {
 
        final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
                 + "where st.account in :users ", SubmittedTimesheet.class);

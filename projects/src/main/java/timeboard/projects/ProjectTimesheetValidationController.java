@@ -42,8 +42,6 @@ import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.io.Serializable;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Calendar;
 import java.util.stream.Collectors;
@@ -77,7 +75,7 @@ public class ProjectTimesheetValidationController {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 
-        final Map<Account, List<SubmittedTimesheet>> timesheetsFromProject = this.timesheetService.getTimesheetsFromProject(actor, project);
+        final Map<Account, List<SubmittedTimesheet>> timesheetsFromProject = this.timesheetService.getProjectTimesheetByAccounts(actor, project);
 
         // add member with no submitted week
         project.getMembers().stream()

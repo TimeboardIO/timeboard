@@ -93,7 +93,7 @@ public interface TimesheetService {
             final Account user,
             final AbstractTask task);
 
-     Map<Account, List<SubmittedTimesheet>> getTimesheetsFromProject(Account actor, Project project);
+     Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project);
 
 
     }
