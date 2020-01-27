@@ -314,12 +314,16 @@ let app = new Vue({
             event.target.classList.toggle('loading');
             $.ajax({
                 type: "PATCH",
-                url: "/projects/"+currentProjectID+"/tasks/approve/"+task.taskID,
+                url: "/projects/" + currentProjectID + "/tasks/approve/" + task.taskID,
                 success: function (data) {
                     task.status = 'IN_PROGRESS';
                     self.taskList.find(e => e.taskID === task.taskID).status = 'IN_PROGRESS';
                     event.target.classList.toggle('loading');
                 },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
         },
         denyTask: function(event, task) {
             event.target.classList.toggle('loading');
@@ -328,6 +332,7 @@ let app = new Vue({
                 url: "/projects/"+currentProjectID+"/tasks/deny/"+task.taskID,
                 success: function (data) {
                     task.status = 'REFUSED';
+                    self.taskList.find(e => e.taskID === task.taskID).status = 'REFUSED';
                     event.target.classList.toggle('loading');
                 },
                 error: function (data){
@@ -335,7 +340,6 @@ let app = new Vue({
                 }
             });
         },
-                    self.taskList.find(e => e.taskID === task.taskID).status = 'REFUSED';
         deleteTask: function(event, task) {
             this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.taskName + "?",
                 function() {

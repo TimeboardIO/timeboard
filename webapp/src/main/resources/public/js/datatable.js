@@ -97,9 +97,9 @@ Vue.component('data-table', {
 
             // copying raw data
             let finalData = [];
-            for(let i = this.table.length; i>=0 ; i--) {
-                finalData.push(this.table[i]);
-            } 
+            this.table.forEach(row => {
+                finalData.push(row);
+            });
 
             //filtering
             if(this.config.filters){
