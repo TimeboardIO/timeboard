@@ -37,7 +37,6 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.io.Serializable;
 import java.util.*;
 import java.util.Calendar;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
@@ -147,60 +146,6 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
         wrapper.setListOfProjectSnapshotDates(listOfProjectSnapshotDates);
     }
 
-    public static class ProjectSnapshotGraphWrapper implements Serializable {
-        public List<String> listOfProjectSnapshotDates;
-        public Collection<Double> quotationData;
-        public Collection<Double> originalEstimateData;
-        public Collection<Double> realEffortData;
-        public Collection<Double> effortSpentData;
-        public Collection<Double> effortLeftData;
-        public Collection<Double> quotationRegressionData;
-        public Collection<Double> originalEstimateRegressionData;
-        public Collection<Double> realEffortRegressionData;
-        public Collection<Double> effortLeftRegressionData;
-        public Collection<Double> effortSpentRegressionData;
 
-        public ProjectSnapshotGraphWrapper() {
-        }
-
-        public void setListOfProjectSnapshotDates(final List<String> listOfProjectSnapshotDates) {
-            this.listOfProjectSnapshotDates = listOfProjectSnapshotDates;
-        }
-
-        public void setQuotationData(final Collection<Double> quotationData) {
-            this.quotationData = quotationData;
-
-        }
-
-        public void setRealEffortData(final Collection<Double> realEffortData) {
-            this.realEffortData = realEffortData;
-        }
-
-        public void setOriginalEstimateData(final Collection<Double> originalEstimateData) {
-            this.originalEstimateData = originalEstimateData;
-        }
-
-        public void setEffortSpentData(final Collection<Double> effortSpentData) {
-            this.effortSpentData = effortSpentData;
-        }
-
-        public void setEffortLeftData(final Collection<Double> effortLeftData) {
-            this.effortLeftData = effortLeftData;
-        }
-
-        public void setQuotationRegressionData(Collection<Double> quotationRegressionData) { this.quotationRegressionData = quotationRegressionData; }
-
-        public void setOriginalEstimateRegressionData(Collection<Double> originalEstimateRegressionData) {
-            this.originalEstimateRegressionData = originalEstimateRegressionData; }
-
-        public void setRealEffortRegressionData(Collection<Double> realEffortRegressionData) {
-            this.realEffortRegressionData = realEffortRegressionData; }
-
-        public void setEffortLeftRegressionData(Collection<Double> effortLeftRegressionData) {
-            this.effortLeftRegressionData = effortLeftRegressionData; }
-
-        public void setEffortSpentRegressionData(Collection<Double> effortSpentRegressionData) {
-            this.effortSpentRegressionData = effortSpentRegressionData; }
-    }
 
 }

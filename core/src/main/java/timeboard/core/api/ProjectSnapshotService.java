@@ -27,12 +27,13 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.ProjectSnapshotServiceImpl;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
 import timeboard.core.model.TaskSnapshot;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 
 public interface ProjectSnapshotService {
@@ -51,6 +52,63 @@ public interface ProjectSnapshotService {
 
     List<TaskSnapshot> findAllTaskSnapshotByTaskID(Account actor, Long taskID);
 
-    void regression(ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates,
+    void regression(ProjectSnapshotService.ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates,
                     List<ProjectSnapshot> projectSnapshotList);
+
+    class ProjectSnapshotGraphWrapper implements Serializable {
+        public List<String> listOfProjectSnapshotDates;
+        public Collection<Double> quotationData;
+        public Collection<Double> originalEstimateData;
+        public Collection<Double> realEffortData;
+        public Collection<Double> effortSpentData;
+        public Collection<Double> effortLeftData;
+        public Collection<Double> quotationRegressionData;
+        public Collection<Double> originalEstimateRegressionData;
+        public Collection<Double> realEffortRegressionData;
+        public Collection<Double> effortLeftRegressionData;
+        public Collection<Double> effortSpentRegressionData;
+
+        public ProjectSnapshotGraphWrapper() {
+        }
+
+        public void setListOfProjectSnapshotDates(final List<String> listOfProjectSnapshotDates) {
+            this.listOfProjectSnapshotDates = listOfProjectSnapshotDates;
+        }
+
+        public void setQuotationData(final Collection<Double> quotationData) {
+            this.quotationData = quotationData;
+
+        }
+
+        public void setRealEffortData(final Collection<Double> realEffortData) {
+            this.realEffortData = realEffortData;
+        }
+
+        public void setOriginalEstimateData(final Collection<Double> originalEstimateData) {
+            this.originalEstimateData = originalEstimateData;
+        }
+
+        public void setEffortSpentData(final Collection<Double> effortSpentData) {
+            this.effortSpentData = effortSpentData;
+        }
+
+        public void setEffortLeftData(final Collection<Double> effortLeftData) {
+            this.effortLeftData = effortLeftData;
+        }
+
+        public void setQuotationRegressionData(Collection<Double> quotationRegressionData) {
+            this.quotationRegressionData = quotationRegressionData; }
+
+        public void setOriginalEstimateRegressionData(Collection<Double> originalEstimateRegressionData) {
+            this.originalEstimateRegressionData = originalEstimateRegressionData; }
+
+        public void setRealEffortRegressionData(Collection<Double> realEffortRegressionData) {
+            this.realEffortRegressionData = realEffortRegressionData; }
+
+        public void setEffortLeftRegressionData(Collection<Double> effortLeftRegressionData) {
+            this.effortLeftRegressionData = effortLeftRegressionData; }
+
+        public void setEffortSpentRegressionData(Collection<Double> effortSpentRegressionData) {
+            this.effortSpentRegressionData = effortSpentRegressionData; }
+    }
 }
