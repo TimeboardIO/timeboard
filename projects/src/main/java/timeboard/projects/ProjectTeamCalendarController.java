@@ -55,8 +55,10 @@ import java.util.stream.Collectors;
 public class ProjectTeamCalendarController {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
     @Autowired
     public ProjectService projectService;
+
     @Autowired
     public VacationService vacationService;
 

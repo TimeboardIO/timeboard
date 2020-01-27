@@ -26,6 +26,7 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -56,9 +58,6 @@ public class ProjectTimesheetValidationController {
     @Autowired
     public TimesheetService timesheetService;
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-
     @GetMapping
     protected String timesheetValidationApp(TimeboardAuthentication authentication,
                               @PathVariable Long projectID, Model model) throws BusinessException {
@@ -72,7 +71,7 @@ public class ProjectTimesheetValidationController {
     }
 
 
-    @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/listProjectMembersTimesheets", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,
                                                                         @PathVariable Long projectID) throws BusinessException {
         final Account actor = authentication.getDetails();
@@ -101,7 +100,7 @@ public class ProjectTimesheetValidationController {
             //user already have submitted at least one week
             final Optional<SubmittedTimesheet> lastValidatedSubmittedTimesheet = submittedTimesheets
                     .stream()
-                    .filter(SubmittedTimesheet::isValidated)
+                    .filter(st -> st.getTimesheetStatus().equals(ValidationStatus.VALIDATED))
                     .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
 
             final Optional<SubmittedTimesheet> lastSubmittedTimesheet = submittedTimesheets
@@ -177,11 +176,16 @@ public class ProjectTimesheetValidationController {
         return c;
     }
 
-    public class UserWrapper {
+    public class UserWrapper implements Serializable {
+
         private Long id;
         private String name;
-        private String lastSubmittedDate;
-        private String lastApprovedDate;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private Date lastSubmittedDate;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private Date lastApprovedDate;
+
         private String statusColor;
         private List<TimesheetWeekWrapper> weeks;
 
@@ -200,11 +204,11 @@ public class ProjectTimesheetValidationController {
             this.lastSubmittedDate = weeks.stream()
                     .filter(TimesheetWeekWrapper::isSubmitted)
                     .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
-                    .map(t -> DATE_FORMAT.format(calendarFromWeek(t.getYear(), t.getWeek()).getTime())).orElseGet(() -> "N/A");
+                    .map(t -> calendarFromWeek(t.getYear(), t.getWeek()).getTime()).orElseGet(() -> null);
             this.lastApprovedDate = rawList.stream()
-                    .filter(SubmittedTimesheet::isValidated)
+                    .filter(st -> st.getTimesheetStatus().equals(ValidationStatus.VALIDATED))
                     .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
-                    .map(t -> DATE_FORMAT.format(calendarFromWeek(t.getYear(), t.getWeek()).getTime())).orElseGet(() -> "N/A");
+                    .map(t -> calendarFromWeek(t.getYear(), t.getWeek()).getTime()).orElseGet(() ->null);
         }
 
         public Long getId() {
@@ -213,10 +217,10 @@ public class ProjectTimesheetValidationController {
         public String getName() {
             return name;
         }
-        public String getLastSubmittedDate() {
+        public Date getLastSubmittedDate() {
             return lastSubmittedDate;
         }
-        public String getLastApprovedDate() {
+        public Date getLastApprovedDate() {
             return lastApprovedDate;
         }
         public String getStatus() {
@@ -244,7 +248,7 @@ public class ProjectTimesheetValidationController {
             this.id = submittedTimesheet.getId();
             this.year = (int) submittedTimesheet.getYear();
             this.week = (int) submittedTimesheet.getWeek();
-            this.isValidated = submittedTimesheet.isValidated();
+            this.isValidated = submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED);
             this.isSubmitted = submitted;
         }
 

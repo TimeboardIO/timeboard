@@ -88,10 +88,4 @@ public class SubmittedTimesheet extends OrganizationEntity {
         this.account = account;
     }
 
-    @Transient
-    public boolean isValidated() {
-        return timesheetStatus.equals(ValidationStatus.VALIDATED);
-    }
-
-
 }

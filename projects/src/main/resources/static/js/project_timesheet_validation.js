@@ -62,7 +62,7 @@ $(document).ready(function () {
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: "projects/" + projectID + "/timesheets/list",
+                url: "projects/" + projectID + "/timesheets/listProjectMembersTimesheets",
                 success: function (d) {
                     self.timesheets = d;
                     $('.ui.dimmer').removeClass('active');
