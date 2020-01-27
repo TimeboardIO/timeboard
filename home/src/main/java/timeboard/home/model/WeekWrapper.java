@@ -42,7 +42,8 @@ public class WeekWrapper {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date lastDay;
 
-    public WeekWrapper(final int number, final int year, final double imputationSum, final ValidationStatus vs, final Date firstDay, final Date lastDay) {
+    public WeekWrapper(final int number, final int year, final double imputationSum, final ValidationStatus vs,
+                       final Date firstDay, final Date lastDay) {
         this.number = number;
         this.year = year;
         this.imputationSum = imputationSum;
