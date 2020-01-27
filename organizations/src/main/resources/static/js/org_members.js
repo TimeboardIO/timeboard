@@ -17,7 +17,7 @@ let app = new Vue({
     },
     methods: {
         removeMember: function(e, member){
-            $.get("/org/members/remove?orgID="+currentOrgID+"&memberID="+member.id)
+            $.get("/org/members/remove/"+currentOrgID+"/"+member.id)
             .then(function(data){
                 let copy = [];
                 for (let i = 0; i < app.members.length; i++) {
@@ -53,7 +53,7 @@ let app = new Vue({
 //Initialization
 $(document).ready(function(){
     //initial data loading
-        $.get("/org/members/list?orgID="+currentOrgID)
+        $.get("/org/members/list/"+currentOrgID)
         .then(function(data){
             for (let i = 0; i < data.length; i++) {
                 app.members.push(data[i]);
