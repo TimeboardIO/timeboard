@@ -177,7 +177,8 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Map<Integer, Double> getAllImputationsForAccountOnDateRange(final Date startDate, final Date endDate, final Account account, final TimesheetService.TimesheetFilter[] filters) {
+    public Map<Integer, Double> getAllImputationsForAccountOnDateRange(final Date startDate, final Date endDate,
+                                                                       final Account account, final TimesheetService.TimesheetFilter[] filters) {
 
         final Map<String, Object> parameters = new HashMap<>();
         final StringBuilder sb = new StringBuilder();
