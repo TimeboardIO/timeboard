@@ -191,47 +191,47 @@
                 <div class="column">
                     <label>Name</label>
                     <div class="ui fluid icon input">
-                        <input v-model="table.filters.name.filterValue" placeholder="Name.. ">
+                        <input v-model="taskListConfig.filters.name.filterValue" placeholder="Name.. ">
                         <i class="search icon"></i>
                     </div>
                 </div>
                 <div class="column">
                     <label>Between </label>
                     <div class="ui fluid input">
-                        <input v-model="table.filters.start.filterValue" type="date" placeholder="Start date.. ">
+                        <input v-model="taskListConfig.filters.start.filterValue" type="date" placeholder="Start date.. ">
                     </div>
                     <label>and </label>
                     <div class="ui fluid input">
-                        <input v-model="table.filters.end.filterValue" type="date"  placeholder="End date.. ">
+                        <input v-model="taskListConfig.filters.end.filterValue" type="date"  placeholder="End date.. ">
                     </div>
                 </div>
                 <div class="column">
 
                     <label>Original estimate </label>
                     <div class="ui mini fluid input">
-                        <input v-model="table.filters.oeMin.filterValue"  type="text" placeholder="Min">
+                        <input v-model="taskListConfig.filters.oeMin.filterValue"  type="text" placeholder="Min">
                     </div>
                     <div class="ui mini fluid input">
-                        <input v-model="table.filters.oeMax.filterValue" type="text" placeholder="Max">
+                        <input v-model="taskListConfig.filters.oeMax.filterValue" type="text" placeholder="Max">
                     </div>
                 </div>
                 <div class="column">
                     <label>Batch </label>
-                    <select v-model="table.filters.batch.filterValue" class="ui multiple selection fluid dropdown" >
+                    <select v-model="taskListConfig.filters.batch.filterValue" class="ui multiple selection fluid dropdown" >
                         <option th:each="batch: ${allProjectBatches}"
                                 th:text="${batch.name}"
                                 th:value="${batch.id}"
                         ></option>
                     </select>
                     <label>Type </label>
-                    <select v-model="table.filters.type.filterValue" class="ui type multiple selection fluid dropdown" >
+                    <select v-model="taskListConfig.filters.type.filterValue" class="ui type multiple selection fluid dropdown" >
                         <option th:each="type: ${taskTypes}"
                                 th:text="${type.typeName}"
                                 th:value="${type.id}"
                         ></option>
                     </select>
                     <label>Status </label>
-                    <select v-model="table.filters.status.filterValue" class="ui status multiple selection fluid dropdown" >
+                    <select v-model="taskListConfig.filters.status.filterValue" class="ui status multiple selection fluid dropdown" >
                         <option th:each="status: ${allTaskStatus}"
                                 th:text="${status}"
                                 th:value="${status}"
@@ -242,13 +242,13 @@
         </div>
 
 
-        <div v-if="tablePending.data.length" class="ui horizontal divider">
+        <div v-if="pendingTaskList.length" class="ui horizontal divider">
             <i class="boxes icon"></i>
             Pending tasks
         </div>
 
         <!-- Pending tasks datatable component -->
-        <data-table v-bind:config="tablePending">
+        <data-table v-bind:config="pendingTaskListConfig" v-bind:table="pendingTaskList">
             <template v-slot:name="{row}">
                 {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
                 {{row.taskComments}}</p>
@@ -274,7 +274,7 @@
                 <div v-if="row.typeName !== '' " class="ui blue horizontal label"> {{row.typeName}} </div>
             </template>
             <template v-slot:status="{row}">
-                <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                <div class="ui small primary horizontal label"> {{row.status}} </div>
             </template>
 
             <template v-slot:actions="{row}">
@@ -302,7 +302,7 @@
                 </div>
                 <div class="content">
                     <!-- Datatable component -->
-                    <data-table v-bind:config="tableByBatch[batch.batchID]">
+                    <data-table v-bind:config="taskListConfig" v-bind:table="tableByBatch[batch.batchID]">
                         <template v-slot:name="{row}">
                             {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
                             {{row.taskComments}}</p>
@@ -328,7 +328,7 @@
                             <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
                         </template>
                         <template v-slot:status="{row}">
-                            <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                            <div class="ui small primary horizontal label"> {{row.status}} </div>
                         </template>
 
                         <template v-slot:actions="{row}">
@@ -348,7 +348,7 @@
                 </div>
             </div >
             <div th:if="${batchType} == 'Default' ">
-                <data-table v-bind:config="table">
+                <data-table v-bind:config="taskListConfig" v-bind:table="taskList">
                     <template v-slot:name="{row}">
                         {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
                         {{row.taskComments}}</p>
@@ -374,7 +374,7 @@
                         <div  v-if="row.typeName !== '' " class="ui blue green horizontal label"> {{row.typeName}} </div>
                     </template>
                     <template v-slot:status="{row}">
-                        <div class="ui small primary horizontal label"> {{row.statusName}} </div>
+                        <div class="ui small primary horizontal label"> {{row.status}} </div>
                     </template>
 
                     <template v-slot:actions="{row}">

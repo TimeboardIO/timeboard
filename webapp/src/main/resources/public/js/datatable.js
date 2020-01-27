@@ -1,7 +1,14 @@
 Vue.component('data-table', {
     props: ['config', 'table'],
+    watch: {
+        config: function(newVal, oldVal) { // watch it
+            if(this.config.data) {
+                this.table = this.config.data;
+            }
+        }
+    },
     template: `
-            <table class="ui celled table" v-if="config.data.length > 0">
+            <table class="ui celled table" v-if="table.length > 0">
                 <thead>
                     <tr>
                         <th v-for="col in finalCols"  v-if="col.visible" @click="sortBy(col.slot)"  v-bind:class="col.class"> 
@@ -86,13 +93,15 @@ Vue.component('data-table', {
     },
     computed: {
         finalData: function () {
+
             let sortKey = this.sortKey+'';
             let order = this.sortOrders[sortKey] || 1 ;
 
             // copying raw data
             let finalData = [];
-            let i = this.config.data.length;
-            while(i--) finalData.push(this.config.data[i]);
+            this.table.forEach(row => {
+                finalData.push(row);
+            });
 
             //filtering
             if(this.config.filters){
@@ -130,7 +139,7 @@ Vue.component('data-table', {
                 detachable : true, centered: true
             }).modal('show');
         },
-        changeDataTableConfig: function(event){
+        changeDataTableConfig: function(event) {
             let self = this;
             event.target.classList.toggle('loading');
 
