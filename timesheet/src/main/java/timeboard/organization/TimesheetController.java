@@ -66,7 +66,16 @@ public class TimesheetController {
     @GetMapping
     protected String currentWeekTimesheet(final TimeboardAuthentication authentication, final Model model) throws Exception {
         final Calendar c = Calendar.getInstance();
-        return this.fillAndDisplayTimesheetPage(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+        return this.fillAndDisplayTimesheetPage(authentication,
+                authentication.getDetails(), c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+    }
+
+    @GetMapping("/{user}")
+    protected String currentWeekTimesheet(final TimeboardAuthentication authentication,
+                                          @PathVariable("user") final Account user,
+                                          final Model model) throws Exception {
+        final Calendar c = Calendar.getInstance();
+        return this.fillAndDisplayTimesheetPage(authentication, user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
     @GetMapping(value="/data",  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -154,14 +163,23 @@ public class TimesheetController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
     }
 
+
     @GetMapping("/{year}/{week}")
     protected String fillAndDisplayTimesheetPage(
             final TimeboardAuthentication authentication,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
             final Model model) throws Exception {
+        return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, model);
+    }
 
-
+    @GetMapping("/{user}/{year}/{week}")
+    protected String fillAndDisplayTimesheetPage(
+            final TimeboardAuthentication authentication,
+            @PathVariable("user") final Account user,
+            @PathVariable("year") final int year,
+            @PathVariable("week") final int week,
+            final Model model) throws Exception {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
