@@ -435,7 +435,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         final ValidationStatus timesheetSubmitted = this.timesheetService.getTimesheetValidationStatus(
                 orgID,
-                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR)).orElse(null);
 
         if (task instanceof Task) {
             if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {

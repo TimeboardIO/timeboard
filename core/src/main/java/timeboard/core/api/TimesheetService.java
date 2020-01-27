@@ -32,6 +32,7 @@ import timeboard.core.model.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 public interface TimesheetService {
@@ -57,11 +58,11 @@ public interface TimesheetService {
      * Get timesheet validation status.
      *
      * @param currentAccount user used to check timesheet sumbit state.
-     * @param week           timesheet week
      * @param year           timesheet year
-     * @return ValidationStatus
+     * @param week           timesheet week
+     * @return ValidationStatus, null current account has no timesheet validation request for current week
      */
-    ValidationStatus getTimesheetValidationStatus(
+    Optional<ValidationStatus> getTimesheetValidationStatus(
             final Long orgID,
             final Account currentAccount,
             final int year,
@@ -80,21 +81,21 @@ public interface TimesheetService {
             final Date firstDayOfWeek,
             final Date lastDayOfWeek,
             final Account account,
-            final TimesheetFilter ... filters);
+            final TimesheetFilter... filters);
 
 
-     Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project);
+    Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project);
 
-    class TimesheetFilter<T>  {
+    class TimesheetFilter<T> {
         private T target;
 
         public T getTarget() {
             return target;
         }
 
-        public TimesheetFilter(T target){
+        public TimesheetFilter(T target) {
             this.target = target;
         }
     }
 
-    }
+}
