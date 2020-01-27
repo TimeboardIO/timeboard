@@ -100,8 +100,8 @@ public class WeekWrapper {
         this.lastDay = lastDay;
     }
 
-    public Boolean isValidationStatus(String validationStatus){
-        if(this.getValidationStatus() != null) {
+    public Boolean isValidationStatus(String validationStatus) {
+        if (this.getValidationStatus() != null) {
             return validationStatus.equals(this.getValidationStatus().toString());
         }
 

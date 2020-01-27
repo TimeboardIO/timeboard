@@ -84,7 +84,9 @@ public class HomeController {
                 final Date firstDayOfWeek = calendar.getTime();
                 calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
                 final Date lastDayOfWeek = calendar.getTime();
-                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(firstDayOfWeek, lastDayOfWeek,
+                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(
+                        authentication.getCurrentOrganization(),
+                        firstDayOfWeek, lastDayOfWeek,
                         account).values().stream().reduce(Double::sum).orElse(0.0);
 
                 final WeekWrapper week = new WeekWrapper(
@@ -100,8 +102,12 @@ public class HomeController {
             }
         }
 
-        model.addAttribute(NB_PROJECTS, this.projectService.listProjects(account, authentication.getCurrentOrganization()).size());
-        model.addAttribute(NB_TASKS, this.projectService.listUserTasks(account).size());
+        model.addAttribute(NB_PROJECTS, this.projectService
+                .listProjects(account, authentication.getCurrentOrganization()).size());
+
+        model.addAttribute(NB_TASKS, this.projectService
+                .listUserTasks(authentication.getCurrentOrganization(), account).size());
+
         model.addAttribute(WEEKS, weeks);
 
         return "home.html";

@@ -12,10 +12,10 @@ package timeboard.core.model;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -29,8 +29,8 @@ package timeboard.core.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 
 public class CalendarEvent implements Serializable {
@@ -41,38 +41,7 @@ public class CalendarEvent implements Serializable {
     private double value;
     private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
 
-    public CalendarEvent() { }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public int getType() {
-        return type;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public void setValue(double value) {
-        this.value = value;
-    }
-
-    public void setType(int type) {
-        this.type = type;
+    public CalendarEvent() {
     }
 
     public static List<CalendarEvent> requestToWrapperList(List<VacationRequest> requests) {
@@ -85,7 +54,6 @@ public class CalendarEvent implements Serializable {
         return results;
     }
 
-
     public static List<CalendarEvent> requestToWrapper(VacationRequest request) {
         final LinkedList<CalendarEvent> results = new LinkedList<>();
 
@@ -95,15 +63,14 @@ public class CalendarEvent implements Serializable {
         start.setTime(request.getStartDate());
         end.setTime(request.getEndDate());
         boolean last = true;
-        while(last) {
+        while (last) {
             final CalendarEvent wrapper = new CalendarEvent();
 
             wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate (start.getTime());
+            wrapper.setDate(start.getTime());
             if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
                 wrapper.setValue(1);
-            }
-            else if (request.getStatus() == VacationRequestStatus.PENDING ) {
+            } else if (request.getStatus() == VacationRequestStatus.PENDING) {
                 wrapper.setValue(0.5);
             } else {
                 wrapper.setValue(0);
@@ -126,6 +93,38 @@ public class CalendarEvent implements Serializable {
 
         return results;
     }
-    
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
+    }
+
 
 }

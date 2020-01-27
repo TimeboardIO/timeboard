@@ -26,6 +26,7 @@ package timeboard.core.internal;
  * #L%
  */
 
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,10 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Calendar;
-import org.apache.commons.math3.stat.regression.SimpleRegression;
+import java.util.Date;
+import java.util.List;
 
 @Component
 @Transactional
@@ -89,7 +91,7 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
     }
 
     @Override
-    public void regression(ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList){
+    public void regression(ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList) {
 
         final SimpleRegression quotationRegression = new SimpleRegression();
         final SimpleRegression originalEstimateRegression = new SimpleRegression();
@@ -145,7 +147,6 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
 
         wrapper.setListOfProjectSnapshotDates(listOfProjectSnapshotDates);
     }
-
 
 
 }

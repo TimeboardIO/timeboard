@@ -47,6 +47,7 @@ public interface TimesheetService {
      * @return true if timesheet is submit else, false.
      */
     SubmittedTimesheet submitTimesheet(
+            final Long orgID,
             final Account actor,
             final Account accountTimesheet,
             final Organization currentOrg,
@@ -78,13 +79,17 @@ public interface TimesheetService {
      * @return the sum of all imputations of the week
      */
     Map<Integer, Double> getAllImputationsForAccountOnDateRange(
+            final Long orgID,
             final Date firstDayOfWeek,
             final Date lastDayOfWeek,
             final Account account,
             final TimesheetFilter... filters);
 
 
-    Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project);
+    Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(
+            final Long orgID,
+            final Account actor,
+            final Project project);
 
     class TimesheetFilter<T> {
         private T target;

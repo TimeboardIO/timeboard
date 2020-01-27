@@ -1,10 +1,10 @@
-package timeboard.core.api;
+package timeboard.core.internal.organization;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.core.api;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,23 +26,30 @@ package timeboard.core.api;
  * #L%
  */
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import timeboard.core.security.TimeboardAuthentication;
 
-public final class ThreadLocalStorage {
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 
-    private static ThreadLocal<Long> CURRENT_ORG_ID = new ThreadLocal<>();
+public class CreateOrganizationEvent extends OrganizationEvent {
 
-    private ThreadLocalStorage() {
+
+    private final Account actor;
+
+    /**
+     * Create a new ApplicationEvent.
+     *
+     * @param source the object on which the event initially occurred (never {@code null})
+     */
+    public CreateOrganizationEvent(final Account actor, final Organization source) {
+        super(source);
+        this.actor = actor;
     }
 
-    public static Long getCurrentOrgId() {
-        return CURRENT_ORG_ID.get();
+    public Organization getOrganization(){
+        return (Organization) this.source;
     }
 
-    public static void setCurrentOrgId(final Long tenantName) {
-        CURRENT_ORG_ID.set(tenantName);
-        ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
+    public Account getActor() {
+        return actor;
     }
-
 }

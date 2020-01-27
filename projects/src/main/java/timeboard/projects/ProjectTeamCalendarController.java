@@ -42,7 +42,10 @@ import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -75,9 +78,9 @@ public class ProjectTeamCalendarController {
 
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(final TimeboardAuthentication authentication,
-                                                                            @PathVariable final Long projectID,
-                                                                            @PathVariable final Integer yearNum,
-                                                                            @PathVariable final Integer monthNum) throws BusinessException {
+                                                                     @PathVariable final Long projectID,
+                                                                     @PathVariable final Integer yearNum,
+                                                                     @PathVariable final Integer monthNum) throws BusinessException {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 
@@ -138,18 +141,16 @@ public class ProjectTeamCalendarController {
             return type;
         }
 
+        public void setType(int type) {
+            this.type = type;
+        }
 
         public double getValue() {
             return value;
         }
 
-
         public void setValue(double value) {
             this.value = value;
-        }
-
-        public void setType(int type) {
-            this.type = type;
         }
     }
 

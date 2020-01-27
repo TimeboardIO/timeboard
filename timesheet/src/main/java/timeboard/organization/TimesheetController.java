@@ -34,7 +34,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.*;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
+import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
@@ -43,8 +46,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 
 @Controller
@@ -64,12 +67,13 @@ public class TimesheetController {
     private OrganizationService organizationService;
 
     @GetMapping
-    protected String currentWeekTimesheet(final TimeboardAuthentication authentication, final Model model) throws Exception {
+    protected String currentWeekTimesheet(
+            final TimeboardAuthentication authentication, final Model model) throws Exception {
         final Calendar c = Calendar.getInstance();
         return this.fillAndDisplayTimesheetPage(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
-    @GetMapping(value="/data",  produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/data", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimesheetWrapper> getTimesheetData(
             final TimeboardAuthentication authentication,
             final @RequestParam("week") int week,
@@ -93,21 +97,21 @@ public class TimesheetController {
 
         //Get tasks for current week
         if (this.projectService != null) {
-            this.projectService.listTasksByProject(currentAccount, ds, de).stream().forEach(projectTasks -> {
+            this.projectService.listTasksByProject(
+                    authentication.getCurrentOrganization(),
+                    currentAccount,
+                    ds,
+                    de).stream().forEach(projectTasks -> {
+
                 final List<TaskWrapper> tasks = new ArrayList<>();
 
                 projectTasks.getTasks().stream().forEach(task -> {
                     tasks.add(new TaskWrapper(
-                            task.getId(),
-                            task.getName(),
-                            task.getComments(),
-                            task.getEffortSpent(),
-                            task.getEffortLeft(),
-                            task.getOriginalEstimate(),
-                            task.getRealEffort(),
-                            task.getStartDate(),
-                            task.getEndDate(),
-                            task.getTaskStatus().name(),
+                            task.getId(), task.getName(),
+                            task.getComments(), task.getEffortSpent(),
+                            task.getEffortLeft(), task.getOriginalEstimate(),
+                            task.getRealEffort(), task.getStartDate(),
+                            task.getEndDate(), task.getTaskStatus().name(),
                             task.getTaskType() != null ? task.getTaskType().getId() : 0)
                     );
 
@@ -162,7 +166,6 @@ public class TimesheetController {
             final Model model) throws Exception {
 
 
-
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
                 .get().getCreationDate();
@@ -194,7 +197,8 @@ public class TimesheetController {
 
         model.addAttribute("projectList",
                 this.projectService.listProjects(
-                        authentication.getDetails(), authentication.getCurrentOrganization()));
+                        authentication.getDetails(),
+                        authentication.getCurrentOrganization()));
 
         return "timesheet.html";
     }
@@ -242,7 +246,15 @@ public class TimesheetController {
 
         try {
             final Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
-            final SubmittedTimesheet submittedTimesheet = this.timesheetService.submitTimesheet(actor, actor, currentOrg, year, week);
+            final SubmittedTimesheet submittedTimesheet =
+                    this.timesheetService.submitTimesheet(
+                            authentication.getCurrentOrganization(),
+                            actor,
+                            actor,
+                            currentOrg,
+                            year,
+                            week);
+
             return ResponseEntity.ok(submittedTimesheet.getTimesheetStatus());
         } catch (final Exception e) { // TimesheetException
             return ResponseEntity.status(412).build();
@@ -250,14 +262,12 @@ public class TimesheetController {
     }
 
 
-
-
     private List<TaskWrapper> getDefaultTasks(final Account currentAccount,
-                                                               final Long orgID,
-                                                               final List<ImputationWrapper> imputations,
-                                                               final Date ds,
-                                                               final Date de,
-                                                               final List<DateWrapper> days) throws BusinessException {
+                                              final Long orgID,
+                                              final List<ImputationWrapper> imputations,
+                                              final Date ds,
+                                              final Date de,
+                                              final List<DateWrapper> days) throws BusinessException {
 
         final List<TaskWrapper> tasks = new ArrayList<>();
 

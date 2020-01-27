@@ -39,7 +39,7 @@ public interface ProjectService {
     === Projects ===
     */
 
-    Project createProject(Account owner, String projectName) throws BusinessException;
+    Project createProject(Long orgID, Account owner, String projectName) throws BusinessException;
 
     List<Project> listProjects(Account owner, Long orgID);
 
@@ -59,21 +59,19 @@ public interface ProjectService {
      == Tasks ==
      */
 
-    List<Task> listUserTasks(Account account);
+    List<Task> listUserTasks(Long orgID, Account account);
 
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
 
     AbstractTask getTaskByID(Account account, long id) throws BusinessException;
 
-    List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de);
+    List<ProjectTasks> listTasksByProject(Long orgID, Account actor, Date ds, Date de);
 
     Task createTask(Account actor, Project project, String taskName, String taskComment,
                     Date startDate, Date endDate, double originalEstimate,
                     Long taskTypeID, Account assignedAccountID, String origin,
                     String remotePath, String remoteId,
                     TaskStatus taskStatus, Batch batch);
-
-    void createTasks(Account actor, List<Task> taskList);
 
     Task updateTask(Account actor, Task task);
 

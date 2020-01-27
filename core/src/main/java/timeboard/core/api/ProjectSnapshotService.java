@@ -97,18 +97,23 @@ public interface ProjectSnapshotService {
         }
 
         public void setQuotationRegressionData(Collection<Double> quotationRegressionData) {
-            this.quotationRegressionData = quotationRegressionData; }
+            this.quotationRegressionData = quotationRegressionData;
+        }
 
         public void setOriginalEstimateRegressionData(Collection<Double> originalEstimateRegressionData) {
-            this.originalEstimateRegressionData = originalEstimateRegressionData; }
+            this.originalEstimateRegressionData = originalEstimateRegressionData;
+        }
 
         public void setRealEffortRegressionData(Collection<Double> realEffortRegressionData) {
-            this.realEffortRegressionData = realEffortRegressionData; }
+            this.realEffortRegressionData = realEffortRegressionData;
+        }
 
         public void setEffortLeftRegressionData(Collection<Double> effortLeftRegressionData) {
-            this.effortLeftRegressionData = effortLeftRegressionData; }
+            this.effortLeftRegressionData = effortLeftRegressionData;
+        }
 
         public void setEffortSpentRegressionData(Collection<Double> effortSpentRegressionData) {
-            this.effortSpentRegressionData = effortSpentRegressionData; }
+            this.effortSpentRegressionData = effortSpentRegressionData;
+        }
     }
 }

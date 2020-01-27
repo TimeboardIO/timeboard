@@ -120,7 +120,7 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     @PreAuthorize("hasPermission(#applicant,'VACATION_LIST')")
-    public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID,  int year) {
+    public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID, int year) {
 
         final Calendar startBound = Calendar.getInstance();
         final Calendar endBound = Calendar.getInstance();
@@ -128,11 +128,11 @@ public class VacationServiceImpl implements VacationService {
 
         endBound.set(Calendar.DAY_OF_MONTH, 1);
         endBound.set(Calendar.MONTH, Calendar.JANUARY);
-        endBound.set(Calendar.YEAR, year+1);
+        endBound.set(Calendar.YEAR, year + 1);
 
         startBound.set(Calendar.DAY_OF_MONTH, 31);
         startBound.set(Calendar.MONTH, Calendar.DECEMBER);
-        startBound.set(Calendar.YEAR, year-1);
+        startBound.set(Calendar.YEAR, year - 1);
 
         final TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v " +
@@ -296,7 +296,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         while (currentCalendar.before(endCalendar)) {
-            if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY  && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
+            if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
                 this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
             }
             value = 1 * sign;
@@ -305,7 +305,7 @@ public class VacationServiceImpl implements VacationService {
         if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
             value = 0.5 * sign;
         }
-        if (currentCalendar.get(Calendar.DAY_OF_WEEK)  <= Calendar.FRIDAY  && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY ) {
+        if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
             this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
         }
 
@@ -329,7 +329,7 @@ public class VacationServiceImpl implements VacationService {
     private void updateTaskImputation(final long orgID, final Account user, final DefaultTask task, final Date day,
                                       final double val, final VacationRequest request) throws BusinessException {
 
-        double newValue =  val;
+        double newValue = val;
         if (newValue > 0) {
             //change imputation value only if previous value is smaller than new
             final Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
@@ -343,8 +343,8 @@ public class VacationServiceImpl implements VacationService {
             // keep accepted request
             vacationRequests = vacationRequests.stream().filter(r ->
                     r.getStatus() == VacationRequestStatus.ACCEPTED
-                    && !(r instanceof RecursiveVacationRequest)
-                    && !r.getId().equals(request.getId()))
+                            && !(r instanceof RecursiveVacationRequest)
+                            && !r.getId().equals(request.getId()))
                     .collect(Collectors.toList());
 
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)

@@ -33,6 +33,7 @@ import timeboard.core.api.events.TaskEvent;
 import timeboard.core.api.events.TimeboardEvent;
 import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.api.events.VacationEvent;
+import timeboard.core.internal.organization.OrganizationEvent;
 import timeboard.core.model.Account;
 
 import javax.annotation.PostConstruct;
@@ -43,6 +44,7 @@ import java.util.Map;
 public class TimeboardSubjects {
 
     public static PublishSubject<TaskEvent> TASK_EVENTS = PublishSubject.create();
+    public static PublishSubject<OrganizationEvent> ORGANIZATION_EVENTS = PublishSubject.create();
     public static PublishSubject<VacationEvent> VACATION_EVENTS = PublishSubject.create();
     public static PublishSubject<TimesheetEvent> TIMESHEET_EVENTS = PublishSubject.create();
     public static Observable<TimeboardEvent> TIMEBOARD_EVENTS = PublishSubject.create();
