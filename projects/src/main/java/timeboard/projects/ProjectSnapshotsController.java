@@ -42,7 +42,6 @@ import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectSnapshotService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.ProjectSnapshotServiceImpl;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
@@ -84,7 +83,7 @@ public class ProjectSnapshotsController {
                                            final Project project) throws BusinessException, JsonProcessingException {
 
 
-        final ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
+        final ProjectSnapshotService.ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projectSnapshotGraphWrapper));
     }
 
@@ -255,9 +254,9 @@ public class ProjectSnapshotsController {
     }
 
 
-    public ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper createGraph(final List<ProjectSnapshot> projectSnapshotList) {
+    public ProjectSnapshotService.ProjectSnapshotGraphWrapper createGraph(final List<ProjectSnapshot> projectSnapshotList) {
 
-        final ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper();
+        final ProjectSnapshotService.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotService.ProjectSnapshotGraphWrapper();
 
         final String formatDateToDisplay = "yyyy-MM-dd HH:mm:ss.S";
         final List<String> listOfProjectSnapshotDates = new ArrayList<>();
