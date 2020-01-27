@@ -102,7 +102,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#applicant,'LIST_VACATION')")
+    @PreAuthorize("hasPermission(#applicant,'VACATION_LIST')")
     public List<VacationRequest> listVacationRequestsByUser(final Account applicant, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
@@ -119,7 +119,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#applicant,'LIST_VACATION')")
+    @PreAuthorize("hasPermission(#applicant,'VACATION_LIST')")
     public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID,  int year) {
 
         final Calendar startBound = Calendar.getInstance();
@@ -150,7 +150,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#assignee,'LIST_VACATION')")
+    @PreAuthorize("hasPermission(#assignee,'VACATION_LIST')")
     public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(

@@ -26,8 +26,8 @@ package timeboard.vacations;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -42,6 +42,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -114,8 +115,7 @@ public class VacationsController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createRequest(final TimeboardAuthentication authentication,
-                                        @ModelAttribute final VacationRequestWrapper requestWrapper)
-            throws BusinessException, ParseException {
+                                        @ModelAttribute final VacationRequestWrapper requestWrapper) {
 
         final Account actor = authentication.getDetails();
         final Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
@@ -245,15 +245,16 @@ public class VacationsController {
         return this.listRequests(authentication);
     }
 
-    public static class VacationRequestWrapper {
+    public static class VacationRequestWrapper implements Serializable {
 
         public long id;
-
         public boolean recursive;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         public Date start;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         public Date end;
+
         public boolean halfStart;
         public boolean halfEnd;
         public int recurrenceDay;
@@ -387,7 +388,6 @@ public class VacationsController {
         public void setRecurrenceType(final String recurrenceType) {
             this.recurrenceType = recurrenceType;
         }
-
 
         public boolean isRecursive() {
             return recursive;
