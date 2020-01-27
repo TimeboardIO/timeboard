@@ -82,7 +82,6 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
 
-
     @Override
     @PostAuthorize("#actor.isMemberOf(returnObject)")
     @Cacheable(value = "organizationsCache", key = "#id")
@@ -255,7 +254,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         final TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t " +
                         " from DefaultTask t left join fetch t.imputations where "
-                        +" t.organizationID = :orgID", DefaultTask.class);
+                        + " t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("orgID", orgID);
 
         return q.getResultList();

@@ -94,12 +94,12 @@ public interface TimesheetService {
     class TimesheetFilter<T> {
         private T target;
 
-        public T getTarget() {
-            return target;
-        }
-
         public TimesheetFilter(T target) {
             this.target = target;
+        }
+
+        public T getTarget() {
+            return target;
         }
     }
 
