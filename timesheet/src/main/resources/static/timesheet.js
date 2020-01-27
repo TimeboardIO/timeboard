@@ -6,7 +6,6 @@
 const _ACTOR_ID = $("meta[property='timesheet']").attr('actorID');
 const _YEAR = $("meta[property='timesheet']").attr('year');
 const _WEEK = $("meta[property='timesheet']").attr('week');
-const _LAST_WEEK_SUBMITTED = $("meta[property='timesheet']").attr('lastWeekSubmitted');
 
 const emptyTask = {
     taskID: 0,
@@ -55,22 +54,6 @@ const timesheetModel = {
     },
     getImputation: function (date, taskID) {
         return this.imputations[date][taskID];
-    },
-    enableSubmitButton: function (week) {
-        let result = true;
-
-        //check last week
-        result = result && (this.disablePrev || _LAST_WEEK_SUBMITTED === 'true');
-
-        //check all days imputations == 1
-        this.days.forEach(function (day) {
-            if (day.day !== 'Sun' && day.day !== 'Sat') {
-                let sum = timesheetModel.getImputationSum(day.date);
-                result = result && (sum === 1);
-            }
-        });
-
-        return result;
     },
     rollWeek: function (year, week, x) {
         let day = (1 + (week - 1) * 7); // 1st of January + 7 days for each week
@@ -167,6 +150,19 @@ $(document).ready(function () {
         el: '#timesheet',
         data: timesheetModel,
         methods: {
+            enableSubmitButton: function (week) {
+                let result = true;
+ 
+                //check all days imputations == 1
+                app.days.forEach(function (day) {
+                    if (day.day !== 'Sun' && day.day !== 'Sat') {
+                        let sum = timesheetModel.getImputationSum(day.date);
+                        result = result && (sum === 1);
+                    }
+                });
+
+                return result;
+            },
             updateTimesheet: function () {
                 $('.ui.dimmer').addClass('active');
                 $.get("/timesheet/data?week=" + _WEEK + "&year=" + _YEAR)

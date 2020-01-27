@@ -27,6 +27,8 @@ package timeboard.organization;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,8 +56,9 @@ import java.util.*;
 @RequestMapping("/timesheet")
 public class TimesheetController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TimesheetController.class);
+
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Autowired
     private ProjectService projectService;
@@ -211,9 +214,7 @@ public class TimesheetController {
         try {
             final Account actor = authentication.getDetails();
 
-            // String type = request.getParameter("type");
-
-            final Long taskID = request.task;//Long.parseLong(taskStr);
+            final Long taskID = request.task;
             final AbstractTask task = this.projectService.getTaskByID(actor, taskID);
 
             UpdatedTaskResult updatedTask = null;
@@ -229,7 +230,7 @@ public class TimesheetController {
                 updatedTask = this.projectService.updateTaskEffortLeft(actor, (Task) task, request.imputation);
             }
 
-            return ResponseEntity.ok().body(MAPPER.writeValueAsString(updatedTask));
+            return ResponseEntity.ok(updatedTask);
 
         } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -257,6 +258,7 @@ public class TimesheetController {
 
             return ResponseEntity.ok(submittedTimesheet.getTimesheetStatus());
         } catch (final Exception e) { // TimesheetException
+            LOGGER.error(e.getMessage(), e);
             return ResponseEntity.status(412).build();
         }
     }
@@ -403,7 +405,7 @@ public class TimesheetController {
             this.year = year;
             this.week = week;
             this.days = days;
-            this.disablePrev = year < beginWorkYear || year == beginWorkYear && week <= beginWorkWeek;
+            this.disablePrev = year == beginWorkYear && week == beginWorkWeek;
             this.disableNext = year > currentYear || year == currentYear && week >= currentWeek;
             this.projects = projects;
             this.imputations = imputationWrappers;
@@ -452,6 +454,8 @@ public class TimesheetController {
             return res;
 
         }
+
+
 
         public boolean isDisablePrev() {
             return disablePrev;
