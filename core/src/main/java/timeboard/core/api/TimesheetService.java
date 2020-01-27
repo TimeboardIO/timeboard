@@ -32,6 +32,7 @@ import timeboard.core.model.*;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 
 public interface TimesheetService {
@@ -57,11 +58,11 @@ public interface TimesheetService {
      * Get timesheet validation status.
      *
      * @param currentAccount user used to check timesheet sumbit state.
-     * @param week           timesheet week
      * @param year           timesheet year
+     * @param week           timesheet week
      * @return ValidationStatus
      */
-    ValidationStatus getTimesheetValidationStatus(
+    Optional<ValidationStatus> getTimesheetValidationStatus(
             final Long orgID,
             final Account currentAccount,
             final int year,

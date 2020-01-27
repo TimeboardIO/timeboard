@@ -59,9 +59,10 @@
                 <table class="ui table">
                     <thead class="mobile hide">
                     <tr class="center aligned">
-                        <th class="two wide">Week</th>
-                        <th class="four wide">Period</th>
-                        <th class="two wide">Days</th>
+                        <th class="three wide">Week</th>
+                        <th class="six wide">Period</th>
+                        <th class="one wide">Days</th>
+                        <th class="one wide">Submitted</th>
                         <th class="one wide">Validated</th>
                     </tr>
                     </thead>
@@ -83,16 +84,33 @@
                                 ><p th:text="${week.imputationSum}"></p></div>
                             </a>
                         </td>
+                        <td data-label="Submitted">
+                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
+                                <span th:if="${week.isValidationStatus('REJECTED')}">
+                                    <i class="large attention yellow icon"></i>
+                                </span>
+                                <span th:if="${week.isValidationStatus('NONE')}">
+                                    <i class="large plus circle red icon" style="transform: rotateZ(45deg);"></i>
+                                </span>
+                                <span th:if="${!week.isValidationStatus('NONE') && !week.isValidationStatus('REJECTED')}">
+                                    <i class="large check circle green icon"></i>
+                                </span>
+                            </a>
+                        </td>
                         <td data-label="Validated">
                             <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
-                                <span th:text="${week.getValidationStatus()}"></span>
+                                <span th:if="${week.isValidationStatus('VALIDATED')}">
+                                    <i class="large check circle green icon"></i>
+                                </span>
+                                <span th:if="${!week.isValidationStatus('VALIDATED')}">
+                                    <i class="large plus circle red icon" style="transform: rotateZ(45deg);"></i>
+                                </span>
                             </a>
                         </td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-
         </div>
 
     </div>

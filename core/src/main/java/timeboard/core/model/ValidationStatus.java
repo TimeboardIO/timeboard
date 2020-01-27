@@ -27,7 +27,7 @@ package timeboard.core.model;
  */
 
 public enum ValidationStatus {
-    DRAFT,
+    NONE,
     PENDING_VALIDATION,
     VALIDATED,
     REJECTED

@@ -39,10 +39,7 @@ import timeboard.core.model.ValidationStatus;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.model.WeekWrapper;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Controller
@@ -78,7 +75,7 @@ public class HomeController {
         final int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                final ValidationStatus timesheetStatus = timesheetService.getTimesheetValidationStatus(
+                final Optional<ValidationStatus> timesheetStatusOpt = timesheetService.getTimesheetValidationStatus(
                         authentication.getCurrentOrganization(),
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
@@ -94,7 +91,7 @@ public class HomeController {
                         calendar.get(Calendar.WEEK_OF_YEAR),
                         calendar.get(Calendar.YEAR),
                         weekSum,
-                        timesheetStatus,
+                        timesheetStatusOpt.orElse(ValidationStatus.NONE),
                         firstDayOfWeek,
                         lastDayOfWeek);
 

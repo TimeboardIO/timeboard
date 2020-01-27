@@ -86,12 +86,12 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
         previousWeek.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
-        final ValidationStatus lastWeekSubmitted = this.getTimesheetValidationStatus(
+        final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
                 currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if (!firstWeek && lastWeekSubmitted == ValidationStatus.VALIDATED) {
-            throw new TimesheetException("Can not submit this week, previous week is not validated");
+        if (!firstWeek && lastWeekValidatedOpt.isEmpty()) {
+            throw new TimesheetException("Can not submit this week, previous week is not submitted");
         }
 
         final Calendar firstDay = Calendar.getInstance();
@@ -154,26 +154,31 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public ValidationStatus getTimesheetValidationStatus(
+    public Optional<ValidationStatus> getTimesheetValidationStatus(
             final Long orgID,
             final Account currentAccount,
             final int year,
             final int week) {
 
-        final TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year " +
-                "and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
-
-        q.setParameter("week", week);
-        q.setParameter("year", year);
-        q.setParameter("user", currentAccount);
-        q.setParameter("orgID", orgID);
+        ValidationStatus validationStatus = null;
 
         try {
-            return q.getSingleResult();
-        } catch (final Exception e) {
-            return ValidationStatus.DRAFT;
+
+            final TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
+                    + "where st.account = :user and st.year = :year " +
+                    "and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
+
+            q.setParameter("week", week);
+            q.setParameter("year", year);
+            q.setParameter("user", currentAccount);
+            q.setParameter("orgID", orgID);
+
+            validationStatus = q.getSingleResult();
+
+        }catch(Exception e){
         }
+
+        return Optional.ofNullable(validationStatus);
     }
 
     @Override
