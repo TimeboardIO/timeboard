@@ -24,7 +24,7 @@
             </a>
         </div>
 
-        <data-table v-bind:config="table">
+        <data-table v-bind:table="tagsListData" v-bind:config="tagsListConfig">
             <template v-slot:tagkey="{row}">
                 <div class="ui input">
                     <input type="text" v-model="row.tagKey"/>

@@ -22,7 +22,7 @@
             </a>
         </div>
 
-        <data-table v-bind:config="table">
+        <data-table v-bind:table="batchesListData" v-bind:config="batchesListConfig">
             <template v-slot:name="{row}">
                 {{row.name}}
             </template>
