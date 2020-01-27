@@ -1,4 +1,4 @@
-package timeboard.core.internal;
+package timeboard.core.internal.reports;
 
 /*-
  * #%L
@@ -26,6 +26,8 @@ package timeboard.core.internal;
  * #L%
  */
 
+import edu.emory.mathcs.backport.java.util.Collections;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +41,14 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
+import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -59,17 +64,58 @@ public class ReportServiceImpl implements ReportService {
     @Autowired
     private ProjectService projectService;
 
+    @Autowired(required = false)
+    private List<ReportHandler> reportHandlers;
+
+    @Autowired
+    private Scheduler scheduler;
+
+    @PostConstruct
+    public void initQuartzJobsForHandlers(){
+        this.reportHandlers
+                .stream()
+                .forEach(reportHandler -> {
+                    try {
+                        final JobDetail details = JobBuilder.newJob()
+                                .withIdentity(reportHandler.handlerJobJey())
+                                .ofType(ReportJob.class)
+                                .requestRecovery(false)
+                                .storeDurably(true)
+                                .build();
+                        this.scheduler.addJob(details, false);
+                    }catch (SchedulerException e){
+                        LOGGER.error(e.getMessage());
+                    }
+                });
+
+    }
+
     @Override
     @Transactional
     public Report createReport(final Account owner, final String reportName, final Account organization,
-                               final String type, final String filterProject) {
+                               final String handlerID, final String filterProject) throws SchedulerException {
+
+
         final Report newReport = new Report();
         newReport.setName(reportName);
-        newReport.setType(type);
+        newReport.setHandlerID(handlerID);
         newReport.setFilterProject(filterProject);
-        em.persist(newReport);
 
-        LOGGER.info("Report " + reportName + " created by user " + owner.getId());
+        final Optional<ReportHandler> reportHandler = this.getReportHandler(newReport);
+        if(reportHandler.isPresent()){
+            newReport.setHandlerID(reportHandler.get().handlerID());
+            if(reportHandler.get().isAsyncHandler()){
+                final Trigger trigger = TriggerBuilder.newTrigger()
+                        .forJob(reportHandler.get().handlerJobJey())
+                        .withSchedule(CronScheduleBuilder.cronSchedule("*/15 * * * *"))
+                        .build();
+                this.scheduler.scheduleJob(trigger);
+            }
+            em.persist(newReport);
+            LOGGER.info("Report " + reportName + " created by user " + owner.getId());
+        }
+
+
         return newReport;
     }
 
@@ -133,6 +179,33 @@ public class ReportServiceImpl implements ReportService {
     public List<ProjectWrapper> findProjects(final Account actor, final Long orgID, final Report report) {
         return this.findProjects(actor, orgID, Arrays.asList(report.getFilterProject().split("\n")));
     }
+
+    @Override
+    public Optional<ReportHandler> getReportHandler(final Report report) {
+
+
+        return this.reportHandlers.stream()
+                .filter(rc ->
+                {
+                    return  rc.handlerID().equals(report.getHandlerID());
+                }).findFirst();
+    }
+
+    @Override
+    public List<ReportHandler> listReportHandlers() {
+        return Collections.unmodifiableList(this.reportHandlers);
+    }
+
+    @Override
+    public void executeAsyncReport(final Account actor, final Report report) throws SchedulerException {
+
+        final Optional<ReportHandler> handler = this.getReportHandler(report);
+        if(handler.isPresent()) {
+            this.scheduler.triggerJob((handler.get().handlerJobJey()));
+        }
+
+    }
+
 
     private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {
         return projectWrapper.getProjectTags()

@@ -44,12 +44,14 @@ public class Report extends OrganizationEntity implements Serializable {
     private String filterProject;
 
     @Column
-    private String type;
+    private String handlerID;
+
+    @Column
+    private String handlerAsyncJobID;
 
 
     public Report() {
     }
-
 
 
     public Long getId() {
@@ -58,6 +60,14 @@ public class Report extends OrganizationEntity implements Serializable {
 
     public void setId(final Long id) {
         this.id = id;
+    }
+
+    public String getHandlerID() {
+        return handlerID;
+    }
+
+    public void setHandlerID(final String handlerID) {
+        this.handlerID = handlerID;
     }
 
     public String getName() {
@@ -76,11 +86,11 @@ public class Report extends OrganizationEntity implements Serializable {
         this.filterProject = filterProject;
     }
 
-    public String getType() {
-        return type;
+    public String getHandlerAsyncJobID() {
+        return handlerAsyncJobID;
     }
 
-    public void setType(final String type) {
-        this.type = type;
+    public void setHandlerAsyncJobID(final String handlerAsyncJobID) {
+        this.handlerAsyncJobID = handlerAsyncJobID;
     }
 }

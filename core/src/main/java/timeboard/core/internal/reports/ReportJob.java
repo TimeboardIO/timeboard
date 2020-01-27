@@ -1,8 +1,8 @@
-package timeboard.reports;
+package timeboard.core.internal.reports;
 
 /*-
  * #%L
- * reports
+ * core
  * %%
  * Copyright (C) 2019 - 2020 Timeboard
  * %%
@@ -12,10 +12,10 @@ package timeboard.reports;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,39 +26,16 @@ package timeboard.reports;
  * #L%
  */
 
-import org.springframework.ui.Model;
-import timeboard.core.model.Report;
-import timeboard.core.security.TimeboardAuthentication;
+import org.quartz.*;
+import org.springframework.stereotype.Component;
 
-import java.io.Serializable;
+@Component
+@PersistJobDataAfterExecution
+@DisallowConcurrentExecution
+public final class ReportJob implements Job {
 
-public interface ReportController {
+    @Override
+    public void execute(final JobExecutionContext context) throws JobExecutionException {
 
-    <T extends Serializable> T getReportModel(
-            final TimeboardAuthentication authentication,
-            final Report report);
-
-    /**
-     * Unique report id
-     * @return unique id as string
-     */
-    String reportID();
-
-    /**
-     * i18n report name as code
-     * @return report.*
-     */
-    String reportLabel();
-
-    /**
-     * Report template name
-     * @return template name relative to reports/src/main/resources/templates/fragments
-     */
-    String reportView();
-
-    /**
-     * if true, report exec is async
-     * @return true if async, false else
-     */
-    Boolean isAsync();
+    }
 }

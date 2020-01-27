@@ -26,23 +26,31 @@ package timeboard.core.api;
  * #L%
  */
 
+import org.quartz.SchedulerException;
+import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
 import java.beans.Transient;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface ReportService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
-    Report createReport(Account owner, String reportName, Account organization, String type, String filterProject);
+    Report createReport(Account owner, String reportName, Account organization, String handlerName, String filterProject) throws SchedulerException;
 
+    /**
+     * List all report for owner
+     * @param owner an account that own reports
+     * @return
+     */
     List<Report> listReports(Account owner);
 
-    Report updateReport(Account owner, Report report);
+    Report updateReport(Account actor, Report report);
 
     Report getReportByID(Account actor, Long reportId);
 
@@ -51,6 +59,14 @@ public interface ReportService {
     List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions);
 
     List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report);
+
+    Optional<ReportHandler> getReportHandler(Report report);
+
+    List<ReportHandler> listReportHandlers();
+
+    void executeAsyncReport(Account actor, Report report) throws SchedulerException;
+
+
 
 
     class ProjectWrapper {
