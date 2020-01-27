@@ -59,9 +59,10 @@
                 <table class="ui table">
                     <thead class="mobile hide">
                     <tr class="center aligned">
-                        <th class="six wide">Week</th>
-                        <th class="four wide">Days</th>
-                        <th class="two wide">Validated</th>
+                        <th class="two wide">Week</th>
+                        <th class="four wide">Period</th>
+                        <th class="two wide">Days</th>
+                        <th class="one wide">Validated</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -69,6 +70,10 @@
                         <td data-label="Week">
                             <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} "
                                th:text="${'Week '+week.number}"></a>
+                        </td>
+                        <td data-label="Period">
+                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} "
+                               th:text="${week.firstDay+' | '+week.lastDay}"></a>
                         </td>
                         <td data-label="Days">
                             <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">

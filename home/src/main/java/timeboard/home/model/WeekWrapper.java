@@ -26,20 +26,29 @@ package timeboard.home.model;
  * #L%
  */
 
+import org.springframework.format.annotation.DateTimeFormat;
 import timeboard.core.model.ValidationStatus;
 
-public class Week {
+import java.util.Date;
+
+public class WeekWrapper {
 
     private int number;
     private int year;
     private double imputationSum;
     private ValidationStatus validationStatus;
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    private Date firstDay;
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    private Date lastDay;
 
-    public Week(final int number, final int year, final double imputationSum, final ValidationStatus vs) {
+    public WeekWrapper(final int number, final int year, final double imputationSum, final ValidationStatus vs, final Date firstDay, final Date lastDay) {
         this.number = number;
         this.year = year;
         this.imputationSum = imputationSum;
         this.validationStatus = vs;
+        this.firstDay = firstDay;
+        this.lastDay = lastDay;
     }
 
     public int getNumber() {
@@ -72,5 +81,21 @@ public class Week {
 
     public void setValidationStatus(final ValidationStatus validationStatus) {
         this.validationStatus = validationStatus;
+    }
+
+    public Date getFirstDay() {
+        return firstDay;
+    }
+
+    public void setFirstDay(Date firstDay) {
+        this.firstDay = firstDay;
+    }
+
+    public Date getLastDay() {
+        return lastDay;
+    }
+
+    public void setLastDay(Date lastDay) {
+        this.lastDay = lastDay;
     }
 }
