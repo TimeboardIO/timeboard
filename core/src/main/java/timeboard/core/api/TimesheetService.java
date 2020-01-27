@@ -60,7 +60,7 @@ public interface TimesheetService {
      * @param currentAccount user used to check timesheet sumbit state.
      * @param year           timesheet year
      * @param week           timesheet week
-     * @return ValidationStatus
+     * @return ValidationStatus, null current account has no timesheet validation request for current week
      */
     Optional<ValidationStatus> getTimesheetValidationStatus(
             final Long orgID,
@@ -81,21 +81,21 @@ public interface TimesheetService {
             final Date firstDayOfWeek,
             final Date lastDayOfWeek,
             final Account account,
-            final TimesheetFilter ... filters);
+            final TimesheetFilter... filters);
 
 
-     Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project);
+    Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project);
 
-    class TimesheetFilter<T>  {
+    class TimesheetFilter<T> {
         private T target;
 
         public T getTarget() {
             return target;
         }
 
-        public TimesheetFilter(T target){
+        public TimesheetFilter(T target) {
             this.target = target;
         }
     }
 
-    }
+}

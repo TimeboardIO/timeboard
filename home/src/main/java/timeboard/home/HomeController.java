@@ -91,7 +91,7 @@ public class HomeController {
                         calendar.get(Calendar.WEEK_OF_YEAR),
                         calendar.get(Calendar.YEAR),
                         weekSum,
-                        timesheetStatusOpt.orElse(ValidationStatus.NONE),
+                        timesheetStatusOpt.orElse(null),
                         firstDayOfWeek,
                         lastDayOfWeek);
 

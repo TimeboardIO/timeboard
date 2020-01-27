@@ -4,20 +4,6 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <style>
-
-    /* Table styles on Medium and Large screen  */
-    @media (max-width: 768px) {
-      .mobile.hide {
-        display: none !important;
-      }
-    }
-
-
-
-    </style>
-</head>
 <body>
 
 
@@ -56,55 +42,55 @@
             </div>
 
             <div class="column center aligned">
-                <table class="ui table">
+                <table class="ui table" style="white-space: nowrap;">
                     <thead class="mobile hide">
                     <tr class="center aligned">
                         <th class="three wide">Week</th>
                         <th class="six wide">Period</th>
                         <th class="one wide">Days</th>
-                        <th class="one wide">Submitted</th>
-                        <th class="one wide">Validated</th>
+                        <th class="one wide"></th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr class="center aligned" th:each="week : ${weeks}">
                         <td data-label="Week">
-                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} "
+                            <a style="color: black" th:href="@{/timesheet/{year}/{week}(week=${week.number}, year=${week.year})} "
                                th:text="${'Week '+week.number}"></a>
                         </td>
                         <td data-label="Period">
-                            <a style="color: black" th:href="@{/timesheet(week=${week.number}, year=${week.year})} "
-                               th:text="${week.firstDay+' | '+week.lastDay}"></a>
+                            <a th:href="@{/timesheet/{year}/{week}(week=${week.number}, year=${week.year})} ">
+                                <span th:text="${#dates.format(week.firstDay, 'dd-MM-yyyy')}"></span>
+                                <i class="angle right icon"></i>
+                                <span th:text="${#dates.format(week.lastDay, 'dd-MM-yyyy')}"></span>
+                            </a>
                         </td>
                         <td data-label="Days">
-                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
+                            <a th:href="@{/timesheet/{year}/{week}(week=${week.number}, year=${week.year})} ">
                                 <div class="ui circular label large day-badge green" th:if="${week.imputationSum >= 5}"
                                 ><p th:text="${week.imputationSum}"></p></div>
                                 <div class="ui circular label large day-badge red" th:if="${week.imputationSum < 5}"
                                 ><p th:text="${week.imputationSum}"></p></div>
                             </a>
                         </td>
-                        <td data-label="Submitted">
-                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
-                                <span th:if="${week.isValidationStatus('REJECTED')}">
-                                    <i class="large attention yellow icon"></i>
-                                </span>
-                                <span th:if="${week.isValidationStatus('NONE')}">
-                                    <i class="large plus circle red icon" style="transform: rotateZ(45deg);"></i>
-                                </span>
-                                <span th:if="${!week.isValidationStatus('NONE') && !week.isValidationStatus('REJECTED')}">
-                                    <i class="large check circle green icon"></i>
-                                </span>
-                            </a>
-                        </td>
                         <td data-label="Validated">
-                            <a th:href="@{/timesheet(week=${week.number}, year=${week.year})} ">
-                                <span th:if="${week.isValidationStatus('VALIDATED')}">
-                                    <i class="large check circle green icon"></i>
-                                </span>
-                                <span th:if="${!week.isValidationStatus('VALIDATED')}">
-                                    <i class="large plus circle red icon" style="transform: rotateZ(45deg);"></i>
-                                </span>
+                            <a th:if="${week.isValidationStatus('REJECTED')}"
+                               th:href="@{/timesheet/{year}/{week}(week=${week.number}, year=${week.year})} "
+                               class="ui red right label">
+                                Rejected
+                            </a>
+                            <a th:if="${week.isValidationStatus('VALIDATED')}"
+                               th:href="@{/timesheet/{year}/{week}(week=${week.number}, year=${week.year})} "
+                               class="ui right label teal">
+                                Validated
+                            </a>
+                            <a th:if="${week.isValidationStatus('PENDING_VALIDATION')}"
+                               th:href="@{/timesheet/{year}/{week}(week=${week.number}, year=${week.year})} "
+                               class="ui orange right label">
+                                Pending Validation
+                            </a>
+                            <a th:if="${week.isValidationStatus('PENDING_SUBMISSION')}"
+                               th:href="@{/timesheet/{year}/{week}(week=${week.number}, year=${week.year})} " class="ui right label">
+                                Pending Submission
                             </a>
                         </td>
                     </tr>
