@@ -152,7 +152,7 @@ $(document).ready(function () {
         methods: {
             enableSubmitButton: function (week) {
                 let result = true;
- 
+
                 //check all days imputations == 1
                 app.days.forEach(function (day) {
                     if (day.day !== 'Sun' && day.day !== 'Sat') {
