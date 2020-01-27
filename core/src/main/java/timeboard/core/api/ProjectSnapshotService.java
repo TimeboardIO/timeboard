@@ -51,5 +51,6 @@ public interface ProjectSnapshotService {
 
     List<TaskSnapshot> findAllTaskSnapshotByTaskID(Account actor, Long taskID);
 
-    void regression(ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList);
+    void regression(ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates,
+                    List<ProjectSnapshot> projectSnapshotList);
 }
