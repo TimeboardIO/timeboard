@@ -5,7 +5,7 @@ $(document).ready(function () {
     let app = new Vue({
         el: '#projectTags',
         data: {
-            table: {
+            tagsListConfig: {
                 cols: [
                     {
                         "slot": "tagkey",
@@ -26,10 +26,10 @@ $(document).ready(function () {
                         "label": "Actions",
                         "primary" : true
                     }],
-                data: [],
                 name: 'tableTag',
                 configurable : true
-            }
+            },
+            tagsListData: []
         },
         methods: {
             addTag: function () {
@@ -43,7 +43,7 @@ $(document).ready(function () {
                         "tagValue": "New Value"
                     },
                     success: function (d) {
-                        self.table.data = d;
+                        self.tagsListData = d;
                     }
                 });
             },
@@ -55,7 +55,7 @@ $(document).ready(function () {
                     data: row,
                     url: "projects/" + projectID + "/tags/" + row.id,
                     success: function (d) {
-                        self.table.data = d;
+                        self.tagsListData = d;
                     }
                 });
             },
@@ -67,7 +67,7 @@ $(document).ready(function () {
                         dataType: "json",
                         url: "projects/" + projectID + "/tags/" + row.id,
                         success: function (d) {
-                            self.table.data = d;
+                            self.tagsListData = d;
                         }
                     });
                 });
@@ -81,7 +81,7 @@ $(document).ready(function () {
                 dataType: "json",
                 url: "projects/" + projectID + "/tags/list",
                 success: function (d) {
-                    self.table.data = d;
+                    self.tagsListData = d;
                 }
             });
         }

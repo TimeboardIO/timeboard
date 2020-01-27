@@ -64,7 +64,7 @@ let app = new Vue({
         vacationRequest: Object.assign({}, emptyVacationRequest),
         calendarData : [],
         calendarYear : 2020,
-        myRequests: {
+        myRequestsListConfig: {
             cols: [
                 {
                     "slot": "label",
@@ -111,11 +111,11 @@ let app = new Vue({
                     "label": "Actions",
                     "primary" : true
                 }],
-            data: [],
             name: 'tableVacation',
             configurable : true
         },
-        toValidateRequests: {
+        myRequestsListData: [],
+        toValidateRequestsListConfig: {
             cols: [
                 {
                     "slot": "label",
@@ -155,10 +155,10 @@ let app = new Vue({
                     "label": "Actions",
                     "primary" : true
                 }],
-            data: [],
             name: 'tableVacationValidation',
             configurable : true
-        }
+        },
+        toValidateRequestsListData: []
     },
     methods:  {
         openModal: function() {
@@ -187,7 +187,7 @@ let app = new Vue({
                         $('#newVacation').modal('hide');
                         $('#newRecursiveVacation').modal('hide');
                         // do something
-                        self.myRequests.data = d;
+                        self.myRequestsListData = d;
                         self.loadCalendar();
                         if(assignedToMyself){
                             self.listToValidateRequests();
@@ -209,7 +209,7 @@ let app = new Vue({
                 data: self.vacationRequest,
                 url: "/vacation/approve/"+request.id,
                 success: function (d) {
-                    self.toValidateRequests.data = d;
+                    self.toValidateRequestsListData = d;
                     if(assignedToMyself){
                         self.listMyRequests();
                     }
@@ -229,7 +229,7 @@ let app = new Vue({
                 data: self.vacationRequest,
                 url: "/vacation/reject/"+request.id,
                 success: function (d) {
-                    self.toValidateRequests.data = d;
+                    self.toValidateRequestsListData = d;
                     if(assignedToMyself){
                         self.listMyRequests();
                     }
@@ -257,7 +257,7 @@ let app = new Vue({
                         data: self.vacationRequest,
                         url: "/vacation/"+request.id,
                         success: function (d) {
-                            self.myRequests.data = d;
+                            self.myRequestsListData = d;
                             self.loadCalendar();
                             if(assignedToMyself){
                                 self.listToValidateRequests();
@@ -278,7 +278,7 @@ let app = new Vue({
                 dataType: "json",
                 url: "vacation/toValidate/list",
                 success: function (d) {
-                    self.toValidateRequests.data = d;
+                    self.toValidateRequestsListData = d;
                 }
             });
         },
@@ -289,7 +289,7 @@ let app = new Vue({
                 dataType: "json",
                 url: "vacation/list",
                 success: function (d) {
-                    self.myRequests.data = d;
+                    self.myRequestsListData = d;
                 }
             });
             self.loadCalendar();

@@ -33,7 +33,7 @@
                         New Snapshot
                     </a>
                 </div>
-                <data-table v-bind:config="table">
+                <data-table v-bind:table="snapshotsListData" v-bind:config="snapshotsListConfig">
                     <template v-slot:snapshotdate="{row}">
                         <div class="ui field">
                             <label>{{row.projectSnapshotDate}}</label>
