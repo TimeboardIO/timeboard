@@ -26,17 +26,18 @@ package timeboard.core.model;
  * #L%
  */
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class CalendarEvent {
+import java.io.Serializable;
+import java.util.*;
+import java.util.Calendar;
+
+
+public class CalendarEvent implements Serializable {
 
     private String name;
-    private String date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date date;
     private double value;
     private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
 
@@ -50,7 +51,7 @@ public class CalendarEvent {
         this.name = name;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
@@ -62,7 +63,7 @@ public class CalendarEvent {
         return value;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
@@ -74,18 +75,18 @@ public class CalendarEvent {
         this.type = type;
     }
 
-    public static List<CalendarEvent> requestToWrapperList(List<VacationRequest> requests, DateFormat formatter) {
+    public static List<CalendarEvent> requestToWrapperList(List<VacationRequest> requests) {
         final List<CalendarEvent> results = new ArrayList<>();
 
         for (VacationRequest r : requests) {
-            results.addAll(requestToWrapper(r, formatter));
+            results.addAll(requestToWrapper(r));
         }
 
         return results;
     }
 
 
-    public static List<CalendarEvent> requestToWrapper(VacationRequest request, DateFormat formatter) {
+    public static List<CalendarEvent> requestToWrapper(VacationRequest request) {
         final LinkedList<CalendarEvent> results = new LinkedList<>();
 
         final java.util.Calendar start = java.util.Calendar.getInstance();
@@ -98,7 +99,7 @@ public class CalendarEvent {
             final CalendarEvent wrapper = new CalendarEvent();
 
             wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate (formatter.format(start.getTime()));
+            wrapper.setDate (start.getTime());
             if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
                 wrapper.setValue(1);
             }

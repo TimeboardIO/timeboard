@@ -51,5 +51,5 @@
     "description": "Any user belonging to the project can see project members vacation requests",
     "target": "action == 'VACATION_TEAM_LIST'",
     "condition": "resource.isMember(subject.getDetails())"
-  },
+  }
 ]

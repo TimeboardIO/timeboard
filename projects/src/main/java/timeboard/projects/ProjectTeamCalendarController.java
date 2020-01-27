@@ -26,6 +26,7 @@ package timeboard.projects;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +41,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.io.Serializable;
 import java.util.*;
 import java.util.Calendar;
 import java.util.stream.Collectors;
@@ -54,7 +54,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects/{projectID}/calendar")
 public class ProjectTeamCalendarController {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     @Autowired
     public ProjectService projectService;
@@ -95,7 +94,7 @@ public class ProjectTeamCalendarController {
 
         // re-balance key to user screen name and wrap request to ui calendar
         final Map<String, List<CalendarEvent>> newMap = accountVacationRequestMap.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> CalendarEvent.requestToWrapperList(e.getValue(), DATE_FORMAT)));
+                .collect(Collectors.toMap(e -> e.getKey().getScreenName(), e -> CalendarEvent.requestToWrapperList(e.getValue())));
 
         return ResponseEntity.ok(newMap);
     }
@@ -125,7 +124,7 @@ public class ProjectTeamCalendarController {
             final CalendarEventWrapper wrapper = new CalendarEventWrapper();
 
             wrapper.setName(request.getApplicant().getScreenName());
-            wrapper.setDate(start);
+            wrapper.setDate(start.getTime());
             if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
                 wrapper.setValue(1);
             } else if (request.getStatus() == VacationRequestStatus.PENDING) {
@@ -152,20 +151,19 @@ public class ProjectTeamCalendarController {
         return results;
     }
 
-    public static class CalendarEventWrapper {
+    public static class CalendarEventWrapper implements Serializable {
 
         private String name;
-        private Calendar date;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private Date date;
         private double value;
         private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
 
         public CalendarEventWrapper() {
-            this.date = Calendar.getInstance();
         }
 
         public CalendarEventWrapper(final Imputation imputation) {
-            this.date = Calendar.getInstance();
-            this.date.setTime(imputation.getDay());
+            this.date = imputation.getDay();
             this.value = imputation.getValue();
             this.type = 1;
             this.name = imputation.getAccount().getScreenName();
@@ -179,15 +177,12 @@ public class ProjectTeamCalendarController {
             this.name = name;
         }
 
-        public String getDate() {
-            return DATE_FORMAT.format(date);
+
+        public Date getDate() {
+            return date;
         }
 
         public void setDate(Date date) {
-            this.date.setTime(date);
-        }
-
-        public void setDate(Calendar date) {
             this.date = date;
         }
 

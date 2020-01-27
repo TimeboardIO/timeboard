@@ -26,6 +26,7 @@ package timeboard.vacations;
  * #L%
  */
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +42,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -53,7 +52,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/vacation")
 public class VacationsController {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private UserService userService;
 
@@ -121,8 +119,8 @@ public class VacationsController {
 
         final Account actor = authentication.getDetails();
         final Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
-        final Date startDate = DATE_FORMAT.parse(requestWrapper.start);
-        final Date endDate = DATE_FORMAT.parse(requestWrapper.end);
+        final Date startDate = requestWrapper.start;
+        final Date endDate = requestWrapper.end;
 
         if (startDate.getTime() > endDate.getTime()) {
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
@@ -252,8 +250,10 @@ public class VacationsController {
         public long id;
 
         public boolean recursive;
-        public String start;
-        public String end;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        public Date start;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        public Date end;
         public boolean halfStart;
         public boolean halfEnd;
         public int recurrenceDay;
@@ -270,8 +270,8 @@ public class VacationsController {
 
         public VacationRequestWrapper(final VacationRequest r) {
             this.id = r.getId();
-            this.start = DATE_FORMAT.format(r.getStartDate());
-            this.end = DATE_FORMAT.format(r.getEndDate());
+            this.start = r.getStartDate();
+            this.end = r.getEndDate();
             this.halfStart = r.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON);
             this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
             this.status = r.getStatus().name();
@@ -316,19 +316,19 @@ public class VacationsController {
             this.id = id;
         }
 
-        public String getStart() {
+        public Date getStart() {
             return start;
         }
 
-        public void setStart(final String start) {
+        public void setStart(final Date start) {
             this.start = start;
         }
 
-        public String getEnd() {
+        public Date getEnd() {
             return end;
         }
 
-        public void setEnd(final String end) {
+        public void setEnd(final Date end) {
             this.end = end;
         }
 
