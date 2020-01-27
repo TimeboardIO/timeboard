@@ -37,9 +37,9 @@ public class WeekWrapper {
     private int year;
     private double imputationSum;
     private ValidationStatus validationStatus;
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date firstDay;
-    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date lastDay;
 
     public WeekWrapper(final int number, final int year, final double imputationSum, final ValidationStatus vs,
