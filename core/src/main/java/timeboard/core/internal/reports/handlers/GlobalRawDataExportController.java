@@ -1,4 +1,4 @@
-package timeboard.reports.controller;
+package timeboard.core.internal.reports.handlers;
 
 /*-
  * #%L
@@ -26,34 +26,25 @@ package timeboard.reports.controller;
  * #L%
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
+import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.reports.ReportController;
 
 import java.io.Serializable;
 import java.util.List;
 
 
 @Component
-public class GlobalRawDataExportController implements ReportController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalRawDataExportController.class);
+public class GlobalRawDataExportController implements ReportHandler {
 
     @Autowired
     private ReportService reportService;
-
-    @Autowired
-    private ProjectService projectService;
-
 
     @Override
     public Serializable getReportModel(
@@ -73,22 +64,22 @@ public class GlobalRawDataExportController implements ReportController {
 
 
     @Override
-    public String reportID() {
+    public String handlerID() {
         return this.getClass().getSimpleName();
     }
 
     @Override
-    public String reportLabel() {
+    public String handlerLabel() {
         return "report.raw";
     }
 
     @Override
-    public String reportView() {
+    public String handlerView() {
         return "global_raw_data_export.html";
     }
 
     @Override
-    public Boolean isAsync() {
+    public Boolean isAsyncHandler() {
         return true;
     }
 }

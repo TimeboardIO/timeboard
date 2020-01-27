@@ -46,7 +46,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -201,7 +200,7 @@ public class ReportServiceImpl implements ReportService {
 
         final Optional<ReportHandler> handler = this.getReportHandler(report);
         if(handler.isPresent()) {
-            this.scheduler.triggerJob((handler.get().handlerJobJey()));
+            this.scheduler.triggerJob(handler.get().handlerJobJey());
         }
 
     }

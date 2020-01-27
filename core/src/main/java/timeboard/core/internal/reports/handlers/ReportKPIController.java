@@ -1,4 +1,4 @@
-package timeboard.reports.controller;
+package timeboard.core.internal.reports.handlers;
 
 /*-
  * #%L
@@ -36,10 +36,10 @@ import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.reports.ReportController;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 @Component
-public class ReportKPIController implements ReportController {
+public class ReportKPIController implements ReportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportKPIController.class);
 
@@ -101,22 +101,22 @@ public class ReportKPIController implements ReportController {
 
 
     @Override
-    public String reportID() {
+    public String handlerID() {
         return this.getClass().getSimpleName();
     }
 
     @Override
-    public String reportLabel() {
+    public String handlerLabel() {
         return "report.kpi";
     }
 
     @Override
-    public String reportView() {
+    public String handlerView() {
         return "view_report_kpi.html";
     }
 
     @Override
-    public Boolean isAsync() {
+    public Boolean isAsyncHandler() {
         return false;
     }
 }
