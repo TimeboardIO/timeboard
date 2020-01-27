@@ -87,12 +87,12 @@ public class ProjectTimesheetValidationController {
 
                 .collect(Collectors.toMap(
                         e -> e.getKey().getId(),
-                        e -> new UserWrapper(e.getKey(), e.getValue(), fillSubmittedTimesheets(e.getKey(), e.getValue()))));
+                        e -> new UserWrapper(e.getKey(), e.getValue(), fillTimesheetWeeks(e.getKey(), e.getValue()))));
 
         return ResponseEntity.ok(newMap);
     }
 
-    private List<TimesheetWeekWrapper> fillSubmittedTimesheets(Account a, List<SubmittedTimesheet> submittedTimesheets) {
+    private List<TimesheetWeekWrapper> fillTimesheetWeeks(Account a, List<SubmittedTimesheet> submittedTimesheets) {
 
         if(!submittedTimesheets.isEmpty()) {
             //user already have submitted at least one week
