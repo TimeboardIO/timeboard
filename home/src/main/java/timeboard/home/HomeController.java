@@ -87,7 +87,8 @@ public class HomeController {
                 final Date firstDayOfWeek = calendar.getTime();
                 calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
                 final Date lastDayOfWeek = calendar.getTime();
-                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(firstDayOfWeek, lastDayOfWeek, account);
+                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(firstDayOfWeek, lastDayOfWeek,
+                        account).values().stream().reduce(Double::sum).orElse(0.0);
 
                 final Week week = new Week(
                         calendar.get(Calendar.WEEK_OF_YEAR),
