@@ -6,6 +6,7 @@ $(document).ready(function () {
         el: '#projectSnapshots',
         data: {
             table: {
+                name:"table",
                 cols: [
                     {
                         "slot": "snapshotdate",
@@ -73,6 +74,7 @@ $(document).ready(function () {
                     }
                 });
             },
+
             showGraph: function() {
                 var self = this;
                 $.ajax({
@@ -80,50 +82,84 @@ $(document).ready(function () {
                     dataType: "json",
                     url: "projects/" + projectID + "/snapshots/chart",
                     success: function (d) {
-                        let listOfProjectSnapshotDates = d.listOfProjectSnapshotDates;
-                        let quotationDataForChart = d.quotationData;
-                        let originalDataForChart = d.originalEstimateData;
-                        let realEffortDataForChart = d.realEffortData;
-                        let effortLeftDataForChart = d.effortLeftData;
-                        let effortSpentDataForChart = d.effortSpentData;
+
+                        for(let i = 0; i < d.listOfProjectSnapshotDates.length; i++){
+                            let date = new Date(d.listOfProjectSnapshotDates[i]);
+                            d.listOfProjectSnapshotDates[i] = date.toLocaleString();
+                        }
 
                         //chart config
                         let chart = new Chart($("#lineChart"), {
                             type: 'line',
                             data: {
-                                labels: listOfProjectSnapshotDates,
+                                labels: d.listOfProjectSnapshotDates,
                                 datasets: [{
-                                    data: quotationDataForChart,
+                                    data: d.quotationData,
                                     label: "QT",
                                     borderColor: "#3e95cd",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
                                 } , {
-                                    data: originalDataForChart,
+                                    data: d.quotationRegressionData,
+                                    label: "Poly_QT",
+                                    borderColor: "#3e95cd",
+                                    fill: false,
+                                    steppedLine: true,
+                                    borderDash:[5, 15]
+                                } , {
+                                    data: d.originalEstimateData,
                                     label: "OE",
                                     borderColor: "#ff6384",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
-                                 } , {
-                                    data: realEffortDataForChart,
+                                } , {
+                                    data: d.originalEstimateRegressionData,
+                                    label: "Poly_OE",
+                                    borderColor: "#ff6384",
+                                    fill: false,
+                                    steppedLine: true,
+                                    borderDash:[5, 15]
+                                } , {
+                                    data: d.realEffortData,
                                     label: "RE",
                                     borderColor: "#00CC00",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
-                                 } , {
-                                     data: effortLeftDataForChart,
+                                } , {
+                                     data: d.realEffortRegressionData,
+                                     label: "Poly_RE",
+                                     borderColor: "#00CC00",
+                                     fill: false,
+                                     steppedLine: true,
+                                     borderDash:[5, 15]
+                                } , {
+                                     data: d.effortLeftData,
                                      label: "EL",
                                      borderColor: "#FF00CC",
-                                     fill: true,
+                                     fill: false,
                                      steppedLine: true
-                                 } , {
-                                    data: effortSpentDataForChart,
+                                } , {
+                                     data: d.effortLeftRegressionData,
+                                     label: "Poly_EL",
+                                     borderColor: "#FF00CC",
+                                     fill: false,
+                                     steppedLine: true,
+                                     borderDash:[5, 15]
+                                } , {
+                                    data: d.effortSpentData,
                                     label: "ES",
                                     borderColor: "#FFFF00",
-                                    fill: true,
+                                    fill: false,
                                     steppedLine: true
-                                  }
-                                 ]
+                                } , {
+                                    data: d.effortSpentRegressionData,
+                                    label: "Poly_ES",
+                                    borderColor: "#FFFF00",
+                                    fill: false,
+                                    steppedLine: true,
+                                    borderDash:[5, 15]
+                                }
+                                ]
                             },
                             options: {
                                 title: { display: true, text: 'Project' },
@@ -153,7 +189,10 @@ $(document).ready(function () {
                 success: function (d) {
                     self.formatDate(d);
                     self.table.data = d;
-                    self.showGraph();
+                    if(d.length>0){
+                        self.showGraph();
+                    }
+
                 }
             });
         }
