@@ -3,7 +3,7 @@
 */
 
 
-const _ACTOR_ID = $("meta[property='timesheet']").attr('actorID');
+const _USER_ID = $("meta[property='timesheet']").attr('userID');
 const _YEAR = $("meta[property='timesheet']").attr('year');
 const _WEEK = $("meta[property='timesheet']").attr('week');
 const _LAST_WEEK_SUBMITTED = $("meta[property='timesheet']").attr('lastWeekSubmitted');
@@ -169,7 +169,7 @@ $(document).ready(function () {
         methods: {
             updateTimesheet: function () {
                 $('.ui.dimmer').addClass('active');
-                $.get("/timesheet/data?week=" + _WEEK + "&year=" + _YEAR)
+                $.get("/timesheet/data?user="+_USER_ID+"&week=" + _WEEK + "&year=" + _YEAR)
                     .then(function (data) {
                         app.week = data.week;
                         app.year = data.year;
@@ -283,7 +283,7 @@ $(document).ready(function () {
                 } else {
                     this.modalTitle = "Create task";
                     Object.assign(this.newTask, emptyTask);
-                    this.newTask.assigneeID = _ACTOR_ID;
+                    this.newTask.assigneeID = _USER_ID;
                 }
                 let self = this;
                 $('.create-task.modal').modal({

@@ -81,24 +81,25 @@ public class TimesheetController {
     @GetMapping(value="/data",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimesheetWrapper> getTimesheetData(
             final TimeboardAuthentication authentication,
+            final @RequestParam("user") Account user,
             final @RequestParam("week") int week,
             final @RequestParam("year") int year) throws BusinessException {
 
-        final Account currentAccount = authentication.getDetails();
+        final Account currentAccount = user;
+        final Long currentOrg =  authentication.getCurrentOrganization();
 
         final Calendar beginWorkDate = this.organizationService
-                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .findOrganizationMembership(currentAccount, currentOrg)
                 .get().getCreationDate();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
-
         final Calendar c = firstDayOfWeek(week, year);
         final Date ds = findStartDate(c);
         final Date de = findEndDate(c);
 
         // Create days for current week
-        final List<DateWrapper> days = createDaysForCurrentWeek(authentication, c, ds);
+        final List<DateWrapper> days = createDaysForCurrentWeek(currentOrg, currentAccount, c, ds);
 
         //Get tasks for current week
         if (this.projectService != null) {
@@ -133,7 +134,7 @@ public class TimesheetController {
             });
 
             //Default tasks
-            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, authentication.getCurrentOrganization(), imputations, ds, de, days);
+            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, currentOrg, imputations, ds, de, days);
 
             projects.add(new ProjectWrapper(
                     (long) 0,
@@ -143,12 +144,12 @@ public class TimesheetController {
 
         final TimesheetWrapper ts = new TimesheetWrapper(
                 this.timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
+                        currentOrg,
                         currentAccount,
                         year,
                         week - 1),
                 this.timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
+                        currentOrg,
                         currentAccount,
                         year,
                         week),
@@ -165,24 +166,24 @@ public class TimesheetController {
 
 
     @GetMapping("/{year}/{week}")
-    protected String fillAndDisplayTimesheetPage(
+    public String fillAndDisplayTimesheetPage(
             final TimeboardAuthentication authentication,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
-            final Model model) throws Exception {
+            final Model model) {
         return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, model);
     }
 
     @GetMapping("/{user}/{year}/{week}")
-    protected String fillAndDisplayTimesheetPage(
+    public String fillAndDisplayTimesheetPage(
             final TimeboardAuthentication authentication,
             @PathVariable("user") final Account user,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
-            final Model model) throws Exception {
+            final Model model) {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
-                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .findOrganizationMembership(user, authentication.getCurrentOrganization())
                 .get().getCreationDate();
 
         final Calendar c = beginWorkDateForCurrentOrg;
@@ -200,11 +201,11 @@ public class TimesheetController {
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
-        model.addAttribute("actorID", authentication.getDetails().getId());
+        model.addAttribute("userID", user.getId());
         model.addAttribute("lastWeekSubmitted",
                 this.timesheetService.getTimesheetValidationStatus(
                         authentication.getCurrentOrganization(),
-                        authentication.getDetails(),
+                        user,
                         lastWeekYear,
                         lastWeek));
 
@@ -212,7 +213,7 @@ public class TimesheetController {
 
         model.addAttribute("projectList",
                 this.projectService.listProjects(
-                        authentication.getDetails(), authentication.getCurrentOrganization()));
+                        user, authentication.getCurrentOrganization()));
 
         return "timesheet.html";
     }
@@ -302,10 +303,10 @@ public class TimesheetController {
     }
 
     private List<DateWrapper> createDaysForCurrentWeek(
-            final TimeboardAuthentication authentication, final Calendar c, final Date ds) throws BusinessException {
+            final Long organization, final Account user,  final Calendar c, final Date ds) throws BusinessException {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
-                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .findOrganizationMembership(user, organization)
                 .get().getCreationDate();
 
 
