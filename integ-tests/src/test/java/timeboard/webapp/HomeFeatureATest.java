@@ -60,17 +60,17 @@ public class HomeFeatureATest extends TimeboardTest {
     public void user_with_an_existing_account_and_project(final int arg1) throws Throwable {
 
         this.model = new ConcurrentModel();
-        this.organisation = this.organizationService.createOrganization("Integration", Collections.emptyMap());
-
         this.account = this.userService.userProvisionning(UUID.randomUUID().toString(), "test");
+
+        this.organisation = this.organizationService.createOrganization(this.account, "Integration", Collections.emptyMap());
+
         Assert.assertNotNull(this.account);
         this.auth = new TimeboardAuthentication(this.account);
         this.auth.setCurrentOrganization(this.organisation.getId());
-        this.account.getOrganizations().add(new OrganizationMembership(this.organisation, this.account, MembershipRole.OWNER));
         SecurityContextHolder.getContext().setAuthentication(this.auth);
         ThreadLocalStorage.setCurrentOrgId(this.organisation.getId());
 
-        this.projectService.createProject(this.account, "TestProject");
+        this.projectService.createProject(this.organisation.getId(), this.account, "TestProject");
     }
 
     @When("^the user calls /home$")
