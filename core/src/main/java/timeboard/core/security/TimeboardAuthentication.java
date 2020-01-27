@@ -116,5 +116,10 @@ public class TimeboardAuthentication implements Authentication {
                 .allMatch(o -> o.isPublicOrganisation());
     }
 
+    @Transient
+    public boolean is(Account account) {
+        return this.getDetails().equals(account);
+    }
+
 
 }

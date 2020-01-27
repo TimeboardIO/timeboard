@@ -105,11 +105,12 @@ const projectID = $("meta[name='projectID']").attr('value');
 let app = new Vue({
     el: '#tasksList',
     data: {
+        taskList : [],
         newTask: Object.assign({}, emptyTask),
         formError: "",
         batches: [],
         modalTitle: "Create task",
-        table: {
+        taskListConfig: {
             cols: [
                 {
                     "slot": "name",
@@ -184,17 +185,29 @@ let app = new Vue({
                 type:      { filterKey: 'typeID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
             },
-            data: [],
             name: 'tasks',
             configurable : true
         },
-        tablePending : {
+        pendingTaskListConfig : {
             cols: [], //will copy table columns
-            data: [],
             name: 'pending tasks',
             configurable : true
         },
-        tableByBatch : {}
+    },
+    computed : {
+        pendingTaskList : function () {
+            return this.taskList.filter(r => r.status === 'PENDING');
+        },
+        tableByBatch: function () {
+            let self = this;
+            let res = {};
+            this.batches.forEach(function(batch) {
+                res[batch.batchID] = self.taskList.filter(row => {
+                    return row.batchIDs.some(b => b === batch.batchID);
+                });
+            });
+            return res;
+        }
     },
     methods: {
         showGraphModal: function(projectID, task, event){
@@ -297,16 +310,17 @@ let app = new Vue({
             }).modal('show');
         },
         approveTask: function(event, task) {
+            let self = this;
             event.target.classList.toggle('loading');
             $.ajax({
                 type: "PATCH",
-                url: "/projects/"+currentProjectID+"/tasks/approve/"+task.taskID,
+                url: "/projects/" + currentProjectID + "/tasks/approve/" + task.taskID,
                 success: function (data) {
                     task.status = 'IN_PROGRESS';
+                    self.taskList.find(e => e.taskID === task.taskID).status = 'IN_PROGRESS';
                     event.target.classList.toggle('loading');
-                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 },
-                error: function (data){
+                error: function (data) {
                     console.log(data);
                 }
             });
@@ -318,8 +332,8 @@ let app = new Vue({
                 url: "/projects/"+currentProjectID+"/tasks/deny/"+task.taskID,
                 success: function (data) {
                     task.status = 'REFUSED';
+                    self.taskList.find(e => e.taskID === task.taskID).status = 'REFUSED';
                     event.target.classList.toggle('loading');
-                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
                 },
                 error: function (data){
                     console.log(data);
@@ -350,7 +364,7 @@ let app = new Vue({
     },
     created: function () {
         // copying table config to pending task table config
-        this.tablePending.cols = this.table.cols;
+        this.pendingTaskListConfig.cols = this.taskListConfig.cols;
 
         let self = this;
         if (currentBatchType !== 'Default') {
@@ -360,17 +374,10 @@ let app = new Vue({
                 url: "/projects/"+currentProjectID+"/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
                 success: function (d) {
                     self.batches = d;
-                    d.forEach(function(batch) {
-                        self.tableByBatch[batch.batchID] = Object.assign({}, self.table );
-                    });
                 }
             });
         }
 
-    },
-    updated: function () {
-        // ! \\ create a infinite loop
-       // this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
     },
     mounted: function () {
         let self = this;
@@ -379,14 +386,13 @@ let app = new Vue({
             dataType: "json",
             url: "/projects/"+currentProjectID+"/tasks/list",
             success: function (d) {
-                self.table.data = d;
-                if(currentBatchType !== 'Default') {
+                self.taskList = d;
+                /*if(currentBatchType !== 'Default') {
                     // Spliting data by batch
                     self.batches.forEach(function(batch) {
                         self.tableByBatch[batch.batchID].data = d.filter(row => { return row.batchIDs.some(b => b === batch.batchID) });
                     });
-                }
-                self.tablePending.data = d.filter(r => r.status === 'PENDING');
+                }*/
                 $('.ui.dimmer').removeClass('active');
             }
         });

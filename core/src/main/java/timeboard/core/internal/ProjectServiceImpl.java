@@ -863,10 +863,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(user, project.getOrganizationID());
 
-        final Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
-                user, organization.get().getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get());
-        final Map<Integer, Double> projectImputations = timesheetService.getProjectImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
-                user, project);
+        final Map<Integer, Double> vacationImputations = this.timesheetService.getAllImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
+                user,
+                new TimesheetService.TimesheetFilter<AbstractTask>(organization.get().getDefaultTasks().stream()
+                        .filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get()));
+
+        final Map<Integer, Double> projectImputations = this.timesheetService.getAllImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
+                user,
+                new TimesheetService.TimesheetFilter<Project>(project));
         final Map<Integer, String> comments = new HashMap<>();
         final Map<Integer, Double> otherProjectImputations = new HashMap<>();
         final List<Integer> dayMonthNums = new ArrayList<>();

@@ -65,11 +65,11 @@
             </template>
             <template v-slot:recursive="{row}">
                 <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
-                <a v-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
-                <a v-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
-                <a v-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
-                <a v-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
-                <a v-if="row.recurrenceDay === undefined" class="ui circular label">X</a>
+                <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                <a v-else class="ui circular label">X</a>
             </template>
             <template v-slot:actions="{row}">
                 <button class="ui positive button icon" v-on:click="approveRequest(row)">
@@ -104,11 +104,11 @@
             </template>
             <template v-slot:recursive="{row}">
                 <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
-                <a v-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
-                <a v-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
-                <a v-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
-                <a v-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
-                <a v-if="row.recurrenceDay === undefined" class="ui circular label">X</a>
+                <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                <a v-else class="ui circular label">X</a>
             </template>
             <template v-slot:status="{row}">
                 <button v-if="row.status == 'ACCEPTED'"   class="ui disabled green icon button">
@@ -133,6 +133,22 @@
             </template>
 
         </data-table>
+
+
+        <div class="ui three item menu">
+            <a @click="calendarYear--" class="active item">
+                <i class="icon big arrow circle left"></i>
+            </a>
+            <a class="item">
+                {{ calendarYear }}
+            </a>
+            <a @click="calendarYear++" class="item">
+                <i class="icon big arrow circle right"></i>
+            </a>
+        </div>
+
+        <year-calendar :year="calendarYear"  :events="calendarData"></year-calendar>
+
 
         <tmodal-confirm
                 ref="confirmModal"

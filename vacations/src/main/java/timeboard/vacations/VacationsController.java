@@ -27,6 +27,7 @@ package timeboard.vacations;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -38,24 +39,19 @@ import timeboard.core.api.VacationService;
 import timeboard.core.api.events.TimeboardEventType;
 import timeboard.core.api.events.VacationEvent;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.RecursiveVacationRequest;
-import timeboard.core.model.VacationRequest;
-import timeboard.core.model.VacationRequestStatus;
+import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/vacation")
 public class VacationsController {
 
-    private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     @Autowired
     private UserService userService;
 
@@ -73,7 +69,7 @@ public class VacationsController {
 
         final Account actor = authentication.getDetails();
 
-        final List<VacationRequest> list = this.vacationService.listVacationRequestsByUser(actor);
+        final List<VacationRequest> list = this.vacationService.listVacationRequestsByUser(actor, authentication.getCurrentOrganization());
         final List<VacationRequestWrapper> returnList = new ArrayList<>();
 
         for (final VacationRequest v : list) {
@@ -88,7 +84,7 @@ public class VacationsController {
 
         final Account actor = authentication.getDetails();
 
-        final List<VacationRequest> list = this.vacationService.listVacationRequestsToValidateByUser(actor);
+        final List<VacationRequest> list = this.vacationService.listVacationRequestsToValidateByUser(actor, authentication.getCurrentOrganization());
         final List<VacationRequestWrapper> returnList = new ArrayList<>();
 
         for (final VacationRequest v : list) {
@@ -98,15 +94,32 @@ public class VacationsController {
         return ResponseEntity.ok(returnList);
     }
 
+    @GetMapping(value = "/calendar/{yearNum}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CalendarEvent>> listTags(TimeboardAuthentication authentication,
+                                                        @PathVariable Integer yearNum) throws BusinessException {
+        final Account actor = authentication.getDetails();
+
+        // get existing vacation request for year
+        List<VacationRequest> vacationRequests =
+                this.vacationService.listVacationRequestsByUser(actor, authentication.getCurrentOrganization(), yearNum);
+
+        // remove recursive events (only keep single event)
+        vacationRequests = vacationRequests.stream().filter(r -> !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
+
+        // re-balance key to user screen name and wrap request to ui calendar
+        final List<CalendarEvent> newList = CalendarEvent.requestToWrapperList(vacationRequests);
+
+        return ResponseEntity.ok(newList);
+    }
+
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createRequest(final TimeboardAuthentication authentication,
-                                        @ModelAttribute final VacationRequestWrapper requestWrapper)
-            throws BusinessException, ParseException {
+                                        @ModelAttribute final VacationRequestWrapper requestWrapper) {
 
         final Account actor = authentication.getDetails();
         final Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
-        final Date startDate = DATE_FORMAT.parse(requestWrapper.start);
-        final Date endDate = DATE_FORMAT.parse(requestWrapper.end);
+        final Date startDate = requestWrapper.start;
+        final Date endDate = requestWrapper.end;
 
         if (startDate.getTime() > endDate.getTime()) {
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
@@ -125,10 +138,6 @@ public class VacationsController {
         request.setAssignee(assignee);
         request.setStartDate(startDate);
         request.setEndDate(endDate);
-/*
-        if (!vacationService.listVacationRequestsByPeriod(actor,request).isEmpty()) {
-            return ResponseEntity.badRequest().body("You already have a vacation request covering this period.");
-        }*/
 
         if (requestWrapper.isRecursive()) {
             assert request instanceof RecursiveVacationRequest;
@@ -167,11 +176,11 @@ public class VacationsController {
 
         } else {
             request = new VacationRequest();
+            request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
+            request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         }
         request.setLabel(requestWrapper.label);
 
-        request.setStartHalfDay(requestWrapper.isHalfStart() ? VacationRequest.HalfDay.AFTERNOON : VacationRequest.HalfDay.MORNING);
-        request.setEndHalfDay(requestWrapper.isHalfEnd() ? VacationRequest.HalfDay.MORNING : VacationRequest.HalfDay.AFTERNOON);
         request.setStatus(VacationRequestStatus.PENDING);
 
 
@@ -235,13 +244,16 @@ public class VacationsController {
         return this.listRequests(authentication);
     }
 
-    public static class VacationRequestWrapper {
+    public static class VacationRequestWrapper implements Serializable {
 
         public long id;
-
         public boolean recursive;
-        public String start;
-        public String end;
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        public Date start;
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
+        public Date end;
+
         public boolean halfStart;
         public boolean halfEnd;
         public int recurrenceDay;
@@ -258,8 +270,8 @@ public class VacationsController {
 
         public VacationRequestWrapper(final VacationRequest r) {
             this.id = r.getId();
-            this.start = DATE_FORMAT.format(r.getStartDate());
-            this.end = DATE_FORMAT.format(r.getEndDate());
+            this.start = r.getStartDate();
+            this.end = r.getEndDate();
             this.halfStart = r.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON);
             this.halfEnd = r.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING);
             this.status = r.getStatus().name();
@@ -304,19 +316,19 @@ public class VacationsController {
             this.id = id;
         }
 
-        public String getStart() {
+        public Date getStart() {
             return start;
         }
 
-        public void setStart(final String start) {
+        public void setStart(final Date start) {
             this.start = start;
         }
 
-        public String getEnd() {
+        public Date getEnd() {
             return end;
         }
 
-        public void setEnd(final String end) {
+        public void setEnd(final Date end) {
             this.end = end;
         }
 
@@ -375,7 +387,6 @@ public class VacationsController {
         public void setRecurrenceType(final String recurrenceType) {
             this.recurrenceType = recurrenceType;
         }
-
 
         public boolean isRecursive() {
             return recursive;

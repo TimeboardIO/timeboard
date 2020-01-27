@@ -30,6 +30,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 
@@ -72,23 +73,28 @@ public interface TimesheetService {
      *
      * @param firstDayOfWeek first day of week
      * @param lastDayOfWeek  last day of week
-     * @param account        user used to check timesheet validation state.
+     * @param filters        user used to check timesheet validation state.
      * @return the sum of all imputations of the week
      */
-    double getAllImputationsForAccountOnDateRange(
+    Map<Integer, Double> getAllImputationsForAccountOnDateRange(
             final Date firstDayOfWeek,
             final Date lastDayOfWeek,
-            final Account account);
+            final Account account,
+            final TimesheetFilter ... filters);
 
-    Map<Integer, Double> getProjectImputationsForAccountOnDateRange(
-            final Date startDate,
-            final Date endDate,
-            final Account user,
-            final Project project);
 
-    Map<Integer, Double> getTaskImputationsForAccountOnDateRange(
-            final Date startDate,
-            final Date endDate,
-            final Account user,
-            final AbstractTask task);
-}
+     Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project);
+
+    class TimesheetFilter<T>  {
+        private T target;
+
+        public T getTarget() {
+            return target;
+        }
+
+        public TimesheetFilter(T target){
+            this.target = target;
+        }
+    }
+
+    }
