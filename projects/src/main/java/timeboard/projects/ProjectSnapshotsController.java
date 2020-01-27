@@ -43,6 +43,7 @@ import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectSnapshotService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.ProjectSnapshotServiceImpl;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
@@ -85,7 +86,7 @@ public class ProjectSnapshotsController {
                                            final Project project) throws BusinessException, JsonProcessingException {
 
 
-        final ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
+        final ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper projectSnapshotGraphWrapper = this.createGraph(project.getSnapshots());
         return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projectSnapshotGraphWrapper));
     }
 
@@ -255,66 +256,10 @@ public class ProjectSnapshotsController {
         return effortSpentMap.values();
     }
 
-    public void regression(ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList){
 
-        final SimpleRegression quotationRegression = new SimpleRegression();
-        final SimpleRegression originalEstimateRegression = new SimpleRegression();
-        final SimpleRegression realEffortRegression = new SimpleRegression();
-        final SimpleRegression effortLeftRegression = new SimpleRegression();
-        final SimpleRegression effortSpentRegression = new SimpleRegression();
-        final List<Double> quotationRegressionPoints = new ArrayList<>();
-        final List<Double> originalEstimateRegressionPoints = new ArrayList<>();
-        final List<Double> realEffortRegressionPoints = new ArrayList<>();
-        final List<Double> effortLeftRegressionPoints = new ArrayList<>();
-        final List<Double> effortSpentRegressionPoints = new ArrayList<>();
-        projectSnapshotList.forEach(snapshot -> {
-            quotationRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getQuotation());
-            originalEstimateRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getOriginalEstimate());
-            realEffortRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getRealEffort());
-            effortLeftRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getEffortLeft());
-            effortSpentRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getEffortSpent());
-        });
+    public ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper createGraph(final List<ProjectSnapshot> projectSnapshotList) {
 
-        projectSnapshotList.forEach(snapshot -> {
-            quotationRegressionPoints.add(quotationRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
-            originalEstimateRegressionPoints.add(originalEstimateRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
-            realEffortRegressionPoints.add(realEffortRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
-            effortLeftRegressionPoints.add(effortLeftRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
-            effortSpentRegressionPoints.add(effortSpentRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
-        });
-
-        final Calendar c = new GregorianCalendar();
-
-        quotationRegressionPoints.add(quotationRegression.predict(c.getTime().getTime()));
-        originalEstimateRegressionPoints.add(originalEstimateRegression.predict(c.getTime().getTime()));
-        realEffortRegressionPoints.add(realEffortRegression.predict(c.getTime().getTime()));
-        effortLeftRegressionPoints.add(effortLeftRegression.predict(c.getTime().getTime()));
-        effortSpentRegressionPoints.add(effortSpentRegression.predict(c.getTime().getTime()));
-
-        listOfProjectSnapshotDates.add(c.getTime().toString());
-
-        c.add(Calendar.DATE, 180);
-
-        quotationRegressionPoints.add(quotationRegression.predict(c.getTime().getTime()));
-        originalEstimateRegressionPoints.add(originalEstimateRegression.predict(c.getTime().getTime()));
-        realEffortRegressionPoints.add(realEffortRegression.predict(c.getTime().getTime()));
-        effortLeftRegressionPoints.add(effortLeftRegression.predict(c.getTime().getTime()));
-        effortSpentRegressionPoints.add(effortSpentRegression.predict(c.getTime().getTime()));
-
-        listOfProjectSnapshotDates.add(c.getTime().toString());
-
-        wrapper.setQuotationRegressionData(quotationRegressionPoints);
-        wrapper.setOriginalEstimateRegressionData(originalEstimateRegressionPoints);
-        wrapper.setRealEffortRegressionData(realEffortRegressionPoints);
-        wrapper.setEffortLeftRegressionData(effortLeftRegressionPoints);
-        wrapper.setEffortSpentRegressionData(effortSpentRegressionPoints);
-
-        wrapper.setListOfProjectSnapshotDates(listOfProjectSnapshotDates);
-    }
-
-    public ProjectSnapshotGraphWrapper createGraph(final List<ProjectSnapshot> projectSnapshotList) {
-
-        final ProjectSnapshotsController.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotsController.ProjectSnapshotGraphWrapper();
+        final ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper wrapper = new ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper();
 
         final String formatDateToDisplay = "yyyy-MM-dd HH:mm:ss.S";
         final List<String> listOfProjectSnapshotDates = new ArrayList<>();
@@ -341,7 +286,7 @@ public class ProjectSnapshotsController {
         wrapper.setEffortSpentData(this.effortSpentValuesForGraph(listOfProjectSnapshotDates, projectSnapshotList,
                 formatDateToDisplay, projectDashboards));
 
-        this.regression(wrapper, listOfProjectSnapshotDates, projectSnapshotList);
+        this.projectSnapshotService.regression(wrapper, listOfProjectSnapshotDates, projectSnapshotList);
 
         return wrapper;
     }
@@ -432,59 +377,5 @@ public class ProjectSnapshotsController {
         }
     }
 
-    public static class ProjectSnapshotGraphWrapper implements Serializable {
-        public List<String> listOfProjectSnapshotDates;
-        public Collection<Double> quotationData;
-        public Collection<Double> originalEstimateData;
-        public Collection<Double> realEffortData;
-        public Collection<Double> effortSpentData;
-        public Collection<Double> effortLeftData;
-        public Collection<Double> quotationRegressionData;
-        public Collection<Double> originalEstimateRegressionData;
-        public Collection<Double> realEffortRegressionData;
-        public Collection<Double> effortLeftRegressionData;
-        public Collection<Double> effortSpentRegressionData;
 
-        public ProjectSnapshotGraphWrapper() {
-        }
-
-        public void setListOfProjectSnapshotDates(final List<String> listOfProjectSnapshotDates) {
-            this.listOfProjectSnapshotDates = listOfProjectSnapshotDates;
-        }
-
-        public void setQuotationData(final Collection<Double> quotationData) {
-            this.quotationData = quotationData;
-
-        }
-
-        public void setRealEffortData(final Collection<Double> realEffortData) {
-            this.realEffortData = realEffortData;
-        }
-
-        public void setOriginalEstimateData(final Collection<Double> originalEstimateData) {
-            this.originalEstimateData = originalEstimateData;
-        }
-
-        public void setEffortSpentData(final Collection<Double> effortSpentData) {
-            this.effortSpentData = effortSpentData;
-        }
-
-        public void setEffortLeftData(final Collection<Double> effortLeftData) {
-            this.effortLeftData = effortLeftData;
-        }
-
-        public void setQuotationRegressionData(Collection<Double> quotationRegressionData) { this.quotationRegressionData = quotationRegressionData; }
-
-        public void setOriginalEstimateRegressionData(Collection<Double> originalEstimateRegressionData) {
-            this.originalEstimateRegressionData = originalEstimateRegressionData; }
-
-        public void setRealEffortRegressionData(Collection<Double> realEffortRegressionData) {
-            this.realEffortRegressionData = realEffortRegressionData; }
-
-        public void setEffortLeftRegressionData(Collection<Double> effortLeftRegressionData) {
-            this.effortLeftRegressionData = effortLeftRegressionData; }
-
-        public void setEffortSpentRegressionData(Collection<Double> effortSpentRegressionData) {
-            this.effortSpentRegressionData = effortSpentRegressionData; }
-    }
 }

@@ -27,6 +27,7 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.ProjectSnapshotServiceImpl;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
@@ -49,4 +50,6 @@ public interface ProjectSnapshotService {
     ProjectSnapshot createProjectSnapshot(Account actor, Project project) throws BusinessException;
 
     List<TaskSnapshot> findAllTaskSnapshotByTaskID(Account actor, Long taskID);
+
+    void regression(ProjectSnapshotServiceImpl.ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList);
 }
