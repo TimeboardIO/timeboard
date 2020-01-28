@@ -124,7 +124,7 @@
                     </div>
                 </div>
                 <button
-                        v-if="isTimesheetHasState(['NONE','REJECTED'])"
+                        v-if="isTimesheetHasState([null,'REJECTED'])"
                         v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
                     New Task
                 </button>
