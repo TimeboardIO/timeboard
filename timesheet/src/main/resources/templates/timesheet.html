@@ -111,30 +111,29 @@
 
 
             <div class="actions">
-                <div v-if="isTimesheetHasState([null,'REJECTED'])"
+                <div v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
                      v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
                      data-position="right center">
                     <button
                             v-bind:data-week="week"
                             v-bind:data-year="year"
                             v-on:click="submitMyWeek"
-                            v-bind:class="{'ui positive button icon':true, 'disabled':(!enableSubmitButton())}"
-                            type="submit" th:text="#{timesheet.submit}">
-                        Submit My Week
+                            v-bind:class="{'ui positive button icons':true, 'disabled':(!enableSubmitButton())}"
+                            type="submit">
+                        <span th:text="#{timesheet.submit}">Submit My Week</span>
                         <i class="paper plane icon"></i>
                     </button>
                 </div>
-                <template v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
-                    <div >
+
+                    <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
                         <div class="ui orange label" v-if="userIsActor">
                             Pending validation
                         </div>
                     </div>
-                    <button v-if="canValidate"
+                    <button v-if="canValidate && !isTimesheetHasState([null, 'VALIDATED'])" :class="{ disabled : isTimesheetHasState(['PENDING_VALIDATION']) }"
                         class="ui primary create-task button">
                         Validate this week
                     </button>
-                </template>
                 <div v-if="isTimesheetHasState(['VALIDATED'])">
                     <div class="ui green label">
                         Week validated

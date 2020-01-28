@@ -157,6 +157,7 @@ $(document).ready(function () {
             enableSubmitButton: function (week) {
                 let result = true;
 
+                result &= ['PENDING_VALIDATION', 'VALIDATED'].includes(this.currentWeekValidationStatus);
                 //check all days imputations == 1
                 app.days.forEach(function (day) {
                     if (day.day !== 'Sun' && day.day !== 'Sat') {
