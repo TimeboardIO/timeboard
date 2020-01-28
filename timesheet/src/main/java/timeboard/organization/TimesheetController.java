@@ -35,10 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UpdatedTaskResult;
+import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
@@ -67,6 +64,9 @@ public class TimesheetController {
 
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     protected String currentWeekTimesheet(
@@ -290,13 +290,19 @@ public class TimesheetController {
 
         final int week = Integer.parseInt(request.getParameter("week"));
         final int year = Integer.parseInt(request.getParameter("year"));
+        final long userID = Long.parseLong(request.getParameter("userID"));
 
+        final Account user = userService.findUserByID(userID);
+
+        if(! projectService.isOwnerOfAnyUserProject(actor, user)){
+            return ResponseEntity.badRequest().body("You have not enough right do do this.");
+        }
         try {
             final Optional<SubmittedTimesheet> submittedTimesheet =
-                    this.timesheetService.getTimesheet(
+                    this.timesheetService.getSubmittedTimesheet(
                             authentication.getCurrentOrganization(),
                             actor,
-                            actor,
+                            user,
                             year,
                             week);
 
@@ -305,11 +311,11 @@ public class TimesheetController {
                 return ResponseEntity.ok(result.getTimesheetStatus());
 
             } else {
-                return ResponseEntity.status(412).build();
+                return ResponseEntity.badRequest().body("Could not find this week. Was it submitted ?");
             }
         } catch (final Exception e) { // TimesheetException
             LOGGER.error(e.getMessage(), e);
-            return ResponseEntity.status(412).build();
+            return ResponseEntity.badRequest().body("An error occurred when validating this week. ");
         }
     }
 

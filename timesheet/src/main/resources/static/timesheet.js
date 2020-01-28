@@ -217,7 +217,22 @@ $(document).ready(function () {
 
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        app.displayErrorMessage("Error can not submit your timesheet.");
+                        app.displayErrorMessage("Error can not submit your timesheet. "+ textStatus);
+                    }
+                });
+            },
+            validateWeek: function (event) {
+                $.ajax({
+                    method: "GET",
+                    url: "timesheet/validate?userID=" + _USER_ID + "&week=" + app.week + "&year=" + app.year,
+                    success: function (weekValidationStatus, textStatus, jqXHR) {
+                        app.submitted = true;
+                        app.displaySuccessMessage("This timesheet have been validated successfully.");
+                        app.updateTimesheet();
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        app.displayErrorMessage("Error can not validate this timesheet. "+ textStatus);
                     }
                 });
             },

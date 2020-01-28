@@ -172,7 +172,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Optional<SubmittedTimesheet> getTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {
+    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year " +
