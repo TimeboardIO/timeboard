@@ -70,6 +70,7 @@ public class HomeController {
         final Date d = new Date();
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
         final List<WeekWrapper> weeks = new ArrayList<>();
         final Account account = authentication.getDetails();
         final int weeksToDisplay = 3; // actual week and the two previous ones
@@ -80,10 +81,11 @@ public class HomeController {
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
-                calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 final Date firstDayOfWeek = calendar.getTime();
-                calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                 final Date lastDayOfWeek = calendar.getTime();
+
                 final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(
                         authentication.getCurrentOrganization(),
                         firstDayOfWeek, lastDayOfWeek,
