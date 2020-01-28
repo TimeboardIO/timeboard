@@ -83,7 +83,16 @@ public interface ProjectService {
                     final TaskStatus taskStatus,
                     final Batch batch);
 
-    Task updateTask(Account actor, Task task);
+    /**
+     * Update task in database
+     * @param orgID relevant {@link Organization} ID
+     * @param actor issuer {@link Account}
+     * @param task {@link Task} to update in database
+     * @return updated {@link Task}
+     */
+    Task updateTask(final Long orgID,
+                    final Account actor,
+                    final Task task);
 
     void updateTasks(Account actor, List<Task> taskList);
 

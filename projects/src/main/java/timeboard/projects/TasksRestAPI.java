@@ -111,7 +111,7 @@ public class TasksRestAPI {
 
         if (taskID != null && taskID != 0) {
             try {
-                task = processUpdateTask(taskWrapper, actor, batches, taskID);
+                task = processUpdateTask(authentication.getCurrentOrganization(),taskWrapper, actor, batches, taskID);
 
             } catch (final Exception e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -185,7 +185,9 @@ public class TasksRestAPI {
         return returnList;
     }
 
-    private Task processUpdateTask(@RequestBody final TaskWrapper taskWrapper,
+    private Task processUpdateTask(
+            final Long orgID,
+            final TaskWrapper taskWrapper,
                                    final Account actor,
                                    final Set<Batch> batches,
                                    final Long taskID) throws BusinessException, ParseException {
@@ -206,7 +208,7 @@ public class TasksRestAPI {
         task.setBatches(batches);
         task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
-        projectService.updateTask(actor, task);
+        projectService.updateTask(orgID, actor, task);
         return task;
     }
 

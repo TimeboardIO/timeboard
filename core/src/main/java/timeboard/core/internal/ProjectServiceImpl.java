@@ -323,8 +323,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Task updateTask(final Account actor, final Task task) {
+    public Task updateTask(final Long orgID, final Account actor, final Task task) {
         if (task.getProject().isMember(actor)) {
+            task.setOrganizationID(orgID);
             em.merge(task);
             em.flush();
         }
