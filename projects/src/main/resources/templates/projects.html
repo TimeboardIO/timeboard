@@ -35,9 +35,9 @@
 
         <div class="ui five stackable cards">
         </div>
-        <div id="projectsApp">
+        <div id="projectsApp" style="margin-top: 1rem;">
             <div class="ui five stackable cards">
-                <div v-for="project in table.data.slice(0, 4)" class="ui project card" data-cy="project" >
+                <div v-for="project in projectListData.slice(0, 4)" class="ui project card" data-cy="project" >
                     <div class="image"  v-bind:style="'background-color:' + project.color" >
                         <a v-bind:href="'/projects/'+project.id+'/tasks'">
                             <div class="badge" >
@@ -94,7 +94,7 @@
         </div>
 
 
-            <data-table v-bind:config="table">
+            <data-table v-bind:table="projectListData" v-bind:config="projectListConfig">
                 <template v-slot:name="{row}">
                     {{row.name}}
                 </template>

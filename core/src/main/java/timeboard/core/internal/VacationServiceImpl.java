@@ -28,6 +28,7 @@ package timeboard.core.internal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
@@ -39,7 +40,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
-import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.Calendar;
@@ -102,30 +102,73 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsByUser(final Account applicant) {
+    @PreAuthorize("hasPermission(#applicant,'VACATION_LIST')")
+    public List<VacationRequest> listVacationRequestsByUser(final Account applicant, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
-                "select v from VacationRequest v where v.applicant = :applicant and v.parent IS NULL"
+                "select v from VacationRequest v " +
+                        "where v.applicant = :applicant  " +
+                        "and v.organizationID = :orgID " +
+                        "and v.parent IS NULL"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
+        q.setParameter("orgID", orgID);
 
         return q.getResultList();
 
     }
 
     @Override
-    public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee) {
+    @PreAuthorize("hasPermission(#applicant,'VACATION_LIST')")
+    public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID, int year) {
 
-        final TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
-                        "where v.assignee = :assignee and v.status = :status and v.parent IS NULL",
+        final Calendar startBound = Calendar.getInstance();
+        final Calendar endBound = Calendar.getInstance();
+
+
+        endBound.set(Calendar.DAY_OF_MONTH, 1);
+        endBound.set(Calendar.MONTH, Calendar.JANUARY);
+        endBound.set(Calendar.YEAR, year + 1);
+
+        startBound.set(Calendar.DAY_OF_MONTH, 31);
+        startBound.set(Calendar.MONTH, Calendar.DECEMBER);
+        startBound.set(Calendar.YEAR, year - 1);
+
+        final TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v " +
+                        "where v.applicant = :applicant " +
+                        "and v.organizationID = :orgID " +
+                        "and not (v.endDate < :startBound and v.startDate > :endBound)"
+                , VacationRequest.class);
+        q.setParameter("applicant", applicant);
+        q.setParameter("orgID", orgID);
+        q.setParameter("endBound", endBound.getTime());
+        q.setParameter("startBound", startBound.getTime());
+
+        return q.getResultList();
+
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#assignee,'VACATION_LIST')")
+    public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee, long orgID) {
+
+        final TypedQuery<VacationRequest> q = em.createQuery(
+                "select v from VacationRequest v " +
+                        "where v.assignee = :assignee " +
+                        "and v.status = :status " +
+                        "and v.organizationID = :orgID " +
+                        "and v.parent IS NULL",
                 VacationRequest.class);
         q.setParameter("assignee", assignee);
+        q.setParameter("orgID", orgID);
         q.setParameter("status", VacationRequestStatus.PENDING);
 
         return q.getResultList();
     }
 
     @Override
+    @PreAuthorize("hasPermission(#project,'VACATION_TEAM_LIST')")
     public Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(
             final Account actor, final Project project, final int month, final int year) {
 
@@ -162,50 +205,6 @@ public class VacationServiceImpl implements VacationService {
                 .collect(Collectors.groupingBy(VacationRequest::getApplicant,
                         Collectors.mapping(r -> r, Collectors.toList())));
     }
-
-    @Override
-    public List<VacationRequest> listVacationRequestsByPeriod(final Account applicant, final VacationRequest request) {
-
-        final TypedQuery<VacationRequest> q = em.createQuery("select v from VacationRequest v " +
-                        "where v.applicant = :applicant and v.parent is null " +
-                        "and ( " +
-                        "(v.startDate >= :startDate and :startDate <= v.endDate)" +
-                        " or " +
-                        "(v.startDate >= :endDate and :endDate <= v.endDate)" +
-                        ")",
-                VacationRequest.class);
-
-        q.setParameter("applicant", applicant);
-        q.setParameter("startDate", request.getStartDate(), TemporalType.DATE);
-        q.setParameter("endDate", request.getEndDate(), TemporalType.DATE);
-
-        final List<VacationRequest> resultList = q.getResultList();
-        final List<VacationRequest> copyList = new ArrayList<>(resultList);
-
-        for (final VacationRequest r : resultList) {
-            if (
-                    r.getStartDate().compareTo(request.getEndDate()) > 0
-                            && request.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                            && r.getStartHalfDay() == VacationRequest.HalfDay.MORNING
-            ) {
-                copyList.remove(r);
-            }
-
-            if (
-                    r.getEndDate().compareTo(request.getStartDate()) > 0
-                            && request.getEndHalfDay() == VacationRequest.HalfDay.AFTERNOON
-                            && r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
-            ) {
-                copyList.remove(r);
-            }
-            if (r instanceof RecursiveVacationRequest) {
-                copyList.remove(r);
-            }
-        }
-
-        return copyList;
-    }
-
 
     @Override
     public void deleteVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {
@@ -280,34 +279,34 @@ public class VacationServiceImpl implements VacationService {
 
         final DefaultTask vacationTask = this.getVacationTask(actor, request);
 
-        final java.util.Calendar c1 = java.util.Calendar.getInstance();
-        c1.setTime(request.getStartDate());
-        c1.set(Calendar.HOUR_OF_DAY, 2);
-        c1.set(Calendar.MINUTE, 0);
-        c1.set(Calendar.SECOND, 0);
-        c1.set(Calendar.MILLISECOND, 0);
-        c1.setFirstDayOfWeek(Calendar.MONDAY);
+        final java.util.Calendar currentCalendar = java.util.Calendar.getInstance();
+        currentCalendar.setTime(request.getStartDate());
+        currentCalendar.set(Calendar.HOUR_OF_DAY, 2);
+        currentCalendar.set(Calendar.MINUTE, 0);
+        currentCalendar.set(Calendar.SECOND, 0);
+        currentCalendar.set(Calendar.MILLISECOND, 0);
+        currentCalendar.setFirstDayOfWeek(Calendar.MONDAY);
 
         double value = 1 * sign;
-        final java.util.Calendar c2 = java.util.Calendar.getInstance();
-        c2.setTime(request.getEndDate());
+        final java.util.Calendar endCalendar = java.util.Calendar.getInstance();
+        endCalendar.setTime(request.getEndDate());
 
         if (request.getStartHalfDay().equals(VacationRequest.HalfDay.AFTERNOON)) {
             value = 0.5 * sign;
         }
 
-        while (c1.before(c2)) {
-            if (c1.get(Calendar.DAY_OF_WEEK) <= 6 && c1.get(Calendar.DAY_OF_WEEK) > 1) {
-                this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, c1.getTime(), value);
+        while (currentCalendar.before(endCalendar)) {
+            if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
+                this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
             }
             value = 1 * sign;
-            c1.add(Calendar.DATE, 1);
+            currentCalendar.add(Calendar.DATE, 1);
         }
         if (request.getEndHalfDay().equals(VacationRequest.HalfDay.MORNING)) {
             value = 0.5 * sign;
         }
-        if (c1.get(Calendar.DAY_OF_WEEK) <= 6 && c1.get(Calendar.DAY_OF_WEEK) > 1) {
-            this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, c1.getTime(), value);
+        if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
+            this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
         }
 
     }
@@ -327,31 +326,35 @@ public class VacationServiceImpl implements VacationService {
         return null;
     }
 
-    private void updateTaskImputation(final Long orgID,
-                                      final Account user,
-                                      final DefaultTask task,
-                                      final Date day, final double val) throws BusinessException {
+    private void updateTaskImputation(final long orgID, final Account user, final DefaultTask task, final Date day,
+                                      final double val, final VacationRequest request) throws BusinessException {
 
-        if (val > 0) {
+        double newValue = val;
+        if (newValue > 0) {
             //change imputation value only if previous value is smaller than new
             final Optional<Imputation> old = this.projectservice.getImputation(user, task, day);
-            if (old.isEmpty() || old.get().getValue() < val) {
-                this.projectservice.updateTaskImputation(orgID, user, task, day, val);
+            if (old.isPresent()) {
+                newValue = Double.min(1, newValue + old.get().getValue());
             }
         } else {
             // looking for existing vacation request on same day
-            double newValue = val;
+            newValue = 0;
             List<VacationRequest> vacationRequests = this.listVacationRequests(user, day);
             // keep accepted request
-            vacationRequests = vacationRequests.stream().filter(r -> r.getStatus() == VacationRequestStatus.ACCEPTED
-                    && !(r instanceof RecursiveVacationRequest)).collect(Collectors.toList());
+            vacationRequests = vacationRequests.stream().filter(r ->
+                    r.getStatus() == VacationRequestStatus.ACCEPTED
+                            && !(r instanceof RecursiveVacationRequest)
+                            && !r.getId().equals(request.getId()))
+                    .collect(Collectors.toList());
 
             // determining if the imputation for current day is 0.5 (half day) or 1 (full day)
             final boolean halfDay = vacationRequests.stream().anyMatch(r -> {
                 //current day is first day of request and request is half day started
-                final boolean halfStart = r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON && day.compareTo(r.getStartDate()) == 0;
+                final boolean halfStart = r.getStartHalfDay() == VacationRequest.HalfDay.AFTERNOON
+                        && onSameDay(day, r.getStartDate());
                 //current day is last day of request and request is half day ended
-                final boolean halfEnd = r.getEndHalfDay() == VacationRequest.HalfDay.MORNING && day.compareTo(r.getEndDate()) == 0;
+                final boolean halfEnd = r.getEndHalfDay() == VacationRequest.HalfDay.MORNING
+                        && onSameDay(day, r.getEndDate());
                 return halfStart || halfEnd;
             });
 
@@ -360,13 +363,18 @@ public class VacationServiceImpl implements VacationService {
             } else if (!vacationRequests.isEmpty()) {
                 newValue = 1;
             }
-
-            //update imputation
-            this.projectservice.updateTaskImputation(orgID, user, task, day, newValue);
-
         }
 
+        //update imputation
+        this.projectservice.updateTaskImputation(orgID, user, task, day, newValue);
+    }
 
+    private boolean onSameDay(Date date1, Date date2) {
+        final Calendar cal1 = Calendar.getInstance();
+        final Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(date1);
+        cal2.setTime(date2);
+        return cal1.compareTo(cal2) == 0;
     }
 
     private List<VacationRequest> listVacationRequests(final Account applicant, final Date day) {

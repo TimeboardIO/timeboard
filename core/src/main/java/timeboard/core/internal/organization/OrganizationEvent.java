@@ -1,10 +1,10 @@
-package timeboard.core.api;
+package timeboard.core.internal.organization;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,16 @@ package timeboard.core.api;
  * #L%
  */
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import timeboard.core.security.TimeboardAuthentication;
+import org.springframework.context.ApplicationEvent;
 
-public final class ThreadLocalStorage {
+public class OrganizationEvent extends ApplicationEvent {
 
-    private static ThreadLocal<Long> CURRENT_ORG_ID = new ThreadLocal<>();
-
-    private ThreadLocalStorage() {
+    /**
+     * Create a new ApplicationEvent.
+     *
+     * @param source the object on which the event initially occurred (never {@code null})
+     */
+    public OrganizationEvent(final Object source) {
+        super(source);
     }
-
-    public static Long getCurrentOrgId() {
-        return CURRENT_ORG_ID.get();
-    }
-
-    public static void setCurrentOrgId(final Long tenantName) {
-        CURRENT_ORG_ID.set(tenantName);
-        ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
-    }
-
 }

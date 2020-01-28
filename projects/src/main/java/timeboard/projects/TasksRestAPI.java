@@ -28,14 +28,15 @@ package timeboard.projects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
@@ -43,26 +44,20 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RestController
 @RequestMapping(value = "/api/tasks", produces = MediaType.APPLICATION_JSON_VALUE)
-public class TasksRestController {
+public class TasksRestAPI {
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(TasksRestController.class);
 
     @Autowired
     private ProjectService projectService;
@@ -72,244 +67,6 @@ public class TasksRestController {
 
     @Autowired
     private UserService userService;
-
-    @GetMapping("/batches")
-    public ResponseEntity getBatches(final TimeboardAuthentication authentication,
-                                     final HttpServletRequest request) throws JsonProcessingException {
-        final Account actor = authentication.getDetails();
-        Project project = null;
-
-        final String strProjectID = request.getParameter("project");
-        final String strBatchType = request.getParameter("batchType");
-
-        Long projectID = null;
-        if (strProjectID != null) {
-            projectID = Long.parseLong(strProjectID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
-        }
-
-        BatchType batchType = null;
-        if (strBatchType != null) {
-            batchType = BatchType.valueOf(strBatchType.toUpperCase());
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect batchType argument");
-        }
-
-        try {
-            project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        } catch (final BusinessException e) {
-            // just handling exception
-        }
-        if (project == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
-        }
-
-        List<Batch> batchList = null;
-        try {
-            batchList = projectService.getBatchList(actor, project, batchType);
-        } catch (final BusinessException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
-        }
-
-        final List<BatchWrapper> batchWrapperList = new ArrayList<>();
-        batchList.forEach(batch -> batchWrapperList.add(new BatchWrapper(batch.getId(), batch.getName())));
-
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(batchWrapperList.toArray()));
-    }
-
-    @GetMapping
-    public ResponseEntity getTasks(final TimeboardAuthentication authentication,
-                                   final HttpServletRequest request) throws JsonProcessingException {
-
-        final Account actor = authentication.getDetails();
-
-        final String strProjectID = request.getParameter("project");
-        Long projectID = null;
-        if (strProjectID != null) {
-            projectID = Long.parseLong(strProjectID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
-        }
-
-        try {
-            final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-            if (project == null) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
-            }
-            final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
-
-            final List<TaskWrapper> result = new ArrayList<>();
-
-            for (final Task task : tasks) {
-                Account assignee = task.getAssigned();
-                if (assignee == null) {
-                    assignee = new Account();
-                    assignee.setId(0);
-                    assignee.setName("");
-                    assignee.setFirstName("");
-                }
-
-                final List<Long> batchIDs = new ArrayList<>();
-                final List<String> batchNames = new ArrayList<>();
-
-                task.getBatches().stream().forEach(b -> {
-                    batchIDs.add(b.getId());
-                    batchNames.add(b.getName());
-                });
-                result.add(new TaskWrapper(
-                        task.getId(),
-                        task.getName(),
-                        task.getComments(),
-                        task.getOriginalEstimate(),
-                        task.getStartDate(),
-                        task.getEndDate(),
-                        assignee.getScreenName(), assignee.getId(),
-                        task.getTaskStatus().name(),
-                        task.getTaskType() != null ? task.getTaskType().getId() : 0L,
-                        batchIDs, batchNames,
-                        task.getTaskStatus().name(),
-                        task.getTaskType() != null ? task.getTaskType().getTypeName() : ""
-                ));
-
-            }
-            return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(result.toArray()));
-        } catch (final BusinessException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-
-    }
-
-    @GetMapping("/chart")
-    public ResponseEntity getDatasForCharts(
-            final TimeboardAuthentication authentication,
-            final HttpServletRequest request) throws BusinessException, JsonProcessingException {
-
-        final TaskGraphWrapper wrapper = new TaskGraphWrapper();
-        final Account actor = authentication.getDetails();
-
-        final String taskIdStr = request.getParameter("task");
-        Long taskID = null;
-        if (taskIdStr != null) {
-            taskID = Long.parseLong(taskIdStr);
-        }
-        if (taskID == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
-        }
-
-        final Task task = (Task) this.projectService.getTaskByID(actor, taskID);
-
-        // Datas for dates (Axis X)
-        final String formatLocalDate = "yyyy-MM-dd";
-        final String formatDateToDisplay = "dd/MM/yyyy";
-        final LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getStartDate()));
-        final LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getEndDate()));
-        final List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
-                .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
-                .collect(Collectors.toList());
-        wrapper.setListOfTaskDates(listOfTaskDates);
-
-        // Datas for effort spent (Axis Y)
-        final List<ValueHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor,
-                task, task.getStartDate(), task.getEndDate());
-        final ValueHistory[] lastEffortSpentSum = {new ValueHistory(task.getStartDate(), 0.0)};
-        final Map<Date, Double> effortSpentMap = listOfTaskDates
-                .stream()
-                .map(dateString -> {
-                    return formatDate(formatDateToDisplay, dateString);
-                })
-                .map(date -> effortSpentDB.stream()
-                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
-                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
-                        .map(effort -> {
-                            lastEffortSpentSum[0] = new ValueHistory(date, effort.getValue());
-                            return lastEffortSpentSum[0];
-                        })
-                        .findFirst().orElse(new ValueHistory(date, lastEffortSpentSum[0].getValue())))
-                .collect(Collectors.toMap(
-                        e -> e.getDate(),
-                        e -> e.getValue(),
-                        (x, y) -> y, LinkedHashMap::new
-                ));
-        wrapper.setEffortSpentData(effortSpentMap.values());
-
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(wrapper));
-
-    }
-
-    private Date formatDate(final String formatDateToDisplay, final String dateString) {
-        try {
-            return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
-        } catch (final ParseException e) {
-            LOGGER.error(e.getMessage());
-        }
-        return null;
-    }
-
-
-    @GetMapping("/approve")
-    public ResponseEntity approveTask(final TimeboardAuthentication authentication, final HttpServletRequest request) {
-        final Account actor = authentication.getDetails();
-        return this.changeTaskStatus(actor, request, TaskStatus.IN_PROGRESS);
-    }
-
-    @GetMapping("/deny")
-    public ResponseEntity denyTask(final TimeboardAuthentication authentication, final HttpServletRequest request) {
-        final Account actor = authentication.getDetails();
-        return this.changeTaskStatus(actor, request, TaskStatus.REFUSED);
-    }
-
-    private ResponseEntity changeTaskStatus(final Account actor, final HttpServletRequest request, final TaskStatus status) {
-        final String taskIdStr = request.getParameter("task");
-        Long taskID = null;
-        if (taskIdStr != null) {
-            taskID = Long.parseLong(taskIdStr);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
-        }
-        if (taskID == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
-        }
-
-        final Task task;
-        try {
-            task = (Task) this.projectService.getTaskByID(actor, taskID);
-            task.setTaskStatus(status);
-            this.projectService.updateTask(actor, task);
-
-        } catch (final ClassCastException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");
-        } catch (final Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task id not found.");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @GetMapping("/delete")
-    public ResponseEntity deleteTask(final TimeboardAuthentication authentication,
-                                     final HttpServletRequest request) {
-        final Account actor = authentication.getDetails();
-
-        final String taskIdStr = request.getParameter("task");
-        Long taskID = null;
-        if (taskIdStr != null) {
-            taskID = Long.parseLong(taskIdStr);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
-        }
-        if (taskID == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
-        }
-
-        try {
-            projectService.deleteTaskByID(actor, taskID);
-        } catch (final Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -663,33 +420,4 @@ public class TasksRestController {
             return this.endDate;
         }
     }
-
-  /*  public static class BatchWrapper {
-
-        public Long batchID;
-        public String batchName;
-
-        public BatchWrapper(Long batchID, String batchName) {
-            this.batchID = batchID;
-            this.batchName = batchName;
-        }
-
-        public Long getBatchID() {
-            return batchID;
-        }
-
-        public void setBatchID(Long batchID) {
-            this.batchID = batchID;
-        }
-
-        public String getBatchName() {
-            return batchName;
-        }
-
-        public void setBatchName(String batchName) {
-            this.batchName = batchName;
-        }
-
-
-    }*/
 }

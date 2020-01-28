@@ -21,7 +21,7 @@
         </div>
 
         <div id="app-create-report">
-            <data-table v-bind:config="table">
+            <data-table v-bind:table="reportListData" v-bind:config="reportListConfig">
                 <template v-slot:name="{row}">
                     {{row.name}}
                 </template>

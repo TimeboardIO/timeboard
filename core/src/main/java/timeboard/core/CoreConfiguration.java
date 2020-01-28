@@ -34,6 +34,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Organization;
 
 import javax.annotation.PostConstruct;
@@ -58,7 +59,7 @@ public class CoreConfiguration {
     private String defaultVacationTaskName;
 
     @PostConstruct
-    private void verifyPublicOrganization() {
+    private void verifyPublicOrganization() throws BusinessException {
 
         final Optional<Organization> defaultOrganization = this.organizationService
                 .getOrganizationByName(this.defaultOrganizationName);
@@ -67,7 +68,7 @@ public class CoreConfiguration {
             final Map<String, String> props = new HashMap<>();
             props.put(Organization.SETUP_PUBLIC, "true");
 
-            this.organizationService.createOrganization(this.defaultOrganizationName, props);
+            this.organizationService.createOrganization(null, this.defaultOrganizationName, props);
         }
 
         this.organizationService.checkOrganizationVacationTask(defaultVacationTaskName);

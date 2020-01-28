@@ -57,13 +57,11 @@ public class ProjectsTest extends TimeboardTest {
 
     @Test
     public void testCreateProject() throws BusinessException {
-
-        final Organization org = this.organizationService.createOrganization("testOrg", Collections.emptyMap());
         final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test1@test.fr");
+        final Organization org = this.organizationService.createOrganization(a1, "testOrg", Collections.emptyMap());
         SecurityUtils.signIn(org, a1);
-        this.organizationService.addMembership(a1, org, a1, MembershipRole.OWNER);
 
-        final Project project = this.projectService.createProject(a1, "SampleProject");
+        final Project project = this.projectService.createProject(org.getId(), a1, "SampleProject");
 
         Assert.assertNotNull(project);
         Assert.assertNotNull(project.getId());

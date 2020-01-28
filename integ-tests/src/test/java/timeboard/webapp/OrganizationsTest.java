@@ -35,10 +35,13 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.DefaultTask;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 
 import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @RunWith(SpringRunner.class)
@@ -54,13 +57,13 @@ public class OrganizationsTest extends TimeboardTest {
     @Test
     public void testRemoveOrganizationMember() throws BusinessException {
 
-        final Organization org = this.organizationService.createOrganization("testOrg", Collections.emptyMap());
-        final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test1@test.fr");
+        final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "testRemove1@test.fr");
+        final Organization org = this.organizationService.createOrganization(a1,"testRemoveOrg", Collections.emptyMap());
+
         SecurityUtils.signIn(org, a1);
 
-        final Account a2 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test2@test.fr");
+        final Account a2 = this.userService.userProvisionning(UUID.randomUUID().toString(), "testRemove2@test.fr");
 
-        this.organizationService.addMembership(a1, org, a1, MembershipRole.OWNER);
         this.organizationService.addMembership(a1, org, a2, MembershipRole.CONTRIBUTOR);
 
         Assert.assertEquals(2, this.organizationService.getOrganizationByID(a1, org.getId()).get().getMembers().size());
@@ -71,4 +74,19 @@ public class OrganizationsTest extends TimeboardTest {
 
     }
 
+    @Test
+    public void testCreateDefaultTask() throws BusinessException {
+
+        final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test3@test.fr");
+        final Organization org = this.organizationService.createOrganization(a1,"testOrg2", Collections.emptyMap());
+
+        SecurityUtils.signIn(org, a1);
+
+        this.organizationService.createDefaultTask(a1, org.getId(),"TestDefaultTask");
+
+        final List<DefaultTask> tasks = this.organizationService.listDefaultTasks(org.getId(), org.getCreatedDate().getTime(), new Date());
+
+        Assert.assertEquals(2, tasks.size());
+
+    }
 }

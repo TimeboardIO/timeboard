@@ -26,6 +26,7 @@ package timeboard.core.internal;
  * #L%
  */
 
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,8 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -45,6 +48,9 @@ import java.util.List;
 public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
+
+    /* nombre de jours de projection pour la regression*/
+    private static final int projection_days = 180;
 
     @Autowired
     private ProjectServiceImpl projectService;
@@ -83,4 +89,64 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
         q.setParameter("taskID", taskID);
         return q.getResultList();
     }
+
+    @Override
+    public void regression(ProjectSnapshotGraphWrapper wrapper, List<String> listOfProjectSnapshotDates, List<ProjectSnapshot> projectSnapshotList) {
+
+        final SimpleRegression quotationRegression = new SimpleRegression();
+        final SimpleRegression originalEstimateRegression = new SimpleRegression();
+        final SimpleRegression realEffortRegression = new SimpleRegression();
+        final SimpleRegression effortLeftRegression = new SimpleRegression();
+        final SimpleRegression effortSpentRegression = new SimpleRegression();
+        final List<Double> quotationRegressionPoints = new ArrayList<>();
+        final List<Double> originalEstimateRegressionPoints = new ArrayList<>();
+        final List<Double> realEffortRegressionPoints = new ArrayList<>();
+        final List<Double> effortLeftRegressionPoints = new ArrayList<>();
+        final List<Double> effortSpentRegressionPoints = new ArrayList<>();
+        projectSnapshotList.forEach(snapshot -> {
+            quotationRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getQuotation());
+            originalEstimateRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getOriginalEstimate());
+            realEffortRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getRealEffort());
+            effortLeftRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getEffortLeft());
+            effortSpentRegression.addData(snapshot.getProjectSnapshotDate().getTime(), snapshot.getEffortSpent());
+        });
+
+        projectSnapshotList.forEach(snapshot -> {
+            quotationRegressionPoints.add(quotationRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
+            originalEstimateRegressionPoints.add(originalEstimateRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
+            realEffortRegressionPoints.add(realEffortRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
+            effortLeftRegressionPoints.add(effortLeftRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
+            effortSpentRegressionPoints.add(effortSpentRegression.predict(snapshot.getProjectSnapshotDate().getTime()));
+        });
+
+        final java.util.Calendar c = java.util.Calendar.getInstance();
+
+        quotationRegressionPoints.add(quotationRegression.predict(c.getTime().getTime()));
+        originalEstimateRegressionPoints.add(originalEstimateRegression.predict(c.getTime().getTime()));
+        realEffortRegressionPoints.add(realEffortRegression.predict(c.getTime().getTime()));
+        effortLeftRegressionPoints.add(effortLeftRegression.predict(c.getTime().getTime()));
+        effortSpentRegressionPoints.add(effortSpentRegression.predict(c.getTime().getTime()));
+
+        listOfProjectSnapshotDates.add(c.getTime().toString());
+
+        c.add(Calendar.DATE, this.projection_days);
+
+        quotationRegressionPoints.add(quotationRegression.predict(c.getTime().getTime()));
+        originalEstimateRegressionPoints.add(originalEstimateRegression.predict(c.getTime().getTime()));
+        realEffortRegressionPoints.add(realEffortRegression.predict(c.getTime().getTime()));
+        effortLeftRegressionPoints.add(effortLeftRegression.predict(c.getTime().getTime()));
+        effortSpentRegressionPoints.add(effortSpentRegression.predict(c.getTime().getTime()));
+
+        listOfProjectSnapshotDates.add(c.getTime().toString());
+
+        wrapper.setQuotationRegressionData(quotationRegressionPoints);
+        wrapper.setOriginalEstimateRegressionData(originalEstimateRegressionPoints);
+        wrapper.setRealEffortRegressionData(realEffortRegressionPoints);
+        wrapper.setEffortLeftRegressionData(effortLeftRegressionPoints);
+        wrapper.setEffortSpentRegressionData(effortSpentRegressionPoints);
+
+        wrapper.setListOfProjectSnapshotDates(listOfProjectSnapshotDates);
+    }
+
+
 }

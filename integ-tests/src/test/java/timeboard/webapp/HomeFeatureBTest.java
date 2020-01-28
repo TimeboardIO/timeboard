@@ -60,32 +60,20 @@ public class HomeFeatureBTest extends TimeboardTest {
     @Given("^user with an existing account and (\\d+) project in (\\d+) org \\(A\\) and (\\d+) in an other org \\(B\\)$")
     public void user_with_an_existing_account_and_project_in_org_A_and_in_an_other_org_B(final int arg1, final int arg2, final int arg3) throws Throwable {
         this.model = new ConcurrentModel();
-
-        this.organisationA = this.organizationService.createOrganization("Integration A", Collections.emptyMap());
-        this.organisationB = this.organizationService.createOrganization("Integration B", Collections.emptyMap());
-
         this.account = this.userService.userProvisionning(UUID.randomUUID().toString(), "test2");
 
-        this.auth = new TimeboardAuthentication(this.account);
-
-        this.account.getOrganizations().add(new OrganizationMembership(this.organisationA, this.account, MembershipRole.OWNER));
-        this.account.getOrganizations().add(new OrganizationMembership(this.organisationB, this.account, MembershipRole.OWNER));
+        this.organisationA = this.organizationService.createOrganization(this.account, "Integration A", Collections.emptyMap());
+        this.organisationB = this.organizationService.createOrganization(this.account,"Integration B", Collections.emptyMap());
 
 
-        this.auth.setCurrentOrganization(this.organisationA.getId());
-        SecurityContextHolder.getContext().setAuthentication(this.auth);
-        ThreadLocalStorage.setCurrentOrgId(this.organisationA.getId());
-        this.projectService.createProject(this.account, "TestProjectOrgA");
+        this.auth = SecurityUtils.signIn(organisationA, this.account);
+        this.projectService.createProject(this.organisationA.getId(), this.account, "TestProjectOrgA");
 
-        this.auth.setCurrentOrganization(this.organisationB.getId());
-        ThreadLocalStorage.setCurrentOrgId(this.organisationB.getId());
-        SecurityContextHolder.getContext().setAuthentication(this.auth);
-        this.projectService.createProject(this.account, "TestProjectOrgB");
+        this.auth = SecurityUtils.signIn(organisationB, this.account);
+        this.projectService.createProject(this.organisationB.getId(), this.account, "TestProjectOrgB");
 
+        this.auth = SecurityUtils.signIn(organisationA, this.account);
 
-        this.auth.setCurrentOrganization(this.organisationA.getId());
-        ThreadLocalStorage.setCurrentOrgId(this.organisationA.getId());
-        SecurityContextHolder.getContext().setAuthentication(this.auth);
 
     }
 

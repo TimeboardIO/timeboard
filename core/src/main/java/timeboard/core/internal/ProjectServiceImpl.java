@@ -99,11 +99,12 @@ public class ProjectServiceImpl implements ProjectService {
     @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     @CacheEvict(value = "accountProjectsCache", key = "#owner.getId()")
-    public Project createProject(final Account owner, final String projectName) {
+    public Project createProject(final Long orgID, final Account owner, final String projectName) {
         final Account ownerAccount = this.em.find(Account.class, owner.getId());
         final Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
+        newProject.setOrganizationID(orgID);
         newProject.getAttributes()
                 .put(Project.PROJECT_COLOR_ATTR, new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
         em.persist(newProject);
@@ -258,9 +259,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Cacheable(value = "accountTasksCache")
-    public List<Task> listUserTasks(final Account account) {
-        final TypedQuery<Task> q = em.createQuery("select t from Task t where t.assigned = :user", Task.class);
+    public List<Task> listUserTasks(Long orgID, final Account account) {
+        final TypedQuery<Task> q = em.createQuery("select t " +
+                "from Task t " +
+                "where t.assigned = :user and t.organizationID = :orgID", Task.class);
         q.setParameter("user", account);
+        q.setParameter("orgID", orgID);
         return q.getResultList();
 
     }
@@ -325,17 +329,6 @@ public class ProjectServiceImpl implements ProjectService {
         TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
 
         return task;
-    }
-
-    @Override
-    public void createTasks(final Account actor, final List<Task> taskList) {
-        for (final Task newTask : taskList) {
-            LOGGER.info("User " + actor + " tasks " + newTask.getName() + " on " + newTask.getStartDate());
-        }
-        LOGGER.info("User " + actor + " created " + taskList.size() + " tasks ");
-
-        em.flush();
-
     }
 
     @Override
@@ -435,7 +428,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         final ValidationStatus timesheetSubmitted = this.timesheetService.getTimesheetValidationStatus(
                 orgID,
-                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR)).orElse(null);
 
         if (task instanceof Task) {
             if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
@@ -497,8 +490,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     public UpdatedTaskResult updateDefaultTaskImputation(final Account actor,
-                                                          final DefaultTask task,
-                                                          final Date day, final double val, final Calendar calendar) throws BusinessException {
+                                                         final DefaultTask task,
+                                                         final Date day, final double val, final Calendar calendar) throws BusinessException {
 
         final DefaultTask defaultTask = (DefaultTask) this.getTaskByID(actor, task.getId());
 
@@ -523,11 +516,11 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
-    public void actionOnImputation( final Imputation imputation,
-                                          final AbstractTask task,
-                                          final Account actor,
-                                          final double val,
-                                          final Date date) {
+    public void actionOnImputation(final Imputation imputation,
+                                   final AbstractTask task,
+                                   final Account actor,
+                                   final double val,
+                                   final Date date) {
 
         if (imputation == null) {
             //No imputation for current task and day
@@ -593,18 +586,20 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectTasks> listTasksByProject(final Account actor, final Date ds, final Date de) {
+    public List<ProjectTasks> listTasksByProject(final Long orgID, final Account actor, final Date ds, final Date de) {
         final List<ProjectTasks> projectTasks = new ArrayList<>();
 
 
         final TypedQuery<Task> q = em
                 .createQuery("select distinct t from Task t left join fetch t.imputations where "
                         + "t.endDate >= :ds "
+                        + "and t.organizationID = :orgID "
                         + "and t.startDate <= :de "
                         + "and t.assigned = :actor ", Task.class);
         q.setParameter("ds", ds);
         q.setParameter("de", de);
         q.setParameter("actor", actor);
+        q.setParameter("orgID", orgID);
         final List<Task> tasks = q.getResultList();
 
         //rebalance task by project
@@ -863,10 +858,20 @@ public class ProjectServiceImpl implements ProjectService {
 
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(user, project.getOrganizationID());
 
-        final Map<Integer, Double> vacationImputations = timesheetService.getTaskImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
-                user, organization.get().getDefaultTasks().stream().filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get());
-        final Map<Integer, Double> projectImputations = timesheetService.getProjectImputationsForAccountOnDateRange(start.getTime(), end.getTime(),
-                user, project);
+        final Map<Integer, Double> vacationImputations = this.timesheetService.getAllImputationsForAccountOnDateRange(
+                organization.get().getId(),
+                start.getTime(),
+                end.getTime(),
+                user,
+                new TimesheetService.TimesheetFilter<AbstractTask>(organization.get().getDefaultTasks().stream()
+                        .filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get()));
+
+        final Map<Integer, Double> projectImputations = this.timesheetService.getAllImputationsForAccountOnDateRange(
+                organization.get().getId(),
+                start.getTime(),
+                end.getTime(),
+                user,
+                new TimesheetService.TimesheetFilter<Project>(project));
         final Map<Integer, String> comments = new HashMap<>();
         final Map<Integer, Double> otherProjectImputations = new HashMap<>();
         final List<Integer> dayMonthNums = new ArrayList<>();

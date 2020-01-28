@@ -152,7 +152,7 @@ public class CalendarServiceImpl implements CalendarService {
                 }
                 this.projectService.deleteTasks(actor, tasksToDelete);
             }
-            this.projectService.createTasks(actor, tasksToCreate);
+
             this.projectService.updateTasks(actor, tasksToUpdate);
         } catch (final Exception e) {
             throw new BusinessException(e);

@@ -88,5 +88,4 @@ public class SubmittedTimesheet extends OrganizationEntity {
         this.account = account;
     }
 
-
 }

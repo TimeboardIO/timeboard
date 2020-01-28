@@ -37,12 +37,9 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
 import timeboard.core.model.ValidationStatus;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.home.model.Week;
+import timeboard.home.model.WeekWrapper;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Controller
@@ -73,35 +70,46 @@ public class HomeController {
         final Date d = new Date();
         final Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
-        final List<Week> weeks = new ArrayList<>();
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        final List<WeekWrapper> weeks = new ArrayList<>();
         final Account account = authentication.getDetails();
         final int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                final ValidationStatus timesheetStatus = timesheetService.getTimesheetValidationStatus(
+                final Optional<ValidationStatus> timesheetStatusOpt = timesheetService.getTimesheetValidationStatus(
                         authentication.getCurrentOrganization(),
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
-                calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 final Date firstDayOfWeek = calendar.getTime();
-                calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                 final Date lastDayOfWeek = calendar.getTime();
-                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(firstDayOfWeek, lastDayOfWeek, account);
 
-                final Week week = new Week(
+                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(
+                        authentication.getCurrentOrganization(),
+                        firstDayOfWeek, lastDayOfWeek,
+                        account).values().stream().reduce(Double::sum).orElse(0.0);
+
+                final WeekWrapper week = new WeekWrapper(
                         calendar.get(Calendar.WEEK_OF_YEAR),
                         calendar.get(Calendar.YEAR),
                         weekSum,
-                        timesheetStatus);
+                        timesheetStatusOpt.orElse(null),
+                        firstDayOfWeek,
+                        lastDayOfWeek);
 
                 weeks.add(week);
                 calendar.roll(Calendar.WEEK_OF_YEAR, -1);
             }
         }
 
-        model.addAttribute(NB_PROJECTS, this.projectService.listProjects(account, authentication.getCurrentOrganization()).size());
-        model.addAttribute(NB_TASKS, this.projectService.listUserTasks(account).size());
+        model.addAttribute(NB_PROJECTS, this.projectService
+                .listProjects(account, authentication.getCurrentOrganization()).size());
+
+        model.addAttribute(NB_TASKS, this.projectService
+                .listUserTasks(authentication.getCurrentOrganization(), account).size());
+
         model.addAttribute(WEEKS, weeks);
 
         return "home.html";

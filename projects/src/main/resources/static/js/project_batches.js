@@ -11,7 +11,7 @@ $(document).ready(function () {
                 "type":"GROUP",
                 "date":new Date()
             },
-            table: {
+            batchesListConfig: {
                 cols: [
                     {
                         "slot": "name",
@@ -33,10 +33,9 @@ $(document).ready(function () {
                         "slot": "actions",
                         "label": "Actions"
                     }],
-                data: [],
                 name: 'tableBatch'
-
-            }
+            },
+            batchesListData: []
         },
         methods: {
             openModal: function(){
@@ -76,7 +75,7 @@ $(document).ready(function () {
                     dataType: "json",
                     url: "projects/" + projectID + "/batches/list",
                     success: function (d) {
-                        self.table.data = d;
+                        self.batchesListData = d;
                     }
                 });
             }
