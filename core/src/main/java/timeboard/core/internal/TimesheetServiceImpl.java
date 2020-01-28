@@ -159,7 +159,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     public SubmittedTimesheet validateTimesheet(final Account actor,
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
-        if (submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
+        if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not validate unsubmitted weeks");
         }
         submittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);

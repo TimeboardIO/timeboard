@@ -130,8 +130,10 @@
                             Pending validation
                         </div>
                     </div>
-                    <button v-if="canValidate && !isTimesheetHasState([null, 'VALIDATED'])" :class="{ disabled : isTimesheetHasState(['PENDING_VALIDATION']) }"
-                        class="ui primary create-task button">
+                    <button v-if="canValidate && !isTimesheetHasState(['VALIDATED'])" :class="{ disabled : !isTimesheetHasState(['PENDING_VALIDATION']) }"
+                            v-on:click="validateWeek"
+
+                            class="ui primary create-task button">
                         Validate this week
                     </button>
                 <div v-if="isTimesheetHasState(['VALIDATED'])">

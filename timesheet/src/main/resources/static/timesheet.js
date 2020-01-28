@@ -214,6 +214,7 @@ $(document).ready(function () {
                         app.submitted = true;
                         app.displaySuccessMessage("Your timesheet have been submitted successfully.");
                         app.updateTimesheet();
+                        app.currentWeekValidationStatus = "PENDING_VALIDATION";
 
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -229,6 +230,7 @@ $(document).ready(function () {
                         app.submitted = true;
                         app.displaySuccessMessage("This timesheet have been validated successfully.");
                         app.updateTimesheet();
+                        app.currentWeekValidationStatus = "VALIDATED";
 
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
