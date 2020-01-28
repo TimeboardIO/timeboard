@@ -42,6 +42,7 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.math.BigInteger;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.*;
@@ -230,7 +231,12 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         final Map<Integer, Double> result = new HashMap<>();
         for (final Object[] o : dayImputations) {
-            result.put(((Integer) o[0]).intValue(), (double) o[1]);
+            if(o[0] instanceof BigInteger){
+                result.put(((BigInteger) o[0]).intValue(), (double) o[1]);
+            }
+            if(o[0] instanceof Integer){
+                result.put((Integer) o[0], (double) o[1]);
+            }
         }
 
         return result;
