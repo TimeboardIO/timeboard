@@ -139,7 +139,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Account> findOwnersOfAnyUserProject(Account user) {
-        final TypedQuery<Account> q = em.createQuery("SELECT m2.member " +
+        final TypedQuery<Account> q = em.createQuery("SELECT DISTINCT m2.member " +
                 "FROM ProjectMembership m1 JOIN ProjectMembership m2 " +
                 "ON m1.project = m2.project WHERE m1.member = :user AND m2.role = :role", Account.class);
         q.setParameter("user", user);

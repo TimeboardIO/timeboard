@@ -119,32 +119,8 @@ public class UsersSearchRestController {
             orgID = authentication.getCurrentOrganization();
         }
 
-        MembershipRole role = null;
-        if (req.getParameter("role") != null) {
-            role = req.getParameter("role").equals("OWNER") ? MembershipRole.OWNER : MembershipRole.CONTRIBUTOR;
-        }
-
         final List<Account> accounts = new ArrayList<>();
         if (orgID != null) {
-           /* final List<Project> myProjects = projectService.listProjects(actor, orgID)
-                    .stream()
-                    .filter(project -> project.isMember(actor))
-                    .collect(Collectors.toList());
-
-            final List<Account> myManagers = new ArrayList<>();
-            final MembershipRole finalRole = role;
-            myProjects
-                    .stream()
-                    .map(project -> project.getMemberShipsByRole(finalRole))
-                    .forEach(projectMembershipOwners -> {
-                        for (final ProjectMembership projectMembershipOwner : projectMembershipOwners) {
-                            if (projectMembershipOwner.getMember().getEmail().startsWith(query)
-                                    && !myManagers.contains(projectMembershipOwner.getMember())) {
-                                myManagers.add(projectMembershipOwner.getMember());
-                            }
-                        }
-                    });
-*/
             final List<Account> ownersOfAnyUserProject = this.projectService.findOwnersOfAnyUserProject(actor);
             accounts.addAll(ownersOfAnyUserProject);
 

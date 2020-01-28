@@ -56,6 +56,19 @@ public interface TimesheetService {
 
 
     /**
+     * Submit user timesheet.
+     *
+     * @param actor            user who trigger this function.
+     * @param submittedTimesheet  submittedTimesheet to validate
+     * @return true if timesheet is submit else, false.
+     */
+    SubmittedTimesheet validateTimesheet( final Account actor,
+            final SubmittedTimesheet submittedTimesheet) throws BusinessException;
+
+    Optional<SubmittedTimesheet> getTimesheet(Long currentOrganization, Account actor, Account user, int year, int week);
+
+
+    /**
      * Get timesheet validation status.
      *
      * @param currentAccount user used to check timesheet sumbit state.

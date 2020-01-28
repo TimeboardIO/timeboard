@@ -283,6 +283,37 @@ public class TimesheetController {
     }
 
 
+    @GetMapping("/validate")
+    public ResponseEntity validateTimesheet(final TimeboardAuthentication authentication, final HttpServletRequest request) {
+
+        final Account actor = authentication.getDetails();
+
+        final int week = Integer.parseInt(request.getParameter("week"));
+        final int year = Integer.parseInt(request.getParameter("year"));
+
+        try {
+            final Optional<SubmittedTimesheet> submittedTimesheet =
+                    this.timesheetService.getTimesheet(
+                            authentication.getCurrentOrganization(),
+                            actor,
+                            actor,
+                            year,
+                            week);
+
+            if (submittedTimesheet.isPresent()) {
+                final SubmittedTimesheet result = this.timesheetService.validateTimesheet(actor, submittedTimesheet.get());
+                return ResponseEntity.ok(result.getTimesheetStatus());
+
+            } else {
+                return ResponseEntity.status(412).build();
+            }
+        } catch (final Exception e) { // TimesheetException
+            LOGGER.error(e.getMessage(), e);
+            return ResponseEntity.status(412).build();
+        }
+    }
+
+
     private List<TaskWrapper> getDefaultTasks(final Account currentAccount,
                                               final Long orgID,
                                               final List<ImputationWrapper> imputations,

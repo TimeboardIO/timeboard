@@ -155,6 +155,37 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
 
+
+    public SubmittedTimesheet validateTimesheet(final Account actor,
+                                                final SubmittedTimesheet submittedTimesheet) throws BusinessException {
+
+        if (submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
+            throw new BusinessException("Can not validate unsubmitted weeks");
+        }
+        submittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
+
+        em.merge(submittedTimesheet);
+
+        return submittedTimesheet;
+
+
+    }
+
+    @Override
+    public Optional<SubmittedTimesheet> getTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {
+
+        final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year " +
+                "and st.week = :week and st.organizationID = :orgID", SubmittedTimesheet.class);
+
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", user);
+        q.setParameter("orgID", currentOrganization);
+
+        return Optional.ofNullable(q.getSingleResult());
+    }
+
     @Override
     public Optional<ValidationStatus> getTimesheetValidationStatus(
             final Long orgID,
