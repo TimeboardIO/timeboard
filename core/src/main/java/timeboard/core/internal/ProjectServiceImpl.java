@@ -273,7 +273,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     //@PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
     @PreAuthorize("hasPermission(#project,'TASKS_CREATE')")
-    public Task createTask(final Account actor,
+    public Task createTask(
+            final Long orgID,
+            final Account actor,
                            final Project project,
                            final String taskName,
                            final String taskComment,
@@ -302,7 +304,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
-        newTask.setOrganizationID(project.getId());
+        newTask.setOrganizationID(orgID);
         if (batch != null) {
             em.merge(batch);
         }

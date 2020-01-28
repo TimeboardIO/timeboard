@@ -67,11 +67,21 @@ public interface ProjectService {
 
     List<ProjectTasks> listTasksByProject(Long orgID, Account actor, Date ds, Date de);
 
-    Task createTask(Account actor, Project project, String taskName, String taskComment,
-                    Date startDate, Date endDate, double originalEstimate,
-                    Long taskTypeID, Account assignedAccountID, String origin,
-                    String remotePath, String remoteId,
-                    TaskStatus taskStatus, Batch batch);
+    Task createTask(final Long orgID,
+                    final Account actor,
+                    final Project project,
+                    final String taskName,
+                    final String taskComment,
+                    final Date startDate,
+                    final Date endDate,
+                    final double originalEstimate,
+                    final Long taskTypeID,
+                    final Account assignedAccountID,
+                    final String origin,
+                    final String remotePath,
+                    final String remoteId,
+                    final TaskStatus taskStatus,
+                    final Batch batch);
 
     Task updateTask(Account actor, Task task);
 
