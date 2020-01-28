@@ -81,17 +81,19 @@ public final class ProjectSyncJob implements Job {
 
             final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
 
-            context.setResult(this.syncProjectTasks(actor, project, syncService, credentials));
+            context.setResult(this.syncProjectTasks(orgID, actor, project, syncService, credentials));
 
         } catch (final Exception e) {
             context.setResult(e);
         }
     }
 
-    private Object syncProjectTasks(final Account actor,
-                                    final Project project,
-                                    final ProjectSyncPlugin syncService,
-                                    final List<ProjectSyncCredentialField> jiraCrendentials) throws Exception {
+    private Object syncProjectTasks(
+            final Long orgID,
+            final Account actor,
+            final Project project,
+            final ProjectSyncPlugin syncService,
+            final List<ProjectSyncCredentialField> jiraCrendentials) throws Exception {
 
 
         final List<RemoteTask> remoteTasks = syncService.getRemoteTasks(actor, jiraCrendentials);
@@ -105,13 +107,18 @@ public final class ProjectSyncJob implements Job {
                     }
                 });
 
-        this.syncTasks(actor, project, remoteTasks);
+        this.syncTasks(orgID, actor, project, remoteTasks);
 
 
         return String.format("Sync %s tasks from %s", remoteTasks.size(), syncService.getServiceName());
     }
 
-    private void syncTasks(final Account actor, final Project project, final List<RemoteTask> remoteTasks) throws BusinessException {
+    private void syncTasks(
+            final Long orgID,
+            final Account actor,
+            final Project project,
+            final List<RemoteTask> remoteTasks) throws BusinessException {
+
         final List<RemoteTask> newTasks = new ArrayList<>();
         for (final RemoteTask task1 : remoteTasks) {
             if (isNewTask(actor, task1)) {
@@ -127,19 +134,20 @@ public final class ProjectSyncJob implements Job {
         }
 
 
-        this.createTasks(actor, project, newTasks);
+        this.createTasks(orgID, actor, project, newTasks);
 
         for (final RemoteTask remoteTask : updatedTasks) {
             final Optional<Task> taskToUpdate = projectService.getTaskByRemoteID(actor, remoteTask.getId());
             if (taskToUpdate.isPresent()) {
                 taskToUpdate.get().setName(remoteTask.getTitle());
-                projectService.updateTask(actor, taskToUpdate.get());
+                projectService.updateTask(orgID,actor, taskToUpdate.get());
             }
         }
     }
 
 
-    private void createTasks(final Account actor, final Project project, final List<RemoteTask> newTasks) {
+    private void createTasks(
+            final Long orgID, final Account actor, final Project project, final List<RemoteTask> newTasks) {
         newTasks.forEach(task -> {
                     String taskName = task.getTitle();
                     if (taskName.length() >= 100) {
@@ -155,7 +163,7 @@ public final class ProjectSyncJob implements Job {
                     final String remotePath = null;
                     final String remoteId = task.getId();
                     final Batch batch = null;
-                    projectService.createTask(actor, project, taskName, taskComment,
+                    projectService.createTask(orgID, actor, project, taskName, taskComment,
                             startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
                             remotePath, String.valueOf(remoteId), TaskStatus.IN_PROGRESS, batch);
                 }

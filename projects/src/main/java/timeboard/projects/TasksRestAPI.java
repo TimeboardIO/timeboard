@@ -111,14 +111,16 @@ public class TasksRestAPI {
 
         if (taskID != null && taskID != 0) {
             try {
-                task = processUpdateTask(taskWrapper, actor, batches, taskID);
+                task = processUpdateTask(authentication.getCurrentOrganization(),taskWrapper, actor, batches, taskID);
 
             } catch (final Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error in task creation please verify your inputs and retry");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body("Error in task creation please verify your inputs and retry");
             }
         } else {
             try {
-                task = createTask(taskWrapper, actor, startDate, endDate, name, comment, oe, project, typeID);
+                task = createTask(authentication.getCurrentOrganization(),
+                        taskWrapper, actor, startDate, endDate, name, comment, oe, project, typeID);
             } catch (final Exception e) {
                 return ResponseEntity
                         .status(HttpStatus.BAD_REQUEST)
@@ -140,7 +142,9 @@ public class TasksRestAPI {
         return comment;
     }
 
-    private Task createTask(final TaskWrapper taskWrapper,
+    private Task createTask(
+            final Long orgID,
+            final TaskWrapper taskWrapper,
                             final Account actor,
                             final Date startDate,
                             final Date endDate,
@@ -155,7 +159,7 @@ public class TasksRestAPI {
         }
 
 
-        return projectService.createTask(actor, project,
+        return projectService.createTask(orgID, actor, project,
                 name, comment, startDate,
                 endDate, oe, typeID, assignee,
                 ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING, null);
@@ -181,7 +185,9 @@ public class TasksRestAPI {
         return returnList;
     }
 
-    private Task processUpdateTask(@RequestBody final TaskWrapper taskWrapper,
+    private Task processUpdateTask(
+            final Long orgID,
+            final TaskWrapper taskWrapper,
                                    final Account actor,
                                    final Set<Batch> batches,
                                    final Long taskID) throws BusinessException, ParseException {
@@ -202,7 +208,7 @@ public class TasksRestAPI {
         task.setBatches(batches);
         task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
 
-        projectService.updateTask(actor, task);
+        projectService.updateTask(orgID, actor, task);
         return task;
     }
 
