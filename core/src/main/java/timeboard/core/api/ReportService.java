@@ -29,6 +29,7 @@ package timeboard.core.api;
 import org.quartz.SchedulerException;
 import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
@@ -39,9 +40,23 @@ import java.util.stream.Collectors;
 
 public interface ReportService {
 
-    String ORIGIN_TIMEBOARD = "timeboard";
 
-    Report createReport(Account owner, String reportName, Account organization, String handlerName, String filterProject) throws SchedulerException;
+    /**
+     * Create a new report configuration
+     * @param organizationID relevant organization
+     * @param owner user that owner report
+     * @param reportName screen name used to identify report
+     * @param handlerName name of report handler used to compute report data
+     * @param filterProject SPEL
+     * @return
+     * @throws SchedulerException
+     */
+    Report createReport(
+            final Long organizationID,
+            final Account owner,
+            final String reportName,
+            final String handlerName,
+            final String filterProject) throws SchedulerException;
 
     /**
      * List all report for owner

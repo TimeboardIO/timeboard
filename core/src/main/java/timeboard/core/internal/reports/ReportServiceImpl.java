@@ -91,7 +91,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public Report createReport(final Account owner, final String reportName, final Account organization,
+    public Report createReport(final Long orgID, final Account owner, final String reportName,
                                final String handlerID, final String filterProject) throws SchedulerException {
 
 
