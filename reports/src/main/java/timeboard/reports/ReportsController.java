@@ -49,6 +49,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -64,6 +65,7 @@ public class ReportsController {
     @Autowired
     private UserService userService;
 
+
     @GetMapping
     protected String handleGet() {
         return "reports.html";
@@ -73,7 +75,7 @@ public class ReportsController {
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<List<ReportDecorator>> reportList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
-        final List<ReportDecorator> reports = this.reportService.listReports(actor)
+        final List<ReportDecorator> reports = this.reportService.listReports(authentication.getCurrentOrganization(),  actor)
                 .stream()
                 .map(report -> {
                     final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
@@ -102,15 +104,14 @@ public class ReportsController {
                                 @ModelAttribute final Report report, final RedirectAttributes attributes) throws SchedulerException {
 
         final Account actor = authentication.getDetails();
-        final Long organizationID = ThreadLocalStorage.getCurrentOrgId();
-        final Account organization = userService.findUserByID(organizationID);
+        final Long organizationID = authentication.getCurrentOrganization();
 
         final String projectFilter = report.getFilterProject();
 
         this.reportService.createReport(
+                organizationID,
                 actor,
                 report.getName(),
-                organization,
                 report.getHandlerID(),
                 projectFilter
         );
@@ -244,6 +245,15 @@ public class ReportsController {
             this.controller = controller;
         }
 
+        public Report getReport() {
+            return report;
+        }
+
+        public ReportHandler getController() {
+            return controller;
+        }
+
+
         public long getID() {
             return this.report.getId();
         }
@@ -256,6 +266,8 @@ public class ReportsController {
         public boolean isAsync() {
             return this.controller.isAsyncHandler();
         }
+
+
     }
 
 }

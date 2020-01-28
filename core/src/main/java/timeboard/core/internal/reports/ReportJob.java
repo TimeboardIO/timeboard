@@ -27,15 +27,50 @@ package timeboard.core.internal.reports;
  */
 
 import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.ReportService;
+import timeboard.core.api.UserService;
+import timeboard.core.model.Account;
+import timeboard.core.model.Report;
+import timeboard.core.security.TimeboardAuthentication;
+
+import java.io.Serializable;
+import java.util.Optional;
 
 @Component
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 public final class ReportJob implements Job {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReportJob.class);
+
+    @Autowired
+    private ReportService reportService;
+    
+    @Autowired
+    private UserService userService;
+
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
+
+        final Long reportID = context.getMergedJobDataMap().getLong("reportID");
+        final Long actorID = context.getMergedJobDataMap().getLong("actorID");
+
+        final Account actor = this.userService.findUserByID(actorID);
+        final TimeboardAuthentication authentication = new TimeboardAuthentication(actor);
+        final Report report = this.reportService.getReportByID(actor, reportID);
+        final Optional<ReportHandler> reportHandler = this.reportService.getReportHandler(report);
+
+        if(reportHandler.isPresent()){
+            final Serializable data = reportHandler.get().getReportModel(authentication, report);
+            LOGGER.info("Report "+reportID+" finished with "+data.toString());
+        }else{
+            context.setResult("Mission report handler : "+report.getHandlerID());
+        }
+
 
     }
 }

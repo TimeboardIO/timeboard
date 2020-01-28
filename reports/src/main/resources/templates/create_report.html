@@ -27,10 +27,10 @@
                 </div>
                 <div class="field">
                     <label>Report Type</label>
-                    <select name="reportType" class="ui dropdown" th:field="*{type}">
+                    <select name="reportType" class="ui dropdown" th:field="*{handlerID}">
                         <option th:each="reportType: ${allReportTypes}"
-                                th:text="#{${reportType.reportLabel()}}"
-                                th:value="${reportType.reportID()}">
+                                th:text="#{${reportType.handlerLabel()}}"
+                                th:value="${reportType.handlerID()}">
                         </option>
                     </select>
                 </div>

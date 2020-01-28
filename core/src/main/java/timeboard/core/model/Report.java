@@ -28,6 +28,7 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Calendar;
 
 
 @Entity
@@ -48,6 +49,10 @@ public class Report extends OrganizationEntity implements Serializable {
 
     @Column
     private String handlerAsyncJobID;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private java.util.Calendar lastAsyncJobTrigger;
 
 
     public Report() {
@@ -92,5 +97,13 @@ public class Report extends OrganizationEntity implements Serializable {
 
     public void setHandlerAsyncJobID(final String handlerAsyncJobID) {
         this.handlerAsyncJobID = handlerAsyncJobID;
+    }
+
+    public Calendar getLastAsyncJobTrigger() {
+        return lastAsyncJobTrigger;
+    }
+
+    public void setLastAsyncJobTrigger(final Calendar lastAsyncJobTrigger) {
+        this.lastAsyncJobTrigger = lastAsyncJobTrigger;
     }
 }

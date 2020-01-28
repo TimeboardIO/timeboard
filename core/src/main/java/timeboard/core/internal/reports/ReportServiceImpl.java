@@ -45,9 +45,8 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.Calendar;
 import java.util.stream.Collectors;
 
 
@@ -103,14 +102,23 @@ public class ReportServiceImpl implements ReportService {
         final Optional<ReportHandler> reportHandler = this.getReportHandler(newReport);
         if(reportHandler.isPresent()){
             newReport.setHandlerID(reportHandler.get().handlerID());
+            em.persist(newReport);
+
             if(reportHandler.get().isAsyncHandler()){
+
+                final JobDataMap jobDataMap = new JobDataMap();
+                jobDataMap.put("reportID", newReport.getId());
+                jobDataMap.put("actorID", owner.getId());
+
                 final Trigger trigger = TriggerBuilder.newTrigger()
                         .forJob(reportHandler.get().handlerJobJey())
-                        .withSchedule(CronScheduleBuilder.cronSchedule("*/15 * * * *"))
+                        .withSchedule(CronScheduleBuilder.cronSchedule("0 0 14-6 ? * FRI-MON"))
+                        .usingJobData(jobDataMap)
                         .build();
+
                 this.scheduler.scheduleJob(trigger);
+                this.scheduler.triggerJob(trigger.getJobKey(), jobDataMap);
             }
-            em.persist(newReport);
             LOGGER.info("Report " + reportName + " created by user " + owner.getId());
         }
 
@@ -119,8 +127,12 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> listReports(final Account owner) {
-        final TypedQuery<Report> query = em.createQuery("select r from Report r", Report.class);
+    public List<Report> listReports(final Long orgID, final Account owner) {
+        final TypedQuery<Report> query = em.createQuery(
+                "select r from Report r where r.organizationID = :orgID",
+                Report.class);
+        query.setParameter("orgID", orgID);
+
         return query.getResultList();
     }
 
@@ -200,10 +212,16 @@ public class ReportServiceImpl implements ReportService {
 
         final Optional<ReportHandler> handler = this.getReportHandler(report);
         if(handler.isPresent()) {
-            this.scheduler.triggerJob(handler.get().handlerJobJey());
+            final JobDataMap jobDataMap = new JobDataMap();
+            jobDataMap.put("reportID", report.getId());
+            jobDataMap.put("actorID", actor.getId());
+
+            this.scheduler.triggerJob(handler.get().handlerJobJey(), jobDataMap);
         }
 
     }
+
+
 
 
     private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {

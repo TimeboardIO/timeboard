@@ -34,6 +34,7 @@ import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
 import java.beans.Transient;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -60,10 +61,11 @@ public interface ReportService {
 
     /**
      * List all report for owner
+     * @param orgID primary key {@link Organization} where looking for reports
      * @param owner an account that own reports
      * @return
      */
-    List<Report> listReports(Account owner);
+    List<Report> listReports(final Long orgID, final Account owner);
 
     Report updateReport(Account actor, Report report);
 
@@ -80,8 +82,6 @@ public interface ReportService {
     List<ReportHandler> listReportHandlers();
 
     void executeAsyncReport(Account actor, Report report) throws SchedulerException;
-
-
 
 
     class ProjectWrapper {
