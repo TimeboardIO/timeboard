@@ -214,6 +214,10 @@ public class TimesheetController {
 
             UpdatedTaskResult updatedTask = null;
 
+            if (task instanceof  Task && ((Task) task).getTaskStatus() == TaskStatus.PENDING) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Can't update a task in pending validation");
+            }
+
             if (request.type.equals("imputation")) {
                 final Date day = DATE_FORMAT.parse(request.day);
                 updatedTask = this.projectService.updateTaskImputation(
