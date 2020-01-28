@@ -231,7 +231,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         final Map<Integer, Double> result = new HashMap<>();
         for (final Object[] o : dayImputations) {
-            result.put(((BigInteger) o[0]).intValue(), (double) o[1]);
+            result.put(((Integer) o[0]).intValue(), (double) o[1]);
         }
 
         return result;
