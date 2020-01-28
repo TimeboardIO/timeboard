@@ -1,4 +1,4 @@
-package timeboard.core.internal;
+package timeboard.core.internal.organization;
 
 /*-
  * #%L
@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
@@ -57,40 +58,29 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Autowired
     private EntityManager em;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
 
     @Override
-    public Organization createOrganization(final String organizationName, final Map<String, String> properties) {
+    public Organization createOrganization(final Account account, final String organizationName, final Map<String, String> properties) {
 
         final Organization organization = new Organization();
         organization.setName(organizationName);
         organization.setCreatedDate(Calendar.getInstance());
         organization.setSetup(properties);
 
-
         this.em.persist(organization);
 
-        LOGGER.info("Organization " + organization.getName() + " created");
 
-        try {
-            this.createDefaultTask(organization, this.defaultVacationTaskName);
-        } catch (final BusinessException e) {
-            LOGGER.error(e.getMessage());
-        }
+        this.applicationEventPublisher.publishEvent(
+                new CreateOrganizationEvent(account, organization));
+
+        LOGGER.info("Organization " + organization.getName() + " created");
 
         return organization;
     }
 
-    @Override
-    public Organization createOrganization(
-            final Account actor,
-            final String organizationName,
-            final Map<String, String> properties) throws BusinessException {
-
-        final Organization org = this.createOrganization(organizationName, properties);
-        this.addMembership(actor, org, actor, MembershipRole.OWNER);
-
-        return org;
-    }
 
     @Override
     @PostAuthorize("#actor.isMemberOf(returnObject)")
@@ -262,7 +252,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public List<DefaultTask> listDefaultTasks(final Long orgID, final Date ds, final Date de) {
         final TypedQuery<DefaultTask> q = em
-                .createQuery("select distinct t from DefaultTask t left join fetch t.imputations where "
+                .createQuery("select distinct t " +
+                        " from DefaultTask t left join fetch t.imputations where "
                         + " t.organizationID = :orgID", DefaultTask.class);
         q.setParameter("orgID", orgID);
 

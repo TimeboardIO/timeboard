@@ -39,9 +39,6 @@ import java.util.Optional;
  */
 public interface OrganizationService {
 
-    Organization createOrganization(
-            final String organizationName,
-            final Map<String, String> properties);
 
     Organization createOrganization(
             final Account actor,
@@ -73,7 +70,6 @@ public interface OrganizationService {
     Optional<Organization> updateMembership(
             final Account actor,
             final OrganizationMembership membership) throws BusinessException;
-
 
     Optional<OrganizationMembership> findOrganizationMembership(
             final Account actor,

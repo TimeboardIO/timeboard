@@ -41,7 +41,6 @@ public abstract class AbstractExcelReport {
     protected boolean format = false;
 
 
-
     /**
      * Save current workbook in <code>this.reportFile</code>.
      */
@@ -55,10 +54,6 @@ public abstract class AbstractExcelReport {
             }
         }
     }
-
-
-
-
 
 
 }

@@ -45,10 +45,10 @@
             </a>
         </div>
 
-        <div v-if="toValidateRequests.data.length" class="ui horizontal divider"><i class="clock icon"></i>
+        <div v-if="toValidateRequestsListData.length" class="ui horizontal divider"><i class="clock icon"></i>
             Vacations requests to Validate
         </div>
-        <data-table v-bind:config="toValidateRequests">
+        <data-table v-bind:table="toValidateRequestsListData" v-bind:config="toValidateRequestsListConfig">
             <template v-slot:label="{row}">
                 {{ row.label }}
             </template>
@@ -84,10 +84,10 @@
         </data-table>
 
 
-        <div v-if="myRequests.data.length" class="ui horizontal divider"><i class="boxes icon"></i>
+        <div v-if="myRequestsListData.length" class="ui horizontal divider"><i class="boxes icon"></i>
             My vacation requests
         </div>
-        <data-table v-bind:config="myRequests">
+        <data-table v-bind:table="myRequestsListData" v-bind:config="myRequestsListConfig">
             <template v-slot:label="{row}">
                 {{ row.label }}
             </template>

@@ -60,7 +60,6 @@ public final class ProjectSyncJob implements Job {
     private UserService userService;
 
 
-
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
         try {

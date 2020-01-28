@@ -5,8 +5,8 @@ $(document).ready(function () {
     var app = new Vue({
         el: '#projectSnapshots',
         data: {
-            table: {
-                name:"table",
+            snapshotsListConfig: {
+                name:"tableSnapshots",
                 cols: [
                     {
                         "slot": "snapshotdate",
@@ -35,9 +35,9 @@ $(document).ready(function () {
                     {
                         "slot": "snapshotactions",
                         "label": "Actions"
-                    }],
-                data: []
-            }
+                    }]
+            },
+            snapshotsListData: []
         },
         methods: {
             formatDate: function(d) {
@@ -56,7 +56,7 @@ $(document).ready(function () {
                     },
                     success: function (d) {
                         self.formatDate(d);
-                        self.table.data = d;
+                        self.snapshotsListData = d;
                         self.showGraph();
                     }
                 });
@@ -69,7 +69,7 @@ $(document).ready(function () {
                     url: "projects/" + projectID + "/snapshots/" + row.id,
                     success: function (d) {
                         self.formatDate(d);
-                        self.table.data = d;
+                        self.snapshotsListData = d;
                         self.showGraph();
                     }
                 });
@@ -188,7 +188,7 @@ $(document).ready(function () {
                 url: "projects/" + projectID + "/snapshots/list",
                 success: function (d) {
                     self.formatDate(d);
-                    self.table.data = d;
+                    self.snapshotsListData = d;
                     if(d.length>0){
                         self.showGraph();
                     }

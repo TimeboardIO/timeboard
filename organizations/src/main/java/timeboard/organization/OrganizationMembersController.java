@@ -35,18 +35,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.OrganizationMembership;
-import timeboard.core.security.TimeboardAuthentication;
-import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
+import timeboard.core.model.OrganizationMembership;
+import timeboard.core.security.TimeboardAuthentication;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.*;
-import javax.servlet.http.HttpServletRequest;
 
 
 /**
@@ -224,7 +224,7 @@ public class OrganizationMembersController {
         public String screenName;
         public String role;
 
-        @JsonFormat(pattern="yyyy-MM-dd")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         public java.util.Calendar creationDate;
 
         public MemberWrapper() {

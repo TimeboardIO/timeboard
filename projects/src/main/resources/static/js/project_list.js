@@ -5,7 +5,7 @@ $(document).ready(function () {
     var app = new Vue({
         el: '#projectsApp',
         data: {
-            table: {
+            projectListConfig: {
                 cols: [
                     {
                         "slot": "name",
@@ -19,9 +19,9 @@ $(document).ready(function () {
                         "primary" : true,
                         "class":"right aligned collapsing"
                     }],
-                data: [],
                 name : "tableProjects",
-            }
+            },
+            projectListData: []
         },
         methods: {
             archive : function (row){
@@ -38,7 +38,7 @@ $(document).ready(function () {
                 dataType: "json",
                 url: "projects/list",
                 success: function (d) {
-                    self.table.data = d;
+                    self.projectListData = d;
                     $('.ui.loading').toggle();
                 }
             });

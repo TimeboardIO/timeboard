@@ -107,7 +107,7 @@
 
 
             <div class="actions">
-                <div v-if="isTimesheetHasState(['DRAFT','REJECTED'])"
+                <div v-if="isTimesheetHasState([null,'REJECTED'])"
                      v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
                      data-position="right center">
                     <button
@@ -130,7 +130,7 @@
                     </div>
                 </div>
                 <button
-                        v-if="isTimesheetHasState(['DRAFT','REJECTED'])"
+                        v-if="isTimesheetHasState(['NONE','REJECTED'])"
                         v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
                     New Task
                 </button>

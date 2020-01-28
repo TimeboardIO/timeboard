@@ -42,6 +42,7 @@ import timeboard.core.model.*;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.math.BigInteger;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.*;
@@ -66,6 +67,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public SubmittedTimesheet submitTimesheet(
+            final Long orgID,
             final Account actor,
             final Account accountTimesheet,
             final Organization currentOrg,
@@ -86,12 +88,12 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
         previousWeek.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
-        final ValidationStatus lastWeekSubmitted = this.getTimesheetValidationStatus(
+        final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
                 currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if (!firstWeek && lastWeekSubmitted == ValidationStatus.VALIDATED) {
-            throw new TimesheetException("Can not submit this week, previous week is not validated");
+        if (!firstWeek && lastWeekValidatedOpt.isEmpty()) {
+            throw new TimesheetException("Can not submit this week, previous week is not submitted");
         }
 
         final Calendar firstDay = Calendar.getInstance();
@@ -154,48 +156,59 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    public ValidationStatus getTimesheetValidationStatus(
+    public Optional<ValidationStatus> getTimesheetValidationStatus(
             final Long orgID,
             final Account currentAccount,
             final int year,
             final int week) {
 
-        final TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
-                + "where st.account = :user and st.year = :year " +
-                "and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
-
-        q.setParameter("week", week);
-        q.setParameter("year", year);
-        q.setParameter("user", currentAccount);
-        q.setParameter("orgID", orgID);
+        ValidationStatus validationStatus = null;
 
         try {
-            return q.getSingleResult();
-        } catch (final Exception e) {
-            return ValidationStatus.DRAFT;
+
+            final TypedQuery<ValidationStatus> q = em.createQuery("select st.timesheetStatus from SubmittedTimesheet st "
+                    + "where st.account = :user and st.year = :year " +
+                    "and st.week = :week and st.organizationID = :orgID", ValidationStatus.class);
+
+            q.setParameter("week", week);
+            q.setParameter("year", year);
+            q.setParameter("user", currentAccount);
+            q.setParameter("orgID", orgID);
+
+            validationStatus = q.getSingleResult();
+
+        } catch (Exception e) {
+            LOGGER.debug(e.getMessage(), e);
         }
+
+        return Optional.ofNullable(validationStatus);
     }
 
     @Override
-    public Map<Integer, Double> getAllImputationsForAccountOnDateRange(final Date startDate, final Date endDate,
-                                                                       final Account account, final TimesheetService.TimesheetFilter[] filters) {
+    public Map<Integer, Double> getAllImputationsForAccountOnDateRange(
+            final Long orgID,
+            final Date startDate,
+            final Date endDate,
+            final Account account,
+            final TimesheetService.TimesheetFilter[] filters) {
 
         final Map<String, Object> parameters = new HashMap<>();
         final StringBuilder sb = new StringBuilder();
         sb.append("SELECT DAY(day), COALESCE(SUM(i.value),0) ");
         sb.append("FROM Imputation i JOIN Task t ON i.task_id = t.id ");
         sb.append("WHERE  i.account_id = :user ");
+        sb.append("AND i.organizationID = :orgID ");
         sb.append("AND i.day >= :startDate ");
         sb.append("AND i.day <= :endDate ");
 
         for (var filter : filters) {
             sb.append("AND ");
-            if(filter.getTarget().getClass() == Project.class) {
+            if (filter.getTarget().getClass() == Project.class) {
                 sb.append("t.project_id = :project");
                 final Project project = (Project) filter.getTarget();
                 parameters.put("project", project.getId());
             }
-            if(AbstractTask.class.isAssignableFrom( filter.getTarget().getClass())) {
+            if (AbstractTask.class.isAssignableFrom(filter.getTarget().getClass())) {
                 sb.append("i.task_id = :task ");
                 final AbstractTask task = (AbstractTask) filter.getTarget();
                 parameters.put("task", task.getId());
@@ -209,6 +222,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("startDate", startDate);
         q.setParameter("endDate", endDate);
         q.setParameter("user", account.getId());
+        q.setParameter("orgID", orgID);
 
         for (Map.Entry parameter : parameters.entrySet()) {
             q.setParameter((String) parameter.getKey(), parameter.getValue());
@@ -217,84 +231,33 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         final Map<Integer, Double> result = new HashMap<>();
         for (final Object[] o : dayImputations) {
-            result.put((int) o[0], (double) o[1]);
+            if(o[0] instanceof BigInteger){
+                result.put(((BigInteger) o[0]).intValue(), (double) o[1]);
+            }
+            if(o[0] instanceof Integer){
+                result.put((Integer) o[0], (double) o[1]);
+            }
         }
 
         return result;
     }
 
-/*
     @Override
-    public Map<Integer, Double> getProjectImputationsForAccountOnDateRange(
-            final Date startDate,
-            final Date endDate,
-            final Account user,
-            final Project project) {
+    public Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Long orgID, Account actor, Project project) {
 
-        final TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
-                "SELECT DAY(day), COALESCE(sum(i.value),0) \n"
-                        + "FROM Imputation i JOIN Task t ON i.task_id = t.id \n"
-                        + "WHERE i.account_id = :user \n"
-                        + "AND i.day >= :startDate\n"
-                        + "AND i.day <= :endDate\n"
-                        + "AND t.project_id = :project\n"
-                        + "GROUP BY i.day");
-        q.setParameter("project", project.getId());
-        q.setParameter("startDate", startDate);
-        q.setParameter("endDate", endDate);
-        q.setParameter("user", user.getId());
-        final List<Object[]> dayImputations = q.getResultList();
+        final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
+                + "where st.account in :users and st.organizationID = :orgID", SubmittedTimesheet.class);
 
-        final Map<Integer, Double> result = new HashMap<>();
-        for (final Object[] o : dayImputations) {
-            result.put((int) o[0], (double) o[1]);
-        }
-
-        return result;
-
-    }
-
-    @Override
-    public Map<Integer, Double> getTaskImputationsForAccountOnDateRange(
-            final Date startDate,
-            final Date endDate,
-            final Account user,
-            final AbstractTask task) {
-
-        final TypedQuery<Object[]> q = (TypedQuery<Object[]>) em.createNativeQuery(
-                "SELECT DAY(day), COALESCE(i.value,0) \n"
-                        + "FROM Imputation i\n"
-                        + "WHERE i.account_id = :user \n"
-                        + "AND i.day >= :startDate\n"
-                        + "AND i.day <= :endDate\n"
-                        + "AND i.task_id = :task\n"
-                        + "GROUP BY i.day");
-        q.setParameter("task", task.getId());
-        q.setParameter("startDate", startDate);
-        q.setParameter("endDate", endDate);
-        q.setParameter("user", user.getId());
-        final List<Object[]> dayImputations = q.getResultList();
-
-        final Map<Integer, Double> result = new HashMap<>();
-
-        for (final Object[] o : dayImputations) {
-            result.put((int) o[0], (double) o[1]);
-        }
-
-        return result;
-    }
-*/
-    @Override
-    public Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Account actor, Project project) {
-
-       final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
-                + "where st.account in :users ", SubmittedTimesheet.class);
-
+        q.setParameter("orgID", orgID);
         q.setParameter("users", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
 
         final List<SubmittedTimesheet> resultList = q.getResultList();
-        return resultList.stream().collect(Collectors.groupingBy(SubmittedTimesheet::getAccount,
-                        Collectors.mapping(r -> r,Collectors.toList())));
+        return resultList.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                SubmittedTimesheet::getAccount,
+                                Collectors.mapping(r -> r, Collectors.toList())
+                        ));
 
     }
 
