@@ -208,6 +208,7 @@ public class TimesheetController {
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("userID", user.getId());
+        model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekSubmitted",
                 this.timesheetService.getTimesheetValidationStatus(
                         authentication.getCurrentOrganization(),
@@ -451,6 +452,11 @@ public class TimesheetController {
         public List<DateWrapper> getDays() {
             return days;
         }
+
+        public boolean isCanValidate() {
+            return canValidate;
+        }
+
 
         public Map<Long, ProjectWrapper> getProjects() {
             final Map<Long, ProjectWrapper> res = new HashMap<>();

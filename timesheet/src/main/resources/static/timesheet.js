@@ -4,6 +4,7 @@
 
 
 const _USER_ID = $("meta[property='timesheet']").attr('userID');
+const _ACTOR_ID = $("meta[property='timesheet']").attr('actorID');
 const _YEAR = $("meta[property='timesheet']").attr('year');
 const _WEEK = $("meta[property='timesheet']").attr('week');
 
@@ -42,6 +43,8 @@ const timesheetModel = {
     projects: {},
     imputations: {},
     canValidate : false,
+    userIsActor : _USER_ID === _ACTOR_ID,
+    userID: _USER_ID,
     getImputationSum: function (date) {
         let sum = 0;
         if (this.imputations[date]) {

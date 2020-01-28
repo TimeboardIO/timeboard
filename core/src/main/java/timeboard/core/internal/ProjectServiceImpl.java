@@ -150,18 +150,19 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public boolean isOwnerOfAnyUserProject(Account owner, Account user) {
-        final TypedQuery<ProjectMembership> q = em.createQuery("SELECT m2 " +
+        final TypedQuery<Account> q = em.createQuery("SELECT DISTINCT m2.member " +
                 "FROM ProjectMembership m1 JOIN ProjectMembership m2 " +
                 "ON m1.project = m2.project " +
                 "WHERE m1.member = :user " +
                 "AND m2.member = :owner " +
-                "AND m2.role = :role", ProjectMembership.class);
+                "AND m2.role = :role", Account.class);
         q.setParameter("user", user);
         q.setParameter("owner", owner);
         q.setParameter("role", MembershipRole.OWNER);
 
+
         try {
-            final ProjectMembership singleResult = q.getSingleResult();
+            final Account singleResult = q.getSingleResult();
             if(singleResult != null ) {
                 return true;
             }
