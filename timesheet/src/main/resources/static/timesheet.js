@@ -41,6 +41,7 @@ const timesheetModel = {
     days: [],
     projects: {},
     imputations: {},
+    canValidate : false,
     getImputationSum: function (date) {
         let sum = 0;
         if (this.imputations[date]) {
@@ -167,6 +168,7 @@ $(document).ready(function () {
                 $('.ui.dimmer').addClass('active');
                 $.get("/timesheet/data?user="+_USER_ID+"&week=" + _WEEK + "&year=" + _YEAR)
                     .then(function (data) {
+                        app.canValidate = data.canValidate;
                         app.week = data.week;
                         app.year = data.year;
                         app.submitted = data.submitted;

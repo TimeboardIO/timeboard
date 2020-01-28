@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -127,7 +126,7 @@ public class UsersSearchRestController {
 
         final List<Account> accounts = new ArrayList<>();
         if (orgID != null) {
-            final List<Project> myProjects = projectService.listProjects(actor, orgID)
+           /* final List<Project> myProjects = projectService.listProjects(actor, orgID)
                     .stream()
                     .filter(project -> project.isMember(actor))
                     .collect(Collectors.toList());
@@ -145,8 +144,9 @@ public class UsersSearchRestController {
                             }
                         }
                     });
-
-            accounts.addAll(myManagers);
+*/
+            final List<Account> ownersOfAnyUserProject = this.projectService.findOwnersOfAnyUserProject(actor);
+            accounts.addAll(ownersOfAnyUserProject);
 
         } else {
             throw new BusinessException("OrganizationID is null");

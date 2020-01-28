@@ -118,8 +118,7 @@ public class TimesheetController {
                 final List<TaskWrapper> tasks = new ArrayList<>();
 
                 projectTasks.getTasks().forEach(task -> {
-                    tasks.add(new TaskWrapper(
-                            task.getId(), task.getName(),
+                    tasks.add(new TaskWrapper( task.getId(), task.getName(),
                             task.getComments(), task.getEffortSpent(),
                             task.getEffortLeft(), task.getOriginalEstimate(),
                             task.getRealEffort(), task.getStartDate(),
@@ -147,7 +146,7 @@ public class TimesheetController {
                     "Default Tasks",
                     tasks));
         }
-
+        final boolean canValidate = this.projectService.isOwnerOfAnyUserProject(authentication.getDetails(), currentAccount);
         final TimesheetWrapper ts = new TimesheetWrapper(
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
@@ -165,7 +164,8 @@ public class TimesheetController {
                 beginWorkDate.get(Calendar.WEEK_OF_YEAR),
                 days,
                 projects,
-                imputations);
+                imputations,
+                canValidate);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
     }
@@ -397,6 +397,7 @@ public class TimesheetController {
         private final int week;
         private final boolean disablePrev;
         private final boolean disableNext;
+        private final boolean canValidate;
         private final List<DateWrapper> days;
         private final List<ProjectWrapper> projects;
         private final List<ImputationWrapper> imputations;
@@ -410,8 +411,9 @@ public class TimesheetController {
                 final int beginWorkWeek,
                 final List<DateWrapper> days,
                 final List<ProjectWrapper> projects,
-                final List<ImputationWrapper> imputationWrappers
-        ) {
+                final List<ImputationWrapper> imputationWrappers,
+                final boolean canValidate
+                ) {
 
 
             final Calendar c = Calendar.getInstance();
@@ -423,6 +425,7 @@ public class TimesheetController {
             this.year = year;
             this.week = week;
             this.days = days;
+            this.canValidate = canValidate;
             this.disablePrev = year == beginWorkYear && week == beginWorkWeek;
             this.disableNext = year > currentYear || year == currentYear && week >= currentWeek;
             this.projects = projects;

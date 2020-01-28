@@ -56,7 +56,7 @@
                         <td colspan="5">
                             <data-table v-bind:config="Object.assign({}, config)" v-bind:table="account.weeks">
                                 <template v-slot:week="{row}">
-                                    <a class="ui button" :href="baseURL+'/'+account.id"> {{ row.week }} </a>
+                                    <a class="ui button" ::href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week"> {{ row.week }} </a>
                                 </template>
                                 <template v-slot:period="{row}">
                                     <a :href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week">  {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}</a>
