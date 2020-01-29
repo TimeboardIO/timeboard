@@ -151,8 +151,8 @@ public class TimesheetController {
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
                         currentAccount,
-                        findLastWeekYear(c, week, year),
-                        findLastWeek(c, week, year)).orElse(null),
+                        findPreviousWeekYear(c, week, year),
+                        findPreviousWeek(c, week, year)).orElse(null),
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
                         currentAccount,
@@ -202,8 +202,8 @@ public class TimesheetController {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
 
-        final int lastWeek = this.findLastWeek(c, week, year);
-        final int lastWeekYear = this.findLastWeekYear(c, week, year);
+        final int lastWeek = this.findPreviousWeek(c, week, year);
+        final int lastWeekYear = this.findPreviousWeekYear(c, week, year);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
@@ -283,16 +283,13 @@ public class TimesheetController {
     }
 
 
-    @GetMapping("/validate")
-    public ResponseEntity validateTimesheet(final TimeboardAuthentication authentication, final HttpServletRequest request) {
+    @GetMapping("/validate/{user}/{year}/{week}")
+    public ResponseEntity validateTimesheet(final TimeboardAuthentication authentication,
+                                            @PathVariable final Account user,
+                                            @PathVariable final int year,
+                                            @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
-
-        final int week = Integer.parseInt(request.getParameter("week"));
-        final int year = Integer.parseInt(request.getParameter("year"));
-        final long userID = Long.parseLong(request.getParameter("userID"));
-
-        final Account user = userService.findUserByID(userID);
 
         if(! projectService.isOwnerOfAnyUserProject(actor, user)){
             return ResponseEntity.badRequest().body("You have not enough right do do this.");
@@ -394,20 +391,17 @@ public class TimesheetController {
         return c.getTime();
     }
 
-    private int findLastWeekYear(final Calendar c, final int week, final int year) {
+    private int findPreviousWeekYear(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
-        if (c.get(Calendar.WEEK_OF_YEAR) > week) {
-            c.roll(Calendar.YEAR, -1);  // remove one year
-        }
+        c.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.YEAR);
     }
 
-    private int findLastWeek(final Calendar c, final int week, final int year) {
+    private int findPreviousWeek(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        c.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.WEEK_OF_YEAR);
     }
 

@@ -96,7 +96,7 @@
     <!-- Timesheet Vue App view -->
 
     <div class="ui inverted dimmer">
-        <div class="ui text loader" th:text="#{loading}"  >Loading</div>
+        <div class="ui text loader" th:text="#{loading}">Loading</div>
     </div>
     <div id="timesheet" class="hidden">
         <div v-for="error in errorMessages" v-if="error.visible" class="ui container negative timesheet message">
@@ -114,17 +114,17 @@
 
                 <!-- LABELS -->
                 <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
-                    <div class="ui orange label" th:text="#{timesheet.status.pending.validation}" >
+                    <div class="ui orange label" th:text="#{timesheet.status.pending.validation}">
                         Pending validation
                     </div>
                 </div>
                 <div v-if="isTimesheetHasState([null])  && !userIsActor">
-                    <div class="ui orange label" th:text="#{timesheet.status.pending.submission}" >
+                    <div class="ui orange label" th:text="#{timesheet.status.pending.submission}">
                         Pending submission
                     </div>
                 </div>
                 <div v-if="isTimesheetHasState(['VALIDATED'])">
-                    <div class="ui green label" th:text="#{timesheet.status.validated}" >
+                    <div class="ui green label" th:text="#{timesheet.status.validated}">
                         Week validated
                     </div>
                 </div>
@@ -152,7 +152,8 @@
                 </button>
                 <button
                         v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
-                        v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button icons" th:text="#{timesheet.newtask}">
+                        v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button icons"
+                        th:text="#{timesheet.newtask}">
                     <i class="plus icon"></i>
                     <span th:text="#{timesheet.newtask}">New Task</span>
                 </button>
@@ -175,26 +176,26 @@
 
         <fieldset v-bind:disabled="!userIsActor || isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])">
             <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
-
                 <table class="ui celled table" style="text-align:center">
                     <thead>
                     <tr class="days">
                         <th class="two wide"></th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
-                            {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{ new Date(day.date).getDate() }}
+                            {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{
+                            new Date(day.date).getDate() }}
                         </th>
                         <th class="wide one" style="background-color: white;" colspan="4"></th>
                     </tr>
 
                     <tr class="timesheet-head">
-                        <th class="two wide" th:text="#{tasks}" >Tasks</th>
+                        <th class="two wide" th:text="#{tasks}">Tasks</th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
                             <div v-if="(day.dayNum != 7) && (day.dayNum != 1)"
                                  v-bind:id="day.date"
                                  v-bind:class="{'ui circular label large day-badge':true,
-                                      'green':(getImputationSum(day.date).toFixed(1) == 1),
-                                      'yellow':(getImputationSum(day.date).toFixed(1) < 1),
-                                      'red':(getImputationSum(day.date).toFixed(1) > 1)}"
+                                          'green':(getImputationSum(day.date).toFixed(1) == 1),
+                                          'yellow':(getImputationSum(day.date).toFixed(1) < 1),
+                                          'red':(getImputationSum(day.date).toFixed(1) > 1)}"
                                  style="margin-top: 5px;"
                                  v-bind:day-badge="day.date">
                                 <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
@@ -202,8 +203,8 @@
                             <div v-if="(day.dayNum == 7) || (day.dayNum == 1)"
                                  v-bind:id="day.date"
                                  v-bind:class="{'ui circular label large day-badge':true,
-                                      'green':(getImputationSum(day.date).toFixed(1) == 1),
-                                      'red':(getImputationSum(day.date).toFixed(1) > 1)}"
+                                          'green':(getImputationSum(day.date).toFixed(1) == 1),
+                                          'red':(getImputationSum(day.date).toFixed(1) > 1)}"
                                  style="margin-top: 5px;"
                                  v-bind:day-badge="day.date">
                                 <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
@@ -229,28 +230,21 @@
                             </td>
                         </tr>
 
-                        </thead>
-                        <tbody>
-                        <template v-for="(project, projectID) in projects">
-                            <tr>
-                                <td class="ui header left aligned project" v-bind:colspan="days.length + 5">
-                                    <a v-bind:href="'/projects/'+project.projectID+'/setup'">{{ project.projectName }}</a>
-                                </td>
-                            </tr>
-
-                            <tr v-for="(task, taskID) in project.tasks">
-                                <td>{{ task.taskName }}</td>
-                                <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
-                                    <i class="hourglass half icon"></i> Task pending manager validation
-                                </td>
-                                <td  v-else-if="task.status == 'REFUSED'" v-bind:colspan="days.length" class="negative">
-                                    <i class="times icon"></i> Task have been rejected by a manager, please modify and request again.
-                                    <button v-on:click="showCreateTaskModal(projectID, task, $event)" class="ui right labeled icon button">
-                                        <i class="right arrow icon"></i> Edit
-                                    </button>
-                                </td>
-                                <td v-else v-for="day in days">
-                                    <div class="ui input">
+                        <tr v-for="(task, taskID) in project.tasks">
+                            <td>{{ task.taskName }}</td>
+                            <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
+                                <i class="hourglass half icon"></i> Task pending manager validation
+                            </td>
+                            <td v-else-if="task.status == 'REFUSED'" v-bind:colspan="days.length" class="negative">
+                                <i class="times icon"></i> Task have been rejected by a manager, please modify and
+                                request again.
+                                <button v-on:click="showCreateTaskModal(projectID, task, $event)"
+                                        class="ui right labeled icon button">
+                                    <i class="right arrow icon"></i> Edit
+                                </button>
+                            </td>
+                            <td v-else v-for="day in days">
+                                <div class="ui input">
                                     <input
                                             max="1"
                                             min="0"
@@ -268,42 +262,43 @@
                                 </div>
                             </td>
 
-
-                                <td colspan="4" v-if="projectID == 0" ></td>
-                                <template v-if="task.status!='PENDING'">
-                                    <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
-                                    <td v-if="projectID > 0">
-                                        <div class="ui input">
+                            <td colspan="4" v-if="projectID == 0"></td>
+                            <template v-if="task.status!='PENDING'">
+                                <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}
+                                </td>
+                                <td v-if="projectID > 0">
+                                    <div class="ui input">
                                         <input
-                                            min="0"
-                                            step="0.1"
-                                            name="effortLeft"
-                                            v-on:focusout="triggerUpdateEffortLeft"
-                                            v-bind:value="task.effortLeft.toFixed(1)"
-                                            v-bind:data-task-effortLeft="taskID"
-                                            type="number"
+                                                min="0"
+                                                step="0.1"
+                                                name="effortLeft"
+                                                v-on:focusout="triggerUpdateEffortLeft"
+                                                v-bind:value="task.effortLeft.toFixed(1)"
+                                                v-bind:data-task-effortLeft="taskID"
+                                                type="number"
                                         />
-                                         <i class="search icon hidden" style="color: transparent;"></i>
+                                        <i class="search icon hidden" style="color: transparent;"></i>
 
-                                        </div>
-                                    </td>
-                                    <td v-if="projectID > 0"
-                                            v-bind:data-task-rew="taskID">{{task.realEffort.toFixed(1)}}
-                                    </td>
-                                    <td v-if="projectID > 0" v-bind:data-task-ew="taskID">{{task.originalEstimate.toFixed(1)}}</td>
-                                </template>
-                            </tr>
-                        </template>
-                        </tbody>
-                    </table>
-                </form>
-            </fieldset>
+                                    </div>
+                                </td>
+                                <td v-if="projectID > 0"
+                                    v-bind:data-task-rew="taskID">{{task.realEffort.toFixed(1)}}
+                                </td>
+                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID">
+                                    {{task.originalEstimate.toFixed(1)}}
+                                </td>
+                            </template>
+                        </tr>
+                    </template>
+                    </tbody>
+                </table>
+            </form>
+        </fieldset>
         <task-modal
                 :task="newTask"
                 :form-error="formError"
                 :modal-title="modalTitle">
         </task-modal>
-
     </div>
     <script src="timesheet.js"></script>
 </div>
