@@ -147,7 +147,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.persist(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, orgID));
 
         LOGGER.info("Timesheet for " + week + " submit for user"
                 + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
@@ -168,6 +168,12 @@ public class TimesheetServiceImpl implements TimesheetService {
         submittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
 
         em.merge(submittedTimesheet);
+
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
+
+        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" validated for user"
+                + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
+
 
         return submittedTimesheet;
 
