@@ -151,8 +151,8 @@ public class TimesheetController {
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
                         currentAccount,
-                        year,
-                        week - 1).orElse(null),
+                        findLastWeekYear(c, week, year),
+                        findLastWeek(c, week, year)).orElse(null),
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
                         currentAccount,
@@ -429,7 +429,7 @@ public class TimesheetController {
 
     public static class TimesheetWrapper implements Serializable {
 
-        private final ValidationStatus previousWeekSubmissionStatus;
+        private final ValidationStatus previousWeekValidationStatus;
         private final ValidationStatus currentWeekValidationStatus;
         private final int year;
         private final int week;
@@ -441,7 +441,7 @@ public class TimesheetController {
         private final List<ImputationWrapper> imputations;
 
         public TimesheetWrapper(
-                final ValidationStatus previousWeekSubmissionStatus,
+                final ValidationStatus previousWeekValidationStatus,
                 final ValidationStatus currentWeekValidationStatus,
                 final int year,
                 final int week,
@@ -458,7 +458,7 @@ public class TimesheetController {
             final int currentWeek = c.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = c.get(Calendar.YEAR);
 
-            this.previousWeekSubmissionStatus = previousWeekSubmissionStatus;
+            this.previousWeekValidationStatus = previousWeekValidationStatus;
             this.currentWeekValidationStatus = currentWeekValidationStatus;
             this.year = year;
             this.week = week;
@@ -470,8 +470,8 @@ public class TimesheetController {
             this.imputations = imputationWrappers;
         }
 
-        public ValidationStatus getPreviousWeekSubmissionStatus() {
-            return previousWeekSubmissionStatus;
+        public ValidationStatus getPreviousWeekValidationStatus() {
+            return previousWeekValidationStatus;
         }
 
         public ValidationStatus getCurrentWeekValidationStatus() {
