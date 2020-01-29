@@ -81,7 +81,7 @@
                 </form>
             </div>
             <div class="actions">
-                <div class="ui black deny button">
+                <div class="ui black deny button" th:text="#{cancel}">
                     Cancel
                 </div>
                 <div class="ui positive submit right labeled icon button">
@@ -96,7 +96,7 @@
     <!-- Timesheet Vue App view -->
 
     <div class="ui inverted dimmer">
-        <div class="ui text loader">Loading</div>
+        <div class="ui text loader" th:text="#{loading}"  >Loading</div>
     </div>
     <div id="timesheet" class="hidden">
         <div v-for="error in errorMessages" v-if="error.visible" class="ui container negative timesheet message">
@@ -111,54 +111,61 @@
 
 
             <div class="actions">
+
+                <!-- LABELS -->
+                <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
+                    <div class="ui orange label" v-if="userIsActor" th:text="#{timesheet.status.pending}" >
+                        Pending validation
+                    </div>
+                </div>
+                <div v-if="isTimesheetHasState(['VALIDATED'])">
+                    <div class="ui green label" th:text="#{timesheet.status.validated}" >
+                        Week validated
+                    </div>
+                </div>
+
+
+                <!-- ACTION BUTTONS -->
                 <div v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
                      v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
                      data-position="right center">
                     <button
-                            v-bind:data-week="week"
-                            v-bind:data-year="year"
+                            v-bind:data-week="week" v-bind:data-year="year"
                             v-on:click="submitMyWeek"
                             v-bind:class="{'ui positive button icons':true, 'disabled':(!enableSubmitButton())}"
                             type="submit">
-                        <span th:text="#{timesheet.submit}">Submit My Week</span>
                         <i class="paper plane icon"></i>
+                        <span th:text="#{timesheet.submit}">Submit My Week</span>
                     </button>
                 </div>
-
-                    <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
-                        <div class="ui orange label" v-if="userIsActor">
-                            Pending validation
-                        </div>
-                    </div>
-                    <button v-if="canValidate && !isTimesheetHasState(['VALIDATED'])" :class="{ disabled : !isTimesheetHasState(['PENDING_VALIDATION']) }"
-                            v-on:click="validateWeek"
-
-                            class="ui primary create-task button">
-                        Validate this week
-                    </button>
-                <div v-if="isTimesheetHasState(['VALIDATED'])">
-                    <div class="ui green label">
-                        Week validated
-                    </div>
-                </div>
+                <button v-if="(canValidate && !isTimesheetHasState(['VALIDATED'])) && !(userIsActor && !isTimesheetHasState(['PENDING_VALIDATION']))"
+                        :class="{ disabled : !isTimesheetHasState(['PENDING_VALIDATION']) }"
+                        v-on:click="validateWeek"
+                        class="ui icons positive create-task button">
+                    <i class="check icon"></i>
+                    <span th:text="#{timesheet.validate}">Validate this week</span>
+                </button>
                 <button
                         v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
-                        v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button" th:text="#{timesheet.newtask}">
-                    New Task
+                        v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button icons" th:text="#{timesheet.newtask}">
+                    <i class="plus icon"></i>
+                    <span th:text="#{timesheet.newtask}">New Task</span>
                 </button>
+
+
             </div>
 
             <a class="ui labeled icon button"
                v-bind:href="userIsActor ? '/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) : '/timesheet/'+userID+'/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) "
                :class="{ disabled : disablePrev }">
-                <i class="left arrow icon"></i>Previous week</a>
+                <i class="left arrow icon"></i><span th:text="#{timesheet.previousweek}">Previous Week</span> </a>
 
-            <span class="ui blue circular label">Week {{ week }}</span>
+            <span class="ui blue circular label"><span th:text="#{week}">Week</span> {{ week }}</span>
 
             <a class="ui right labeled icon button"
                v-bind:href="userIsActor ? '/timesheet/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) : '/timesheet/'+userID+'/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) "
                :class="{ disabled : disableNext }">
-                <i class="right arrow icon"></i>Next week</a>
+                <i class="right arrow icon"></i><span th:text="#{timesheet.nextweek}">Next Week</span></a>
         </div>
 
         <fieldset v-bind:disabled="!userIsActor || isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])">

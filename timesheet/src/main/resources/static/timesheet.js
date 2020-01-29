@@ -8,6 +8,12 @@ const _ACTOR_ID = $("meta[property='timesheet']").attr('actorID');
 const _YEAR = $("meta[property='timesheet']").attr('year');
 const _WEEK = $("meta[property='timesheet']").attr('week');
 
+const ValidationStatus = {
+    PENDING_VALIDATION : "PENDING_VALIDATION",
+    VALIDATED : "VALIDATED",
+    REJECTED : "REJECTED"
+}
+
 const emptyTask = {
     taskID: 0,
     projectID: 0,
@@ -38,7 +44,6 @@ const timesheetModel = {
     week: 0,
     year: 0,
     sum: 0,
-    submitted: false,
     days: [],
     projects: {},
     imputations: {},
@@ -157,7 +162,7 @@ $(document).ready(function () {
             enableSubmitButton: function (week) {
                 let result = true;
 
-                result &= ['PENDING_VALIDATION', 'VALIDATED'].includes(this.currentWeekValidationStatus);
+                result &= ['PENDING_VALIDATION', 'VALIDATED'].includes(this.previousWeekValidationStatus);
                 //check all days imputations == 1
                 app.days.forEach(function (day) {
                     if (day.day !== 'Sun' && day.day !== 'Sat') {
@@ -175,7 +180,6 @@ $(document).ready(function () {
                         app.canValidate = data.canValidate;
                         app.week = data.week;
                         app.year = data.year;
-                        app.submitted = data.submitted;
                         app.days = data.days;
                         app.imputations = data.imputations;
                         app.projects = data.projects;
