@@ -123,7 +123,7 @@ public class ReportsController {
     @GetMapping("/delete/{report}")
     protected String deleteReport(final TimeboardAuthentication authentication,
                                   @PathVariable final Report report,
-                                  final RedirectAttributes attributes) {
+                                  final RedirectAttributes attributes) throws SchedulerException {
 
         this.reportService.deleteReportByID(authentication.getDetails(), report.getId());
 

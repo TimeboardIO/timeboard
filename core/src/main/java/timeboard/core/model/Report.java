@@ -48,16 +48,27 @@ public class Report extends OrganizationEntity implements Serializable {
     private String handlerID;
 
     @Column
-    private String handlerAsyncJobID;
+    private String asyncTriggerKeyName;
 
     @Column
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Calendar lastAsyncJobTrigger;
 
+    @Lob
+    @Column
+    private Serializable data;
+
 
     public Report() {
     }
 
+    public Serializable getData() {
+        return data;
+    }
+
+    public void setData(final Serializable data) {
+        this.data = data;
+    }
 
     public Long getId() {
         return id;
@@ -91,19 +102,19 @@ public class Report extends OrganizationEntity implements Serializable {
         this.filterProject = filterProject;
     }
 
-    public String getHandlerAsyncJobID() {
-        return handlerAsyncJobID;
-    }
-
-    public void setHandlerAsyncJobID(final String handlerAsyncJobID) {
-        this.handlerAsyncJobID = handlerAsyncJobID;
-    }
-
     public Calendar getLastAsyncJobTrigger() {
         return lastAsyncJobTrigger;
     }
 
     public void setLastAsyncJobTrigger(final Calendar lastAsyncJobTrigger) {
         this.lastAsyncJobTrigger = lastAsyncJobTrigger;
+    }
+
+    public String getAsyncTriggerKeyName() {
+        return asyncTriggerKeyName;
+    }
+
+    public void setAsyncTriggerKeyName(final String asyncTriggerKeyName) {
+        this.asyncTriggerKeyName = asyncTriggerKeyName;
     }
 }

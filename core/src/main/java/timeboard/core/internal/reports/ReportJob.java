@@ -68,6 +68,7 @@ public final class ReportJob implements Job {
         if(reportHandler.isPresent()){
             final Serializable data = reportHandler.get().getReportModel(authentication, report);
             report.setLastAsyncJobTrigger(Calendar.getInstance());
+            report.setData(data);
             this.reportService.updateReport(actor, report);
             LOGGER.info("Report "+reportID+" finished with "+data.toString());
         }else{

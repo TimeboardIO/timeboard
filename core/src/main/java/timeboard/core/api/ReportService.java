@@ -71,7 +71,7 @@ public interface ReportService {
 
     Report getReportByID(Account actor, Long reportId);
 
-    void deleteReportByID(Account actor, Long reportId);
+    void deleteReportByID(Account actor, Long reportId) throws SchedulerException;
 
     List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions);
 

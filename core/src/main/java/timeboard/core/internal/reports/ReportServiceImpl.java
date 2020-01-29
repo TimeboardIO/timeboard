@@ -46,7 +46,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.util.*;
-import java.util.Calendar;
 import java.util.stream.Collectors;
 
 
@@ -80,7 +79,7 @@ public class ReportServiceImpl implements ReportService {
                                 .requestRecovery(false)
                                 .storeDurably(true)
                                 .build();
-                        this.scheduler.addJob(details, false);
+                        this.scheduler.addJob(details, true);
                     }catch (SchedulerException e){
                         LOGGER.error(e.getMessage());
                     }
@@ -112,12 +111,13 @@ public class ReportServiceImpl implements ReportService {
 
                 final Trigger trigger = TriggerBuilder.newTrigger()
                         .forJob(reportHandler.get().handlerJobJey())
-                        .withSchedule(CronScheduleBuilder.cronSchedule("0 0 14-6 ? * FRI-MON"))
+                        .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * 1/1 * ? *"))
                         .usingJobData(jobDataMap)
                         .build();
 
                 this.scheduler.scheduleJob(trigger);
-                this.scheduler.triggerJob(trigger.getJobKey(), jobDataMap);
+
+                newReport.setAsyncTriggerKeyName(trigger.getKey().getName());
             }
             LOGGER.info("Report " + reportName + " created by user " + owner.getId());
         }
@@ -152,8 +152,16 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void deleteReportByID(final Account actor, final Long reportId) {
+    public void deleteReportByID(final Account actor, final Long reportId) throws SchedulerException {
         final Report report = em.find(Report.class, reportId);
+
+        if(report.getAsyncTriggerKeyName() != null) {
+            final TriggerKey triggerKey = TriggerKey.triggerKey(report.getAsyncTriggerKeyName());
+
+            if (null != this.scheduler.getTrigger(triggerKey)) {
+                this.scheduler.unscheduleJob(triggerKey);
+            }
+        }
         em.remove(report);
         em.flush();
 
