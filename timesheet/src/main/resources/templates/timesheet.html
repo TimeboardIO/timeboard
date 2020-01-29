@@ -193,7 +193,7 @@
 
                             <tr v-for="(task, taskID) in project.tasks">
                                 <td>{{ task.taskName }}</td>
-                                <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 3" class="primary">
+                                <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
                                     <i class="hourglass half icon"></i> Task pending manager validation
                                 </td>
                                 <td  v-else-if="task.status == 'REFUSED'" v-bind:colspan="days.length" class="negative">
