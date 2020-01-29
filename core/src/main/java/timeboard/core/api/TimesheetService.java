@@ -91,7 +91,7 @@ public interface TimesheetService {
             final Account actor,
             final Project project);
 
-    void forceValidateTimesheet(Long organizationID, Account actor, Account target, int year, int week);
+    void forceValidateTimesheets(Long organizationID, Account actor, Account target, int selectedYear, int selectedWeek, int olderYear, int olderWeek);
 
     class TimesheetFilter<T> {
         private T target;

@@ -65,6 +65,11 @@ public class TimesheetServiceImpl implements TimesheetService {
     private OrganizationService organizationService;
 
 
+    private static long absoluteWeekNumber(int year, int week) {
+        return (long) (year * 53) + week;
+    }
+
+
     @Override
     public SubmittedTimesheet submitTimesheet(
             final Long orgID,
@@ -262,38 +267,53 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public void forceValidateTimesheet(Long organizationID, Account actor, Account target, int year, int week) {
+    public void forceValidateTimesheets(Long organizationID, Account actor, Account target, int selectedYear, int selectedWeek, int olderYear, int olderWeek) {
 
         Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
-        final Optional<SubmittedTimesheet> submittedTimesheet =
-                this.getSubmittedTimesheet(organizationID, actor, target, year, week);
+        long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
 
-        try{
+        final Calendar current = Calendar.getInstance();
+        current.set(Calendar.WEEK_OF_YEAR, olderYear);
+        current.set(Calendar.YEAR, olderWeek);
 
-            if (submittedTimesheet.isPresent()) {
-                this.validateTimesheet(actor, submittedTimesheet.get());
+        while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= selectedAbsoluteWeekNumber) {
 
-            }else{
+            final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
+            final int currentYear = current.get(Calendar.YEAR);
 
-                // Timesheet Submission
-                final SubmittedTimesheet newSubmittedTimesheet = new SubmittedTimesheet();
-                newSubmittedTimesheet.setAccount(target);
-                newSubmittedTimesheet.setYear(year);
-                newSubmittedTimesheet.setWeek(week);
-                newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
-                em.persist(newSubmittedTimesheet);
+            final Optional<SubmittedTimesheet> submittedTimesheet =
+                    this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
 
-                TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg));
+            try {
 
-                LOGGER.info("Timesheet for " + week + " submit for user" + target.getScreenName() + " by user " + actor.getScreenName());
+                if (submittedTimesheet.isPresent()) {
+
+                    this.validateTimesheet(actor, submittedTimesheet.get());
+
+                } else {
+
+                    // Timesheet Submission
+                    final SubmittedTimesheet newSubmittedTimesheet = new SubmittedTimesheet();
+                    newSubmittedTimesheet.setAccount(target);
+                    newSubmittedTimesheet.setYear(currentYear);
+                    newSubmittedTimesheet.setWeek(currentWeek);
+                    newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
+                    em.persist(newSubmittedTimesheet);
+
+                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg));
+                    LOGGER.info("Timesheet for " + currentWeek + " submit for user" + target.getScreenName() + " by user " + actor.getScreenName());
 
 
-                // Timesheet Validation
-                this.validateTimesheet(actor, newSubmittedTimesheet);
+                    // Timesheet Validation
+                    this.validateTimesheet(actor, newSubmittedTimesheet);
 
+                }
+
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
             }
-        }catch(Exception e){
-             LOGGER.error(e.getMessage(), e);
+
+            current.add(Calendar.WEEK_OF_YEAR, 1);
         }
     }
 

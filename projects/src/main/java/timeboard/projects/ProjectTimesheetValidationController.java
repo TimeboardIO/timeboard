@@ -30,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -37,6 +38,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.UserServiceImpl;
 import timeboard.core.model.*;
@@ -58,6 +60,9 @@ public class ProjectTimesheetValidationController {
 
     @Autowired
     public TimesheetService timesheetService;
+
+    @Autowired
+    public UserService userService;
 
     private static long absoluteWeekNumber(SubmittedTimesheet t) {
         return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
@@ -116,6 +121,14 @@ public class ProjectTimesheetValidationController {
 
     private List<TimesheetWeekWrapper> fillTimesheetWeeks(Account a, List<SubmittedTimesheet> submittedTimesheets) {
 
+        Pair<Integer, Integer> pair = getOlderWeekYearNotValidated(a, submittedTimesheets);
+
+        return generateSubmittedTimesheets(pair.getFirst(), pair.getSecond(), submittedTimesheets);
+
+    }
+
+    private Pair<Integer, Integer> getOlderWeekYearNotValidated(Account a, List<SubmittedTimesheet> submittedTimesheets){
+
         if (!submittedTimesheets.isEmpty()) {
             //user already have submitted at least one week
             final Optional<SubmittedTimesheet> lastValidatedSubmittedTimesheet = submittedTimesheets
@@ -130,21 +143,18 @@ public class ProjectTimesheetValidationController {
             // user have at least one non validated week.
             final SubmittedTimesheet t = lastValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
 
-            return generateSubmittedTimesheets((int) t.getYear(), (int) t.getWeek(),
-                    submittedTimesheets);
+           return Pair.of(t.getYear(), t.getWeek());
 
         } else {
             // user NEVER submitted a single week
             final Calendar current = Calendar.getInstance();
 
             current.setTime(a.getAccountCreationTime());
-
-            return generateSubmittedTimesheets(current.get(Calendar.YEAR),
-                    current.get(Calendar.WEEK_OF_YEAR), submittedTimesheets);
+            return Pair.of(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR));
 
         }
-
     }
+
 
     List<TimesheetWeekWrapper> generateSubmittedTimesheets(int firstYear, int firstWeek, List<SubmittedTimesheet> submittedTimesheets) {
 
@@ -181,21 +191,37 @@ public class ProjectTimesheetValidationController {
     }
 
 
+
     @PostMapping(value = "/forceValidate/{target}/{year}/{week}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,
+    public ResponseEntity<Map<Long, UserWrapper>> forceValidate(TimeboardAuthentication authentication,
                                                         @PathVariable Long projectID,
-                                                        @PathVariable Account target,
-                                                        @PathVariable int year,
-                                                        @PathVariable int week) throws BusinessException {
+                                                        @PathVariable UserWrapper targetWrapper,
+                                                        @PathVariable int selectedYear,
+                                                        @PathVariable int selectedWeek) throws BusinessException {
         try {
-            this.timesheetService.forceValidateTimesheet(
-                    authentication.getCurrentOrganization(),
-                    authentication.getDetails(),
-                    target,
-                    year,
-                    week
-            );
-            return ResponseEntity.ok().build();
+            Account target = this.userService.findUserByID(targetWrapper.getId());
+
+            TimesheetWeekWrapper olderTimesheetWrapper =
+                    targetWrapper.weeks.stream().min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
+                    .get();
+
+            long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
+            long olderAbsoluteWeekNumber = absoluteWeekNumber(olderTimesheetWrapper.year, olderTimesheetWrapper.week);
+
+            if(selectedAbsoluteWeekNumber >= olderAbsoluteWeekNumber) {
+                this.timesheetService.forceValidateTimesheets(
+                        authentication.getCurrentOrganization(),
+                        authentication.getDetails(),
+                        target,
+                        selectedYear,
+                        selectedWeek,
+                        olderTimesheetWrapper.year,
+                        olderTimesheetWrapper.week
+                );
+                return ResponseEntity.ok().build();
+            }else{
+                return ResponseEntity.badRequest().build();
+            }
         } catch (Exception e){
             LOGGER.error(e.getMessage(), e);
             return ResponseEntity.badRequest().build();
