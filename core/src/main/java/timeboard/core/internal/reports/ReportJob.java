@@ -38,6 +38,7 @@ import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Optional;
 
 @Component
@@ -66,6 +67,8 @@ public final class ReportJob implements Job {
 
         if(reportHandler.isPresent()){
             final Serializable data = reportHandler.get().getReportModel(authentication, report);
+            report.setLastAsyncJobTrigger(Calendar.getInstance());
+            this.reportService.updateReport(actor, report);
             LOGGER.info("Report "+reportID+" finished with "+data.toString());
         }else{
             context.setResult("Mission report handler : "+report.getHandlerID());

@@ -26,7 +26,7 @@
                     {{row.name}}
                 </template>
                 <template v-slot:async="{row}">
-                    {{row.async}}
+                    {{row.getLastAsyncJobTrigger()}}
                 </template>
                 <template v-slot:actions="{row}">
                     <a v-if="row.async==false" class="ui right labeled success icon button" v-bind:href="'/reports/view/'+row.id">

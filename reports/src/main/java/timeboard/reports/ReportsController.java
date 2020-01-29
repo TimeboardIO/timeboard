@@ -255,6 +255,9 @@ public class ReportsController {
             return controller;
         }
 
+        public Calendar getLastAsyncJobTrigger(){
+            return this.report.getLastAsyncJobTrigger();
+        }
 
         public long getID() {
             return this.report.getId();
