@@ -29,6 +29,7 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
@@ -66,6 +67,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
+    @PreAuthorize("hasPermission(#accountTimesheet,'TIMESHEET_SUBMIT')")
     public SubmittedTimesheet submitTimesheet(
             final Long orgID,
             final Account actor,
@@ -155,8 +157,9 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
 
-
-    public SubmittedTimesheet validateTimesheet(final Account actor,
+    @Override
+    @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_VALIDATE')")
+    public SubmittedTimesheet validateTimesheet(final Account actor, //submittedTimesheet.getAccount()
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {

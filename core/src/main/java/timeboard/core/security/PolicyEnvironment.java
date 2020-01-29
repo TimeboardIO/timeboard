@@ -29,7 +29,9 @@ package timeboard.core.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.BusinessPolicyEvaluator;
+import timeboard.core.api.UserPolicyEvaluator;
 import timeboard.core.api.exceptions.CommercialException;
+import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 
 import java.util.Date;
@@ -39,6 +41,10 @@ public class PolicyEnvironment {
 
     @Autowired
     BusinessPolicyEvaluator businessPolicyEvaluator;
+
+    @Autowired
+    UserPolicyEvaluator userPolicyEvaluator;
+
 
     public PolicyEnvironment() {
     }
@@ -53,6 +59,10 @@ public class PolicyEnvironment {
 
     public boolean checkTaskByProjectLimit(final TimeboardAuthentication authentication, final Project project) throws CommercialException {
         return businessPolicyEvaluator.checkTaskByProjectLimit(authentication.getDetails(), project);
+    }
+
+    public boolean isOwnerOfAnyUserProject(final TimeboardAuthentication authentication, final Account user) {
+        return userPolicyEvaluator.isOwnerOfAnyUserProject(authentication.getDetails(), user);
     }
 
 
