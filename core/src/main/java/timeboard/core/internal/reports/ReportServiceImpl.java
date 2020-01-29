@@ -193,8 +193,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Optional<ReportHandler> getReportHandler(final Report report) {
-
-
         return this.reportHandlers.stream()
                 .filter(rc ->
                 {
@@ -217,6 +215,7 @@ public class ReportServiceImpl implements ReportService {
             jobDataMap.put("actorID", actor.getId());
 
             this.scheduler.triggerJob(handler.get().handlerJobJey(), jobDataMap);
+
         }
 
     }

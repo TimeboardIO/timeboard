@@ -21,7 +21,7 @@
 
             Report <span th:text="${report.getName()}"></span></h4>
 
-        <h3 style="text-align: center" th:text="#{${reportController.reportLabel()}}"></h3>
+        <h3 style="text-align: center" th:text="#{${reportController.handlerLabel()}}"></h3>
 
         <div class="ui segment"
              th:include="fragments/__${fragment}__ :: report"></div>

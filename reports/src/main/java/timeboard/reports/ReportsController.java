@@ -186,13 +186,15 @@ public class ReportsController {
     }
 
     @GetMapping("/async/{report}")
-    public ResponseEntity requestAsyncReport(
+    public String requestAsyncReport(
             final TimeboardAuthentication authentication,
-            @PathVariable final Report report) throws SchedulerException {
+            @PathVariable final Report report,
+            final RedirectAttributes attributes) throws SchedulerException {
 
         this.reportService.executeAsyncReport(authentication.getDetails(), report);
+        attributes.addFlashAttribute("success", "report.async.request");
 
-        return ResponseEntity.ok(report);
+        return "redirect:/reports";
     }
 
     @GetMapping("/view/{report}")

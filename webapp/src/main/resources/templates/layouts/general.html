@@ -57,12 +57,12 @@
 <div class="ui main container pusher"  style="padding-top:6em">
     <div class="ui container negative message" th:if="${error !=  null && error != ''}">
         <i class="close icon"></i>
-        <div th:text="${error}" class="header">  </div>
+        <div th:text="#{${error}}" class="header">  </div>
 
     </div>
     <div class="ui container positive message" th:if="${success !=  null && success != ''}">
         <i class="close icon"></i>
-        <div th:text="${success}" class="header">  </div>
+        <div th:text="#{${success}}" class="header">  </div>
     </div>
     <div layout:fragment="content" ></div>
 </div>
