@@ -50,7 +50,6 @@ public interface TimesheetService {
             final Long orgID,
             final Account actor,
             final Account accountTimesheet,
-            final Organization currentOrg,
             final int year,
             final int week) throws BusinessException;
 

@@ -70,10 +70,11 @@ public class TimesheetServiceImpl implements TimesheetService {
             final Long orgID,
             final Account actor,
             final Account accountTimesheet,
-            final Organization currentOrg,
             final int year,
             final int week)
             throws BusinessException {
+
+        Organization currentOrg = this.organizationService.getOrganizationByID(actor, orgID).get();
 
         final Calendar beginWorkDate = this.organizationService
                 .findOrganizationMembership(actor, currentOrg).get().getCreationDate();

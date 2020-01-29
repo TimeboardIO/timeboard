@@ -203,7 +203,7 @@ $(document).ready(function () {
             submitMyWeek: function (event) {
                 $.ajax({
                     method: "GET",
-                    url: "timesheet/submit?week=" + app.week + "&year=" + app.year,
+                    url: "timesheet/submit/" + app.year + "/" + app.week,
                     success: function (weekValidationStatus, textStatus, jqXHR) {
                         app.submitted = true;
                         app.displaySuccessMessage("Your timesheet have been submitted successfully.");

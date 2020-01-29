@@ -236,22 +236,19 @@ public class TimesheetController {
         }
     }
 
-    @GetMapping("/submit")
-    public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication, final HttpServletRequest request) {
+    @GetMapping("/submit/{year}/{week}")
+    public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication,
+                          @PathVariable final int year,
+                          @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
 
-        final int week = Integer.parseInt(request.getParameter("week"));
-        final int year = Integer.parseInt(request.getParameter("year"));
-
         try {
-            final Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
             final SubmittedTimesheet submittedTimesheet =
                     this.timesheetService.submitTimesheet(
                             authentication.getCurrentOrganization(),
                             actor,
                             actor,
-                            currentOrg,
                             year,
                             week);
 
