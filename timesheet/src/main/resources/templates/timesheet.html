@@ -193,7 +193,7 @@
 
                             <tr v-for="(task, taskID) in project.tasks">
                                 <td>{{ task.taskName }}</td>
-                                <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length" class="primary">
+                                <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
                                     <i class="hourglass half icon"></i> Task pending manager validation
                                 </td>
                                 <td  v-else-if="task.status == 'REFUSED'" v-bind:colspan="days.length" class="negative">
@@ -221,27 +221,30 @@
                                     </div>
                                 </td>
 
-                                <td colspan="4" v-if="projectID == 0" ></td>
-                                <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
-                                <td v-if="projectID > 0">
-                                    <div class="ui input">
-                                    <input
-                                        min="0"
-                                        step="0.1"
-                                        name="effortLeft"
-                                        v-on:focusout="triggerUpdateEffortLeft"
-                                        v-bind:value="task.effortLeft.toFixed(1)"
-                                        v-bind:data-task-effortLeft="taskID"
-                                        type="number"
-                                    />
-                                     <i class="search icon hidden" style="color: transparent;"></i>
 
-                                    </div>
-                                </td>
-                                <td v-if="projectID > 0"
-                                        v-bind:data-task-rew="taskID">{{task.realEffort.toFixed(1)}}
-                                </td>
-                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID">{{task.originalEstimate.toFixed(1)}}</td>
+                                <td colspan="4" v-if="projectID == 0" ></td>
+                                <template v-if="task.status!='PENDING'">
+                                    <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}</td>
+                                    <td v-if="projectID > 0">
+                                        <div class="ui input">
+                                        <input
+                                            min="0"
+                                            step="0.1"
+                                            name="effortLeft"
+                                            v-on:focusout="triggerUpdateEffortLeft"
+                                            v-bind:value="task.effortLeft.toFixed(1)"
+                                            v-bind:data-task-effortLeft="taskID"
+                                            type="number"
+                                        />
+                                         <i class="search icon hidden" style="color: transparent;"></i>
+
+                                        </div>
+                                    </td>
+                                    <td v-if="projectID > 0"
+                                            v-bind:data-task-rew="taskID">{{task.realEffort.toFixed(1)}}
+                                    </td>
+                                    <td v-if="projectID > 0" v-bind:data-task-ew="taskID">{{task.originalEstimate.toFixed(1)}}</td>
+                                </template>
                             </tr>
                         </template>
                         </tbody>
