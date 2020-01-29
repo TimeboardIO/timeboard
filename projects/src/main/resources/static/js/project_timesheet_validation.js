@@ -64,7 +64,12 @@ $(document).ready(function () {
                 event.target.classList.toggle('loading');
                 $.ajax({
                     type: "POST",
-                    url: "/projects/" + projectID + "/timesheets/forceValidate/" + target.id + "/" + week.year + "/" + week.week,
+                    dataType: "json",
+                    url: "/projects/" + projectID + "/timesheets/forceValidate/" + week.year + "/" + week.week,
+                    data: {
+                        "id": target.id,
+                        "weeks": target.weeks
+                    },
                     success: function (data) {
                         event.target.classList.toggle('loading');
                     },

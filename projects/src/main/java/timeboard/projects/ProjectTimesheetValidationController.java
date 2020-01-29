@@ -192,12 +192,13 @@ public class ProjectTimesheetValidationController {
 
 
 
-    @PostMapping(value = "/forceValidate/{target}/{year}/{week}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<Long, UserWrapper>> forceValidate(TimeboardAuthentication authentication,
-                                                        @PathVariable Long projectID,
-                                                        @PathVariable UserWrapper targetWrapper,
-                                                        @PathVariable int selectedYear,
-                                                        @PathVariable int selectedWeek) throws BusinessException {
+    @PostMapping(value = "/forceValidate/{year}/{week}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity forceValidate(TimeboardAuthentication authentication,
+                                                        @PathVariable final Long projectID,
+                                                        @PathVariable final int selectedYear,
+                                                        @PathVariable final int selectedWeek,
+                                                        //@PathVariable final UserWrapper targetWrapper,
+                                                        @ModelAttribute final UserWrapper targetWrapper) throws BusinessException {
         try {
             Account target = this.userService.findUserByID(targetWrapper.getId());
 

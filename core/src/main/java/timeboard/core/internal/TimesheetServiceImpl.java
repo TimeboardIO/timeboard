@@ -281,14 +281,14 @@ public class TimesheetServiceImpl implements TimesheetService {
             final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = current.get(Calendar.YEAR);
 
-            final Optional<SubmittedTimesheet> submittedTimesheet =
-                    this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
+            final Optional<SubmittedTimesheet> submittedTimesheet = Optional.empty();
+                // this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
 
             try {
 
                 if (submittedTimesheet.isPresent()) {
 
-                    this.validateTimesheet(actor, submittedTimesheet.get());
+                  //  this.validateTimesheet(actor, submittedTimesheet.get());
 
                 } else {
 
@@ -305,7 +305,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
                     // Timesheet Validation
-                    this.validateTimesheet(actor, newSubmittedTimesheet);
+                   // this.validateTimesheet(actor, newSubmittedTimesheet);
 
                 }
 
