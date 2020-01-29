@@ -114,8 +114,13 @@
 
                 <!-- LABELS -->
                 <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
-                    <div class="ui orange label" v-if="userIsActor" th:text="#{timesheet.status.pending}" >
+                    <div class="ui orange label" th:text="#{timesheet.status.pending.validation}" >
                         Pending validation
+                    </div>
+                </div>
+                <div v-if="isTimesheetHasState([null])  && !userIsActor">
+                    <div class="ui orange label" th:text="#{timesheet.status.pending.submission}" >
+                        Pending submission
                     </div>
                 </div>
                 <div v-if="isTimesheetHasState(['VALIDATED'])">
