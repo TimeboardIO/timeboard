@@ -27,17 +27,18 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.UserServiceImpl;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -49,6 +50,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/projects/{projectID}/timesheets")
 public class ProjectTimesheetValidationController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     public ProjectService projectService;
@@ -175,6 +178,28 @@ public class ProjectTimesheetValidationController {
         c.set(Calendar.YEAR, (int) year);
         c.set(Calendar.WEEK_OF_YEAR, (int) week);
         return c;
+    }
+
+
+    @PostMapping(value = "/fillAndValidate/{target}/{year}/{week}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,
+                                                        @PathVariable Long projectID,
+                                                        @PathVariable Account target,
+                                                        @PathVariable int year,
+                                                        @PathVariable int week) throws BusinessException {
+        try {
+            this.timesheetService.fillAndValidateTimesheet(
+                    authentication.getCurrentOrganization(),
+                    authentication.getDetails(),
+                    target,
+                    year,
+                    week
+            );
+            return ResponseEntity.ok().build();
+        } catch (Exception e){
+            LOGGER.error(e.getMessage(), e);
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     public static class TimesheetWeekWrapper {

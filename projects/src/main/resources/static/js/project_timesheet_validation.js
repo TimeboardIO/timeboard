@@ -25,7 +25,6 @@ $(document).ready(function () {
                     {
                         "slot": "submitted",
                         "label": "S",
-                        "sortKey": "validated",
                         "primary" : true,
                         "class" : "collapsing"
 
@@ -33,10 +32,15 @@ $(document).ready(function () {
                     {
                         "slot": "validated",
                         "label": "V",
-                        "sortKey": "submitted",
                         "primary" : true,
                         "class" : "collapsing"
 
+                    },
+                    {
+                        "slot": "actions",
+                        "label": "Actions",
+                        "primary" : true,
+                        "class":"right aligned collapsing"
                     }],
                 data: [],
                 name: 'tableTimesheetValidation',
@@ -54,7 +58,21 @@ $(document).ready(function () {
                 else
                     isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
                 return isoWeekStart;
-            }
+            },
+            fillAndValidate: function(event, target, week) {
+                let self = this;
+                event.target.classList.toggle('loading');
+                $.ajax({
+                    type: "POST",
+                    url: "/projects/" + projectID + "/timesheets/fillAndValidate/" + target.id + "/" + week.year + "/" + week.week,
+                    success: function (data) {
+                        event.target.classList.toggle('loading');
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                });
+            },
         },
         mounted: function () {
             let self = this;

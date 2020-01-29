@@ -261,5 +261,40 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     }
 
+    @Override
+    public void fillAndValidateTimesheet(Long organizationID, Account actor, Account target, int year, int week) {
+
+        Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
+        final Optional<SubmittedTimesheet> submittedTimesheet =
+                this.getSubmittedTimesheet(organizationID, actor, target, year, week);
+
+        try{
+
+            if (submittedTimesheet.isPresent()) {
+                this.validateTimesheet(actor, submittedTimesheet.get());
+
+            }else{
+
+                // Timesheet Submission
+                final SubmittedTimesheet newSubmittedTimesheet = new SubmittedTimesheet();
+                newSubmittedTimesheet.setAccount(target);
+                newSubmittedTimesheet.setYear(year);
+                newSubmittedTimesheet.setWeek(week);
+                newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
+                em.persist(newSubmittedTimesheet);
+
+                TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg));
+
+                LOGGER.info("Timesheet for " + week + " submit for user" + target.getScreenName() + " by user " + actor.getScreenName());
+
+
+                // Timesheet Validation
+                this.validateTimesheet(actor, newSubmittedTimesheet);
+
+            }
+        }catch(Exception e){
+             LOGGER.error(e.getMessage(), e);
+        }
+    }
 
 }

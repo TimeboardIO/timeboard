@@ -60,11 +60,17 @@
                                     {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}
                                 </template>
 
+                                <template v-slot:submitted="{row}">
+                                    <div :class="{red:  !row.submitted, green: row.submitted}" class="ui circular label large "></div>
+                                </template>
                                 <template v-slot:validated="{row}">
                                      <div :class="{red:  row.submitted && !row.validated, green: row.validated}" class="ui circular label large "></div>
                                 </template>
-                                <template v-slot:submitted="{row}">
-                                    <div :class="{red:  !row.submitted, green: row.submitted}" class="ui circular label large "></div>
+                                <template v-slot:actions="{row}">
+                                    <button @click="fillAndValidate($event, account, row)" class="ui positive icon button">
+                                        Fill and Validate
+                                        <i class="check icon"></i>
+                                    </button>
                                 </template>
                             </data-table>
                         </td>
