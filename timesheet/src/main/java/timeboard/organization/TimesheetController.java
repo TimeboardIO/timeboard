@@ -65,9 +65,6 @@ public class TimesheetController {
     @Autowired
     private OrganizationService organizationService;
 
-    @Autowired
-    private UserService userService;
-
     @GetMapping
     protected String currentWeekTimesheet(
             final TimeboardAuthentication authentication, final Model model) throws Exception {
