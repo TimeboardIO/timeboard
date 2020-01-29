@@ -65,6 +65,9 @@ public class TimesheetController {
     @Autowired
     private OrganizationService organizationService;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping
     protected String currentWeekTimesheet(
             final TimeboardAuthentication authentication, final Model model) throws Exception {
@@ -98,22 +101,21 @@ public class TimesheetController {
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
         final Calendar c = firstDayOfWeek(week, year);
-        final Date ds = findStartDate(c);
-        final Date de = findEndDate(c);
+        final Calendar firstDayOfWeek = findStartDate(c);
+        final Calendar lastDayOfWeek = findEndDate(c);
 
         // Create days for current week
-        final List<DateWrapper> days = createDaysForCurrentWeek(currentOrg, currentAccount, c, ds);
+        final List<DateWrapper> days = createDaysForCurrentWeek(currentOrg, currentAccount, c, firstDayOfWeek.getTime());
 
         //Get tasks for current week
         if (this.projectService != null) {
             this.projectService.listTasksByProject(
                     authentication.getCurrentOrganization(),
                     currentAccount,
-                    ds,
-                    de).stream().forEach(projectTasks -> {
+                    firstDayOfWeek.getTime(),
+                    lastDayOfWeek.getTime()).stream().forEach(projectTasks -> {
 
                 final List<TaskWrapper> tasks = new ArrayList<>();
-
                 projectTasks.getTasks().forEach(task -> {
                     tasks.add(new TaskWrapper( task.getId(), task.getName(),
                             task.getComments(), task.getEffortSpent(),
@@ -122,13 +124,11 @@ public class TimesheetController {
                             task.getEndDate(), task.getTaskStatus().name(),
                             task.getTaskType() != null ? task.getTaskType().getId() : 0)
                     );
-
                     days.forEach(dateWrapper -> {
                         final double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
                         imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                     });
                 });
-
                 projects.add(new ProjectWrapper(
                         projectTasks.getProject().getId(),
                         projectTasks.getProject().getName(),
@@ -136,15 +136,22 @@ public class TimesheetController {
             });
 
             //Default tasks
-            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, currentOrg, imputations, ds, de, days);
-
-            projects.add(new ProjectWrapper(
-                    (long) 0,
-                    "Default Tasks",
-                    tasks));
+            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, currentOrg,
+                    imputations, firstDayOfWeek.getTime(), lastDayOfWeek.getTime(), days);
+            projects.add(new ProjectWrapper(0L, "Default Tasks", tasks));
         }
         final boolean canValidate = this.projectService.isOwnerOfAnyUserProject(authentication.getDetails(), currentAccount);
+        final Calendar creationDate = this.organizationService
+                .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization())
+                .orElseThrow().getCreationDate();
+        creationDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+
+        final boolean isFirstWeek =
+                firstDayOfWeek.compareTo(creationDate) <= 0
+                && lastDayOfWeek.compareTo(creationDate) >= 0 ;
+
         final TimesheetWrapper ts = new TimesheetWrapper(
+                isFirstWeek ? ValidationStatus.PENDING_VALIDATION :
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
                         currentAccount,
@@ -153,16 +160,11 @@ public class TimesheetController {
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
                         currentAccount,
-                        year,
-                        week).orElse(null),
-                year,
-                week,
+                        year, week).orElse(null),
+                year, week,
                 beginWorkDate.get(Calendar.YEAR),
                 beginWorkDate.get(Calendar.WEEK_OF_YEAR),
-                days,
-                projects,
-                imputations,
-                canValidate);
+                days, projects, imputations, canValidate);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
     }
@@ -378,14 +380,18 @@ public class TimesheetController {
         return c;
     }
 
-    private Date findStartDate(final Calendar c) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        return c.getTime();
+    private Calendar findStartDate(final Calendar c) {
+        final Calendar result = Calendar.getInstance();
+        result.setTime(c.getTime());
+        result.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        return result;
     }
 
-    private Date findEndDate(final Calendar c) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        return c.getTime();
+    private Calendar findEndDate(final Calendar c) {
+        final Calendar result = Calendar.getInstance();
+        result.setTime(c.getTime());
+        result.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        return result;
     }
 
     private int findPreviousWeekYear(final Calendar c, final int week, final int year) {
