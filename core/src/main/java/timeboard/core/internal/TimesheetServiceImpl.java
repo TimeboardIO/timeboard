@@ -67,14 +67,12 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public SubmittedTimesheet submitTimesheet(
-            final Long orgID,
+            final Organization currentOrg,
             final Account actor,
             final Account accountTimesheet,
             final int year,
             final int week)
             throws BusinessException {
-
-        Organization currentOrg = this.organizationService.getOrganizationByID(actor, orgID).get();
 
         final Calendar beginWorkDate = this.organizationService
                 .findOrganizationMembership(actor, currentOrg).get().getCreationDate();

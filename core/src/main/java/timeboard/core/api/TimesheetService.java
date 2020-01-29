@@ -47,7 +47,7 @@ public interface TimesheetService {
      * @return true if timesheet is submit else, false.
      */
     SubmittedTimesheet submitTimesheet(
-            final Long orgID,
+            final Organization currentOrg,
             final Account actor,
             final Account accountTimesheet,
             final int year,
