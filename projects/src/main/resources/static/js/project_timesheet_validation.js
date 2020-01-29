@@ -59,12 +59,12 @@ $(document).ready(function () {
                     isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
                 return isoWeekStart;
             },
-            fillAndValidate: function(event, target, week) {
+            forceValidate: function(event, target, week) {
                 let self = this;
                 event.target.classList.toggle('loading');
                 $.ajax({
                     type: "POST",
-                    url: "/projects/" + projectID + "/timesheets/fillAndValidate/" + target.id + "/" + week.year + "/" + week.week,
+                    url: "/projects/" + projectID + "/timesheets/forceValidate/" + target.id + "/" + week.year + "/" + week.week,
                     success: function (data) {
                         event.target.classList.toggle('loading');
                     },

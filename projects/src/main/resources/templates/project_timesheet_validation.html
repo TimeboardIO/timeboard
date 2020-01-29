@@ -67,8 +67,8 @@
                                      <div :class="{red:  row.submitted && !row.validated, green: row.validated}" class="ui circular label large "></div>
                                 </template>
                                 <template v-slot:actions="{row}">
-                                    <button @click="fillAndValidate($event, account, row)" class="ui positive icon button">
-                                        Fill and Validate
+                                    <button @click="forceValidate($event, account, row)" class="ui positive icon button">
+                                        Force Validate
                                         <i class="check icon"></i>
                                     </button>
                                 </template>

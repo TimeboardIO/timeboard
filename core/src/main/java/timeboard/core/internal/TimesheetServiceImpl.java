@@ -262,7 +262,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public void fillAndValidateTimesheet(Long organizationID, Account actor, Account target, int year, int week) {
+    public void forceValidateTimesheet(Long organizationID, Account actor, Account target, int year, int week) {
 
         Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
         final Optional<SubmittedTimesheet> submittedTimesheet =
