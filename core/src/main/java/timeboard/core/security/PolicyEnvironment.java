@@ -27,9 +27,10 @@ package timeboard.core.security;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.BusinessPolicyEvaluator;
-import timeboard.core.api.UserPolicyEvaluator;
+import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.CommercialException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
@@ -43,8 +44,7 @@ public class PolicyEnvironment {
     BusinessPolicyEvaluator businessPolicyEvaluator;
 
     @Autowired
-    UserPolicyEvaluator userPolicyEvaluator;
-
+    ApplicationContext ctx;
 
     public PolicyEnvironment() {
     }
@@ -62,7 +62,7 @@ public class PolicyEnvironment {
     }
 
     public boolean isOwnerOfAnyUserProject(final TimeboardAuthentication authentication, final Account user) {
-        return userPolicyEvaluator.isOwnerOfAnyUserProject(authentication.getDetails(), user);
+        return ctx.getBean(ProjectService.class).isOwnerOfAnyUserProject(authentication.getDetails(), user);
     }
 
 

@@ -88,7 +88,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.set(Calendar.WEEK_OF_YEAR, week);
         previousWeek.set(Calendar.YEAR, year);
         previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
-        previousWeek.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
                 currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
