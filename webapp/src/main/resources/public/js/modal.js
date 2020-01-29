@@ -22,7 +22,7 @@ Vue.component('tmodal', {
 });
 
 Vue.component('tmodal-confirm', {
-    props: ['title', 'text', 'icon' ],
+    props: ['title', 'icon' ],
     template: `
         <div v-bind:id="id" class="ui mini modal">
             <div class="ui icon header">
@@ -48,6 +48,7 @@ Vue.component('tmodal-confirm', {
         return {
             id: Math.floor(Math.random() * 10000),
             callback : function () { },
+            text : '',
         }
     },
     methods: {
@@ -62,7 +63,6 @@ Vue.component('tmodal-confirm', {
         confirm :  function (element, callback) {
 
             let self = this;
-
             this.text = element;
 
             $('#'+this.id).modal({ detachable : true, centered: true }).modal({
