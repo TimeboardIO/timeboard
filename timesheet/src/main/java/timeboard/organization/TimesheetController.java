@@ -363,10 +363,7 @@ public class TimesheetController {
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
             if (c.getTime().getTime() >= beginWorkDateForCurrentOrg.getTime().getTime()) {
-                final DateWrapper dw = new DateWrapper(
-                        c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).substring(0, 3),
-                        c.getTime()
-                );
+                final DateWrapper dw = new DateWrapper( c.getTime() );
                 days.add(dw);
             }
             c.add(Calendar.DAY_OF_YEAR, 1);
@@ -497,9 +494,7 @@ public class TimesheetController {
 
         public Map<Long, ProjectWrapper> getProjects() {
             final Map<Long, ProjectWrapper> res = new HashMap<>();
-            this.projects.forEach(projectWrapper -> {
-                res.put(projectWrapper.getProjectID(), projectWrapper);
-            });
+            this.projects.forEach(projectWrapper -> res.put(projectWrapper.getProjectID(), projectWrapper));
             return res;
         }
 
@@ -507,11 +502,9 @@ public class TimesheetController {
 
             final Map<String, Map<Long, Double>> res = new HashMap<>();
 
-            this.imputations.stream().forEach(d -> {
+            this.imputations.forEach(d -> {
                 final String date = DATE_FORMAT.format(d.date);
-                if (res.get(date) == null) {
-                    res.put(date, new HashMap<>());
-                }
+                res.computeIfAbsent(date, k -> new HashMap<>());
                 res.get(date).put(d.taskID, d.value);
             });
 
@@ -532,16 +525,19 @@ public class TimesheetController {
 
     public static class DateWrapper implements Serializable {
 
-        private final String day;
+
+        private final int dayNum;
         private final Date date;
 
-        public DateWrapper(final String day, final Date date) {
-            this.day = day;
+        public DateWrapper(final Date date) {
+            final Calendar c = Calendar.getInstance();
             this.date = date;
+            c.setTime(date);
+            this.dayNum = c.get(Calendar.DAY_OF_WEEK);
         }
 
-        public String getDay() {
-            return day;
+        public int getDayNum() {
+            return dayNum;
         }
 
         public String getDate() {
@@ -572,9 +568,7 @@ public class TimesheetController {
         public Map<Long, TaskWrapper> getTasks() {
             final Map<Long, TaskWrapper> res = new HashMap<>();
 
-            this.tasks.forEach(taskWrapper -> {
-                res.put(taskWrapper.getTaskID(), taskWrapper);
-            });
+            this.tasks.forEach(taskWrapper -> res.put(taskWrapper.getTaskID(), taskWrapper));
 
             return res;
         }

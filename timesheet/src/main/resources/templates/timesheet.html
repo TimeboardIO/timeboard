@@ -9,9 +9,9 @@
     <meta property="timesheet"
           th:year="${year}"
           th:week="${week}"
-          th:lastWeekSubmitted="${lastWeekSubmitted}"
           th:userID="${userID}"
           th:actorID="${actorID}"
+          th:locale="#{locale}"
     />
     <style> .hidden {
         display: none;
@@ -176,15 +176,15 @@
                     <tr class="days">
                         <th class="two wide"></th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
-                            {{ day.day }} {{ new Date(day.date).getDate() }}
+                            {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{ new Date(day.date).getDate() }}
                         </th>
                         <th class="wide one" style="background-color: white;" colspan="4"></th>
                     </tr>
 
                     <tr class="timesheet-head">
-                        <th class="two wide">Task</th>
+                        <th class="two wide" th:text="#{tasks}" >Tasks</th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
-                            <div v-if="(day.day != 'Sat') && (day.day != 'Sun')"
+                            <div v-if="(day.dayNum != 7) && (day.dayNum != 1)"
                                  v-bind:id="day.date"
                                  v-bind:class="{'ui circular label large day-badge':true,
                                       'green':(getImputationSum(day.date).toFixed(1) == 1),
@@ -194,7 +194,7 @@
                                  v-bind:day-badge="day.date">
                                 <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
                             </div>
-                            <div v-if="(day.day == 'Sat') || (day.day == 'Sun')"
+                            <div v-if="(day.dayNum == 7) || (day.dayNum == 1)"
                                  v-bind:id="day.date"
                                  v-bind:class="{'ui circular label large day-badge':true,
                                       'green':(getImputationSum(day.date).toFixed(1) == 1),
@@ -204,17 +204,13 @@
                                 <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
                             </div>
                         </th>
-                        <th class="wide one" data-tooltip="Effort spent: Total effort spent on the task" rowspan="1">
-                            ES
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1"> ES
                         </th>
-                        <th class="wide one" data-tooltip="Effort Left: Effort Left to complete the task" rowspan="1">
-                            EL
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1"> EL
                         </th>
-                        <th class="wide one" data-tooltip="Real Effort: Total effort to complete the task" rowspan="1">
-                            RE
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.re}" rowspan="1"> RE
                         </th>
-                        <th class="wide one" data-tooltip="Original estimate: Initial estimate to complete the task"
-                            rowspan="1">OE
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.oe}" rowspan="1"> OE
                         </th>
 
                     </tr>

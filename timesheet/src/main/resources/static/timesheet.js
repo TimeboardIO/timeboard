@@ -1,18 +1,19 @@
 /**
-* type = imputation | effortLeft
-*/
+ * type = imputation | effortLeft
+ */
 
-
-const _USER_ID = $("meta[property='timesheet']").attr('userID');
-const _ACTOR_ID = $("meta[property='timesheet']").attr('actorID');
-const _YEAR = $("meta[property='timesheet']").attr('year');
-const _WEEK = $("meta[property='timesheet']").attr('week');
+const properties = $("meta[property='timesheet']");
+const _USER_ID = properties.attr('userID');
+const _ACTOR_ID = properties.attr('actorID');
+const _YEAR = properties.attr('year');
+const _WEEK = properties.attr('week');
+const _LOCALE = properties.attr('locale');
 
 const ValidationStatus = {
-    PENDING_VALIDATION : "PENDING_VALIDATION",
-    VALIDATED : "VALIDATED",
-    REJECTED : "REJECTED"
-}
+    PENDING_VALIDATION: "PENDING_VALIDATION",
+    VALIDATED: "VALIDATED",
+    REJECTED: "REJECTED"
+};
 
 const emptyTask = {
     taskID: 0,
@@ -29,11 +30,15 @@ const emptyTask = {
     statusName: '',
     milestoneID: '',
     milestoneName: '',
-}
+};
 
 const timesheetModel = {
-    currentWeekValidationStatus: {},
-    previousWeekValidationStatus: {},
+    week: 0,
+    year: 0,
+    sum: 0,
+    days: [],
+    projects: {},
+    imputations: {},
     successMessages: [],
     errorMessages: [],
     newTask: Object.assign({}, emptyTask),
@@ -41,15 +46,11 @@ const timesheetModel = {
     disablePrev: false,
     formError: "",
     modalTitle: "",
-    week: 0,
-    year: 0,
-    sum: 0,
-    days: [],
-    projects: {},
-    imputations: {},
-    canValidate : false,
-    userIsActor : _USER_ID === _ACTOR_ID,
+    canValidate: false,
+    currentWeekValidationStatus: {},
+    previousWeekValidationStatus: {},
     userID: _USER_ID,
+    userIsActor: _USER_ID === _ACTOR_ID,
     getImputationSum: function (date) {
         let sum = 0;
         if (this.imputations[date]) {
@@ -88,13 +89,17 @@ const timesheetModel = {
     nextWeekYear: function (year, week) {
         let date = timesheetModel.rollWeek(year, week, 1);
         let weekNum = timesheetModel.getWeekNumber(date);
-        if (week > weekNum) { year++; }
+        if (week > weekNum) {
+            year++;
+        }
         return year;
     },
     lastWeekYear: function (year, week) {
         let date = timesheetModel.rollWeek(year, week, -1);
         let weekNum = timesheetModel.getWeekNumber(date);
-        if (week < weekNum) { year--; }
+        if (week < weekNum) {
+            year--;
+        }
         return year;
     },
     updateTask: function (date, task, type, val) {
@@ -116,32 +121,28 @@ const timesheetModel = {
 
 $(document).ready(function () {
 
-    const week = $("meta[property='timesheet']").attr('week');
-    const year = $("meta[property='timesheet']").attr('year');
-    const lastWeekSubmitted = $("meta[property='timesheet']").attr('lastWeekSubmitted');
-
     const formValidationRules = {
         fields: {
             projectID: {
                 identifier: 'projectID',
-                rules: [{ type: 'empty', prompt: 'Please select project' }]
+                rules: [{type: 'empty', prompt: 'Please select project'}]
             },
             taskName: {
                 identifier: 'taskName',
-                rules: [{ type: 'empty', prompt: 'Please enter task name' }]
+                rules: [{type: 'empty', prompt: 'Please enter task name'}]
             },
             taskStartDate: {
                 identifier: 'taskStartDate',
-                rules: [{ type: "empty", prompt: 'Please enter task start date' }]
+                rules: [{type: "empty", prompt: 'Please enter task start date'}]
             },
             taskEndDate: {
                 identifier: 'taskEndDate',
-                rules: [{ type: "empty", prompt: 'Please enter task end date' }]
+                rules: [{type: "empty", prompt: 'Please enter task end date'}]
             },
             taskOriginalEstimate: {
                 identifier: 'taskOriginalEstimate',
-                rules: [{ type: 'empty', prompt: 'Please enter task original estimate in days' },
-                { type: 'number', prompt: 'Please enter task a number original estimate in days' }]
+                rules: [{type: 'empty', prompt: 'Please enter task original estimate in days'},
+                    {type: 'number', prompt: 'Please enter task a number original estimate in days'}]
             },
         }
     };
@@ -162,10 +163,10 @@ $(document).ready(function () {
             enableSubmitButton: function (week) {
                 let result = true;
 
-                result &= ['PENDING_VALIDATION', 'VALIDATED'].includes(this.previousWeekValidationStatus);
+                result &= [ValidationStatus.PENDING_VALIDATION, ValidationStatus.VALIDATED].includes(this.previousWeekValidationStatus);
                 //check all days imputations == 1
                 app.days.forEach(function (day) {
-                    if (day.day !== 'Sun' && day.day !== 'Sat') {
+                    if (day.dayNum !== 1 && day.dayNum !== 7) {
                         let sum = timesheetModel.getImputationSum(day.date);
                         result = result && (sum === 1);
                     }
@@ -175,7 +176,7 @@ $(document).ready(function () {
             },
             updateTimesheet: function () {
                 $('.ui.dimmer').addClass('active');
-                $.get("/timesheet/data?user="+_USER_ID+"&week=" + _WEEK + "&year=" + _YEAR)
+                $.get("/timesheet/data?user=" + _USER_ID + "&week=" + _WEEK + "&year=" + _YEAR)
                     .then(function (data) {
                         app.canValidate = data.canValidate;
                         app.week = data.week;
@@ -188,27 +189,27 @@ $(document).ready(function () {
                         app.currentWeekValidationStatus = data.currentWeekValidationStatus;
                         app.previousWeekValidationStatus = data.previousWeekValidationStatus;
                     }).then(function () {
-                        $('.ui.dimmer').removeClass('active');
-                        $(' #timesheet').removeClass('hidden');
-                    }).then(function () {
-                        let list = document.getElementsByClassName("day-badge");
-                        for (let i = 0; i < list.length; i++) {
-                            let badge = list[i];
-                            if (badge.innerText === "1.0") {
-                                badge.classList.add("green");
-                                badge.classList.remove("red");
-                            }
+                    $('.ui.dimmer').removeClass('active');
+                    $(' #timesheet').removeClass('hidden');
+                }).then(function () {
+                    let list = document.getElementsByClassName("day-badge");
+                    for (let i = 0; i < list.length; i++) {
+                        let badge = list[i];
+                        if (badge.innerText === "1.0") {
+                            badge.classList.add("green");
+                            badge.classList.remove("red");
                         }
-                    })
+                    }
+                })
             },
             isTimesheetHasState: function (statesArray) {
                 return statesArray.includes(this.currentWeekValidationStatus);
             },
             displayErrorMessage: function (message) {
-                this.errorMessages.push({ message: message, visible: true });
+                this.errorMessages.push({message: message, visible: true});
             },
             displaySuccessMessage: function (message) {
-                this.successMessages.push({ message: message, visible: true });
+                this.successMessages.push({message: message, visible: true});
             },
             submitMyWeek: function (event) {
                 $.ajax({
@@ -218,11 +219,11 @@ $(document).ready(function () {
                         app.submitted = true;
                         app.displaySuccessMessage("Your timesheet have been submitted successfully.");
                         app.updateTimesheet();
-                        app.currentWeekValidationStatus = "PENDING_VALIDATION";
+                        app.currentWeekValidationStatus = ValidationStatus.PENDING_VALIDATION;
 
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        app.displayErrorMessage("Error can not submit your timesheet. "+ textStatus);
+                        app.displayErrorMessage("Error can not submit your timesheet. " + textStatus);
                     }
                 });
             },
@@ -234,16 +235,15 @@ $(document).ready(function () {
                         app.submitted = true;
                         app.displaySuccessMessage("This timesheet have been validated successfully.");
                         app.updateTimesheet();
-                        app.currentWeekValidationStatus = "VALIDATED";
+                        app.currentWeekValidationStatus = ValidationStatus.VALIDATED;
 
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
-                        app.displayErrorMessage("Error can not validate this timesheet. "+ textStatus);
+                        app.displayErrorMessage("Error can not validate this timesheet. " + textStatus);
                     }
                 });
             },
             triggerUpdateEffortLeft: function (event) {
-
                 $(event.target).parent().addClass('left icon loading').removeClass('error');
                 const taskID = $(event.target).attr('data-task-effortLeft');
                 const val = $(event.target).val();
@@ -311,8 +311,8 @@ $(document).ready(function () {
                 let self = this;
                 $('.create-task.modal').modal({
                     onApprove: function ($element) {
-                        let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
-                        if (validated) {
+                        let formIsOK = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                        if (formIsOK) {
                             $('.ui.error.message').hide();
                             $.ajax({
                                 method: "POST",
@@ -341,6 +341,5 @@ $(document).ready(function () {
             this.updateTimesheet();
         }
     });
-
 
 });
