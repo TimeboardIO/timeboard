@@ -69,10 +69,11 @@ $(document).ready(function () {
                     type: "POST",
                     dataType: "json",
                     contentType: "application/json",
-                    url: "/projects/" + projectID + "/timesheets/forceValidate/" + target.id + "/" + week.year + "/" + week.week,
+                    url: "projects/" + _PROJECT_ID + "/timesheets/forceValidate/" + target.id + "/" + week.year + "/" + week.week,
                     data:  JSON.stringify(target.weeks),
                     success: function (data) {
                         event.target.classList.toggle('loading');
+                        document.location.reload(true);
                     },
                     error: function (data) {
                         console.log(data);

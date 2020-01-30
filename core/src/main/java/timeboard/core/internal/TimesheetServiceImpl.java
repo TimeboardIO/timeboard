@@ -196,7 +196,12 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("user", user);
         q.setParameter("orgID", currentOrganization);
 
-        return Optional.ofNullable(q.getSingleResult());
+        try {
+            return Optional.ofNullable(q.getSingleResult());
+        }catch(Exception e){
+            LOGGER.debug(e.getMessage(), e);
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -312,22 +317,22 @@ public class TimesheetServiceImpl implements TimesheetService {
         long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
 
         final Calendar current = Calendar.getInstance();
-        current.set(Calendar.WEEK_OF_YEAR, olderYear);
-        current.set(Calendar.YEAR, olderWeek);
+        current.set(Calendar.WEEK_OF_YEAR, olderWeek);
+        current.set(Calendar.YEAR, olderYear);
 
         while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= selectedAbsoluteWeekNumber) {
 
             final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = current.get(Calendar.YEAR);
 
-            final Optional<SubmittedTimesheet> submittedTimesheet = Optional.empty();
-                // this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
+            final Optional<SubmittedTimesheet> submittedTimesheet =
+                    this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
 
             try {
 
                 if (submittedTimesheet.isPresent()) {
 
-                  //  this.validateTimesheet(actor, submittedTimesheet.get());
+                  this.validateTimesheet(actor, submittedTimesheet.get());
 
                 } else {
 
@@ -339,12 +344,12 @@ public class TimesheetServiceImpl implements TimesheetService {
                     newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
                     em.persist(newSubmittedTimesheet);
 
-                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg));
+                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg.getId()));
                     LOGGER.info("Timesheet for " + currentWeek + " submit for user" + target.getScreenName() + " by user " + actor.getScreenName());
 
 
                     // Timesheet Validation
-                   // this.validateTimesheet(actor, newSubmittedTimesheet);
+                    this.validateTimesheet(actor, newSubmittedTimesheet);
 
                 }
 
