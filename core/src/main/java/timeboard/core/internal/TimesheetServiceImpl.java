@@ -315,10 +315,11 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public void forceValidateTimesheets(Long organizationID, Account actor, Account target, int selectedYear, int selectedWeek, int olderYear, int olderWeek) {
+    public void forceValidateTimesheets(Long organizationID, Account actor, Account target,
+                                        int selectedYear, int selectedWeek, int olderYear, int olderWeek) {
 
-        Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
-        long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
+        final Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
+        final long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
 
         final Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, olderWeek);
@@ -340,8 +341,10 @@ public class TimesheetServiceImpl implements TimesheetService {
                         // Timesheet Submission
                         submittedTimesheet.get().setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
                         em.persist(submittedTimesheet.get());
-                        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet.get(), projectService, currentOrg.getId()));
-                        LOGGER.info("Timesheet for " + currentWeek + " submit for user" + target.getScreenName() + " by user " + actor.getScreenName());
+                        TimeboardSubjects.TIMESHEET_EVENTS.onNext(
+                                new TimesheetEvent(submittedTimesheet.get(), projectService, currentOrg.getId()));
+                        LOGGER.info("Timesheet for " + currentWeek + " submit for user" + target.getScreenName()
+                                + " by user " + actor.getScreenName());
                     }
 
                     // Timesheet Validation

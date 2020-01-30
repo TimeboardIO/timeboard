@@ -121,7 +121,7 @@ public class ProjectTimesheetValidationController {
 
     private List<TimesheetWeekWrapper> fillTimesheetWeeks(Account a, List<SubmittedTimesheet> submittedTimesheets) {
 
-        Pair<Integer, Integer> pair = getOlderWeekYearNotValidated(a, submittedTimesheets);
+        final Pair<Integer, Integer> pair = getOlderWeekYearNotValidated(a, submittedTimesheets);
 
         return generateSubmittedTimesheets(pair.getFirst(), pair.getSecond(), submittedTimesheets);
 
@@ -200,14 +200,14 @@ public class ProjectTimesheetValidationController {
                                                         @PathVariable final Long targetID,
                                                         @RequestBody final ArrayList<TimesheetWeekWrapper> weeks) throws BusinessException {
         try {
-            Account target = this.userService.findUserByID(targetID);
+            final Account target = this.userService.findUserByID(targetID);
 
-            TimesheetWeekWrapper olderTimesheetWrapper =
+            final TimesheetWeekWrapper olderTimesheetWrapper =
                     weeks.stream().min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
                     .get();
 
-            long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
-            long olderAbsoluteWeekNumber = absoluteWeekNumber(olderTimesheetWrapper.year, olderTimesheetWrapper.week);
+            final long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
+            final long olderAbsoluteWeekNumber = absoluteWeekNumber(olderTimesheetWrapper.year, olderTimesheetWrapper.week);
 
             if(selectedAbsoluteWeekNumber >= olderAbsoluteWeekNumber) {
                 this.timesheetService.forceValidateTimesheets(
