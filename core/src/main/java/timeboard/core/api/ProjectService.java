@@ -201,4 +201,8 @@ public interface ProjectService {
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 
     Optional<Imputation> getImputation(Account user, DefaultTask task, Date day);
+
+    List<Account> findOwnersOfAnyUserProject(Account user);
+
+    boolean isOwnerOfAnyUserProject(Account owner, Account user);
 }
