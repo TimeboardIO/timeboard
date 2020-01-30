@@ -1,12 +1,5 @@
 Vue.component('data-table', {
     props: ['config', 'table'],
-    watch: {
-        config: function(newVal, oldVal) { // watch it
-            if(this.config.data) {
-                this.table = this.config.data;
-            }
-        }
-    },
     template: `
             <table class="ui celled table" v-if="table.length > 0">
                 <thead>
@@ -59,11 +52,17 @@ Vue.component('data-table', {
 
 `,
     data: function () {
-        if(this.table) {
-            this.config.data = this.table;
+
+        if(!this.table) {
+            console.error("[DATA-TABLE] you have to specify 'table' props.");
         }
+        if(!this.config) {
+            console.error("[DATA-TABLE] you have to specify 'config' props.");
+        }
+
         let sortOrders = {};
         let finalCols = [];
+
         this.config.cols.forEach(function (key) {
             sortOrders[key.slot] = 1;
             key.visible = true;
@@ -72,18 +71,22 @@ Vue.component('data-table', {
         });
         let self = this;
         if (this.config.configurable === true) {
-            $.ajax({
-                type: "GET",
-                dataType: "json",
-                url: "/api/datatable?tableID=" + this.config.name,
-                success: function (d) {
-                    self.finalCols
-                        .forEach(function(c) {
-                            let visible = d.colNames.includes(c.slot) ;
-                            c.visible = (c.primary === true || visible);
-                        });
-                }
-            });
+            if(!this.config.name) {
+                console.error("[DATA-TABLE] No name have been set for configuration saving")
+            } else {
+                $.ajax({
+                    type: "GET",
+                    dataType: "json",
+                    url: "/api/datatable?tableID=" + this.config.name,
+                    success: function (d) {
+                        self.finalCols
+                            .forEach(function (c) {
+                                let visible = d.colNames.includes(c.slot);
+                                c.visible = (c.primary === true || visible);
+                            });
+                    }
+                });
+            }
         }
         return {
             finalCols : finalCols,
