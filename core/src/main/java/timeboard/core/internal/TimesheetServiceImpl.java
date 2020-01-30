@@ -74,10 +74,9 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     @PreAuthorize("hasPermission(#accountTimesheet,'TIMESHEET_SUBMIT')")
     public SubmittedTimesheet submitTimesheet(
-            final Long orgID,
+            final Organization currentOrg,
             final Account actor,
             final Account accountTimesheet,
-            final Organization currentOrg,
             final int year,
             final int week)
             throws BusinessException {
@@ -152,7 +151,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.persist(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, orgID));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg.getId()));
 
         LOGGER.info("Timesheet for " + week + " submit for user"
                 + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
