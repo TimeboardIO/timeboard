@@ -1,10 +1,13 @@
 $(document).ready(function () {
 
-    const projectID = $("meta[name='projectID']").attr('value');
+    const _PROJECT_ID = $("meta[name='projectID']").attr('value');
+    const _BASE_URL = $("meta[name='baseURL']").attr('value');
 
     let app = new Vue({
         el: '#timesheetValidationApp',
+
         data: {
+            baseURL: _BASE_URL,
             timesheets : [],
             config: {
                 cols: [
@@ -62,7 +65,7 @@ $(document).ready(function () {
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: "projects/" + projectID + "/timesheets/listProjectMembersTimesheets",
+                url: "projects/" + _PROJECT_ID + "/timesheets/listProjectMembersTimesheets",
                 success: function (d) {
                     self.timesheets = d;
                     $('.ui.dimmer').removeClass('active');

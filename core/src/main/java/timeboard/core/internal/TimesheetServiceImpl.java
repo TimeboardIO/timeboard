@@ -29,6 +29,7 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
@@ -66,6 +67,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
+    @PreAuthorize("hasPermission(#accountTimesheet,'TIMESHEET_SUBMIT')")
     public SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
             final Account actor,
@@ -85,7 +87,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.set(Calendar.WEEK_OF_YEAR, week);
         previousWeek.set(Calendar.YEAR, year);
         previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
-        previousWeek.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
                 currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
@@ -144,7 +146,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.persist(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, orgID));
 
         LOGGER.info("Timesheet for " + week + " submit for user"
                 + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
@@ -153,6 +155,44 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     }
 
+
+    @Override
+    @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_VALIDATE')")
+    public SubmittedTimesheet validateTimesheet(final Account actor, //submittedTimesheet.getAccount()
+                                                final SubmittedTimesheet submittedTimesheet) throws BusinessException {
+
+        if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
+            throw new BusinessException("Can not validate unsubmitted weeks");
+        }
+        submittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
+
+        em.merge(submittedTimesheet);
+
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
+
+        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" validated for user"
+                + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
+
+
+        return submittedTimesheet;
+
+
+    }
+
+    @Override
+    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {
+
+        final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
+                + "where st.account = :user and st.year = :year " +
+                "and st.week = :week and st.organizationID = :orgID", SubmittedTimesheet.class);
+
+        q.setParameter("week", week);
+        q.setParameter("year", year);
+        q.setParameter("user", user);
+        q.setParameter("orgID", currentOrganization);
+
+        return Optional.ofNullable(q.getSingleResult());
+    }
 
     @Override
     public Optional<ValidationStatus> getTimesheetValidationStatus(

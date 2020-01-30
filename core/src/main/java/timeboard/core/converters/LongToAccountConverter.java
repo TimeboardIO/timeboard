@@ -1,10 +1,10 @@
-package timeboard.core.api.events;
+package timeboard.core.converters;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -12,10 +12,10 @@ package timeboard.core.api.events;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,36 +26,20 @@ package timeboard.core.api.events;
  * #L%
  */
 
-import timeboard.core.api.ProjectService;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Project;
-import timeboard.core.model.SubmittedTimesheet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.UserService;
+import timeboard.core.model.Account;
 
-import java.util.Date;
-import java.util.List;
+@Component
+public class LongToAccountConverter implements Converter<String, Account> {
 
+    @Autowired
+    private UserService service;
 
-public class TimesheetEvent extends TimeboardEvent {
-
-    private SubmittedTimesheet timesheet;
-
-    public TimesheetEvent(final SubmittedTimesheet timesheet, final ProjectService projectService, final long orgID) {
-        super(new Date());
-
-        this.timesheet = timesheet;
-
-        final List<Project> projects = projectService.listProjects(timesheet.getAccount(), orgID);
-
-        projects.forEach(project -> project.getMembers()
-                .stream()
-                .filter(member -> member.getRole() == MembershipRole.OWNER)
-                .forEach(member -> this.usersToNotify.add(member.getMember())));
-
-        usersToInform.add(timesheet.getAccount());
-    }
-
-
-    public SubmittedTimesheet getTimesheet() {
-        return timesheet;
+    @Override
+    public Account convert(final String aLong) {
+        return this.service.findUserByID(Long.parseLong(aLong));
     }
 }
