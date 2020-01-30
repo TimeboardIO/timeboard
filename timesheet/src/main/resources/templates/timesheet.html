@@ -112,6 +112,10 @@
 
             <div class="actions">
 
+                <a th:if="${backTo != null}"
+                   th:href="@{/projects/{projectID}/timesheets(projectID=${backTo})} "
+                   class="ui left labeled primary icon button"><i class="left arrow icon"></i><span>Back to list</span></a>
+
                 <!-- LABELS -->
                 <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
                     <div class="ui orange label" th:text="#{timesheet.status.pending.validation}">
