@@ -67,16 +67,15 @@ $(document).ready(function () {
                 event.target.classList.toggle('loading');
                 $.ajax({
                     type: "POST",
-                    dataType: "json",
                     contentType: "application/json",
                     url: "projects/" + _PROJECT_ID + "/timesheets/forceValidate/" + target.id + "/" + week.year + "/" + week.week,
                     data:  JSON.stringify(target.weeks),
-                    success: function (data) {
+                    success: function (data, textStatus, jqXHR)  {
                         event.target.classList.toggle('loading');
                         document.location.reload(true);
                     },
-                    error: function (data) {
-                        console.log(data);
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(errorThrown);
                     }
                 });
             },

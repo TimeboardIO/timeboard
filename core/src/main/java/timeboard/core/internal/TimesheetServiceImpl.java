@@ -166,6 +166,10 @@ public class TimesheetServiceImpl implements TimesheetService {
     public SubmittedTimesheet validateTimesheet(final Account actor, //submittedTimesheet.getAccount()
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
+        if (submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED)) {
+            //Do nothing
+            return submittedTimesheet;
+        }
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not validate unsubmitted weeks");
         }
@@ -332,7 +336,16 @@ public class TimesheetServiceImpl implements TimesheetService {
 
                 if (submittedTimesheet.isPresent()) {
 
-                  this.validateTimesheet(actor, submittedTimesheet.get());
+                    if(submittedTimesheet.get().getTimesheetStatus() == ValidationStatus.REJECTED) {
+                        // Timesheet Submission
+                        submittedTimesheet.get().setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
+                        em.persist(submittedTimesheet.get());
+                        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet.get(), projectService, currentOrg.getId()));
+                        LOGGER.info("Timesheet for " + currentWeek + " submit for user" + target.getScreenName() + " by user " + actor.getScreenName());
+                    }
+
+                    // Timesheet Validation
+                    this.validateTimesheet(actor, submittedTimesheet.get());
 
                 } else {
 
