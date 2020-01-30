@@ -35,10 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UpdatedTaskResult;
+import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
@@ -72,57 +69,63 @@ public class TimesheetController {
     protected String currentWeekTimesheet(
             final TimeboardAuthentication authentication, final Model model) throws Exception {
         final Calendar c = Calendar.getInstance();
-        return this.fillAndDisplayTimesheetPage(authentication, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+        return this.fillAndDisplayTimesheetPage(authentication,
+                authentication.getDetails(), c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
-    @GetMapping(value = "/data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{user}")
+    protected String currentWeekTimesheet(final TimeboardAuthentication authentication,
+                                          @PathVariable("user") final Account user,
+                                          final Model model) throws Exception {
+        final Calendar c = Calendar.getInstance();
+        return this.fillAndDisplayTimesheetPage(authentication, user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
+    }
+
+    @GetMapping(value="/data",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimesheetWrapper> getTimesheetData(
             final TimeboardAuthentication authentication,
+            final @RequestParam("user") Account user,
             final @RequestParam("week") int week,
             final @RequestParam("year") int year) throws BusinessException {
 
-        final Account currentAccount = authentication.getDetails();
+        final Account currentAccount = user;
+        final Long currentOrg =  authentication.getCurrentOrganization();
 
         final Calendar beginWorkDate = this.organizationService
-                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .findOrganizationMembership(currentAccount, currentOrg)
                 .get().getCreationDate();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
-
         final Calendar c = firstDayOfWeek(week, year);
-        final Date ds = findStartDate(c);
-        final Date de = findEndDate(c);
+        final Calendar firstDayOfWeek = findStartDate(c);
+        final Calendar lastDayOfWeek = findEndDate(c);
 
         // Create days for current week
-        final List<DateWrapper> days = createDaysForCurrentWeek(authentication, c, ds);
+        final List<DateWrapper> days = createDaysForCurrentWeek(currentOrg, currentAccount, c, firstDayOfWeek.getTime());
 
         //Get tasks for current week
         if (this.projectService != null) {
             this.projectService.listTasksByProject(
                     authentication.getCurrentOrganization(),
                     currentAccount,
-                    ds,
-                    de).stream().forEach(projectTasks -> {
+                    firstDayOfWeek.getTime(),
+                    lastDayOfWeek.getTime()).stream().forEach(projectTasks -> {
 
                 final List<TaskWrapper> tasks = new ArrayList<>();
-
-                projectTasks.getTasks().stream().forEach(task -> {
-                    tasks.add(new TaskWrapper(
-                            task.getId(), task.getName(),
+                projectTasks.getTasks().forEach(task -> {
+                    tasks.add(new TaskWrapper( task.getId(), task.getName(),
                             task.getComments(), task.getEffortSpent(),
                             task.getEffortLeft(), task.getOriginalEstimate(),
                             task.getRealEffort(), task.getStartDate(),
                             task.getEndDate(), task.getTaskStatus().name(),
                             task.getTaskType() != null ? task.getTaskType().getId() : 0)
                     );
-
                     days.forEach(dateWrapper -> {
                         final double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
                         imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                     });
                 });
-
                 projects.add(new ProjectWrapper(
                         projectTasks.getProject().getId(),
                         projectTasks.getProject().getName(),
@@ -130,46 +133,59 @@ public class TimesheetController {
             });
 
             //Default tasks
-            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, authentication.getCurrentOrganization(), imputations, ds, de, days);
-
-            projects.add(new ProjectWrapper(
-                    (long) 0,
-                    "Default Tasks",
-                    tasks));
+            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, currentOrg,
+                    imputations, firstDayOfWeek.getTime(), lastDayOfWeek.getTime(), days);
+            projects.add(new ProjectWrapper(0L, "Default Tasks", tasks));
         }
+        final boolean canValidate = this.projectService.isOwnerOfAnyUserProject(authentication.getDetails(), currentAccount);
+        final Calendar creationDate = this.organizationService
+                .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization())
+                .orElseThrow().getCreationDate();
+        creationDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+
+        final boolean isFirstWeek =
+                firstDayOfWeek.compareTo(creationDate) <= 0
+                && lastDayOfWeek.compareTo(creationDate) >= 0 ;
 
         final TimesheetWrapper ts = new TimesheetWrapper(
+                isFirstWeek ? ValidationStatus.PENDING_VALIDATION :
                 this.timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
+                        currentOrg,
                         currentAccount,
-                        year,
-                        week - 1).orElse(null),
+                        findPreviousWeekYear(c, week, year),
+                        findPreviousWeek(c, week, year)).orElse(null),
                 this.timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
+                        currentOrg,
                         currentAccount,
-                        year,
-                        week).orElse(null),
-                year,
-                week,
+                        year, week).orElse(null),
+                year, week,
                 beginWorkDate.get(Calendar.YEAR),
                 beginWorkDate.get(Calendar.WEEK_OF_YEAR),
-                days,
-                projects,
-                imputations);
+                days, projects, imputations, canValidate);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
     }
 
+
     @GetMapping("/{year}/{week}")
-    protected String fillAndDisplayTimesheetPage(
+    public String fillAndDisplayTimesheetPage(
             final TimeboardAuthentication authentication,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
-            final Model model) throws Exception {
+            final Model model) {
+        return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, model);
+    }
 
+    @GetMapping("/{user}/{year}/{week}")
+    public String fillAndDisplayTimesheetPage(
+            final TimeboardAuthentication authentication,
+            @PathVariable("user") final Account user,
+            @PathVariable("year") final int year,
+            @PathVariable("week") final int week,
+            final Model model) {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
-                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .findOrganizationMembership(user, authentication.getCurrentOrganization())
                 .get().getCreationDate();
 
         final Calendar c = beginWorkDateForCurrentOrg;
@@ -182,16 +198,17 @@ public class TimesheetController {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
 
-        final int lastWeek = this.findLastWeek(c, week, year);
-        final int lastWeekYear = this.findLastWeekYear(c, week, year);
+        final int lastWeek = this.findPreviousWeek(c, week, year);
+        final int lastWeekYear = this.findPreviousWeekYear(c, week, year);
 
         model.addAttribute("week", week);
         model.addAttribute("year", year);
+        model.addAttribute("userID", user.getId());
         model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekSubmitted",
                 this.timesheetService.getTimesheetValidationStatus(
                         authentication.getCurrentOrganization(),
-                        authentication.getDetails(),
+                        user,
                         lastWeekYear,
                         lastWeek));
 
@@ -199,8 +216,7 @@ public class TimesheetController {
 
         model.addAttribute("projectList",
                 this.projectService.listProjects(
-                        authentication.getDetails(),
-                        authentication.getCurrentOrganization()));
+                        user, authentication.getCurrentOrganization()));
 
         return "timesheet.html";
     }
@@ -263,6 +279,40 @@ public class TimesheetController {
     }
 
 
+    @GetMapping("/validate/{user}/{year}/{week}")
+    public ResponseEntity validateTimesheet(final TimeboardAuthentication authentication,
+                                            @PathVariable final Account user,
+                                            @PathVariable final int year,
+                                            @PathVariable final int week) {
+
+        final Account actor = authentication.getDetails();
+
+        if(! projectService.isOwnerOfAnyUserProject(actor, user)){
+            return ResponseEntity.badRequest().body("You have not enough right do do this.");
+        }
+        try {
+            final Optional<SubmittedTimesheet> submittedTimesheet =
+                    this.timesheetService.getSubmittedTimesheet(
+                            authentication.getCurrentOrganization(),
+                            actor,
+                            user,
+                            year,
+                            week);
+
+            if (submittedTimesheet.isPresent()) {
+                final SubmittedTimesheet result = this.timesheetService.validateTimesheet(actor, submittedTimesheet.get());
+                return ResponseEntity.ok(result.getTimesheetStatus());
+
+            } else {
+                return ResponseEntity.badRequest().body("Could not find this week. Was it submitted ?");
+            }
+        } catch (final Exception e) { // TimesheetException
+            LOGGER.error(e.getMessage(), e);
+            return ResponseEntity.badRequest().body("An error occurred when validating this week. ");
+        }
+    }
+
+
     private List<TaskWrapper> getDefaultTasks(final Account currentAccount,
                                               final Long orgID,
                                               final List<ImputationWrapper> imputations,
@@ -295,10 +345,10 @@ public class TimesheetController {
     }
 
     private List<DateWrapper> createDaysForCurrentWeek(
-            final TimeboardAuthentication authentication, final Calendar c, final Date ds) throws BusinessException {
+            final Long organization, final Account user,  final Calendar c, final Date ds) throws BusinessException {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
-                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization())
+                .findOrganizationMembership(user, organization)
                 .get().getCreationDate();
 
 
@@ -306,10 +356,7 @@ public class TimesheetController {
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
             if (c.getTime().getTime() >= beginWorkDateForCurrentOrg.getTime().getTime()) {
-                final DateWrapper dw = new DateWrapper(
-                        c.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.ENGLISH).substring(0, 3),
-                        c.getTime()
-                );
+                final DateWrapper dw = new DateWrapper( c.getTime() );
                 days.add(dw);
             }
             c.add(Calendar.DAY_OF_YEAR, 1);
@@ -330,30 +377,31 @@ public class TimesheetController {
         return c;
     }
 
-    private Date findStartDate(final Calendar c) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        return c.getTime();
+    private Calendar findStartDate(final Calendar c) {
+        final Calendar result = Calendar.getInstance();
+        result.setTime(c.getTime());
+        result.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        return result;
     }
 
-    private Date findEndDate(final Calendar c) {
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-        return c.getTime();
+    private Calendar findEndDate(final Calendar c) {
+        final Calendar result = Calendar.getInstance();
+        result.setTime(c.getTime());
+        result.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        return result;
     }
 
-    private int findLastWeekYear(final Calendar c, final int week, final int year) {
+    private int findPreviousWeekYear(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
-        if (c.get(Calendar.WEEK_OF_YEAR) > week) {
-            c.roll(Calendar.YEAR, -1);  // remove one year
-        }
+        c.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.YEAR);
     }
 
-    private int findLastWeek(final Calendar c, final int week, final int year) {
+    private int findPreviousWeek(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
-        c.roll(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        c.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.WEEK_OF_YEAR);
     }
 
@@ -372,18 +420,19 @@ public class TimesheetController {
 
     public static class TimesheetWrapper implements Serializable {
 
-        private final ValidationStatus previousWeekSubmissionStatus;
+        private final ValidationStatus previousWeekValidationStatus;
         private final ValidationStatus currentWeekValidationStatus;
         private final int year;
         private final int week;
         private final boolean disablePrev;
         private final boolean disableNext;
+        private final boolean canValidate;
         private final List<DateWrapper> days;
         private final List<ProjectWrapper> projects;
         private final List<ImputationWrapper> imputations;
 
         public TimesheetWrapper(
-                final ValidationStatus previousWeekSubmissionStatus,
+                final ValidationStatus previousWeekValidationStatus,
                 final ValidationStatus currentWeekValidationStatus,
                 final int year,
                 final int week,
@@ -391,27 +440,29 @@ public class TimesheetController {
                 final int beginWorkWeek,
                 final List<DateWrapper> days,
                 final List<ProjectWrapper> projects,
-                final List<ImputationWrapper> imputationWrappers
-        ) {
+                final List<ImputationWrapper> imputationWrappers,
+                final boolean canValidate
+                ) {
 
 
             final Calendar c = Calendar.getInstance();
             final int currentWeek = c.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = c.get(Calendar.YEAR);
 
-            this.previousWeekSubmissionStatus = previousWeekSubmissionStatus;
+            this.previousWeekValidationStatus = previousWeekValidationStatus;
             this.currentWeekValidationStatus = currentWeekValidationStatus;
             this.year = year;
             this.week = week;
             this.days = days;
+            this.canValidate = canValidate;
             this.disablePrev = year == beginWorkYear && week == beginWorkWeek;
             this.disableNext = year > currentYear || year == currentYear && week >= currentWeek;
             this.projects = projects;
             this.imputations = imputationWrappers;
         }
 
-        public ValidationStatus getPreviousWeekSubmissionStatus() {
-            return previousWeekSubmissionStatus;
+        public ValidationStatus getPreviousWeekValidationStatus() {
+            return previousWeekValidationStatus;
         }
 
         public ValidationStatus getCurrentWeekValidationStatus() {
@@ -430,11 +481,14 @@ public class TimesheetController {
             return days;
         }
 
+        public boolean isCanValidate() {
+            return canValidate;
+        }
+
+
         public Map<Long, ProjectWrapper> getProjects() {
             final Map<Long, ProjectWrapper> res = new HashMap<>();
-            this.projects.forEach(projectWrapper -> {
-                res.put(projectWrapper.getProjectID(), projectWrapper);
-            });
+            this.projects.forEach(projectWrapper -> res.put(projectWrapper.getProjectID(), projectWrapper));
             return res;
         }
 
@@ -442,11 +496,9 @@ public class TimesheetController {
 
             final Map<String, Map<Long, Double>> res = new HashMap<>();
 
-            this.imputations.stream().forEach(d -> {
+            this.imputations.forEach(d -> {
                 final String date = DATE_FORMAT.format(d.date);
-                if (res.get(date) == null) {
-                    res.put(date, new HashMap<>());
-                }
+                res.computeIfAbsent(date, k -> new HashMap<>());
                 res.get(date).put(d.taskID, d.value);
             });
 
@@ -467,16 +519,19 @@ public class TimesheetController {
 
     public static class DateWrapper implements Serializable {
 
-        private final String day;
+
+        private final int dayNum;
         private final Date date;
 
-        public DateWrapper(final String day, final Date date) {
-            this.day = day;
+        public DateWrapper(final Date date) {
+            final Calendar c = Calendar.getInstance();
             this.date = date;
+            c.setTime(date);
+            this.dayNum = c.get(Calendar.DAY_OF_WEEK);
         }
 
-        public String getDay() {
-            return day;
+        public int getDayNum() {
+            return dayNum;
         }
 
         public String getDate() {
@@ -507,9 +562,7 @@ public class TimesheetController {
         public Map<Long, TaskWrapper> getTasks() {
             final Map<Long, TaskWrapper> res = new HashMap<>();
 
-            this.tasks.forEach(taskWrapper -> {
-                res.put(taskWrapper.getTaskID(), taskWrapper);
-            });
+            this.tasks.forEach(taskWrapper -> res.put(taskWrapper.getTaskID(), taskWrapper));
 
             return res;
         }

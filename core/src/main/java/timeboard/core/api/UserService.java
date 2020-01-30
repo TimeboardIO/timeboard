@@ -111,4 +111,5 @@ public interface UserService {
     List<Account> createUsers(List<Account> usersList);
 
     Account findUserByLogin(String name);
+
 }
