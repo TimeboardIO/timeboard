@@ -9,8 +9,10 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title th:text="#{project.tab.timesheets}"></title>
+    <title th:text="#{project.tab.timesheets}"
+           ></title>
     <meta name="projectID" th:value="${project.id}"/>
+    <meta name="baseURL" th:value="@{/timesheet}"/>
     <style>
         .ui.accordion .accordion .active.content, .ui.accordion .active.content {
             display: table-row;
@@ -54,14 +56,10 @@
                         <td colspan="5">
                             <data-table v-bind:config="Object.assign({}, config)" v-bind:table="account.weeks">
                                 <template v-slot:week="{row}">
-                                    {{ row.week }}
+                                    <a class="ui button" ::href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week"> {{ row.week }} </a>
                                 </template>
                                 <template v-slot:period="{row}">
-                                    {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}
-                                </template>
-
-                                <template v-slot:submitted="{row}">
-                                    <div :class="{red:  !row.submitted, green: row.submitted}" class="ui circular label large "></div>
+                                    <a :href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week">  {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}</a>
                                 </template>
                                 <template v-slot:validated="{row}">
                                      <div :class="{red:  row.submitted && !row.validated, green: row.validated}" class="ui circular label large "></div>

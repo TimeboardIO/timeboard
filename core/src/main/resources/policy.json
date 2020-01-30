@@ -57,5 +57,17 @@
     "description": "Any user belonging to the project can see project members vacation requests",
     "target": "action == 'VACATION_TEAM_LIST'",
     "condition": "resource.isMember(subject.getDetails())"
+  },
+  {
+    "name": "User can submit his timesheet weeks",
+    "description": "Only user can submit his timesheet weeks",
+    "target": "action == 'TIMESHEET_SUBMIT'",
+    "condition": "subject.is(resource)"
+  },
+  {
+    "name": "Project owners can validate timesheet weeks of his project members",
+    "description": "Any project owner of user project can validate his weeks",
+    "target": "action == 'TIMESHEET_VALIDATE'",
+    "condition": "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource.getAccount())"
   }
 ]
