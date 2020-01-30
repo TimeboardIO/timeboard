@@ -908,6 +908,10 @@ table,
   border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
 }
 
+.calendar-cell {
+  width: 25px;
+}
+
 /** PROJECT **/
 
 .badge {

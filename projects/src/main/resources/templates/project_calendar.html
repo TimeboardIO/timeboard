@@ -31,14 +31,15 @@
             </a>
         </div>
 
-        <calendar v-for="(calendar, i) in teamCalendars"
-                  :name="calendar.name"
-                  :events="calendar.events"
-                  :show-header="i == 0"
-                  :year="year"
-                  :month="month">
-        </calendar>
-
+        <div style="overflow-x: scroll;" >
+            <calendar v-for="(calendar, i) in teamCalendars"
+                      :name="calendar.name"
+                      :events="calendar.events"
+                      :show-header="i == 0"
+                      :year="year"
+                      :month="month">
+            </calendar>
+        </div>
         <div class="ui segment">
             <div class="ui two column very relaxed grid">
                 <div class="column">
