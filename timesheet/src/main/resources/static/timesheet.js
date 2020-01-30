@@ -230,7 +230,7 @@ $(document).ready(function () {
             validateWeek: function (event) {
                 $.ajax({
                     method: "GET",
-                    url: "timesheet/validate?userID=" + _USER_ID + "&week=" + app.week + "&year=" + app.year,
+                    url: "timesheet/validate/" + _USER_ID + "/" + app.year + "/" + app.week,
                     success: function (weekValidationStatus, textStatus, jqXHR) {
                         app.submitted = true;
                         app.displaySuccessMessage("This timesheet have been validated successfully.");
