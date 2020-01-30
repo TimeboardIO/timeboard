@@ -65,11 +65,9 @@ $(document).ready(function () {
                 $.ajax({
                     type: "POST",
                     dataType: "json",
-                    url: "/projects/" + projectID + "/timesheets/forceValidate/" + week.year + "/" + week.week,
-                    data: {
-                        "id": target.id,
-                        "weeks": target.weeks
-                    },
+                    contentType: "application/json",
+                    url: "/projects/" + projectID + "/timesheets/forceValidate/" + target.id + "/" + week.year + "/" + week.week,
+                    data:  JSON.stringify(target.weeks),
                     success: function (data) {
                         event.target.classList.toggle('loading');
                     },

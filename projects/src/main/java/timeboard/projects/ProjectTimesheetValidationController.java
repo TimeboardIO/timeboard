@@ -192,18 +192,18 @@ public class ProjectTimesheetValidationController {
 
 
 
-    @PostMapping(value = "/forceValidate/{year}/{week}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/forceValidate/{targetID}/{selectedYear}/{selectedWeek}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity forceValidate(TimeboardAuthentication authentication,
                                                         @PathVariable final Long projectID,
                                                         @PathVariable final int selectedYear,
                                                         @PathVariable final int selectedWeek,
-                                                        //@PathVariable final UserWrapper targetWrapper,
-                                                        @ModelAttribute final UserWrapper targetWrapper) throws BusinessException {
+                                                        @PathVariable final Long targetID,
+                                                        @RequestBody final ArrayList<TimesheetWeekWrapper> weeks) throws BusinessException {
         try {
-            Account target = this.userService.findUserByID(targetWrapper.getId());
+            Account target = this.userService.findUserByID(targetID);
 
             TimesheetWeekWrapper olderTimesheetWrapper =
-                    targetWrapper.weeks.stream().min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
+                    weeks.stream().min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
                     .get();
 
             long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
@@ -236,6 +236,8 @@ public class ProjectTimesheetValidationController {
         private int week;
         private boolean isValidated;
         private boolean isSubmitted;
+
+        public TimesheetWeekWrapper(){}
 
         public TimesheetWeekWrapper(SubmittedTimesheet submittedTimesheet, boolean submitted) {
             this.id = submittedTimesheet.getId();
