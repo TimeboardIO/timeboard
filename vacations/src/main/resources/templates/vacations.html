@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{layouts/general.html(path='/account')}"
+<html layout:decorate="~{layouts/general.html(path='/vacation')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform"
       xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
@@ -32,7 +32,7 @@
                 {{ formError }}
             </div>
         </div>
-        <div class="ui top attached tabular menu">
+        <div class="ui attached tabular menu stackable container ">
             <a @click="activateTab('Requests') " :class="{ active : activeTab === 'Requests' }" class="item">
                 Requests
             </a>
@@ -134,18 +134,18 @@
                 <a v-else class="ui circular label">X</a>
             </template>
             <template v-slot:status="{row}">
-                <button v-if="row.status == 'ACCEPTED'"   class="ui disabled green icon button">
+                <span v-if="row.status == 'ACCEPTED'"   class="ui green icon label">
                     <i class="check icon"></i>
                     Accepted
-                </button>
-                <button v-else-if="row.status == 'REJECTED'" class="ui disabled negative icon button">
+                </span>
+                <span v-else-if="row.status == 'REJECTED'" class="ui negative icon label">
                     <i class="close icon"></i>
                     Rejected
-                </button>
-                <button v-else class="ui disabled yellow icon button">
+                </span>
+                <span v-else class="ui yellow icon label">
                     <i class="clock outline icon"></i>
                     Pending
-                </button>
+                </span>
             </template>
             <template v-slot:actions="{row}">
                 <button :class="{ disabled : (row.status !== 'ACCEPTED') && (new Date(row.end).getTime() < new Date().getTime()) }"
