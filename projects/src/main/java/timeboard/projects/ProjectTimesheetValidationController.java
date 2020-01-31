@@ -40,7 +40,6 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
-
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.*;
@@ -56,16 +55,16 @@ public class ProjectTimesheetValidationController {
     @Autowired
     public TimesheetService timesheetService;
 
+    private static long absoluteWeekNumber(int year, int week) {
+        return (long) (year * 53) + week;
+    }
+
     private static long absoluteWeekNumber(SubmittedTimesheet t) {
         return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
     }
 
     private static long absoluteWeekNumber(TimesheetWeekWrapper t) {
         return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
-    }
-
-    private static long absoluteWeekNumber(int year, int week) {
-        return (long) (year * 53) + week;
     }
 
     private static long absoluteWeekNumber(Calendar c) {
@@ -80,6 +79,22 @@ public class ProjectTimesheetValidationController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
+        model.addAttribute("currentUserID", 0);
+
+
+        return "project_timesheet_validation.html";
+    }
+
+    @GetMapping(value = "/{user}")
+    protected String timesheetValidationApp(TimeboardAuthentication authentication,
+                                            @PathVariable Long projectID, @PathVariable Account user, Model model) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+
+        model.addAttribute("project", project);
+        model.addAttribute("currentUserID", user.getId());
+
 
         return "project_timesheet_validation.html";
     }

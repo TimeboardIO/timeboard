@@ -40,6 +40,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,10 +66,10 @@ public class TimesheetController {
     private OrganizationService organizationService;
 
     @GetMapping
-    protected String currentWeekTimesheet(final TimeboardAuthentication authentication,  final HttpServletRequest request, final Model model) throws Exception {
+    protected String currentWeekTimesheet(final TimeboardAuthentication authentication, final Model model) throws Exception {
         final Calendar c = Calendar.getInstance();
         return this.fillAndDisplayTimesheetPage(authentication,
-                authentication.getDetails(), c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), request, model);
+                authentication.getDetails(), c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
     @GetMapping("/{user}")
@@ -77,7 +78,7 @@ public class TimesheetController {
                                           final HttpServletRequest request,
                                           final Model model) {
         final Calendar c = Calendar.getInstance();
-        return this.fillAndDisplayTimesheetPage(authentication, user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), request, model);
+        return this.fillAndDisplayTimesheetPage(authentication, user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
 
@@ -86,10 +87,9 @@ public class TimesheetController {
             final TimeboardAuthentication authentication,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
-            final HttpServletRequest request,
 
             final Model model) {
-        return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, request, model);
+        return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, model);
     }
 
     @GetMapping("/{user}/{year}/{week}")
@@ -98,7 +98,6 @@ public class TimesheetController {
             @PathVariable("user") final Account user,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
-            final HttpServletRequest request,
             final Model model) {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
@@ -122,6 +121,7 @@ public class TimesheetController {
         model.addAttribute("year", year);
         model.addAttribute("userID", user.getId());
         model.addAttribute("actorID", authentication.getDetails().getId());
+
         model.addAttribute("lastWeekSubmitted",
                 this.timesheetService.getTimesheetValidationStatus(
                         authentication.getCurrentOrganization(),
@@ -134,9 +134,6 @@ public class TimesheetController {
         model.addAttribute("projectList",
                 this.projectService.listProjects(
                         user, authentication.getCurrentOrganization()));
-
-
-        model.addAttribute("backTo", request.getParameter("backTo"));
 
 
         return "timesheet.html";

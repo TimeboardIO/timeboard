@@ -1,5 +1,6 @@
 const _PROJECT_ID = $("meta[name='projectID']").attr('value');
 const _BASE_URL = $("meta[name='baseURL']").attr('value');
+const _INITIAL_USER_ID = $("meta[name='currentUserID']").attr('value');
 
 $(document).ready(function () {
 
@@ -8,6 +9,7 @@ $(document).ready(function () {
 
         data: {
             baseURL: _BASE_URL,
+            currentUserID: _INITIAL_USER_ID,
             timesheets : [],
             config: {
                 cols: [
@@ -57,6 +59,10 @@ $(document).ready(function () {
                 else
                     isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
                 return isoWeekStart;
+            },
+            switchUser: function (userID) {
+              //  this.currentUserID = userID;
+                window.history.pushState('timesheet', 'timesheet', '/projects/'+_PROJECT_ID+'/timesheets/'+userID);
             }
         },
         mounted: function () {
