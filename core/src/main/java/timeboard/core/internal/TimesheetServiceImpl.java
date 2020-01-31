@@ -310,7 +310,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public void forceValidateTimesheets(Long organizationID, Account actor, Account target,
+    public void forceValidationTimesheets(Long organizationID, Account actor, Account target,
                                         int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException {
 
         final Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);

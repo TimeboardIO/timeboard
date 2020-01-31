@@ -175,8 +175,8 @@ public class ProjectTimesheetValidationController {
 
 
 
-    @PostMapping(value = "/forceValidate/{userSelectedID}/{selectedYear}/{selectedWeek}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity forceValidate(final TimeboardAuthentication authentication,
+    @PostMapping(value = "/forceValidation/{userSelectedID}/{selectedYear}/{selectedWeek}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity forceValidation(final TimeboardAuthentication authentication,
                                                         @PathVariable final Long projectID,
                                                         @PathVariable final int selectedYear,
                                                         @PathVariable final int selectedWeek,
@@ -194,7 +194,7 @@ public class ProjectTimesheetValidationController {
             final long olderAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(olderTimesheetWrapper.year, olderTimesheetWrapper.week);
 
             if(selectedAbsoluteWeekNumber >= olderAbsoluteWeekNumber) {
-                this.timesheetService.forceValidateTimesheets(
+                this.timesheetService.forceValidationTimesheets(
                         authentication.getCurrentOrganization(),
                         authentication.getDetails(),
                         target,

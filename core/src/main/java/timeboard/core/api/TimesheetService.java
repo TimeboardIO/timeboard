@@ -115,7 +115,7 @@ public interface TimesheetService {
      * @param olderYear      year of older week in the "validation timesheet week" list
      * @param olderWeek      week of older week in the "validation timesheet week" list
      */
-    void forceValidateTimesheets(Long organizationID, Account actor, Account target,
+    void forceValidationTimesheets(Long organizationID, Account actor, Account target,
                                  int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
 
     class TimesheetFilter<T> {

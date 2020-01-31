@@ -62,13 +62,13 @@ $(document).ready(function () {
                     isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
                 return isoWeekStart;
             },
-            forceValidate: function(event, target, week) {
+            forceValidation: function(event, target, week) {
                 let self = this;
                 event.target.classList.toggle('loading');
                 $.ajax({
                     type: "POST",
                     contentType: "application/json",
-                    url: "projects/" + _PROJECT_ID + "/timesheets/forceValidate/" + target.id + "/" + week.year + "/" + week.week,
+                    url: "projects/" + _PROJECT_ID + "/timesheets/forceValidation/" + target.id + "/" + week.year + "/" + week.week,
                     data:  JSON.stringify(target.weeks),
                     success: function (data, textStatus, jqXHR)  {
                         event.target.classList.toggle('loading');
