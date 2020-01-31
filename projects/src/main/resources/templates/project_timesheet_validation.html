@@ -9,11 +9,10 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title th:text="#{project.tab.timesheets}" ></title>
+    <title th:text="#{project.tab.timesheets}"
+           ></title>
     <meta name="projectID" th:value="${project.id}"/>
-    <meta name="currentUserID" th:value="${currentUserID}"/>
     <meta name="baseURL" th:value="@{/timesheet}"/>
-
     <style>
         .ui.accordion .accordion .active.content, .ui.accordion .active.content {
             display: table-row;
@@ -38,7 +37,7 @@
                     <div class="ui text loader" th:text="#{loading}" >Loading</div>
                 </div>
                 <template v-for="account in timesheets" >
-                    <tr :class="{active : account.id == currentUserID}" class="ui title" @click="switchUser(account.id)">
+                    <tr class="ui title">
                             <td>
                                 <i class="dropdown icon"></i>
                                 {{ account.name }}
@@ -53,14 +52,14 @@
                                 {{ account.lastApprovedDate }}
                             </td>
                     </tr>
-                    <tr :class="{active : account.id == currentUserID}" class="ui content">
+                    <tr class="ui content">
                         <td colspan="5">
                             <data-table v-bind:config="Object.assign({}, config)" v-bind:table="account.weeks">
                                 <template v-slot:week="{row}">
-                                    <a class="ui button" ::href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week" :target="account.id" > {{ row.week }} </a>
+                                    <a class="ui button" :href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week" :target="account.id"  > {{ row.week }} </a>
                                 </template>
                                 <template v-slot:period="{row}">
-                                    <a :href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week+" :target="account.id" >  {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}</a>
+                                    <a :href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week" :target="account.id" >  {{ 'From: ' + getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+ getDateOfWeek(row.week, row.year, 5).toDateString() }}</a>
                                 </template>
                                 <template v-slot:validated="{row}">
                                      <div :class="{red:  row.submitted && !row.validated, green: row.validated}" class="ui circular label large "></div>

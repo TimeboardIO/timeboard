@@ -66,7 +66,8 @@ public class TimesheetController {
     private OrganizationService organizationService;
 
     @GetMapping
-    protected String currentWeekTimesheet(final TimeboardAuthentication authentication, final Model model) throws Exception {
+    protected String currentWeekTimesheet(
+            final TimeboardAuthentication authentication, final Model model) throws Exception {
         final Calendar c = Calendar.getInstance();
         return this.fillAndDisplayTimesheetPage(authentication,
                 authentication.getDetails(), c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
@@ -75,69 +76,9 @@ public class TimesheetController {
     @GetMapping("/{user}")
     protected String currentWeekTimesheet(final TimeboardAuthentication authentication,
                                           @PathVariable("user") final Account user,
-                                          final HttpServletRequest request,
-                                          final Model model) {
+                                          final Model model) throws Exception {
         final Calendar c = Calendar.getInstance();
         return this.fillAndDisplayTimesheetPage(authentication, user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
-    }
-
-
-    @GetMapping("/{year}/{week}")
-    public String fillAndDisplayTimesheetPage(
-            final TimeboardAuthentication authentication,
-            @PathVariable("year") final int year,
-            @PathVariable("week") final int week,
-
-            final Model model) {
-        return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, model);
-    }
-
-    @GetMapping("/{user}/{year}/{week}")
-    public String fillAndDisplayTimesheetPage(
-            final TimeboardAuthentication authentication,
-            @PathVariable("user") final Account user,
-            @PathVariable("year") final int year,
-            @PathVariable("week") final int week,
-            final Model model) {
-
-        final Calendar beginWorkDateForCurrentOrg = this.organizationService
-                .findOrganizationMembership(user, authentication.getCurrentOrganization())
-                .get().getCreationDate();
-
-        final Calendar c = beginWorkDateForCurrentOrg;
-
-
-        c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.YEAR, year);
-        c.set(Calendar.HOUR_OF_DAY, 2);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        final int lastWeek = this.findPreviousWeek(c, week, year);
-        final int lastWeekYear = this.findPreviousWeekYear(c, week, year);
-
-        model.addAttribute("week", week);
-        model.addAttribute("year", year);
-        model.addAttribute("userID", user.getId());
-        model.addAttribute("actorID", authentication.getDetails().getId());
-
-        model.addAttribute("lastWeekSubmitted",
-                this.timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
-                        user,
-                        lastWeekYear,
-                        lastWeek));
-
-        model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
-
-        model.addAttribute("projectList",
-                this.projectService.listProjects(
-                        user, authentication.getCurrentOrganization()));
-
-
-        return "timesheet.html";
-
     }
 
     @GetMapping(value="/data",  produces = MediaType.APPLICATION_JSON_VALUE)
@@ -204,15 +145,15 @@ public class TimesheetController {
 
         final boolean isFirstWeek =
                 firstDayOfWeek.compareTo(creationDate) <= 0
-                        && lastDayOfWeek.compareTo(creationDate) >= 0 ;
+                && lastDayOfWeek.compareTo(creationDate) >= 0 ;
 
         final TimesheetWrapper ts = new TimesheetWrapper(
                 isFirstWeek ? ValidationStatus.PENDING_VALIDATION :
-                        this.timesheetService.getTimesheetValidationStatus(
-                                currentOrg,
-                                currentAccount,
-                                findPreviousWeekYear(c, week, year),
-                                findPreviousWeek(c, week, year)).orElse(null),
+                this.timesheetService.getTimesheetValidationStatus(
+                        currentOrg,
+                        currentAccount,
+                        findPreviousWeekYear(c, week, year),
+                        findPreviousWeek(c, week, year)).orElse(null),
                 this.timesheetService.getTimesheetValidationStatus(
                         currentOrg,
                         currentAccount,
@@ -223,6 +164,61 @@ public class TimesheetController {
                 days, projects, imputations, canValidate);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
+    }
+
+
+    @GetMapping("/{year}/{week}")
+    public String fillAndDisplayTimesheetPage(
+            final TimeboardAuthentication authentication,
+            @PathVariable("year") final int year,
+            @PathVariable("week") final int week,
+            final Model model) {
+        return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, model);
+    }
+
+    @GetMapping("/{user}/{year}/{week}")
+    public String fillAndDisplayTimesheetPage(
+            final TimeboardAuthentication authentication,
+            @PathVariable("user") final Account user,
+            @PathVariable("year") final int year,
+            @PathVariable("week") final int week,
+            final Model model) {
+
+        final Calendar beginWorkDateForCurrentOrg = this.organizationService
+                .findOrganizationMembership(user, authentication.getCurrentOrganization())
+                .get().getCreationDate();
+
+        final Calendar c = beginWorkDateForCurrentOrg;
+
+
+        c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.HOUR_OF_DAY, 2);
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+        c.set(Calendar.MILLISECOND, 0);
+
+        final int lastWeek = this.findPreviousWeek(c, week, year);
+        final int lastWeekYear = this.findPreviousWeekYear(c, week, year);
+
+        model.addAttribute("week", week);
+        model.addAttribute("year", year);
+        model.addAttribute("userID", user.getId());
+        model.addAttribute("actorID", authentication.getDetails().getId());
+        model.addAttribute("lastWeekSubmitted",
+                this.timesheetService.getTimesheetValidationStatus(
+                        authentication.getCurrentOrganization(),
+                        user,
+                        lastWeekYear,
+                        lastWeek));
+
+        model.addAttribute("taskTypes", this.organizationService.listTaskType(authentication.getCurrentOrganization()));
+
+        model.addAttribute("projectList",
+                this.projectService.listProjects(
+                        user, authentication.getCurrentOrganization()));
+
+        return "timesheet.html";
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -257,15 +253,15 @@ public class TimesheetController {
     }
 
     @GetMapping("/submit/{year}/{week}")
-    public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication,
-                          @PathVariable final int year,
-                          @PathVariable final int week) {
+     public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication,
+        @PathVariable final int year,
+        @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
 
+
         try {
             final Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
-
             final SubmittedTimesheet submittedTimesheet =
                     this.timesheetService.submitTimesheet(
                             currentOrg,
