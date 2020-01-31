@@ -40,7 +40,6 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.UserServiceImpl;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -53,7 +52,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/projects/{projectID}/timesheets")
 public class ProjectTimesheetValidationController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTimesheetValidationController.class);
 
     @Autowired
     public ProjectService projectService;
@@ -63,22 +62,6 @@ public class ProjectTimesheetValidationController {
 
     @Autowired
     public UserService userService;
-
-    private static long absoluteWeekNumber(SubmittedTimesheet t) {
-        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
-    }
-
-    private static long absoluteWeekNumber(TimesheetWeekWrapper t) {
-        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
-    }
-
-    private static long absoluteWeekNumber(int year, int week) {
-        return (long) (year * 53) + week;
-    }
-
-    private static long absoluteWeekNumber(Calendar c) {
-        return absoluteWeekNumber(c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
-    }
 
     @GetMapping
     protected String timesheetValidationApp(TimeboardAuthentication authentication,
@@ -134,11 +117,11 @@ public class ProjectTimesheetValidationController {
             final Optional<SubmittedTimesheet> lastValidatedSubmittedTimesheet = submittedTimesheets
                     .stream()
                     .filter(st -> st.getTimesheetStatus().equals(ValidationStatus.VALIDATED))
-                    .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
+                    .max(Comparator.comparingLong(timesheetService::absoluteWeekNumber));
 
             final Optional<SubmittedTimesheet> lastSubmittedTimesheet = submittedTimesheets
                     .stream()
-                    .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
+                    .max(Comparator.comparingLong(timesheetService::absoluteWeekNumber));
 
             // user have at least one non validated week.
             final SubmittedTimesheet t = lastValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
@@ -159,15 +142,15 @@ public class ProjectTimesheetValidationController {
     List<TimesheetWeekWrapper> generateSubmittedTimesheets(int firstYear, int firstWeek, List<SubmittedTimesheet> submittedTimesheets) {
 
         final List<TimesheetWeekWrapper> returnList = new LinkedList<>();
-        final long todayAbsoluteWeekNumber = absoluteWeekNumber(Calendar.getInstance());
+        final long todayAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(Calendar.getInstance());
         final Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, firstWeek);
         current.set(Calendar.YEAR, firstYear);
-        final long weekNumber = todayAbsoluteWeekNumber - absoluteWeekNumber(firstYear, firstWeek);
+        final long weekNumber = todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(firstYear, firstWeek);
         if (weekNumber <= 1) { //Min two weeks
             current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));
         }
-        while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
+        while (this.timesheetService.absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
             final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = current.get(Calendar.YEAR);
             final Optional<TimesheetWeekWrapper> existingWeek = submittedTimesheets
@@ -192,22 +175,23 @@ public class ProjectTimesheetValidationController {
 
 
 
-    @PostMapping(value = "/forceValidate/{targetID}/{selectedYear}/{selectedWeek}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity forceValidate(TimeboardAuthentication authentication,
+    @PostMapping(value = "/forceValidate/{userSelectedID}/{selectedYear}/{selectedWeek}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity forceValidate(final TimeboardAuthentication authentication,
                                                         @PathVariable final Long projectID,
                                                         @PathVariable final int selectedYear,
                                                         @PathVariable final int selectedWeek,
-                                                        @PathVariable final Long targetID,
+                                                        @PathVariable final Long userSelectedID,
                                                         @RequestBody final ArrayList<TimesheetWeekWrapper> weeks) throws BusinessException {
         try {
-            final Account target = this.userService.findUserByID(targetID);
+            final Account target = this.userService.findUserByID(userSelectedID);
 
             final TimesheetWeekWrapper olderTimesheetWrapper =
-                    weeks.stream().min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
+                    weeks.stream()
+                    .min(Comparator.comparingLong(t -> this.timesheetService.absoluteWeekNumber(t.getYear(), t.getWeek())))
                     .get();
 
-            final long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
-            final long olderAbsoluteWeekNumber = absoluteWeekNumber(olderTimesheetWrapper.year, olderTimesheetWrapper.week);
+            final long selectedAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(selectedYear, selectedWeek);
+            final long olderAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(olderTimesheetWrapper.year, olderTimesheetWrapper.week);
 
             if(selectedAbsoluteWeekNumber >= olderAbsoluteWeekNumber) {
                 this.timesheetService.forceValidateTimesheets(
@@ -303,11 +287,11 @@ public class ProjectTimesheetValidationController {
             this.weeks = weeks;
             this.lastSubmittedDate = weeks.stream()
                     .filter(TimesheetWeekWrapper::isSubmitted)
-                    .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
+                    .min(Comparator.comparingLong(t -> timesheetService.absoluteWeekNumber(t.getYear(), t.getWeek())))
                     .map(t -> calendarFromWeek(t.getYear(), t.getWeek()).getTime()).orElseGet(() -> null);
             this.lastApprovedDate = rawList.stream()
                     .filter(st -> st.getTimesheetStatus().equals(ValidationStatus.VALIDATED))
-                    .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
+                    .min(Comparator.comparingLong(timesheetService::absoluteWeekNumber))
                     .map(t -> calendarFromWeek(t.getYear(), t.getWeek()).getTime()).orElseGet(() -> null);
         }
 

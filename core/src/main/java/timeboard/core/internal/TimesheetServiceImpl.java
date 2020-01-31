@@ -66,11 +66,6 @@ public class TimesheetServiceImpl implements TimesheetService {
     private OrganizationService organizationService;
 
 
-    private static long absoluteWeekNumber(int year, int week) {
-        return (long) (year * 53) + week;
-    }
-
-
     @Override
     @PreAuthorize("hasPermission(#accountTimesheet,'TIMESHEET_SUBMIT')")
     public SubmittedTimesheet submitTimesheet(
@@ -163,7 +158,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_VALIDATE')")
-    public SubmittedTimesheet validateTimesheet(final Account actor, //submittedTimesheet.getAccount()
+    public SubmittedTimesheet validateTimesheet(final Account actor,
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
         if (submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED)) {
@@ -316,7 +311,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public void forceValidateTimesheets(Long organizationID, Account actor, Account target,
-                                        int selectedYear, int selectedWeek, int olderYear, int olderWeek) {
+                                        int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException {
 
         final Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
         final long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
@@ -325,55 +320,51 @@ public class TimesheetServiceImpl implements TimesheetService {
         current.set(Calendar.WEEK_OF_YEAR, olderWeek);
         current.set(Calendar.YEAR, olderYear);
 
-        while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= selectedAbsoluteWeekNumber) {
+        try {
 
-            final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
-            final int currentYear = current.get(Calendar.YEAR);
+            while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= selectedAbsoluteWeekNumber) {
 
-            final Optional<SubmittedTimesheet> submittedTimesheet =
-                    this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
+                final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
+                final int currentYear = current.get(Calendar.YEAR);
 
-            try {
+                final Optional<SubmittedTimesheet> submittedTimesheet =
+                        this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
 
                 if (submittedTimesheet.isPresent()) {
 
-                    if(submittedTimesheet.get().getTimesheetStatus() == ValidationStatus.REJECTED) {
-                        // Timesheet Submission
-                        submittedTimesheet.get().setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
-                        em.persist(submittedTimesheet.get());
-                        TimeboardSubjects.TIMESHEET_EVENTS.onNext(
-                                new TimesheetEvent(submittedTimesheet.get(), projectService, currentOrg.getId()));
-                        LOGGER.info("Timesheet for " + currentWeek + " submit for user" + target.getScreenName()
-                                + " by user " + actor.getScreenName());
-                    }
+                    final SubmittedTimesheet updatedSubmittedTimesheet = submittedTimesheet.get();
+                    updatedSubmittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
+                    em.merge(updatedSubmittedTimesheet);
 
-                    // Timesheet Validation
-                    this.validateTimesheet(actor, submittedTimesheet.get());
+                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(updatedSubmittedTimesheet,
+                            projectService, updatedSubmittedTimesheet.getOrganizationID()));
+                    LOGGER.info("Timesheet for " + updatedSubmittedTimesheet.getWeek()  + " of "+updatedSubmittedTimesheet.getYear()
+                            + " validated for user " + updatedSubmittedTimesheet.getAccount().getScreenName()
+                            + " by user " + actor.getScreenName());
+
 
                 } else {
 
-                    // Timesheet Submission
                     final SubmittedTimesheet newSubmittedTimesheet = new SubmittedTimesheet();
                     newSubmittedTimesheet.setAccount(target);
                     newSubmittedTimesheet.setYear(currentYear);
                     newSubmittedTimesheet.setWeek(currentWeek);
-                    newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
+                    newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
                     em.persist(newSubmittedTimesheet);
 
                     TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg.getId()));
-                    LOGGER.info("Timesheet for " + currentWeek + " submit for user" + target.getScreenName() + " by user " + actor.getScreenName());
-
-
-                    // Timesheet Validation
-                    this.validateTimesheet(actor, newSubmittedTimesheet);
+                    LOGGER.info("Timesheet " + currentWeek + " of " + currentYear
+                            + " submitted and validated for user " + target.getScreenName()
+                            + " by user " + actor.getScreenName());
 
                 }
 
-            } catch (Exception e) {
-                LOGGER.error(e.getMessage(), e);
+                current.add(Calendar.WEEK_OF_YEAR, 1);
             }
 
-            current.add(Calendar.WEEK_OF_YEAR, 1);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new TimesheetException("This force validation is impossible.");
         }
     }
 
