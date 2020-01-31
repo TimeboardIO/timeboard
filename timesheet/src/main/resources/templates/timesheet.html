@@ -14,7 +14,7 @@
           th:locale="#{locale}"
     />
 
-    <title th:text="${userScreenName}"></title>
+    <title th:text="${userScreenName + ' Timesheet'}"></title>
     <style> .hidden {
         display: none;
     } </style>
@@ -237,7 +237,7 @@
 
                         <tr v-for="(task, taskID) in project.tasks">
                             <td>{{ task.taskName }}</td>
-                            <td>{{ task.endDate }}</td>
+                            <td>{{  task.endDate !== null ? (new Date(task.endDate)).toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' }) : '' }}</td>
                             <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
                                 <i class="hourglass half icon"></i> Task pending manager validation
                             </td>
