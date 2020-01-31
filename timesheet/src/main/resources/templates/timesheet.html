@@ -13,6 +13,8 @@
           th:actorID="${actorID}"
           th:locale="#{locale}"
     />
+
+    <title th:text="${userScreenName}"></title>
     <style> .hidden {
         display: none;
     } </style>
@@ -179,7 +181,9 @@
                 <table class="ui celled table" style="text-align:center">
                     <thead>
                     <tr class="days">
-                        <th class="two wide"></th>
+                        <th class="two wide" colspan="2">
+                            <label th:text="${userScreenName}" v-if="!userIsActor"></label>
+                        </th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
                             {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{
                             new Date(day.date).getDate() }}
@@ -189,6 +193,7 @@
 
                     <tr class="timesheet-head">
                         <th class="two wide" th:text="#{tasks}">Tasks</th>
+                        <th class="two wide" >End Date</th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
                             <div v-if="(day.dayNum != 7) && (day.dayNum != 1)"
                                  v-bind:id="day.date"
@@ -225,13 +230,14 @@
                     <tbody>
                     <template v-for="(project, projectID) in projects">
                         <tr>
-                            <td class="ui header left aligned project" v-bind:colspan="days.length + 5">
+                            <td class="ui header left aligned project" v-bind:colspan="days.length + 6">
                                 <a v-bind:href="'/projects/'+project.projectID+'/setup'">{{ project.projectName }}</a>
                             </td>
                         </tr>
 
                         <tr v-for="(task, taskID) in project.tasks">
                             <td>{{ task.taskName }}</td>
+                            <td>{{ task.endDate }}</td>
                             <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
                                 <i class="hourglass half icon"></i> Task pending manager validation
                             </td>
