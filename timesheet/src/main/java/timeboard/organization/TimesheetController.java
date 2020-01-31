@@ -40,7 +40,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
