@@ -28,29 +28,29 @@ Vue.component('calendar', {
         }
     },
     template: `
-        <table style="margin: 0; table-layout:fixed;" class="ui celled table calendar">
-            <tr v-if="showHeader === true">
-              <th style="width: 10rem; white-space: nowrap;"  v-if="showColName === true" ></th>
-              <th v-for="day in daysInMonth" v-bind:data-label="day.date.toDateString()" >{{ day.date.getDate() }}</th>    
-              
-              <th v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)"></th>        
-            </tr>
-            <tr>
-              <td style="width: 10rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
-              <td v-for="day in daysInMonth" v-bind:style="[
-               (day.morningEvent !== undefined && selectColor(day.morningEvent)) ? {'background-color' : selectColor(day.morningEvent) } : {},
-               (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {} 
-               ] " v-bind:data-label="day.date.toDateString()" ></td>  
-              
-               <td v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)" rowspan="2"></td>        
-            </tr>
-            <tr>
-              <td v-for="day in daysInMonth" v-bind:style="[
-               (day.afternoonEvent !== undefined && selectColor(day.afternoonEvent)) ? {'background-color' : selectColor(day.afternoonEvent) } : {},
-               (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {} 
-               ] " v-bind:data-label="day.date.toDateString()" ></td>        
-            </tr>
-        </table>
+            <table style="margin: 0; table-layout:fixed;" class="ui celled table unstackable calendar">
+                <tr v-if="showHeader === true">
+                  <th style="width: 10rem; white-space: nowrap;"  v-if="showColName === true" ></th>
+                  <th class="calendar-cell" v-for="day in daysInMonth" v-bind:data-label="day.date.toDateString()" >{{ day.date.getDate() }}</th>    
+                  
+                  <th v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)"></th>        
+                </tr>
+                <tr>
+                  <td style="width: 10rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
+                  <td class="calendar-cell" v-for="day in daysInMonth" v-bind:style="[
+                   (day.morningEvent !== undefined && selectColor(day.morningEvent)) ? {'background-color' : selectColor(day.morningEvent) } : {},
+                   (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {} 
+                   ] " v-bind:data-label="day.date.toDateString()" ></td>  
+                  
+                   <td class="calendar-cell" v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)" rowspan="2"></td>        
+                </tr>
+                <tr>
+                  <td class="calendar-cell" v-for="day in daysInMonth" v-bind:style="[
+                   (day.afternoonEvent !== undefined && selectColor(day.afternoonEvent)) ? {'background-color' : selectColor(day.afternoonEvent) } : {},
+                   (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {} 
+                   ] " v-bind:data-label="day.date.toDateString()" ></td>        
+                </tr>
+            </table>
        `,
     computed: {
         daysInMonth : function() {
@@ -95,7 +95,7 @@ Vue.component('year-calendar', {
         }
     },
     template: `
-        <div>
+        <div style="overflow-x: scroll;">
             <calendar v-for="month in monthsInYear" :name="monthNames[month]" :show-header="month === 0" :year="year" :month="month" :events="events"></calendar>
         </div>
        `,

@@ -64,6 +64,7 @@ let app = new Vue({
         vacationRequest: Object.assign({}, emptyVacationRequest),
         calendarData : [],
         calendarYear : 2020,
+        activeTab: 'Requests',
         myRequestsListConfig: {
             cols: [
                 {
@@ -161,6 +162,9 @@ let app = new Vue({
         toValidateRequestsListData: []
     },
     methods:  {
+        activateTab: function(tabName) {
+            this.activeTab = tabName;
+        },
         openModal: function() {
             this.vacationRequest = Object.assign({}, emptyVacationRequest);
             this.vacationRequest.recursive = false;
