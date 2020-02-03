@@ -173,9 +173,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" validated for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
 
-
         return submittedTimesheet;
-
     }
 
     @Override
@@ -195,9 +193,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" rejected for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
 
-
         return submittedTimesheet;
-
     }
 
 
