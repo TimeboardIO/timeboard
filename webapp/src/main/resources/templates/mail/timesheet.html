@@ -7,11 +7,11 @@
 <body>
 <div th:fragment="timesheet">
     <table align="left" border="0" cellpadding="0" cellspacing="0" class="col380" style="width: 100%; max-width: 800px;"
-           th:if="${timesheetSubmitted.length > 0 || timesheetValidated.length > 0}">
+           th:if="${timesheetSubmitted.length > 0 || timesheetRejected.length > 0 || timesheetValidated.length > 0}">
         <tr th:if="${timesheetSubmitted.length > 0}">
             <td class=" title bodycopy " style="font-size:30px"><b>Timesheet Submission</b></td>
         </tr>
-        <tr th:if="${timesheetSubmitted.length > 0}">>
+        <tr th:if="${timesheetSubmitted.length > 0}">
             <td class=" bodycopy borderbottom" style="text-align:center;">These users have submitted their timesheet</td>
         </tr>
         <tr th:each="ts : ${timesheetSubmitted}">
@@ -54,6 +54,51 @@
                 </table>
             </td>
         </tr>
+
+
+        <tr th:if="${timesheetRejected.length > 0}">
+            <td class=" title bodycopy " style="font-size:30px"><b>Timesheet Rejected</b></td>
+        </tr>
+        <tr th:each="tr : ${timesheetRejected}">
+            <td class="borderbottom">
+                <table border="0" cellpadding="4" cellspacing="2" width="100%">
+                    <tr>
+                        <td class="bodycopy center">
+                            <table>
+                                <tr>
+                                    <td><b>User</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${tr.account.firstName}"></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${tr.account.name}"></td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy">
+                            <table>
+                                <tr>
+                                    <td style="text-align: center;"><b>Week</b></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${tr.week}"></td>
+                                </tr>
+                                <tr>
+                                    <td th:text="${tr.year}"></td>
+                                </tr>
+                            </table>
+
+                        </td>
+                        <td class="bodycopy ">
+                            <div class="circle">OK</div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
 
         <tr th:if="${timesheetValidated.length > 0}">
             <td class=" title bodycopy " style="font-size:30px"><b>Timesheet Validation</b></td>
@@ -98,7 +143,6 @@
                 </table>
             </td>
         </tr>
-
     </table>
 </div>
 

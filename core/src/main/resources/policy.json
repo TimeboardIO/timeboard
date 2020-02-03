@@ -69,5 +69,11 @@
     "description": "Any project owner of user project can validate his weeks",
     "target": "action == 'TIMESHEET_VALIDATE'",
     "condition": "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource.getAccount())"
+  },
+  {
+    "name": "Project owners can reject timesheet weeks of his project members",
+    "description": "Any project owner of user project can reject his weeks",
+    "target": "action == 'TIMESHEET_REJECT'",
+    "condition": "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource.getAccount())"
   }
 ]
