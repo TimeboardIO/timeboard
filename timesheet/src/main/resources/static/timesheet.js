@@ -113,7 +113,6 @@ const timesheetModel = {
                 'imputation': val
             }),
             contentType: "application/json",
-            dataType: "json",
         });
     }
 };
@@ -247,12 +246,17 @@ $(document).ready(function () {
                 $(event.target).parent().addClass('left icon loading').removeClass('error');
                 const taskID = $(event.target).attr('data-task-effortLeft');
                 const val = $(event.target).val();
+                const self = this;
                 this.updateTask(null, taskID, 'effortLeft', val)
-                    .then(function (updateTask) {
+                    .done(function (updateTask) {
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
+                        $(event.target).parent().removeClass('left icon loading');
+                    })
+                    .fail(function (errorMessage) {
+                        self.displayErrorMessage(errorMessage.responseText);
                         $(event.target).parent().removeClass('left icon loading');
                     });
             },
@@ -274,13 +278,18 @@ $(document).ready(function () {
                 }
                 if (currentSum + (newval - oldVal) <= 1.0) {
                     $(event.target).val(newval);
+                    const self = this;
                     this.updateTask(date, taskID, 'imputation', newval)
-                        .then(function (updateTask) {
+                        .done(function (updateTask) {
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
                             app.imputations[date][taskID] = newval;
+                            $(event.target).parent().removeClass('left icon loading');
+                        })
+                        .fail(function (errorMessage) {
+                            self.displayErrorMessage(errorMessage.responseText);
                             $(event.target).parent().removeClass('left icon loading');
                         });
                 } else {
