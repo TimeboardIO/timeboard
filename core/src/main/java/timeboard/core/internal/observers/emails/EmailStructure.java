@@ -26,21 +26,70 @@ package timeboard.core.internal.observers.emails;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EmailStructure {
 
     private List<String> targetUserList;
     private List<String> targetCCUserList;
     private String subject;
-    private String message;
+    private String template;
+    private Map<String, Object> model;
+
+    private EmailStructure(final String subject) {
+        this.model = new HashMap<>();
+        this.targetUserList = new ArrayList<>();
+        this.targetCCUserList = new ArrayList<>();
+        this.template = "mail/simple.html";
+        this.subject = subject;
+        this.model.put("message", "");
+    }
+
 
     public EmailStructure(final List<String> targetUserList, final List<String> targetCCUserList, final String subject, final String message) {
+        this(subject);
         this.targetUserList = targetUserList;
         this.targetCCUserList = targetCCUserList;
-        this.subject = subject;
-        this.message = message;
+        this.model.put("message", message);
+
     }
+
+    public EmailStructure(final List<String> targetUserList, final List<String> targetCCUserList,
+                          final String subject, Map<String, Object> model, final String template) {
+        this(targetUserList, targetCCUserList, subject, "");
+        this.template = template;
+        this.model = model;
+    }
+
+    public EmailStructure(final String targetUser, final String subject, final String message) {
+        this(targetUser, null, subject, message);
+    }
+
+
+    public EmailStructure(final String targetUser, final String targetCCUser, final String subject, final String message) {
+        this(subject);
+        this.targetUserList.add(targetUser);
+        if (targetCCUser !=null) {
+            this.targetCCUserList.add(targetCCUser);
+        }
+        this.model.put("message", message);
+        this.template = "mail/simple.html";
+    }
+
+    public EmailStructure(final String targetUser, final String targetCCUser, final String subject, Map<String, Object> model, final String template) {
+        this(subject);
+        this.targetUserList.add(targetUser);
+        if (targetCCUser !=null) {
+            this.targetCCUserList.add(targetCCUser);
+        }
+        this.template = template;
+        this.model = model;
+    }
+
+
 
     public List<String> getTargetUserList() {
         return targetUserList;
@@ -66,11 +115,19 @@ public class EmailStructure {
         this.subject = subject;
     }
 
-    public String getMessage() {
-        return message;
+    public String getTemplate() {
+        return template;
     }
 
-    public void setMessage(final String message) {
-        this.message = message;
+    public void setTemplate(String template) {
+        this.template = template;
+    }
+
+    public Map<String, Object> getModel() {
+        return model;
+    }
+
+    public void setModel(Map<String, Object> model) {
+        this.model = model;
     }
 }

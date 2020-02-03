@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
 import timeboard.core.internal.observers.emails.EmailStructure;
+import timeboard.core.internal.observers.emails.TemplateGenerator;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -58,6 +59,7 @@ public class EmailServiceImpl implements EmailService {
     @Value("${timeboard.smtp.password}")
     private String password;
 
+    private TemplateGenerator templateGenerator = new TemplateGenerator();
 
     @Override
     public void sendMessage(final EmailStructure emailStructure) throws MessagingException {
@@ -69,10 +71,12 @@ public class EmailServiceImpl implements EmailService {
 
         final Session session = Session.getInstance(props, null);
 
+        final String message = templateGenerator.getTemplateString(emailStructure.getTemplate(), emailStructure.getModel());
+
         final MimeMessage msg = new MimeMessage(session);
-        msg.setSubject(emailStructure.getSubject());
+        msg.setSubject("[Timeboard] " + emailStructure.getSubject());
         msg.setFrom(new InternetAddress(fromEmail));
-        msg.setContent(emailStructure.getMessage(), "text/html; charset=utf-8");
+        msg.setContent(message, "text/html; charset=utf-8");
 
         final List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList()
                 .stream().distinct().collect(Collectors.toList());

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{mail/global.html(path='/projects')}"
+       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+       xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title layout:fragment="title">Home Page</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <tr>
+        <td class="innerpadding borderbottom">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td class="bodycopy" th:text="message">
+
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</div>
+</body>
+</html>

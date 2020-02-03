@@ -35,12 +35,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.EmailService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.observers.emails.EmailStructure;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
+import javax.mail.MessagingException;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.*;
@@ -55,6 +58,9 @@ public class ProjectTimesheetValidationController {
 
     @Autowired
     public TimesheetService timesheetService;
+
+    @Autowired
+    public EmailService emailService;
 
     private static long absoluteWeekNumber(SubmittedTimesheet t) {
         return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
@@ -83,6 +89,27 @@ public class ProjectTimesheetValidationController {
 
         return "project_timesheet_validation.html";
     }
+
+
+    @GetMapping(value = "/sendReminderMail/{targetUser}")
+    public String sendReminderMail(
+            final TimeboardAuthentication authentication, final Model model, @PathVariable Account targetUser) throws MessagingException {
+
+        final Account actor = authentication.getDetails();
+
+       final HashMap<String, Object> data =  new HashMap<>();
+        model.addAttribute("message", "Test");
+        data.put("message", "Test");
+
+        final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
+
+       this.emailService.sendMessage(structure);
+
+       // return ResponseEntity.ok().build();
+
+        return "mail/reminder.html";
+    }
+
 
     @GetMapping(value = "/listProjectMembersTimesheets", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,
