@@ -229,13 +229,29 @@ $(document).ready(function () {
             },
             validateWeek: function (event) {
                 $.ajax({
-                    method: "GET",
+                    method: "POST",
                     url: "timesheet/validate/" + _USER_ID + "/" + app.year + "/" + app.week,
                     success: function (weekValidationStatus, textStatus, jqXHR) {
                         app.submitted = true;
                         app.displaySuccessMessage("This timesheet have been validated successfully.");
                         app.updateTimesheet();
                         app.currentWeekValidationStatus = ValidationStatus.VALIDATED;
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        app.displayErrorMessage("Error can not validate this timesheet. " + textStatus);
+                    }
+                });
+            },
+            rejectWeek: function (event) {
+                $.ajax({
+                    method: "POST",
+                    url: "timesheet/reject/" + _USER_ID + "/" + app.year + "/" + app.week,
+                    success: function (weekValidationStatus, textStatus, jqXHR) {
+                        app.submitted = false;
+                        app.displaySuccessMessage("This timesheet have been rejected successfully.");
+                        app.updateTimesheet();
+                        app.currentWeekValidationStatus = ValidationStatus.REJECTED;
 
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
