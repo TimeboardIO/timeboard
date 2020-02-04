@@ -65,6 +65,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
+    private static final String PROJECT_CREATE = "PROJECT_CREATE";
+    private static final String PROJECT_SETUP = "PROJECT_SETUP";
+    private static final String PROJECT_ARCHIVE = "PROJECT_ARCHIVE";
+    private static final String PROJECT_LIST = "PROJECT_LIST";
+
+    private static final String TASK_LIST = "TASK_LIST";
+
     @Value("${timeboard.tasks.default.vacation}")
     private String defaultVacationTaskName;
 
@@ -96,7 +103,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(null,'PROJECTS_CREATE')")
+    @PreAuthorize("hasPermission(null,'" + PROJECT_CREATE + "')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     @CacheEvict(value = "accountProjectsCache", key = "#owner.getId()")
     public Project createProject(final Long orgID, final Account owner, final String projectName) {
@@ -118,6 +125,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(null,'" + PROJECT_LIST + "')")
     @Cacheable(value = "accountProjectsCache", key = "#candidate.getId()")
     public List<Project> listProjects(final Account candidate, final Long orgID) {
         final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
@@ -127,6 +135,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PostAuthorize("hasPermission(returnObject,'" + PROJECT_SETUP + "')")
     public Project getProjectByID(final Account actor, final Long orgID, final Long projectId) {
         final Project data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
                 .setParameter("user", actor)
@@ -174,23 +183,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Project getProjectByIdWithAllMembers(final Account actor, final Long projectId) throws BusinessException {
-        final Project project = em.createQuery("select p from Project p where p.id = :projectId", Project.class)
-                .setParameter("projectId", projectId)
-                .getSingleResult();
-        final RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMember());
-        final Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
-
-        return project;
-
-    }
-
-    @Override
-    @PreAuthorize("hasPermission(#project,'PROJECTS_ARCHIVE')")
+    @PreAuthorize("hasPermission(#project,'" + PROJECT_ARCHIVE + "')")
     @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project archiveProjectByID(final Account actor, final Project project) throws BusinessException {
         final RuleSet<Project> ruleSet = new RuleSet<>();
@@ -208,7 +201,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#project,'PROJECT_SETUP')")
+    @PreAuthorize("hasPermission(#project,'" + PROJECT_SETUP + "')")
     @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project updateProject(final Account actor, final Project project) throws BusinessException {
         final RuleSet<Project> ruleSet = new RuleSet<>();
@@ -279,6 +272,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#project,'" + TASK_LIST + "')")
     public List<Task> listProjectTasks(final Account actor, final Project project) throws BusinessException {
 
         final RuleSet<Project> ruleSet = new RuleSet<>();
@@ -379,9 +373,6 @@ public class ProjectServiceImpl implements ProjectService {
         LOGGER.info("User " + actor + " updated " + taskList.size() + " tasks ");
         em.flush();
 
-        /*taskList.stream().forEach(task -> {
-            TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.UPDATE, task, actor));
-        });*/
     }
 
     @Override
@@ -440,54 +431,6 @@ public class ProjectServiceImpl implements ProjectService {
         return Optional.ofNullable(task);
     }
 
-    @Override
-    public List<UpdatedTaskResult> updateTaskImputations(final Long orgID, final Account actor, final List<Imputation> imputationsList) {
-        final List<UpdatedTaskResult> result = new ArrayList<>();
-        for (final Imputation imputation : imputationsList) {
-            UpdatedTaskResult updatedTaskResult = null;
-            try {
-                updatedTaskResult = this.updateTaskImputation(orgID, actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
-            } catch (final BusinessException e) {
-                LOGGER.error(e.getMessage());
-            }
-            result.add(updatedTaskResult);
-        }
-        em.flush();
-        return result;
-    }
-
-    @Override
-    public UpdatedTaskResult updateTaskImputation(
-            final Long orgID,
-            final Account actor,
-            final AbstractTask task,
-            final Date day,
-            final double val) throws BusinessException {
-        final Calendar c = Calendar.getInstance();
-        c.setTime(day);
-
-        final ValidationStatus timesheetSubmitted = this.timesheetService.getTimesheetValidationStatus(
-                orgID,
-                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR)).orElse(null);
-
-        if (task instanceof Task) {
-            if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
-                return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
-            } else {
-                final Task projectTask = (Task) task;
-                return new UpdatedTaskResult(projectTask.getProject().getId(),
-                        projectTask.getId(), projectTask.getEffortSpent(),
-                        projectTask.getEffortLeft(), projectTask.getOriginalEstimate(),
-                        projectTask.getRealEffort());
-            }
-        } else {
-            if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
-                return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
-            } else {
-                return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
-            }
-        }
-    }
 
     @Override
     public Optional<Imputation> getImputation(final Account user, final DefaultTask task, final Date day) {
@@ -495,60 +438,8 @@ public class ProjectServiceImpl implements ProjectService {
         return Optional.ofNullable(existingImputation);
     }
 
-
-    private UpdatedTaskResult updateProjectTaskImputation(final Account actor,
-                                                          final Task task,
-                                                          final Date day,
-                                                          final double val,
-                                                          final Calendar calendar) throws BusinessException {
-
-        final Task projectTask = (Task) this.getTaskByID(actor, task.getId());
-
-
-        if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
-            final Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), projectTask, actor);
-            final double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
-
-            this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
-            final Task updatedTask = em.find(Task.class, projectTask.getId());
-            final double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
-            updatedTask.setEffortLeft(newEffortLeft);
-
-            LOGGER.info("User " + actor.getScreenName()
-                    + " updated imputations for task "
-                    + projectTask.getId() + " (" + day + ") in project "
-                    + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
-
-            em.merge(updatedTask);
-            em.flush();
-
-            return new UpdatedTaskResult(updatedTask.getProject().getId(),
-                    updatedTask.getId(), updatedTask.getEffortSpent(),
-                    updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(),
-                    updatedTask.getRealEffort());
-        }
-        return null;
-    }
-
-    public UpdatedTaskResult updateDefaultTaskImputation(final Account actor,
-                                                         final DefaultTask task,
-                                                         final Date day, final double val, final Calendar calendar) throws BusinessException {
-
-        final DefaultTask defaultTask = (DefaultTask) this.getTaskByID(actor, task.getId());
-
-        // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
-        final Imputation existingImputation = this.getImputationByDayByTask(em, calendar.getTime(), defaultTask, actor);
-        this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime());
-
-        em.flush();
-        LOGGER.info("User " + actor.getScreenName() + " updated imputations for default task "
-                + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
-
-        return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
-
-    }
-
-    protected Imputation getImputationByDayByTask(final EntityManager entityManager, final Date day, final AbstractTask task, final Account account) {
+    @Override
+    public Imputation getImputationByDayByTask(final EntityManager entityManager, final Date day, final AbstractTask task, final Account account) {
         final TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  " +
                 "where i.task.id = :taskID and i.day = :day and i.account = :account", Imputation.class);
         q.setParameter("taskID", task.getId());
@@ -557,54 +448,6 @@ public class ProjectServiceImpl implements ProjectService {
         return q.getResultList().stream().findFirst().orElse(null);
     }
 
-    public void actionOnImputation(final Imputation imputation,
-                                   final AbstractTask task,
-                                   final Account actor,
-                                   final double val,
-                                   final Date date) {
-
-        if (imputation == null) {
-            //No imputation for current task and day
-            final Imputation localImputation = new Imputation();
-            localImputation.setDay(date);
-            localImputation.setTask(task);
-            localImputation.setAccount(actor);
-            localImputation.setValue(val);
-            em.persist(localImputation);
-        } else {
-            // There is an existing imputation for this day and task
-            if (val == 0) {
-                //if value equal to 0 then remove imputation
-                final Long imputationID = imputation.getId();
-                task.getImputations().removeIf(i -> i.getId() == imputationID);
-                em.remove(imputation);
-                em.merge(task);
-            } else {
-                imputation.setValue(val);
-                // else save new value
-                em.persist(imputation);
-            }
-        }
-        em.flush();
-    }
-
-    private double updateEffortLeftFromImputationValue(
-            final double currentEffortLeft,
-            final double currentImputationValue,
-            final double newImputationValue) {
-
-        double newEL = currentEffortLeft; // new effort left
-        final double diffValue = Math.abs(newImputationValue - currentImputationValue);
-
-        if (currentImputationValue < newImputationValue) {
-            newEL = currentEffortLeft - diffValue;
-        }
-        if (currentImputationValue > newImputationValue) {
-            newEL = currentEffortLeft + diffValue;
-        }
-
-        return Math.max(newEL, 0);
-    }
 
     @Override
     public UpdatedTaskResult updateTaskEffortLeft(final Account actor, final Task task, final double effortLeft) throws BusinessException {

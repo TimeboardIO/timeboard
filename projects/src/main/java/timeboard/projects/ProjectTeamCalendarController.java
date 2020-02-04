@@ -82,7 +82,7 @@ public class ProjectTeamCalendarController {
                                                                      @PathVariable final Integer yearNum,
                                                                      @PathVariable final Integer monthNum) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         // get existing vacation request for month/year
         final Map<Account, List<VacationRequest>> accountVacationRequestMap

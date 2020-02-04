@@ -93,7 +93,6 @@ public class Project extends OrganizationEntity implements Serializable {
     @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
-
     @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectTag> tags;
 
@@ -237,5 +236,10 @@ public class Project extends OrganizationEntity implements Serializable {
         } else {
             return "#957DAD";
         }
+    }
+
+    @Override
+    public String toString() {
+        return "project("+this.getId()+") - "+this.getName();
     }
 }

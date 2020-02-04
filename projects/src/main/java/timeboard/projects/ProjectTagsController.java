@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{projectID}/tags")
-public class ProjectTagsController extends ProjectBaseController{
+public class ProjectTagsController extends ProjectBaseController {
 
     @Autowired
     private ProjectService projectService;

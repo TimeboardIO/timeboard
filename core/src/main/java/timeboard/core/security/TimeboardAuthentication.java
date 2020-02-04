@@ -122,4 +122,8 @@ public class TimeboardAuthentication implements Authentication {
     }
 
 
+    @Override
+    public String toString() {
+        return getDetails().getScreenName();
+    }
 }

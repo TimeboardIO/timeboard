@@ -105,6 +105,18 @@ public interface TimesheetService {
             final Account account,
             final TimesheetFilter... filters);
 
+    UpdatedTaskResult updateTaskImputation(
+            final Long orgID,
+            final Account actor,
+            final AbstractTask task,
+            final Date day,
+            final double val) throws BusinessException;
+
+    List<UpdatedTaskResult> updateTaskImputations(
+            final Long orgID,
+            final Account actor,
+            final List<Imputation> imputationsList);
+
 
     Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(
             final Long orgID,

@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{projectID}/batches")
-public class ProjectBatchesController extends ProjectBaseController{
+public class ProjectBatchesController extends ProjectBaseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
 

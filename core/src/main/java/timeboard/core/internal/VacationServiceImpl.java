@@ -30,10 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.api.VacationService;
+import timeboard.core.api.*;
 import timeboard.core.api.events.TimeboardEventType;
 import timeboard.core.api.events.VacationEvent;
 import timeboard.core.api.exceptions.BusinessException;
@@ -62,6 +59,9 @@ public class VacationServiceImpl implements VacationService {
 
     @Autowired
     private ProjectService projectservice;
+
+    @Autowired
+    private TimesheetService timesheetService;
 
     @Override
     public Optional<VacationRequest> getVacationRequestByID(final Account actor, final Long requestID) {
@@ -366,7 +366,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         //update imputation
-        this.projectservice.updateTaskImputation(orgID, user, task, day, newValue);
+        this.timesheetService.updateTaskImputation(orgID, user, task, day, newValue);
     }
 
     private boolean onSameDay(Date date1, Date date2) {

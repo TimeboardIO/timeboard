@@ -29,6 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 
 public interface ProjectService {
@@ -44,8 +45,6 @@ public interface ProjectService {
     List<Project> listProjects(Account owner, Long orgID);
 
     Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
-
-    Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
 
     Project archiveProjectByID(Account actor, Project project) throws BusinessException;
 
@@ -97,6 +96,8 @@ public interface ProjectService {
 
     void updateTasks(Account actor, List<Task> taskList);
 
+    Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task, Account account);
+
     UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
     void deleteTaskByID(Account actor, long taskID) throws BusinessException;
@@ -120,18 +121,6 @@ public interface ProjectService {
                                                      Date startTaskDate,
                                                      Date endTaskDate) throws BusinessException;
 
-
-    UpdatedTaskResult updateTaskImputation(
-            final Long orgID,
-            final Account actor,
-            final AbstractTask task,
-            final Date day,
-            final double val) throws BusinessException;
-
-    List<UpdatedTaskResult> updateTaskImputations(
-            final Long orgID,
-            final Account actor,
-            final List<Imputation> imputationsList);
 
 
 

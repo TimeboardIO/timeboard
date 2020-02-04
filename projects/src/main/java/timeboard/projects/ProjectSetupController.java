@@ -52,7 +52,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/projects/{projectID}/setup")
-public class ProjectSetupController extends ProjectBaseController{
+public class ProjectSetupController extends ProjectBaseController {
 
     @Autowired
     private ProjectService projectService;
@@ -68,7 +68,7 @@ public class ProjectSetupController extends ProjectBaseController{
             final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final Map<String, Object> map = new HashMap<>();
         this.prepareTemplateData(project, map);
         model.addAllAttributes(map);
@@ -100,7 +100,7 @@ public class ProjectSetupController extends ProjectBaseController{
                                                   @PathVariable final MembershipRole role) throws Exception {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getMembers().stream()
                 .filter(projectMembership -> projectMembership.getMembershipID().equals(membershipID))
                 .forEach(projectMembership -> projectMembership.setRole(role));
@@ -114,7 +114,7 @@ public class ProjectSetupController extends ProjectBaseController{
                                                   @PathVariable final Long membershipID) throws Exception {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getMembers().removeIf(projectMembership -> {
             return projectMembership.getMembershipID() == membershipID && projectMembership.getMember().getId() != actor.getId();
         });
@@ -131,7 +131,7 @@ public class ProjectSetupController extends ProjectBaseController{
 
         final Account actor = authentication.getDetails();
 
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.setName(projectConfigForm.getName());
         project.setComments(projectConfigForm.getComments());
         project.setQuotation(projectConfigForm.getQuotation());

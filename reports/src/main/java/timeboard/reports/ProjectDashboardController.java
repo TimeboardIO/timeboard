@@ -39,7 +39,6 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.projects.ProjectBaseController;
-import timeboard.projects.api.ProjectNavigationProvider;
 
 import static timeboard.reports.ProjectDashboardController.PATH;
 
@@ -48,10 +47,10 @@ import static timeboard.reports.ProjectDashboardController.PATH;
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}"+PATH)
-public class ProjectDashboardController  extends ProjectBaseController{
+@RequestMapping("/projects/{projectID}" + PATH)
+public class ProjectDashboardController extends ProjectBaseController {
 
-    public static final String PATH="/dashboard";
+    public static final String PATH = "/dashboard";
 
     @Autowired
     public ProjectService projectService;

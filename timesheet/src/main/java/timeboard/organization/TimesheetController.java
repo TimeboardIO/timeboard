@@ -237,7 +237,7 @@ public class TimesheetController {
 
             if (request.type.equals("imputation")) {
                 final Date day = DATE_FORMAT.parse(request.day);
-                updatedTask = this.projectService.updateTaskImputation(
+                updatedTask = this.timesheetService.updateTaskImputation(
                         authentication.getCurrentOrganization(), actor, task, day, request.imputation);
             }
 

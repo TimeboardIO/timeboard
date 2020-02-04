@@ -52,7 +52,13 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
         //Filter the rules according to context.
         final List<PolicyRule> matchedRules = filterRules(allRules, cxt);
         //finally, check if any of the rules are satisfied, otherwise return false.
-        return checkRules(matchedRules, cxt);
+        final boolean res = checkRules(matchedRules, cxt);
+
+        if(res == false){
+            LOGGER.info("Account :"+subject+ " has no policy for action : "+action+" on ressource : "+resource);
+        }
+
+        return res;
     }
 
     private List<PolicyRule> filterRules(final List<PolicyRule> allRules, final SecurityAccessContext cxt) {

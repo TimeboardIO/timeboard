@@ -90,7 +90,7 @@ public class UsersSearchRestController {
         final Set<Account> accounts = new HashSet<>();
 
         if (projectID != null) {
-            final Project project = projectService.getProjectByIdWithAllMembers(actor, projectID);
+            final Project project = projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
             accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
         } else if (orgID != null) {
             final Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);

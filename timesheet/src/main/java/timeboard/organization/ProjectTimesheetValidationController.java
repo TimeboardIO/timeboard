@@ -92,7 +92,7 @@ public class ProjectTimesheetValidationController extends ProjectBaseController 
     public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,
                                                        @PathVariable Long projectID) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         final Map<Account, List<SubmittedTimesheet>> timesheetsFromProject =
                 this.timesheetService.getProjectTimesheetByAccounts(

@@ -7,7 +7,7 @@
   },{
     "name": "Project owner can setup project",
     "description": "Only user with role OWNER on project can setup project",
-    "target": "action == 'PROJECT_SETUP'",
+    "target": "action == 'PROJECT_SETUP' || action == 'TASK_LIST'",
     "condition": "subject.currentProjectRole(resource, 'OWNER')"
   },
   {
@@ -15,6 +15,18 @@
     "description": "Any user belonging to the project can create tasks in this project",
     "target": "action == 'TASKS_CREATE'",
     "condition": "resource.isMember(subject.getDetails()) && environment.checkTaskByProjectLimit(subject, resource)"
+  },
+  {
+    "name": "User can list projects",
+    "description": "Any user can list projects",
+    "target": "action == 'PROJECT_LIST'",
+    "condition": "true == true"
+  },
+  {
+    "name": "User can list projects",
+    "description": "Any user can list projects",
+    "target": "action == 'PROJECT_LIST'",
+    "condition": "true == true"
   },
   {
     "name": "User can create task in a project",

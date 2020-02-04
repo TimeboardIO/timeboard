@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{project}/snapshots")
-public class ProjectSnapshotsController extends ProjectBaseController{
+public class ProjectSnapshotsController extends ProjectBaseController {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSnapshotsController.class);
