@@ -26,6 +26,7 @@ package timeboard.core.internal.observers.emails;
  * #L%
  */
 
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -60,6 +61,8 @@ public class TemplateGenerator {
 
         final TemplateEngine engine = new TemplateEngine();
         engine.setTemplateResolver(resolver);
+        engine.addDialect(new LayoutDialect());
+
         final Context ctx = new Context(Locale.FRANCE);
 
         templateData.forEach(ctx::setVariable);

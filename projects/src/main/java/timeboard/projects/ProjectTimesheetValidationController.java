@@ -92,22 +92,21 @@ public class ProjectTimesheetValidationController {
 
 
     @GetMapping(value = "/sendReminderMail/{targetUser}")
-    public String sendReminderMail(
+    public ResponseEntity sendReminderMail(
             final TimeboardAuthentication authentication, final Model model, @PathVariable Account targetUser) throws MessagingException {
 
         final Account actor = authentication.getDetails();
 
        final HashMap<String, Object> data =  new HashMap<>();
-        model.addAttribute("message", "Test");
+
         data.put("message", "Test");
 
         final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
 
        this.emailService.sendMessage(structure);
 
-       // return ResponseEntity.ok().build();
+       return ResponseEntity.ok().build();
 
-        return "mail/reminder.html";
     }
 
 

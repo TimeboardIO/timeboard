@@ -79,7 +79,8 @@ public class EmailStructure {
         this.template = "mail/simple.html";
     }
 
-    public EmailStructure(final String targetUser, final String targetCCUser, final String subject, Map<String, Object> model, final String template) {
+    public EmailStructure(final String targetUser, final String targetCCUser,
+                          final String subject, Map<String, Object> model, final String template) {
         this(subject);
         this.targetUserList.add(targetUser);
         if (targetCCUser !=null) {
