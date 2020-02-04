@@ -267,25 +267,25 @@ $(document).ready(function () {
                 const taskID = $(event.target).attr('data-task');
 
                 const currentSum = app.getImputationSum(date);
-                let newval = parseFloat($(event.target).val());
+                let newVal = parseFloat($(event.target).val());
                 let oldVal = app.imputations[date][taskID];
 
-                if (newval > 1) {
-                    newval = 1;
+                if (newVal > 1) {
+                    newVal = 1;
                 }
-                if (newval < 0) {
-                    newval = 0;
+                if (newVal < 0) {
+                    newVal = 0;
                 }
-                if (currentSum + (newval - oldVal) <= 1.0) {
-                    $(event.target).val(newval);
+                if (currentSum + (newVal - oldVal) <= 1.0) {
+                    $(event.target).val(newVal);
                     const self = this;
-                    this.updateTask(date, taskID, 'imputation', newval)
+                    this.updateTask(date, taskID, 'imputation', newVal)
                         .done(function (updateTask) {
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
                             app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
-                            app.imputations[date][taskID] = newval;
+                            app.imputations[date][taskID] = newVal;
                             $(event.target).parent().removeClass('left icon loading');
                         })
                         .fail(function (errorMessage) {
