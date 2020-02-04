@@ -49,7 +49,11 @@ public class TimesheetEvent extends TimeboardEvent {
         projects.forEach(project -> project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == MembershipRole.OWNER)
-                .forEach(member -> this.usersToNotify.add(member.getMember())));
+                .forEach(member -> {
+                    if(!this.usersToNotify.contains(member.getMember())) {
+                        this.usersToNotify.add(member.getMember());
+                    }
+                }));
 
         usersToInform.add(timesheet.getAccount());
     }
