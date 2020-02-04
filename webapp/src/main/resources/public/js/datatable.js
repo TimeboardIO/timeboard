@@ -54,10 +54,10 @@ Vue.component('data-table', {
     data: function () {
 
         if(!this.table) {
-            console.error("[DATA-TABLE] you have to specify 'table' props.");
+            Logger.error("[DATA-TABLE] you have to specify 'table' props.");
         }
         if(!this.config) {
-            console.error("[DATA-TABLE] you have to specify 'config' props.");
+            Logger.error("[DATA-TABLE] you have to specify 'config' props.");
         }
 
         let sortOrders = {};
@@ -72,7 +72,7 @@ Vue.component('data-table', {
         let self = this;
         if (this.config.configurable === true) {
             if(!this.config.name) {
-                console.error("[DATA-TABLE] No name have been set for configuration saving")
+                Logger.error("[DATA-TABLE] No name have been set for configuration saving")
             } else {
                 $.ajax({
                     type: "GET",
