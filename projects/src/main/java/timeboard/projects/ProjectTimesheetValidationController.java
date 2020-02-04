@@ -101,11 +101,19 @@ public class ProjectTimesheetValidationController {
 
         data.put("message", "Test");
 
+
+
+        this.getFirstTimesheetToSubmit();
         final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
 
        this.emailService.sendMessage(structure);
 
        return ResponseEntity.ok().build();
+
+    }
+
+    private void getFirstTimesheetToSubmit() {
+
 
     }
 
