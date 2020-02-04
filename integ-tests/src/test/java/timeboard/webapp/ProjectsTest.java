@@ -36,7 +36,6 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
@@ -57,7 +56,7 @@ public class ProjectsTest extends TimeboardTest {
 
     @Test
     public void testCreateProject() throws BusinessException {
-        final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test1@test.fr");
+        final Account a1 = this.userService.userProvisioning(UUID.randomUUID().toString(), "test1@test.fr");
         final Organization org = this.organizationService.createOrganization(a1, "testOrg", Collections.emptyMap());
         SecurityUtils.signIn(org, a1);
 

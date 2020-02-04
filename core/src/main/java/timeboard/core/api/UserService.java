@@ -106,7 +106,7 @@ public interface UserService {
 
     Account findUserByExternalID(String origin, String userExternalID);
 
-    Account userProvisionning(String sub, String email) throws BusinessException;
+    Account userProvisioning(String sub, String email) throws BusinessException;
 
     List<Account> createUsers(List<Account> usersList);
 

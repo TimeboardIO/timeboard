@@ -36,9 +36,7 @@ import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
-import timeboard.core.model.OrganizationMembership;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
 
@@ -60,7 +58,7 @@ public class HomeFeatureATest extends TimeboardTest {
     public void user_with_an_existing_account_and_project(final int arg1) throws Throwable {
 
         this.model = new ConcurrentModel();
-        this.account = this.userService.userProvisionning(UUID.randomUUID().toString(), "test");
+        this.account = this.userService.userProvisioning(UUID.randomUUID().toString(), "test");
 
         this.organisation = this.organizationService.createOrganization(this.account, "Integration", Collections.emptyMap());
 
