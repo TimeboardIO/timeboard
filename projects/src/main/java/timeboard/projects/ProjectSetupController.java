@@ -101,7 +101,7 @@ public class ProjectSetupController {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
         project.getMembers().stream()
-                .filter(projectMembership -> projectMembership.getMembershipID() == membershipID)
+                .filter(projectMembership -> projectMembership.getMembershipID().equals(membershipID))
                 .forEach(projectMembership -> projectMembership.setRole(role));
         this.projectService.updateProject(actor, project);
         return ResponseEntity.status(HttpStatus.OK).build();

@@ -785,7 +785,7 @@ td {
   text-align: center;
 }
 
-.ui.segment {
+.ui.segment:not(.visible) {
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
   border: none !important;
@@ -906,6 +906,10 @@ table,
 .calendar.ui.celled.table tr td,
 .calendar.ui.celled.table tr th {
   border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
+}
+
+.calendar-cell {
+  width: 25px;
 }
 
 /** PROJECT **/

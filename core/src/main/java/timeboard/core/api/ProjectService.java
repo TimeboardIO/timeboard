@@ -67,13 +67,32 @@ public interface ProjectService {
 
     List<ProjectTasks> listTasksByProject(Long orgID, Account actor, Date ds, Date de);
 
-    Task createTask(Account actor, Project project, String taskName, String taskComment,
-                    Date startDate, Date endDate, double originalEstimate,
-                    Long taskTypeID, Account assignedAccountID, String origin,
-                    String remotePath, String remoteId,
-                    TaskStatus taskStatus, Batch batch);
+    Task createTask(final Long orgID,
+                    final Account actor,
+                    final Project project,
+                    final String taskName,
+                    final String taskComment,
+                    final Date startDate,
+                    final Date endDate,
+                    final double originalEstimate,
+                    final Long taskTypeID,
+                    final Account assignedAccountID,
+                    final String origin,
+                    final String remotePath,
+                    final String remoteId,
+                    final TaskStatus taskStatus,
+                    final Batch batch);
 
-    Task updateTask(Account actor, Task task);
+    /**
+     * Update task in database
+     * @param orgID relevant {@link Organization} ID
+     * @param actor issuer {@link Account}
+     * @param task {@link Task} to update in database
+     * @return updated {@link Task}
+     */
+    Task updateTask(final Long orgID,
+                    final Account actor,
+                    final Task task);
 
     void updateTasks(Account actor, List<Task> taskList);
 
@@ -182,4 +201,8 @@ public interface ProjectService {
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 
     Optional<Imputation> getImputation(Account user, DefaultTask task, Date day);
+
+    List<Account> findOwnersOfAnyUserProject(Account user);
+
+    boolean isOwnerOfAnyUserProject(Account owner, Account user);
 }

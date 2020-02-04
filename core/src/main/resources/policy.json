@@ -36,13 +36,7 @@
   },
   {
     "name": "Project owner can view snapshot",
-    "description": "Only user with role OWNER on current project",
-    "target": "action == 'PROJECT_SNAPSHOT'",
-    "condition": "resource.isMember(subject.getDetails(), 'OWNER')"
-  },
-  {
-    "name": "Project owner can view snapshot",
-    "description": "Only user with role OWNER on current project",
+    "description": "Only user with role OWNER on current project can access to view Snapshots",
     "target": "action == 'PROJECT_SNAPSHOT'",
     "condition": "resource.isMember(subject.getDetails(), 'OWNER')"
   },
@@ -57,5 +51,29 @@
     "description": "Any user belonging to the project can see project members vacation requests",
     "target": "action == 'VACATION_TEAM_LIST'",
     "condition": "resource.isMember(subject.getDetails())"
+  },
+  {
+    "name": "Project owner can access timesheets",
+    "description": "Only user with role OWNER on current project can access to the member's timesheets of this project",
+    "target": "action == 'PROJECT_TIMESHEETS'",
+    "condition": "subject.currentProjectRole(resource, 'OWNER')"
+  },
+  {
+    "name": "User can submit his timesheet weeks",
+    "description": "Only user can submit his timesheet weeks",
+    "target": "action == 'TIMESHEET_SUBMIT'",
+    "condition": "subject.is(resource)"
+  },
+  {
+    "name": "Project owners can validate timesheet weeks of his project members",
+    "description": "Any project owner of user project can validate his weeks",
+    "target": "action == 'TIMESHEET_VALIDATE'",
+    "condition": "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource.getAccount())"
+  },
+  {
+    "name": "Project owners can reject timesheet weeks of his project members",
+    "description": "Any project owner of user project can reject his weeks",
+    "target": "action == 'TIMESHEET_REJECT'",
+    "condition": "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource.getAccount())"
   }
 ]

@@ -1,4 +1,4 @@
-package timeboard.core.security;
+package timeboard.core.converters;
 
 /*-
  * #%L
@@ -12,10 +12,10 @@ package timeboard.core.security;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,43 +27,19 @@ package timeboard.core.security;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.BusinessPolicyEvaluator;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.CommercialException;
+import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
-import timeboard.core.model.Project;
-
-import java.util.Date;
 
 @Component
-public class PolicyEnvironment {
+public class LongToAccountConverter implements Converter<String, Account> {
 
     @Autowired
-    BusinessPolicyEvaluator businessPolicyEvaluator;
+    private UserService service;
 
-    @Autowired
-    ApplicationContext ctx;
-
-    public PolicyEnvironment() {
+    @Override
+    public Account convert(final String aLong) {
+        return this.service.findUserByID(Long.parseLong(aLong));
     }
-
-    public Date getDate() {
-        return new Date();
-    }
-
-    public boolean checkProjectByUserLimit(final TimeboardAuthentication authentication) throws CommercialException {
-        return businessPolicyEvaluator.checkProjectByUserLimit(authentication.getDetails());
-    }
-
-    public boolean checkTaskByProjectLimit(final TimeboardAuthentication authentication, final Project project) throws CommercialException {
-        return businessPolicyEvaluator.checkTaskByProjectLimit(authentication.getDetails(), project);
-    }
-
-    public boolean isOwnerOfAnyUserProject(final TimeboardAuthentication authentication, final Account user) {
-        return ctx.getBean(ProjectService.class).isOwnerOfAnyUserProject(authentication.getDetails(), user);
-    }
-
-
 }

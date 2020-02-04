@@ -206,17 +206,28 @@ public class ProjectTasksController {
     public ResponseEntity approveTask(final TimeboardAuthentication authentication,
                                       @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
-        return this.changeTaskStatus(actor, taskID, TaskStatus.IN_PROGRESS);
+        return this.changeTaskStatus(
+                authentication.getCurrentOrganization(),
+                actor,
+                taskID,
+                TaskStatus.IN_PROGRESS);
     }
 
     @PatchMapping("/deny/{taskID}")
     public ResponseEntity denyTask(final TimeboardAuthentication authentication,
                                    @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
-        return this.changeTaskStatus(actor, taskID, TaskStatus.REFUSED);
+        return this.changeTaskStatus(
+                authentication.getCurrentOrganization(),
+                actor,
+                taskID,
+                TaskStatus.REFUSED);
     }
 
-    private ResponseEntity changeTaskStatus(final Account actor, Long taskID, final TaskStatus status) {
+    private ResponseEntity changeTaskStatus(final Long orgID,
+                                            final Account actor,
+                                            final Long taskID,
+                                            final TaskStatus status) {
 
         if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
@@ -229,7 +240,7 @@ public class ProjectTasksController {
         try {
             task = (Task) this.projectService.getTaskByID(actor, taskID);
             task.setTaskStatus(status);
-            this.projectService.updateTask(actor, task);
+            this.projectService.updateTask(orgID, actor, task);
 
         } catch (final ClassCastException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");

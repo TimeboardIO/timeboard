@@ -47,12 +47,31 @@ public interface TimesheetService {
      * @return true if timesheet is submit else, false.
      */
     SubmittedTimesheet submitTimesheet(
-            final Long orgID,
+            final Organization currentOrg,
             final Account actor,
             final Account accountTimesheet,
-            final Organization currentOrg,
             final int year,
             final int week) throws BusinessException;
+
+
+    /**
+     * Submit user timesheet.
+     *
+     * @param actor            user who trigger this function.
+     * @param submittedTimesheet  submittedTimesheet to validate
+     * @return true if timesheet is submit else, false.
+     */
+    SubmittedTimesheet validateTimesheet(final Account actor, final SubmittedTimesheet submittedTimesheet) throws BusinessException;    /**
+
+     * Reject user timesheet.
+     *
+     * @param actor            user who trigger this function.
+     * @param submittedTimesheet  submittedTimesheet to reject
+     * @return SubmittedTimesheet with status REJECTED
+     */
+    SubmittedTimesheet rejectTimesheet(final Account actor, final SubmittedTimesheet submittedTimesheet) throws BusinessException;
+
+    Optional<SubmittedTimesheet> getSubmittedTimesheet(Long orgID, Account actor, Account user, int year, int week);
 
 
     /**

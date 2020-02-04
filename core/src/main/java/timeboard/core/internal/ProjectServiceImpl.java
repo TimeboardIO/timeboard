@@ -136,6 +136,43 @@ public class ProjectServiceImpl implements ProjectService {
         return data;
     }
 
+
+    @Override
+    public List<Account> findOwnersOfAnyUserProject(Account user) {
+        final TypedQuery<Account> q = em.createQuery("SELECT DISTINCT m2.member " +
+                "FROM ProjectMembership m1 JOIN ProjectMembership m2 " +
+                "ON m1.project = m2.project WHERE m1.member = :user AND m2.role = :role", Account.class);
+        q.setParameter("user", user);
+        q.setParameter("role", MembershipRole.OWNER);
+        return q.getResultList();
+
+    }
+
+    @Override
+    public boolean isOwnerOfAnyUserProject(Account owner, Account user) {
+        final TypedQuery<Account> q = em.createQuery("SELECT DISTINCT m2.member " +
+                "FROM ProjectMembership m1 JOIN ProjectMembership m2 " +
+                "ON m1.project = m2.project " +
+                "WHERE m1.member = :user " +
+                "AND m2.member = :owner " +
+                "AND m2.role = :role", Account.class);
+        q.setParameter("user", user);
+        q.setParameter("owner", owner);
+        q.setParameter("role", MembershipRole.OWNER);
+
+
+        try {
+            final Account singleResult = q.getSingleResult();
+            if(singleResult != null ) {
+                return true;
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+
     @Override
     public Project getProjectByIdWithAllMembers(final Account actor, final Long projectId) throws BusinessException {
         final Project project = em.createQuery("select p from Project p where p.id = :projectId", Project.class)
@@ -273,7 +310,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     //@PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
     @PreAuthorize("hasPermission(#project,'TASKS_CREATE')")
-    public Task createTask(final Account actor,
+    public Task createTask(
+            final Long orgID,
+            final Account actor,
                            final Project project,
                            final String taskName,
                            final String taskComment,
@@ -302,7 +341,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
-        newTask.setOrganizationID(project.getId());
+        newTask.setOrganizationID(orgID);
         if (batch != null) {
             em.merge(batch);
         }
@@ -321,8 +360,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Task updateTask(final Account actor, final Task task) {
+    public Task updateTask(final Long orgID, final Account actor, final Task task) {
         if (task.getProject().isMember(actor)) {
+            task.setOrganizationID(orgID);
             em.merge(task);
             em.flush();
         }
@@ -454,6 +494,8 @@ public class ProjectServiceImpl implements ProjectService {
         final Imputation existingImputation = this.getImputationByDayByTask(em, day, task, user);
         return Optional.ofNullable(existingImputation);
     }
+
+
 
     private UpdatedTaskResult updateProjectTaskImputation(final Account actor,
                                                           final Task task,

@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
@@ -54,6 +55,9 @@ public class AccountController {
 
     @Autowired
     private OrganizationService organizationService;
+
+    @Autowired
+    private UserService userService;
 
 
     @Autowired(
@@ -85,6 +89,7 @@ public class AccountController {
                 actor.setEmail(email);
 
                 try {
+                    this.userService.updateUser(actor);
                     model.addAttribute("message", "User account changed successfully !");
                 } catch (final Exception e) {
                     model.addAttribute("error", "Error while updating user information.");
@@ -102,6 +107,7 @@ public class AccountController {
                     }
                 }
                 try {
+                    this.userService.updateUser(actor);
                     model.addAttribute("message", "External tools updated successfully !");
                 } catch (final Exception e) {
                     model.addAttribute("error", "Error while external tools");

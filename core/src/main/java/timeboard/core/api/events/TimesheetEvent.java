@@ -28,7 +28,6 @@ package timeboard.core.api.events;
 
 import timeboard.core.api.ProjectService;
 import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.SubmittedTimesheet;
 
@@ -40,18 +39,21 @@ public class TimesheetEvent extends TimeboardEvent {
 
     private SubmittedTimesheet timesheet;
 
-
-    public TimesheetEvent(final SubmittedTimesheet timesheet, final ProjectService projectService, final Organization currentOrg) {
+    public TimesheetEvent(final SubmittedTimesheet timesheet, final ProjectService projectService, final long orgID) {
         super(new Date());
 
         this.timesheet = timesheet;
 
-        final List<Project> projects = projectService.listProjects(timesheet.getAccount(), currentOrg.getId());
+        final List<Project> projects = projectService.listProjects(timesheet.getAccount(), orgID);
 
         projects.forEach(project -> project.getMembers()
                 .stream()
                 .filter(member -> member.getRole() == MembershipRole.OWNER)
-                .forEach(member -> this.usersToNotify.add(member.getMember())));
+                .forEach(member -> {
+                    if(!this.usersToNotify.contains(member.getMember())) {
+                        this.usersToNotify.add(member.getMember());
+                    }
+                }));
 
         usersToInform.add(timesheet.getAccount());
     }
