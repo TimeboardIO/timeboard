@@ -158,7 +158,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_VALIDATE')")
-    public SubmittedTimesheet validateTimesheet(final Account actor, //submittedTimesheet.getAccount()
+    public SubmittedTimesheet validateTimesheet(final Account actor,
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
@@ -176,8 +176,30 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         return submittedTimesheet;
 
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_REJECT')")
+    public SubmittedTimesheet rejectTimesheet(final Account actor,
+                                                final SubmittedTimesheet submittedTimesheet) throws BusinessException {
+
+        if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
+            throw new BusinessException("Can not reject unsubmitted weeks");
+        }
+        submittedTimesheet.setTimesheetStatus(ValidationStatus.REJECTED);
+
+        em.merge(submittedTimesheet);
+
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
+
+        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" rejected for user"
+                + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
+
+
+        return submittedTimesheet;
 
     }
+
 
     @Override
     public Optional<SubmittedTimesheet> getSubmittedTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {

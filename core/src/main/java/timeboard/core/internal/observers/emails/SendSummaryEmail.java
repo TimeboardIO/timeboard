@@ -36,6 +36,7 @@ import timeboard.core.api.events.*;
 import timeboard.core.model.Account;
 import timeboard.core.model.SubmittedTimesheet;
 import timeboard.core.model.Task;
+import timeboard.core.model.ValidationStatus;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -101,7 +102,12 @@ public class SendSummaryEmail {
 
         }
         data.put("projects", projects.values());
-        data.put("submittedTimesheets", submittedTimesheets);
+        data.put("timesheetSubmitted", submittedTimesheets.stream()
+                .filter(timesheet -> timesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)).toArray());
+        data.put("timesheetRejected", submittedTimesheets.stream()
+                .filter(timesheet -> timesheet.getTimesheetStatus().equals(ValidationStatus.REJECTED)).toArray());
+        data.put("timesheetValidated", submittedTimesheets.stream()
+                .filter(timesheet -> timesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED)).toArray());
         data.put("vacationEventsCreated", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.CREATE)).toArray());
         data.put("vacationEventsApproved", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.APPROVE)).toArray());
         data.put("vacationEventsDenied", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DENY)).toArray());
