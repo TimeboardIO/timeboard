@@ -41,6 +41,7 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import timeboard.core.converters.LongToAccountConverter;
 import timeboard.projects.converters.LongToProjectConverter;
+import timeboard.reports.converters.ReportConverter;
 import timeboard.vacations.converters.LongToVacationRequestConverter;
 
 import java.util.Locale;
@@ -60,6 +61,9 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
 
     @Autowired
     private LongToAccountConverter longToAccountConverter;
+
+    @Autowired
+    private ReportConverter reportConverter;
 
     @Bean
     public MessageSource messageSource() {
@@ -104,6 +108,7 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
     public void addFormatters(final FormatterRegistry registry) {
         registry.addConverter(this.longToProjectConverter);
         registry.addConverter(this.longToVacationRequestConverter);
+        registry.addConverter(this.reportConverter);
         registry.addConverter(this.longToAccountConverter);
     }
 }

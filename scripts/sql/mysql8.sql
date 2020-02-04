@@ -194,8 +194,9 @@
        id bigint not null,
         organizationID bigint,
         filterProject varchar(255),
+        handlerAsyncJobID varchar(255),
+        handlerID varchar(255),
         name varchar(50),
-        type integer,
         primary key (id)
     ) engine=InnoDB;
 
