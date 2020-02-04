@@ -1,4 +1,4 @@
-package timeboard.projects;
+package timeboard.reports;
 
 /*-
  * #%L
@@ -38,14 +38,20 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
+import timeboard.projects.ProjectBaseController;
+import timeboard.projects.api.ProjectNavigationProvider;
+
+import static timeboard.reports.ProjectDashboardController.PATH;
 
 
 /**
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}/dashboard")
-public class ProjectDashboardController {
+@RequestMapping("/projects/{projectID}"+PATH)
+public class ProjectDashboardController  extends ProjectBaseController{
+
+    public static final String PATH="/dashboard";
 
     @Autowired
     public ProjectService projectService;
@@ -61,8 +67,9 @@ public class ProjectDashboardController {
 
         model.addAttribute("project", project);
         model.addAttribute("dashboard", dashboard);
-
+        this.initModel(model);
         return "project_dashboard.html";
     }
+
 
 }

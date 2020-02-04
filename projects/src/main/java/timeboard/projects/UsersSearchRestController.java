@@ -35,7 +35,9 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;

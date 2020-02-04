@@ -36,7 +36,6 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 

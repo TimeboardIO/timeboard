@@ -50,7 +50,7 @@ public final class ReportJob implements Job {
 
     @Autowired
     private ReportService reportService;
-    
+
     @Autowired
     private UserService userService;
 
@@ -65,14 +65,14 @@ public final class ReportJob implements Job {
         final Report report = this.reportService.getReportByID(actor, reportID);
         final Optional<ReportHandler> reportHandler = this.reportService.getReportHandler(report);
 
-        if(reportHandler.isPresent()){
+        if (reportHandler.isPresent()) {
             final Serializable data = reportHandler.get().getReportModel(authentication, report);
             report.setLastAsyncJobTrigger(Calendar.getInstance());
             report.setData(data);
             this.reportService.updateReport(actor, report);
-            LOGGER.info("Report "+reportID+" finished with "+data.toString());
-        }else{
-            context.setResult("Mission report handler : "+report.getHandlerID());
+            LOGGER.info("Report " + reportID + " finished with " + data.toString());
+        } else {
+            context.setResult("Mission report handler : " + report.getHandlerID());
         }
 
 

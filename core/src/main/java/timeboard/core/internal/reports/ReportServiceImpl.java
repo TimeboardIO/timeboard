@@ -45,7 +45,9 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -68,7 +70,7 @@ public class ReportServiceImpl implements ReportService {
     private Scheduler scheduler;
 
     @PostConstruct
-    public void initQuartzJobsForHandlers(){
+    public void initQuartzJobsForHandlers() {
         this.reportHandlers
                 .stream()
                 .forEach(reportHandler -> {
@@ -80,7 +82,7 @@ public class ReportServiceImpl implements ReportService {
                                 .storeDurably(true)
                                 .build();
                         this.scheduler.addJob(details, true);
-                    }catch (SchedulerException e){
+                    } catch (SchedulerException e) {
                         LOGGER.error(e.getMessage());
                     }
                 });
@@ -99,11 +101,11 @@ public class ReportServiceImpl implements ReportService {
         newReport.setFilterProject(filterProject);
 
         final Optional<ReportHandler> reportHandler = this.getReportHandler(newReport);
-        if(reportHandler.isPresent()){
+        if (reportHandler.isPresent()) {
             newReport.setHandlerID(reportHandler.get().handlerID());
             em.persist(newReport);
 
-            if(reportHandler.get().isAsyncHandler()){
+            if (reportHandler.get().isAsyncHandler()) {
 
                 final JobDataMap jobDataMap = new JobDataMap();
                 jobDataMap.put("reportID", newReport.getId());
@@ -155,7 +157,7 @@ public class ReportServiceImpl implements ReportService {
     public void deleteReportByID(final Account actor, final Long reportId) throws SchedulerException {
         final Report report = em.find(Report.class, reportId);
 
-        if(report.getAsyncTriggerKeyName() != null) {
+        if (report.getAsyncTriggerKeyName() != null) {
             final TriggerKey triggerKey = TriggerKey.triggerKey(report.getAsyncTriggerKeyName());
 
             if (null != this.scheduler.getTrigger(triggerKey)) {
@@ -204,7 +206,7 @@ public class ReportServiceImpl implements ReportService {
         return this.reportHandlers.stream()
                 .filter(rc ->
                 {
-                    return  rc.handlerID().equals(report.getHandlerID());
+                    return rc.handlerID().equals(report.getHandlerID());
                 }).findFirst();
     }
 
@@ -217,7 +219,7 @@ public class ReportServiceImpl implements ReportService {
     public void executeAsyncReport(final Account actor, final Report report) throws SchedulerException {
 
         final Optional<ReportHandler> handler = this.getReportHandler(report);
-        if(handler.isPresent()) {
+        if (handler.isPresent()) {
             final JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("reportID", report.getId());
             jobDataMap.put("actorID", actor.getId());
@@ -227,8 +229,6 @@ public class ReportServiceImpl implements ReportService {
         }
 
     }
-
-
 
 
     private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {

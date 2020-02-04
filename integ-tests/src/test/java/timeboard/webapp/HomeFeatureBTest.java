@@ -31,14 +31,10 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
-import timeboard.core.model.OrganizationMembership;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
 
@@ -63,7 +59,7 @@ public class HomeFeatureBTest extends TimeboardTest {
         this.account = this.userService.userProvisionning(UUID.randomUUID().toString(), "test2");
 
         this.organisationA = this.organizationService.createOrganization(this.account, "Integration A", Collections.emptyMap());
-        this.organisationB = this.organizationService.createOrganization(this.account,"Integration B", Collections.emptyMap());
+        this.organisationB = this.organizationService.createOrganization(this.account, "Integration B", Collections.emptyMap());
 
 
         this.auth = SecurityUtils.signIn(organisationA, this.account);

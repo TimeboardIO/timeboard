@@ -52,7 +52,7 @@ import java.util.Map;
 
 @Controller
 @RequestMapping("/projects/{projectID}/setup")
-public class ProjectSetupController {
+public class ProjectSetupController extends ProjectBaseController{
 
     @Autowired
     private ProjectService projectService;
@@ -72,6 +72,7 @@ public class ProjectSetupController {
         final Map<String, Object> map = new HashMap<>();
         this.prepareTemplateData(project, map);
         model.addAllAttributes(map);
+        this.initModel(model);
         return "project_config.html";
     }
 

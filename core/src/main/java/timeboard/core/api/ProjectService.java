@@ -85,9 +85,10 @@ public interface ProjectService {
 
     /**
      * Update task in database
+     *
      * @param orgID relevant {@link Organization} ID
      * @param actor issuer {@link Account}
-     * @param task {@link Task} to update in database
+     * @param task  {@link Task} to update in database
      * @return updated {@link Task}
      */
     Task updateTask(final Long orgID,

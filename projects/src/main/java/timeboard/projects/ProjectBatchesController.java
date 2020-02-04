@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{projectID}/batches")
-public class ProjectBatchesController {
+public class ProjectBatchesController extends ProjectBaseController{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
 
@@ -79,7 +79,7 @@ public class ProjectBatchesController {
 
         model.addAttribute("project", project);
         model.addAttribute("batchTypes", BatchType.values());
-
+        this.initModel(model);
         return "project_batches.html";
     }
 
@@ -139,7 +139,7 @@ public class ProjectBatchesController {
         model.addAttribute("batch", batch);
         model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, batch));
 
-
+        this.initModel(model);
         return ResponseEntity.ok(new BatchDecorator(batch));
     }
 
@@ -153,7 +153,7 @@ public class ProjectBatchesController {
 
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         this.fillModelWithBatches(model, actor, project);
-
+        this.initModel(model);
         return "project_batches_config.html";
 
     }

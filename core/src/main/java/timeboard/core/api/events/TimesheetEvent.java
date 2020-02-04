@@ -50,7 +50,7 @@ public class TimesheetEvent extends TimeboardEvent {
                 .stream()
                 .filter(member -> member.getRole() == MembershipRole.OWNER)
                 .forEach(member -> {
-                    if(!this.usersToNotify.contains(member.getMember())) {
+                    if (!this.usersToNotify.contains(member.getMember())) {
                         this.usersToNotify.add(member.getMember());
                     }
                 }));

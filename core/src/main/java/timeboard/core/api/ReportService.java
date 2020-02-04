@@ -34,7 +34,6 @@ import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
 import java.beans.Transient;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,11 +43,12 @@ public interface ReportService {
 
     /**
      * Create a new report configuration
+     *
      * @param organizationID relevant organization
-     * @param owner user that owner report
-     * @param reportName screen name used to identify report
-     * @param handlerName name of report handler used to compute report data
-     * @param filterProject SPEL
+     * @param owner          user that owner report
+     * @param reportName     screen name used to identify report
+     * @param handlerName    name of report handler used to compute report data
+     * @param filterProject  SPEL
      * @return
      * @throws SchedulerException
      */
@@ -61,6 +61,7 @@ public interface ReportService {
 
     /**
      * List all report for owner
+     *
      * @param orgID primary key {@link Organization} where looking for reports
      * @param owner an account that own reports
      * @return

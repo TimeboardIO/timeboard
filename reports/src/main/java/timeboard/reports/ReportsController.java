@@ -75,11 +75,11 @@ public class ReportsController {
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<List<ReportDecorator>> reportList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
-        final List<ReportDecorator> reports = this.reportService.listReports(authentication.getCurrentOrganization(),  actor)
+        final List<ReportDecorator> reports = this.reportService.listReports(authentication.getCurrentOrganization(), actor)
                 .stream()
                 .map(report -> {
                     final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
-                    if(reportController.isPresent()) {
+                    if (reportController.isPresent()) {
                         return new ReportDecorator(report, reportController.get());
                     }
                     return null;
@@ -206,7 +206,7 @@ public class ReportsController {
 
         final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
 
-        if(reportController.isPresent()){
+        if (reportController.isPresent()) {
             mav.getModel().put("fragment", reportController.get().handlerView());
         }
 
@@ -228,7 +228,7 @@ public class ReportsController {
 
         final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
 
-        if(reportController.isPresent()){
+        if (reportController.isPresent()) {
             final Serializable model = reportController.get().getReportModel(authentication, report);
             return ResponseEntity.ok(model);
         }
@@ -255,7 +255,7 @@ public class ReportsController {
             return controller;
         }
 
-        public Calendar getLastAsyncJobTrigger(){
+        public Calendar getLastAsyncJobTrigger() {
             return this.report.getLastAsyncJobTrigger();
         }
 

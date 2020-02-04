@@ -1,8 +1,8 @@
-package timeboard.core.converters;
+package timeboard.organization;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
  * Copyright (C) 2019 - 2020 Timeboard
  * %%
@@ -26,20 +26,19 @@ package timeboard.core.converters;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.UserService;
-import timeboard.core.model.Account;
+import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
-public class LongToAccountConverter implements Converter<String, Account> {
+public class TimesheetProjectNavigationProvider implements ProjectNavigationProvider {
+    @Override
+    public String getNavigationLabel() {
+        return "timesheet.validation";
+    }
 
-    @Autowired
-    private UserService service;
 
     @Override
-    public Account convert(final String aLong) {
-        return this.service.findUserByID(Long.parseLong(aLong));
+    public String getNavigationPath() {
+        return ProjectTimesheetValidationController.PATH;
     }
 }

@@ -163,7 +163,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         try {
             final Account singleResult = q.getSingleResult();
-            if(singleResult != null ) {
+            if (singleResult != null) {
                 return true;
             }
         } catch (Exception e) {
@@ -313,19 +313,19 @@ public class ProjectServiceImpl implements ProjectService {
     public Task createTask(
             final Long orgID,
             final Account actor,
-                           final Project project,
-                           final String taskName,
-                           final String taskComment,
-                           final Date startDate,
-                           final Date endDate,
-                           final double originalEstimate,
-                           final Long taskTypeID,
-                           final Account assignedAccount,
-                           final String origin,
-                           final String remotePath,
-                           final String remoteId,
-                           final TaskStatus taskStatus,
-                           final Batch batch
+            final Project project,
+            final String taskName,
+            final String taskComment,
+            final Date startDate,
+            final Date endDate,
+            final double originalEstimate,
+            final Long taskTypeID,
+            final Account assignedAccount,
+            final String origin,
+            final String remotePath,
+            final String remoteId,
+            final TaskStatus taskStatus,
+            final Batch batch
     ) {
         final Task newTask = new Task();
         newTask.setTaskType(this.organizationService.findTaskTypeByID(taskTypeID));
@@ -494,7 +494,6 @@ public class ProjectServiceImpl implements ProjectService {
         final Imputation existingImputation = this.getImputationByDayByTask(em, day, task, user);
         return Optional.ofNullable(existingImputation);
     }
-
 
 
     private UpdatedTaskResult updateProjectTaskImputation(final Account actor,

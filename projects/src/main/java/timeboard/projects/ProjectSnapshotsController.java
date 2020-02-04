@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{project}/snapshots")
-public class ProjectSnapshotsController {
+public class ProjectSnapshotsController extends ProjectBaseController{
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSnapshotsController.class);
@@ -74,7 +74,7 @@ public class ProjectSnapshotsController {
                           final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
-
+        this.initModel(model);
         return "project_snapshots";
     }
 

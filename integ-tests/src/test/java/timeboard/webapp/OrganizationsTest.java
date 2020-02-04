@@ -58,7 +58,7 @@ public class OrganizationsTest extends TimeboardTest {
     public void testRemoveOrganizationMember() throws BusinessException {
 
         final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "testRemove1@test.fr");
-        final Organization org = this.organizationService.createOrganization(a1,"testRemoveOrg", Collections.emptyMap());
+        final Organization org = this.organizationService.createOrganization(a1, "testRemoveOrg", Collections.emptyMap());
 
         SecurityUtils.signIn(org, a1);
 
@@ -78,11 +78,11 @@ public class OrganizationsTest extends TimeboardTest {
     public void testCreateDefaultTask() throws BusinessException {
 
         final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test3@test.fr");
-        final Organization org = this.organizationService.createOrganization(a1,"testOrg2", Collections.emptyMap());
+        final Organization org = this.organizationService.createOrganization(a1, "testOrg2", Collections.emptyMap());
 
         SecurityUtils.signIn(org, a1);
 
-        this.organizationService.createDefaultTask(a1, org.getId(),"TestDefaultTask");
+        this.organizationService.createDefaultTask(a1, org.getId(), "TestDefaultTask");
 
         final List<DefaultTask> tasks = this.organizationService.listDefaultTasks(org.getId(), org.getCreatedDate().getTime(), new Date());
 

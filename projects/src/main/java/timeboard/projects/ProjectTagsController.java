@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{projectID}/tags")
-public class ProjectTagsController {
+public class ProjectTagsController extends ProjectBaseController{
 
     @Autowired
     private ProjectService projectService;
@@ -59,7 +59,7 @@ public class ProjectTagsController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
-
+        this.initModel(model);
         return "project_tags";
     }
 

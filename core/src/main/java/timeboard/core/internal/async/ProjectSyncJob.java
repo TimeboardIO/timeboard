@@ -140,7 +140,7 @@ public final class ProjectSyncJob implements Job {
             final Optional<Task> taskToUpdate = projectService.getTaskByRemoteID(actor, remoteTask.getId());
             if (taskToUpdate.isPresent()) {
                 taskToUpdate.get().setName(remoteTask.getTitle());
-                projectService.updateTask(orgID,actor, taskToUpdate.get());
+                projectService.updateTask(orgID, actor, taskToUpdate.get());
             }
         }
     }

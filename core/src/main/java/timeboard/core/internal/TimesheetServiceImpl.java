@@ -170,7 +170,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
 
-        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" validated for user"
+        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek() + " of " + submittedTimesheet.getYear() + " validated for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
 
 
@@ -181,7 +181,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_REJECT')")
     public SubmittedTimesheet rejectTimesheet(final Account actor,
-                                                final SubmittedTimesheet submittedTimesheet) throws BusinessException {
+                                              final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not reject unsubmitted weeks");
@@ -192,7 +192,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
 
-        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" rejected for user"
+        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek() + " of " + submittedTimesheet.getYear() + " rejected for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
 
 
@@ -292,10 +292,10 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         final Map<Integer, Double> result = new HashMap<>();
         for (final Object[] o : dayImputations) {
-            if(o[0] instanceof BigInteger){
+            if (o[0] instanceof BigInteger) {
                 result.put(((BigInteger) o[0]).intValue(), (double) o[1]);
             }
-            if(o[0] instanceof Integer){
+            if (o[0] instanceof Integer) {
                 result.put((Integer) o[0], (double) o[1]);
             }
         }

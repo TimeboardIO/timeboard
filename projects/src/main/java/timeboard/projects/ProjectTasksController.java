@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/projects/{projectID}/tasks")
-public class ProjectTasksController {
+public class ProjectTasksController extends ProjectBaseController{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTasksController.class);
 
@@ -88,6 +88,7 @@ public class ProjectTasksController {
         fillModel(model, authentication.getCurrentOrganization(), actor, project);
 
         model.addAttribute("batchType", "Default");
+        this.initModel(model);
         return "project_tasks.html";
     }
 
@@ -180,6 +181,7 @@ public class ProjectTasksController {
         model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());
+        this.initModel(model);
     }
 
     @GetMapping("/{taskID}")

@@ -193,9 +193,11 @@
     create table Report (
        id bigint not null,
         organizationID bigint,
+        asyncTriggerKeyName varchar(255),
+        data longblob,
         filterProject varchar(255),
-        handlerAsyncJobID varchar(255),
         handlerID varchar(255),
+        lastAsyncJobTrigger datetime(6),
         name varchar(50),
         primary key (id)
     ) engine=InnoDB;

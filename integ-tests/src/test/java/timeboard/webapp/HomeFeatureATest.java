@@ -36,9 +36,7 @@ import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
-import timeboard.core.model.OrganizationMembership;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
 
