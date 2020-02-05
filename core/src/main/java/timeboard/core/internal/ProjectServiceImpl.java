@@ -50,6 +50,7 @@ import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import java.awt.*;
@@ -139,11 +140,17 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @PostAuthorize("hasPermission(returnObject,'" + PROJECT_VIEW + "')")
     public Project getProjectByID(final Account actor, final Long orgID, final Long projectId) {
-        final Project data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
-                .setParameter("user", actor)
-                .setParameter("projectID", projectId)
-                .setParameter("orgID", orgID)
-                .getSingleResult();
+
+         Project data = null;
+         try {
+             data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
+                     .setParameter("user", actor)
+                     .setParameter("projectID", projectId)
+                     .setParameter("orgID", orgID)
+                     .getSingleResult();
+         }catch (NoResultException nre){
+             data = null;
+         }
         return data;
     }
 

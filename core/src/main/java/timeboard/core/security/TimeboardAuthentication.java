@@ -101,6 +101,9 @@ public class TimeboardAuthentication implements Authentication {
 
     @Transient
     public boolean currentProjectRole(final Project project, final MembershipRole role) {
+        if(project == null){
+            return false;
+        }
         return project.getMembers()
                 .stream()
                 .filter(projectMembership -> projectMembership.getMember().getId() == account.getId())
