@@ -98,14 +98,13 @@ public final class ProjectSyncJob implements Job {
 
         final List<RemoteTask> remoteTasks = syncService.getRemoteTasks(actor, jiraCrendentials);
 
-        remoteTasks.stream()
-                .forEach(task -> {
-                    try {
-                        mergeAssignee(userService, syncService.getServiceName(), task);
-                    } catch (final Exception e) {
-
-                    }
-                });
+        remoteTasks.forEach(task -> {
+            try {
+                mergeAssignee(userService, syncService.getServiceID(), task);
+            } catch (final Exception e) {
+                System.out.println(e);
+            }
+        });
 
         this.syncTasks(orgID, actor, project, remoteTasks);
 
