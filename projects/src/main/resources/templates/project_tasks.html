@@ -153,7 +153,7 @@
                 Import tasks
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" th:modal-id="${plugin.serviceID}" class="item" v-on:click="$('#'+event.target.getAttribute('modal-id')).modal('show')">plugin name</div>
+                    <div th:each="plugin : ${sync_plugins}" th:text="${plugin.serviceName}" th:modal-id="${plugin.serviceID}" class="item" v-on:click="showImportModal">plugin name</div>
                 </div>
             </div>
             <div @click="toggleFilters" class="ui dropdown item" >

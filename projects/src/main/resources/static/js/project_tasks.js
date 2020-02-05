@@ -22,7 +22,7 @@ Vue.component('graph-modal', {
 });
 
 // SYnc in progress or not
-var interval = 5000;  // 5000 = 5 seconds
+const interval = 5000;  // 5000 = 5 seconds
 function showStateSync() {
     $.ajax({
         method: "GET",
@@ -254,6 +254,11 @@ let app = new Vue({
                     console.log(data);
                 }
             });
+        },
+        showImportModal: function (event) {
+            if (event) {
+                $('#'+event.target.getAttribute('modal-id')).modal('show')
+            }
         },
         showCreateTaskModal: function(projectID, task, event){
             event.preventDefault();
