@@ -27,6 +27,8 @@ package timeboard.core.internal.async;
  */
 
 import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -58,6 +60,9 @@ public final class ProjectSyncJob implements Job {
 
     @Autowired
     private UserService userService;
+
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncJob.class);
 
 
     @Override
@@ -102,7 +107,7 @@ public final class ProjectSyncJob implements Job {
             try {
                 mergeAssignee(userService, syncService.getServiceID(), task);
             } catch (final Exception e) {
-                System.out.println(e);
+                LOGGER.trace(e.getMessage());
             }
         });
 
@@ -155,16 +160,15 @@ public final class ProjectSyncJob implements Job {
                     final String taskComment = task.getComments();
                     final Date startDate = task.getStartDate();
                     final Date endDate = task.getStopDate();
-                    final double originaEstimate = 0;
-                    final Long taskTypeID = null;
+                    final double originalEstimate = 0;
+                    final TaskType taskType = null;
                     final Account assignedAccountID = this.userService.findUserByID(task.getLocalUserID());
                     final String origin = task.getOrigin();
                     final String remotePath = null;
                     final String remoteId = task.getId();
-                    final Batch batch = null;
                     projectService.createTask(orgID, actor, project, taskName, taskComment,
-                            startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
-                            remotePath, String.valueOf(remoteId), TaskStatus.IN_PROGRESS, batch);
+                            startDate, endDate, originalEstimate, taskType, assignedAccountID, origin,
+                            remotePath, String.valueOf(remoteId), TaskStatus.IN_PROGRESS, null);
                 }
         );
     }

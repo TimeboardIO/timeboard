@@ -56,7 +56,7 @@
                             <label>Task Name</label>
                             <input v-model="task.taskName" name="taskName" placeholder="Task Name" required type="text" data-cy="task-name">
                         </div>
-                        <div class="field">
+                        <div class="field" :class="{ disabled : !task.canChangeAssignee }">
                             <label>User assigned</label>
                             <div class="ui category search">
                                 <div class="ui icon input">

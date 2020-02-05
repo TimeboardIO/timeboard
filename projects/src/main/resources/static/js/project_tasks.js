@@ -96,6 +96,7 @@ const emptyTask =  {
     statusName: '',
     batchNames: [],
     batchIDs: [],
+    canChangeAssignee: true,
 };
 
 const projectID = $("meta[name='projectID']").attr('value');
@@ -280,6 +281,7 @@ let app = new Vue({
                 this.newTask.statusName = task.statusName;
                 this.newTask.assignee = task.assignee;
                 this.newTask.assigneeID = task.assigneeID;
+                this.newTask.canChangeAssignee = task.canChangeAssignee;
 
             }else{
                  this.modalTitle = "Create task";
