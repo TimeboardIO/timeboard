@@ -38,6 +38,9 @@ import java.util.Optional;
 
 public interface VacationService {
 
+    String VACATION_LIST = "VACATION_LIST";
+    String VACATION_TEAM_LIST = "VACATION_TEAM_LIST";
+
     Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID);
 
     VacationRequest createVacationRequest(Account actor, VacationRequest request);

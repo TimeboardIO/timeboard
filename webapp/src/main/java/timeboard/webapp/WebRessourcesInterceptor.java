@@ -41,6 +41,7 @@ import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
@@ -86,14 +87,14 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
 
 
         if (modelMap != null && webRequest.getUserPrincipal() != null) {
-            final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();
+            final TimeboardAuthentication authentication = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
 
-            modelMap.put("account", account);
-            modelMap.put("navs", navRegistry.getEntries());
+            modelMap.put("account", authentication.getDetails());
+            modelMap.put("navs", navRegistry.getEntries(authentication));
             modelMap.put("dataTableService", dataTableService);
             final Long orgaID = ThreadLocalStorage.getCurrentOrgId();
             if (orgaID != null) {
-                fillModelWithOrganization(account, modelMap, orgaID);
+                fillModelWithOrganization(authentication.getDetails(), modelMap, orgaID);
             }
 
         }

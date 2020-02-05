@@ -39,7 +39,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
@@ -63,7 +63,7 @@ public class ReportsController {
     private ReportService reportService;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @GetMapping
@@ -149,7 +149,7 @@ public class ReportsController {
 
         final Account actor = authentication.getDetails();
         final Long organizationID = ThreadLocalStorage.getCurrentOrgId();
-        final Account organization = userService.findUserByID(organizationID);
+        final Account organization = accountService.findUserByID(organizationID);
 
         final Report updatedReport = this.reportService.getReportByID(organization, reportID);
         updatedReport.setName(report.getName());

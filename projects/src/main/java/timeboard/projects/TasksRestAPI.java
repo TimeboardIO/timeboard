@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
@@ -66,7 +66,7 @@ public class TasksRestAPI {
     private OrganizationService organizationService;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -155,7 +155,7 @@ public class TasksRestAPI {
             final Long typeID) {
         Account assignee = null;
         if (taskWrapper.assigneeID > 0) {
-            assignee = userService.findUserByID(taskWrapper.assigneeID);
+            assignee = accountService.findUserByID(taskWrapper.assigneeID);
         }
 
 
@@ -195,7 +195,7 @@ public class TasksRestAPI {
         final Task task = (Task) projectService.getTaskByID(actor, taskID);
 
         if (taskWrapper.assigneeID != null && taskWrapper.assigneeID > 0) {
-            final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
+            final Account assignee = accountService.findUserByID(taskWrapper.assigneeID);
             task.setAssigned(assignee);
         }
         task.setName(taskWrapper.getTaskName());

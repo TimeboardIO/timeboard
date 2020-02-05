@@ -34,7 +34,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.home.HomeController;
 
 
@@ -57,7 +57,7 @@ public class TimeboardTest {
     protected ProjectService projectService;
 
     @Autowired
-    protected UserService userService;
+    protected AccountService accountService;
 
     @Autowired
     protected OrganizationService organizationService;

@@ -65,13 +65,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectServiceImpl.class);
 
-    private static final String PROJECT_CREATE = "PROJECT_CREATE";
-    private static final String PROJECT_SETUP = "PROJECT_SETUP";
-    private static final String PROJECT_ARCHIVE = "PROJECT_ARCHIVE";
-    private static final String PROJECT_LIST = "PROJECT_LIST";
-
-    private static final String TASK_LIST = "TASK_LIST";
-
     @Value("${timeboard.tasks.default.vacation}")
     private String defaultVacationTaskName;
 
@@ -132,6 +125,15 @@ public class ProjectServiceImpl implements ProjectService {
         query.setParameter("user", candidate);
         query.setParameter("orgID", orgID);
         return query.getResultList();
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(null,'" + PROJECT_COUNT + "')")
+    public double countAccountProjectMemberships(final Long orgID, final Account candidate){
+        final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
+        query.setParameter("user", candidate);
+        query.setParameter("orgID", orgID);
+        return query.getResultList().size();
     }
 
     @Override
@@ -290,6 +292,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Cacheable(value = "accountTasksCache")
+    @PreAuthorize("hasPermission(#project,'"+TASK_LIST+"')")
     public List<Task> listUserTasks(Long orgID, final Account account) {
         final TypedQuery<Task> q = em.createQuery("select t " +
                 "from Task t " +
@@ -302,7 +305,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    //@PreAuthorize("@bpe.checkTaskByProjectLimit(#actor, #project)")
     @PreAuthorize("hasPermission(#project,'TASKS_CREATE')")
     public Task createTask(
             final Long orgID,

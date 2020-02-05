@@ -33,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
@@ -46,7 +46,7 @@ import java.util.UUID;
 public class ProjectsTest extends TimeboardTest {
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
     @Autowired
     private OrganizationService organizationService;
@@ -56,7 +56,7 @@ public class ProjectsTest extends TimeboardTest {
 
     @Test
     public void testCreateProject() throws BusinessException {
-        final Account a1 = this.userService.userProvisionning(UUID.randomUUID().toString(), "test1@test.fr");
+        final Account a1 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test1@test.fr");
         final Organization org = this.organizationService.createOrganization(a1, "testOrg", Collections.emptyMap());
         SecurityUtils.signIn(org, a1);
 

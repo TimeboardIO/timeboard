@@ -37,6 +37,11 @@ import java.util.Optional;
 
 public interface TimesheetService {
 
+      String TIMESHEET_SUBMIT = "TIMESHEET_SUBMIT";
+     String TIMESHEET_VALIDATE = "TIMESHEET_VALIDATE";
+      String TIMESHEET_REJECT = "TIMESHEET_REJECT";
+     String TIMESHEET_IMPUTATION = "TIMESHEET_IMPUTATION";
+     String TIMESHEET_LIST = "TIMESHEET_LIST";
     /**
      * Submit user timesheet.
      *

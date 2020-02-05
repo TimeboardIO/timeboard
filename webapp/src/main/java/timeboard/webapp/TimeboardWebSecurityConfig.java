@@ -40,7 +40,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.web.filter.GenericFilterBean;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.model.Account;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
@@ -70,7 +70,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     private String clientid;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @Override
@@ -140,11 +140,11 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 Account account = null;
 
                 if (auth instanceof UsernamePasswordAuthenticationToken) {
-                    account = userService.findUserBySubject(((UsernamePasswordAuthenticationToken) auth).getName());
+                    account = accountService.findUserBySubject(((UsernamePasswordAuthenticationToken) auth).getName());
                 }
 
                 if (auth instanceof OAuth2AuthenticationToken) {
-                    account = userService.findUserBySubject(
+                    account = accountService.findUserBySubject(
                             (String) ((OAuth2AuthenticationToken) auth).getPrincipal().getAttributes().get("sub"));
                 }
 

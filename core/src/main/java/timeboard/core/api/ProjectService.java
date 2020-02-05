@@ -36,6 +36,13 @@ public interface ProjectService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
+     String PROJECT_CREATE = "PROJECT_CREATE";
+     String PROJECT_SETUP = "PROJECT_SETUP";
+    String PROJECT_ARCHIVE = "PROJECT_ARCHIVE";
+    String PROJECT_LIST = "PROJECT_LIST";
+    String PROJECT_COUNT = "PROJECT_COUNT";
+
+      String TASK_LIST = "TASK_LIST";
     /*
     === Projects ===
     */
@@ -43,6 +50,8 @@ public interface ProjectService {
     Project createProject(Long orgID, Account owner, String projectName) throws BusinessException;
 
     List<Project> listProjects(Account owner, Long orgID);
+
+    double countAccountProjectMemberships(Long orgID, Account candidate);
 
     Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
 

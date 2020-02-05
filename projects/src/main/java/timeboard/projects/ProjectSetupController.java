@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
@@ -58,7 +58,7 @@ public class ProjectSetupController extends ProjectBaseController {
     private ProjectService projectService;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @GetMapping
@@ -81,7 +81,7 @@ public class ProjectSetupController extends ProjectBaseController {
     protected ResponseEntity updateProjectMembers(final TimeboardAuthentication authentication,
                                                   @PathVariable final long projectID, final HttpServletRequest request) throws Exception {
         final Account actor = authentication.getDetails();
-        final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
+        final Account targetMember = this.accountService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         if (project.isMember(targetMember)) {

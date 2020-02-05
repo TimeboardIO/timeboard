@@ -36,7 +36,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
@@ -62,7 +62,7 @@ public class OrganizationMembersController {
     public OrganizationService organizationService;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
     @GetMapping
     protected String handleGet(final TimeboardAuthentication authentication, final Model viewModel) {
@@ -169,7 +169,7 @@ public class OrganizationMembersController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
-        final Account member = this.userService.findUserByID(memberID);
+        final Account member = this.accountService.findUserByID(memberID);
 
         // Add member in current organization
         try {

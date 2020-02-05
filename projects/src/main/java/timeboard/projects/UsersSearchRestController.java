@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
@@ -56,7 +56,7 @@ import java.util.*;
 public class UsersSearchRestController {
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
     @Autowired
     private OrganizationService organizationService;
@@ -91,12 +91,12 @@ public class UsersSearchRestController {
 
         if (projectID != null) {
             final Project project = projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-            accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query, project));
         } else if (orgID != null) {
             final Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
-            accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query, org.get()));
         } else {
-            accounts.addAll(this.userService.searchUserByEmail(actor, query));
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query));
         }
 
         final SearchResults searchResults = new SearchResults(accounts.size(), accounts);

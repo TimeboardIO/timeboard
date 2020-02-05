@@ -53,6 +53,8 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimesheetServiceImpl.class);
 
+
+
     @Autowired
     private EntityManager em;
 
@@ -64,7 +66,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize("hasPermission(#accountTimesheet,'TIMESHEET_SUBMIT')")
+    @PreAuthorize("hasPermission(#accountTimesheet,'"+TIMESHEET_SUBMIT+"')")
     public SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
             final Account actor,
@@ -154,7 +156,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_VALIDATE')")
+    @PreAuthorize("hasPermission(#submittedTimesheet,'"+TIMESHEET_VALIDATE+"')")
     public SubmittedTimesheet validateTimesheet(final Account actor,
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
@@ -176,7 +178,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_REJECT')")
+    @PreAuthorize("hasPermission(#submittedTimesheet,'"+TIMESHEET_REJECT+"')")
     public SubmittedTimesheet rejectTimesheet(final Account actor,
                                               final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
@@ -198,6 +200,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(null,'"+TIMESHEET_IMPUTATION+"')")
     public List<UpdatedTaskResult> updateTaskImputations(final Long orgID, final Account actor, final List<Imputation> imputationsList) {
         final List<UpdatedTaskResult> result = new ArrayList<>();
         for (final Imputation imputation : imputationsList) {
@@ -214,6 +217,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(null,'"+TIMESHEET_IMPUTATION+"')")
     public UpdatedTaskResult updateTaskImputation(
             final Long orgID,
             final Account actor,
@@ -248,6 +252,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
+    @PreAuthorize("hasPermission(null,'"+TIMESHEET_LIST+"')")
     public Optional<SubmittedTimesheet> getSubmittedTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "

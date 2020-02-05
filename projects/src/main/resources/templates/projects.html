@@ -16,7 +16,7 @@
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
-        <div class="content" sec:authorize="hasPermission(null,'PROJECTS_CREATE')">
+        <div class="content" sec:authorize="hasPermission(null,'PROJECT_CREATE')">
             <div class="header">
                 No Projects ?
             </div>
@@ -59,14 +59,14 @@
                     </div>
                     <div class="extra content" style="text-align: center;">
 
-                        <a v-bind:href="'/projects/'+project.id+'/setup'" class="ui positive icon button" data-cy="setup">
+                        <a v-bind:href="'/projects/'+project.id+'/setup'" class="ui positive icon button" data-cy="setup" sec:authorize="hasPermission(null,'PROJECT_ARCHIVE')">
                             <i class="cog icon"></i>
                         </a>
                         <a v-bind:href="'/projects/'+project.id+'/tasks'"
                             class="ui primary icon button">
                             <i class="tasks icon"></i>
                         </a>
-                        <a @click="archive(project)" class="ui negative icon button" data-cy="archive">
+                        <a @click="archive(project)" class="ui negative icon button" data-cy="archive" sec:authorize="hasPermission(null,'PROJECT_ARCHIVE')">
                             <i class="archive icon"></i>
                         </a>
                     </div>
@@ -77,7 +77,7 @@
                         <div class="ui active loader"></div>
                     </a>
                 </div>
-                <div class="ui card" sec:authorize="hasPermission(null,'PROJECTS_CREATE')">
+                <div class="ui card" sec:authorize="hasPermission(null,'PROJECT_CREATE')">
                     <a class="content"  style="background-color: lightgrey" data-cy="create-project"  th:href="@{/projects/create}">
                         <div class="badge" style="font-size: 4.2rem; padding-top: 2rem;">
                             <i class="plus icon"></i>
@@ -107,7 +107,7 @@
                         <i class="tasks icon"></i>
                         Task
                     </a>
-                    <a class="ui right labeled negative icon button" @click="archive(row)" data-cy="archive">
+                    <a class="ui right labeled negative icon button" @click="archive(row)" data-cy="archive" >
                         <i class="archive icon"></i>
                         Archive
                     </a>

@@ -11,7 +11,9 @@
         <img src="/onboarding/images/logo.png">
     </div>
 
-    <a class="item nav" th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''" th:each="nav : ${navs}" data-cy="menu-link"
+    <a class="item nav"
+       th:classappend="${title} == ${nav.getNavigationPath()}  ? 'active':''"
+       th:each="nav : ${navs}" data-cy="menu-link"
        th:href="${nav.getNavigationPath()}">
         <i th:class="${nav.getNavigationLogo()}+' icon'"></i>
         <div class="title" th:text="#{${nav.getNavigationLabel()}}"></div>
