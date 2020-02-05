@@ -267,10 +267,8 @@ public class TasksRestAPI {
 
     public static class BatchWrapper implements Serializable {
 
-
         public Long batchID;
         public String batchName;
-
 
         public BatchWrapper(final Long batchID, final String batchName) {
             this.batchID = batchID;
