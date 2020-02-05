@@ -129,7 +129,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @PreAuthorize("hasPermission(null,'" + PROJECT_COUNT + "')")
-    public double countAccountProjectMemberships(final Long orgID, final Account candidate){
+    public double countAccountProjectMemberships(final Long orgID, final Account candidate) {
         final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
         query.setParameter("orgID", orgID);
@@ -137,7 +137,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PostAuthorize("hasPermission(returnObject,'" + PROJECT_SETUP + "')")
+    @PostAuthorize("hasPermission(returnObject,'" + PROJECT_VIEW + "')")
     public Project getProjectByID(final Account actor, final Long orgID, final Long projectId) {
         final Project data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
                 .setParameter("user", actor)
@@ -292,7 +292,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Cacheable(value = "accountTasksCache")
-    @PreAuthorize("hasPermission(#project,'"+TASK_LIST+"')")
+    @PreAuthorize("hasPermission(#project,'" + TASK_LIST + "')")
     public List<Task> listUserTasks(Long orgID, final Account account) {
         final TypedQuery<Task> q = em.createQuery("select t " +
                 "from Task t " +

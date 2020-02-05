@@ -12,6 +12,12 @@
     "condition": "true==true"
   },
   {
+    "name": "Every user can count his projects",
+    "description": "Every user can count his projects",
+    "target": " action == 'PROJECT_VIEW'",
+    "condition": "subject.currentProjectRole(resource, 'OWNER') || subject.currentProjectRole(resource, 'CONTRIBUTOR')"
+  },
+  {
     "name": "Every user can edit his timesheet",
     "description": "Every user can edit his timesheet",
     "target": "action == 'TIMESHEET_LIST' || action == 'TIMESHEET_IMPUTATION'",
@@ -20,7 +26,7 @@
   {
     "name": "Every user can list his tasks",
     "description": "Every user can list his tasks",
-    "target": "action == 'TASK_LIST'",
+    "target": "action == 'TASK_LIST' || action == 'PROJECT_TASKS_VIEW'",
     "condition": "true==true"
   },
   {

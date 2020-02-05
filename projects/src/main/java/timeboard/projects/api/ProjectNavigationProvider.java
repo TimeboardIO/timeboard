@@ -32,6 +32,8 @@ public interface ProjectNavigationProvider {
 
     String getNavigationPath();
 
+    String getNavigationAction();
+
     default String getNavigationLogo() {
         return "hourglass";
     }

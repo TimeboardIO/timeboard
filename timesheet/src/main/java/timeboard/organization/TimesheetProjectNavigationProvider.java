@@ -27,6 +27,7 @@ package timeboard.organization;
  */
 
 import org.springframework.stereotype.Component;
+import timeboard.core.api.TimesheetService;
 import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
@@ -40,5 +41,10 @@ public class TimesheetProjectNavigationProvider implements ProjectNavigationProv
     @Override
     public String getNavigationPath() {
         return ProjectTimesheetValidationController.PATH;
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return TimesheetService.TIMESHEET_VALIDATE;
     }
 }

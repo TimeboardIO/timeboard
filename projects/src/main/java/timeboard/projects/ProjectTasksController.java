@@ -54,9 +54,11 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}/tasks")
+@RequestMapping("/projects/{projectID}"+ProjectTasksController.URL)
 public class ProjectTasksController extends ProjectBaseController {
 
+    public static final String URL = "/tasks";
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTasksController.class);
 
     @Autowired
@@ -85,10 +87,10 @@ public class ProjectTasksController extends ProjectBaseController {
         model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, authentication.getCurrentOrganization(), actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
         model.addAttribute("batchType", "Default");
-        this.initModel(model);
+        this.initModel(model, authentication, project);
         return "project_tasks.html";
     }
 
@@ -166,22 +168,22 @@ public class ProjectTasksController extends ProjectBaseController {
         model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, authentication.getCurrentOrganization(), actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
         return "project_tasks.html";
     }
 
-    private void fillModel(final Model model, final Long orgID, final Account actor, final Project project) throws BusinessException {
+    private void fillModel(final Model model, final Long orgID, final TimeboardAuthentication auth, final Project project) throws BusinessException {
         model.addAttribute("project", project);
-        model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
+        model.addAttribute("tasks", this.projectService.listProjectTasks(auth.getDetails(), project));
         model.addAttribute("taskTypes", this.organizationService.listTaskType(orgID));
         model.addAttribute("allTaskStatus", TaskStatus.values());
-        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
-        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
-        model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
+        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(auth.getDetails(), project));
+        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(auth.getDetails(), project));
+        model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(auth.getDetails(), project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());
-        this.initModel(model);
+        this.initModel(model, auth, project);
     }
 
     @GetMapping("/{taskID}")
@@ -198,7 +200,7 @@ public class ProjectTasksController extends ProjectBaseController {
 
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        fillModel(model, authentication.getCurrentOrganization(), actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
 
         return "project_tasks.html";

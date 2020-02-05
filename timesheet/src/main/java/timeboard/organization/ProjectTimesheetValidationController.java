@@ -84,7 +84,7 @@ public class ProjectTimesheetValidationController extends ProjectBaseController 
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
-        this.initModel(model);
+        this.initModel(model, authentication, project);
         return "timesheet_validation.html";
     }
 

@@ -102,7 +102,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#applicant,'"+VACATION_LIST+"')")
+    @PreAuthorize("hasPermission(#applicant,'" + VACATION_LIST + "')")
     public List<VacationRequest> listVacationRequestsByUser(final Account applicant, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
@@ -119,7 +119,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#applicant,'"+VACATION_LIST+"')")
+    @PreAuthorize("hasPermission(#applicant,'" + VACATION_LIST + "')")
     public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID, int year) {
 
         final Calendar startBound = Calendar.getInstance();
@@ -150,7 +150,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#applicant,'"+VACATION_LIST+"')")
+    @PreAuthorize("hasPermission(#applicant,'" + VACATION_LIST + "')")
     public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee, long orgID) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
@@ -168,7 +168,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#project,'"+VACATION_TEAM_LIST+"')")
+    @PreAuthorize("hasPermission(#project,'" + VACATION_TEAM_LIST + "')")
     public Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(
             final Account actor, final Project project, final int month, final int year) {
 

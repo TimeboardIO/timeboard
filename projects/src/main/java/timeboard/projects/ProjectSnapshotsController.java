@@ -74,7 +74,7 @@ public class ProjectSnapshotsController extends ProjectBaseController {
                           final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
-        this.initModel(model);
+        this.initModel(model, authentication, project);
         return "project_snapshots";
     }
 

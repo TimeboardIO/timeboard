@@ -58,15 +58,14 @@ public class ProjectDashboardController extends ProjectBaseController {
 
     @GetMapping
     protected String handleGet(final TimeboardAuthentication authentication,
-                               @PathVariable final Long projectID, final Model model) throws BusinessException {
+                               @PathVariable final Project project, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
 
         model.addAttribute("project", project);
         model.addAttribute("dashboard", dashboard);
-        this.initModel(model);
+        this.initModel(model, authentication, project);
         return "project_dashboard.html";
     }
 

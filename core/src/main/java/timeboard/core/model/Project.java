@@ -240,6 +240,6 @@ public class Project extends OrganizationEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "project("+this.getId()+") - "+this.getName();
+        return "project(" + this.getId() + ") - " + this.getName();
     }
 }

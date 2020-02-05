@@ -59,7 +59,7 @@ public class AccountServiceImpl implements AccountService {
     private EntityManager em;
 
     @Override
-    @PreAuthorize("hasPermission(null,'"+ACCOUNT_CREATE+"')")
+    @PreAuthorize("hasPermission(null,'" + ACCOUNT_CREATE + "')")
     public List<Account> createUsers(final List<Account> accounts) {
         accounts.forEach(user -> {
             em.persist(user);

@@ -32,9 +32,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.AccountService;
 import timeboard.home.HomeController;
 
 

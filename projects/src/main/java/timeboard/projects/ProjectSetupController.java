@@ -33,9 +33,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
@@ -72,7 +72,7 @@ public class ProjectSetupController extends ProjectBaseController {
         final Map<String, Object> map = new HashMap<>();
         this.prepareTemplateData(project, map);
         model.addAllAttributes(map);
-        this.initModel(model);
+        this.initModel(model, authentication, project);
         return "project_config.html";
     }
 

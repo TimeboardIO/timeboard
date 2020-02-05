@@ -36,13 +36,18 @@ public interface ProjectService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
-     String PROJECT_CREATE = "PROJECT_CREATE";
-     String PROJECT_SETUP = "PROJECT_SETUP";
+    String PROJECT_CREATE = "PROJECT_CREATE";
+    String PROJECT_SETUP = "PROJECT_SETUP";
     String PROJECT_ARCHIVE = "PROJECT_ARCHIVE";
     String PROJECT_LIST = "PROJECT_LIST";
     String PROJECT_COUNT = "PROJECT_COUNT";
+    String PROJECT_VIEW = "PROJECT_VIEW";
 
-      String TASK_LIST = "TASK_LIST";
+    String TASK_LIST = "TASK_LIST";
+    String PROJECT_TAGS_VIEW = "PROJECT_TAGS_VIEW";
+    String PROJECT_TASKS_VIEW = "PROJECT_TASKS_VIEW";
+    String PROJECT_BATCHES_VIEW = "PROJECT_BATCHES_VIEW";
+    String PROJECT_SETUP_VIEW = "PROJECT_BATCHES_VIEW";
     /*
     === Projects ===
     */
