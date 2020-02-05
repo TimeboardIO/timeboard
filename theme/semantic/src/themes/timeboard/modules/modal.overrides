@@ -1,0 +1,9 @@
+/*******************************
+         Theme Overrides
+*******************************/
+
+.ui.modal>.close{
+    top : 0rem;
+    right:0rem;
+    color:black;
+}

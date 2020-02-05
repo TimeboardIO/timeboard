@@ -36,7 +36,7 @@
                     <div v-bind="formError" class="ui error message"></div>
                     <div class="field">
                         <label>Project</label>
-                        <select v-model="task.projectID" class="select dropdown" name="projectID">
+                        <select v-model="task.projectID" class="select ui dropdown" name="projectID">
                             <option th:each="project: ${projectList}"
                                     th:text="${project.name}" th:value="${project.id}"
                             ></option>
@@ -72,7 +72,7 @@
                         </div>
                         <div class="field">
                             <label>Task type</label>
-                            <select v-model="task.typeID" name="taskTypeID">
+                            <select v-model="task.typeID" name="taskTypeID" class="ui dropdown">
                                 <option th:each="type: ${taskTypes}"
                                         th:text="${type.typeName}" th:value="${type.id}"
                                 ></option>

@@ -14,13 +14,19 @@
   {
     "name": "Every user can edit his timesheet",
     "description": "Every user can edit his timesheet",
-    "target": "action == 'TIMESHEET_LIST'",
+    "target": "action == 'TIMESHEET_LIST' || action == 'TIMESHEET_IMPUTATION'",
     "condition": "true==true"
   },
   {
     "name": "Every user can list his tasks",
     "description": "Every user can list his tasks",
     "target": "action == 'TASK_LIST'",
+    "condition": "true==true"
+  },
+  {
+    "name": "Every user can list his tasks",
+    "description": "Every user can list his tasks",
+    "target": "action == 'PROJECT_LIST'",
     "condition": "true==true"
   },
   {
