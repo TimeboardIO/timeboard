@@ -99,6 +99,8 @@
         <div class="ui text loader" th:text="#{loading}">Loading</div>
     </div>
     <div id="timesheet" class="hidden">
+        <number-input :min="0" :max="1" :step="0.1"></number-input>
+
         <div v-for="error in errorMessages" v-if="error.visible" class="ui container negative timesheet message">
             <i class="close icon" @click="error.visible = false; "></i>
             <div class="header"> {{ error.message }}</div>

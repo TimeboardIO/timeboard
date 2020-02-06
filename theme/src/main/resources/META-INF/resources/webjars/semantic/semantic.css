@@ -949,6 +949,48 @@ table,
   padding: 1.1em 1em !important;
 }
 
+/** input number **/
+
+.number-input {
+  display: block;
+  font-size: 0;
+  max-width: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.number-input input {
+  -moz-appearance: textfield;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 100%;
+  min-height: 1.5rem;
+  min-width: 3rem;
+  padding: 0.4375rem 0.875rem;
+  -webkit-transition: border-color 0.15s;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+.number-input input::-webkit-outer-spin-button,
+.number-input input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+.number-input input:focus {
+  border-color: #0074d9;
+  outline: none;
+}
+
+.number-input input:disabled,
+.number-input input[readonly] {
+  background-color: #f8f8f8;
+}
+
 /*******************************
          Site Overrides
 *******************************/
