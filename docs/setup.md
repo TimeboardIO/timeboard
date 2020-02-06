@@ -9,7 +9,8 @@
 - Docker engine
 - Maven
 - Internet connexion
-- MySQL Workbench
+- MySQL Workbench v6+
+- Git 2 (and Git GUI client optional) 
 - Intellij or maven compatible IDE
 
 ### Download source code
@@ -29,10 +30,13 @@ Commands are assumed to be run from source code root folder.
         -p 3306:3306 \
         mysql:8.0
         
-A shortcut is available 
+For information database init script is available in  
 
-    ./scripts/docker/mysql.sh
+    ./scripts/sql/mysql8.sql
     
+To start mysql docker component 
+
+    docker start timeboard-mysql
 
 ### Build Timeboard source code
 
@@ -43,9 +47,9 @@ Command is assumed to be run from source code root folder :
 ### Deploy Timeboard
 
 
-Timeboard source code is divided into business modules. To run timeboard run **App** in webapp module.
+Timeboard source code is divided into business modules. To run timeboard run **App.main()** in webapp module from an IDE.
 
-    Run timeboard.webapp.App 
+   {SRC_ROOT}/webapp/src/main/java/timeboard/webapp.App
 
 Open your web browser and got to 
 
@@ -53,17 +57,12 @@ Open your web browser and got to
     
 Congratulation, you have access to Timeboard !
 
-### Last job : Authentication account
 
-Timeboard works with amazon cognito authentication.
-If you just wan't to use timeboard for testing you can enable testing authentication in **application.properties** located in *webapp/src/main/ressources/*
+### Trouble shooting
+#### Authentication Error
 
-    timeboard.uitest = true
-        
-Now, you can login into Timeboard with 
-
-    username : user
-    password : password     
+If you are using a virtual machine, try to reset date/time settings of your device.
+On ubuntu : parameters > details > date & time > click twice on switch automatic date & time settings 
         
 
 ## For test with Docker
