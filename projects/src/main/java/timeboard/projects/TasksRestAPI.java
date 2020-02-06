@@ -105,9 +105,11 @@ public class TasksRestAPI {
         try {
             if (taskID != null && taskID != 0) {
                 final Task oldTask = (Task) projectService.getTaskByID(actor, taskID);
-                if (oldTask.getEffortSpent() > 0) {
+                if (oldTask.getEffortSpent() > 0 && oldTask.getAssigned() != t.getAssigned()) {
                     throw new TaskCreationException("You can not modify assignee because he already add imputation on this task");
                 }
+                t.setOrigin(oldTask.getOrigin());
+                t.setId(oldTask.getId());
                 task = processUpdateTask(orgID, actor, t);
 
             }
