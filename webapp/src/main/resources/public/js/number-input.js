@@ -102,6 +102,12 @@ Vue.component('number-input', {
                 input.focus();
                 input.select();
             };
+            let self = this;
+            listeners.keypress = (event) => {
+                if (event.which === 13 ||event.keyCode === 13) {
+                    self.trigger(event);
+                }
+            };
             listeners.focusout = this.trigger;
             return listeners;
         },
@@ -155,7 +161,7 @@ Vue.component('number-input', {
                 this.$refs.input.value = newValue;
             }
             this.$emit('change', newValue, oldValue);
-        },
+        }
     }
 });
 

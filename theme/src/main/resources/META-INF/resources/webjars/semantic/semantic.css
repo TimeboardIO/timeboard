@@ -863,8 +863,7 @@ table,
 }
 
 #timesheet input:focus {
-  border-color: #0074d9;
-  outline: none;
+  background: rgba(125, 125, 125, 0.05) !important;
 }
 
 #timesheet input:disabled,

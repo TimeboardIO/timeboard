@@ -99,10 +99,7 @@ table, .controls {
   input::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
-  input:focus {
-    border-color: #0074d9;
-    outline: none;
-  }
+
   input:disabled,
   input[readonly] {
     background-color: #f8f8f8;
