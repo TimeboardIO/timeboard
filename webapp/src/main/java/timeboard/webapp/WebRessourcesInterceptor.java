@@ -37,15 +37,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import timeboard.core.api.DataTableService;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
-import java.util.Optional;
 
 @Component
 public class WebRessourcesInterceptor implements WebRequestInterceptor {
@@ -61,8 +56,6 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     @Autowired
     private DataTableService dataTableService;
 
-    @Autowired
-    private OrganizationService organizationService;
 
     private String version = "";
 
@@ -92,9 +85,8 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
             modelMap.put("account", authentication.getDetails());
             modelMap.put("navs", navRegistry.getEntries(authentication));
             modelMap.put("dataTableService", dataTableService);
-            final Long orgaID = ThreadLocalStorage.getCurrentOrgId();
-            if (orgaID != null) {
-                fillModelWithOrganization(authentication.getDetails(), modelMap, orgaID);
+            if (authentication.getCurrentOrganization() != null) {
+                fillModelWithOrganization(authentication, modelMap);
             }
 
         }
@@ -105,14 +97,9 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
         }
     }
 
-    private void fillModelWithOrganization(final Account account, final ModelMap modelMap, final Long orgaID) {
-        modelMap.put("orgID", orgaID);
-        final Optional<Organization> organisation = organizationService.getOrganizationByID(account, orgaID);
-        if (organisation.isPresent()) {
-            modelMap.put("currentOrg", organisation.get());
-        } else {
-            LOGGER.warn("User : {} try to access missing org : {}", account, orgaID);
-        }
+    private void fillModelWithOrganization(final TimeboardAuthentication auth, final ModelMap modelMap) {
+        modelMap.put("orgID", auth.getCurrentOrganization().getId());
+        modelMap.put("currentOrg", auth.getCurrentOrganization());
     }
 
     @Override
