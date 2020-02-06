@@ -261,6 +261,37 @@ table,
           box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
 }
 /** Timesheet **/
+#timesheet {
+  /** input number **/
+}
+#timesheet input {
+  -moz-appearance: textfield;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 100%;
+  min-height: 1.5rem;
+  min-width: 3rem;
+  padding: 0.4375rem 0.875rem;
+  -webkit-transition: border-color 0.15s;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+#timesheet input::-webkit-outer-spin-button,
+#timesheet input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+#timesheet input:focus {
+  border-color: #0074d9;
+  outline: none;
+}
+#timesheet input:disabled,
+#timesheet input[readonly] {
+  background-color: #f8f8f8;
+}
 #timesheet table td {
   padding: 0.3rem 0.3rem;
 }
@@ -351,42 +382,6 @@ table,
   color: #FFFFFF !important;
   background-color: #00bfd8 !important;
   padding: 1.1em 1em !important;
-}
-/** input number **/
-.number-input {
-  display: block;
-  font-size: 0;
-  max-width: 100%;
-  overflow: hidden;
-  position: relative;
-}
-.number-input input {
-  -moz-appearance: textfield;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 0.25rem;
-  display: block;
-  font-size: 1rem;
-  line-height: 1.5;
-  max-width: 100%;
-  min-height: 1.5rem;
-  min-width: 3rem;
-  padding: 0.4375rem 0.875rem;
-  -webkit-transition: border-color 0.15s;
-  transition: border-color 0.15s;
-  width: 100%;
-}
-.number-input input::-webkit-outer-spin-button,
-.number-input input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-}
-.number-input input:focus {
-  border-color: #0074d9;
-  outline: none;
-}
-.number-input input:disabled,
-.number-input input[readonly] {
-  background-color: #f8f8f8;
 }
 
 

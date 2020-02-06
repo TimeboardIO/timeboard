@@ -13,60 +13,65 @@ Vue.component('number-input', {
     props: {
         attrs: {
             type: Object,
-        default: undefined,
+            default: undefined,
         },
         center: Boolean,
-            controls: Boolean,
-            disabled: Boolean,
-            inputtable: {
+        controls: Boolean,
+        disabled: Boolean,
+        inputtable: {
             type: Boolean,
-        default: true,
+            default: true,
         },
         min: {
             type: Number,
-        default: -Infinity,
+            default: -Infinity,
+        },
+        max: {
+            type: Number,
+            default: Infinity,
         },
         name: {
             type: String,
-        default: undefined,
+            default: undefined,
         },
         placeholder: {
             type: String,
-        default: undefined,
+            default: undefined,
         },
         readonly: Boolean,
-            rounded: Boolean,
-            size: {
+        rounded: Boolean,
+        size: {
             type: String,
-        default: undefined,
+            default: undefined,
         },
-        step: {
+        trigger: {
+            type: Function,
+            default: undefined,
+        },
+        validationStep: {
             type: Number,
-        default: 1,
+            default: 1,
+        },
+        inputStep: {
+            type: Number,
+            default: 1,
         },
         value: {
             type: Number,
-        default: NaN,
+            default: NaN,
         }
     },
     template: `
-    <div
-        :class="{
-        'number-input--inline': inline,
-            'number-input--center': center,
-            'number-input--controls': controls,
-        }"
-        class="number-input"
-        v-on="listeners"
-        >
+
             <input
+                class="number-input"
                 :disabled="disabled"
                 :max="max"
                 :min="min"
                 :name="name"
                 :placeholder="placeholder"
                 :readonly="readonly || !inputtable"
-                :step="step"
+                :step="inputStep"
                 :value="currentValue"
                 @change="change"
                 @paste="paste"
@@ -74,8 +79,9 @@ Vue.component('number-input', {
                 ref="input"
                 type="number"
                 v-bind="attrs"
+                v-on="listeners"
             >
-    </div>
+
     `,
 
     data() {
@@ -91,6 +97,12 @@ Vue.component('number-input', {
         listeners() {
             const listeners = { ...this.$listeners };
             delete listeners.change;
+            listeners.click = function (event) {
+                const input = event.target;
+                input.focus();
+                input.select();
+            };
+            listeners.focusout = this.trigger;
             return listeners;
         },
     },
@@ -133,7 +145,7 @@ Vue.component('number-input', {
          */
         setValue(value) {
             const oldValue = this.currentValue;
-            let newValue = this.rounded ? Math.round(value) : value;
+            let newValue = Math.round(value * (1 / this.validationStep)) / (1 / this.validationStep) ;
             if (this.min <= this.max) {
                 newValue = Math.min(this.max, Math.max(this.min, newValue));
             }

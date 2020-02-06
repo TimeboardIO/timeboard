@@ -275,8 +275,8 @@ $(document).ready(function () {
             triggerUpdateTask: function (event) {
 
                 $(event.target).parent().addClass('left icon loading').removeClass('error');
-                const date = $(event.target).attr('data-date');
-                const taskID = $(event.target).attr('data-task');
+                const date = $(event.target).attr('date');
+                const taskID = $(event.target).attr('task');
 
                 const currentSum = app.getImputationSum(date);
                 let newval = parseFloat($(event.target).val());
