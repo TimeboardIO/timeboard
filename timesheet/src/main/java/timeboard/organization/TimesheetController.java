@@ -228,6 +228,12 @@ public class TimesheetController {
             @RequestBody final UpdateRequest request) {
 
         try {
+
+            if((request.imputation * 100) % 5 != 0){ // Modulo with int and not double
+                return ResponseEntity.badRequest().body("Your imputation value is not valid. The step is 0.05.");
+            }
+
+
             final Account actor = authentication.getDetails();
 
             final Long taskID = request.task;
