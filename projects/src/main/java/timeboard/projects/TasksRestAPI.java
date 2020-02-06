@@ -143,7 +143,7 @@ public class TasksRestAPI {
     }
 
     private Task createTask(
-            final Long orgID,
+            final Organization orgID,
             final TaskWrapper taskWrapper,
             final Account actor,
             final Date startDate,
@@ -186,7 +186,7 @@ public class TasksRestAPI {
     }
 
     private Task processUpdateTask(
-            final Long orgID,
+            final Organization orgID,
             final TaskWrapper taskWrapper,
             final Account actor,
             final Set<Batch> batches,

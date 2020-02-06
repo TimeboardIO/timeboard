@@ -38,6 +38,7 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -129,7 +130,7 @@ public class AccountController {
         return "account.html";
     }
 
-    private void loadPage(final Model model, final Account actor, final Long orgID) throws BusinessException {
+    private void loadPage(final Model model, final Account actor, final Organization orgID) throws BusinessException {
         model.addAttribute("account", actor);
 
         final List<Project> projects = projectService.listProjects(actor, orgID);

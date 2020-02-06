@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
@@ -91,7 +92,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public Report createReport(final Long orgID, final Account owner, final String reportName,
+    public Report createReport(final Organization orgID, final Account owner, final String reportName,
                                final String handlerID, final String filterProject) throws SchedulerException {
 
 
@@ -129,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> listReports(final Long orgID, final Account owner) {
+    public List<Report> listReports(final Organization orgID, final Account owner) {
         final TypedQuery<Report> query = em.createQuery(
                 "select r from Report r where r.organizationID = :orgID",
                 Report.class);
@@ -171,7 +172,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(final Account actor, final Long orgID, final List<String> expressions) {
+    public List<ProjectWrapper> findProjects(final Account actor, final Organization orgID, final List<String> expressions) {
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -197,7 +198,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(final Account actor, final Long orgID, final Report report) {
+    public List<ProjectWrapper> findProjects(final Account actor, final Organization orgID, final Report report) {
         return this.findProjects(actor, orgID, Arrays.asList(report.getFilterProject().split("\n")));
     }
 

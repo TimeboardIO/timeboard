@@ -56,7 +56,7 @@ public interface ReportService {
      * @throws SchedulerException
      */
     Report createReport(
-            final Long organizationID,
+            final Organization organizationID,
             final Account owner,
             final String reportName,
             final String handlerName,
@@ -69,7 +69,7 @@ public interface ReportService {
      * @param owner an account that own reports
      * @return
      */
-    List<Report> listReports(final Long orgID, final Account owner);
+    List<Report> listReports(final Organization orgID, final Account owner);
 
     Report updateReport(Account actor, Report report);
 
@@ -77,9 +77,9 @@ public interface ReportService {
 
     void deleteReportByID(Account actor, Long reportId) throws SchedulerException;
 
-    List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions);
+    List<ProjectWrapper> findProjects(Account actor, Organization orgID, List<String> expressions);
 
-    List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report);
+    List<ProjectWrapper> findProjects(Account actor, Organization orgID, Report report);
 
     Optional<ReportHandler> getReportHandler(Report report);
 

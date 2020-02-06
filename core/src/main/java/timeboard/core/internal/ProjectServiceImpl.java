@@ -100,12 +100,12 @@ public class ProjectServiceImpl implements ProjectService {
     @PreAuthorize("hasPermission(null,'" + PROJECT_CREATE + "')")
     @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
     @CacheEvict(value = "accountProjectsCache", key = "#owner.getId()")
-    public Project createProject(final Long orgID, final Account owner, final String projectName) {
+    public Project createProject(final Organization orgID, final Account owner, final String projectName) {
         final Account ownerAccount = this.em.find(Account.class, owner.getId());
         final Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
-        newProject.setOrganizationID(orgID);
+        newProject.setOrganizationID(orgID.getId());
         newProject.getAttributes()
                 .put(Project.PROJECT_COLOR_ATTR, new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
         em.persist(newProject);
@@ -121,7 +121,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @PreAuthorize("hasPermission(null,'" + PROJECT_LIST + "')")
     @Cacheable(value = "accountProjectsCache", key = "#candidate.getId()")
-    public List<Project> listProjects(final Account candidate, final Long orgID) {
+    public List<Project> listProjects(final Account candidate, final Organization orgID) {
         final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
         query.setParameter("orgID", orgID);
@@ -139,18 +139,18 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @PostAuthorize("hasPermission(returnObject,'" + PROJECT_VIEW + "')")
-    public Project getProjectByID(final Account actor, final Long orgID, final Long projectId) {
+    public Project getProjectByID(final Account actor, final Organization org, final Long projectId) {
 
-         Project data = null;
-         try {
-             data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
-                     .setParameter("user", actor)
-                     .setParameter("projectID", projectId)
-                     .setParameter("orgID", orgID)
-                     .getSingleResult();
-         }catch (NoResultException nre){
-             data = null;
-         }
+        Project data = null;
+        try {
+            data = em.createNamedQuery(Project.PROJECT_GET_BY_ID, Project.class)
+                    .setParameter("user", actor)
+                    .setParameter("projectID", projectId)
+                    .setParameter("orgID", org.getId())
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            data = null;
+        }
         return data;
     }
 
@@ -314,7 +314,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @PreAuthorize("hasPermission(#project,'TASKS_CREATE')")
     public Task createTask(
-            final Long orgID,
+            final Organization orgID,
             final Account actor,
             final Project project,
             final String taskName,
@@ -344,7 +344,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
-        newTask.setOrganizationID(orgID);
+        newTask.setOrganizationID(orgID.getId());
         if (batch != null) {
             em.merge(batch);
         }
@@ -363,9 +363,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Task updateTask(final Long orgID, final Account actor, final Task task) {
+    public Task updateTask(final Organization orgID, final Account actor, final Task task) {
         if (task.getProject().isMember(actor)) {
-            task.setOrganizationID(orgID);
+            task.setOrganizationID(orgID.getId());
             em.merge(task);
             em.flush();
         }

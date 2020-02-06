@@ -84,7 +84,7 @@ public class UsersSearchRestController {
 
         Long orgID = null;
         if (req.getParameter("orgID") != null) {
-            orgID = authentication.getCurrentOrganization();
+            orgID = authentication.getCurrentOrganization().getId();
         }
 
         final Set<Account> accounts = new HashSet<>();
@@ -118,7 +118,7 @@ public class UsersSearchRestController {
 
         Long orgID = null;
         if (req.getParameter("orgID") != null) {
-            orgID = authentication.getCurrentOrganization();
+            orgID = authentication.getCurrentOrganization().getId();
         }
 
         final List<Account> accounts = new ArrayList<>();

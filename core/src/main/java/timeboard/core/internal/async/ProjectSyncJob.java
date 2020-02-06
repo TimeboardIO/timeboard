@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.AccountService;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
@@ -59,6 +60,8 @@ public final class ProjectSyncJob implements Job {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private OrganizationService organizationService;
 
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
@@ -76,12 +79,13 @@ public final class ProjectSyncJob implements Job {
                     .findFirst().get();
 
             final Account actor = this.accountService.findUserByID(accountID);
+            final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, orgID);
 
             SecurityContextHolder.getContext().setAuthentication(new TimeboardAuthentication(actor));
 
-            final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+            final Project project = this.projectService.getProjectByID(actor, org.get(), projectID);
 
-            context.setResult(this.syncProjectTasks(orgID, actor, project, syncService, credentials));
+            context.setResult(this.syncProjectTasks(org.get(), actor, project, syncService, credentials));
 
         } catch (final Exception e) {
             context.setResult(e);
@@ -89,7 +93,7 @@ public final class ProjectSyncJob implements Job {
     }
 
     private Object syncProjectTasks(
-            final Long orgID,
+            final Organization orgID,
             final Account actor,
             final Project project,
             final ProjectSyncPlugin syncService,
@@ -114,7 +118,7 @@ public final class ProjectSyncJob implements Job {
     }
 
     private void syncTasks(
-            final Long orgID,
+            final Organization orgID,
             final Account actor,
             final Project project,
             final List<RemoteTask> remoteTasks) throws BusinessException {
@@ -147,7 +151,7 @@ public final class ProjectSyncJob implements Job {
 
 
     private void createTasks(
-            final Long orgID, final Account actor, final Project project, final List<RemoteTask> newTasks) {
+            final Organization orgID, final Account actor, final Project project, final List<RemoteTask> newTasks) {
         newTasks.forEach(task -> {
                     String taskName = task.getTitle();
                     if (taskName.length() >= 100) {

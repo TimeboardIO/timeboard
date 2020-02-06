@@ -144,7 +144,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.persist(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg.getId()));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
         LOGGER.info("Timesheet for " + week + " submit for user"
                 + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
@@ -166,7 +166,9 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.merge(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
+        final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, submittedTimesheet.getOrganizationID());
+
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, org.get()));
 
         LOGGER.info("Timesheet for " + submittedTimesheet.getWeek() + " of " + submittedTimesheet.getYear() + " validated for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
@@ -185,10 +187,11 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new BusinessException("Can not reject unsubmitted weeks");
         }
         submittedTimesheet.setTimesheetStatus(ValidationStatus.REJECTED);
+        final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, submittedTimesheet.getOrganizationID());
 
         em.merge(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, org.get()));
 
         LOGGER.info("Timesheet for " + submittedTimesheet.getWeek() + " of " + submittedTimesheet.getYear() + " rejected for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());

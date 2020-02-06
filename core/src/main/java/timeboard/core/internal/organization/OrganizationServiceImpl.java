@@ -196,7 +196,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public Optional<OrganizationMembership> findOrganizationMembership(final Account actor, final Long organizationID) {
         final Account localActor = this.em.find(Account.class, actor.getId());
-        final Optional<OrganizationMembership> o = localActor.getOrganizations()
+        final Optional<OrganizationMembership> o = localActor.getOrganizationMemberships()
                 .stream()
                 .filter(om -> om.getOrganization().getId() == organizationID).findFirst();
 

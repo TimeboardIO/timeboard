@@ -88,7 +88,7 @@ public class Account implements Serializable {
     }
 
 
-    public Set<OrganizationMembership> getOrganizations() {
+    public Set<OrganizationMembership> getOrganizationMemberships() {
         if (this.organizations == null) {
             this.organizations = new HashSet<>();
         }

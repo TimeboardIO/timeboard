@@ -1,10 +1,10 @@
-package timeboard.core.api;
+package timeboard.core.security;
 
 /*-
  * #%L
  * core
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,42 @@ package timeboard.core.api;
  * #L%
  */
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import timeboard.core.security.TimeboardAuthentication;
+import org.springframework.expression.Expression;
 
-public final class ThreadLocalStorage {
+import java.util.List;
 
-    private static ThreadLocal<Long> CURRENT_ORG_ID = new ThreadLocal<>();
+public class PolicyRuleSet {
+    private String name;
 
-    private ThreadLocalStorage() {
+    private List<String> actions;
+
+    private List<Expression> conditions;
+
+    public PolicyRuleSet() {
+
     }
 
-    public static Long getCurrentOrgId() {
-        return CURRENT_ORG_ID.get();
+    public String getName() {
+        return name;
     }
 
-    public static void setCurrentOrgId(final Long tenantName) {
-        CURRENT_ORG_ID.set(tenantName);
-        ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
+    public void setName(final String name) {
+        this.name = name;
     }
 
+    public List<String> getActions() {
+        return actions;
+    }
+
+    public void setActions(final List<String> actions) {
+        this.actions = actions;
+    }
+
+    public List<Expression> getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(final List<Expression> conditions) {
+        this.conditions = conditions;
+    }
 }

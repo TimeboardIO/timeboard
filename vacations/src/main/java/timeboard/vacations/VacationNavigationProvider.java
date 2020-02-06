@@ -46,7 +46,7 @@ public class VacationNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationAction() {
-        return VacationService.VACATION_LIST;
+        return VacationService.VACATION_VIEW;
     }
 
     @Override

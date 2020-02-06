@@ -34,6 +34,8 @@ import java.util.Map;
 
 public interface CalendarService {
 
+    String CALENDAR_VIEW = "CALENDAR_VIEW";
+
     boolean importCalendarAsTasksFromIcs(
             Account actor,
             String name,

@@ -30,17 +30,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import javax.persistence.Transient;
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Collection;
 
 public class TimeboardAuthentication implements Authentication {
 
     private Principal p;
     private Account account;
-    private Long currentOrganization;
+    private Organization currentOrganization;
 
     public TimeboardAuthentication(final Account a) {
         this.account = a;
@@ -77,11 +79,11 @@ public class TimeboardAuthentication implements Authentication {
 
     }
 
-    public Long getCurrentOrganization() {
+    public Organization getCurrentOrganization() {
         return currentOrganization;
     }
 
-    public void setCurrentOrganization(final Long currentOrganization) {
+    public void setCurrentOrganization(final Organization currentOrganization) {
         this.currentOrganization = currentOrganization;
     }
 
@@ -91,31 +93,35 @@ public class TimeboardAuthentication implements Authentication {
     }
 
     @Transient
-    public boolean currentOrganizationRole(final MembershipRole role) {
-        return account.getOrganizations()
+    public boolean currentOrganizationRole(final MembershipRole... roles) {
+        if (account == null || account.getOrganizationMemberships() == null) {
+            return false;
+        }
+        return account.getOrganizationMemberships()
                 .stream()
-                .filter(o -> o.getOrganization().getId() == currentOrganization)
-                .filter(o -> o.getRole() == role)
+                .filter(o -> o.getOrganization() != null)
+                .filter(o -> o.getOrganization().getId() == currentOrganization.getId())
+                .filter(o -> Arrays.asList(roles).contains(o.getRole()))
                 .count() > 0;
     }
 
     @Transient
-    public boolean currentProjectRole(final Project project, final MembershipRole role) {
-        if(project == null){
+    public boolean currentProjectRole(final Project project, final MembershipRole... roles) {
+        if (project == null) {
             return false;
         }
         return project.getMembers()
                 .stream()
                 .filter(projectMembership -> projectMembership.getMember().getId() == account.getId())
-                .filter(projectMembership -> projectMembership.getRole() == role)
+                .filter(projectMembership -> Arrays.asList(roles).contains(projectMembership.getRole()))
                 .count() > 0;
     }
 
     @Transient
     public boolean isPublicCurrentOrganization() {
-        return account.getOrganizations().stream()
+        return account.getOrganizationMemberships().stream()
                 .map(o -> o.getOrganization())
-                .filter(o -> o.getId() == this.currentOrganization)
+                .filter(o -> o.getId() == this.currentOrganization.getId())
                 .allMatch(o -> o.isPublicOrganisation());
     }
 

@@ -45,10 +45,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{project}"+ProjectBatchesController.URL)
+@RequestMapping("/projects/{project}" + ProjectBatchesController.URL)
 public class ProjectBatchesController extends ProjectBaseController {
 
-    public static final String URL ="/batches";
+    public static final String URL = "/batches";
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
 
     @Autowired
@@ -167,7 +167,7 @@ public class ProjectBatchesController extends ProjectBaseController {
 
 
     protected String createConfigLinks(final Account actor,
-                                       final long orgID,
+                                       final Organization orgID,
                                        final HttpServletRequest request,
                                        final Model model) throws BusinessException {
 

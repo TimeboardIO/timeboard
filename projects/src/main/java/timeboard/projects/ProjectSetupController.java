@@ -35,12 +35,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.AccountService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Project;
-import timeboard.core.model.ProjectMembership;
+import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,7 +66,7 @@ public class ProjectSetupController extends ProjectBaseController {
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final Map<String, Object> map = new HashMap<>();
-        this.prepareTemplateData(project, map);
+        this.prepareTemplateData(authentication.getCurrentOrganization(), project, map);
         model.addAllAttributes(map);
         this.initModel(model, authentication, project);
         return "project_config.html";
@@ -146,7 +142,7 @@ public class ProjectSetupController extends ProjectBaseController {
         return "redirect:/projects/" + projectID + "/setup";
     }
 
-    private void prepareTemplateData(final Project project, final Map<String, Object> map) {
+    private void prepareTemplateData(final Organization org, final Project project, final Map<String, Object> map) {
 
         final ProjectConfigForm pcf = new ProjectConfigForm();
         pcf.setName(project.getName());
@@ -157,7 +153,7 @@ public class ProjectSetupController extends ProjectBaseController {
         pmf.setMemberships(new ArrayList<>(project.getMembers()));
 
         map.put("project", project);
-        map.put("orgID", ThreadLocalStorage.getCurrentOrgId());
+        map.put("orgID", org.getId());
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());

@@ -78,7 +78,7 @@ public class HomeController {
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
                 final Optional<ValidationStatus> timesheetStatusOpt = timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
+                        authentication.getCurrentOrganization().getId(),
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
@@ -88,7 +88,7 @@ public class HomeController {
                 final Date lastDayOfWeek = calendar.getTime();
 
                 final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(
-                        authentication.getCurrentOrganization(),
+                        authentication.getCurrentOrganization().getId(),
                         firstDayOfWeek, lastDayOfWeek,
                         account).values().stream().reduce(Double::sum).orElse(0.0);
 
@@ -106,10 +106,10 @@ public class HomeController {
         }
 
         model.addAttribute(NB_PROJECTS, this.projectService
-                .countAccountProjectMemberships(authentication.getCurrentOrganization(), account));
+                .countAccountProjectMemberships(authentication.getCurrentOrganization().getId(), account));
 
         model.addAttribute(NB_TASKS, this.projectService
-                .listUserTasks(authentication.getCurrentOrganization(), account).size());
+                .listUserTasks(authentication.getCurrentOrganization().getId(), account).size());
 
         model.addAttribute(WEEKS, weeks);
 
