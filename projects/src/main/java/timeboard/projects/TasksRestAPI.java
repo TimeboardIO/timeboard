@@ -226,6 +226,9 @@ public class TasksRestAPI {
         if (name == null) {
             throw new TaskCreationException("You have to specify task name.");
         }
+        if (name.length() > 100) {
+            throw new TaskCreationException("The task name you specify is too long. The field is limited to 100 prints.");
+        }
         return name;
     }
 
