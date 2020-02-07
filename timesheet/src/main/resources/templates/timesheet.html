@@ -128,6 +128,11 @@
                         Week validated
                     </div>
                 </div>
+                <div v-if="isTimesheetHasState(['REJECTED'])">
+                    <div class="ui red label" th:text="#{timesheet.status.rejected}">
+                        Week rejected
+                    </div>
+                </div>
 
 
                 <!-- ACTION BUTTONS -->
@@ -143,12 +148,17 @@
                         <span th:text="#{timesheet.submit}">Submit My Week</span>
                     </button>
                 </div>
-                <button v-if="(canValidate && !isTimesheetHasState(['VALIDATED'])) && !(userIsActor && !isTimesheetHasState(['PENDING_VALIDATION']))"
-                        :class="{ disabled : !isTimesheetHasState(['PENDING_VALIDATION']) }"
+                <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
                         v-on:click="validateWeek"
                         class="ui icons positive create-task button">
                     <i class="check icon"></i>
                     <span th:text="#{timesheet.validate}">Validate this week</span>
+                </button>
+                <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
+                        v-on:click="rejectWeek"
+                        class="ui icons negative create-task button">
+                    <i class="close icon"></i>
+                    <span th:text="#{timesheet.reject}">Reject this week</span>
                 </button>
                 <button
                         v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
@@ -248,7 +258,7 @@
                                     <input
                                             max="1"
                                             min="0"
-                                            step="0.1"
+                                            step="0.05"
                                             v-if="((day.date >= task.startDate || !task.startDate)) && ((day.date <= task.endDate) || (!task.endDate))"
                                             v-on:focusout="triggerUpdateTask"
                                             v-on:keyup.enter="triggerUpdateTask"

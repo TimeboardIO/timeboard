@@ -226,6 +226,12 @@ public class TimesheetController {
             @RequestBody final UpdateRequest request) {
 
         try {
+
+            if((request.imputation * 100) % 5 != 0){ // Modulo with int and not double
+                return ResponseEntity.badRequest().body("Your imputation value is not valid. The step is 0.05.");
+            }
+
+
             final Account actor = authentication.getDetails();
 
             final Long taskID = request.task;
@@ -277,7 +283,7 @@ public class TimesheetController {
     }
 
 
-    @GetMapping("/validate/{user}/{year}/{week}")
+    @PostMapping("/validate/{user}/{year}/{week}")
     public ResponseEntity validateTimesheet(final TimeboardAuthentication authentication,
                                             @PathVariable final Account user,
                                             @PathVariable final int year,
@@ -307,6 +313,40 @@ public class TimesheetController {
         } catch (final Exception e) { // TimesheetException
             LOGGER.error(e.getMessage(), e);
             return ResponseEntity.badRequest().body("An error occurred when validating this week. ");
+        }
+    }
+
+
+    @PostMapping("/reject/{user}/{year}/{week}")
+    public ResponseEntity rejectTimesheet(final TimeboardAuthentication authentication,
+                                            @PathVariable final Account user,
+                                            @PathVariable final int year,
+                                            @PathVariable final int week) {
+
+        final Account actor = authentication.getDetails();
+
+        if(! projectService.isOwnerOfAnyUserProject(actor, user)){
+            return ResponseEntity.badRequest().body("You have not enough right do do this.");
+        }
+        try {
+            final Optional<SubmittedTimesheet> submittedTimesheet =
+                    this.timesheetService.getSubmittedTimesheet(
+                            authentication.getCurrentOrganization(),
+                            actor,
+                            user,
+                            year,
+                            week);
+
+            if (submittedTimesheet.isPresent()) {
+                final SubmittedTimesheet result = this.timesheetService.rejectTimesheet(actor, submittedTimesheet.get());
+                return ResponseEntity.ok(result.getTimesheetStatus());
+
+            } else {
+                return ResponseEntity.badRequest().body("Could not find this week. Was it submitted ?");
+            }
+        } catch (final Exception e) { // TimesheetException
+            LOGGER.error(e.getMessage(), e);
+            return ResponseEntity.badRequest().body("An error occurred when rejecting this week. ");
         }
     }
 
