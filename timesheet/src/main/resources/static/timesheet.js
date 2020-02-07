@@ -113,7 +113,6 @@ const timesheetModel = {
                 'imputation': val
             }),
             contentType: "application/json",
-            dataType: "json",
         });
     }
 };
@@ -263,12 +262,17 @@ $(document).ready(function () {
                 $(event.target).parent().addClass('left icon loading').removeClass('error');
                 const taskID = $(event.target).attr('effortLeft');
                 const val = $(event.target).val();
+                const self = this;
                 this.updateTask(null, taskID, 'effortLeft', val)
-                    .then(function (updateTask) {
+                    .done(function (updateTask) {
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
                         app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
+                        $(event.target).parent().removeClass('left icon loading');
+                    })
+                    .fail(function (errorMessage) {
+                        self.displayErrorMessage(errorMessage.responseText);
                         $(event.target).parent().removeClass('left icon loading');
                     });
             },
@@ -278,11 +282,37 @@ $(document).ready(function () {
                 const taskID = $(event.target).attr('task');
                 const currentSum = app.getImputationSum(date);
 
-                let newval = parseFloat($(event.target).val());
+                const currentSum = app.getImputationSum(date);
+                let newVal = parseFloat($(event.target).val());
                 let oldVal = app.imputations[date][taskID];
                 if (newval !== oldVal) {
 
-                    $(event.target).parent().addClass('left icon loading').removeClass('error');
+                if (newVal > 1) {
+                    newVal = 1;
+                }
+                if (newVal < 0) {
+                    newVal = 0;
+                }
+                if (currentSum + (newVal - oldVal) <= 1.0) {
+                    $(event.target).val(newVal);
+                    const self = this;
+                    this.updateTask(date, taskID, 'imputation', newVal)
+                        .done(function (updateTask) {
+                            app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
+                            app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
+                            app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
+                            app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
+                            app.imputations[date][taskID] = newVal;
+                            $(event.target).parent().removeClass('left icon loading');
+                        })
+                        .fail(function (errorMessage) {
+                            self.displayErrorMessage(errorMessage.responseText);
+                            $(event.target).parent().removeClass('left icon loading');
+                        });
+                } else {
+                    $(event.target).val(oldVal);
+                    $(event.target).parent().removeClass('left icon loading').addClass('error');
+                    this.displayErrorMessage("you cannot charge more than one day a day.");
 
 
                     if (newval > 1) {
