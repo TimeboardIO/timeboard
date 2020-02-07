@@ -44,8 +44,27 @@ Command is assumed to be run from source code root folder :
 
     mvn install -P full   
     
-### Deploy Timeboard
+### Open IntelliJ IDE
 
+sudo /snap/intellij-idea-community/202/bin/idea.sh
+
+It can be convenient to make a symlink,
+for example:
+ln -s /snap/intellij-idea-community/202/bin//idea.sh /home/vagrant/idea.sh
+
+Thus, you can use it, in vagrant's home directory:
+sudo ./idea.sh 
+
+### Import Timeboard project into IntelliJ
+
+At IntelliJ startup:
+-> Select 'Import Project', 
+-> Select directory: '/home/vagrant/projects/timeboard'
+
+In Import Project popup:
+-> Select 'Import project fron external model' and select 'Maven'
+
+### Deploy Timeboard
 
 Timeboard source code is divided into business modules. To run timeboard run **App.main()** in webapp module from an IDE.
 
