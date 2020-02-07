@@ -55,6 +55,11 @@ ui.input.error > input {
     color: @darkRed !important;
 
 }
+.ui.button, .ui.buttons .button, .ui.buttons .or {
+
+  font-size: .85714286rem !important;
+
+}
 
 .day-badge {
   min-width: 2.5rem !important;
@@ -74,6 +79,7 @@ table, .controls {
 /** Timesheet **/
 
 #timesheet {
+
 
 
 
@@ -102,7 +108,7 @@ table, .controls {
 
   input:disabled,
   input[readonly] {
-    background-color: #f8f8f8;
+    color: lightgrey;
   }
 
   table td{

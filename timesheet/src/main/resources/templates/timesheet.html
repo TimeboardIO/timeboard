@@ -114,26 +114,26 @@
             <div class="actions">
 
                 <!-- LABELS -->
-                <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
+                <template v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
                     <div class="ui orange label" th:text="#{timesheet.status.pending.validation}">
                         Pending validation
                     </div>
-                </div>
-                <div v-if="isTimesheetHasState([null])  && !userIsActor">
+                </template>
+                <template v-if="isTimesheetHasState([null])  && !userIsActor">
                     <div class="ui orange label" th:text="#{timesheet.status.pending.submission}">
                         Pending submission
                     </div>
-                </div>
-                <div v-if="isTimesheetHasState(['VALIDATED'])">
+                </template>
+                <template v-if="isTimesheetHasState(['VALIDATED'])">
                     <div class="ui green label" th:text="#{timesheet.status.validated}">
                         Week validated
                     </div>
-                </div>
-                <div v-if="isTimesheetHasState(['REJECTED'])">
+                </template>
+                <template v-if="isTimesheetHasState(['REJECTED'])">
                     <div class="ui red label" th:text="#{timesheet.status.rejected}">
                         Week rejected
                     </div>
-                </div>
+                </template>
 
 
                 <!-- ACTION BUTTONS -->
@@ -265,6 +265,7 @@
                                             task: taskID,
                                         }"
                                     ></number-input>
+                                    <i class="search icon hidden" style="color: transparent;"></i>
                                 </div>
                             </td>
 
@@ -275,15 +276,13 @@
                                 <td v-if="projectID > 0">
                                     <div class="ui input">
                                         <number-input
-                                                :min="0" :max="1" :validation-step="0.05" :input-step="0.1" :trigger="triggerUpdateTask"
+                                                :min="0" :max="1" :validation-step="0.05" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
                                                 :value="parseFloat(task.effortLeft.toFixed(2))"
                                                 v-bind:attrs="{
                                                     effortLeft: taskID
                                                 }"
                                         ></number-input>
-
-
-
+                                        <i class="search icon hidden" style="color: transparent;"></i>
                                     </div>
                                 </td>
                                 <td v-if="projectID > 0"

@@ -8,7 +8,7 @@
 @positiveTextShadow: @invertedTextShadow;
 @positiveBoxShadow: transparent;
 
-@fontWeight: 600;
+@fontWeight: 700;
 
 @negativeTextColor: @white;
 @negativeTextShadow: @invertedTextShadow;

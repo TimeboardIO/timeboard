@@ -261,7 +261,7 @@ $(document).ready(function () {
             },
             triggerUpdateEffortLeft: function (event) {
                 $(event.target).parent().addClass('left icon loading').removeClass('error');
-                const taskID = $(event.target).attr('data-task-effortLeft');
+                const taskID = $(event.target).attr('effortLeft');
                 const val = $(event.target).val();
                 this.updateTask(null, taskID, 'effortLeft', val)
                     .then(function (updateTask) {
