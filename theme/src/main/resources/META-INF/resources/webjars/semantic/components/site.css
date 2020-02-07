@@ -335,8 +335,12 @@ table,
 #timesheet td:focus {
   background-color: rgba(128, 128, 200, 0.3);
 }
+#timesheet .timesheet-menu {
+  background-color: white !important;
+  border-radius: 0.5rem !important;
+}
 #timesheet .timesheet-navigation-controls {
-  margin-bottom: 1em;
+  margin-bottom: 0em;
   text-align: right;
 }
 #timesheet .timesheet-validation-controls {

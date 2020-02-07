@@ -158,12 +158,16 @@ table, .controls {
   td:focus {
       background-color: rgba(128,128,200,0.3);
   }
-  .timesheet-navigation-controls{
-      margin-bottom: 1em;
+  .timesheet-menu {
+    background-color: white !important;
+    border-radius: 0.5rem !important;
+  }
+  .timesheet-navigation-controls {
+      margin-bottom: 0em;
       text-align: right;
   }
 
-  .timesheet-validation-controls{
+  .timesheet-validation-controls {
       margin-top: 1em;
   }
 
