@@ -28,7 +28,6 @@ $(document).ready(function () {
                     {
                         "slot": "submitted",
                         "label": "S",
-                        "sortKey": "validated",
                         "primary" : true,
                         "class" : "collapsing"
 
@@ -36,10 +35,15 @@ $(document).ready(function () {
                     {
                         "slot": "validated",
                         "label": "V",
-                        "sortKey": "submitted",
                         "primary" : true,
                         "class" : "collapsing"
 
+                    },
+                    {
+                        "slot": "actions",
+                        "label": "Actions",
+                        "primary" : true,
+                        "class":"right aligned collapsing"
                     }],
                 data: [],
                 name: 'tableTimesheetValidation',
@@ -57,7 +61,24 @@ $(document).ready(function () {
                 else
                     isoWeekStart.setDate(simple.getDate() + 8 - simple.getDay());
                 return isoWeekStart;
-            }
+            },
+            forceValidation: function(event, target, week) {
+                let self = this;
+                event.target.classList.toggle('loading');
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "projects/" + _PROJECT_ID + "/timesheets/forceValidation/" + target.id + "/" + week.year + "/" + week.week,
+                    data:  JSON.stringify(target.weeks),
+                    success: function (data, textStatus, jqXHR)  {
+                        event.target.classList.toggle('loading');
+                        document.location.reload(true);
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.log(errorThrown);
+                    }
+                });
+            },
         },
         mounted: function () {
             let self = this;
