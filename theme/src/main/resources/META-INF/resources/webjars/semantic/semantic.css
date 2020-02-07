@@ -876,6 +876,12 @@ table,
   -webkit-appearance: none;
 }
 
+@media only screen and (max-width: 767px) {
+  #timesheet .ui.table:not(.unstackable) thead {
+    display: none !important;
+  }
+}
+
 #timesheet input:disabled,
 #timesheet input[readonly] {
   color: lightgrey;

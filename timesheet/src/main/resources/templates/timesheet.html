@@ -98,7 +98,7 @@
     <div class="ui inverted dimmer">
         <div class="ui text loader" th:text="#{loading}">Loading</div>
     </div>
-    <div id="timesheet" class="hidden">
+    <div id="timesheet" class="hidden" >
 
         <div v-for="error in errorMessages" v-if="error.visible" class="ui container negative timesheet message">
             <i class="close icon" @click="error.visible = false; "></i>
@@ -185,9 +185,9 @@
                 <i class="right arrow icon"></i><span th:text="#{timesheet.nextweek}">Next Week</span></a>
         </div>
 
-        <fieldset v-bind:disabled="!userIsActor || isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])">
+        <fieldset v-bind:disabled="!userIsActor || isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])" style="overflow-x: scroll;">
             <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
-                <table class="ui celled table" style="text-align:center">
+                <table class="ui celled table unstackable" style="text-align:center">
                     <thead>
                     <tr class="days">
                         <th class="two wide"></th>
