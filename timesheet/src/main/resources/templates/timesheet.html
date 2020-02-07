@@ -98,7 +98,7 @@
     <div class="ui inverted dimmer">
         <div class="ui text loader" th:text="#{loading}">Loading</div>
     </div>
-    <div id="timesheet" class="hidden" >
+    <div id="timesheet" class="hidden" style="overflow-x: scroll;" >
 
         <div v-for="error in errorMessages" v-if="error.visible" class="ui container negative timesheet message">
             <i class="close icon" @click="error.visible = false; "></i>
@@ -189,7 +189,6 @@
 
         <fieldset v-bind:disabled="!userIsActor || isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])">
             <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
-                <div style="overflow-x: scroll">
                     <table class="ui celled table unstackable" style="text-align:center">
                     <thead>
                     <tr class="days">
@@ -299,7 +298,6 @@
                     </template>
                     </tbody>
                 </table>
-                </div>
             </form>
         </fieldset>
         <task-modal
