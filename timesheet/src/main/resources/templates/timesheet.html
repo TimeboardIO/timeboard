@@ -111,7 +111,7 @@
         <div class="ui segment">
             <div class="ui controls stackable grid timesheet-menu" >
                 <div class=" two column row">
-                    <div class="left floated column">
+                    <div class="left floated column" style="text-align: center;">
                         <!-- LABELS -->
                         <template v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
                             <div class="ui orange label" th:text="#{timesheet.status.pending.validation}">
@@ -170,7 +170,7 @@
                         </button>
 
                     </div>
-                    <div class="right floated column  timesheet-navigation-controls ">
+                    <div class="right floated column" style="text-align: center;">
                         <a class="ui labeled icon button"
                            v-bind:href="userIsActor ? '/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) : '/timesheet/'+userID+'/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) "
                            :class="{ disabled : disablePrev }">
