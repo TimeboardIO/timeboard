@@ -161,6 +161,10 @@ public class TimesheetServiceImpl implements TimesheetService {
     public SubmittedTimesheet validateTimesheet(final Account actor,
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
+        if (submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED)) {
+            //Do nothing
+            return submittedTimesheet;
+        }
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not validate unsubmitted weeks");
         }
@@ -213,7 +217,12 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("user", user);
         q.setParameter("orgID", currentOrganization);
 
-        return Optional.ofNullable(q.getSingleResult());
+        try {
+            return Optional.ofNullable(q.getSingleResult());
+        }catch(Exception e){
+            LOGGER.debug(e.getMessage(), e);
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -322,5 +331,63 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     }
 
+    @Override
+    public void forceValidationTimesheets(Long organizationID, Account actor, Account target,
+                                        int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException {
+
+        final Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
+        final long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
+
+        final Calendar current = Calendar.getInstance();
+        current.set(Calendar.WEEK_OF_YEAR, olderWeek);
+        current.set(Calendar.YEAR, olderYear);
+
+        try {
+
+            while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= selectedAbsoluteWeekNumber) {
+
+                final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
+                final int currentYear = current.get(Calendar.YEAR);
+
+                final Optional<SubmittedTimesheet> submittedTimesheet =
+                        this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
+
+                if (submittedTimesheet.isPresent()) {
+
+                    final SubmittedTimesheet updatedSubmittedTimesheet = submittedTimesheet.get();
+                    updatedSubmittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
+                    em.merge(updatedSubmittedTimesheet);
+
+                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(updatedSubmittedTimesheet,
+                            projectService, updatedSubmittedTimesheet.getOrganizationID()));
+                    LOGGER.info("Timesheet for " + updatedSubmittedTimesheet.getWeek()  + " of "+updatedSubmittedTimesheet.getYear()
+                            + " validated for user " + updatedSubmittedTimesheet.getAccount().getScreenName()
+                            + " by user " + actor.getScreenName());
+
+
+                } else {
+
+                    final SubmittedTimesheet newSubmittedTimesheet = new SubmittedTimesheet();
+                    newSubmittedTimesheet.setAccount(target);
+                    newSubmittedTimesheet.setYear(currentYear);
+                    newSubmittedTimesheet.setWeek(currentWeek);
+                    newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
+                    em.persist(newSubmittedTimesheet);
+
+                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg.getId()));
+                    LOGGER.info("Timesheet " + currentWeek + " of " + currentYear
+                            + " submitted and validated for user " + target.getScreenName()
+                            + " by user " + actor.getScreenName());
+
+                }
+
+                current.add(Calendar.WEEK_OF_YEAR, 1);
+            }
+
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new TimesheetException("This force validation is impossible.");
+        }
+    }
 
 }
