@@ -130,10 +130,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @PreAuthorize("hasPermission(null,'" + PROJECT_COUNT + "')")
-    public double countAccountProjectMemberships(final Long orgID, final Account candidate) {
+    public double countAccountProjectMemberships(final Organization org, final Account candidate) {
         final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
-        query.setParameter("orgID", orgID);
+        query.setParameter("orgID", org.getId());
         return query.getResultList().size();
     }
 
@@ -300,12 +300,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Cacheable(value = "accountTasksCache")
     @PreAuthorize("hasPermission(#project,'" + TASK_LIST + "')")
-    public List<Task> listUserTasks(Long orgID, final Account account) {
+    public List<Task> listUserTasks(Organization org, final Account account) {
         final TypedQuery<Task> q = em.createQuery("select t " +
                 "from Task t " +
                 "where t.assigned = :user and t.organizationID = :orgID", Task.class);
         q.setParameter("user", account);
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
         return q.getResultList();
 
     }
@@ -479,7 +479,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectTasks> listTasksByProject(final Long orgID, final Account actor, final Date ds, final Date de) {
+    public List<ProjectTasks> listTasksByProject(final Organization org, final Account actor, final Date ds, final Date de) {
         final List<ProjectTasks> projectTasks = new ArrayList<>();
 
 
@@ -492,7 +492,7 @@ public class ProjectServiceImpl implements ProjectService {
         q.setParameter("ds", ds);
         q.setParameter("de", de);
         q.setParameter("actor", actor);
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
         final List<Task> tasks = q.getResultList();
 
         //rebalance task by project
@@ -752,7 +752,7 @@ public class ProjectServiceImpl implements ProjectService {
         final Optional<Organization> organization = this.organizationService.getOrganizationByID(user, project.getOrganizationID());
 
         final Map<Integer, Double> vacationImputations = this.timesheetService.getAllImputationsForAccountOnDateRange(
-                organization.get().getId(),
+                organization.get(),
                 start.getTime(),
                 end.getTime(),
                 user,
@@ -760,7 +760,7 @@ public class ProjectServiceImpl implements ProjectService {
                         .filter(t -> t.getName().matches(defaultVacationTaskName)).findFirst().get()));
 
         final Map<Integer, Double> projectImputations = this.timesheetService.getAllImputationsForAccountOnDateRange(
-                organization.get().getId(),
+                organization.get(),
                 start.getTime(),
                 end.getTime(),
                 user,

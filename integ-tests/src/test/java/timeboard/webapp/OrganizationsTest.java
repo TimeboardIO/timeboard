@@ -82,9 +82,9 @@ public class OrganizationsTest extends TimeboardTest {
 
         SecurityUtils.signIn(org, a1);
 
-        this.organizationService.createDefaultTask(a1, org.getId(), "TestDefaultTask");
+        this.organizationService.createDefaultTask(a1, org, "TestDefaultTask");
 
-        final List<DefaultTask> tasks = this.organizationService.listDefaultTasks(org.getId(), org.getCreatedDate().getTime(), new Date());
+        final List<DefaultTask> tasks = this.organizationService.listDefaultTasks(org, org.getCreatedDate().getTime(), new Date());
 
         Assert.assertEquals(2, tasks.size());
 

@@ -178,7 +178,7 @@ public class ProjectTasksController extends ProjectBaseController {
 
         model.addAttribute("project", project);
         model.addAttribute("tasks", this.projectService.listProjectTasks(auth.getDetails(), project));
-        model.addAttribute("taskTypes", this.organizationService.listTaskType(org.getId()));
+        model.addAttribute("taskTypes", this.organizationService.listTaskType(org));
         model.addAttribute("allTaskStatus", TaskStatus.values());
         model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(auth.getDetails(), project));
         model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(auth.getDetails(), project));

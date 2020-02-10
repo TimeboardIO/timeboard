@@ -103,7 +103,7 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     @PreAuthorize("hasPermission(#applicant,'" + VACATION_LIST + "')")
-    public List<VacationRequest> listVacationRequestsByUser(final Account applicant, long orgID) {
+    public List<VacationRequest> listVacationRequestsByUser(final Account applicant, Organization org) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v " +
@@ -112,7 +112,7 @@ public class VacationServiceImpl implements VacationService {
                         "and v.parent IS NULL"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
 
         return q.getResultList();
 
@@ -120,7 +120,7 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     @PreAuthorize("hasPermission(#applicant,'" + VACATION_LIST + "')")
-    public List<VacationRequest> listVacationRequestsByUser(Account applicant, long orgID, int year) {
+    public List<VacationRequest> listVacationRequestsByUser(Account applicant, Organization org, int year) {
 
         final Calendar startBound = Calendar.getInstance();
         final Calendar endBound = Calendar.getInstance();
@@ -141,7 +141,7 @@ public class VacationServiceImpl implements VacationService {
                         "and not (v.endDate < :startBound and v.startDate > :endBound)"
                 , VacationRequest.class);
         q.setParameter("applicant", applicant);
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
         q.setParameter("endBound", endBound.getTime());
         q.setParameter("startBound", startBound.getTime());
 
@@ -151,7 +151,7 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     @PreAuthorize("hasPermission(#applicant,'" + VACATION_LIST + "')")
-    public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee, long orgID) {
+    public List<VacationRequest> listVacationRequestsToValidateByUser(final Account assignee, Organization org) {
 
         final TypedQuery<VacationRequest> q = em.createQuery(
                 "select v from VacationRequest v " +
@@ -161,7 +161,7 @@ public class VacationServiceImpl implements VacationService {
                         "and v.parent IS NULL",
                 VacationRequest.class);
         q.setParameter("assignee", assignee);
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
         q.setParameter("status", VacationRequestStatus.PENDING);
 
         return q.getResultList();
@@ -207,10 +207,10 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public void deleteVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Organization org, final Account actor, final VacationRequest request) throws BusinessException {
 
         if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
-            this.updateImputations(orgID, actor, request, 0);
+            this.updateImputations(org, actor, request, 0);
         }
 
         em.remove(request);
@@ -221,7 +221,7 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public void deleteVacationRequest(final Long orgID, final Account actor, final RecursiveVacationRequest request) throws BusinessException {
+    public void deleteVacationRequest(final Organization org, final Account actor, final RecursiveVacationRequest request) throws BusinessException {
 
         request.setEndDate(new Date());
         boolean removeIt = true;
@@ -229,7 +229,7 @@ public class VacationServiceImpl implements VacationService {
             if (r.getStatus().equals(VacationRequestStatus.ACCEPTED) && r.getStartDate().before(new Date())) {
                 removeIt = false;
             } else {
-                this.deleteVacationRequest(orgID, actor, r);
+                this.deleteVacationRequest(org, actor, r);
             }
         }
 
@@ -243,13 +243,16 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public VacationRequest approveVacationRequest(final Long orgID, final Account actor, final VacationRequest request) throws BusinessException {
+    public VacationRequest approveVacationRequest(final Organization org,
+                                                  final Account actor,
+                                                  final VacationRequest request) throws BusinessException {
+
         request.setStatus(VacationRequestStatus.ACCEPTED);
         em.merge(request);
         em.flush();
 
 
-        this.updateImputations(orgID, actor, request, 1);
+        this.updateImputations(org, actor, request, 1);
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.APPROVE, request));
 
         return request;
@@ -257,14 +260,14 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     public RecursiveVacationRequest approveVacationRequest(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final RecursiveVacationRequest request) throws BusinessException {
 
         request.setStatus(VacationRequestStatus.ACCEPTED);
 
         for (final VacationRequest r : request.getChildren()) {
-            this.approveVacationRequest(orgID, actor, r);
+            this.approveVacationRequest(org, actor, r);
         }
 
         em.merge(request);
@@ -275,7 +278,10 @@ public class VacationServiceImpl implements VacationService {
         return request;
     }
 
-    private void updateImputations(final Long orgID, final Account actor, final VacationRequest request, final double sign) throws BusinessException {
+    private void updateImputations(final Organization org,
+                                   final Account actor,
+                                   final VacationRequest request,
+                                   final double sign) throws BusinessException {
 
         final DefaultTask vacationTask = this.getVacationTask(actor, request);
 
@@ -297,7 +303,7 @@ public class VacationServiceImpl implements VacationService {
 
         while (currentCalendar.before(endCalendar)) {
             if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
-                this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
+                this.updateTaskImputation(org, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
             }
             value = 1 * sign;
             currentCalendar.add(Calendar.DATE, 1);
@@ -306,7 +312,7 @@ public class VacationServiceImpl implements VacationService {
             value = 0.5 * sign;
         }
         if (currentCalendar.get(Calendar.DAY_OF_WEEK) <= Calendar.FRIDAY && currentCalendar.get(Calendar.DAY_OF_WEEK) > Calendar.SUNDAY) {
-            this.updateTaskImputation(orgID, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
+            this.updateTaskImputation(org, request.getApplicant(), vacationTask, currentCalendar.getTime(), value, request);
         }
 
     }
@@ -326,7 +332,7 @@ public class VacationServiceImpl implements VacationService {
         return null;
     }
 
-    private void updateTaskImputation(final long orgID, final Account user, final DefaultTask task, final Date day,
+    private void updateTaskImputation(final Organization org, final Account user, final DefaultTask task, final Date day,
                                       final double val, final VacationRequest request) throws BusinessException {
 
         double newValue = val;
@@ -366,7 +372,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         //update imputation
-        this.timesheetService.updateTaskImputation(orgID, user, task, day, newValue);
+        this.timesheetService.updateTaskImputation(org, user, task, day, newValue);
     }
 
     private boolean onSameDay(Date date1, Date date2) {

@@ -37,9 +37,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.api.AccountService;
 import timeboard.core.api.ReportService;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
@@ -61,10 +59,6 @@ public class ReportsController {
 
     @Autowired
     private ReportService reportService;
-
-    @Autowired
-    private AccountService accountService;
-
 
     @GetMapping
     protected String handleGet() {
@@ -104,12 +98,11 @@ public class ReportsController {
                                 @ModelAttribute final Report report, final RedirectAttributes attributes) throws SchedulerException {
 
         final Account actor = authentication.getDetails();
-        final Long organizationID = authentication.getCurrentOrganization();
 
         final String projectFilter = report.getFilterProject();
 
         this.reportService.createReport(
-                organizationID,
+                authentication.getCurrentOrganization(),
                 actor,
                 report.getName(),
                 report.getHandlerID(),
@@ -148,10 +141,8 @@ public class ReportsController {
                                 @ModelAttribute final Report report, final RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        final Long organizationID = ThreadLocalStorage.getCurrentOrgId();
-        final Account organization = accountService.findUserByID(organizationID);
 
-        final Report updatedReport = this.reportService.getReportByID(organization, reportID);
+        final Report updatedReport = this.reportService.getReportByID(authentication.getDetails(), reportID);
         updatedReport.setName(report.getName());
         updatedReport.setHandlerID(report.getHandlerID());
         updatedReport.setFilterProject(report.getFilterProject());

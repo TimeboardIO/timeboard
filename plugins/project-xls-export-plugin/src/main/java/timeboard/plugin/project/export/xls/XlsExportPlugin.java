@@ -31,20 +31,25 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
 
 
 @Component
 public class XlsExportPlugin implements ProjectExportService {
 
+    @Autowired
+    private OrganizationService organizationService;
 
     @Autowired
     private ProjectService projectService;
@@ -62,7 +67,9 @@ public class XlsExportPlugin implements ProjectExportService {
     @Override
     public void export(final Account actor, final long orgID, final long projectID, final OutputStream output) throws IOException, BusinessException {
 
-        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+        final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, orgID);
+
+        final Project project = this.projectService.getProjectByID(actor, org.get(), projectID);
 
         final String sheetName = project.getName();
 

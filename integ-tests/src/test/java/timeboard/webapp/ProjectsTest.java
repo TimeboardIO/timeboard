@@ -60,13 +60,13 @@ public class ProjectsTest extends TimeboardTest {
         final Organization org = this.organizationService.createOrganization(a1, "testOrg", Collections.emptyMap());
         SecurityUtils.signIn(org, a1);
 
-        final Project project = this.projectService.createProject(org.getId(), a1, "SampleProject");
+        final Project project = this.projectService.createProject(org, a1, "SampleProject");
 
         Assert.assertNotNull(project);
         Assert.assertNotNull(project.getId());
         Assert.assertEquals(project.getName(), "SampleProject");
 
-        final Project projectFromDB = this.projectService.getProjectByID(a1, org.getId(), project.getId());
+        final Project projectFromDB = this.projectService.getProjectByID(a1, org, project.getId());
         Assert.assertEquals(project.getId(), projectFromDB.getId());
     }
 

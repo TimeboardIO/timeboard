@@ -88,7 +88,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
-                currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
+                currentOrg, accountTimesheet, previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
         if (!firstWeek && lastWeekValidatedOpt.isEmpty()) {
@@ -203,12 +203,12 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     @PreAuthorize("hasPermission(null,'" + TIMESHEET_IMPUTATION + "')")
-    public List<UpdatedTaskResult> updateTaskImputations(final Long orgID, final Account actor, final List<Imputation> imputationsList) {
+    public List<UpdatedTaskResult> updateTaskImputations(final Organization org, final Account actor, final List<Imputation> imputationsList) {
         final List<UpdatedTaskResult> result = new ArrayList<>();
         for (final Imputation imputation : imputationsList) {
             UpdatedTaskResult updatedTaskResult = null;
             try {
-                updatedTaskResult = this.updateTaskImputation(orgID, actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
+                updatedTaskResult = this.updateTaskImputation(org, actor, (Task) imputation.getTask(), imputation.getDay(), imputation.getValue());
             } catch (final BusinessException e) {
                 LOGGER.error(e.getMessage());
             }
@@ -221,7 +221,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     @PreAuthorize("hasPermission(null,'" + TIMESHEET_IMPUTATION + "')")
     public UpdatedTaskResult updateTaskImputation(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final AbstractTask task,
             final Date day,
@@ -230,7 +230,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         c.setTime(day);
 
         final ValidationStatus timesheetSubmitted = this.getTimesheetValidationStatus(
-                orgID,
+                org,
                 actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR)).orElse(null);
 
         if (task instanceof Task) {
@@ -255,7 +255,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     @PreAuthorize("hasPermission(null,'" + TIMESHEET_LIST + "')")
-    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {
+    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization currentOrganization, Account actor, Account user, int year, int week) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year " +
@@ -271,7 +271,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public Optional<ValidationStatus> getTimesheetValidationStatus(
-            final Long orgID,
+            final Organization org,
             final Account currentAccount,
             final int year,
             final int week) {
@@ -287,7 +287,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             q.setParameter("week", week);
             q.setParameter("year", year);
             q.setParameter("user", currentAccount);
-            q.setParameter("orgID", orgID);
+            q.setParameter("orgID", org.getId());
 
             validationStatus = q.getSingleResult();
 
@@ -300,7 +300,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public Map<Integer, Double> getAllImputationsForAccountOnDateRange(
-            final Long orgID,
+            final Organization org,
             final Date startDate,
             final Date endDate,
             final Account account,
@@ -336,7 +336,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("startDate", startDate);
         q.setParameter("endDate", endDate);
         q.setParameter("user", account.getId());
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
 
         for (Map.Entry parameter : parameters.entrySet()) {
             q.setParameter((String) parameter.getKey(), parameter.getValue());
@@ -357,12 +357,12 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Long orgID, Account actor, Project project) {
+    public Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Organization org, Account actor, Project project) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
                 + "where st.account in :users and st.organizationID = :orgID", SubmittedTimesheet.class);
 
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
         q.setParameter("users", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
 
         final List<SubmittedTimesheet> resultList = q.getResultList();

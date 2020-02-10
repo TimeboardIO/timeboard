@@ -44,7 +44,7 @@ public interface CalendarService {
             boolean deleteOrphan) throws BusinessException;
 
     boolean importCalendarAsImputationsFromIcs(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final String ics,
             final AbstractTask task,

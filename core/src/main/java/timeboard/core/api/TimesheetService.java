@@ -78,7 +78,7 @@ public interface TimesheetService {
      */
     SubmittedTimesheet rejectTimesheet(final Account actor, final SubmittedTimesheet submittedTimesheet) throws BusinessException;
 
-    Optional<SubmittedTimesheet> getSubmittedTimesheet(Long orgID, Account actor, Account user, int year, int week);
+    Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization org, Account actor, Account user, int year, int week);
 
 
     /**
@@ -90,7 +90,7 @@ public interface TimesheetService {
      * @return ValidationStatus, null current account has no timesheet validation request for current week
      */
     Optional<ValidationStatus> getTimesheetValidationStatus(
-            final Long orgID,
+            final Organization org,
             final Account currentAccount,
             final int year,
             final int week);
@@ -105,27 +105,27 @@ public interface TimesheetService {
      * @return the sum of all imputations of the week
      */
     Map<Integer, Double> getAllImputationsForAccountOnDateRange(
-            final Long orgID,
+            final Organization org,
             final Date firstDayOfWeek,
             final Date lastDayOfWeek,
             final Account account,
             final TimesheetFilter... filters);
 
     UpdatedTaskResult updateTaskImputation(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final AbstractTask task,
             final Date day,
             final double val) throws BusinessException;
 
     List<UpdatedTaskResult> updateTaskImputations(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final List<Imputation> imputationsList);
 
 
     Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final Project project);
 

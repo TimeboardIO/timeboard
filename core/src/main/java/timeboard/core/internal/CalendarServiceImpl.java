@@ -76,7 +76,7 @@ public class CalendarServiceImpl implements CalendarService {
 
     @Override
     public boolean importCalendarAsImputationsFromIcs(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final String url,
             final AbstractTask task,
@@ -107,7 +107,7 @@ public class CalendarServiceImpl implements CalendarService {
                     }
                 }
             }
-            this.timesheetService.updateTaskImputations(orgID, actor, imputationsToUpdate);
+            this.timesheetService.updateTaskImputations(org, actor, imputationsToUpdate);
         } catch (final IOException | ParseException e) {
             throw new BusinessException(e);
         }

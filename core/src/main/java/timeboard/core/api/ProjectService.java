@@ -59,7 +59,7 @@ public interface ProjectService {
 
     List<Project> listProjects(Account owner, Organization orgID);
 
-    double countAccountProjectMemberships(Long orgID, Account candidate);
+    double countAccountProjectMemberships(Organization org, Account candidate);
 
     Project getProjectByID(Account actor, Organization org, Long projectID) throws BusinessException;
 
@@ -75,13 +75,13 @@ public interface ProjectService {
      == Tasks ==
      */
 
-    List<Task> listUserTasks(Long orgID, Account account);
+    List<Task> listUserTasks(Organization org, Account account);
 
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
 
     AbstractTask getTaskByID(Account account, long id) throws BusinessException;
 
-    List<ProjectTasks> listTasksByProject(Long orgID, Account actor, Date ds, Date de);
+    List<ProjectTasks> listTasksByProject(Organization org, Account actor, Date ds, Date de);
 
     Task createTask(final Organization orgID,
                     final Account actor,

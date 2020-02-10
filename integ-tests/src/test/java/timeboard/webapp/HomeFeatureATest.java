@@ -66,7 +66,7 @@ public class HomeFeatureATest extends TimeboardTest {
         this.auth.setCurrentOrganization(this.organisation);
         SecurityContextHolder.getContext().setAuthentication(this.auth);
 
-        this.projectService.createProject(this.organisation.getId(), this.account, "TestProject");
+        this.projectService.createProject(this.organisation, this.account, "TestProject");
     }
 
     @When("^the user calls /home$")

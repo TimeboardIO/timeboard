@@ -63,10 +63,10 @@ public class HomeFeatureBTest extends TimeboardTest {
 
 
         this.auth = SecurityUtils.signIn(organisationA, this.account);
-        this.projectService.createProject(this.organisationA.getId(), this.account, "TestProjectOrgA");
+        this.projectService.createProject(this.organisationA, this.account, "TestProjectOrgA");
 
         this.auth = SecurityUtils.signIn(organisationB, this.account);
-        this.projectService.createProject(this.organisationB.getId(), this.account, "TestProjectOrgB");
+        this.projectService.createProject(this.organisationB, this.account, "TestProjectOrgB");
 
         this.auth = SecurityUtils.signIn(organisationA, this.account);
 
