@@ -33,5 +33,15 @@
     "conditions": [
       "subject.currentProjectRole(resource, 'OWNER', 'CONTRIBUTOR')"
     ]
+  },
+
+  {
+    "name": "Only owner can create projects",
+    "actions": [
+      "PROJECT_CREATE"
+    ],
+    "conditions": [
+      "subject.currentOrganizationRole('OWNER')"
+    ]
   }
 ]

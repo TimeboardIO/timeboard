@@ -98,8 +98,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @PreAuthorize("hasPermission(null,'" + PROJECT_CREATE + "')")
-    @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
-    @CacheEvict(value = "accountProjectsCache", key = "#owner.getId()")
     public Project createProject(final Organization orgID, final Account owner, final String projectName) {
         final Account ownerAccount = this.em.find(Account.class, owner.getId());
         final Project newProject = new Project();
