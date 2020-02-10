@@ -84,6 +84,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Calendar previousWeek = Calendar.getInstance();
         previousWeek.set(Calendar.WEEK_OF_YEAR, week);
         previousWeek.set(Calendar.YEAR, year);
+        previousWeek.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
         previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
@@ -136,19 +137,16 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
 
-        final SubmittedTimesheet submittedTimesheet = new SubmittedTimesheet();
-        submittedTimesheet.setAccount(accountTimesheet);
-        submittedTimesheet.setYear(year);
-        submittedTimesheet.setWeek(week);
-        submittedTimesheet.setTimesheetStatus(ValidationStatus.PENDING_VALIDATION);
+       return processSubmission(actor, accountTimesheet, year, week, currentOrg );
+    }
 
-        em.persist(submittedTimesheet);
+    private SubmittedTimesheet processSubmission(Account actor, Account accountTimesheet, int year, int week, Organization currentOrg) {
 
+        final Optional<SubmittedTimesheet> existingRejectedTimesheet = this.getSubmittedTimesheet(
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
-        LOGGER.info("Timesheet for " + week + " submit for user"
+        LOGGER.info("Timesheet for " + week + " submit for user "
                 + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
-
         return submittedTimesheet;
 
     }
@@ -159,9 +157,30 @@ public class TimesheetServiceImpl implements TimesheetService {
     public SubmittedTimesheet validateTimesheet(final Account actor,
                                                 final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
+        if (submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED)) {
+            //Do nothing
+            return submittedTimesheet;
+        }
+
+
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not validate unsubmitted weeks");
         }
+
+        final Calendar previousWeek = Calendar.getInstance();
+        previousWeek.set(Calendar.WEEK_OF_YEAR, submittedTimesheet.getWeek());
+        previousWeek.set(Calendar.YEAR, submittedTimesheet.getYear());
+        previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
+        previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+
+        final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
+                currentOrg.getId(), submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
+                previousWeek.get(Calendar.WEEK_OF_YEAR));
+
+        if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED) ) {
+            throw new TimesheetException("Can not validate this week, previous week is not validated");
+        }
+
         submittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
 
         em.merge(submittedTimesheet);
@@ -186,6 +205,24 @@ public class TimesheetServiceImpl implements TimesheetService {
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not reject unsubmitted weeks");
         }
+
+
+        final Calendar previousWeek = Calendar.getInstance();
+        previousWeek.set(Calendar.WEEK_OF_YEAR, submittedTimesheet.getWeek());
+        previousWeek.set(Calendar.YEAR, submittedTimesheet.getYear());
+        previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
+        previousWeek.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+
+        final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
+                currentOrg.getId(), submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
+                previousWeek.get(Calendar.WEEK_OF_YEAR));
+
+        if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED) ) {
+            throw new TimesheetException("Can not validate this week, previous week is not validated");
+        }
+
+
         submittedTimesheet.setTimesheetStatus(ValidationStatus.REJECTED);
         final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, submittedTimesheet.getOrganizationID());
 
@@ -266,7 +303,12 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("user", user);
         q.setParameter("orgID", currentOrganization);
 
-        return Optional.ofNullable(q.getSingleResult());
+        try {
+            return Optional.ofNullable(q.getSingleResult());
+        }catch(Exception e){
+            LOGGER.debug(e.getMessage(), e);
+            return Optional.empty();
+        }
     }
 
     @Override

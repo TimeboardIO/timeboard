@@ -149,18 +149,21 @@
                         <span th:text="#{timesheet.submit}">Submit My Week</span>
                     </button>
                 </div>
-                <button class="ui icons positive create-task button"
-                        v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
-                        v-on:click="validateWeek">
-                    <i class="check icon"></i>
-                    <span th:text="#{timesheet.validate}">Validate this week</span>
-                </button>
-                <button class="ui icons negative create-task button"
-                        v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
-                        v-on:click="rejectWeek">
-                    <i class="close icon"></i>
-                    <span th:text="#{timesheet.reject}">Reject this week</span>
-                </button>
+                <div v-bind:data-tooltip="!enableValidationButtons()?' Please validate previous week before.' : false"
+                     data-position="right center">
+                    <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
+                            v-on:click="validateWeek" :class="{disabled : !enableValidationButtons()}"
+                            class="ui icons positive create-task button" >
+                        <i class="check icon"></i>
+                        <span th:text="#{timesheet.validate}">Validate this week</span>
+                    </button>
+                    <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
+                            v-on:click="rejectWeek" :class="{disabled : !enableValidationButtons()}"
+                            class="ui icons negative create-task button">
+                        <i class="close icon"></i>
+                        <span th:text="#{timesheet.reject}">Reject this week</span>
+                    </button>
+                </div>
                 <button
                         class="ui primary create-task button icons"
                         th:text="#{timesheet.newtask}" v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"

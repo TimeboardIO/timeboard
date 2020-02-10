@@ -102,7 +102,7 @@ public class AccountController {
                 while (params1.hasMoreElements()) {
                     final String param = params1.nextElement();
                     if (param.startsWith("attr-")) {
-                        final String key = param.substring(5, param.length());
+                        final String key = param.substring(5);
                         final String value = request.getParameter(param);
                         actor.getExternalIDs().put(key, value);
                     }
@@ -135,11 +135,11 @@ public class AccountController {
 
         final List<Project> projects = projectService.listProjects(actor, orgID);
 
-        final List<String> fieldNames = new ArrayList<>();
+        final Map<String, String> fieldNames = new HashMap<>();
         //import external ID field name from import plugins list
         if (projectImportServices != null) {
             projectImportServices.forEach(service -> {
-                fieldNames.add(service.getServiceName());
+                fieldNames.put(service.getServiceID(), service.getServiceName());
             });
         }
 

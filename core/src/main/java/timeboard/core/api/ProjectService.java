@@ -91,13 +91,13 @@ public interface ProjectService {
                     final Date startDate,
                     final Date endDate,
                     final double originalEstimate,
-                    final Long taskTypeID,
-                    final Account assignedAccountID,
+                    final TaskType taskType,
+                    final Account assignedAccount,
                     final String origin,
                     final String remotePath,
                     final String remoteId,
                     final TaskStatus taskStatus,
-                    final Batch batch);
+                    final Collection<Batch> batches);
 
     /**
      * Update task in database

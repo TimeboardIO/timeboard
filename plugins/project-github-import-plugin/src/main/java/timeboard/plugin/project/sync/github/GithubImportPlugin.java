@@ -32,7 +32,6 @@ import org.eclipse.egit.github.core.service.IssueService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.RemoteTask;
@@ -70,7 +69,7 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
 
 
     @Override
-    public List<RemoteTask> getRemoteTasks(final Account currentUser, final List<ProjectSyncCredentialField> credentials) throws BusinessException {
+    public List<RemoteTask> getRemoteTasks(final Account currentUser, final List<ProjectSyncCredentialField> credentials) {
 
         final List<RemoteTask> remoteTasks = new ArrayList<>();
 
@@ -86,18 +85,20 @@ public class GithubImportPlugin implements ProjectSyncPlugin {
             issueService.getClient().setOAuth2Token(githubOAuthToken);
             final List<Issue> issues = issueService.getIssues(repositoryId, new HashMap<>());
 
-            issues.stream().forEach(issue -> {
+            issues.forEach(issue -> {
 
                 final RemoteTask rt = new RemoteTask();
                 if (issue.getAssignee() != null) {
                     rt.setUserName(issue.getAssignee().getLogin());
                 }
+
                 rt.setId(String.valueOf(issue.getId()));
                 rt.setTitle(issue.getTitle());
-                rt.setOrigin("Github");
-                rt.setComments(issue.getBodyHtml());
+                rt.setOrigin(this.getServiceID());
+                rt.setComments(issue.getBody());
                 rt.setStopDate(issue.getClosedAt());
                 rt.setStartDate(issue.getCreatedAt());
+
                 remoteTasks.add(rt);
             });
         } catch (final Exception e) {

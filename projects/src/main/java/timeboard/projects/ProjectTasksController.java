@@ -119,7 +119,7 @@ public class ProjectTasksController extends ProjectBaseController {
                 final List<Long> batchIDs = new ArrayList<>();
                 final List<String> batchNames = new ArrayList<>();
 
-                task.getBatches().stream().forEach(b -> {
+                task.getBatches().forEach(b -> {
                     batchIDs.add(b.getId());
                     batchNames.add(b.getName());
                 });
@@ -135,7 +135,8 @@ public class ProjectTasksController extends ProjectBaseController {
                         task.getTaskType() != null ? task.getTaskType().getId() : 0L,
                         batchIDs, batchNames,
                         task.getTaskStatus().name(),
-                        task.getTaskType() != null ? task.getTaskType().getTypeName() : ""
+                        task.getTaskType() != null ? task.getTaskType().getTypeName() : "",
+                        task.getEffortSpent() == 0
                 ));
 
             }
@@ -145,7 +146,6 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
     }
-
 
     @GetMapping("/group/{batchType}")
     protected String listTasksGroupByBatchType(

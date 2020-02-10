@@ -267,6 +267,7 @@ public class TimesheetController {
 
         final Account actor = authentication.getDetails();
 
+
         try {
             final Organization currentOrg = this.organizationService.getOrganizationByID(
                     actor, authentication.getCurrentOrganization().getId()).get();
@@ -308,7 +309,7 @@ public class TimesheetController {
                             week);
 
             if (submittedTimesheet.isPresent()) {
-                final SubmittedTimesheet result = this.timesheetService.validateTimesheet(actor, submittedTimesheet.get());
+                final SubmittedTimesheet result = this.timesheetService.validateTimesheet( org.get(), actor,submittedTimesheet.get());
                 return ResponseEntity.ok(result.getTimesheetStatus());
 
             } else {
@@ -328,6 +329,7 @@ public class TimesheetController {
                                           @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
+        final Optional<Organization> org = organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
         if (!projectService.isOwnerOfAnyUserProject(actor, user)) {
             return ResponseEntity.badRequest().body("You have not enough right do do this.");
@@ -342,7 +344,7 @@ public class TimesheetController {
                             week);
 
             if (submittedTimesheet.isPresent()) {
-                final SubmittedTimesheet result = this.timesheetService.rejectTimesheet(actor, submittedTimesheet.get());
+                final SubmittedTimesheet result = this.timesheetService.rejectTimesheet(org.get(), actor, submittedTimesheet.get());
                 return ResponseEntity.ok(result.getTimesheetStatus());
 
             } else {
@@ -436,6 +438,7 @@ public class TimesheetController {
     private int findPreviousWeekYear(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         c.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.YEAR);
     }
@@ -455,8 +458,6 @@ public class TimesheetController {
 
         public UpdateRequest() {
         }
-
-        ;
     }
 
 

@@ -27,6 +27,8 @@ package timeboard.core.internal.async;
  */
 
 import org.quartz.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -62,6 +64,9 @@ public final class ProjectSyncJob implements Job {
 
     @Autowired
     private OrganizationService organizationService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncJob.class);
+
 
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
@@ -108,10 +113,7 @@ public final class ProjectSyncJob implements Job {
                         mergeAssignee(accountService, syncService.getServiceName(), task);
                     } catch (final Exception e) {
 
-                    }
-                });
-
-        this.syncTasks(orgID, actor, project, remoteTasks);
+        this.syncTasks(orgID, actor, project, remoteTasks, syncService.getServiceID());
 
 
         return String.format("Sync %s tasks from %s", remoteTasks.size(), syncService.getServiceName());
@@ -121,7 +123,8 @@ public final class ProjectSyncJob implements Job {
             final Organization orgID,
             final Account actor,
             final Project project,
-            final List<RemoteTask> remoteTasks) throws BusinessException {
+            final List<RemoteTask> remoteTasks,
+            final String externalID) throws BusinessException {
 
         final List<RemoteTask> newTasks = new ArrayList<>();
         for (final RemoteTask task1 : remoteTasks) {
@@ -137,12 +140,18 @@ public final class ProjectSyncJob implements Job {
             }
         }
 
+        this.createTasks(orgID, actor, project, newTasks, TaskStatus.IN_PROGRESS);
 
-        this.createTasks(orgID, actor, project, newTasks);
+        this.updateTasks(orgID, actor, project, updatedTasks, externalID);
+
+    }
+
+    private void updateTasks(Long orgID, Account actor, Project project, List<RemoteTask> updatedTasks, String externalID) {
 
         for (final RemoteTask remoteTask : updatedTasks) {
             final Optional<Task> taskToUpdate = projectService.getTaskByRemoteID(actor, remoteTask.getId());
             if (taskToUpdate.isPresent()) {
+
                 taskToUpdate.get().setName(remoteTask.getTitle());
                 projectService.updateTask(orgID, actor, taskToUpdate.get());
             }
@@ -166,10 +175,9 @@ public final class ProjectSyncJob implements Job {
                     final String origin = task.getOrigin();
                     final String remotePath = null;
                     final String remoteId = task.getId();
-                    final Batch batch = null;
                     projectService.createTask(orgID, actor, project, taskName, taskComment,
-                            startDate, endDate, originaEstimate, taskTypeID, assignedAccountID, origin,
-                            remotePath, String.valueOf(remoteId), TaskStatus.IN_PROGRESS, batch);
+                            startDate, endDate, originalEstimate, taskType, assignedAccountID, origin,
+                            remotePath, String.valueOf(remoteId), status, null);
                 }
         );
     }
@@ -179,15 +187,15 @@ public final class ProjectSyncJob implements Job {
         return !this.isNewTask(actor, task);
     }
 
-    private boolean isNewTask(final Account actor, final RemoteTask task) throws BusinessException {
+    private boolean isNewTask(final Account actor, final RemoteTask task) {
         final Optional<Task> existingTask = this.projectService.getTaskByRemoteID(actor, task.getId());
-        return !existingTask.isPresent();
+        return existingTask.isEmpty();
     }
 
     private void mergeAssignee(final AccountService accountService, final String externalID, final RemoteTask task) {
         final Account remoteAccount = accountService.findUserByExternalID(externalID, task.getUserName());
         if (remoteAccount != null) {
-            task.setLocalUserID(remoteAccount.getId());
+            task.setLocalUser(remoteAccount);
         }
     }
 }
