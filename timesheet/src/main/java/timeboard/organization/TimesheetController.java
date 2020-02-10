@@ -35,7 +35,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.*;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
+import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
@@ -48,13 +51,12 @@ import java.util.*;
 
 
 @Controller
-@RequestMapping("/timesheet")
+@RequestMapping(TimesheetController.PATH)
 public class TimesheetController {
 
+    public static final String PATH = "/timesheet";
     private static final Logger LOGGER = LoggerFactory.getLogger(TimesheetController.class);
-
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
     @Autowired
     private ProjectService projectService;
 
@@ -80,7 +82,7 @@ public class TimesheetController {
         return this.fillAndDisplayTimesheetPage(authentication, user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
-    @GetMapping(value="/data",  produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/data", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimesheetWrapper> getTimesheetData(
             final TimeboardAuthentication authentication,
             final @RequestParam("user") Account user,
@@ -88,10 +90,9 @@ public class TimesheetController {
             final @RequestParam("year") int year) throws BusinessException {
 
         final Account currentAccount = user;
-        final Long currentOrg =  authentication.getCurrentOrganization();
 
         final Calendar beginWorkDate = this.organizationService
-                .findOrganizationMembership(currentAccount, currentOrg)
+                .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization())
                 .get().getCreationDate();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
@@ -101,7 +102,9 @@ public class TimesheetController {
         final Calendar lastDayOfWeek = findEndDate(c);
 
         // Create days for current week
-        final List<DateWrapper> days = createDaysForCurrentWeek(currentOrg, currentAccount, c, firstDayOfWeek.getTime());
+        final List<DateWrapper> days = createDaysForCurrentWeek(
+                authentication.getCurrentOrganization(), currentAccount, c,
+                firstDayOfWeek.getTime());
 
         //Get tasks for current week
         if (this.projectService != null) {
@@ -113,7 +116,7 @@ public class TimesheetController {
 
                 final List<TaskWrapper> tasks = new ArrayList<>();
                 projectTasks.getTasks().forEach(task -> {
-                    tasks.add(new TaskWrapper( task.getId(), task.getName(),
+                    tasks.add(new TaskWrapper(task.getId(), task.getName(),
                             task.getComments(), task.getEffortSpent(),
                             task.getEffortLeft(), task.getOriginalEstimate(),
                             task.getRealEffort(), task.getStartDate(),
@@ -132,7 +135,7 @@ public class TimesheetController {
             });
 
             //Default tasks
-            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, currentOrg,
+            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, authentication.getCurrentOrganization(),
                     imputations, firstDayOfWeek.getTime(), lastDayOfWeek.getTime(), days);
             projects.add(new ProjectWrapper(0L, "Default Tasks", tasks));
         }
@@ -144,17 +147,17 @@ public class TimesheetController {
 
         final boolean isFirstWeek =
                 firstDayOfWeek.compareTo(creationDate) <= 0
-                && lastDayOfWeek.compareTo(creationDate) >= 0 ;
+                        && lastDayOfWeek.compareTo(creationDate) >= 0;
 
         final TimesheetWrapper ts = new TimesheetWrapper(
                 isFirstWeek ? ValidationStatus.PENDING_VALIDATION :
+                        this.timesheetService.getTimesheetValidationStatus(
+                                authentication.getCurrentOrganization(),
+                                currentAccount,
+                                findPreviousWeekYear(c, week, year),
+                                findPreviousWeek(c, week, year)).orElse(null),
                 this.timesheetService.getTimesheetValidationStatus(
-                        currentOrg,
-                        currentAccount,
-                        findPreviousWeekYear(c, week, year),
-                        findPreviousWeek(c, week, year)).orElse(null),
-                this.timesheetService.getTimesheetValidationStatus(
-                        currentOrg,
+                        authentication.getCurrentOrganization(),
                         currentAccount,
                         year, week).orElse(null),
                 year, week,
@@ -171,7 +174,7 @@ public class TimesheetController {
             final TimeboardAuthentication authentication,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
-            final Model model) {
+            final Model model) throws BusinessException {
         return this.fillAndDisplayTimesheetPage(authentication, authentication.getDetails(), year, week, model);
     }
 
@@ -181,7 +184,7 @@ public class TimesheetController {
             @PathVariable("user") final Account user,
             @PathVariable("year") final int year,
             @PathVariable("week") final int week,
-            final Model model) {
+            final Model model) throws BusinessException {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(user, authentication.getCurrentOrganization())
@@ -227,7 +230,7 @@ public class TimesheetController {
 
         try {
 
-            if((request.imputation * 100) % 5 != 0){ // Modulo with int and not double
+            if ((request.imputation * 100) % 5 != 0) { // Modulo with int and not double
                 return ResponseEntity.badRequest().body("Your imputation value is not valid. The step is 0.05.");
             }
 
@@ -241,7 +244,7 @@ public class TimesheetController {
 
             if (request.type.equals("imputation")) {
                 final Date day = DATE_FORMAT.parse(request.day);
-                updatedTask = this.projectService.updateTaskImputation(
+                updatedTask = this.timesheetService.updateTaskImputation(
                         authentication.getCurrentOrganization(), actor, task, day, request.imputation);
             }
 
@@ -259,13 +262,14 @@ public class TimesheetController {
 
     @GetMapping("/submit/{year}/{week}")
     public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication,
-                          @PathVariable final int year,
-                          @PathVariable final int week) {
+                                          @PathVariable final int year,
+                                          @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
 
         try {
-            final Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
+            final Organization currentOrg = this.organizationService.getOrganizationByID(
+                    actor, authentication.getCurrentOrganization().getId()).get();
 
             final SubmittedTimesheet submittedTimesheet =
                     this.timesheetService.submitTimesheet(
@@ -291,7 +295,7 @@ public class TimesheetController {
 
         final Account actor = authentication.getDetails();
 
-        if(! projectService.isOwnerOfAnyUserProject(actor, user)){
+        if (!projectService.isOwnerOfAnyUserProject(actor, user)) {
             return ResponseEntity.badRequest().body("You have not enough right do do this.");
         }
         try {
@@ -319,13 +323,13 @@ public class TimesheetController {
 
     @PostMapping("/reject/{user}/{year}/{week}")
     public ResponseEntity rejectTimesheet(final TimeboardAuthentication authentication,
-                                            @PathVariable final Account user,
-                                            @PathVariable final int year,
-                                            @PathVariable final int week) {
+                                          @PathVariable final Account user,
+                                          @PathVariable final int year,
+                                          @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
 
-        if(! projectService.isOwnerOfAnyUserProject(actor, user)){
+        if (!projectService.isOwnerOfAnyUserProject(actor, user)) {
             return ResponseEntity.badRequest().body("You have not enough right do do this.");
         }
         try {
@@ -352,7 +356,7 @@ public class TimesheetController {
 
 
     private List<TaskWrapper> getDefaultTasks(final Account currentAccount,
-                                              final Long orgID,
+                                              final Organization org,
                                               final List<ImputationWrapper> imputations,
                                               final Date ds,
                                               final Date de,
@@ -361,12 +365,12 @@ public class TimesheetController {
         final List<TaskWrapper> tasks = new ArrayList<>();
 
 
-        this.organizationService.listDefaultTasks(orgID, ds, de).stream().forEach(task -> {
+        this.organizationService.listDefaultTasks(org, ds, de).stream().forEach(task -> {
             tasks.add(new TaskWrapper(
                     task.getId(),
                     task.getName(), task.getComments(),
                     0, 0, 0, 0,
-                    organizationService.getOrganizationByID(currentAccount, orgID).get().getCreatedDate().getTime(),
+                    organizationService.getOrganizationByID(currentAccount, org.getId()).get().getCreatedDate().getTime(),
                     null,
                     TaskStatus.IN_PROGRESS.name(),
                     0L)
@@ -383,7 +387,7 @@ public class TimesheetController {
     }
 
     private List<DateWrapper> createDaysForCurrentWeek(
-            final Long organization, final Account user,  final Calendar c, final Date ds) throws BusinessException {
+            final Organization organization, final Account user, final Calendar c, final Date ds) throws BusinessException {
 
         final Calendar beginWorkDateForCurrentOrg = this.organizationService
                 .findOrganizationMembership(user, organization)
@@ -394,7 +398,7 @@ public class TimesheetController {
         c.setTime(ds); //reset calendar to start date
         for (int i = 0; i < 7; i++) {
             if (c.getTime().getTime() >= beginWorkDateForCurrentOrg.getTime().getTime()) {
-                final DateWrapper dw = new DateWrapper( c.getTime() );
+                final DateWrapper dw = new DateWrapper(c.getTime());
                 days.add(dw);
             }
             c.add(Calendar.DAY_OF_YEAR, 1);
@@ -480,7 +484,7 @@ public class TimesheetController {
                 final List<ProjectWrapper> projects,
                 final List<ImputationWrapper> imputationWrappers,
                 final boolean canValidate
-                ) {
+        ) {
 
 
             final Calendar c = Calendar.getInstance();
@@ -543,7 +547,6 @@ public class TimesheetController {
             return res;
 
         }
-
 
 
         public boolean isDisablePrev() {

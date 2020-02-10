@@ -37,9 +37,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
@@ -66,7 +66,7 @@ public class TasksRestAPI {
     private OrganizationService organizationService;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -111,7 +111,7 @@ public class TasksRestAPI {
 
         if (taskID != null && taskID != 0) {
             try {
-                task = processUpdateTask(authentication.getCurrentOrganization(),taskWrapper, actor, batches, taskID);
+                task = processUpdateTask(authentication.getCurrentOrganization(), taskWrapper, actor, batches, taskID);
 
             } catch (final Exception e) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -143,19 +143,19 @@ public class TasksRestAPI {
     }
 
     private Task createTask(
-            final Long orgID,
+            final Organization orgID,
             final TaskWrapper taskWrapper,
-                            final Account actor,
-                            final Date startDate,
-                            final Date endDate,
-                            final String name,
-                            final String comment,
-                            final double oe,
-                            final Project project,
-                            final Long typeID) {
+            final Account actor,
+            final Date startDate,
+            final Date endDate,
+            final String name,
+            final String comment,
+            final double oe,
+            final Project project,
+            final Long typeID) {
         Account assignee = null;
         if (taskWrapper.assigneeID > 0) {
-            assignee = userService.findUserByID(taskWrapper.assigneeID);
+            assignee = accountService.findUserByID(taskWrapper.assigneeID);
         }
 
 
@@ -186,16 +186,16 @@ public class TasksRestAPI {
     }
 
     private Task processUpdateTask(
-            final Long orgID,
+            final Organization orgID,
             final TaskWrapper taskWrapper,
-                                   final Account actor,
-                                   final Set<Batch> batches,
-                                   final Long taskID) throws BusinessException, ParseException {
+            final Account actor,
+            final Set<Batch> batches,
+            final Long taskID) throws BusinessException, ParseException {
 
         final Task task = (Task) projectService.getTaskByID(actor, taskID);
 
         if (taskWrapper.assigneeID != null && taskWrapper.assigneeID > 0) {
-            final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
+            final Account assignee = accountService.findUserByID(taskWrapper.assigneeID);
             task.setAssigned(assignee);
         }
         task.setName(taskWrapper.getTaskName());

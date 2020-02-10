@@ -38,8 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.ReportService;
-import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.UserService;
 import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
@@ -62,10 +60,6 @@ public class ReportsController {
     @Autowired
     private ReportService reportService;
 
-    @Autowired
-    private UserService userService;
-
-
     @GetMapping
     protected String handleGet() {
         return "reports.html";
@@ -75,11 +69,11 @@ public class ReportsController {
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<List<ReportDecorator>> reportList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
-        final List<ReportDecorator> reports = this.reportService.listReports(authentication.getCurrentOrganization(),  actor)
+        final List<ReportDecorator> reports = this.reportService.listReports(authentication.getCurrentOrganization(), actor)
                 .stream()
                 .map(report -> {
                     final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
-                    if(reportController.isPresent()) {
+                    if (reportController.isPresent()) {
                         return new ReportDecorator(report, reportController.get());
                     }
                     return null;
@@ -104,12 +98,11 @@ public class ReportsController {
                                 @ModelAttribute final Report report, final RedirectAttributes attributes) throws SchedulerException {
 
         final Account actor = authentication.getDetails();
-        final Long organizationID = authentication.getCurrentOrganization();
 
         final String projectFilter = report.getFilterProject();
 
         this.reportService.createReport(
-                organizationID,
+                authentication.getCurrentOrganization(),
                 actor,
                 report.getName(),
                 report.getHandlerID(),
@@ -148,10 +141,8 @@ public class ReportsController {
                                 @ModelAttribute final Report report, final RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        final Long organizationID = ThreadLocalStorage.getCurrentOrgId();
-        final Account organization = userService.findUserByID(organizationID);
 
-        final Report updatedReport = this.reportService.getReportByID(organization, reportID);
+        final Report updatedReport = this.reportService.getReportByID(authentication.getDetails(), reportID);
         updatedReport.setName(report.getName());
         updatedReport.setHandlerID(report.getHandlerID());
         updatedReport.setFilterProject(report.getFilterProject());
@@ -206,7 +197,7 @@ public class ReportsController {
 
         final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
 
-        if(reportController.isPresent()){
+        if (reportController.isPresent()) {
             mav.getModel().put("fragment", reportController.get().handlerView());
         }
 
@@ -228,7 +219,7 @@ public class ReportsController {
 
         final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
 
-        if(reportController.isPresent()){
+        if (reportController.isPresent()) {
             final Serializable model = reportController.get().getReportModel(authentication, report);
             return ResponseEntity.ok(model);
         }
@@ -255,7 +246,7 @@ public class ReportsController {
             return controller;
         }
 
-        public Calendar getLastAsyncJobTrigger(){
+        public Calendar getLastAsyncJobTrigger() {
             return this.report.getLastAsyncJobTrigger();
         }
 

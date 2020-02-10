@@ -27,10 +27,7 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.Project;
-import timeboard.core.model.RecursiveVacationRequest;
-import timeboard.core.model.VacationRequest;
+import timeboard.core.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -38,27 +35,31 @@ import java.util.Optional;
 
 public interface VacationService {
 
+    String VACATION_LIST = "VACATION_LIST";
+    String VACATION_TEAM_LIST = "VACATION_TEAM_LIST";
+    String VACATION_VIEW = "VACATION_VIEW";
+
     Optional<VacationRequest> getVacationRequestByID(Account actor, Long requestID);
 
     VacationRequest createVacationRequest(Account actor, VacationRequest request);
 
     RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request);
 
-    List<VacationRequest> listVacationRequestsByUser(Account user, long orgID);
+    List<VacationRequest> listVacationRequestsByUser(Account user, Organization orgID);
 
-    List<VacationRequest> listVacationRequestsByUser(Account user, long orgID, int year);
+    List<VacationRequest> listVacationRequestsByUser(Account user, Organization orgID, int year);
 
-    List<VacationRequest> listVacationRequestsToValidateByUser(Account user, long orgID);
+    List<VacationRequest> listVacationRequestsToValidateByUser(Account user, Organization orgID);
 
     Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
-    void deleteVacationRequest(Long orgID, Account actor, VacationRequest request) throws BusinessException;
+    void deleteVacationRequest(Organization org, Account actor, VacationRequest request) throws BusinessException;
 
-    void deleteVacationRequest(Long orgID, Account actor, RecursiveVacationRequest request) throws BusinessException;
+    void deleteVacationRequest(Organization org, Account actor, RecursiveVacationRequest request) throws BusinessException;
 
-    VacationRequest approveVacationRequest(Long orgID, Account actor, VacationRequest request) throws BusinessException;
+    VacationRequest approveVacationRequest(Organization org, Account actor, VacationRequest request) throws BusinessException;
 
-    RecursiveVacationRequest approveVacationRequest(Long orgID, Account actor, RecursiveVacationRequest request) throws BusinessException;
+    RecursiveVacationRequest approveVacationRequest(Organization org, Account actor, RecursiveVacationRequest request) throws BusinessException;
 
     VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
 

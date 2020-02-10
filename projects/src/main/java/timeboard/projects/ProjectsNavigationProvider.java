@@ -28,6 +28,7 @@ package timeboard.projects;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.api.ProjectService;
 
 
 @Component
@@ -41,6 +42,11 @@ public class ProjectsNavigationProvider implements NavigationExtPoint {
     @Override
     public String getNavigationPath() {
         return "/projects";
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return ProjectService.PROJECT_LIST;
     }
 
     @Override

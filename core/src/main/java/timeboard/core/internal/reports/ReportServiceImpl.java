@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
@@ -45,7 +46,9 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -68,7 +71,7 @@ public class ReportServiceImpl implements ReportService {
     private Scheduler scheduler;
 
     @PostConstruct
-    public void initQuartzJobsForHandlers(){
+    public void initQuartzJobsForHandlers() {
         this.reportHandlers
                 .stream()
                 .forEach(reportHandler -> {
@@ -80,7 +83,7 @@ public class ReportServiceImpl implements ReportService {
                                 .storeDurably(true)
                                 .build();
                         this.scheduler.addJob(details, true);
-                    }catch (SchedulerException e){
+                    } catch (SchedulerException e) {
                         LOGGER.error(e.getMessage());
                     }
                 });
@@ -89,7 +92,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public Report createReport(final Long orgID, final Account owner, final String reportName,
+    public Report createReport(final Organization orgID, final Account owner, final String reportName,
                                final String handlerID, final String filterProject) throws SchedulerException {
 
 
@@ -99,11 +102,11 @@ public class ReportServiceImpl implements ReportService {
         newReport.setFilterProject(filterProject);
 
         final Optional<ReportHandler> reportHandler = this.getReportHandler(newReport);
-        if(reportHandler.isPresent()){
+        if (reportHandler.isPresent()) {
             newReport.setHandlerID(reportHandler.get().handlerID());
             em.persist(newReport);
 
-            if(reportHandler.get().isAsyncHandler()){
+            if (reportHandler.get().isAsyncHandler()) {
 
                 final JobDataMap jobDataMap = new JobDataMap();
                 jobDataMap.put("reportID", newReport.getId());
@@ -127,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> listReports(final Long orgID, final Account owner) {
+    public List<Report> listReports(final Organization orgID, final Account owner) {
         final TypedQuery<Report> query = em.createQuery(
                 "select r from Report r where r.organizationID = :orgID",
                 Report.class);
@@ -155,7 +158,7 @@ public class ReportServiceImpl implements ReportService {
     public void deleteReportByID(final Account actor, final Long reportId) throws SchedulerException {
         final Report report = em.find(Report.class, reportId);
 
-        if(report.getAsyncTriggerKeyName() != null) {
+        if (report.getAsyncTriggerKeyName() != null) {
             final TriggerKey triggerKey = TriggerKey.triggerKey(report.getAsyncTriggerKeyName());
 
             if (null != this.scheduler.getTrigger(triggerKey)) {
@@ -169,7 +172,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(final Account actor, final Long orgID, final List<String> expressions) {
+    public List<ProjectWrapper> findProjects(final Account actor, final Organization orgID, final List<String> expressions) {
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -195,7 +198,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(final Account actor, final Long orgID, final Report report) {
+    public List<ProjectWrapper> findProjects(final Account actor, final Organization orgID, final Report report) {
         return this.findProjects(actor, orgID, Arrays.asList(report.getFilterProject().split("\n")));
     }
 
@@ -204,7 +207,7 @@ public class ReportServiceImpl implements ReportService {
         return this.reportHandlers.stream()
                 .filter(rc ->
                 {
-                    return  rc.handlerID().equals(report.getHandlerID());
+                    return rc.handlerID().equals(report.getHandlerID());
                 }).findFirst();
     }
 
@@ -217,7 +220,7 @@ public class ReportServiceImpl implements ReportService {
     public void executeAsyncReport(final Account actor, final Report report) throws SchedulerException {
 
         final Optional<ReportHandler> handler = this.getReportHandler(report);
-        if(handler.isPresent()) {
+        if (handler.isPresent()) {
             final JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("reportID", report.getId());
             jobDataMap.put("actorID", actor.getId());
@@ -227,8 +230,6 @@ public class ReportServiceImpl implements ReportService {
         }
 
     }
-
-
 
 
     private boolean applyFilterOnProject(final Expression exp, final ProjectWrapper projectWrapper) {

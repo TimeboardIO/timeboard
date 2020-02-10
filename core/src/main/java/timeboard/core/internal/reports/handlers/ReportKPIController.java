@@ -91,8 +91,8 @@ public class ReportKPIController implements ReportHandler {
         model.addAttribute("quotation", quotation.get());
         model.addAttribute("originalEstimate", originalEstimate.get());
         model.addAttribute("effortLeft", effortLeft.get());
-        model.addAttribute("effortSpent",effortSpent.get());
-        model.addAttribute("realEffort",effortSpent.get() + effortLeft.get());
+        model.addAttribute("effortSpent", effortSpent.get());
+        model.addAttribute("realEffort", effortSpent.get() + effortLeft.get());
 
         model.addAttribute("date", Calendar.getInstance().getTime());
 

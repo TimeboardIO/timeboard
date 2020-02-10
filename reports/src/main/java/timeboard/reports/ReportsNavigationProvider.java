@@ -28,6 +28,7 @@ package timeboard.reports;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.api.ReportService;
 
 @Component
 public class ReportsNavigationProvider implements NavigationExtPoint {
@@ -40,6 +41,11 @@ public class ReportsNavigationProvider implements NavigationExtPoint {
     @Override
     public String getNavigationPath() {
         return "/reports";
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return ReportService.REPORT_LIST;
     }
 
     @Override

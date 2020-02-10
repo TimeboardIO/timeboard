@@ -31,8 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.ReportService;
-import timeboard.core.api.UserService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
@@ -50,9 +50,9 @@ public final class ReportJob implements Job {
 
     @Autowired
     private ReportService reportService;
-    
+
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
@@ -60,19 +60,19 @@ public final class ReportJob implements Job {
         final Long reportID = context.getMergedJobDataMap().getLong("reportID");
         final Long actorID = context.getMergedJobDataMap().getLong("actorID");
 
-        final Account actor = this.userService.findUserByID(actorID);
+        final Account actor = this.accountService.findUserByID(actorID);
         final TimeboardAuthentication authentication = new TimeboardAuthentication(actor);
         final Report report = this.reportService.getReportByID(actor, reportID);
         final Optional<ReportHandler> reportHandler = this.reportService.getReportHandler(report);
 
-        if(reportHandler.isPresent()){
+        if (reportHandler.isPresent()) {
             final Serializable data = reportHandler.get().getReportModel(authentication, report);
             report.setLastAsyncJobTrigger(Calendar.getInstance());
             report.setData(data);
             this.reportService.updateReport(actor, report);
-            LOGGER.info("Report "+reportID+" finished with "+data.toString());
-        }else{
-            context.setResult("Mission report handler : "+report.getHandlerID());
+            LOGGER.info("Report " + reportID + " finished with " + data.toString());
+        } else {
+            context.setResult("Mission report handler : " + report.getHandlerID());
         }
 
 

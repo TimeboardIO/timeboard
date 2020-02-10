@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Organization member can access Timesheet",
+    "actions": [
+      "TIMESHEET_LIST",
+      "TIMESHEET_IMPUTATION",
+      "TIMESHEET_SUBMIT",
+      "PROJECT_COUNT",
+      "TASK_LIST",
+      "PROJECT_LIST",
+      "PROJECT_VIEW",
+      "HOME_VIEW"
+    ],
+    "conditions": [
+      "subject.currentOrganizationRole('OWNER', 'CONTRIBUTOR')"
+    ]
+  },
+  {
+    "name": "Organization contributors can access vacations features",
+    "actions": [
+      "VACATION_VIEW"
+    ],
+    "conditions": [
+      "subject.currentProjectRole(resource,'OWNER','CONTRIBUTOR')"
+    ]
+  },
+  {
+    "name": "Users can create tasks on project only if they are member",
+    "actions": [
+      "PROJECT_TASKS_VIEW",
+      "TASKS_CREATE"
+    ],
+    "conditions": [
+      "subject.currentProjectRole(resource, 'OWNER', 'CONTRIBUTOR')"
+    ]
+  }
+]

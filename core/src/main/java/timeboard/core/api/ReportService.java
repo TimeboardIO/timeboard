@@ -34,7 +34,6 @@ import timeboard.core.model.Project;
 import timeboard.core.model.Report;
 
 import java.beans.Transient;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,18 +41,22 @@ import java.util.stream.Collectors;
 public interface ReportService {
 
 
+    String REPORT_LIST = "REPORT_LIST";
+    String REPORT_PROJECT_VIEW = "REPORT_PROJECT_VIEW";
+
     /**
      * Create a new report configuration
+     *
      * @param organizationID relevant organization
-     * @param owner user that owner report
-     * @param reportName screen name used to identify report
-     * @param handlerName name of report handler used to compute report data
-     * @param filterProject SPEL
+     * @param owner          user that owner report
+     * @param reportName     screen name used to identify report
+     * @param handlerName    name of report handler used to compute report data
+     * @param filterProject  SPEL
      * @return
      * @throws SchedulerException
      */
     Report createReport(
-            final Long organizationID,
+            final Organization organizationID,
             final Account owner,
             final String reportName,
             final String handlerName,
@@ -61,11 +64,12 @@ public interface ReportService {
 
     /**
      * List all report for owner
+     *
      * @param orgID primary key {@link Organization} where looking for reports
      * @param owner an account that own reports
      * @return
      */
-    List<Report> listReports(final Long orgID, final Account owner);
+    List<Report> listReports(final Organization orgID, final Account owner);
 
     Report updateReport(Account actor, Report report);
 
@@ -73,9 +77,9 @@ public interface ReportService {
 
     void deleteReportByID(Account actor, Long reportId) throws SchedulerException;
 
-    List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions);
+    List<ProjectWrapper> findProjects(Account actor, Organization orgID, List<String> expressions);
 
-    List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report);
+    List<ProjectWrapper> findProjects(Account actor, Organization orgID, Report report);
 
     Optional<ReportHandler> getReportHandler(Report report);
 

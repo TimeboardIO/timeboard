@@ -1,4 +1,4 @@
-package timeboard.projects;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -40,6 +40,7 @@ import timeboard.core.api.TimesheetService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
+import timeboard.projects.ProjectBaseController;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -47,14 +48,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{projectID}/timesheets")
-public class ProjectTimesheetValidationController {
+@RequestMapping("/projects/{projectID}" + ProjectTimesheetValidationController.PATH)
+public class ProjectTimesheetValidationController extends ProjectBaseController {
+
+    public static final String PATH = "/timesheets";
 
     @Autowired
     public ProjectService projectService;
 
     @Autowired
     public TimesheetService timesheetService;
+
 
     private static long absoluteWeekNumber(SubmittedTimesheet t) {
         return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
@@ -80,15 +84,15 @@ public class ProjectTimesheetValidationController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
-
-        return "project_timesheet_validation.html";
+        this.initModel(model, authentication, project);
+        return "timesheet_validation.html";
     }
 
     @GetMapping(value = "/listProjectMembersTimesheets", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,
                                                        @PathVariable Long projectID) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         final Map<Account, List<SubmittedTimesheet>> timesheetsFromProject =
                 this.timesheetService.getProjectTimesheetByAccounts(

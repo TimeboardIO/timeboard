@@ -187,18 +187,13 @@ public class OrganizationServiceImpl implements OrganizationService {
         return Optional.ofNullable(membership.getOrganization());
     }
 
-    @Override
-    public Optional<OrganizationMembership> findOrganizationMembership(
-            final Account actor, final Organization organization) throws BusinessException {
-        return this.findOrganizationMembership(actor, organization.getId());
-    }
 
     @Override
-    public Optional<OrganizationMembership> findOrganizationMembership(final Account actor, final Long organizationID) {
+    public Optional<OrganizationMembership> findOrganizationMembership(final Account actor, final Organization org) {
         final Account localActor = this.em.find(Account.class, actor.getId());
-        final Optional<OrganizationMembership> o = localActor.getOrganizations()
+        final Optional<OrganizationMembership> o = localActor.getOrganizationMemberships()
                 .stream()
-                .filter(om -> om.getOrganization().getId() == organizationID).findFirst();
+                .filter(om -> om.getOrganization().getId() == org.getId()).findFirst();
 
         if (o.isPresent()) {
             this.em.detach(o.get());
@@ -206,16 +201,6 @@ public class OrganizationServiceImpl implements OrganizationService {
         return o;
     }
 
-    @Override
-    public Optional<OrganizationMembership> findOrganizationMembershipById(final Account details, final Long membershipID) {
-        OrganizationMembership om;
-        try {
-            om = this.em.find(OrganizationMembership.class, membershipID);
-        } catch (final Exception e) {
-            om = null;
-        }
-        return Optional.ofNullable(om);
-    }
 
     @Override
     public DefaultTask updateDefaultTask(final Account actor, final DefaultTask task) {
@@ -250,7 +235,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    public List<DefaultTask> listDefaultTasks(final Long orgID, final Date ds, final Date de) {
+    public List<DefaultTask> listDefaultTasks(final Organization orgID, final Date ds, final Date de) {
         final TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t " +
                         " from DefaultTask t left join fetch t.imputations where "
@@ -262,9 +247,8 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public DefaultTask createDefaultTask(final Account actor, final Long orgID, final String name) throws BusinessException {
-        final Optional<Organization> organization = this.getOrganizationByID(actor, orgID);
-        return this.createDefaultTask(organization.get(), name);
+    public DefaultTask createDefaultTask(final Account actor, final Organization orgID, final String name) throws BusinessException {
+        return this.createDefaultTask(orgID, name);
     }
 
 
@@ -294,7 +278,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public void disableDefaultTaskByID(final Account actor, final Long orgID, final long taskID) throws BusinessException {
+    public void disableDefaultTaskByID(final Account actor, final Organization orgID, final long taskID) throws BusinessException {
 
         final DefaultTask task = em.find(DefaultTask.class, taskID);
         task.setEndDate(new Date());
@@ -306,7 +290,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public List<TaskType> listTaskType(final Long orgID) {
+    public List<TaskType> listTaskType(final Organization orgID) {
         final TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt " +
                 "where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
         q.setParameter("orgID", orgID);
@@ -332,10 +316,10 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public TaskType createTaskType(final Account actor, final Long orgID, final String name) {
+    public TaskType createTaskType(final Account actor, final Organization orgID, final String name) {
         final TaskType taskType = new TaskType();
         taskType.setTypeName(name);
-        taskType.setOrganizationID(orgID);
+        taskType.setOrganizationID(orgID.getId());
         em.persist(taskType);
         em.flush();
         LOGGER.info("User " + actor.getScreenName() + " create task type " + name);

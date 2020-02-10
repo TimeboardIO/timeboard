@@ -29,23 +29,39 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 
 public interface ProjectService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
+    String PROJECT_CREATE = "PROJECT_CREATE";
+    String PROJECT_SETUP = "PROJECT_SETUP";
+    String PROJECT_ARCHIVE = "PROJECT_ARCHIVE";
+    String PROJECT_LIST = "PROJECT_LIST";
+    String PROJECT_COUNT = "PROJECT_COUNT";
+    String PROJECT_VIEW = "PROJECT_VIEW";
+
+    String TASK_LIST = "TASK_LIST";
+    String PROJECT_TAGS_VIEW = "PROJECT_TAGS_VIEW";
+    String PROJECT_TASKS_VIEW = "PROJECT_TASKS_VIEW";
+    String PROJECT_TASKS_APPROBATION = "PROJECT_TASKS_APPROBATION";
+    String PROJECT_TASKS_IMPORT = "PROJECT_TASKS_IMPORT";
+    String PROJECT_TASKS_EDIT = "PROJECT_TASKS_EDIT";
+    String PROJECT_BATCHES_VIEW = "PROJECT_BATCHES_VIEW";
+    String PROJECT_SETUP_VIEW = "PROJECT_BATCHES_VIEW";
     /*
     === Projects ===
     */
 
-    Project createProject(Long orgID, Account owner, String projectName) throws BusinessException;
+    Project createProject(final Organization orgID, Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(Account owner, Long orgID);
+    List<Project> listProjects(Account owner, Organization orgID);
 
-    Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
+    double countAccountProjectMemberships(Organization org, Account candidate);
 
-    Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
+    Project getProjectByID(Account actor, Organization org, Long projectID) throws BusinessException;
 
     Project archiveProjectByID(Account actor, Project project) throws BusinessException;
 
@@ -59,15 +75,15 @@ public interface ProjectService {
      == Tasks ==
      */
 
-    List<Task> listUserTasks(Long orgID, Account account);
+    List<Task> listUserTasks(Organization org, Account account);
 
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
 
     AbstractTask getTaskByID(Account account, long id) throws BusinessException;
 
-    List<ProjectTasks> listTasksByProject(Long orgID, Account actor, Date ds, Date de);
+    List<ProjectTasks> listTasksByProject(Organization org, Account actor, Date ds, Date de);
 
-    Task createTask(final Long orgID,
+    Task createTask(final Organization orgID,
                     final Account actor,
                     final Project project,
                     final String taskName,
@@ -85,16 +101,19 @@ public interface ProjectService {
 
     /**
      * Update task in database
+     *
      * @param orgID relevant {@link Organization} ID
      * @param actor issuer {@link Account}
-     * @param task {@link Task} to update in database
+     * @param task  {@link Task} to update in database
      * @return updated {@link Task}
      */
-    Task updateTask(final Long orgID,
+    Task updateTask(final Organization orgID,
                     final Account actor,
                     final Task task);
 
     void updateTasks(Account actor, List<Task> taskList);
+
+    Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task, Account account);
 
     UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
@@ -119,18 +138,6 @@ public interface ProjectService {
                                                      Date startTaskDate,
                                                      Date endTaskDate) throws BusinessException;
 
-
-    UpdatedTaskResult updateTaskImputation(
-            final Long orgID,
-            final Account actor,
-            final AbstractTask task,
-            final Date day,
-            final double val) throws BusinessException;
-
-    List<UpdatedTaskResult> updateTaskImputations(
-            final Long orgID,
-            final Account actor,
-            final List<Imputation> imputationsList);
 
 
 

@@ -1,13 +1,49 @@
 [
   {
+  "name": "Every user can view home",
+  "description": "Every user can view home",
+  "target": "action == 'HOME_VIEW'",
+  "condition": "true==true"
+  },
+  {
+    "name": "Every user can count his projects",
+    "description": "Every user can count his projects",
+    "target": "action == 'PROJECT_COUNT'",
+    "condition": "true==true"
+  },
+  {
+    "name": "Every user can count his projects",
+    "description": "Every user can count his projects",
+    "target": " action == 'PROJECT_VIEW'",
+    "condition": "subject.currentProjectRole(resource, 'OWNER') || subject.currentProjectRole(resource, 'CONTRIBUTOR')"
+  },
+  {
+    "name": "Every user can edit his timesheet",
+    "description": "Every user can edit his timesheet",
+    "target": "action == 'TIMESHEET_LIST' || action == 'TIMESHEET_IMPUTATION'",
+    "condition": "true==true"
+  },
+  {
+    "name": "Every user can list his tasks",
+    "description": "Every user can list his tasks",
+    "target": "action == 'TASK_LIST' || action == 'PROJECT_TASKS_VIEW'",
+    "condition": "true==true"
+  },
+  {
+    "name": "Every user can list his tasks",
+    "description": "Every user can list his tasks",
+    "target": "action == 'PROJECT_LIST'",
+    "condition": "true==true"
+  },
+  {
     "name": "User can create project",
     "description": "Any user with role OWNER membership on current org can create projects",
-    "target": "action == 'PROJECTS_CREATE'",
+    "target": "action == 'PROJECT_CREATE'",
     "condition": "subject.currentOrganizationRole('OWNER') && environment.checkProjectByUserLimit(subject)"
   },{
     "name": "Project owner can setup project",
     "description": "Only user with role OWNER on project can setup project",
-    "target": "action == 'PROJECT_SETUP'",
+    "target": "action == 'PROJECT_SETUP' || action == 'TASK_LIST'",
     "condition": "subject.currentProjectRole(resource, 'OWNER')"
   },
   {
@@ -15,6 +51,12 @@
     "description": "Any user belonging to the project can create tasks in this project",
     "target": "action == 'TASKS_CREATE'",
     "condition": "resource.isMember(subject.getDetails()) && environment.checkTaskByProjectLimit(subject, resource)"
+  },
+  {
+    "name": "User can list projects",
+    "description": "Any user can list projects",
+    "target": "action == 'PROJECT_LIST'",
+    "condition": "subject.currentOrganizationRole('OWNER')"
   },
   {
     "name": "User can create task in a project",

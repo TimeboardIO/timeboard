@@ -34,7 +34,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.organization.OrganizationSelectController;
@@ -100,7 +99,7 @@ public class OrganizationFilter implements Filter {
                         .getOrganizationByID(authentication.getDetails(), organizationID);
 
                 if (organization.isPresent()) {
-                    ThreadLocalStorage.setCurrentOrgId(organization.get().getId());
+                    authentication.setCurrentOrganization(organization.get());
                 } else {
                     servletResponse.sendRedirect(OrganizationSelectController.URI);
                     LOGGER.info("Wrong or missing org cookie, redirect to login");
