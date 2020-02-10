@@ -69,7 +69,10 @@ public interface TimesheetService {
      * @param submittedTimesheet submittedTimesheet to validate
      * @return true if timesheet is submit else, false.
      */
-    SubmittedTimesheet validateTimesheet(final Account actor, final SubmittedTimesheet submittedTimesheet) throws BusinessException;
+    SubmittedTimesheet validateTimesheet(
+            final Organization currentOrg,
+            final Account actor,
+            final SubmittedTimesheet submittedTimesheet) throws BusinessException;
 
     /**
      * Reject user timesheet.
@@ -143,7 +146,7 @@ public interface TimesheetService {
      * @param olderYear      year of older week in the "validation timesheet week" list
      * @param olderWeek      week of older week in the "validation timesheet week" list
      */
-    void forceValidationTimesheets(Long organizationID, Account actor, Account target,
+    void forceValidationTimesheets(Organization organizationID, Account actor, Account target,
                                  int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
 
     class TimesheetFilter<T> {
@@ -158,14 +161,17 @@ public interface TimesheetService {
         }
     }
 
+    @Deprecated
     default long absoluteWeekNumber(SubmittedTimesheet t) {
         return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
     }
 
+    @Deprecated
     default long absoluteWeekNumber(int year, int week) {
         return (long) (year * 53) + week;
     }
 
+    @Deprecated
     default long absoluteWeekNumber(java.util.Calendar c) {
         return absoluteWeekNumber(c.get(java.util.Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
     }

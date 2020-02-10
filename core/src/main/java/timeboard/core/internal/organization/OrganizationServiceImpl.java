@@ -293,7 +293,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     public List<TaskType> listTaskType(final Organization orgID) {
         final TypedQuery<TaskType> q = em.createQuery("select tt from TaskType tt " +
                 "where tt.enable = true and tt.organizationID = :orgID", TaskType.class);
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", orgID.getId());
         return q.getResultList();
     }
 

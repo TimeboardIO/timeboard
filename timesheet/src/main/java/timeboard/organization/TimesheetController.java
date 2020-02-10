@@ -309,7 +309,11 @@ public class TimesheetController {
                             week);
 
             if (submittedTimesheet.isPresent()) {
-                final SubmittedTimesheet result = this.timesheetService.validateTimesheet( org.get(), actor,submittedTimesheet.get());
+                final SubmittedTimesheet result =
+                        this.timesheetService.validateTimesheet(
+                                authentication.getCurrentOrganization(),
+                                actor,submittedTimesheet.get());
+
                 return ResponseEntity.ok(result.getTimesheetStatus());
 
             } else {
@@ -329,7 +333,9 @@ public class TimesheetController {
                                           @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
-        final Optional<Organization> org = organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
+        final Optional<Organization> org = organizationService.getOrganizationByID(
+                actor,
+                authentication.getCurrentOrganization().getId());
 
         if (!projectService.isOwnerOfAnyUserProject(actor, user)) {
             return ResponseEntity.badRequest().body("You have not enough right do do this.");

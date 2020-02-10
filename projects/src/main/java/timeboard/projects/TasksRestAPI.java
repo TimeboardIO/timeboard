@@ -40,7 +40,6 @@ import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -65,7 +64,7 @@ public class TasksRestAPI {
     private OrganizationService organizationService;
 
     @Autowired
-    private AccountService accountService;
+    private AccountService userService;
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -74,7 +73,7 @@ public class TasksRestAPI {
 
         final Task t = new Task();
         final Account actor = authentication.getDetails();
-        final long orgID = authentication.getCurrentOrganization();
+        final Organization orgID = authentication.getCurrentOrganization();
 
         try {
 
@@ -101,7 +100,7 @@ public class TasksRestAPI {
 
     }
 
-    private Task processCreateOrUpdate(Account actor,Long orgID,  Long taskID, Task t) throws TaskCreationException {
+    private Task processCreateOrUpdate(Account actor,Organization orgID,  Long taskID, Task t) throws TaskCreationException {
         Task task = null;
         try {
             if (taskID != null && taskID != 0) {
@@ -113,13 +112,6 @@ public class TasksRestAPI {
                 t.setId(oldTask.getId());
                 task = processUpdateTask(orgID, actor, t);
 
-        if (taskID != null && taskID != 0) {
-            try {
-                task = processUpdateTask(authentication.getCurrentOrganization(), taskWrapper, actor, batches, taskID);
-
-            } catch (final Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error in task creation please verify your inputs and retry");
             }
             else {
                 task = processCreateTask(orgID, actor, t);
@@ -131,27 +123,8 @@ public class TasksRestAPI {
         }
     }
 
-    private Task createTask(
-            final Organization orgID,
-            final TaskWrapper taskWrapper,
-            final Account actor,
-            final Date startDate,
-            final Date endDate,
-            final String name,
-            final String comment,
-            final double oe,
-            final Project project,
-            final Long typeID) {
-        Account assignee = null;
-        if (taskWrapper.assigneeID > 0) {
-            assignee = accountService.findUserByID(taskWrapper.assigneeID);
-        }
-
-
-        return projectService.createTask(orgID, actor, project,
-                name, comment, startDate,
-                endDate, oe, typeID, assignee,
-                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING, null);
+    private TaskStatus taskStatusValidator(@RequestBody final TaskWrapper taskWrapper) {
+        return  TaskStatus.valueOf(taskWrapper.getStatus());
     }
 
     private Set<Batch> batchesValidator(@RequestBody final TaskWrapper taskWrapper, final Account actor) {
@@ -174,12 +147,8 @@ public class TasksRestAPI {
         return returnList;
     }
 
-    private Task processUpdateTask(
-            final Organization orgID,
-            final TaskWrapper taskWrapper,
-            final Account actor,
-            final Set<Batch> batches,
-            final Long taskID) throws BusinessException, ParseException {
+    private Account assigneeValidator(@RequestBody final TaskWrapper taskWrapper) {
+        final Long assigneeID = taskWrapper.assigneeID;
 
         if (assigneeID != null && assigneeID > 0) {
             return userService.findUserByID(assigneeID);
@@ -187,13 +156,15 @@ public class TasksRestAPI {
         return  null;
     }
 
-        if (taskWrapper.assigneeID != null && taskWrapper.assigneeID > 0) {
-            final Account assignee = accountService.findUserByID(taskWrapper.assigneeID);
-            task.setAssigned(assignee);
+    private TaskType taskTypeValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
+        try {
+            return this.organizationService.findTaskTypeByID(taskWrapper.typeID);
+        } catch (Exception e) {
+            throw new TaskCreationException("Could not find task type");
         }
     }
 
-    private Project projectValidator(@RequestBody final TaskWrapper taskWrapper, Account actor, Long orgID) throws TaskCreationException {
+    private Project projectValidator(@RequestBody final TaskWrapper taskWrapper, Account actor, Organization orgID) throws TaskCreationException {
         final Long projectID = taskWrapper.projectID;
         Project project = null;
         try {
@@ -262,7 +233,7 @@ public class TasksRestAPI {
     }
 
 
-    private Task processCreateTask(final Long orgID, final Account actor, final Task task) {
+    private Task processCreateTask(final Organization orgID, final Account actor, final Task task) {
         return projectService.createTask(orgID, actor, task.getProject(),
                 task.getName(), task.getComments(), task.getStartDate(),
                 task.getEndDate(), task.getOriginalEstimate(), task.getTaskType(), task.getAssigned(),
@@ -270,7 +241,7 @@ public class TasksRestAPI {
                 task.getBatches());
     }
 
-    private Task processUpdateTask(final Long orgID, final Account actor, final Task task) {
+    private Task processUpdateTask(final Organization orgID, final Account actor, final Task task) {
         return projectService.updateTask(orgID, actor, task);
     }
 

@@ -322,13 +322,13 @@ public class ProjectServiceImpl implements ProjectService {
             final Date startDate,
             final Date endDate,
             final double originalEstimate,
-            final Long taskTypeID,
+            final TaskType taskType,
             final Account assignedAccount,
             final String origin,
             final String remotePath,
             final String remoteId,
             final TaskStatus taskStatus,
-            final Batch batch
+            final Collection<Batch> batches
     ) {
         final Task newTask = new Task();
         newTask.setTaskType(taskType);
@@ -349,8 +349,9 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
         newTask.setOrganizationID(orgID.getId());
-        if (batch != null) {
-            em.merge(batch);
+        if (batches!= null && !batches.isEmpty() ) {
+            newTask.setBatches(new HashSet<>());
+            newTask.getBatches().addAll(batches);
         }
         em.persist(newTask);
         em.merge(project);
