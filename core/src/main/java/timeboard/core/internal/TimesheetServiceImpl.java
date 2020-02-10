@@ -332,6 +332,21 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
+    public List<SubmittedTimesheet> getSubmittedTimesheets(Long orgID, Account actor, Account targetUser) {
+        final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
+                + "where st.account = :user and st.organizationID = :orgID", SubmittedTimesheet.class);
+
+        q.setParameter("orgID", orgID);
+        q.setParameter("user", targetUser);
+
+        try {
+            return q.getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
     public void forceValidationTimesheets(Long organizationID, Account actor, Account target,
                                         int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException {
 

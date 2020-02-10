@@ -39,12 +39,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.api.EmailService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UserService;
+import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.observers.emails.EmailStructure;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -67,13 +63,13 @@ public class ProjectTimesheetValidationController {
     public TimesheetService timesheetService;
 
     @Autowired
+    public OrganizationService organizationService;
+
+    @Autowired
     public UserService userService;
+
     @Autowired
     public EmailService emailService;
-
-    private static long absoluteWeekNumber(SubmittedTimesheet t) {
-        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
-    }
 
     @GetMapping
     protected String timesheetValidationApp(TimeboardAuthentication authentication,
@@ -89,29 +85,56 @@ public class ProjectTimesheetValidationController {
 
 
     @GetMapping(value = "/sendReminderMail/{targetUser}")
-    public ResponseEntity sendReminderMail(
+    public String sendReminderMail(
             final TimeboardAuthentication authentication, final Model model, @PathVariable Account targetUser) throws MessagingException {
 
         final Account actor = authentication.getDetails();
 
-       final HashMap<String, Object> data =  new HashMap<>();
+       //final HashMap<String, Object> data =  new HashMap<>();
+        final Model data = model;
 
-        data.put("message", "Test");
+        data.addAttribute("message", "Test");
+
+        final List<SubmittedTimesheet> list = this.timesheetService.getSubmittedTimesheets(
+                authentication.getCurrentOrganization(), authentication.getDetails(), targetUser);
+
+        final long todayAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(Calendar.getInstance());
+
+        final Optional<SubmittedTimesheet> max = list.stream()
+                .filter(e -> !e.getTimesheetStatus().equals(ValidationStatus.REJECTED)) // ignore rejected
+                .max(Comparator.comparingLong(timesheetService::absoluteWeekNumber));
+
+        if (max.isPresent()) {
+            final SubmittedTimesheet lastSubmittedTimesheet = max.get();
+            final Calendar c = Calendar.getInstance();
+            c.set(Calendar.WEEK_OF_YEAR,lastSubmittedTimesheet.getWeek());
+            c.set(Calendar.YEAR,lastSubmittedTimesheet.getYear());
+            c.add(Calendar.WEEK_OF_YEAR, 1);
+
+            data.addAttribute("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(lastSubmittedTimesheet));
+            data.addAttribute("weekToValidate", c.get(Calendar.WEEK_OF_YEAR));
+            data.addAttribute("yearToValidate", c.get(Calendar.YEAR));
 
 
+        } else {
+            // never submitted a first week or it been rejected
+            final Calendar beginWorkDate = this.organizationService
+                    .findOrganizationMembership(actor, authentication.getCurrentOrganization()).get().getCreationDate();
 
-        this.getFirstTimesheetToSubmit();
-        final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
+            data.addAttribute("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(beginWorkDate));
+            data.addAttribute("weekToValidate", beginWorkDate.get(Calendar.WEEK_OF_YEAR));
+            data.addAttribute("yearToValidate", beginWorkDate.get(Calendar.YEAR));
+        }
 
-       this.emailService.sendMessage(structure);
+        data.addAttribute("targetID", targetUser.getId());
+        data.addAttribute("targetScreenName", targetUser.getScreenName());
+       // final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
 
-       return ResponseEntity.ok().build();
+    //   this.emailService.sendMessage(structure);
 
-    }
+    //   return ResponseEntity.ok().build();
 
-    private void getFirstTimesheetToSubmit() {
-
-
+        return "mail/reminder.html";
     }
 
 
@@ -186,6 +209,8 @@ public class ProjectTimesheetValidationController {
         final Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, firstWeek);
         current.set(Calendar.YEAR, firstYear);
+        current.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+
         final long weekNumber = todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(firstYear, firstWeek);
         if (weekNumber <= 1) { //Min two weeks
             current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));

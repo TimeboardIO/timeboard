@@ -112,6 +112,9 @@ public interface TimesheetService {
             final Account actor,
             final Project project);
 
+    List<SubmittedTimesheet> getSubmittedTimesheets(final Long orgID, final Account actor, Account targetUser);
+
+
     /**
      * Force Validation of a list of weeks
      *
@@ -125,6 +128,7 @@ public interface TimesheetService {
      */
     void forceValidationTimesheets(Long organizationID, Account actor, Account target,
                                  int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
+
 
     class TimesheetFilter<T> {
         private T target;
