@@ -34,6 +34,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -64,6 +65,11 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
 
     @Autowired
     private ReportConverter reportConverter;
+
+    @Override
+    public void addCorsMappings(final CorsRegistry registry) {
+        registry.addMapping("/**").allowedOrigins("*");
+    }
 
     @Bean
     public MessageSource messageSource() {

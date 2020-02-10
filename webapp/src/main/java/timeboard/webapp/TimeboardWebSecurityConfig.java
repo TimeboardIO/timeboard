@@ -77,7 +77,7 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(final WebSecurity web) throws Exception {
 
         web.ignoring().antMatchers(
-                "/public/**");
+                "/public/**", "/manifest.json");
 
     }
 
@@ -105,9 +105,8 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterAfter(new CustomFilter(), OAuth2LoginAuthenticationFilter.class);
 
         http.csrf().disable();
-
-
     }
+
 
 
     public class RedirectFilter extends GenericFilterBean {

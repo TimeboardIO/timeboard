@@ -1,21 +1,17 @@
 {
-  "short_name": "MyTimeboard",
-  "name": "Google Maps",
+  "name": "Timeboard",
+  "short_name": "Timeboard",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff",
+  "theme_color": "#039be5",
   "icons": [
     {
-      "src": "/onboarding/images/logo.png",
+      "src": "/onboarding/images/ico.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "/onboarding/images/logo.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "144x144"
     }
   ],
-  "start_url": "/",
-  "background_color": "#3367D6",
-  "display": "standalone",
-  "scope": "/",
-  "theme_color": "#3367D6"
+  "splash_pages": null
 }

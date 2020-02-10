@@ -61,6 +61,7 @@ public class OrganizationFilter implements Filter {
         whitelist.add(OnboardingController.URI);
         whitelist.add("/org/create");
         whitelist.add("/login/oauth2/code/cognito");
+        whitelist.add("/manifest.json");
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2|svg)");
     }
 

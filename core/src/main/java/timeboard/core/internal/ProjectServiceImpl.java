@@ -121,10 +121,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @PreAuthorize("hasPermission(null,'" + PROJECT_LIST + "')")
     @Cacheable(value = "accountProjectsCache", key = "#candidate.getId()")
-    public List<Project> listProjects(final Account candidate, final Organization orgID) {
+    public List<Project> listProjects(final Account candidate, final Organization org) {
         final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
-        query.setParameter("orgID", orgID);
+        query.setParameter("orgID", org.getId());
         return query.getResultList();
     }
 
