@@ -64,7 +64,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
         this.timesheetStatus = timesheetStatus;
     }
 
-    public long getYear() {
+    public int getYear() {
         return year;
     }
 
@@ -72,7 +72,7 @@ public class SubmittedTimesheet extends OrganizationEntity {
         this.year = y;
     }
 
-    public long getWeek() {
+    public int getWeek() {
         return week;
     }
 

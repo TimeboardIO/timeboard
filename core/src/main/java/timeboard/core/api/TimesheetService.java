@@ -27,8 +27,10 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.*;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +112,20 @@ public interface TimesheetService {
             final Account actor,
             final Project project);
 
+    /**
+     * Force Validation of a list of weeks
+     *
+     * @param organizationID id of current organization
+     * @param actor          project owner
+     * @param target         timesheet owner (target of timesheet validation)
+     * @param selectedYear   year of week selected in the "validation timesheet week" list
+     * @param selectedWeek   week of week selected in the "validation timesheet week" list
+     * @param olderYear      year of older week in the "validation timesheet week" list
+     * @param olderWeek      week of older week in the "validation timesheet week" list
+     */
+    void forceValidationTimesheets(Long organizationID, Account actor, Account target,
+                                 int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
+
     class TimesheetFilter<T> {
         private T target;
 
@@ -120,6 +136,18 @@ public interface TimesheetService {
         public T getTarget() {
             return target;
         }
+    }
+
+    default long absoluteWeekNumber(SubmittedTimesheet t) {
+        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
+    }
+
+    default long absoluteWeekNumber(int year, int week) {
+        return (long) (year * 53) + week;
+    }
+
+    default long absoluteWeekNumber(java.util.Calendar c) {
+        return absoluteWeekNumber(c.get(java.util.Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
     }
 
 }
