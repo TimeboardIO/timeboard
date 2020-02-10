@@ -80,12 +80,12 @@ $(document).ready(function () {
                 });
             },
             sendReminder: function (event, target) {
-                event.preventDefault();
+                event.stopPropagation();
                 let self = this;
                 $.ajax({
                     type: "POST",
                     contentType: "application/json",
-                    url: "projects/" + _PROJECT_ID + "/timesheets/sendReminderMail/" + target.id,
+                    url: "/timesheet/sendReminderMail/" + target.id,
                     success: function (data, textStatus, jqXHR)  {
                         event.target.classList.add('disabled');
                     },
@@ -111,6 +111,5 @@ $(document).ready(function () {
         }
     });
 
-    $('.ui.accordion')
-        .accordion();
+    $('.ui.accordion').accordion();
 });

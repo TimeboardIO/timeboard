@@ -39,15 +39,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.LocaleResolver;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.internal.observers.emails.EmailStructure;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.*;
@@ -71,11 +67,6 @@ public class ProjectTimesheetValidationController {
     @Autowired
     public UserService userService;
 
-    @Autowired
-    public EmailService emailService;
-
-    @Autowired
-    private LocaleResolver localeResolver;
 
     @GetMapping
     protected String timesheetValidationApp(TimeboardAuthentication authentication,
@@ -90,60 +81,7 @@ public class ProjectTimesheetValidationController {
     }
 
 
-    @PostMapping(value = "/sendReminderMail/{targetUser}")
-    public ResponseEntity sendReminderMail(HttpServletRequest request,
-            final TimeboardAuthentication authentication, @PathVariable Account targetUser) throws MessagingException {
 
-        final Account actor = authentication.getDetails();
-
-       final HashMap<String, Object> data =  new HashMap<>();
-
-        final List<SubmittedTimesheet> list = this.timesheetService.getSubmittedTimesheets(
-                authentication.getCurrentOrganization(), authentication.getDetails(), targetUser);
-
-        final long todayAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(Calendar.getInstance());
-
-        final Optional<SubmittedTimesheet> max = list.stream()
-                .filter(e -> !e.getTimesheetStatus().equals(ValidationStatus.REJECTED)) // ignore rejected
-                .max(Comparator.comparingLong(timesheetService::absoluteWeekNumber));
-
-        if (max.isPresent()) {
-            final SubmittedTimesheet lastSubmittedTimesheet = max.get();
-            final Calendar c = Calendar.getInstance();
-            c.set(Calendar.WEEK_OF_YEAR,lastSubmittedTimesheet.getWeek());
-            c.set(Calendar.YEAR,lastSubmittedTimesheet.getYear());
-            c.add(Calendar.WEEK_OF_YEAR, 1);
-
-            data.put("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(lastSubmittedTimesheet));
-            data.put("weekToValidate", c.get(Calendar.WEEK_OF_YEAR));
-            data.put("yearToValidate", c.get(Calendar.YEAR));
-            data.put("link", request.getLocalName() +"/timesheet/"+ targetUser.getId()
-                    +"/"+c.get(Calendar.YEAR)+"/"+c.get(Calendar.WEEK_OF_YEAR));
-
-        } else {
-            // never submitted a first week or it been rejected
-            final Calendar beginWorkDate = this.organizationService
-                    .findOrganizationMembership(actor, authentication.getCurrentOrganization()).get().getCreationDate();
-
-            data.put("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(beginWorkDate));
-            data.put("weekToValidate", beginWorkDate.get(Calendar.WEEK_OF_YEAR));
-            data.put("yearToValidate", beginWorkDate.get(Calendar.YEAR));
-            data.put("link", request.getLocalName() +"/timesheet/"+ targetUser.getId()+"/"
-                    +beginWorkDate.get(Calendar.YEAR)+"/"+beginWorkDate.get(Calendar.WEEK_OF_YEAR));
-
-        }
-
-        data.put("targetID", targetUser.getId());
-        data.put("targetScreenName", targetUser.getScreenName());
-        final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
-
-
-        this.emailService.sendMessage(structure, localeResolver.resolveLocale(request));
-
-
-        return ResponseEntity.ok().build();
-
-    }
 
     @GetMapping(value = "/listProjectMembersTimesheets", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,

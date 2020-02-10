@@ -159,6 +159,9 @@
                     <i class="close icon"></i>
                     <span th:text="#{timesheet.reject}">Reject this week</span>
                 </button>
+                <button @click="sendReminder($event)" class="ui yellow icon button" v-if="canValidate && isTimesheetHasState([null,'REJECTED'])" >
+                    Reminder mail <i class="envelope icon"></i>
+                </button>
                 <button
                         v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
                         v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button icons"
