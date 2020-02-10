@@ -235,12 +235,12 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    public List<DefaultTask> listDefaultTasks(final Organization orgID, final Date ds, final Date de) {
+    public List<DefaultTask> listDefaultTasks(final Organization org, final Date ds, final Date de) {
         final TypedQuery<DefaultTask> q = em
                 .createQuery("select distinct t " +
                         " from DefaultTask t left join fetch t.imputations where "
                         + " t.organizationID = :orgID", DefaultTask.class);
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
 
         return q.getResultList();
 
