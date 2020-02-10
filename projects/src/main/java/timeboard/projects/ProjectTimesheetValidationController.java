@@ -39,12 +39,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.LocaleResolver;
 import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.observers.emails.EmailStructure;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.*;
@@ -71,6 +74,9 @@ public class ProjectTimesheetValidationController {
     @Autowired
     public EmailService emailService;
 
+    @Autowired
+    private LocaleResolver localeResolver;
+
     @GetMapping
     protected String timesheetValidationApp(TimeboardAuthentication authentication,
                                             @PathVariable Long projectID, Model model) throws BusinessException {
@@ -84,16 +90,13 @@ public class ProjectTimesheetValidationController {
     }
 
 
-    @GetMapping(value = "/sendReminderMail/{targetUser}")
-    public String sendReminderMail(
-            final TimeboardAuthentication authentication, final Model model, @PathVariable Account targetUser) throws MessagingException {
+    @PostMapping(value = "/sendReminderMail/{targetUser}")
+    public ResponseEntity sendReminderMail(HttpServletRequest request,
+            final TimeboardAuthentication authentication, @PathVariable Account targetUser) throws MessagingException {
 
         final Account actor = authentication.getDetails();
 
-       //final HashMap<String, Object> data =  new HashMap<>();
-        final Model data = model;
-
-        data.addAttribute("message", "Test");
+       final HashMap<String, Object> data =  new HashMap<>();
 
         final List<SubmittedTimesheet> list = this.timesheetService.getSubmittedTimesheets(
                 authentication.getCurrentOrganization(), authentication.getDetails(), targetUser);
@@ -111,32 +114,36 @@ public class ProjectTimesheetValidationController {
             c.set(Calendar.YEAR,lastSubmittedTimesheet.getYear());
             c.add(Calendar.WEEK_OF_YEAR, 1);
 
-            data.addAttribute("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(lastSubmittedTimesheet));
-            data.addAttribute("weekToValidate", c.get(Calendar.WEEK_OF_YEAR));
-            data.addAttribute("yearToValidate", c.get(Calendar.YEAR));
-
+            data.put("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(lastSubmittedTimesheet));
+            data.put("weekToValidate", c.get(Calendar.WEEK_OF_YEAR));
+            data.put("yearToValidate", c.get(Calendar.YEAR));
+            data.put("link", request.getLocalName() +"/timesheet/"+ targetUser.getId()
+                    +"/"+c.get(Calendar.YEAR)+"/"+c.get(Calendar.WEEK_OF_YEAR));
 
         } else {
             // never submitted a first week or it been rejected
             final Calendar beginWorkDate = this.organizationService
                     .findOrganizationMembership(actor, authentication.getCurrentOrganization()).get().getCreationDate();
 
-            data.addAttribute("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(beginWorkDate));
-            data.addAttribute("weekToValidate", beginWorkDate.get(Calendar.WEEK_OF_YEAR));
-            data.addAttribute("yearToValidate", beginWorkDate.get(Calendar.YEAR));
+            data.put("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(beginWorkDate));
+            data.put("weekToValidate", beginWorkDate.get(Calendar.WEEK_OF_YEAR));
+            data.put("yearToValidate", beginWorkDate.get(Calendar.YEAR));
+            data.put("link", request.getLocalName() +"/timesheet/"+ targetUser.getId()+"/"
+                    +beginWorkDate.get(Calendar.YEAR)+"/"+beginWorkDate.get(Calendar.WEEK_OF_YEAR));
+
         }
 
-        data.addAttribute("targetID", targetUser.getId());
-        data.addAttribute("targetScreenName", targetUser.getScreenName());
-       // final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
+        data.put("targetID", targetUser.getId());
+        data.put("targetScreenName", targetUser.getScreenName());
+        final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
 
-    //   this.emailService.sendMessage(structure);
 
-    //   return ResponseEntity.ok().build();
+        this.emailService.sendMessage(structure, localeResolver.resolveLocale(request));
 
-        return "mail/reminder.html";
+
+        return ResponseEntity.ok().build();
+
     }
-
 
     @GetMapping(value = "/listProjectMembersTimesheets", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,

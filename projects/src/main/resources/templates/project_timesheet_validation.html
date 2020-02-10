@@ -30,6 +30,7 @@
                     <th th:text="#{timesheet.last.submitted}"> Last Submitted Date </th>
                     <th th:text="#{status}"> Status </th>
                     <th th:text="#{timesheet.last.validated}"> Last Approved Date </th>
+                    <th> </th>
                 </tr>
             </thead>
             <tbody class="ui accordion" >
@@ -50,6 +51,11 @@
                             </td>
                             <td>
                                 {{ account.lastApprovedDate }}
+                            </td>
+                            <td>
+                                <button @click="sendReminder($event, account)" class="ui positive icon button">
+                                   Reminder mail <i class="envelope icon"></i>
+                                </button>
                             </td>
                     </tr>
                     <tr class="ui content">

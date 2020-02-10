@@ -79,6 +79,21 @@ $(document).ready(function () {
                     }
                 });
             },
+            sendReminder: function (event, target) {
+                event.preventDefault();
+                let self = this;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "projects/" + _PROJECT_ID + "/timesheets/sendReminderMail/" + target.id,
+                    success: function (data, textStatus, jqXHR)  {
+                        event.target.classList.add('disabled');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        event.target.classList.add('red');
+                    }
+                });
+            }
         },
         mounted: function () {
             let self = this;

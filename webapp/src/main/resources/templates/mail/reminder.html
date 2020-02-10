@@ -22,9 +22,7 @@
                         <span th:text="#{reminder.missing2}" ></span>
                         <br/>
                         <span th:text="#{reminder.mail}" ></span>
-                        <a th:href="@{/timesheet/{user}/{year}/{week}/(user=${targetID}, year=${yearToValidate}, week=${weekToValidate})}" th:text="' ' + ${weekToValidate} + '/' + ${yearToValidate}"> </a>
-                    </td>
-
+                        <a th:href="${link}" th:text="' ' + ${weekToValidate} + '/' + ${yearToValidate}"> </a>
                     </td>
                 </tr>
             </table>
