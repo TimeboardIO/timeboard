@@ -197,7 +197,7 @@
                             {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{
                             new Date(day.date).getDate() }}
                         </th>
-                        <th class="wide one" style="background-color: white;" colspan="4"></th>
+                        <th class="wide one" style="background-color: white;" colspan="5"></th>
                     </tr>
 
                     <tr class="timesheet-head">
@@ -225,6 +225,8 @@
                         </th>
                         <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1"> ES
                         </th>
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.esw}" rowspan="1"> ESW
+                        </th>
                         <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1"> EL
                         </th>
                         <th class="wide one" th:data-tooltip="#{timesheet.tooltips.re}" rowspan="1"> RE
@@ -238,14 +240,14 @@
                     <tbody>
                     <template v-for="(project, projectID) in projects">
                         <tr>
-                            <td class="ui header left aligned project" v-bind:colspan="days.length + 5">
+                            <td class="ui header left aligned project" v-bind:colspan="days.length + 6">
                                 <a v-bind:href="'/projects/'+project.projectID+'/setup'">{{ project.projectName }}</a>
                             </td>
                         </tr>
 
                         <tr v-for="(task, taskID) in project.tasks">
                             <td>{{ task.taskName }}</td>
-                            <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
+                            <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 5" class="primary">
                                 <i class="hourglass half icon"></i> Task pending manager validation
                             </td>
                             <td v-else-if="task.status == 'REFUSED'" v-bind:colspan="days.length" class="negative">
@@ -275,9 +277,11 @@
                                 </div>
                             </td>
 
-                            <td colspan="4" v-if="projectID == 0"></td>
+                            <td colspan="5" v-if="projectID == 0"></td>
                             <template v-if="task.status!='PENDING'">
-                                <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}
+                                <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{ task.effortSpent.toFixed(1) }}
+                                </td>
+                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
                                 </td>
                                 <td v-if="projectID > 0">
                                     <div class="ui input">

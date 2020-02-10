@@ -62,6 +62,9 @@ const timesheetModel = {
         this.sum = sum;
         return sum;
     },
+    getTaskESW: function (task) {
+        return Object.values(this.imputations).reduce((accumulator, currentValue ) => accumulator + currentValue[task.taskID], 0);
+    },
     getImputation: function (date, taskID) {
         return this.imputations[date][taskID];
     },
