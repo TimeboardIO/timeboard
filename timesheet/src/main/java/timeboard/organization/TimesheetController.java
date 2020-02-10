@@ -258,15 +258,15 @@ public class TimesheetController {
     }
 
     @GetMapping("/submit/{year}/{week}")
-    public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication,
-                          @PathVariable final int year,
-                          @PathVariable final int week) {
+     public ResponseEntity submitTimesheet(final TimeboardAuthentication authentication,
+        @PathVariable final int year,
+        @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
 
+
         try {
             final Organization currentOrg = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization()).get();
-
             final SubmittedTimesheet submittedTimesheet =
                     this.timesheetService.submitTimesheet(
                             currentOrg,
