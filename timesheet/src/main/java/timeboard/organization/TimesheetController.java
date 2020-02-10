@@ -498,6 +498,7 @@ public class TimesheetController {
     private int findPreviousWeekYear(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         c.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.YEAR);
     }
