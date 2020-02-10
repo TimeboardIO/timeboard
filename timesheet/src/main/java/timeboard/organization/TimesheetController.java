@@ -290,7 +290,7 @@ public class TimesheetController {
                                             @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
-
+        final Optional<Organization> org = organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
         if(! projectService.isOwnerOfAnyUserProject(actor, user)){
             return ResponseEntity.badRequest().body("You have not enough right do do this.");
         }
@@ -304,7 +304,7 @@ public class TimesheetController {
                             week);
 
             if (submittedTimesheet.isPresent()) {
-                final SubmittedTimesheet result = this.timesheetService.validateTimesheet(actor, submittedTimesheet.get());
+                final SubmittedTimesheet result = this.timesheetService.validateTimesheet( org.get(), actor,submittedTimesheet.get());
                 return ResponseEntity.ok(result.getTimesheetStatus());
 
             } else {
@@ -324,6 +324,7 @@ public class TimesheetController {
                                             @PathVariable final int week) {
 
         final Account actor = authentication.getDetails();
+        final Optional<Organization> org = organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
 
         if(! projectService.isOwnerOfAnyUserProject(actor, user)){
             return ResponseEntity.badRequest().body("You have not enough right do do this.");
@@ -338,7 +339,7 @@ public class TimesheetController {
                             week);
 
             if (submittedTimesheet.isPresent()) {
-                final SubmittedTimesheet result = this.timesheetService.rejectTimesheet(actor, submittedTimesheet.get());
+                final SubmittedTimesheet result = this.timesheetService.rejectTimesheet(org.get(), actor, submittedTimesheet.get());
                 return ResponseEntity.ok(result.getTimesheetStatus());
 
             } else {
@@ -452,8 +453,6 @@ public class TimesheetController {
 
         public UpdateRequest() {
         }
-
-        ;
     }
 
 
