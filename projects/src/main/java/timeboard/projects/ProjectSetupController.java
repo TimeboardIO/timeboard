@@ -47,7 +47,7 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}"+ ProjectSetupController.URL)
+@RequestMapping("/projects/{projectID}" + ProjectSetupController.URL)
 public class ProjectSetupController extends ProjectBaseController {
 
     public static final String URL = "/setup";

@@ -28,7 +28,6 @@ package timeboard.vacations;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.NavigationExtPoint;
-import timeboard.core.api.VacationService;
 import timeboard.core.security.AbacEntries;
 
 

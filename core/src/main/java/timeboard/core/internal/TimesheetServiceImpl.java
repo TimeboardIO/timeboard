@@ -137,7 +137,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
 
-       return processSubmission(timesheetOwner, year, week, currentOrg );
+        return processSubmission(timesheetOwner, year, week, currentOrg);
     }
 
     private SubmittedTimesheet processSubmission(Account accountTimesheet, int year, int week, Organization currentOrg) {
@@ -197,7 +197,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 currentOrg, submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED) ) {
+        if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED)) {
             throw new TimesheetException("Can not validate this week, previous week is not validated");
         }
 
@@ -240,7 +240,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 org, submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED) ) {
+        if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED)) {
             throw new TimesheetException("Can not validate this week, previous week is not validated");
         }
 
@@ -328,7 +328,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         try {
             return Optional.ofNullable(q.getSingleResult());
-        }catch(Exception e){
+        } catch (Exception e) {
             LOGGER.debug(e.getMessage(), e);
             return Optional.empty();
         }
@@ -474,7 +474,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                     TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(updatedSubmittedTimesheet,
                             projectService, updatedSubmittedTimesheet.getOrganizationID()));
   */
-                    LOGGER.info("Timesheet for " + updatedSubmittedTimesheet.getWeek()  + " of "+updatedSubmittedTimesheet.getYear()
+                    LOGGER.info("Timesheet for " + updatedSubmittedTimesheet.getWeek() + " of " + updatedSubmittedTimesheet.getYear()
                             + " validated for user " + updatedSubmittedTimesheet.getAccount().getScreenName()
                             + " by user " + actor.getScreenName());
 

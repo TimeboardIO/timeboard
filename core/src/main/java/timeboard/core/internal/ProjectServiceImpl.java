@@ -311,7 +311,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#project, "+AbacEntries.PROJECT_TASKS_CREATE+")")
+    @PreAuthorize("hasPermission(#project, " + AbacEntries.PROJECT_TASKS_CREATE + ")")
     public Task createTask(
             final Organization orgID,
             final Account actor,
@@ -348,7 +348,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
         newTask.setOrganizationID(orgID.getId());
-        if (batches!= null && !batches.isEmpty() ) {
+        if (batches != null && !batches.isEmpty()) {
             newTask.setBatches(new HashSet<>());
             newTask.getBatches().addAll(batches);
         }
@@ -365,7 +365,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#task.getProject(), "+AbacEntries.PROJECT_TASKS_EDIT+")")
+    @PreAuthorize("hasPermission(#task.getProject(), " + AbacEntries.PROJECT_TASKS_EDIT + ")")
     public Task updateTask(final Organization orgID, final Account actor, final Task task) {
         if (task.getProject().isMember(actor)) {
             task.setOrganizationID(orgID.getId());
@@ -378,7 +378,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#task.getProject(), "+AbacEntries.PROJECT_TASKS_EDIT+")")
+    @PreAuthorize("hasPermission(#task.getProject(), " + AbacEntries.PROJECT_TASKS_EDIT + ")")
     public void updateTasks(final Account actor, final List<Task> taskList) {
         for (final Task task : taskList) {
             em.merge(task);

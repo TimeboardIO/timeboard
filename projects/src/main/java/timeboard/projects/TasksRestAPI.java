@@ -90,17 +90,17 @@ public class TasksRestAPI {
             t.setBatches(batchesValidator(taskWrapper, actor));
             t.setTaskStatus(taskStatusValidator(taskWrapper));
 
-            final Task newTask =  processCreateOrUpdate(actor, orgID, taskID, t);
+            final Task newTask = processCreateOrUpdate(actor, orgID, taskID, t);
             taskWrapper.setTaskID(newTask.getId());
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
-        } catch (TaskCreationException | JsonProcessingException e ) {
+        } catch (TaskCreationException | JsonProcessingException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
     }
 
-    private Task processCreateOrUpdate(Account actor,Organization orgID,  Long taskID, Task t) throws TaskCreationException {
+    private Task processCreateOrUpdate(Account actor, Organization orgID, Long taskID, Task t) throws TaskCreationException {
         Task task = null;
         try {
             if (taskID != null && taskID != 0) {
@@ -112,8 +112,7 @@ public class TasksRestAPI {
                 t.setId(oldTask.getId());
                 task = processUpdateTask(orgID, actor, t);
 
-            }
-            else {
+            } else {
                 task = processCreateTask(orgID, actor, t);
             }
 
@@ -124,7 +123,7 @@ public class TasksRestAPI {
     }
 
     private TaskStatus taskStatusValidator(@RequestBody final TaskWrapper taskWrapper) {
-        return  TaskStatus.valueOf(taskWrapper.getStatus());
+        return TaskStatus.valueOf(taskWrapper.getStatus());
     }
 
     private Set<Batch> batchesValidator(@RequestBody final TaskWrapper taskWrapper, final Account actor) {
@@ -153,7 +152,7 @@ public class TasksRestAPI {
         if (assigneeID != null && assigneeID > 0) {
             return userService.findUserByID(assigneeID);
         }
-        return  null;
+        return null;
     }
 
     private TaskType taskTypeValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
@@ -170,7 +169,7 @@ public class TasksRestAPI {
         try {
             project = this.projectService.getProjectByID(actor, orgID, projectID);
         } catch (final Exception e) {
-            throw new TaskCreationException("Can not found project "+e.getMessage());
+            throw new TaskCreationException("Can not found project " + e.getMessage());
         }
 
         return project;
@@ -244,8 +243,6 @@ public class TasksRestAPI {
     private Task processUpdateTask(final Organization orgID, final Account actor, final Task task) {
         return projectService.updateTask(orgID, actor, task);
     }
-
-
 
 
     public static class TaskGraphWrapper implements Serializable {
@@ -467,7 +464,7 @@ public class TasksRestAPI {
 
     public class TaskCreationException extends Exception {
 
-        public TaskCreationException(String message){
+        public TaskCreationException(String message) {
             super(message);
         }
     }

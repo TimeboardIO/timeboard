@@ -31,7 +31,7 @@ import timeboard.core.model.Task;
 
 import java.util.Date;
 
-public class RemoteTask implements Cloneable{
+public class RemoteTask implements Cloneable {
 
     private String id;
     private String title;

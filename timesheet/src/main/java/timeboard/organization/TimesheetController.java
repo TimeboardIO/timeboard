@@ -310,7 +310,7 @@ public class TimesheetController {
                 final SubmittedTimesheet result =
                         this.timesheetService.validateTimesheet(
                                 authentication.getCurrentOrganization(),
-                                actor,submittedTimesheet.get());
+                                actor, submittedTimesheet.get());
 
                 return ResponseEntity.ok(result.getTimesheetStatus());
 

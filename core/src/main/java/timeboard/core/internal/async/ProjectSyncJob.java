@@ -53,20 +53,15 @@ import java.util.Optional;
 @DisallowConcurrentExecution
 public final class ProjectSyncJob implements Job {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncJob.class);
     @Autowired
     private ProjectService projectService;
-
     @Autowired
     private List<ProjectSyncPlugin> projectImportServiceList;
-
     @Autowired
     private AccountService accountService;
-
     @Autowired
     private OrganizationService organizationService;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncJob.class);
-
 
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
@@ -160,7 +155,7 @@ public final class ProjectSyncJob implements Job {
                 taskToUpdate.get().setComments(remoteTask.getComments());
 
                 //Sync can only enlarge the interval start > end
-                if (remoteTask.getStartDate() != null &&  remoteTask.getStartDate().getTime() < taskToUpdate.get().getStartDate().getTime()) {
+                if (remoteTask.getStartDate() != null && remoteTask.getStartDate().getTime() < taskToUpdate.get().getStartDate().getTime()) {
                     taskToUpdate.get().setStartDate(remoteTask.getStartDate());
                 }
                 if (remoteTask.getStopDate() != null && remoteTask.getStopDate().getTime() > taskToUpdate.get().getEndDate().getTime()) {
@@ -168,9 +163,9 @@ public final class ProjectSyncJob implements Job {
                 }
 
                 final Account currentAssigned = taskToUpdate.get().getAssigned();
-                if(currentAssigned != null
+                if (currentAssigned != null
                         && currentAssigned.getExternalIDs().get(externalID) != null
-                        && !currentAssigned.getExternalIDs().get(externalID).matches(remoteTask.getUserName()) ) { //assigned user changed !
+                        && !currentAssigned.getExternalIDs().get(externalID).matches(remoteTask.getUserName())) { //assigned user changed !
 
                     //duplicate task when assignee have been changed
                     final String actualAssigneeID = currentAssigned.getExternalIDs().get(externalID);
@@ -184,11 +179,10 @@ public final class ProjectSyncJob implements Job {
                 }
                 taskToUpdate.get().setAssigned(remoteTask.getLocalUser());
 
-                projectService.updateTask(orgID,actor, taskToUpdate.get());
+                projectService.updateTask(orgID, actor, taskToUpdate.get());
             }
         }
     }
-
 
 
     private void createTasks(

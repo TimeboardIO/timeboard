@@ -47,7 +47,7 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
     public boolean check(final Object subject, final Object resource, final Object action, final Object environment) {
         //Get all policy rules
         final List<PolicyRuleSet> allRules = policyDefinition.getAllPolicyRules()
-                .stream().filter(prs -> prs.getActions().contains(new String(action+"").replaceAll("\'", "")))
+                .stream().filter(prs -> prs.getActions().contains(new String(action + "").replaceAll("\'", "")))
                 .collect(Collectors.toList());
 
         //Wrap the context

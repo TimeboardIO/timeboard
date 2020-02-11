@@ -57,7 +57,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     private List<ProjectSyncPlugin> projectImportServiceList;
 
     @Override
-    @PreAuthorize("hasPermission(#project, '"+ AbacEntries.PROJECT_TASKS_IMPORT+"')")
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_IMPORT + "')")
     public void syncProjectTasksWithSchedule(final Organization orgID,
                                              final Account actor,
                                              final Project project,
@@ -95,7 +95,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#project, '"+ AbacEntries.PROJECT_TASKS_IMPORT+"')")
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_IMPORT + "')")
     public void syncProjectTasks(final Organization org,
                                  final Account actor,
                                  final Project project,
