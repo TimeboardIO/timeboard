@@ -1,0 +1,17 @@
+{
+  "name": "Timeboard",
+  "short_name": "Timeboard",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fff",
+  "theme_color": "#039be5",
+  "icons": [
+    {
+      "src": "/onboarding/images/ico.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    }
+  ],
+  "splash_pages": null
+}

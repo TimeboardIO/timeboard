@@ -26,32 +26,66 @@ package timeboard.core.api;
  * #L%
  */
 
+import org.quartz.SchedulerException;
+import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
-import timeboard.core.model.ReportType;
 
 import java.beans.Transient;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public interface ReportService {
 
-    String ORIGIN_TIMEBOARD = "timeboard";
 
-    Report createReport(Account owner, String reportName, Account organization, ReportType type, String filterProject);
+    String REPORT_LIST = "REPORT_LIST";
+    String REPORT_PROJECT_VIEW = "REPORT_PROJECT_VIEW";
 
-    List<Report> listReports(Account owner);
+    /**
+     * Create a new report configuration
+     *
+     * @param organizationID relevant organization
+     * @param owner          user that owner report
+     * @param reportName     screen name used to identify report
+     * @param handlerName    name of report handler used to compute report data
+     * @param filterProject  SPEL
+     * @return
+     * @throws SchedulerException
+     */
+    Report createReport(
+            final Organization organizationID,
+            final Account owner,
+            final String reportName,
+            final String handlerName,
+            final String filterProject) throws SchedulerException;
 
-    Report updateReport(Account owner, Report report);
+    /**
+     * List all report for owner
+     *
+     * @param orgID primary key {@link Organization} where looking for reports
+     * @param owner an account that own reports
+     * @return
+     */
+    List<Report> listReports(final Organization orgID, final Account owner);
+
+    Report updateReport(Account actor, Report report);
 
     Report getReportByID(Account actor, Long reportId);
 
-    void deleteReportByID(Account actor, Long reportId);
+    void deleteReportByID(Account actor, Long reportId) throws SchedulerException;
 
-    List<ProjectWrapper> findProjects(Account actor, Long orgID, List<String> expressions);
+    List<ProjectWrapper> findProjects(Account actor, Organization orgID, List<String> expressions);
 
-    List<ProjectWrapper> findProjects(Account actor, Long orgID, Report report);
+    List<ProjectWrapper> findProjects(Account actor, Organization orgID, Report report);
+
+    Optional<ReportHandler> getReportHandler(Report report);
+
+    List<ReportHandler> listReportHandlers();
+
+    void executeAsyncReport(Account actor, Report report) throws SchedulerException;
 
 
     class ProjectWrapper {

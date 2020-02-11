@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='timesheet.validation')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml"
+      xmlns:v-slot="http://www.w3.org/1999/xhtml"
+>
+
+<head>
+    <title th:text="#{project.tab.timesheets}"
+    ></title>
+    <meta name="projectID" th:value="${project.id}"/>
+    <meta name="baseURL" th:value="@{/timesheet}"/>
+    <style>
+        .ui.accordion .accordion .active.content, .ui.accordion .active.content {
+            display: table-row;
+        }
+
+    </style>
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+    <div id="timesheetValidationApp">
+
+        <table class="ui table ">
+            <thead>
+            <tr>
+                <th th:text="#{user.name}"> Name</th>
+                <th th:text="#{timesheet.last.submitted}"> Last Submitted Date</th>
+                <th th:text="#{status}"> Status</th>
+                <th th:text="#{timesheet.last.validated}"> Last Approved Date</th>
+            </tr>
+            </thead>
+            <tbody class="ui accordion">
+            <div class="ui inverted dimmer">
+                <div class="ui text loader" th:text="#{loading}">Loading</div>
+            </div>
+            <template v-for="account in timesheets">
+                <tr class="ui title">
+                    <td>
+                        <i class="dropdown icon"></i>
+                        {{ account.name }}
+                    </td>
+                    <td>
+                        {{ account.lastSubmittedDate }}
+                    </td>
+                    <td class="collapsing">
+                        <div :class="account.statusColor" class="ui circular label large "></div>
+                    </td>
+                    <td>
+                        {{ account.lastApprovedDate }}
+                    </td>
+                </tr>
+                <tr class="ui content">
+                    <td colspan="5">
+                        <data-table v-bind:config="Object.assign({}, config)" v-bind:table="account.weeks">
+                            <template v-slot:week="{row}">
+                                <a ::href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week" class="ui button"> {{
+                                    row.week }} </a>
+                            </template>
+                            <template v-slot:period="{row}">
+                                <a :href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week"> {{ 'From: ' +
+                                    getDateOfWeek(row.week, row.year, 0).toDateString() + ' To: '+
+                                    getDateOfWeek(row.week, row.year, 5).toDateString() }}</a>
+                            </template>
+                            <template v-slot:validated="{row}">
+                                <div :class="{red:  row.submitted && !row.validated, green: row.validated}"
+                                     class="ui circular label large "></div>
+                            </template>
+                            <template v-slot:submitted="{row}">
+                                <div :class="{red:  !row.submitted, green: row.submitted}"
+                                     class="ui circular label large "></div>
+                            </template>
+                        </data-table>
+                    </td>
+                </tr>
+            </template>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="/js/timesheet_validation.js"></script>
+
+</div>
+
+
+</body>
+</html>

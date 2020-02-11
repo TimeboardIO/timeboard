@@ -32,6 +32,8 @@ public interface NavigationExtPoint {
 
     String getNavigationPath();
 
+    String getNavigationAction();
+
     default int getNavigationWeight() {
         return 0;
     }

@@ -1,4 +1,4 @@
-package timeboard.projects;
+package timeboard.reports;
 
 /*-
  * #%L
@@ -38,14 +38,19 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
+import timeboard.projects.ProjectBaseController;
+
+import static timeboard.reports.ProjectDashboardController.PATH;
 
 
 /**
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}/dashboard")
-public class ProjectDashboardController {
+@RequestMapping("/projects/{projectID}" + PATH)
+public class ProjectDashboardController extends ProjectBaseController {
+
+    public static final String PATH = "/dashboard";
 
     @Autowired
     public ProjectService projectService;
@@ -53,16 +58,16 @@ public class ProjectDashboardController {
 
     @GetMapping
     protected String handleGet(final TimeboardAuthentication authentication,
-                               @PathVariable final Long projectID, final Model model) throws BusinessException {
+                               @PathVariable final Project project, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
 
         model.addAttribute("project", project);
         model.addAttribute("dashboard", dashboard);
-
+        this.initModel(model, authentication, project);
         return "project_dashboard.html";
     }
+
 
 }

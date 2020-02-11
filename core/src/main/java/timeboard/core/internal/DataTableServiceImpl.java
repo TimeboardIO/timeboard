@@ -45,7 +45,7 @@ import java.util.List;
 @Transactional
 public class DataTableServiceImpl implements DataTableService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Autowired
     private EntityManager em;

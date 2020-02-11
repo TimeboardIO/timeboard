@@ -33,8 +33,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.api.UserService;
 import timeboard.core.api.VacationService;
 import timeboard.core.api.events.TimeboardEventType;
 import timeboard.core.api.events.VacationEvent;
@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 public class VacationsController {
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
     @Autowired
     private VacationService vacationService;
@@ -117,7 +117,7 @@ public class VacationsController {
                                         @ModelAttribute final VacationRequestWrapper requestWrapper) {
 
         final Account actor = authentication.getDetails();
-        final Account assignee = this.userService.findUserByID(requestWrapper.assigneeID);
+        final Account assignee = this.accountService.findUserByID(requestWrapper.assigneeID);
         final Date startDate = requestWrapper.start;
         final Date endDate = requestWrapper.end;
 

@@ -1,10 +1,10 @@
-package timeboard.core.model;
+package timeboard.projects;
 
 /*-
  * #%L
- * core
+ * projects
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,24 @@ package timeboard.core.model;
  * #L%
  */
 
+import org.springframework.stereotype.Component;
+import timeboard.core.api.ProjectService;
+import timeboard.projects.api.ProjectNavigationProvider;
 
-public enum ReportType {
-    PROJECT_KPI,
-    OTHER
+@Component
+public class ProjectSetupNavigationProvider implements ProjectNavigationProvider {
+    @Override
+    public String getNavigationLabel() {
+        return "project.tab.setup";
+    }
+
+    @Override
+    public String getNavigationPath() {
+        return ProjectTasksController.URL;
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return ProjectService.PROJECT_SETUP_VIEW;
+    }
 }
-
-

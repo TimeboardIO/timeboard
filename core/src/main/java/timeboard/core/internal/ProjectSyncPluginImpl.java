@@ -36,6 +36,7 @@ import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.internal.async.ProjectSyncJob;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import java.util.Date;
@@ -54,7 +55,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     private List<ProjectSyncPlugin> projectImportServiceList;
 
     @Override
-    public void syncProjectTasksWithSchedule(final Long orgID,
+    public void syncProjectTasksWithSchedule(final Organization orgID,
                                              final Account actor,
                                              final Project project,
                                              final String serviceName,
@@ -91,7 +92,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     @Override
-    public void syncProjectTasks(final Long orgID,
+    public void syncProjectTasks(final Organization org,
                                  final Account actor,
                                  final Project project,
                                  final String serviceName,
@@ -104,7 +105,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             final JobDataMap data = new JobDataMap();
             data.put(ACCOUNT_ID, actor.getId());
             data.put(CREDENTIALS, jiraCredentials);
-            data.put(ORG_ID, orgID);
+            data.put(ORG_ID, org.getId());
             data.put(SERVICE_NAME, serviceName);
             data.put(PROJECT_ID, project.getId());
 

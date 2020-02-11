@@ -63,7 +63,7 @@ public class OrganizationSelectController {
                                      final HttpServletRequest req, final TimeboardAuthentication p, final Model model) {
 
 
-        final List<Organization> orgs = authentication.getDetails().getOrganizations()
+        final List<Organization> orgs = authentication.getDetails().getOrganizationMemberships()
                 .stream().map(organizationMembership -> organizationMembership.getOrganization()).collect(Collectors.toList());
 
         final Optional<Organization> defaultOrganisation = this.organizationService.getOrganizationByName(this.defaultOrganisationName);

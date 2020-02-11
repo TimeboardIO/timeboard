@@ -37,9 +37,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -64,7 +64,7 @@ public class TasksRestAPI {
     private OrganizationService organizationService;
 
     @Autowired
-    private UserService userService;
+    private AccountService userService;
 
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -73,7 +73,7 @@ public class TasksRestAPI {
 
         final Task t = new Task();
         final Account actor = authentication.getDetails();
-        final long orgID = authentication.getCurrentOrganization();
+        final Organization orgID = authentication.getCurrentOrganization();
 
         try {
 
@@ -100,7 +100,7 @@ public class TasksRestAPI {
 
     }
 
-    private Task processCreateOrUpdate(Account actor,Long orgID,  Long taskID, Task t) throws TaskCreationException {
+    private Task processCreateOrUpdate(Account actor,Organization orgID,  Long taskID, Task t) throws TaskCreationException {
         Task task = null;
         try {
             if (taskID != null && taskID != 0) {
@@ -164,7 +164,7 @@ public class TasksRestAPI {
         }
     }
 
-    private Project projectValidator(@RequestBody final TaskWrapper taskWrapper, Account actor, Long orgID) throws TaskCreationException {
+    private Project projectValidator(@RequestBody final TaskWrapper taskWrapper, Account actor, Organization orgID) throws TaskCreationException {
         final Long projectID = taskWrapper.projectID;
         Project project = null;
         try {
@@ -233,7 +233,7 @@ public class TasksRestAPI {
     }
 
 
-    private Task processCreateTask(final Long orgID, final Account actor, final Task task) {
+    private Task processCreateTask(final Organization orgID, final Account actor, final Task task) {
         return projectService.createTask(orgID, actor, task.getProject(),
                 task.getName(), task.getComments(), task.getStartDate(),
                 task.getEndDate(), task.getOriginalEstimate(), task.getTaskType(), task.getAssigned(),
@@ -241,7 +241,7 @@ public class TasksRestAPI {
                 task.getBatches());
     }
 
-    private Task processUpdateTask(final Long orgID, final Account actor, final Task task) {
+    private Task processUpdateTask(final Organization orgID, final Account actor, final Task task) {
         return projectService.updateTask(orgID, actor, task);
     }
 

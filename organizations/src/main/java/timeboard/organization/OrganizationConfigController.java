@@ -71,19 +71,14 @@ public class OrganizationConfigController {
     protected String handleGet(final TimeboardAuthentication authentication,
                                final Model model) throws BusinessException {
 
-        final Account actor = authentication.getDetails();
-
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
-
         final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
                 new Date(), new Date());
         final List<TaskType> taskTypes = this.organizationService.listTaskType(authentication.getCurrentOrganization());
 
         model.addAttribute("taskTypes", taskTypes);
         model.addAttribute("defaultTasks", defaultTasks);
-        if (organization.isPresent()) {
-            model.addAttribute("organization", organization.get());
-        }
+        model.addAttribute("organization", authentication.getCurrentOrganization());
+
         return "org_config.html";
 
     }
@@ -106,9 +101,8 @@ public class OrganizationConfigController {
     public ResponseEntity addDefaultTask(final TimeboardAuthentication authentication,
                                          @ModelAttribute final TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
         final Account actor = authentication.getDetails();
-        final Long orID = authentication.getCurrentOrganization();
 
-        this.organizationService.createDefaultTask(actor, orID, taskWrapper.getName());
+        this.organizationService.createDefaultTask(actor, authentication.getCurrentOrganization(), taskWrapper.getName());
 
         return this.listDefaultTasks(authentication);
     }
@@ -131,9 +125,8 @@ public class OrganizationConfigController {
     public ResponseEntity deleteDefaultTask(final TimeboardAuthentication authentication, @PathVariable final Long taskID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Long orgID = authentication.getCurrentOrganization();
 
-        this.organizationService.disableDefaultTaskByID(actor, orgID, taskID);
+        this.organizationService.disableDefaultTaskByID(actor, authentication.getCurrentOrganization(), taskID);
 
         return this.listDefaultTasks(authentication);
     }
@@ -143,9 +136,8 @@ public class OrganizationConfigController {
     public ResponseEntity addTaskType(final TimeboardAuthentication authentication,
                                       @ModelAttribute final TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
         final Account actor = authentication.getDetails();
-        final Long orID = authentication.getCurrentOrganization();
 
-        this.organizationService.createTaskType(actor, orID, typeWrapper.getName());
+        this.organizationService.createTaskType(actor, authentication.getCurrentOrganization(), typeWrapper.getName());
 
         return this.listTaskTypes(authentication);
     }
