@@ -74,10 +74,10 @@ public class ProjectBatchesController extends ProjectBaseController {
 
     @GetMapping
     protected String batchApp(final TimeboardAuthentication authentication,
-                              @PathVariable final Long projectID, final Model model) throws BusinessException {
+                              @PathVariable final Project project, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+       // final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
         model.addAttribute("batchTypes", BatchType.values());

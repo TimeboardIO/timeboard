@@ -130,11 +130,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> listReports(final Organization orgID, final Account owner) {
+    public List<Report> listReports(final Organization org, final Account owner) {
         final TypedQuery<Report> query = em.createQuery(
                 "select r from Report r where r.organizationID = :orgID",
                 Report.class);
-        query.setParameter("orgID", orgID);
+        query.setParameter("orgID", org.getId());
 
         return query.getResultList();
     }

@@ -41,6 +41,8 @@
     "name": "Users can create tasks on project only if they are member",
     "actions": [
       "PROJECT_BATCHES_VIEW",
+      "PROJECT_SNAPSHOTS_VIEW",
+      "PROJECT_SNAPSHOT",
       "REPORT_PROJECT_VIEW",
       "PROJECT_SETUP",
       "PROJECT_TAGS_VIEW",

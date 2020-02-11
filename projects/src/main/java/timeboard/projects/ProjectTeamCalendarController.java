@@ -53,9 +53,10 @@ import java.util.stream.Collectors;
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}/calendar")
+@RequestMapping("/projects/{project}" + ProjectTeamCalendarController.URL)
 public class ProjectTeamCalendarController {
 
+    public static final String URL = "/calendar";
 
     @Autowired
     public ProjectService projectService;
@@ -65,11 +66,7 @@ public class ProjectTeamCalendarController {
 
     @GetMapping
     protected String handleGet(final TimeboardAuthentication authentication,
-                               @PathVariable final Long projectID, final Model model) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
-
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+                               @PathVariable final Project project, final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
 
@@ -78,11 +75,10 @@ public class ProjectTeamCalendarController {
 
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(final TimeboardAuthentication authentication,
-                                                                     @PathVariable final Long projectID,
+                                                                     @PathVariable final Project project,
                                                                      @PathVariable final Integer yearNum,
                                                                      @PathVariable final Integer monthNum) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         // get existing vacation request for month/year
         final Map<Account, List<VacationRequest>> accountVacationRequestMap

@@ -45,7 +45,9 @@ public class AbacEntries {
 
     public static final String PROJECT_TAGS_VIEW = "PROJECT_TAGS_VIEW";
     public static final String PROJECT_BATCHES_VIEW = "PROJECT_BATCHES_VIEW";
+    public static final String PROJECT_SNAPSHOTS_VIEW = "PROJECT_SNAPSHOTS_VIEW";
     public static final String PROJECT_SETUP_VIEW = "PROJECT_BATCHES_VIEW";
+    public static final String PROJECT_SNAPSHOT = "PROJECT_SNAPSHOT";
 
     public static final String VACATION_LIST = "VACATION_LIST";
     public static final String VACATION_TEAM_LIST = "VACATION_TEAM_LIST";

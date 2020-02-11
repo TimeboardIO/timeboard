@@ -65,7 +65,7 @@ public interface ReportService {
      * @param owner an account that own reports
      * @return
      */
-    List<Report> listReports(final Organization orgID, final Account owner);
+    List<Report> listReports(final Organization org, final Account owner);
 
     Report updateReport(Account actor, Report report);
 
