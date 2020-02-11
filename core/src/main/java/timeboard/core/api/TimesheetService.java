@@ -63,7 +63,9 @@ public interface TimesheetService {
      * @param submittedTimesheet  submittedTimesheet to validate
      * @return true if timesheet is submit else, false.
      */
-    SubmittedTimesheet validateTimesheet(final Account actor, final SubmittedTimesheet submittedTimesheet) throws BusinessException;    /**
+    SubmittedTimesheet validateTimesheet(final Organization currentOrg, final Account actor,
+                                         final SubmittedTimesheet submittedTimesheet) throws BusinessException;
+    /**
 
      * Reject user timesheet.
      *
@@ -71,7 +73,8 @@ public interface TimesheetService {
      * @param submittedTimesheet  submittedTimesheet to reject
      * @return SubmittedTimesheet with status REJECTED
      */
-    SubmittedTimesheet rejectTimesheet(final Account actor, final SubmittedTimesheet submittedTimesheet) throws BusinessException;
+    SubmittedTimesheet rejectTimesheet(final Organization currentOrg, final Account actor,
+                                       final SubmittedTimesheet submittedTimesheet) throws BusinessException;
 
     Optional<SubmittedTimesheet> getSubmittedTimesheet(Long orgID, Account actor, Account user, int year, int week);
 

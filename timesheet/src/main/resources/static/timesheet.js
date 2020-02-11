@@ -173,6 +173,9 @@ $(document).ready(function () {
 
                 return result;
             },
+            enableValidationButtons: function (week) {
+                return [ValidationStatus.VALIDATED].includes(this.previousWeekValidationStatus);
+            },
             updateTimesheet: function () {
                 $('.ui.dimmer').addClass('active');
                 $.get("/timesheet/data?user=" + _USER_ID + "&week=" + _WEEK + "&year=" + _YEAR)

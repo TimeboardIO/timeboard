@@ -143,7 +143,7 @@ public class Task extends AbstractTask implements Serializable {
      */
     @Transient
     public double getEffortSpent() {
-        return this.getImputations().stream().map(imputation -> imputation.getValue()).mapToDouble(Double::doubleValue).sum();
+        return this.getImputations().stream().map(Imputation::getValue).mapToDouble(Double::doubleValue).sum();
     }
 
 

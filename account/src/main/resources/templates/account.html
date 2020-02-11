@@ -109,13 +109,13 @@
                             </tr>
                             </thead>
                             <tbody class="externalTools">
-                            <tr th:attr="data-key=${element}" th:each="element :  ${externalTools}">
-                                <td th:text="${element}"><i class="github icon"> </i> Github</td>
+                            <tr th:attr="data-key=${element.key}" th:each="element :  ${externalTools}">
+                                <td th:text="${element.value}"><i class="github icon"> </i> Github</td>
                                 <td>
-                                    <input th:if="${account.externalIDs != null}" th:name="'attr-'+${element}"
-                                           th:value="${account.externalIDs.containsKey(element)} ? ${account.externalIDs.get(element)} : '' "
+                                    <input th:if="${account.externalIDs != null}" th:name="'attr-'+${element.key}"
+                                           th:value="${account.externalIDs.containsKey(element.key)} ? ${account.externalIDs.get(element.key)} : '' "
                                            type="text"/>
-                                    <input th:if="${account.externalIDs == null}" th:name="'attr-'+${element}"
+                                    <input th:if="${account.externalIDs == null}" th:name="'attr-'+${element.key}"
                                            type="text"/>
                                 </td>
                             </tr>

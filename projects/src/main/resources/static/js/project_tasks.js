@@ -22,7 +22,7 @@ Vue.component('graph-modal', {
 });
 
 // SYnc in progress or not
-var interval = 5000;  // 5000 = 5 seconds
+const interval = 5000;  // 5000 = 5 seconds
 function showStateSync() {
     $.ajax({
         method: "GET",
@@ -96,6 +96,7 @@ const emptyTask =  {
     statusName: '',
     batchNames: [],
     batchIDs: [],
+    canChangeAssignee: true,
 };
 
 const projectID = $("meta[name='projectID']").attr('value');
@@ -255,6 +256,11 @@ let app = new Vue({
                 }
             });
         },
+        showImportModal: function (event) {
+            if (event) {
+                $('#'+event.target.getAttribute('modal-id')).modal('show')
+            }
+        },
         showCreateTaskModal: function(projectID, task, event){
             event.preventDefault();
             if(task){
@@ -275,6 +281,7 @@ let app = new Vue({
                 this.newTask.statusName = task.statusName;
                 this.newTask.assignee = task.assignee;
                 this.newTask.assigneeID = task.assigneeID;
+                this.newTask.canChangeAssignee = task.canChangeAssignee;
 
             }else{
                  this.modalTitle = "Create task";
