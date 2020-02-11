@@ -33,7 +33,7 @@ Vue.component('calendar', {
                   <th style="width: 10rem; white-space: nowrap;"  v-if="showColName === true" ></th>
                   <th class="calendar-cell" v-for="day in daysInMonth" v-bind:data-label="day.date.toDateString()" >{{ day.date.getDate() }}</th>    
                   
-                  <th v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)"></th>        
+                  <th class="calendar-cell" v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)"></th>        
                 </tr>
                 <tr>
                   <td style="width: 10rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>

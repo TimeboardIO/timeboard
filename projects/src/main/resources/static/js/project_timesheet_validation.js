@@ -1,7 +1,7 @@
-$(document).ready(function () {
+const _PROJECT_ID = $("meta[name='projectID']").attr('value');
+const _BASE_URL = $("meta[name='baseURL']").attr('value');
 
-    const _PROJECT_ID = $("meta[name='projectID']").attr('value');
-    const _BASE_URL = $("meta[name='baseURL']").attr('value');
+$(document).ready(function () {
 
     let app = new Vue({
         el: '#timesheetValidationApp',
