@@ -26,11 +26,12 @@ package timeboard.core.api.sync;
  * #L%
  */
 
+import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 
 import java.util.Date;
 
-public class RemoteTask {
+public class RemoteTask implements Cloneable{
 
     private String id;
     private String title;
@@ -39,7 +40,7 @@ public class RemoteTask {
     private String origin;
     private Date startDate;
     private Date stopDate;
-    private Long localUserID;
+    private Account localUser;
 
     public Task toTask() {
         return null;
@@ -85,12 +86,12 @@ public class RemoteTask {
         this.startDate = date;
     }
 
-    public Long getLocalUserID() {
-        return localUserID;
+    public Account getLocalUser() {
+        return localUser;
     }
 
-    public void setLocalUserID(final Long localUserID) {
-        this.localUserID = localUserID;
+    public void setLocalUser(final Account localUser) {
+        this.localUser = localUser;
     }
 
     public String getComments() {
@@ -108,4 +109,19 @@ public class RemoteTask {
     public void setStopDate(final Date stopDate) {
         this.stopDate = stopDate;
     }
+
+    @Override
+    public Object clone() {
+        final RemoteTask clone = new RemoteTask();
+        clone.id = this.title;
+        clone.title = this.title;
+        clone.userName = this.userName;
+        clone.comments = this.comments;
+        clone.origin = this.origin;
+        clone.startDate = this.startDate;
+        clone.stopDate = this.stopDate;
+        clone.localUser = this.localUser;
+        return clone;
+    }
+
 }

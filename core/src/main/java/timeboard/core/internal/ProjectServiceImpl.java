@@ -319,34 +319,37 @@ public class ProjectServiceImpl implements ProjectService {
                            final Date startDate,
                            final Date endDate,
                            final double originalEstimate,
-                           final Long taskTypeID,
+                           final TaskType taskType,
                            final Account assignedAccount,
                            final String origin,
                            final String remotePath,
                            final String remoteId,
                            final TaskStatus taskStatus,
-                           final Batch batch
+                           final Collection<Batch> batches
     ) {
         final Task newTask = new Task();
-        newTask.setTaskType(this.organizationService.findTaskTypeByID(taskTypeID));
+        newTask.setTaskType(taskType);
         newTask.setOrigin(origin);
         newTask.setRemotePath(remotePath);
         newTask.setRemoteId(remoteId);
         newTask.setName(taskName);
         newTask.setComments(taskComment);
-        newTask.setStartDate(new Date(startDate.getTime() + (2 * 60 * 60 * 1000) + 1));
-        newTask.setEndDate(new Date(endDate.getTime() + (2 * 60 * 60 * 1000) + 1));
+        if (startDate != null) {
+            newTask.setStartDate(new Date(startDate.getTime() + (2 * 60 * 60 * 1000) + 1));
+        }
+        if (endDate != null) {
+            newTask.setEndDate(new Date(endDate.getTime() + (2 * 60 * 60 * 1000) + 1));
+        }
         newTask.setComments(taskComment);
         newTask.setEffortLeft(originalEstimate);
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
         newTask.setOrganizationID(orgID);
-        if (batch != null) {
-            em.merge(batch);
+        if (batches!= null && !batches.isEmpty() ) {
+            newTask.setBatches(new HashSet<>());
+            newTask.getBatches().addAll(batches);
         }
-        newTask.addBatch(batch);
-
         em.persist(newTask);
         em.merge(project);
         newTask.setProject(project);
@@ -361,6 +364,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Task updateTask(final Long orgID, final Account actor, final Task task) {
+
         if (task.getProject().isMember(actor)) {
             task.setOrganizationID(orgID);
             em.merge(task);

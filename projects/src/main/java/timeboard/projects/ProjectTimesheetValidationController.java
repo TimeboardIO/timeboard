@@ -146,6 +146,7 @@ public class ProjectTimesheetValidationController {
         final Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, firstWeek);
         current.set(Calendar.YEAR, firstYear);
+        current.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         final long weekNumber = todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(firstYear, firstWeek);
         if (weekNumber <= 1) { //Min two weeks
             current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));

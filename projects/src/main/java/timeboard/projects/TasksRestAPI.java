@@ -40,13 +40,11 @@ import org.springframework.web.bind.annotation.RestController;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.UserService;
-import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.io.Serializable;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -71,101 +69,65 @@ public class TasksRestAPI {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity createTask(final TimeboardAuthentication authentication,
-                                     @RequestBody final TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+                                     @RequestBody final TaskWrapper taskWrapper) {
 
+        final Task t = new Task();
         final Account actor = authentication.getDetails();
-        Date startDate = null;
-        Date endDate = null;
+        final long orgID = authentication.getCurrentOrganization();
+
         try {
-            startDate = DATE_FORMAT.parse(taskWrapper.startDate);
-            endDate = DATE_FORMAT.parse(taskWrapper.endDate);
-        } catch (final Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect date format");
-        }
 
-        if (startDate.getTime() > endDate.getTime()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Start date must be before end date ");
-        }
+            final Long taskID = taskWrapper.taskID;
 
-        final String name = taskWrapper.taskName;
-        final String comment = commentsValidator(taskWrapper);
+            t.setStartDate(startDateValidator(taskWrapper));
+            t.setEndDate(endDateValidator(taskWrapper));
+            t.setName(nameValidator(taskWrapper));
+            t.setComments(commentsValidator(taskWrapper));
+            t.setOriginalEstimate(oeValidator(taskWrapper));
+            t.setProject(projectValidator(taskWrapper, actor, orgID));
+            t.setTaskType(taskTypeValidator(taskWrapper));
+            t.setAssigned(assigneeValidator(taskWrapper));
+            t.setBatches(batchesValidator(taskWrapper, actor));
+            t.setTaskStatus(taskStatusValidator(taskWrapper));
 
-        final double oe = taskWrapper.originalEstimate;
-        if (oe <= 0.0) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Original original estimate must be positive ");
-        }
+            final Task newTask =  processCreateOrUpdate(actor, orgID, taskID, t);
+            taskWrapper.setTaskID(newTask.getId());
+            return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
-        final Long projectID = taskWrapper.projectID;
-        Project project = null;
-        try {
-            project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        } catch (final Exception e) {
+        } catch (TaskCreationException | JsonProcessingException e ) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
 
-        final Set<Batch> batches = getBatches(taskWrapper, actor);
+    }
 
+    private Task processCreateOrUpdate(Account actor,Long orgID,  Long taskID, Task t) throws TaskCreationException {
         Task task = null;
-        final Long typeID = taskWrapper.typeID;
-        final Long taskID = taskWrapper.taskID;
+        try {
+            if (taskID != null && taskID != 0) {
+                final Task oldTask = (Task) projectService.getTaskByID(actor, taskID);
+                if (oldTask.getEffortSpent() > 0 && oldTask.getAssigned() != t.getAssigned()) {
+                    throw new TaskCreationException("You can not modify assignee because he already add imputation on this task");
+                }
+                t.setOrigin(oldTask.getOrigin());
+                t.setId(oldTask.getId());
+                task = processUpdateTask(orgID, actor, t);
 
-        if (taskID != null && taskID != 0) {
-            try {
-                task = processUpdateTask(authentication.getCurrentOrganization(),taskWrapper, actor, batches, taskID);
-
-            } catch (final Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body("Error in task creation please verify your inputs and retry");
             }
-        } else {
-            try {
-                task = createTask(authentication.getCurrentOrganization(),
-                        taskWrapper, actor, startDate, endDate, name, comment, oe, project, typeID);
-            } catch (final Exception e) {
-                return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .header("msg", "Error in task creation please " +
-                                "verify your inputs and retry. (" + e.getMessage() + ")").build();
+            else {
+                task = processCreateTask(orgID, actor, t);
             }
+
+            return task;
+        } catch (final Exception e) {
+            throw new TaskCreationException("Error in task creation/update please verify your inputs and retry. (" + e.getMessage() + ")");
         }
-
-        taskWrapper.setTaskID(task.getId());
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
-
     }
 
-    private String commentsValidator(@RequestBody final TaskWrapper taskWrapper) {
-        String comment = taskWrapper.taskComments;
-        if (comment == null) {
-            comment = "";
-        }
-        return comment;
+    private TaskStatus taskStatusValidator(@RequestBody final TaskWrapper taskWrapper) {
+        return  TaskStatus.valueOf(taskWrapper.getStatus());
     }
 
-    private Task createTask(
-            final Long orgID,
-            final TaskWrapper taskWrapper,
-                            final Account actor,
-                            final Date startDate,
-                            final Date endDate,
-                            final String name,
-                            final String comment,
-                            final double oe,
-                            final Project project,
-                            final Long typeID) {
-        Account assignee = null;
-        if (taskWrapper.assigneeID > 0) {
-            assignee = userService.findUserByID(taskWrapper.assigneeID);
-        }
-
-
-        return projectService.createTask(orgID, actor, project,
-                name, comment, startDate,
-                endDate, oe, typeID, assignee,
-                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING, null);
-    }
-
-    private Set<Batch> getBatches(@RequestBody final TaskWrapper taskWrapper, final Account actor) throws BusinessException {
+    private Set<Batch> batchesValidator(@RequestBody final TaskWrapper taskWrapper, final Account actor) {
         Set<Batch> returnList = null;
         final List<Long> batchIDList = taskWrapper.batchIDs;
 
@@ -185,32 +147,105 @@ public class TasksRestAPI {
         return returnList;
     }
 
-    private Task processUpdateTask(
-            final Long orgID,
-            final TaskWrapper taskWrapper,
-                                   final Account actor,
-                                   final Set<Batch> batches,
-                                   final Long taskID) throws BusinessException, ParseException {
+    private Account assigneeValidator(@RequestBody final TaskWrapper taskWrapper) {
+        final Long assigneeID = taskWrapper.assigneeID;
 
-        final Task task = (Task) projectService.getTaskByID(actor, taskID);
-
-        if (taskWrapper.assigneeID != null && taskWrapper.assigneeID > 0) {
-            final Account assignee = userService.findUserByID(taskWrapper.assigneeID);
-            task.setAssigned(assignee);
+        if (assigneeID != null && assigneeID > 0) {
+            return userService.findUserByID(assigneeID);
         }
-        task.setName(taskWrapper.getTaskName());
-        task.setComments(taskWrapper.getTaskComments());
-        task.setOriginalEstimate(taskWrapper.getOriginalEstimate());
-        task.setStartDate(DATE_FORMAT.parse(taskWrapper.getStartDate()));
-        task.setEndDate(DATE_FORMAT.parse(taskWrapper.getEndDate()));
-        final TaskType taskType = this.organizationService.findTaskTypeByID(taskWrapper.getTypeID());
-        task.setTaskType(taskType);
-        task.setBatches(batches);
-        task.setTaskStatus(taskWrapper.getStatus() != null ? TaskStatus.valueOf(taskWrapper.getStatus()) : TaskStatus.PENDING);
-
-        projectService.updateTask(orgID, actor, task);
-        return task;
+        return  null;
     }
+
+    private TaskType taskTypeValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
+        try {
+            return this.organizationService.findTaskTypeByID(taskWrapper.typeID);
+        } catch (Exception e) {
+            throw new TaskCreationException("Could not find task type");
+        }
+    }
+
+    private Project projectValidator(@RequestBody final TaskWrapper taskWrapper, Account actor, Long orgID) throws TaskCreationException {
+        final Long projectID = taskWrapper.projectID;
+        Project project = null;
+        try {
+            project = this.projectService.getProjectByID(actor, orgID, projectID);
+        } catch (final Exception e) {
+            throw new TaskCreationException("Can not found project "+e.getMessage());
+        }
+
+        return project;
+    }
+
+    private double oeValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
+        final double oe = taskWrapper.originalEstimate;
+        if (oe <= 0.0) {
+            throw new TaskCreationException("Original original estimate must be positive ");
+        }
+        return oe;
+    }
+
+    private Date startDateValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
+        Date startDate = null;
+        Date endDate = null;
+
+        try {
+            startDate = DATE_FORMAT.parse(taskWrapper.startDate);
+            endDate = DATE_FORMAT.parse(taskWrapper.endDate);
+        } catch (final Exception e) {
+            throw new TaskCreationException("Incorrect date format");
+        }
+
+        if (startDate.getTime() > endDate.getTime()) {
+            throw new TaskCreationException("Start date must be before end date ");
+        }
+        return startDate;
+    }
+
+    private Date endDateValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
+        Date endDate = null;
+
+        try {
+            endDate = DATE_FORMAT.parse(taskWrapper.endDate);
+        } catch (final Exception e) {
+            throw new TaskCreationException("Incorrect date format.");
+        }
+        return endDate;
+
+    }
+
+    private String commentsValidator(@RequestBody final TaskWrapper taskWrapper) {
+        String comment = taskWrapper.taskComments;
+        if (comment == null) {
+            comment = "";
+        }
+        return comment;
+    }
+
+    private String nameValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
+        final String name = taskWrapper.taskName;
+        if (name == null) {
+            throw new TaskCreationException("You have to specify task name.");
+        }
+        if (name.length() > 100) {
+            throw new TaskCreationException("The task name you specify is too long. The field is limited to 100 prints.");
+        }
+        return name;
+    }
+
+
+    private Task processCreateTask(final Long orgID, final Account actor, final Task task) {
+        return projectService.createTask(orgID, actor, task.getProject(),
+                task.getName(), task.getComments(), task.getStartDate(),
+                task.getEndDate(), task.getOriginalEstimate(), task.getTaskType(), task.getAssigned(),
+                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,
+                task.getBatches());
+    }
+
+    private Task processUpdateTask(final Long orgID, final Account actor, final Task task) {
+        return projectService.updateTask(orgID, actor, task);
+    }
+
+
 
 
     public static class TaskGraphWrapper implements Serializable {
@@ -237,10 +272,8 @@ public class TasksRestAPI {
 
     public static class BatchWrapper implements Serializable {
 
-
         public Long batchID;
         public String batchName;
-
 
         public BatchWrapper(final Long batchID, final String batchName) {
             this.batchID = batchID;
@@ -290,6 +323,8 @@ public class TasksRestAPI {
         public List<Long> batchIDs;
         public List<String> batchNames;
 
+        public boolean canChangeAssignee;
+
         public TaskWrapper() {
         }
 
@@ -306,7 +341,8 @@ public class TasksRestAPI {
                            final List<Long> batchIDs,
                            final List<String> batchNames,
                            final String statusName,
-                           final String typeName) {
+                           final String typeName,
+                           final boolean canChangeAssignee) {
 
             this.taskID = taskID;
 
@@ -327,6 +363,7 @@ public class TasksRestAPI {
 
             this.statusName = statusName;
             this.typeName = typeName;
+            this.canChangeAssignee = canChangeAssignee;
         }
 
 
@@ -424,6 +461,14 @@ public class TasksRestAPI {
 
         public String getEndDate() {
             return this.endDate;
+        }
+    }
+
+
+    public class TaskCreationException extends Exception {
+
+        public TaskCreationException(String message){
+            super(message);
         }
     }
 }
