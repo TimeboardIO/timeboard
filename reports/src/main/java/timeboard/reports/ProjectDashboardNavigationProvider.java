@@ -28,10 +28,11 @@ package timeboard.reports;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.ReportService;
+import timeboard.core.security.AbacEntries;
 import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
-public class ProjectDashboardNavigartionProvider implements ProjectNavigationProvider {
+public class ProjectDashboardNavigationProvider implements ProjectNavigationProvider {
 
     @Override
     public String getNavigationLabel() {
@@ -45,7 +46,7 @@ public class ProjectDashboardNavigartionProvider implements ProjectNavigationPro
 
     @Override
     public String getNavigationAction() {
-        return ReportService.REPORT_PROJECT_VIEW;
+        return AbacEntries.REPORT_PROJECT_VIEW;
     }
 
 

@@ -40,10 +40,6 @@ import java.util.stream.Collectors;
 
 public interface ReportService {
 
-
-    String REPORT_LIST = "REPORT_LIST";
-    String REPORT_PROJECT_VIEW = "REPORT_PROJECT_VIEW";
-
     /**
      * Create a new report configuration
      *

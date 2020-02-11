@@ -9,6 +9,8 @@
       "TASK_LIST",
       "PROJECT_LIST",
       "PROJECT_VIEW",
+      "VACATION_VIEW",
+      "VACATION_LIST",
       "HOME_VIEW"
     ],
     "conditions": [
@@ -18,7 +20,7 @@
   {
     "name": "Organization contributors can access vacations features",
     "actions": [
-      "VACATION_VIEW"
+      "VACATION_TEAM_LIST"
     ],
     "conditions": [
       "subject.currentProjectRole(resource,'OWNER','CONTRIBUTOR')"
@@ -28,17 +30,37 @@
     "name": "Users can create tasks on project only if they are member",
     "actions": [
       "PROJECT_TASKS_VIEW",
-      "TASKS_CREATE"
+      "PROJECT_TASKS_CREATE",
+      "PROJECT_SETUP_VIEW"
     ],
     "conditions": [
       "subject.currentProjectRole(resource, 'OWNER', 'CONTRIBUTOR')"
+    ]
+  },
+  {
+    "name": "Users can create tasks on project only if they are member",
+    "actions": [
+      "PROJECT_BATCHES_VIEW",
+      "REPORT_PROJECT_VIEW",
+      "PROJECT_SETUP",
+      "PROJECT_TAGS_VIEW",
+      "PROJECT_TASKS_APPROBATION",
+      "PROJECT_TASKS_EDIT",
+      "PROJECT_TASKS_IMPORT",
+      "TIMESHEET_VALIDATE"
+    ],
+    "conditions": [
+      "subject.currentProjectRole(resource, 'OWNER')"
     ]
   },
 
   {
     "name": "Only owner can create projects",
     "actions": [
-      "PROJECT_CREATE"
+      "PROJECT_CREATE",
+      "PROJECT_ARCHIVE",
+      "REPORT_LIST",
+      "ORG_SETUP"
     ],
     "conditions": [
       "subject.currentOrganizationRole('OWNER')"

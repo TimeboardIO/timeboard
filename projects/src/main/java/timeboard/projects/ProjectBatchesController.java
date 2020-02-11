@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 public class ProjectBatchesController extends ProjectBaseController {
 
     public static final String URL = "/batches";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
 
     @Autowired

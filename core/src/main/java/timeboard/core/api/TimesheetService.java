@@ -39,25 +39,17 @@ import java.util.Optional;
 
 public interface TimesheetService {
 
-    String TIMESHEET_SUBMIT = "TIMESHEET_SUBMIT";
-    String TIMESHEET_VALIDATE = "TIMESHEET_VALIDATE";
-    String TIMESHEET_REJECT = "TIMESHEET_REJECT";
-    String TIMESHEET_IMPUTATION = "TIMESHEET_IMPUTATION";
-    String TIMESHEET_LIST = "TIMESHEET_LIST";
-
     /**
      * Submit user timesheet.
      *
-     * @param actor            user who trigger this function.
-     * @param accountTimesheet user which be used to build timehseet to submit
+     * @param timesheetOwner user which be used to build timehseet to submit
      * @param year             timesheet year
      * @param week             timesheet week
      * @return true if timesheet is submit else, false.
      */
     SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
-            final Account actor,
-            final Account accountTimesheet,
+            final Account timesheetOwner,
             final int year,
             final int week) throws BusinessException;
 
@@ -84,20 +76,20 @@ public interface TimesheetService {
     SubmittedTimesheet rejectTimesheet(final Organization currentOrg, final Account actor,
                                        final SubmittedTimesheet submittedTimesheet) throws BusinessException;
 
-    Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization org, Account actor, Account user, int year, int week);
+    Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization org, Account timesheetOwner, int year, int week);
 
 
     /**
      * Get timesheet validation status.
      *
-     * @param currentAccount user used to check timesheet sumbit state.
+     * @param timesheetOwner user used to check timesheet sumbit state.
      * @param year           timesheet year
      * @param week           timesheet week
      * @return ValidationStatus, null current account has no timesheet validation request for current week
      */
     Optional<ValidationStatus> getTimesheetValidationStatus(
             final Organization org,
-            final Account currentAccount,
+            final Account timesheetOwner,
             final int year,
             final int week);
 

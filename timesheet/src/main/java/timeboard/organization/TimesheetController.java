@@ -276,7 +276,6 @@ public class TimesheetController {
                     this.timesheetService.submitTimesheet(
                             currentOrg,
                             actor,
-                            actor,
                             year,
                             week);
 
@@ -303,7 +302,6 @@ public class TimesheetController {
             final Optional<SubmittedTimesheet> submittedTimesheet =
                     this.timesheetService.getSubmittedTimesheet(
                             authentication.getCurrentOrganization(),
-                            actor,
                             user,
                             year,
                             week);
@@ -344,7 +342,6 @@ public class TimesheetController {
             final Optional<SubmittedTimesheet> submittedTimesheet =
                     this.timesheetService.getSubmittedTimesheet(
                             authentication.getCurrentOrganization(),
-                            actor,
                             user,
                             year,
                             week);

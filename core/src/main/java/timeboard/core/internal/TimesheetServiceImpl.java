@@ -36,6 +36,7 @@ import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.*;
+import timeboard.core.security.AbacEntries;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -65,17 +66,16 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize("hasPermission(#accountTimesheet,'" + TIMESHEET_SUBMIT + "')")
+    @PreAuthorize(AbacEntries.TIMESHEET_SUBMIT)
     public SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
-            final Account actor,
-            final Account accountTimesheet,
+            final Account timesheetOwner,
             final int year,
             final int week)
             throws BusinessException {
 
         final Calendar beginWorkDate = this.organizationService
-                .findOrganizationMembership(actor, currentOrg).get().getCreationDate();
+                .findOrganizationMembership(timesheetOwner, currentOrg).get().getCreationDate();
 
         final int dayInFirstWeek = beginWorkDate.get(Calendar.DAY_OF_WEEK);
         final boolean firstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR)
@@ -89,7 +89,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
-                currentOrg, accountTimesheet, previousWeek.get(Calendar.YEAR),
+                currentOrg, timesheetOwner, previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
         if (!firstWeek && lastWeekValidatedOpt.isEmpty()) {
@@ -128,7 +128,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final TypedQuery<Double> q = em.createNamedQuery(
                 Imputation.SUM_IMPUTATIONS_BY_USER_AND_WEEK, Double.class);
 
-        q.setParameter("user", accountTimesheet);
+        q.setParameter("user", timesheetOwner);
         q.setParameter("days", days);
         q.setParameter("orgID", currentOrg.getId());
         final Double result = q.getSingleResult();
@@ -137,13 +137,13 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to 1");
         }
 
-       return processSubmission(actor, accountTimesheet, year, week, currentOrg );
+       return processSubmission(timesheetOwner, year, week, currentOrg );
     }
 
-    private SubmittedTimesheet processSubmission(Account actor, Account accountTimesheet, int year, int week, Organization currentOrg) {
+    private SubmittedTimesheet processSubmission(Account accountTimesheet, int year, int week, Organization currentOrg) {
 
         final Optional<SubmittedTimesheet> existingRejectedTimesheet = this.getSubmittedTimesheet(
-                currentOrg, actor, accountTimesheet, year, week);
+                currentOrg, accountTimesheet, year, week);
 
         final SubmittedTimesheet submittedTimesheet;
         if (existingRejectedTimesheet.isPresent()) {
@@ -164,14 +164,14 @@ public class TimesheetServiceImpl implements TimesheetService {
         TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
         LOGGER.info("Timesheet for " + week + " submit for user "
-                + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
+                + accountTimesheet.getScreenName());
         return submittedTimesheet;
 
     }
 
 
     @Override
-    @PreAuthorize("hasPermission(#submittedTimesheet,'" + TIMESHEET_VALIDATE + "')")
+    @PreAuthorize("hasPermission(#submittedTimesheet,'" + AbacEntries.TIMESHEET_VALIDATE + "')")
     public SubmittedTimesheet validateTimesheet(
             final Organization currentOrg,
             final Account actor,
@@ -218,7 +218,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#submittedTimesheet,'" + TIMESHEET_REJECT + "')")
+    @PreAuthorize("hasPermission(#submittedTimesheet,'" + AbacEntries.TIMESHEET_REJECT + "')")
     public SubmittedTimesheet rejectTimesheet(
             final Organization org,
             final Account actor,
@@ -260,7 +260,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(null,'" + TIMESHEET_IMPUTATION + "')")
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.TIMESHEET_IMPUTATION + "')")
     public List<UpdatedTaskResult> updateTaskImputations(final Organization org, final Account actor, final List<Imputation> imputationsList) {
         final List<UpdatedTaskResult> result = new ArrayList<>();
         for (final Imputation imputation : imputationsList) {
@@ -279,10 +279,10 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(null,'" + TIMESHEET_IMPUTATION + "')")
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.TIMESHEET_IMPUTATION + "')")
     public UpdatedTaskResult updateTaskImputation(
             final Organization org,
-            final Account actor,
+            final Account timesheetOwner,
             final AbstractTask task,
             final Date day,
             final double val) throws BusinessException {
@@ -291,11 +291,11 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         final ValidationStatus timesheetSubmitted = this.getTimesheetValidationStatus(
                 org,
-                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR)).orElse(null);
+                timesheetOwner, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR)).orElse(null);
 
         if (task instanceof Task) {
             if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
-                return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
+                return this.updateProjectTaskImputation(timesheetOwner, (Task) task, day, val, c);
             } else {
                 final Task projectTask = (Task) task;
                 return new UpdatedTaskResult(projectTask.getProject().getId(),
@@ -305,7 +305,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             }
         } else {
             if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
-                return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
+                return this.updateDefaultTaskImputation(timesheetOwner, (DefaultTask) task, day, val, c);
             } else {
                 return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
             }
@@ -314,8 +314,8 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize("hasPermission(null,'" + TIMESHEET_LIST + "')")
-    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization currentOrganization, Account actor, Account user, int year, int week) {
+    @PreAuthorize(AbacEntries.TIMESHEET_LIST)
+    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization currentOrganization, Account user, int year, int week) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year " +
@@ -463,7 +463,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 final int currentYear = current.get(Calendar.YEAR);
 
                 final Optional<SubmittedTimesheet> submittedTimesheet =
-                        this.getSubmittedTimesheet(org, actor, target, currentYear, currentWeek);
+                        this.getSubmittedTimesheet(org, target, currentYear, currentWeek);
 
                 if (submittedTimesheet.isPresent()) {
 

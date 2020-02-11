@@ -145,7 +145,7 @@
         <!-- Actions buttons-->
         <div class="ui menu">
             <a class="item" th:if="${isProjectOwner}"  data-cy="create-task"
-               v-on:click="showCreateTaskModal(null, null, $event)" sec:authorize="${hasPermission(#vars.project,'TASKS_CREATE')}">
+               v-on:click="showCreateTaskModal(null, null, $event)" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_CREATE')}">
                 <i class="plus icon"></i>
                 New Task
             </a>

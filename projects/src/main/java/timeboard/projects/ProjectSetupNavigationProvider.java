@@ -27,7 +27,7 @@ package timeboard.projects;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.api.ProjectService;
+import timeboard.core.security.AbacEntries;
 import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
@@ -39,11 +39,11 @@ public class ProjectSetupNavigationProvider implements ProjectNavigationProvider
 
     @Override
     public String getNavigationPath() {
-        return ProjectTasksController.URL;
+        return ProjectSetupController.URL;
     }
 
     @Override
     public String getNavigationAction() {
-        return ProjectService.PROJECT_SETUP_VIEW;
+        return AbacEntries.PROJECT_SETUP_VIEW;
     }
 }
