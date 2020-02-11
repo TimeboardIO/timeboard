@@ -32,8 +32,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.AccountService;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
@@ -59,8 +60,10 @@ public final class ProjectSyncJob implements Job {
     private List<ProjectSyncPlugin> projectImportServiceList;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
+    @Autowired
+    private OrganizationService organizationService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncJob.class);
 
@@ -80,13 +83,14 @@ public final class ProjectSyncJob implements Job {
                     .filter(projectSyncPlugin -> projectSyncPlugin.getServiceName().equals(serviceName))
                     .findFirst().get();
 
-            final Account actor = this.userService.findUserByID(accountID);
+            final Account actor = this.accountService.findUserByID(accountID);
+            final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, orgID);
 
             SecurityContextHolder.getContext().setAuthentication(new TimeboardAuthentication(actor));
 
-            final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+            final Project project = this.projectService.getProjectByID(actor, org.get(), projectID);
 
-            context.setResult(this.syncProjectTasks(orgID, actor, project, syncService, credentials));
+            context.setResult(this.syncProjectTasks(org.get(), actor, project, syncService, credentials));
 
         } catch (final Exception e) {
             context.setResult(e);
@@ -94,7 +98,7 @@ public final class ProjectSyncJob implements Job {
     }
 
     private Object syncProjectTasks(
-            final Long orgID,
+            final Organization orgID,
             final Account actor,
             final Project project,
             final ProjectSyncPlugin syncService,
@@ -105,11 +109,12 @@ public final class ProjectSyncJob implements Job {
 
         remoteTasks.forEach(task -> {
             try {
-                mergeAssignee(userService, syncService.getServiceID(), task);
+                mergeAssignee(accountService, syncService.getServiceID(), task);
             } catch (final Exception e) {
                 LOGGER.trace(e.getMessage());
             }
         });
+
 
         this.syncTasks(orgID, actor, project, remoteTasks, syncService.getServiceID());
 
@@ -118,7 +123,7 @@ public final class ProjectSyncJob implements Job {
     }
 
     private void syncTasks(
-            final Long orgID,
+            final Organization orgID,
             final Account actor,
             final Project project,
             final List<RemoteTask> remoteTasks,
@@ -144,7 +149,8 @@ public final class ProjectSyncJob implements Job {
 
     }
 
-    private void updateTasks(Long orgID, Account actor, Project project, List<RemoteTask> updatedTasks, String externalID) {
+
+    private void updateTasks(Organization orgID, Account actor, Project project, List<RemoteTask> updatedTasks, String externalID) {
 
         for (final RemoteTask remoteTask : updatedTasks) {
             final Optional<Task> taskToUpdate = projectService.getTaskByRemoteID(actor, remoteTask.getId());
@@ -184,8 +190,9 @@ public final class ProjectSyncJob implements Job {
     }
 
 
+
     private void createTasks(
-            final Long orgID, final Account actor, final Project project, final List<RemoteTask> newTasks, TaskStatus status) {
+            final Organization orgID, final Account actor, final Project project, final List<RemoteTask> newTasks, TaskStatus status) {
         newTasks.forEach(task -> {
                     String taskName = task.getTitle();
                     if (taskName.length() >= 100) {
@@ -207,7 +214,6 @@ public final class ProjectSyncJob implements Job {
         );
     }
 
-
     private boolean isUpdated(final Account actor, final RemoteTask task) throws BusinessException {
         return !this.isNewTask(actor, task);
     }
@@ -217,8 +223,8 @@ public final class ProjectSyncJob implements Job {
         return existingTask.isEmpty();
     }
 
-    private void mergeAssignee(final UserService userService, final String externalID, final RemoteTask task) {
-        final Account remoteAccount = userService.findUserByExternalID(externalID, task.getUserName());
+    private void mergeAssignee(final AccountService accountService, final String externalID, final RemoteTask task) {
+        final Account remoteAccount = accountService.findUserByExternalID(externalID, task.getUserName());
         if (remoteAccount != null) {
             task.setLocalUser(remoteAccount);
         }

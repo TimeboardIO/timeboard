@@ -29,8 +29,9 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
@@ -49,14 +50,16 @@ import java.util.stream.Collectors;
 
 @Component
 @Transactional
-public class UserServiceImpl implements UserService {
+public class AccountServiceImpl implements AccountService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
+    private static final String ACCOUNT_CREATE = "ACCOUNT_CREATE";
 
     @Autowired
     private EntityManager em;
 
     @Override
+    @PreAuthorize("hasPermission(null,'" + ACCOUNT_CREATE + "')")
     public List<Account> createUsers(final List<Account> accounts) {
         accounts.forEach(user -> {
             em.persist(user);

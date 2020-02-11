@@ -35,8 +35,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
@@ -62,45 +62,23 @@ public class OrganizationMembersController {
     public OrganizationService organizationService;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
     @GetMapping
     protected String handleGet(final TimeboardAuthentication authentication, final Model viewModel) {
 
-        final Account actor = authentication.getDetails();
-
-        final Optional<Organization> organization =
-                this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
-
-        if (organization.isPresent()) {
-            viewModel.addAttribute("members", organization.get().getMembers());
-        }
-
+        viewModel.addAttribute("members", authentication.getCurrentOrganization().getMembers());
         viewModel.addAttribute("roles", MembershipRole.values());
-        viewModel.addAttribute("organization", organization.get());
+        viewModel.addAttribute("organization", authentication.getCurrentOrganization());
 
         return "org_members";
     }
 
     @GetMapping("/list/{orgID}")
     public ResponseEntity getMembers(TimeboardAuthentication authentication,
-                                     @PathVariable final Long orgID) throws JsonProcessingException {
+                                     @PathVariable final Organization org) {
 
-        final Account actor = authentication.getDetails();
-
-        if (orgID == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
-        }
-
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
-
-        if (!organization.isPresent()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body("Project does not exists or you don't have enough permissions to access it.");
-        }
-
-
-        final Set<OrganizationMembership> members = organization.get().getMembers();
+        final Set<OrganizationMembership> members = org.getMembers();
         final List<MemberWrapper> result = new ArrayList<>();
 
         for (OrganizationMembership member : members) {
@@ -126,7 +104,7 @@ public class OrganizationMembersController {
 
 
         final Optional<OrganizationMembership> membershipOpt = this.organizationService
-                .findOrganizationMembershipById(authentication.getDetails(), membershipID);
+                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization());
 
         if (membershipOpt.isPresent()) {
 
@@ -152,14 +130,8 @@ public class OrganizationMembersController {
         final Account actor = authentication.getDetails();
 
         // Get current organization
-        final String strOrgID = request.getParameter("orgID");
-        Long orgID = null;
-        if (strOrgID != null) {
-            orgID = Long.parseLong(strOrgID);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
-        }
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
+        final Organization org = authentication.getCurrentOrganization();
+
 
         // Get added member
         final String strMemberID = request.getParameter("memberID");
@@ -169,11 +141,11 @@ public class OrganizationMembersController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
-        final Account member = this.userService.findUserByID(memberID);
+        final Account member = this.accountService.findUserByID(memberID);
 
         // Add member in current organization
         try {
-            organizationService.addMembership(actor, organization.get(), member, MembershipRole.CONTRIBUTOR);
+            organizationService.addMembership(actor, org, member, MembershipRole.CONTRIBUTOR);
 
             final MemberWrapper memberWrapper = new MemberWrapper(
                     memberID,
@@ -189,27 +161,22 @@ public class OrganizationMembersController {
 
     }
 
-    @GetMapping("/remove/{orgID}/{orgMemberID}")
-    public ResponseEntity removeMember(TimeboardAuthentication authentication,
-                                       @PathVariable final Long orgID,
-                                       @PathVariable final Long orgMemberID) {
+    @GetMapping("/remove/{orgMemberID}")
+    public ResponseEntity removeMember(final TimeboardAuthentication authentication,
+                                       @PathVariable final Long orgMemberID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
-        if (orgID == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org id argument");
-        }
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgID);
 
         if (orgMemberID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
         final OrganizationMembership organizationMembership =
-                this.organizationService.findOrganizationMembershipById(actor, orgMemberID).get();
+                this.organizationService.findOrganizationMembership(actor, authentication.getCurrentOrganization()).get();
         final Account member = organizationMembership.getMember();
 
         try {
-            organizationService.removeMembership(actor, organization.get(), member);
+            organizationService.removeMembership(actor, authentication.getCurrentOrganization(), member);
 
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e) {

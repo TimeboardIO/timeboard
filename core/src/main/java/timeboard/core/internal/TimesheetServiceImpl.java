@@ -31,10 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimeboardSubjects;
-import timeboard.core.api.TimesheetService;
+import timeboard.core.api.*;
 import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
@@ -56,6 +53,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimesheetServiceImpl.class);
 
+
     @Autowired
     private EntityManager em;
 
@@ -67,7 +65,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize("hasPermission(#accountTimesheet,'TIMESHEET_SUBMIT')")
+    @PreAuthorize("hasPermission(#accountTimesheet,'" + TIMESHEET_SUBMIT + "')")
     public SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
             final Account actor,
@@ -91,7 +89,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
-                currentOrg.getId(), accountTimesheet, previousWeek.get(Calendar.YEAR),
+                currentOrg, accountTimesheet, previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
         if (!firstWeek && lastWeekValidatedOpt.isEmpty()) {
@@ -145,7 +143,7 @@ public class TimesheetServiceImpl implements TimesheetService {
     private SubmittedTimesheet processSubmission(Account actor, Account accountTimesheet, int year, int week, Organization currentOrg) {
 
         final Optional<SubmittedTimesheet> existingRejectedTimesheet = this.getSubmittedTimesheet(
-                currentOrg.getId(), actor, accountTimesheet, year, week);
+                currentOrg, actor, accountTimesheet, year, week);
 
         final SubmittedTimesheet submittedTimesheet;
         if (existingRejectedTimesheet.isPresent()) {
@@ -163,7 +161,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             em.persist(submittedTimesheet);
 
         }
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg.getId()));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, currentOrg));
 
         LOGGER.info("Timesheet for " + week + " submit for user "
                 + accountTimesheet.getScreenName() + " by user " + actor.getScreenName());
@@ -173,10 +171,11 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_VALIDATE')")
-    public SubmittedTimesheet validateTimesheet(final Organization currentOrg,
-                                                final Account actor,
-                                                final SubmittedTimesheet submittedTimesheet) throws BusinessException {
+    @PreAuthorize("hasPermission(#submittedTimesheet,'" + TIMESHEET_VALIDATE + "')")
+    public SubmittedTimesheet validateTimesheet(
+            final Organization currentOrg,
+            final Account actor,
+            final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
         if (submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED)) {
             //Do nothing
@@ -195,7 +194,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
-                currentOrg.getId(), submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
+                currentOrg, submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
         if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED) ) {
@@ -206,9 +205,11 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.merge(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
+        final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, submittedTimesheet.getOrganizationID());
 
-        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" validated for user"
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, org.get()));
+
+        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek() + " of " + submittedTimesheet.getYear() + " validated for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
 
 
@@ -217,9 +218,11 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#submittedTimesheet,'TIMESHEET_REJECT')")
-    public SubmittedTimesheet rejectTimesheet(final Organization currentOrg, final Account actor,
-                                                final SubmittedTimesheet submittedTimesheet) throws BusinessException {
+    @PreAuthorize("hasPermission(#submittedTimesheet,'" + TIMESHEET_REJECT + "')")
+    public SubmittedTimesheet rejectTimesheet(
+            final Organization org,
+            final Account actor,
+            final SubmittedTimesheet submittedTimesheet) throws BusinessException {
 
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not reject unsubmitted weeks");
@@ -234,7 +237,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
 
         final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
-                currentOrg.getId(), submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
+                org, submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
         if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED) ) {
@@ -246,9 +249,9 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         em.merge(submittedTimesheet);
 
-        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, submittedTimesheet.getOrganizationID()));
+        TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(submittedTimesheet, projectService, org));
 
-        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek()  + " of "+submittedTimesheet.getYear() +" rejected for user"
+        LOGGER.info("Timesheet for " + submittedTimesheet.getWeek() + " of " + submittedTimesheet.getYear() + " rejected for user"
                 + submittedTimesheet.getAccount().getScreenName() + " by user " + actor.getScreenName());
 
 
@@ -256,9 +259,63 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     }
 
+    @Override
+    @PreAuthorize("hasPermission(null,'" + TIMESHEET_IMPUTATION + "')")
+    public List<UpdatedTaskResult> updateTaskImputations(final Organization org, final Account actor, final List<Imputation> imputationsList) {
+        final List<UpdatedTaskResult> result = new ArrayList<>();
+        for (final Imputation imputation : imputationsList) {
+            UpdatedTaskResult updatedTaskResult = null;
+            try {
+                updatedTaskResult = this.updateTaskImputation(org, actor, (Task) imputation.getTask(),
+                        imputation.getDay(), imputation.getValue());
+
+            } catch (final BusinessException e) {
+                LOGGER.error(e.getMessage());
+            }
+            result.add(updatedTaskResult);
+        }
+        em.flush();
+        return result;
+    }
 
     @Override
-    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Long currentOrganization, Account actor, Account user, int year, int week) {
+    @PreAuthorize("hasPermission(null,'" + TIMESHEET_IMPUTATION + "')")
+    public UpdatedTaskResult updateTaskImputation(
+            final Organization org,
+            final Account actor,
+            final AbstractTask task,
+            final Date day,
+            final double val) throws BusinessException {
+        final Calendar c = Calendar.getInstance();
+        c.setTime(day);
+
+        final ValidationStatus timesheetSubmitted = this.getTimesheetValidationStatus(
+                org,
+                actor, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR)).orElse(null);
+
+        if (task instanceof Task) {
+            if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
+                return this.updateProjectTaskImputation(actor, (Task) task, day, val, c);
+            } else {
+                final Task projectTask = (Task) task;
+                return new UpdatedTaskResult(projectTask.getProject().getId(),
+                        projectTask.getId(), projectTask.getEffortSpent(),
+                        projectTask.getEffortLeft(), projectTask.getOriginalEstimate(),
+                        projectTask.getRealEffort());
+            }
+        } else {
+            if (timesheetSubmitted != ValidationStatus.VALIDATED || timesheetSubmitted != ValidationStatus.PENDING_VALIDATION) {
+                return this.updateDefaultTaskImputation(actor, (DefaultTask) task, day, val, c);
+            } else {
+                return new UpdatedTaskResult(0, task.getId(), 0, 0, 0, 0);
+            }
+        }
+    }
+
+
+    @Override
+    @PreAuthorize("hasPermission(null,'" + TIMESHEET_LIST + "')")
+    public Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization currentOrganization, Account actor, Account user, int year, int week) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
                 + "where st.account = :user and st.year = :year " +
@@ -279,7 +336,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public Optional<ValidationStatus> getTimesheetValidationStatus(
-            final Long orgID,
+            final Organization org,
             final Account currentAccount,
             final int year,
             final int week) {
@@ -295,7 +352,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             q.setParameter("week", week);
             q.setParameter("year", year);
             q.setParameter("user", currentAccount);
-            q.setParameter("orgID", orgID);
+            q.setParameter("orgID", org.getId());
 
             validationStatus = q.getSingleResult();
 
@@ -308,7 +365,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public Map<Integer, Double> getAllImputationsForAccountOnDateRange(
-            final Long orgID,
+            final Organization org,
             final Date startDate,
             final Date endDate,
             final Account account,
@@ -344,7 +401,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("startDate", startDate);
         q.setParameter("endDate", endDate);
         q.setParameter("user", account.getId());
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
 
         for (Map.Entry parameter : parameters.entrySet()) {
             q.setParameter((String) parameter.getKey(), parameter.getValue());
@@ -353,10 +410,10 @@ public class TimesheetServiceImpl implements TimesheetService {
 
         final Map<Integer, Double> result = new HashMap<>();
         for (final Object[] o : dayImputations) {
-            if(o[0] instanceof BigInteger){
+            if (o[0] instanceof BigInteger) {
                 result.put(((BigInteger) o[0]).intValue(), (double) o[1]);
             }
-            if(o[0] instanceof Integer){
+            if (o[0] instanceof Integer) {
                 result.put((Integer) o[0], (double) o[1]);
             }
         }
@@ -365,12 +422,12 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Long orgID, Account actor, Project project) {
+    public Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(Organization org, Account actor, Project project) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
                 + "where st.account in :users and st.organizationID = :orgID", SubmittedTimesheet.class);
 
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
         q.setParameter("users", project.getMembers().stream().map(ProjectMembership::getMember).collect(Collectors.toList()));
 
         final List<SubmittedTimesheet> resultList = q.getResultList();
@@ -384,10 +441,14 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public void forceValidationTimesheets(Long organizationID, Account actor, Account target,
-                                        int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException {
+    public void forceValidationTimesheets(final Organization org,
+                                          final Account actor,
+                                          final Account target,
+                                          final int selectedYear,
+                                          final int selectedWeek,
+                                          final int olderYear,
+                                          final int olderWeek) throws TimesheetException {
 
-        final Organization currentOrg = this.organizationService.getOrganizationByID(actor, organizationID).orElse(null);
         final long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
 
         final Calendar current = Calendar.getInstance();
@@ -402,16 +463,17 @@ public class TimesheetServiceImpl implements TimesheetService {
                 final int currentYear = current.get(Calendar.YEAR);
 
                 final Optional<SubmittedTimesheet> submittedTimesheet =
-                        this.getSubmittedTimesheet(organizationID, actor, target, currentYear, currentWeek);
+                        this.getSubmittedTimesheet(org, actor, target, currentYear, currentWeek);
 
                 if (submittedTimesheet.isPresent()) {
 
                     final SubmittedTimesheet updatedSubmittedTimesheet = submittedTimesheet.get();
                     updatedSubmittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
                     em.merge(updatedSubmittedTimesheet);
-
+/*
                     TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(updatedSubmittedTimesheet,
                             projectService, updatedSubmittedTimesheet.getOrganizationID()));
+  */
                     LOGGER.info("Timesheet for " + updatedSubmittedTimesheet.getWeek()  + " of "+updatedSubmittedTimesheet.getYear()
                             + " validated for user " + updatedSubmittedTimesheet.getAccount().getScreenName()
                             + " by user " + actor.getScreenName());
@@ -426,7 +488,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                     newSubmittedTimesheet.setTimesheetStatus(ValidationStatus.VALIDATED);
                     em.persist(newSubmittedTimesheet);
 
-                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, currentOrg.getId()));
+                    TimeboardSubjects.TIMESHEET_EVENTS.onNext(new TimesheetEvent(newSubmittedTimesheet, projectService, org));
                     LOGGER.info("Timesheet " + currentWeek + " of " + currentYear
                             + " submitted and validated for user " + target.getScreenName()
                             + " by user " + actor.getScreenName());
@@ -441,5 +503,110 @@ public class TimesheetServiceImpl implements TimesheetService {
             throw new TimesheetException("This force validation is impossible.");
         }
     }
+
+
+    private UpdatedTaskResult updateProjectTaskImputation(final Account actor,
+                                                          final Task task,
+                                                          final Date day,
+                                                          final double val,
+                                                          final Calendar calendar) throws BusinessException {
+
+        final Task projectTask = (Task) this.projectService.getTaskByID(actor, task.getId());
+
+
+        if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
+            final Imputation existingImputation = this.projectService.getImputationByDayByTask(em, calendar.getTime(), projectTask, actor);
+            final double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
+
+            this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
+            final Task updatedTask = em.find(Task.class, projectTask.getId());
+            final double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
+            updatedTask.setEffortLeft(newEffortLeft);
+
+            LOGGER.info("User " + actor.getScreenName()
+                    + " updated imputations for task "
+                    + projectTask.getId() + " (" + day + ") in project "
+                    + ((projectTask != null) ? projectTask.getProject().getName() : "default") + " with value " + val);
+
+            em.merge(updatedTask);
+            em.flush();
+
+            return new UpdatedTaskResult(updatedTask.getProject().getId(),
+                    updatedTask.getId(), updatedTask.getEffortSpent(),
+                    updatedTask.getEffortLeft(), updatedTask.getOriginalEstimate(),
+                    updatedTask.getRealEffort());
+        }
+        return null;
+    }
+
+
+    public UpdatedTaskResult updateDefaultTaskImputation(final Account actor,
+                                                         final DefaultTask task,
+                                                         final Date day, final double val, final Calendar calendar) throws BusinessException {
+
+        final DefaultTask defaultTask = (DefaultTask) this.projectService.getTaskByID(actor, task.getId());
+
+        // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
+        final Imputation existingImputation = this.projectService.getImputationByDayByTask(em, calendar.getTime(), defaultTask, actor);
+        this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime());
+
+        em.flush();
+        LOGGER.info("User " + actor.getScreenName() + " updated imputations for default task "
+                + defaultTask.getId() + "(" + day + ") in project: default with value " + val);
+
+        return new UpdatedTaskResult(0, defaultTask.getId(), 0, 0, 0, 0);
+
+    }
+
+
+    public void actionOnImputation(final Imputation imputation,
+                                   final AbstractTask task,
+                                   final Account actor,
+                                   final double val,
+                                   final Date date) {
+
+        if (imputation == null) {
+            //No imputation for current task and day
+            final Imputation localImputation = new Imputation();
+            localImputation.setDay(date);
+            localImputation.setTask(task);
+            localImputation.setAccount(actor);
+            localImputation.setValue(val);
+            em.persist(localImputation);
+        } else {
+            // There is an existing imputation for this day and task
+            if (val == 0) {
+                //if value equal to 0 then remove imputation
+                final Long imputationID = imputation.getId();
+                task.getImputations().removeIf(i -> i.getId() == imputationID);
+                em.remove(imputation);
+                em.merge(task);
+            } else {
+                imputation.setValue(val);
+                // else save new value
+                em.persist(imputation);
+            }
+        }
+        em.flush();
+    }
+
+    private double updateEffortLeftFromImputationValue(
+            final double currentEffortLeft,
+            final double currentImputationValue,
+            final double newImputationValue) {
+
+        double newEL = currentEffortLeft; // new effort left
+        final double diffValue = Math.abs(newImputationValue - currentImputationValue);
+
+        if (currentImputationValue < newImputationValue) {
+            newEL = currentEffortLeft - diffValue;
+        }
+        if (currentImputationValue > newImputationValue) {
+            newEL = currentEffortLeft + diffValue;
+        }
+
+        return Math.max(newEL, 0);
+    }
+
 
 }

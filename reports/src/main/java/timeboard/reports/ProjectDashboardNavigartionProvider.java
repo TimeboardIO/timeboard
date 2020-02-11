@@ -1,10 +1,10 @@
-package timeboard.core.api;
+package timeboard.reports;
 
 /*-
  * #%L
- * core
+ * reports
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,23 +26,27 @@ package timeboard.core.api;
  * #L%
  */
 
-import org.springframework.security.core.context.SecurityContextHolder;
-import timeboard.core.security.TimeboardAuthentication;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.ReportService;
+import timeboard.projects.api.ProjectNavigationProvider;
 
-public final class ThreadLocalStorage {
+@Component
+public class ProjectDashboardNavigartionProvider implements ProjectNavigationProvider {
 
-    private static ThreadLocal<Long> CURRENT_ORG_ID = new ThreadLocal<>();
-
-    private ThreadLocalStorage() {
+    @Override
+    public String getNavigationLabel() {
+        return "report.project.dashboard";
     }
 
-    public static Long getCurrentOrgId() {
-        return CURRENT_ORG_ID.get();
+    @Override
+    public String getNavigationPath() {
+        return ProjectDashboardController.PATH;
     }
 
-    public static void setCurrentOrgId(final Long tenantName) {
-        CURRENT_ORG_ID.set(tenantName);
-        ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).setCurrentOrganization(tenantName);
+    @Override
+    public String getNavigationAction() {
+        return ReportService.REPORT_PROJECT_VIEW;
     }
+
 
 }
