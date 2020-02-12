@@ -446,11 +446,11 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public List<SubmittedTimesheet> getSubmittedTimesheets(Long orgID, Account actor, Account targetUser) {
+    public List<SubmittedTimesheet> getSubmittedTimesheets(Organization org, Account actor, Account targetUser) {
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
                 + "where st.account = :user and st.organizationID = :orgID", SubmittedTimesheet.class);
 
-        q.setParameter("orgID", orgID);
+        q.setParameter("orgID", org.getId());
         q.setParameter("user", targetUser);
 
         try {

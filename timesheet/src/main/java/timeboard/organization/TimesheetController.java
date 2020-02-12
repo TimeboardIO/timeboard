@@ -35,10 +35,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
-import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UpdatedTaskResult;
+import timeboard.core.api.*;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.observers.emails.EmailStructure;
 import timeboard.core.model.*;
@@ -372,7 +369,9 @@ public class TimesheetController {
 
     @PostMapping(value = "/sendReminderMail/{targetUser}")
     public ResponseEntity sendReminderMail(HttpServletRequest request,
-                                           final TimeboardAuthentication authentication, @PathVariable Account targetUser) throws MessagingException {
+                                           final TimeboardAuthentication authentication,
+                                           @PathVariable Account targetUser)
+            throws MessagingException, BusinessException {
 
         final Account actor = authentication.getDetails();
 

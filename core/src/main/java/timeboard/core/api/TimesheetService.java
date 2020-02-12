@@ -124,7 +124,7 @@ public interface TimesheetService {
             final Account actor,
             final Project project);
 
-    List<SubmittedTimesheet> getSubmittedTimesheets(final Long orgID, final Account actor, Account targetUser);
+    List<SubmittedTimesheet> getSubmittedTimesheets(final Organization org, final Account actor, Account targetUser);
 
 
     /**
