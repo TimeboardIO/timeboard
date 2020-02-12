@@ -27,22 +27,31 @@ package timeboard.webapp;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.PermissionEvaluator;
+import org.springframework.stereotype.Component;
 import timeboard.core.api.NavigationExtPoint;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-@org.springframework.stereotype.Component
+@Component
 public class NavigationEntryRegistryService {
 
 
     @Autowired(required = false)
     private List<NavigationExtPoint> entries;
 
-    //ex : @PostFilter("hasPermission(filterObject,'NAVIGATION_VIEW')")
-    public List<NavigationExtPoint> getEntries() {
+    @Autowired
+    private PermissionEvaluator permissionEvaluator;
+
+    public List<NavigationExtPoint> getEntries(TimeboardAuthentication authentication) {
         this.entries.sort(Comparator.comparing(o -> (Integer) o.getNavigationWeight()));
-        return this.entries;
+        return this.entries.stream()
+                .filter(nep ->
+                        permissionEvaluator.hasPermission(authentication, null, nep.getNavigationAction()))
+                .collect(Collectors.toList());
     }
 
 }

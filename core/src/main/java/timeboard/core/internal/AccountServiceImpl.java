@@ -29,8 +29,9 @@ package timeboard.core.internal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
@@ -38,10 +39,11 @@ import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
+import timeboard.core.security.AbacEntries;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -49,14 +51,15 @@ import java.util.stream.Collectors;
 
 @Component
 @Transactional
-public class UserServiceImpl implements UserService {
+public class AccountServiceImpl implements AccountService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Autowired
     private EntityManager em;
 
     @Override
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.ACCOUNT_CREATE + "')")
     public List<Account> createUsers(final List<Account> accounts) {
         accounts.forEach(user -> {
             em.persist(user);
@@ -214,7 +217,7 @@ public class UserServiceImpl implements UserService {
         Account account = this.findUserBySubject(sub);
         if (account == null) {
             //Create user
-            account = new Account(null, null, email, new Date());
+            account = new Account(null, null, email, Calendar.getInstance());
             account.setRemoteSubject(sub);
             account = this.createUser(account);
         }

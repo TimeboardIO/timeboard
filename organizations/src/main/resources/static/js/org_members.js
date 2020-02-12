@@ -53,7 +53,7 @@ let app = new Vue({
 //Initialization
 $(document).ready(function(){
     //initial data loading
-        $.get("/org/members/list/"+currentOrgID)
+        $.get("/org/members/list")
         .then(function(data){
             for (let i = 0; i < data.length; i++) {
                 app.members.push(data[i]);

@@ -8,4 +8,3 @@ var copyToClipboard = function (textToCopy) {
 
     alert("Text copied: " + textToCopy);
 };
-

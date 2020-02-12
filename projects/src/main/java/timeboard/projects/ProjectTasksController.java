@@ -54,8 +54,10 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}/tasks")
-public class ProjectTasksController {
+@RequestMapping("/projects/{project}" + ProjectTasksController.URL)
+public class ProjectTasksController extends ProjectBaseController {
+
+    public static final String URL = "/tasks";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTasksController.class);
 
@@ -74,34 +76,32 @@ public class ProjectTasksController {
     @GetMapping
     protected String handleGet(
             final TimeboardAuthentication authentication,
-            @PathVariable final Long projectID, final Model model) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
+            @PathVariable final Project project, final Model model) throws BusinessException {
 
         final Task task = new Task();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("task", new TaskForm(task));
         model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, authentication.getCurrentOrganization(), actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
         model.addAttribute("batchType", "Default");
+        this.initModel(model, authentication, project);
         return "project_tasks.html";
     }
 
     @GetMapping("/list")
     public ResponseEntity getTasks(final TimeboardAuthentication authentication,
                                    final HttpServletRequest request,
-                                   @PathVariable final Long projectID) throws JsonProcessingException {
+                                   @PathVariable final Project project) throws JsonProcessingException {
 
         final Account actor = authentication.getDetails();
 
         try {
-            final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
             if (project == null) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Project does not exists or you don't have enough permissions to access it.");
             }
             final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
 
@@ -150,12 +150,13 @@ public class ProjectTasksController {
     @GetMapping("/group/{batchType}")
     protected String listTasksGroupByBatchType(
             final TimeboardAuthentication authentication,
-            @PathVariable final Long projectID, @PathVariable final String batchType, final Model model) throws BusinessException {
+            @PathVariable final Project project,
+            @PathVariable final String batchType,
+            final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
         final Task task = new Task();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         final BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
         model.addAttribute("batchType", batchType);
@@ -165,27 +166,32 @@ public class ProjectTasksController {
         model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, authentication.getCurrentOrganization(), actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
         return "project_tasks.html";
     }
 
-    private void fillModel(final Model model, final Long orgID, final Account actor, final Project project) throws BusinessException {
+    private void fillModel(final Model model,
+                           final Organization org,
+                           final TimeboardAuthentication auth,
+                           final Project project) throws BusinessException {
+
         model.addAttribute("project", project);
-        model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
-        model.addAttribute("taskTypes", this.organizationService.listTaskType(orgID));
+        model.addAttribute("tasks", this.projectService.listProjectTasks(auth.getDetails(), project));
+        model.addAttribute("taskTypes", this.organizationService.listTaskType(org));
         model.addAttribute("allTaskStatus", TaskStatus.values());
-        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
-        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
-        model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
+        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(auth.getDetails(), project));
+        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(auth.getDetails(), project));
+        model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(auth.getDetails(), project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());
+        this.initModel(model, auth, project);
     }
 
-    @GetMapping("/{taskID}")
+    @GetMapping("/{task}")
     protected String editTasks(
             final TimeboardAuthentication authentication,
-            @PathVariable final Long projectID,
+            @PathVariable final Project project,
             @PathVariable final Long taskID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
@@ -194,9 +200,8 @@ public class ProjectTasksController {
 
         model.addAttribute("task", new TaskForm(task));
 
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        fillModel(model, authentication.getCurrentOrganization(), actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
 
         return "project_tasks.html";
@@ -224,14 +229,12 @@ public class ProjectTasksController {
                 TaskStatus.REFUSED);
     }
 
-    private ResponseEntity changeTaskStatus(final Long orgID,
+    private ResponseEntity changeTaskStatus(final Organization org,
                                             final Account actor,
                                             final Long taskID,
                                             final TaskStatus status) {
 
-        if (taskID == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
-        }
+
         if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }
@@ -240,7 +243,7 @@ public class ProjectTasksController {
         try {
             task = (Task) this.projectService.getTaskByID(actor, taskID);
             task.setTaskStatus(status);
-            this.projectService.updateTask(orgID, actor, task);
+            this.projectService.updateTask(org, actor, task);
 
         } catch (final ClassCastException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");

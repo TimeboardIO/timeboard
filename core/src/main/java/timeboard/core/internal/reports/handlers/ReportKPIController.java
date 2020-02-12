@@ -1,4 +1,4 @@
-package timeboard.reports;
+package timeboard.core.internal.reports.handlers;
 
 /*-
  * #%L
@@ -29,29 +29,26 @@ package timeboard.reports;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
 
-import java.util.Date;
+import java.io.Serializable;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 
-@Controller
-@RequestMapping("/data-chart/report-kpi")
-public class ReportKPIController {
+@Component
+public class ReportKPIController implements ReportHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReportKPIController.class);
 
@@ -62,17 +59,14 @@ public class ReportKPIController {
     private ProjectService projectService;
 
 
-    @GetMapping("/{reportID}")
-    protected ResponseEntity getDataChart(final TimeboardAuthentication authentication,
-                                          @PathVariable final long reportID, final Model model) {
+    @Override
+    public Serializable getReportModel(
+            final TimeboardAuthentication authentication,
+            final Report report) {
 
+        final Model model = new ConcurrentModel();
         final Account actor = authentication.getDetails();
-        final Report report = this.reportService.getReportByID(actor, reportID);
 
-        // If report has no filter, don't show its KPI graph
-        if (report.getFilterProject() == null || report.getFilterProject().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This report has no filter. Modify it to display the graph.");
-        }
 
         final List<ReportService.ProjectWrapper> listOfProjectsFiltered = this.reportService
                 .findProjects(actor, authentication.getCurrentOrganization(), report);
@@ -94,10 +88,35 @@ public class ReportKPIController {
             }
         });
 
-        final ProjectDashboard dashboardTotal =
-                new ProjectDashboard(quotation.get(), originalEstimate.get(), effortLeft.get(), effortSpent.get(), new Date());
-        return ResponseEntity.status(HttpStatus.OK).body(dashboardTotal);
+        model.addAttribute("quotation", quotation.get());
+        model.addAttribute("originalEstimate", originalEstimate.get());
+        model.addAttribute("effortLeft", effortLeft.get());
+        model.addAttribute("effortSpent", effortSpent.get());
+        model.addAttribute("realEffort", effortSpent.get() + effortLeft.get());
+
+        model.addAttribute("date", Calendar.getInstance().getTime());
+
+        return (Serializable) model.asMap();
     }
 
 
+    @Override
+    public String handlerID() {
+        return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public String handlerLabel() {
+        return "report.kpi";
+    }
+
+    @Override
+    public String handlerView() {
+        return "view_report_kpi.html";
+    }
+
+    @Override
+    public Boolean isAsyncHandler() {
+        return false;
+    }
 }

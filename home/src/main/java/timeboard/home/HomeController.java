@@ -50,6 +50,7 @@ public class HomeController {
     public static final String NB_PROJECTS = "nb_projects";
     public static final String NB_TASKS = "nb_tasks";
     public static final String WEEKS = "weeks";
+    public static final String HOME_VIEW = "HOME_VIEW";
 
     @Autowired
     private ProjectService projectService;
@@ -105,7 +106,7 @@ public class HomeController {
         }
 
         model.addAttribute(NB_PROJECTS, this.projectService
-                .listProjects(account, authentication.getCurrentOrganization()).size());
+                .countAccountProjectMemberships(authentication.getCurrentOrganization(), account));
 
         model.addAttribute(NB_TASKS, this.projectService
                 .listUserTasks(authentication.getCurrentOrganization(), account).size());

@@ -7,15 +7,11 @@
 <head>
     <title layout:fragment="title">View Report Page</title>
     <meta name="reportID" th:content="${report.id}"/>
-    <meta name="reportType" th:content="${reportType}"/>
-    <script src="/js/reportsChartKPI.js" type="text/javascript"></script>
-    <script src="/webjars/chartjs/2.8.0/Chart.js"></script>
-    <link href="/webjars/chartjs/2.8.0/Chart.min.css" rel="stylesheet">
 </head>
 <body>
 
 <div layout:fragment="content">
-    <div class="ui segment" id="create-report">
+    <div class="ui segment">
         <h4 class="ui dividing header">
 
             <a class="ui button" th:href="@{/reports}">
@@ -23,12 +19,12 @@
                 Back
             </a>
 
-            View KPI Report:</h4>
-        <h3 style="text-align: center" th:text="${report.name}"></h3>
+            Report <span th:text="${report.getName()}"></span></h4>
 
-        <div class="column" id="app-view-report">
-            <canvas id="chartKPI"></canvas>
-        </div>
+        <h3 style="text-align: center" th:text="#{${reportController.handlerLabel()}}"></h3>
+
+        <div class="ui segment"
+             th:include="fragments/__${fragment}__ :: report"></div>
 
         <br>
     </div>

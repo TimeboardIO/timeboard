@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{project_layout.html(tab='second')}"
+<html layout:decorate="~{project_layout.html(tab='project.tab.tasks')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:v-bind="http://www.w3.org/1999/xhtml"
@@ -145,11 +145,11 @@
         <!-- Actions buttons-->
         <div class="ui menu">
             <a class="item" th:if="${isProjectOwner}"  data-cy="create-task"
-               v-on:click="showCreateTaskModal(null, null, $event)" sec:authorize="${hasPermission(#vars.project,'TASKS_CREATE')}">
+               v-on:click="showCreateTaskModal(null, null, $event)" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_CREATE')}">
                 <i class="plus icon"></i>
                 New Task
             </a>
-            <div class="ui dropdown item import" id="import">
+            <div class="ui dropdown item import" id="import" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_IMPORT')}">
                 Import tasks
                 <i class="dropdown icon"></i>
                 <div class="menu">
@@ -242,13 +242,13 @@
         </div>
 
 
-        <div v-if="pendingTaskList.length" class="ui horizontal divider">
+        <div v-if="pendingTaskList.length" class="ui horizontal divider" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_APPROBATION')}">
             <i class="boxes icon"></i>
             Pending tasks
         </div>
 
         <!-- Pending tasks datatable component -->
-        <data-table v-bind:config="pendingTaskListConfig" v-bind:table="pendingTaskList">
+        <data-table v-bind:config="pendingTaskListConfig" v-bind:table="pendingTaskList" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_APPROBATION')}">
             <template v-slot:name="{row}">
                 {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
                 {{row.taskComments}}</p>
@@ -378,10 +378,10 @@
                     </template>
 
                     <template v-slot:actions="{row}">
-                        <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
+                        <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_APPROBATION')}" >
                             <i class="close icon"></i>
                         </button>
-                        <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
+                        <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_EDIT')}"
                                 class="ui tiny primary icon button">
                             <i class="edit icon"></i>
                         </button>

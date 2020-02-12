@@ -45,8 +45,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{projectID}/batches")
-public class ProjectBatchesController {
+@RequestMapping("/projects/{project}" + ProjectBatchesController.URL)
+public class ProjectBatchesController extends ProjectBaseController {
+
+    public static final String URL = "/batches";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
 
@@ -56,7 +58,7 @@ public class ProjectBatchesController {
     @GetMapping(value = "/{batchID}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
     public String deleteBatch(
             final TimeboardAuthentication authentication,
-            @PathVariable final Long projectID,
+            @PathVariable final Project project,
             @PathVariable final Long batchID,
             final RedirectAttributes attributes) {
 
@@ -67,30 +69,27 @@ public class ProjectBatchesController {
             attributes.addFlashAttribute("error", e.getMessage());
         }
 
-        return "redirect:/projects/" + projectID + "/batches";
+        return "redirect:/projects/" + project.getId() + "/batches";
     }
 
     @GetMapping
     protected String batchApp(final TimeboardAuthentication authentication,
-                              @PathVariable final Long projectID, final Model model) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+                              @PathVariable final Project project, final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
         model.addAttribute("batchTypes", BatchType.values());
 
+        this.initModel(model, authentication, project);
         return "project_batches.html";
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<BatchDecorator> createBatch(final TimeboardAuthentication authentication,
                                                          @ModelAttribute final BatchWrapper batch,
-                                                         @PathVariable final Long projectID) throws BusinessException {
+                                                         @PathVariable final Project project) throws BusinessException {
 
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         if (batch.getId() == null) {
             final Batch newBatch = this.projectService.createBatch(
@@ -116,10 +115,9 @@ public class ProjectBatchesController {
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
     protected ResponseEntity<List<BatchDecorator>> listBatches(final TimeboardAuthentication authentication,
-                                                               @PathVariable final Long projectID) throws BusinessException {
+                                                               @PathVariable final Project project) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         return ResponseEntity.ok(this.projectService.listProjectBatches(actor, project)
                 .stream().map(batch -> new BatchDecorator(batch))
@@ -129,7 +127,7 @@ public class ProjectBatchesController {
 
     @GetMapping(value = "/{batchID}", produces = MediaType.APPLICATION_JSON_VALUE)
     protected ResponseEntity<BatchDecorator> setupBatch(final TimeboardAuthentication authentication,
-                                                        @PathVariable final Long projectID,
+                                                        @PathVariable final Project project,
                                                         @PathVariable final Long batchID,
                                                         final Model model) throws BusinessException {
 
@@ -139,21 +137,20 @@ public class ProjectBatchesController {
         model.addAttribute("batch", batch);
         model.addAttribute("taskIdsByBatch", this.projectService.listTasksByBatch(actor, batch));
 
-
+        this.initModel(model, authentication, project);
         return ResponseEntity.ok(new BatchDecorator(batch));
     }
 
 
     @GetMapping("/create")
     protected String createBatchView(final TimeboardAuthentication authentication,
-                                     @PathVariable final Long projectID, final Model model) throws BusinessException {
+                                     @PathVariable final Project project, final Model model) throws BusinessException {
         final Account actor = authentication.getDetails();
 
         model.addAttribute("batch", new Batch());
 
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         this.fillModelWithBatches(model, actor, project);
-
+        this.initModel(model, authentication, project);
         return "project_batches_config.html";
 
     }
@@ -168,12 +165,12 @@ public class ProjectBatchesController {
 
 
     protected String createConfigLinks(final Account actor,
-                                       final long orgID,
+                                       final Organization org,
                                        final HttpServletRequest request,
                                        final Model model) throws BusinessException {
 
         final long projectID = Long.parseLong(request.getParameter("projectID"));
-        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+        final Project project = this.projectService.getProjectByID(actor, org, projectID);
         Batch currentBatch = null;
 
         try {

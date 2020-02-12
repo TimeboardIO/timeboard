@@ -34,6 +34,8 @@ import java.util.Map;
 
 public interface CalendarService {
 
+    String CALENDAR_VIEW = "CALENDAR_VIEW";
+
     boolean importCalendarAsTasksFromIcs(
             Account actor,
             String name,
@@ -42,7 +44,7 @@ public interface CalendarService {
             boolean deleteOrphan) throws BusinessException;
 
     boolean importCalendarAsImputationsFromIcs(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final String ics,
             final AbstractTask task,

@@ -53,9 +53,10 @@ import java.util.stream.Collectors;
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}/calendar")
-public class ProjectTeamCalendarController {
+@RequestMapping("/projects/{project}" + ProjectTeamCalendarController.URL)
+public class ProjectTeamCalendarController extends ProjectBaseController {
 
+    public static final String URL = "/calendar";
 
     @Autowired
     public ProjectService projectService;
@@ -65,24 +66,20 @@ public class ProjectTeamCalendarController {
 
     @GetMapping
     protected String handleGet(final TimeboardAuthentication authentication,
-                               @PathVariable final Long projectID, final Model model) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
-
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+                               @PathVariable final Project project, final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
+        this.initModel(model, authentication, project);
 
         return "project_calendar.html";
     }
 
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(final TimeboardAuthentication authentication,
-                                                                     @PathVariable final Long projectID,
+                                                                     @PathVariable final Project project,
                                                                      @PathVariable final Integer yearNum,
                                                                      @PathVariable final Integer monthNum) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
 
         // get existing vacation request for month/year
         final Map<Account, List<VacationRequest>> accountVacationRequestMap

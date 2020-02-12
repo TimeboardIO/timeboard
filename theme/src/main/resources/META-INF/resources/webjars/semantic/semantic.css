@@ -701,12 +701,6 @@ input::-moz-selection {
   color: #393939;
 }
 
-textarea::-moz-selection,
-input::-moz-selection {
-  background-color: rgba(100, 100, 100, 0.4);
-  color: #393939;
-}
-
 textarea::selection,
 input::selection {
   background-color: rgba(100, 100, 100, 0.4);
@@ -895,6 +889,7 @@ table,
   text-align: center;
   border: 0px solid #fff;
   background-color: rgba(1, 0, 1, 0);
+  border: 1px solid lightgrey;
 }
 
 #timesheet input[type=number]::-webkit-inner-spin-button,
@@ -33010,13 +33005,13 @@ select.ui.dropdown {
 
 .ui.modal > .header {
   display: block;
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   background: #FFFFFF;
   margin: 0em;
   padding: 1.25rem 1.5rem;
   -webkit-box-shadow: none;
   box-shadow: none;
-  color: rgba(0, 0, 0, 0.85);
+  color: #393939;
   border-bottom: 1px solid rgba(34, 36, 38, 0.15);
 }
 
@@ -33174,7 +33169,7 @@ select.ui.dropdown {
   .ui.modal > .close {
     top: 1.0535rem;
     right: 1rem;
-    color: rgba(0, 0, 0, 0.87);
+    color: #393939;
   }
 }
 
@@ -33279,11 +33274,11 @@ select.ui.dropdown {
 }
 
 .ui.inverted.dimmer > .basic.modal {
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 .ui.inverted.dimmer > .ui.basic.modal > .header {
-  color: rgba(0, 0, 0, 0.85);
+  color: #393939;
 }
 
 /* Resort to margin positioning if legacy */
@@ -33424,7 +33419,7 @@ select.ui.dropdown {
 .ui.fullscreen.modal > .close {
   top: 1.0535rem;
   right: 1rem;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 /*--------------
@@ -33608,6 +33603,12 @@ select.ui.dropdown {
 /*******************************
          Theme Overrides
 *******************************/
+
+.ui.modal > .close {
+  top: 0rem;
+  right: 0rem;
+  color: black;
+}
 
 /*******************************
          Site Overrides

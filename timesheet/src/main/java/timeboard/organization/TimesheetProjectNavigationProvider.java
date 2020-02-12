@@ -1,10 +1,10 @@
-package timeboard.core.model;
+package timeboard.organization;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,25 @@ package timeboard.core.model;
  * #L%
  */
 
+import org.springframework.stereotype.Component;
+import timeboard.core.security.AbacEntries;
+import timeboard.projects.api.ProjectNavigationProvider;
 
-public enum ReportType {
-    PROJECT_KPI,
-    OTHER
+@Component
+public class TimesheetProjectNavigationProvider implements ProjectNavigationProvider {
+    @Override
+    public String getNavigationLabel() {
+        return "timesheet.validation";
+    }
+
+
+    @Override
+    public String getNavigationPath() {
+        return ProjectTimesheetValidationController.PATH;
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return AbacEntries.TIMESHEET_VALIDATION_VIEW;
+    }
 }
-
-
