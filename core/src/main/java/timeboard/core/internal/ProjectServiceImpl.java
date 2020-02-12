@@ -34,7 +34,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.events.TaskEvent;
@@ -50,7 +49,6 @@ import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 import timeboard.core.security.AbacEntries;
-import timeboard.core.security.TimeboardAuthentication;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;

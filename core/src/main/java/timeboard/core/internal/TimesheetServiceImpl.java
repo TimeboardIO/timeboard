@@ -202,7 +202,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 currentOrg, submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if ((!firstWeek) && (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED)) ){
+        if (!firstWeek && (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED)) ){
             throw new TimesheetException("Can not validate this week, previous week is not validated");
         }
 

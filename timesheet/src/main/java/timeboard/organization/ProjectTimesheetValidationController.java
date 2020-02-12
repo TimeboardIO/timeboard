@@ -139,7 +139,8 @@ public class ProjectTimesheetValidationController extends ProjectBaseController 
             // user NEVER submitted a single week
             final Calendar current = Calendar.getInstance();
 
-            final Organization currentOrganization = ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).getCurrentOrganization();
+            final Organization currentOrganization
+                    = ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).getCurrentOrganization();
             final Calendar beginWorkDate = a.getOrganizationMemberships().stream()
                     .filter(organizationMembership -> organizationMembership.getOrganization().getId() == currentOrganization.getId())
                     .findFirst().map(OrganizationMembership::getCreationDate).orElse(a.getAccountCreationTime());
@@ -161,10 +162,7 @@ public class ProjectTimesheetValidationController extends ProjectBaseController 
         final Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, firstWeek);
         current.set(Calendar.YEAR, firstYear);
-        final long weekNumber = todayAbsoluteWeekNumber - absoluteWeekNumber(firstYear, firstWeek);
-        if (weekNumber <= 1) { //Min two weeks
-           // current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));
-        }
+
         while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
             final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = current.get(Calendar.YEAR);
@@ -198,8 +196,8 @@ public class ProjectTimesheetValidationController extends ProjectBaseController 
 
         public TimesheetWeekWrapper(SubmittedTimesheet submittedTimesheet, boolean submitted) {
             this.id = submittedTimesheet.getId();
-            this.year = (int) submittedTimesheet.getYear();
-            this.week = (int) submittedTimesheet.getWeek();
+            this.year = submittedTimesheet.getYear();
+            this.week = submittedTimesheet.getWeek();
             this.isValidated = submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED);
             this.isSubmitted = submitted;
         }

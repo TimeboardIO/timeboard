@@ -76,8 +76,6 @@ public class ProjectBatchesController extends ProjectBaseController {
     protected String batchApp(final TimeboardAuthentication authentication,
                               @PathVariable final Project project, final Model model) throws BusinessException {
 
-        final Account actor = authentication.getDetails();
-
         model.addAttribute("project", project);
         model.addAttribute("batchTypes", BatchType.values());
 

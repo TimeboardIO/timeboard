@@ -31,8 +31,8 @@ import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Entity
 @Table

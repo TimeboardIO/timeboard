@@ -44,7 +44,6 @@ import timeboard.core.security.AbacEntries;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;

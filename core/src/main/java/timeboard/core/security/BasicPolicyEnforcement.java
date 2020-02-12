@@ -56,7 +56,7 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
         final boolean res = checkRules(allRules, cxt);
 
         if (!res) {
-            LOGGER.info("Account :" + subject + " has no policy for action : " + action + " on resource : " + resource);
+            LOGGER.debug("Account :" + subject + " has no policy for action : " + action + " on resource : " + resource);
         }
 
         return res;
