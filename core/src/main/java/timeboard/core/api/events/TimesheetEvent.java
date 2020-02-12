@@ -40,12 +40,12 @@ public class TimesheetEvent extends TimeboardEvent {
 
     private SubmittedTimesheet timesheet;
 
-    public TimesheetEvent(final SubmittedTimesheet timesheet, final ProjectService projectService, final Organization orgID) {
+    public TimesheetEvent(final SubmittedTimesheet timesheet, final ProjectService projectService, final Organization org) {
         super(new Date());
 
         this.timesheet = timesheet;
 
-        final List<Project> projects = projectService.listProjects(timesheet.getAccount(), orgID);
+        final List<Project> projects = projectService.listProjects(timesheet.getAccount(), org);
 
         projects.forEach(project -> project.getMembers()
                 .stream()

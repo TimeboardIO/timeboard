@@ -58,7 +58,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
 
     @Override
     @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_IMPORT + "')")
-    public void syncProjectTasksWithSchedule(final Organization orgID,
+    public void syncProjectTasksWithSchedule(final Organization org,
                                              final Account actor,
                                              final Project project,
                                              final String serviceName,
@@ -72,7 +72,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             final JobDataMap data = new JobDataMap();
             data.put(ACCOUNT_ID, actor.getId());
             data.put(CREDENTIALS, jiraCredentials);
-            data.put(ORG_ID, orgID);
+            data.put(ORG_ID, org);
             data.put(SERVICE_NAME, serviceName);
             data.put(PROJECT_ID, project.getId());
 

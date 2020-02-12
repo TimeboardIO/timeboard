@@ -29,8 +29,6 @@ package timeboard.core.internal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.events.TimeboardEventType;
@@ -38,8 +36,6 @@ import timeboard.core.api.events.VacationEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.AbacEntries;
-import timeboard.core.security.SecurityAccessContext;
-import timeboard.core.security.TimeboardAuthentication;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -85,9 +81,6 @@ public class VacationServiceImpl implements VacationService {
         request.setStartDate(new Date(request.getStartDate().getTime() + (2 * 60 * 60 * 1000) + 1));
         request.setEndDate(new Date(request.getEndDate().getTime() + (2 * 60 * 60 * 1000) + 1));
 
-        final TimeboardAuthentication authentication = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        request.setOrganizationID(authentication.getCurrentOrganization().getId());
-
         em.persist(request);
         em.flush();
 
@@ -99,9 +92,6 @@ public class VacationServiceImpl implements VacationService {
     public RecursiveVacationRequest createRecursiveVacationRequest(final Account actor, final RecursiveVacationRequest request) {
         request.setStartDate(new Date(request.getStartDate().getTime() + (2 * 60 * 60 * 1000) + 1));
         request.setEndDate(new Date(request.getEndDate().getTime() + (2 * 60 * 60 * 1000) + 1));
-
-        final TimeboardAuthentication authentication = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        request.setOrganizationID(authentication.getCurrentOrganization().getId());
 
         if (request.getChildren().isEmpty()) {
             request.generateChildren();

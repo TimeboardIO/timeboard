@@ -166,12 +166,12 @@ public class ProjectBatchesController extends ProjectBaseController {
 
 
     protected String createConfigLinks(final Account actor,
-                                       final Organization orgID,
+                                       final Organization org,
                                        final HttpServletRequest request,
                                        final Model model) throws BusinessException {
 
         final long projectID = Long.parseLong(request.getParameter("projectID"));
-        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+        final Project project = this.projectService.getProjectByID(actor, org, projectID);
         Batch currentBatch = null;
 
         try {

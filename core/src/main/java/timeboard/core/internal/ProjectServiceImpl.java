@@ -101,18 +101,19 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     @PreAuthorize("hasPermission(null," + AbacEntries.PROJECT_CREATE + ")")
-    public Project createProject(final Organization orgID, final Account owner, final String projectName) {
+    public Project createProject(final Organization org, final Account owner, final String projectName) {
         final Account ownerAccount = this.em.find(Account.class, owner.getId());
         final Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
-        newProject.setOrganizationID(orgID.getId());
+        newProject.setOrganizationID(org.getId());
         newProject.getAttributes()
                 .put(Project.PROJECT_COLOR_ATTR, new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
         em.persist(newProject);
 
         em.flush();
         final ProjectMembership ownerMembership = new ProjectMembership(newProject, ownerAccount, MembershipRole.OWNER);
+
         em.persist(ownerMembership);
 
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
@@ -315,7 +316,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Transactional
     @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_CREATE + "')")
     public Task createTask(
-            final Organization orgID,
+            final Organization org,
             final Account actor,
             final Project project,
             final String taskName,
@@ -349,7 +350,7 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
-        newTask.setOrganizationID(orgID.getId());
+        newTask.setOrganizationID(org.getId());
         if (batches != null && !batches.isEmpty()) {
             newTask.setBatches(new HashSet<>());
             newTask.getBatches().addAll(batches);
@@ -368,9 +369,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @PreAuthorize("hasPermission(#task.getProject(), '" + AbacEntries.PROJECT_TASKS_EDIT + "')")
-    public Task updateTask(final Organization orgID, final Account actor, final Task task) {
+    public Task updateTask(final Organization org, final Account actor, final Task task) {
         if (task.getProject().isMember(actor)) {
-            task.setOrganizationID(orgID.getId());
+            task.setOrganizationID(org.getId());
             em.merge(task);
             em.flush();
         }
@@ -625,8 +626,6 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-
-        final TimeboardAuthentication authentication = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
         final Batch newBatch = new Batch();
         newBatch.setName(name);
         newBatch.setType(type);
@@ -634,7 +633,6 @@ public class ProjectServiceImpl implements ProjectService {
         newBatch.setAttributes(attributes);
         newBatch.setTasks(tasks);
         newBatch.setProject(project);
-        newBatch.setOrganizationID(authentication.getCurrentOrganization().getId());
 
         em.persist(newBatch);
         LOGGER.info("Batch {} created by {} ", newBatch.getName(), actor.getScreenName());

@@ -93,7 +93,7 @@ public final class ProjectSyncJob implements Job {
     }
 
     private Object syncProjectTasks(
-            final Organization orgID,
+            final Organization org,
             final Account actor,
             final Project project,
             final ProjectSyncPlugin syncService,
@@ -111,14 +111,14 @@ public final class ProjectSyncJob implements Job {
         });
 
 
-        this.syncTasks(orgID, actor, project, remoteTasks, syncService.getServiceID());
+        this.syncTasks(org, actor, project, remoteTasks, syncService.getServiceID());
 
 
         return String.format("Sync %s tasks from %s", remoteTasks.size(), syncService.getServiceName());
     }
 
     private void syncTasks(
-            final Organization orgID,
+            final Organization org,
             final Account actor,
             final Project project,
             final List<RemoteTask> remoteTasks,
@@ -138,14 +138,14 @@ public final class ProjectSyncJob implements Job {
             }
         }
 
-        this.createTasks(orgID, actor, project, newTasks, TaskStatus.IN_PROGRESS);
+        this.createTasks(org, actor, project, newTasks, TaskStatus.IN_PROGRESS);
 
-        this.updateTasks(orgID, actor, project, updatedTasks, externalID);
+        this.updateTasks(org, actor, project, updatedTasks, externalID);
 
     }
 
 
-    private void updateTasks(Organization orgID, Account actor, Project project, List<RemoteTask> updatedTasks, String externalID) {
+    private void updateTasks(Organization org, Account actor, Project project, List<RemoteTask> updatedTasks, String externalID) {
 
         for (final RemoteTask remoteTask : updatedTasks) {
             final Optional<Task> taskToUpdate = projectService.getTaskByRemoteID(actor, remoteTask.getId());
@@ -172,21 +172,21 @@ public final class ProjectSyncJob implements Job {
                     final List<RemoteTask> toCreate = new ArrayList<>();
                     final RemoteTask clone = (RemoteTask) remoteTask.clone();
                     toCreate.add(clone);
-                    this.createTasks(orgID, actor, project, toCreate, TaskStatus.DONE);
+                    this.createTasks(org, actor, project, toCreate, TaskStatus.DONE);
 
                     remoteTask.setLocalUser(currentAssigned);
                     remoteTask.setUserName(actualAssigneeID);
                 }
                 taskToUpdate.get().setAssigned(remoteTask.getLocalUser());
 
-                projectService.updateTask(orgID, actor, taskToUpdate.get());
+                projectService.updateTask(org, actor, taskToUpdate.get());
             }
         }
     }
 
 
     private void createTasks(
-            final Organization orgID, final Account actor, final Project project, final List<RemoteTask> newTasks, TaskStatus status) {
+            final Organization org, final Account actor, final Project project, final List<RemoteTask> newTasks, TaskStatus status) {
         newTasks.forEach(task -> {
                     String taskName = task.getTitle();
                     if (taskName.length() >= 100) {
@@ -201,7 +201,7 @@ public final class ProjectSyncJob implements Job {
                     final String origin = task.getOrigin();
                     final String remotePath = null;
                     final String remoteId = task.getId();
-                    projectService.createTask(orgID, actor, project, taskName, taskComment,
+                    projectService.createTask(org, actor, project, taskName, taskComment,
                             startDate, endDate, originalEstimate, taskType, assignedAccountID, origin,
                             remotePath, String.valueOf(remoteId), status, null);
                 }

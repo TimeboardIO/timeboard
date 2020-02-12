@@ -73,7 +73,7 @@ public class TasksRestAPI {
 
         final Task t = new Task();
         final Account actor = authentication.getDetails();
-        final Organization orgID = authentication.getCurrentOrganization();
+        final Organization org = authentication.getCurrentOrganization();
 
         try {
 
@@ -84,13 +84,13 @@ public class TasksRestAPI {
             t.setName(nameValidator(taskWrapper));
             t.setComments(commentsValidator(taskWrapper));
             t.setOriginalEstimate(oeValidator(taskWrapper));
-            t.setProject(projectValidator(taskWrapper, actor, orgID));
+            t.setProject(projectValidator(taskWrapper, actor, org));
             t.setTaskType(taskTypeValidator(taskWrapper));
             t.setAssigned(assigneeValidator(taskWrapper));
             t.setBatches(batchesValidator(taskWrapper, actor));
             t.setTaskStatus(taskStatusValidator(taskWrapper));
 
-            final Task newTask = processCreateOrUpdate(actor, orgID, taskID, t);
+            final Task newTask = processCreateOrUpdate(actor, org, taskID, t);
             taskWrapper.setTaskID(newTask.getId());
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
@@ -100,7 +100,7 @@ public class TasksRestAPI {
 
     }
 
-    private Task processCreateOrUpdate(Account actor, Organization orgID, Long taskID, Task t) throws TaskCreationException {
+    private Task processCreateOrUpdate(Account actor, Organization org, Long taskID, Task t) throws TaskCreationException {
         Task task = null;
         try {
             if (taskID != null && taskID != 0) {
@@ -110,10 +110,10 @@ public class TasksRestAPI {
                 }
                 t.setOrigin(oldTask.getOrigin());
                 t.setId(oldTask.getId());
-                task = processUpdateTask(orgID, actor, t);
+                task = processUpdateTask(org, actor, t);
 
             } else {
-                task = processCreateTask(orgID, actor, t);
+                task = processCreateTask(org, actor, t);
             }
 
             return task;
@@ -163,11 +163,11 @@ public class TasksRestAPI {
         }
     }
 
-    private Project projectValidator(@RequestBody final TaskWrapper taskWrapper, Account actor, Organization orgID) throws TaskCreationException {
+    private Project projectValidator(@RequestBody final TaskWrapper taskWrapper, Account actor, Organization org) throws TaskCreationException {
         final Long projectID = taskWrapper.projectID;
         Project project = null;
         try {
-            project = this.projectService.getProjectByID(actor, orgID, projectID);
+            project = this.projectService.getProjectByID(actor, org, projectID);
         } catch (final Exception e) {
             throw new TaskCreationException("Can not found project " + e.getMessage());
         }
@@ -232,16 +232,16 @@ public class TasksRestAPI {
     }
 
 
-    private Task processCreateTask(final Organization orgID, final Account actor, final Task task) {
-        return projectService.createTask(orgID, actor, task.getProject(),
+    private Task processCreateTask(final Organization org, final Account actor, final Task task) {
+        return projectService.createTask(org, actor, task.getProject(),
                 task.getName(), task.getComments(), task.getStartDate(),
                 task.getEndDate(), task.getOriginalEstimate(), task.getTaskType(), task.getAssigned(),
                 ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,
                 task.getBatches());
     }
 
-    private Task processUpdateTask(final Organization orgID, final Account actor, final Task task) {
-        return projectService.updateTask(orgID, actor, task);
+    private Task processUpdateTask(final Organization org, final Account actor, final Task task) {
+        return projectService.updateTask(org, actor, task);
     }
 
 

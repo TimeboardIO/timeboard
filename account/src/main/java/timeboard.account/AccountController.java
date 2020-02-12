@@ -130,10 +130,10 @@ public class AccountController {
         return "account.html";
     }
 
-    private void loadPage(final Model model, final Account actor, final Organization orgID) throws BusinessException {
+    private void loadPage(final Model model, final Account actor, final Organization org) throws BusinessException {
         model.addAttribute("account", actor);
 
-        final List<Project> projects = projectService.listProjects(actor, orgID);
+        final List<Project> projects = projectService.listProjects(actor, org);
 
         final Map<String, String> fieldNames = new HashMap<>();
         //import external ID field name from import plugins list
@@ -145,7 +145,7 @@ public class AccountController {
 
         final Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
         final Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
-        final Calendar end = this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate();
+        final Calendar end = this.organizationService.findOrganizationMembership(actor, org).get().getCreationDate();
         final Calendar start = Calendar.getInstance();
         start.setTime(new Date());
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);

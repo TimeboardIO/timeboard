@@ -61,7 +61,7 @@ public interface ReportService {
     /**
      * List all report for owner
      *
-     * @param orgID primary key {@link Organization} where looking for reports
+     * @param org primary key {@link Organization} where looking for reports
      * @param owner an account that own reports
      * @return
      */
@@ -73,9 +73,9 @@ public interface ReportService {
 
     void deleteReportByID(Account actor, Long reportId) throws SchedulerException;
 
-    List<ProjectWrapper> findProjects(Account actor, Organization orgID, List<String> expressions);
+    List<ProjectWrapper> findProjects(Account actor, Organization org, List<String> expressions);
 
-    List<ProjectWrapper> findProjects(Account actor, Organization orgID, Report report);
+    List<ProjectWrapper> findProjects(Account actor, Organization org, Report report);
 
     Optional<ReportHandler> getReportHandler(Report report);
 
