@@ -43,6 +43,7 @@ import timeboard.core.security.AbacEntries;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -217,7 +218,7 @@ public class AccountServiceImpl implements AccountService {
         Account account = this.findUserBySubject(sub);
         if (account == null) {
             //Create user
-            account = new Account(null, null, email, new Date());
+            account = new Account(null, null, email, Calendar.getInstance());
             account.setRemoteSubject(sub);
             account = this.createUser(account);
         }

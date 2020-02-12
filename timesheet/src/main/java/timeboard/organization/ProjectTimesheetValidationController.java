@@ -30,6 +30,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -131,15 +132,21 @@ public class ProjectTimesheetValidationController extends ProjectBaseController 
             // user have at least one non validated week.
             final SubmittedTimesheet t = lastValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
 
-            return generateSubmittedTimesheets((int) t.getYear(), (int) t.getWeek(),
+            return generateSubmittedTimesheets(t.getYear(), t.getWeek(),
                     submittedTimesheets);
 
         } else {
             // user NEVER submitted a single week
             final Calendar current = Calendar.getInstance();
 
-            current.setTime(a.getAccountCreationTime());
+            final Organization currentOrganization = ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).getCurrentOrganization();
+            final Calendar beginWorkDate = a.getOrganizationMemberships().stream()
+                    .filter(organizationMembership -> organizationMembership.getOrganization().getId() == currentOrganization.getId())
+                    .findFirst().map(OrganizationMembership::getCreationDate).orElse(a.getAccountCreationTime());
 
+            current.setTime(beginWorkDate.getTime());
+
+            current.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
             return generateSubmittedTimesheets(current.get(Calendar.YEAR),
                     current.get(Calendar.WEEK_OF_YEAR), submittedTimesheets);
 
@@ -156,7 +163,7 @@ public class ProjectTimesheetValidationController extends ProjectBaseController 
         current.set(Calendar.YEAR, firstYear);
         final long weekNumber = todayAbsoluteWeekNumber - absoluteWeekNumber(firstYear, firstWeek);
         if (weekNumber <= 1) { //Min two weeks
-            current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));
+           // current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));
         }
         while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
             final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);

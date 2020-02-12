@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
                                 "where (p.enable = true or p.enable is null) and :user in m.member and p.organizationID = :orgID"),
 
                 @NamedQuery(name = Project.PROJECT_GET_BY_ID, query =
-                        "select p from Project p join fetch p.members m " +
+                        "select p from Project p join p.members m " +
                                 "where p.id = :projectID and m.member = :user and p.organizationID = :orgID"),
 
         }

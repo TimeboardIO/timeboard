@@ -32,6 +32,7 @@ import timeboard.core.model.converters.JSONToStringMapConverter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.Calendar;
 
 @Entity
 @Table
@@ -43,7 +44,7 @@ public class Account implements Serializable {
 
     @Column(nullable = false)
     @Temporal(TemporalType.DATE)
-    private Date accountCreationTime;
+    private Calendar accountCreationTime;
 
     @Column(nullable = true)
     private String name;
@@ -78,7 +79,7 @@ public class Account implements Serializable {
 
 
     public Account(final String name, final String firstName,
-                   final String email, final Date accountCreationTime) {
+                   final String email, final Calendar accountCreationTime) {
         super();
         this.name = name;
         this.firstName = firstName;
@@ -115,11 +116,11 @@ public class Account implements Serializable {
         this.remoteSubject = remoteSubject;
     }
 
-    public Date getAccountCreationTime() {
+    public Calendar getAccountCreationTime() {
         return accountCreationTime;
     }
 
-    public void setAccountCreationTime(final Date accountCreationTime) {
+    public void setAccountCreationTime(final Calendar accountCreationTime) {
         this.accountCreationTime = accountCreationTime;
     }
 
