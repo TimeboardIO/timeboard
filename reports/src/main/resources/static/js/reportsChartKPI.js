@@ -12,7 +12,7 @@ $(document).ready(function () {
             mounted: function () {
                 $.ajax({
                     method: "GET",
-                    url: "/data-chart/report-kpi/"+reportID,
+                    url: "/reports/view/"+reportID+"/data",
                     success : function(dataKPI, textStatus, jqXHR) {
 
                         let chart = new Chart($("#chartKPI"), {

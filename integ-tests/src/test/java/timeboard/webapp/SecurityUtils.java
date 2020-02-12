@@ -27,7 +27,6 @@ package timeboard.webapp;
  */
 
 import org.springframework.security.core.context.SecurityContextHolder;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
@@ -40,8 +39,8 @@ public class SecurityUtils {
 
     public static TimeboardAuthentication signIn(final Organization o, final Account a) {
         final TimeboardAuthentication auth = new TimeboardAuthentication(a);
+        auth.setCurrentOrganization(o);
         SecurityContextHolder.getContext().setAuthentication(auth);
-        ThreadLocalStorage.setCurrentOrgId(o.getId());
         return auth;
     }
 

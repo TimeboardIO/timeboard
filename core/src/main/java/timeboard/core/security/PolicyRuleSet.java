@@ -28,49 +28,17 @@ package timeboard.core.security;
 
 import org.springframework.expression.Expression;
 
-public class PolicyRule {
+import java.util.List;
+
+public class PolicyRuleSet {
     private String name;
-    private String description;
-    /*
-     * Boolean SpEL expression. If evaluated to true, then this rule is applied to the request access context.
-     */
-    private Expression target;
 
-    /*
-     * Boolean SpEL expression, if evaluated to true, then access granted.
-     */
-    private Expression condition;
+    private List<String> actions;
 
-    public PolicyRule() {
+    private List<Expression> conditions;
 
-    }
+    public PolicyRuleSet() {
 
-    public PolicyRule(final String name, final String description, final Expression target, final Expression condition) {
-        this(target, condition);
-        this.name = name;
-        this.description = description;
-    }
-
-    public PolicyRule(final Expression target, final Expression condition) {
-        super();
-        this.target = target;
-        this.condition = condition;
-    }
-
-    public Expression getTarget() {
-        return target;
-    }
-
-    public void setTarget(final Expression target) {
-        this.target = target;
-    }
-
-    public Expression getCondition() {
-        return condition;
-    }
-
-    public void setCondition(final Expression condition) {
-        this.condition = condition;
     }
 
     public String getName() {
@@ -81,11 +49,19 @@ public class PolicyRule {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public List<String> getActions() {
+        return actions;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
+    public void setActions(final List<String> actions) {
+        this.actions = actions;
+    }
+
+    public List<Expression> getConditions() {
+        return conditions;
+    }
+
+    public void setConditions(final List<Expression> conditions) {
+        this.conditions = conditions;
     }
 }

@@ -45,53 +45,48 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}/tags")
-public class ProjectTagsController {
+@RequestMapping("/projects/{project}" + ProjectTagsController.URL)
+public class ProjectTagsController extends ProjectBaseController {
+
+    public static final String URL = "/tags";
 
     @Autowired
     private ProjectService projectService;
 
     @GetMapping
     public String display(final TimeboardAuthentication authentication,
-                          @PathVariable final Long projectID, final Model model) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+                          @PathVariable final Project project, final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
-
+        this.initModel(model, authentication, project);
         return "project_tags";
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectTagWrapper>> listTags(final TimeboardAuthentication authentication,
-                                                            @PathVariable final Long projectID) throws BusinessException {
-        final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+                                                            @PathVariable final Project project) throws BusinessException {
         return ResponseEntity.ok(project.getTags().stream().map(projectTag -> new ProjectTagWrapper(projectTag)).collect(Collectors.toList()));
     }
 
     @DeleteMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectTagWrapper>> deleteTag(
             final TimeboardAuthentication authentication,
-            @PathVariable final Long projectID,
+            @PathVariable final Project project,
             @PathVariable final Long tagID) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getTags().removeIf(projectTag -> projectTag.getId().equals(tagID));
         this.projectService.updateProject(actor, project);
-        return this.listTags(authentication, projectID);
+        return this.listTags(authentication, project);
     }
 
     @PatchMapping(value = "/{tagID}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectTagWrapper>> patchTag(final TimeboardAuthentication authentication,
-                                                            @PathVariable final Long projectID,
+                                                            @PathVariable final Project project,
                                                             @PathVariable final Long tagID,
                                                             @ModelAttribute final ProjectTag tag) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getTags().stream()
                 .filter(projectTag -> projectTag.getId().equals(tagID))
                 .forEach(projectTag -> {
@@ -99,19 +94,18 @@ public class ProjectTagsController {
                     projectTag.setTagValue(tag.getTagValue());
                 });
         this.projectService.updateProject(actor, project);
-        return this.listTags(authentication, projectID);
+        return this.listTags(authentication, project);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ProjectTagWrapper>> createTag(final TimeboardAuthentication authentication,
-                                                             @PathVariable final Long projectID,
+                                                             @PathVariable final Project project,
                                                              @ModelAttribute final ProjectTag tag) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         tag.setProject(project);
         project.getTags().add(tag);
         this.projectService.updateProject(actor, project);
-        return this.listTags(authentication, projectID);
+        return this.listTags(authentication, project);
     }
 
     public static class ProjectTagWrapper {

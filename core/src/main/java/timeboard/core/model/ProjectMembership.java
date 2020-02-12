@@ -53,6 +53,7 @@ public class ProjectMembership extends OrganizationEntity {
         this.member = owner;
         this.role = role;
         this.project = project;
+
     }
 
     public Long getMembershipID() {

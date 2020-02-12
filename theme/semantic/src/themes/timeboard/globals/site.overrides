@@ -83,6 +83,7 @@ table, .controls {
       text-align: center;
       border: 0px solid #fff;
       background-color: rgba(1,0,1,0);
+      border: 1px solid lightgrey;
     }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {

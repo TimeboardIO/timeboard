@@ -32,12 +32,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -57,7 +58,7 @@ public class AccountController {
     private OrganizationService organizationService;
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @Autowired(
@@ -89,7 +90,7 @@ public class AccountController {
                 actor.setEmail(email);
 
                 try {
-                    this.userService.updateUser(actor);
+                    this.accountService.updateUser(actor);
                     model.addAttribute("message", "User account changed successfully !");
                 } catch (final Exception e) {
                     model.addAttribute("error", "Error while updating user information.");
@@ -107,7 +108,7 @@ public class AccountController {
                     }
                 }
                 try {
-                    this.userService.updateUser(actor);
+                    this.accountService.updateUser(actor);
                     model.addAttribute("message", "External tools updated successfully !");
                 } catch (final Exception e) {
                     model.addAttribute("error", "Error while external tools");
@@ -129,10 +130,10 @@ public class AccountController {
         return "account.html";
     }
 
-    private void loadPage(final Model model, final Account actor, final Long orgID) throws BusinessException {
+    private void loadPage(final Model model, final Account actor, final Organization org) throws BusinessException {
         model.addAttribute("account", actor);
 
-        final List<Project> projects = projectService.listProjects(actor, orgID);
+        final List<Project> projects = projectService.listProjects(actor, org);
 
         final Map<String, String> fieldNames = new HashMap<>();
         //import external ID field name from import plugins list
@@ -144,7 +145,7 @@ public class AccountController {
 
         final Set<Integer> yearsSinceHiring = new LinkedHashSet<>();
         final Map<Integer, String> monthsSinceHiring = new LinkedHashMap<>();
-        final Calendar end = this.organizationService.findOrganizationMembership(actor, orgID).get().getCreationDate();
+        final Calendar end = this.organizationService.findOrganizationMembership(actor, org).get().getCreationDate();
         final Calendar start = Calendar.getInstance();
         start.setTime(new Date());
         final DateFormatSymbols dfs = new DateFormatSymbols(Locale.ENGLISH);

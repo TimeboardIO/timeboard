@@ -29,5 +29,5 @@ package timeboard.core.security;
 import java.util.List;
 
 public interface PolicyDefinition {
-    List<PolicyRule> getAllPolicyRules();
+    List<PolicyRuleSet> getAllPolicyRules();
 }

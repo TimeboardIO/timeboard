@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{project_layout.html(tab='six')}"
+<html layout:decorate="~{project_layout.html(tab='project.tab.snapshots')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
@@ -16,14 +16,12 @@
 
 
 <div layout:fragment="placeholder">
-
-
         <div>
-                <div class="ui fluid card">
-                    <div class="image">
-                        <canvas id="lineChart"></canvas>
-                    </div>
+            <div class="ui fluid card">
+                <div class="image">
+                    <canvas id="lineChart"></canvas>
                 </div>
+            </div>
         </div>
             <div id="projectSnapshots">
                 <div class="ui menu">

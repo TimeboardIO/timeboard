@@ -1,4 +1,4 @@
-package timeboard.projects;
+package timeboard.organization;
 
 /*-
  * #%L
@@ -27,21 +27,21 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
+import timeboard.projects.ProjectBaseController;
 
 import java.io.Serializable;
 import java.util.Calendar;
@@ -49,10 +49,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{projectID}/timesheets")
-public class ProjectTimesheetValidationController {
+@RequestMapping("/projects/{projectID}" + ProjectTimesheetValidationController.PATH)
+public class ProjectTimesheetValidationController extends ProjectBaseController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTimesheetValidationController.class);
+    public static final String PATH = "/timesheets";
 
     @Autowired
     public ProjectService projectService;
@@ -60,8 +60,22 @@ public class ProjectTimesheetValidationController {
     @Autowired
     public TimesheetService timesheetService;
 
-    @Autowired
-    public UserService userService;
+
+    private static long absoluteWeekNumber(SubmittedTimesheet t) {
+        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
+    }
+
+    private static long absoluteWeekNumber(TimesheetWeekWrapper t) {
+        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
+    }
+
+    private static long absoluteWeekNumber(int year, int week) {
+        return (long) (year * 53) + week;
+    }
+
+    private static long absoluteWeekNumber(Calendar c) {
+        return absoluteWeekNumber(c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+    }
 
     @GetMapping
     protected String timesheetValidationApp(TimeboardAuthentication authentication,
@@ -71,15 +85,15 @@ public class ProjectTimesheetValidationController {
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
-
-        return "project_timesheet_validation.html";
+        this.initModel(model, authentication, project);
+        return "timesheet_validation.html";
     }
 
     @GetMapping(value = "/listProjectMembersTimesheets", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<Long, UserWrapper>> list(TimeboardAuthentication authentication,
                                                        @PathVariable Long projectID) throws BusinessException {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         final Map<Account, List<SubmittedTimesheet>> timesheetsFromProject =
                 this.timesheetService.getProjectTimesheetByAccounts(
@@ -104,54 +118,52 @@ public class ProjectTimesheetValidationController {
 
     private List<TimesheetWeekWrapper> fillTimesheetWeeks(Account a, List<SubmittedTimesheet> submittedTimesheets) {
 
-        final Pair<Integer, Integer> pair = getOlderWeekYearNotValidated(a, submittedTimesheets);
-
-        return generateSubmittedTimesheets(pair.getFirst(), pair.getSecond(), submittedTimesheets);
-
-    }
-
-    private Pair<Integer, Integer> getOlderWeekYearNotValidated(Account a, List<SubmittedTimesheet> submittedTimesheets){
-
         if (!submittedTimesheets.isEmpty()) {
             //user already have submitted at least one week
             final Optional<SubmittedTimesheet> lastValidatedSubmittedTimesheet = submittedTimesheets
                     .stream()
                     .filter(st -> st.getTimesheetStatus().equals(ValidationStatus.VALIDATED))
-                    .max(Comparator.comparingLong(timesheetService::absoluteWeekNumber));
+                    .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
 
             final Optional<SubmittedTimesheet> lastSubmittedTimesheet = submittedTimesheets
                     .stream()
-                    .max(Comparator.comparingLong(timesheetService::absoluteWeekNumber));
+                    .max(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber));
 
             // user have at least one non validated week.
             final SubmittedTimesheet t = lastValidatedSubmittedTimesheet.orElseGet(lastSubmittedTimesheet::get);
 
-           return Pair.of(t.getYear(), t.getWeek());
+            return generateSubmittedTimesheets(t.getYear(), t.getWeek(),
+                    submittedTimesheets);
 
         } else {
             // user NEVER submitted a single week
             final Calendar current = Calendar.getInstance();
 
-            current.setTime(a.getAccountCreationTime());
-            return Pair.of(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR));
+            final Organization currentOrganization
+                    = ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).getCurrentOrganization();
+            final Calendar beginWorkDate = a.getOrganizationMemberships().stream()
+                    .filter(organizationMembership -> organizationMembership.getOrganization().getId() == currentOrganization.getId())
+                    .findFirst().map(OrganizationMembership::getCreationDate).orElse(a.getAccountCreationTime());
+
+            current.setTime(beginWorkDate.getTime());
+
+            current.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            return generateSubmittedTimesheets(current.get(Calendar.YEAR),
+                    current.get(Calendar.WEEK_OF_YEAR), submittedTimesheets);
 
         }
-    }
 
+    }
 
     List<TimesheetWeekWrapper> generateSubmittedTimesheets(int firstYear, int firstWeek, List<SubmittedTimesheet> submittedTimesheets) {
 
         final List<TimesheetWeekWrapper> returnList = new LinkedList<>();
-        final long todayAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(Calendar.getInstance());
+        final long todayAbsoluteWeekNumber = absoluteWeekNumber(Calendar.getInstance());
         final Calendar current = Calendar.getInstance();
         current.set(Calendar.WEEK_OF_YEAR, firstWeek);
         current.set(Calendar.YEAR, firstYear);
-        current.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-        final long weekNumber = todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(firstYear, firstWeek);
-        if (weekNumber <= 1) { //Min two weeks
-            current.add(Calendar.WEEK_OF_YEAR, (int) (-1 + weekNumber));
-        }
-        while (this.timesheetService.absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
+
+        while (absoluteWeekNumber(current.get(Calendar.YEAR), current.get(Calendar.WEEK_OF_YEAR)) <= todayAbsoluteWeekNumber) {
             final int currentWeek = current.get(Calendar.WEEK_OF_YEAR);
             final int currentYear = current.get(Calendar.YEAR);
             final Optional<TimesheetWeekWrapper> existingWeek = submittedTimesheets
@@ -174,46 +186,6 @@ public class ProjectTimesheetValidationController {
         return c;
     }
 
-
-
-    @PostMapping(value = "/forceValidation/{userSelectedID}/{selectedYear}/{selectedWeek}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity forceValidation(final TimeboardAuthentication authentication,
-                                                        @PathVariable final Long projectID,
-                                                        @PathVariable final int selectedYear,
-                                                        @PathVariable final int selectedWeek,
-                                                        @PathVariable final Long userSelectedID,
-                                                        @RequestBody final ArrayList<TimesheetWeekWrapper> weeks) throws BusinessException {
-        try {
-            final Account target = this.userService.findUserByID(userSelectedID);
-
-            final TimesheetWeekWrapper olderTimesheetWrapper =
-                    weeks.stream()
-                    .min(Comparator.comparingLong(t -> this.timesheetService.absoluteWeekNumber(t.getYear(), t.getWeek())))
-                    .get();
-
-            final long selectedAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(selectedYear, selectedWeek);
-            final long olderAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(olderTimesheetWrapper.year, olderTimesheetWrapper.week);
-
-            if(selectedAbsoluteWeekNumber >= olderAbsoluteWeekNumber) {
-                this.timesheetService.forceValidationTimesheets(
-                        authentication.getCurrentOrganization(),
-                        authentication.getDetails(),
-                        target,
-                        selectedYear,
-                        selectedWeek,
-                        olderTimesheetWrapper.year,
-                        olderTimesheetWrapper.week
-                );
-                return ResponseEntity.ok().build();
-            }else{
-                return ResponseEntity.badRequest().build();
-            }
-        } catch (Exception e){
-            LOGGER.error(e.getMessage(), e);
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
     public static class TimesheetWeekWrapper {
 
         private Long id;
@@ -222,12 +194,10 @@ public class ProjectTimesheetValidationController {
         private boolean isValidated;
         private boolean isSubmitted;
 
-        public TimesheetWeekWrapper(){}
-
         public TimesheetWeekWrapper(SubmittedTimesheet submittedTimesheet, boolean submitted) {
             this.id = submittedTimesheet.getId();
-            this.year = (int) submittedTimesheet.getYear();
-            this.week = (int) submittedTimesheet.getWeek();
+            this.year = submittedTimesheet.getYear();
+            this.week = submittedTimesheet.getWeek();
             this.isValidated = submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.VALIDATED);
             this.isSubmitted = submitted;
         }
@@ -288,11 +258,11 @@ public class ProjectTimesheetValidationController {
             this.weeks = weeks;
             this.lastSubmittedDate = weeks.stream()
                     .filter(TimesheetWeekWrapper::isSubmitted)
-                    .min(Comparator.comparingLong(t -> timesheetService.absoluteWeekNumber(t.getYear(), t.getWeek())))
+                    .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
                     .map(t -> calendarFromWeek(t.getYear(), t.getWeek()).getTime()).orElseGet(() -> null);
             this.lastApprovedDate = rawList.stream()
                     .filter(st -> st.getTimesheetStatus().equals(ValidationStatus.VALIDATED))
-                    .min(Comparator.comparingLong(timesheetService::absoluteWeekNumber))
+                    .min(Comparator.comparingLong(ProjectTimesheetValidationController::absoluteWeekNumber))
                     .map(t -> calendarFromWeek(t.getYear(), t.getWeek()).getTime()).orElseGet(() -> null);
         }
 
