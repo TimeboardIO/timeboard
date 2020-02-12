@@ -44,7 +44,11 @@ public abstract class OrganizationEntity {
     }
 
     public OrganizationEntity() {
-        this.organizationID = ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).getCurrentOrganization().getId();
+        try {
+            this.organizationID = ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).getCurrentOrganization().getId();
+        } catch (Exception e) {
+            this.organizationID = null;
+        }
     }
 
     public Long getOrganizationID() {
