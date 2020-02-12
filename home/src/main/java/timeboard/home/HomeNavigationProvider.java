@@ -44,6 +44,11 @@ public class HomeNavigationProvider implements NavigationExtPoint {
     }
 
     @Override
+    public String getNavigationAction() {
+        return HomeController.HOME_VIEW;
+    }
+
+    @Override
     public int getNavigationWeight() {
         return 0;
     }

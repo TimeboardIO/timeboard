@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import timeboard.core.api.CalendarService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
 import timeboard.core.internal.rules.RuleSet;
@@ -65,12 +66,17 @@ public class CalendarServiceImpl implements CalendarService {
     private static final String CALENDAR_ORIGIN_KEY = "calendar";
     @Autowired
     private EntityManager em;
+
     @Autowired
     private ProjectService projectService;
 
+    @Autowired
+    private TimesheetService timesheetService;
+
+
     @Override
     public boolean importCalendarAsImputationsFromIcs(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final String url,
             final AbstractTask task,
@@ -101,7 +107,7 @@ public class CalendarServiceImpl implements CalendarService {
                     }
                 }
             }
-            this.projectService.updateTaskImputations(orgID, actor, imputationsToUpdate);
+            this.timesheetService.updateTaskImputations(org, actor, imputationsToUpdate);
         } catch (final IOException | ParseException e) {
             throw new BusinessException(e);
         }

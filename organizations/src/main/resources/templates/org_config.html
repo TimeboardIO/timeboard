@@ -43,7 +43,7 @@
                     <i class="boxes icon"></i>
                     Task Types
                 </div>
-                <data-table v-bind:config="types">
+                <data-table v-bind:table="types.data" v-bind:config="types">
                     <template v-slot:name="{row}">
                         <div v-if="row.edition" class="ui input">
                             <input type="text" v-model="row.name"/>
@@ -76,7 +76,7 @@
                     <i class="boxes icon"></i>
                     Default Tasks
                 </div>
-                <data-table v-bind:config="tasks">
+                <data-table v-bind:table="tasks.data" v-bind:config="tasks">
                     <template v-slot:name="{row}">
                         <div v-if="row.edition" class="ui input">
                             <input type="text" v-model="row.name"/>

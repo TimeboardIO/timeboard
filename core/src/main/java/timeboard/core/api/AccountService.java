@@ -37,7 +37,7 @@ import java.util.List;
 /**
  * Service for users and accounts management.
  */
-public interface UserService {
+public interface AccountService {
     /**
      * Search user by remote subject.
      *

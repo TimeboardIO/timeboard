@@ -149,10 +149,6 @@ input::-moz-selection {
   background-color: rgba(100, 100, 100, 0.4);
   color: #393939;
 }
-textarea::-moz-selection, input::-moz-selection {
-  background-color: rgba(100, 100, 100, 0.4);
-  color: #393939;
-}
 textarea::selection,
 input::selection {
   background-color: rgba(100, 100, 100, 0.4);
@@ -268,6 +264,7 @@ table,
   text-align: center;
   border: 0px solid #fff;
   background-color: rgba(1, 0, 1, 0);
+  border: 1px solid lightgrey;
 }
 #timesheet input[type=number]::-webkit-inner-spin-button,
 #timesheet input[type=number]::-webkit-outer-spin-button {

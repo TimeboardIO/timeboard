@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ConcurrentModel;
 import org.springframework.ui.Model;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
@@ -58,17 +57,16 @@ public class HomeFeatureATest extends TimeboardTest {
     public void user_with_an_existing_account_and_project(final int arg1) throws Throwable {
 
         this.model = new ConcurrentModel();
-        this.account = this.userService.userProvisioning(UUID.randomUUID().toString(), "test");
+        this.account = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test");
 
         this.organisation = this.organizationService.createOrganization(this.account, "Integration", Collections.emptyMap());
 
         Assert.assertNotNull(this.account);
         this.auth = new TimeboardAuthentication(this.account);
-        this.auth.setCurrentOrganization(this.organisation.getId());
+        this.auth.setCurrentOrganization(this.organisation);
         SecurityContextHolder.getContext().setAuthentication(this.auth);
-        ThreadLocalStorage.setCurrentOrgId(this.organisation.getId());
 
-        this.projectService.createProject(this.organisation.getId(), this.account, "TestProject");
+        this.projectService.createProject(this.organisation, this.account, "TestProject");
     }
 
     @When("^the user calls /home$")

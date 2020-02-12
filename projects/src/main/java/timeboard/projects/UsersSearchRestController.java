@@ -31,11 +31,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import timeboard.core.api.OrganizationService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.*;
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,10 +55,7 @@ import java.util.*;
 public class UsersSearchRestController {
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
-    private OrganizationService organizationService;
+    private AccountService accountService;
 
     @Autowired
     private ProjectService projectService;
@@ -80,21 +78,17 @@ public class UsersSearchRestController {
             projectID = Long.parseLong(req.getParameter("projectID"));
         }
 
-        Long orgID = null;
-        if (req.getParameter("orgID") != null) {
-            orgID = authentication.getCurrentOrganization();
-        }
+        final Organization org = authentication.getCurrentOrganization();
 
         final Set<Account> accounts = new HashSet<>();
 
         if (projectID != null) {
-            final Project project = projectService.getProjectByIdWithAllMembers(actor, projectID);
-            accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
-        } else if (orgID != null) {
-            final Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
-            accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
+            final Project project = projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query, project));
+        } else if (org != null) {
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query, org));
         } else {
-            accounts.addAll(this.userService.searchUserByEmail(actor, query));
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query));
         }
 
         final SearchResults searchResults = new SearchResults(accounts.size(), accounts);
@@ -114,13 +108,11 @@ public class UsersSearchRestController {
             throw new BusinessException("Query is empty");
         }
 
-        Long orgID = null;
-        if (req.getParameter("orgID") != null) {
-            orgID = authentication.getCurrentOrganization();
-        }
+        final Organization org = authentication.getCurrentOrganization();
+
 
         final List<Account> accounts = new ArrayList<>();
-        if (orgID != null) {
+        if (org != null) {
             final List<Account> ownersOfAnyUserProject = this.projectService.findOwnersOfAnyUserProject(actor);
             accounts.addAll(ownersOfAnyUserProject);
 

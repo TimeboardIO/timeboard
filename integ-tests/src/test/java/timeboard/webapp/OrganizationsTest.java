@@ -31,8 +31,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DefaultTask;
@@ -48,7 +48,7 @@ import java.util.UUID;
 public class OrganizationsTest extends TimeboardTest {
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
     @Autowired
     private OrganizationService organizationService;
@@ -57,12 +57,12 @@ public class OrganizationsTest extends TimeboardTest {
     @Test
     public void testRemoveOrganizationMember() throws BusinessException {
 
-        final Account a1 = this.userService.userProvisioning(UUID.randomUUID().toString(), "testRemove1@test.fr");
-        final Organization org = this.organizationService.createOrganization(a1,"testRemoveOrg", Collections.emptyMap());
+        final Account a1 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "testRemove1@test.fr");
+        final Organization org = this.organizationService.createOrganization(a1, "testRemoveOrg", Collections.emptyMap());
 
         SecurityUtils.signIn(org, a1);
 
-        final Account a2 = this.userService.userProvisioning(UUID.randomUUID().toString(), "testRemove2@test.fr");
+        final Account a2 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "testRemove2@test.fr");
 
         this.organizationService.addMembership(a1, org, a2, MembershipRole.CONTRIBUTOR);
 
@@ -77,14 +77,14 @@ public class OrganizationsTest extends TimeboardTest {
     @Test
     public void testCreateDefaultTask() throws BusinessException {
 
-        final Account a1 = this.userService.userProvisioning(UUID.randomUUID().toString(), "test3@test.fr");
-        final Organization org = this.organizationService.createOrganization(a1,"testOrg2", Collections.emptyMap());
+        final Account a1 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test3@test.fr");
+        final Organization org = this.organizationService.createOrganization(a1, "testOrg2", Collections.emptyMap());
 
         SecurityUtils.signIn(org, a1);
 
-        this.organizationService.createDefaultTask(a1, org.getId(),"TestDefaultTask");
+        this.organizationService.createDefaultTask(a1, org, "TestDefaultTask");
 
-        final List<DefaultTask> tasks = this.organizationService.listDefaultTasks(org.getId(), org.getCreatedDate().getTime(), new Date());
+        final List<DefaultTask> tasks = this.organizationService.listDefaultTasks(org, org.getCreatedDate().getTime(), new Date());
 
         Assert.assertEquals(2, tasks.size());
 
