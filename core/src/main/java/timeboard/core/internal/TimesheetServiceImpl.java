@@ -66,7 +66,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize(AbacEntries.TIMESHEET_SUBMIT)
+    @PreAuthorize("hasPermission(#submittedTimesheet,'" + AbacEntries.TIMESHEET_SUBMIT + "')")
     public SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
             final Account timesheetOwner,
@@ -314,7 +314,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize(AbacEntries.TIMESHEET_LIST)
+    @PreAuthorize("hasPermission(#user,'" + AbacEntries.TIMESHEET_LIST + "')")
     public Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization currentOrganization, Account user, int year, int week) {
 
         final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st "
@@ -324,7 +324,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         q.setParameter("week", week);
         q.setParameter("year", year);
         q.setParameter("user", user);
-        q.setParameter("orgID", currentOrganization);
+        q.setParameter("orgID", currentOrganization.getId());
 
         try {
             return Optional.ofNullable(q.getSingleResult());

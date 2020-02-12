@@ -61,6 +61,7 @@ public class AbacEntries {
     public static final String TIMESHEET_IMPUTATION = "TIMESHEET_IMPUTATION";
 
     public static final String TIMESHEET_LIST = "TIMESHEET_LIST";
+    public static final String TIMESHEET_VIEW = "TIMESHEET_VIEW";
 
     public static final String REPORT_LIST = "REPORT_LIST";
     public static final String REPORT_PROJECT_VIEW = "REPORT_PROJECT_VIEW";

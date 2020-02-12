@@ -2,7 +2,6 @@
   {
     "name": "user is a member of organization",
     "actions": [
-      "TIMESHEET_LIST",
       "TIMESHEET_IMPUTATION",
       "TIMESHEET_SUBMIT",
       "PROJECT_COUNT",
@@ -10,7 +9,8 @@
       "PROJECT_LIST",
       "PROJECT_VIEW",
       "VACATION_VIEW",
-      "HOME_VIEW"
+      "HOME_VIEW",
+      "TIMESHEET_VIEW"
     ],
     "conditions": [
       "subject.currentOrganizationRole('OWNER', 'CONTRIBUTOR')"
@@ -60,9 +60,19 @@
     ]
   },
   {
-    "name": "User is owner of any project of target",
+    "name": "Actor is user or an owner of any project of target",
     "actions": [
+      "TIMESHEET_LIST",
       "VACATION_LIST"
+    ],
+    "conditions": [
+      "resource.getId() == subject.getDetails().getId() || environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"
+    ]
+  },
+  {
+    "name": "Actor is an owner of any project of target",
+    "actions": [
+
     ],
     "conditions": [
       "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"

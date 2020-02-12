@@ -57,7 +57,7 @@ public class TimesheetNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationAction() {
-        return AbacEntries.TIMESHEET_LIST;
+        return AbacEntries.TIMESHEET_VIEW;
     }
 
     @Override
