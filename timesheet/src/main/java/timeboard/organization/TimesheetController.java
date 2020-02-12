@@ -150,16 +150,16 @@ public class TimesheetController {
                         && lastDayOfWeek.compareTo(creationDate) >= 0;
 
         final TimesheetWrapper ts = new TimesheetWrapper(
-                isFirstWeek ? ValidationStatus.PENDING_VALIDATION :
-                        this.timesheetService.getTimesheetValidationStatus(
-                                authentication.getCurrentOrganization(),
-                                currentAccount,
-                                findPreviousWeekYear(c, week, year),
-                                findPreviousWeek(c, week, year)).orElse(null),
+                isFirstWeek ? ValidationStatus.VALIDATED :
                 this.timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
-                        currentAccount,
-                        year, week).orElse(null),
+                    authentication.getCurrentOrganization(),
+                    currentAccount,
+                    findPreviousWeekYear(c, week, year),
+                    findPreviousWeek(c, week, year)).orElse(null),
+                this.timesheetService.getTimesheetValidationStatus(
+                    authentication.getCurrentOrganization(),
+                    currentAccount,
+                    year, week).orElse(null),
                 year, week,
                 beginWorkDate.get(Calendar.YEAR),
                 beginWorkDate.get(Calendar.WEEK_OF_YEAR),

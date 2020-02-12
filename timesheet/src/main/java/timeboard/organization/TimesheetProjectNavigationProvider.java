@@ -45,6 +45,6 @@ public class TimesheetProjectNavigationProvider implements ProjectNavigationProv
 
     @Override
     public String getNavigationAction() {
-        return AbacEntries.TIMESHEET_VALIDATE;
+        return AbacEntries.TIMESHEET_VALIDATION_VIEW;
     }
 }

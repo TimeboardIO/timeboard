@@ -41,7 +41,7 @@
       "PROJECT_TASKS_APPROBATION",
       "PROJECT_TASKS_EDIT",
       "PROJECT_TASKS_IMPORT",
-      "TIMESHEET_VALIDATE"
+      "TIMESHEET_VALIDATION_VIEW"
     ],
     "conditions": [
       "subject.currentProjectRole(resource, 'OWNER')"
@@ -72,7 +72,7 @@
   {
     "name": "Actor is an owner of any project of target",
     "actions": [
-
+      "TIMESHEET_VALIDATE"
     ],
     "conditions": [
       "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"

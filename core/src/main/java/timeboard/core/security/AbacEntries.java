@@ -39,10 +39,11 @@ public class AbacEntries {
     public static final String TASK_LIST = "TASK_LIST";
     public static final String PROJECT_TASKS_VIEW = "PROJECT_TASKS_VIEW";
     public static final String PROJECT_TASKS_APPROBATION = "PROJECT_TASKS_APPROBATION";
+    public static final String PROJECT_TASKS_CREATE = "PROJECT_TASKS_CREATE";
     public static final String PROJECT_TASKS_IMPORT = "PROJECT_TASKS_IMPORT";
     public static final String PROJECT_TASKS_EDIT = "PROJECT_TASKS_EDIT";
-    public static final String PROJECT_TASKS_CREATE = "PROJECT_TASKS_CREATE";
 
+    public static final String TIMESHEET_VALIDATION_VIEW = "TIMESHEET_VALIDATION_VIEW";
     public static final String PROJECT_TAGS_VIEW = "PROJECT_TAGS_VIEW";
     public static final String PROJECT_BATCHES_VIEW = "PROJECT_BATCHES_VIEW";
     public static final String PROJECT_SNAPSHOTS_VIEW = "PROJECT_SNAPSHOTS_VIEW";

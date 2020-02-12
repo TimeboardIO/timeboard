@@ -171,7 +171,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
     @Override
-    @PreAuthorize("hasPermission(#submittedTimesheet,'" + AbacEntries.TIMESHEET_VALIDATE + "')")
+    @PreAuthorize("hasPermission(#submittedTimesheet.getAccount(),'" + AbacEntries.TIMESHEET_VALIDATE + "')")
     public SubmittedTimesheet validateTimesheet(
             final Organization currentOrg,
             final Account actor,
@@ -182,10 +182,15 @@ public class TimesheetServiceImpl implements TimesheetService {
             return submittedTimesheet;
         }
 
-
         if (!submittedTimesheet.getTimesheetStatus().equals(ValidationStatus.PENDING_VALIDATION)) {
             throw new BusinessException("Can not validate unsubmitted weeks");
         }
+
+        final Calendar beginWorkDate = this.organizationService
+                .findOrganizationMembership(submittedTimesheet.getAccount(), currentOrg).get().getCreationDate();
+
+        final boolean firstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR)
+                == submittedTimesheet.getWeek() && beginWorkDate.get(Calendar.YEAR) == submittedTimesheet.getYear();
 
         final Calendar previousWeek = Calendar.getInstance();
         previousWeek.set(Calendar.WEEK_OF_YEAR, submittedTimesheet.getWeek());
@@ -197,7 +202,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 currentOrg, submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED)) {
+        if ((!firstWeek) && (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED)) ){
             throw new TimesheetException("Can not validate this week, previous week is not validated");
         }
 
