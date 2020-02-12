@@ -67,5 +67,6 @@ public class AbacEntries {
     public static final String REPORT_LIST = "REPORT_LIST";
     public static final String REPORT_PROJECT_VIEW = "REPORT_PROJECT_VIEW";
 
+    public static final String ORG_SETUP = "ORG_SETUP";
 
 }

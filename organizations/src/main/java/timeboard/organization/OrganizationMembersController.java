@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -42,6 +43,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 import timeboard.core.model.OrganizationMembership;
+import timeboard.core.security.AbacEntries;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
@@ -74,11 +76,11 @@ public class OrganizationMembersController {
         return "org_members";
     }
 
-    @GetMapping("/list/{orgID}")
-    public ResponseEntity getMembers(TimeboardAuthentication authentication,
-                                     @PathVariable final Organization org) {
+    @GetMapping("/list")
+    @PreAuthorize("hasPermission(null, '" + AbacEntries.ORG_SETUP + "')")
+    public ResponseEntity getMembers(final TimeboardAuthentication authentication) {
 
-        final Set<OrganizationMembership> members = org.getMembers();
+        final Set<OrganizationMembership> members = authentication.getCurrentOrganization().getMembers();
         final List<MemberWrapper> result = new ArrayList<>();
 
         for (OrganizationMembership member : members) {
