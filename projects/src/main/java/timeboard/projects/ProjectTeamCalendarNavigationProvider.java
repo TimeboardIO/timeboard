@@ -31,7 +31,7 @@ import timeboard.core.security.AbacEntries;
 import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
-public class ProjectCalendarNavigationProvider implements ProjectNavigationProvider {
+public class ProjectTeamCalendarNavigationProvider implements ProjectNavigationProvider {
     @Override
     public String getNavigationLabel() {
         return "project.tab.calendar";

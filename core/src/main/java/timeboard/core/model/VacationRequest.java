@@ -76,6 +76,7 @@ public class VacationRequest extends OrganizationEntity {
         this.endHalfDay = other.endHalfDay;
         this.applicant = other.applicant;
         this.assignee = other.assignee;
+        this.organizationID = other.organizationID;
     }
 
     public Long getId() {

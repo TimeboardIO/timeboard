@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
  */
 @Controller
 @RequestMapping("/projects/{project}" + ProjectTeamCalendarController.URL)
-public class ProjectTeamCalendarController {
+public class ProjectTeamCalendarController extends ProjectBaseController {
 
     public static final String URL = "/calendar";
 

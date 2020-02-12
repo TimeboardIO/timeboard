@@ -1,6 +1,6 @@
 [
   {
-    "name": "Organization member can access Timesheet",
+    "name": "user is a member of oranization",
     "actions": [
       "TIMESHEET_LIST",
       "TIMESHEET_IMPUTATION",
@@ -10,35 +10,27 @@
       "PROJECT_LIST",
       "PROJECT_VIEW",
       "VACATION_VIEW",
-      "VACATION_LIST",
       "HOME_VIEW"
     ],
     "conditions": [
       "subject.currentOrganizationRole('OWNER', 'CONTRIBUTOR')"
     ]
   },
+
   {
-    "name": "Organization contributors can access vacations features",
-    "actions": [
-      "VACATION_TEAM_LIST"
-    ],
-    "conditions": [
-      "subject.currentProjectRole(resource,'OWNER','CONTRIBUTOR')"
-    ]
-  },
-  {
-    "name": "Users can create tasks on project only if they are member",
+    "name": "User is a member of project ",
     "actions": [
       "PROJECT_TASKS_VIEW",
       "PROJECT_TASKS_CREATE",
-      "PROJECT_SETUP_VIEW"
+      "PROJECT_SETUP_VIEW",
+      "VACATION_TEAM_LIST"
     ],
     "conditions": [
       "subject.currentProjectRole(resource, 'OWNER', 'CONTRIBUTOR')"
     ]
   },
   {
-    "name": "Users can create tasks on project only if they are member",
+    "name": "User is project owner",
     "actions": [
       "PROJECT_BATCHES_VIEW",
       "PROJECT_SNAPSHOTS_VIEW",
@@ -55,9 +47,8 @@
       "subject.currentProjectRole(resource, 'OWNER')"
     ]
   },
-
   {
-    "name": "Only owner can create projects",
+    "name": "User is owner of organization",
     "actions": [
       "PROJECT_CREATE",
       "PROJECT_ARCHIVE",
@@ -66,6 +57,15 @@
     ],
     "conditions": [
       "subject.currentOrganizationRole('OWNER')"
+    ]
+  },
+  {
+    "name": "User is owner of any project of target",
+    "actions": [
+      "VACATION_LIST"
+    ],
+    "conditions": [
+      "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"
     ]
   }
 ]
