@@ -80,6 +80,7 @@ public class ProjectBatchesController extends ProjectBaseController {
 
         model.addAttribute("project", project);
         model.addAttribute("batchTypes", BatchType.values());
+
         this.initModel(model, authentication, project);
         return "project_batches.html";
     }

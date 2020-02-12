@@ -1,6 +1,6 @@
 [
   {
-    "name": "user is a member of oranization",
+    "name": "user is a member of organization",
     "actions": [
       "TIMESHEET_LIST",
       "TIMESHEET_IMPUTATION",

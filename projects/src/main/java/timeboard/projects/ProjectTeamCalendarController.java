@@ -69,6 +69,7 @@ public class ProjectTeamCalendarController extends ProjectBaseController {
                                @PathVariable final Project project, final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
+        this.initModel(model, authentication, project);
 
         return "project_calendar.html";
     }
