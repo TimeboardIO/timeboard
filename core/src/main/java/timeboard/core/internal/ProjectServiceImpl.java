@@ -98,7 +98,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(null," + AbacEntries.PROJECT_CREATE + ")")
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.PROJECT_CREATE + "')")
     public Project createProject(final Organization org, final Account owner, final String projectName) {
         final Account ownerAccount = this.em.find(Account.class, owner.getId());
         final Project newProject = new Project();
