@@ -32,8 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationException;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class BasicPolicyEnforcement implements PolicyEnforcement {
@@ -46,33 +46,28 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
     @Override
     public boolean check(final Object subject, final Object resource, final Object action, final Object environment) {
         //Get all policy rules
-        final List<PolicyRule> allRules = policyDefinition.getAllPolicyRules();
+        final List<PolicyRuleSet> allRules = policyDefinition.getAllPolicyRules()
+                .stream().filter(prs -> prs.getActions().contains(new String(action + "").replaceAll("\'", "")))
+                .collect(Collectors.toList());
+
         //Wrap the context
         final SecurityAccessContext cxt = new SecurityAccessContext(subject, resource, action, environment);
-        //Filter the rules according to context.
-        final List<PolicyRule> matchedRules = filterRules(allRules, cxt);
-        //finally, check if any of the rules are satisfied, otherwise return false.
-        return checkRules(matchedRules, cxt);
-    }
 
-    private List<PolicyRule> filterRules(final List<PolicyRule> allRules, final SecurityAccessContext cxt) {
-        final List<PolicyRule> matchedRules = new ArrayList<>();
-        for (final PolicyRule rule : allRules) {
-            try {
-                if (rule.getTarget().getValue(cxt, Boolean.class)) {
-                    matchedRules.add(rule);
-                }
-            } catch (final EvaluationException ex) {
-                LOGGER.error("An error occurred while evaluating PolicyRule.", ex);
-            }
+        final boolean res = checkRules(allRules, cxt);
+
+        if (!res) {
+            LOGGER.debug("Account :" + subject + " has no policy for action : " + action + " on resource : " + resource);
         }
-        return matchedRules;
+
+        return res;
     }
 
-    private boolean checkRules(final List<PolicyRule> matchedRules, final SecurityAccessContext cxt) {
-        for (final PolicyRule rule : matchedRules) {
+
+    private boolean checkRules(final List<PolicyRuleSet> matchedRules, final SecurityAccessContext cxt) {
+        for (final PolicyRuleSet rule : matchedRules) {
             try {
-                if (rule.getCondition().getValue(cxt, Boolean.class)) {
+                if (rule.getConditions().stream()
+                        .allMatch(expression -> expression.getValue(cxt, Boolean.class))) {
                     return true;
                 }
             } catch (final EvaluationException ex) {

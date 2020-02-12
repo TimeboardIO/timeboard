@@ -50,6 +50,7 @@ public final class AbacPermissionEvaluator implements PermissionEvaluator {
         return policy.check(user, targetDomainObject, permission, policyEnvironment);
     }
 
+
     @Override
     public boolean hasPermission(final Authentication authentication, final Serializable targetId, final String targetType, final Object permission) {
         return false;

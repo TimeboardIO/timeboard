@@ -29,6 +29,7 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
+import javax.persistence.EntityManager;
 import java.util.*;
 
 public interface ProjectService {
@@ -39,13 +40,13 @@ public interface ProjectService {
     === Projects ===
     */
 
-    Project createProject(Long orgID, Account owner, String projectName) throws BusinessException;
+    Project createProject(final Organization org, Account owner, String projectName) throws BusinessException;
 
-    List<Project> listProjects(Account owner, Long orgID);
+    List<Project> listProjects(Account owner, Organization org);
 
-    Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
+    int countAccountProjectMemberships(Organization org, Account candidate);
 
-    Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
+    Project getProjectByID(Account actor, Organization org, Long projectID) throws BusinessException;
 
     Project archiveProjectByID(Account actor, Project project) throws BusinessException;
 
@@ -59,15 +60,15 @@ public interface ProjectService {
      == Tasks ==
      */
 
-    List<Task> listUserTasks(Long orgID, Account account);
+    List<Task> listUserTasks(Organization org, Account account);
 
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
 
     AbstractTask getTaskByID(Account account, long id) throws BusinessException;
 
-    List<ProjectTasks> listTasksByProject(Long orgID, Account actor, Date ds, Date de);
+    List<ProjectTasks> listTasksByProject(Organization org, Account actor, Date ds, Date de);
 
-    Task createTask(final Long orgID,
+    Task createTask(final Organization org,
                     final Account actor,
                     final Project project,
                     final String taskName,
@@ -85,16 +86,19 @@ public interface ProjectService {
 
     /**
      * Update task in database
-     * @param orgID relevant {@link Organization} ID
+     *
+     * @param org   relevant {@link Organization} ID
      * @param actor issuer {@link Account}
-     * @param task {@link Task} to update in database
+     * @param task  {@link Task} to update in database
      * @return updated {@link Task}
      */
-    Task updateTask(final Long orgID,
+    Task updateTask(final Organization org,
                     final Account actor,
                     final Task task);
 
     void updateTasks(Account actor, List<Task> taskList);
+
+    Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task, Account account);
 
     UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
@@ -119,18 +123,6 @@ public interface ProjectService {
                                                      Date startTaskDate,
                                                      Date endTaskDate) throws BusinessException;
 
-
-    UpdatedTaskResult updateTaskImputation(
-            final Long orgID,
-            final Account actor,
-            final AbstractTask task,
-            final Date day,
-            final double val) throws BusinessException;
-
-    List<UpdatedTaskResult> updateTaskImputations(
-            final Long orgID,
-            final Account actor,
-            final List<Imputation> imputationsList);
 
 
 

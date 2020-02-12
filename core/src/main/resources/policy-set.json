@@ -1,0 +1,81 @@
+[
+  {
+    "name": "user is a member of organization",
+    "actions": [
+      "TIMESHEET_IMPUTATION",
+      "TIMESHEET_SUBMIT",
+      "PROJECT_COUNT",
+      "TASK_LIST",
+      "PROJECT_LIST",
+      "PROJECT_VIEW",
+      "VACATION_VIEW",
+      "HOME_VIEW",
+      "TIMESHEET_VIEW"
+    ],
+    "conditions": [
+      "subject.currentOrganizationRole('OWNER', 'CONTRIBUTOR')"
+    ]
+  },
+
+  {
+    "name": "User is a member of project ",
+    "actions": [
+      "PROJECT_TASKS_VIEW",
+      "PROJECT_TASKS_CREATE",
+      "PROJECT_SETUP_VIEW",
+      "VACATION_TEAM_LIST"
+    ],
+    "conditions": [
+      "subject.currentProjectRole(resource, 'OWNER', 'CONTRIBUTOR')"
+    ]
+  },
+  {
+    "name": "User is project owner",
+    "actions": [
+      "PROJECT_BATCHES_VIEW",
+      "PROJECT_SNAPSHOTS_VIEW",
+      "PROJECT_SNAPSHOT",
+      "REPORT_PROJECT_VIEW",
+      "PROJECT_SETUP",
+      "PROJECT_TAGS_VIEW",
+      "PROJECT_TASKS_APPROBATION",
+      "PROJECT_TASKS_EDIT",
+      "PROJECT_TASKS_IMPORT",
+      "TIMESHEET_VALIDATION_VIEW"
+    ],
+    "conditions": [
+      "subject.currentProjectRole(resource, 'OWNER')"
+    ]
+  },
+  {
+    "name": "User is owner of organization",
+    "actions": [
+      "PROJECT_CREATE",
+      "PROJECT_ARCHIVE",
+      "REPORT_LIST",
+      "ORG_SETUP"
+    ],
+    "conditions": [
+      "subject.currentOrganizationRole('OWNER')"
+    ]
+  },
+  {
+    "name": "Actor is user or an owner of any project of target",
+    "actions": [
+      "TIMESHEET_LIST",
+      "VACATION_LIST"
+    ],
+    "conditions": [
+      "resource.getId() == subject.getDetails().getId() || environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"
+    ]
+  },
+  {
+    "name": "Actor is an owner of any project of target",
+    "actions": [
+      "TIMESHEET_VALIDATE"
+    ],
+    "conditions": [
+      "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"
+    ]
+  }
+]

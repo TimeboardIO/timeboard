@@ -30,13 +30,16 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
 import timeboard.core.internal.async.ProjectSyncJob;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
+import timeboard.core.security.AbacEntries;
 
 import java.util.Date;
 import java.util.List;
@@ -54,7 +57,8 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     private List<ProjectSyncPlugin> projectImportServiceList;
 
     @Override
-    public void syncProjectTasksWithSchedule(final Long orgID,
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_IMPORT + "')")
+    public void syncProjectTasksWithSchedule(final Organization org,
                                              final Account actor,
                                              final Project project,
                                              final String serviceName,
@@ -68,7 +72,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             final JobDataMap data = new JobDataMap();
             data.put(ACCOUNT_ID, actor.getId());
             data.put(CREDENTIALS, jiraCredentials);
-            data.put(ORG_ID, orgID);
+            data.put(ORG_ID, org);
             data.put(SERVICE_NAME, serviceName);
             data.put(PROJECT_ID, project.getId());
 
@@ -91,7 +95,8 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
     }
 
     @Override
-    public void syncProjectTasks(final Long orgID,
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_IMPORT + "')")
+    public void syncProjectTasks(final Organization org,
                                  final Account actor,
                                  final Project project,
                                  final String serviceName,
@@ -104,7 +109,7 @@ public class ProjectSyncPluginImpl implements ProjectSyncService {
             final JobDataMap data = new JobDataMap();
             data.put(ACCOUNT_ID, actor.getId());
             data.put(CREDENTIALS, jiraCredentials);
-            data.put(ORG_ID, orgID);
+            data.put(ORG_ID, org.getId());
             data.put(SERVICE_NAME, serviceName);
             data.put(PROJECT_ID, project.getId());
 

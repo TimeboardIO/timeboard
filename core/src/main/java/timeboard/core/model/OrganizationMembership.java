@@ -79,7 +79,7 @@ public class OrganizationMembership {
 
     public void setMember(final Account member) {
         this.member = member;
-        member.getOrganizations().add(this);
+        member.getOrganizationMemberships().add(this);
     }
 
     public Organization getOrganization() {
