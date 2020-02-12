@@ -33,7 +33,7 @@ import org.springframework.security.authentication.event.InteractiveAuthenticati
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 
@@ -42,7 +42,7 @@ import timeboard.core.model.Account;
 public class SuccessfulLoginListener {
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @EventListener
@@ -54,13 +54,13 @@ public class SuccessfulLoginListener {
         if (account == null) {
             if (event.getSource() instanceof OAuth2AuthenticationToken) {
                 final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) event.getSource();
-                this.userService.userProvisionning((String) token.getPrincipal().getAttributes().get("sub"),
+                this.accountService.userProvisionning((String) token.getPrincipal().getAttributes().get("sub"),
                         (String) token.getPrincipal().getAttributes().get("email"));
             }
 
             if (event.getSource() instanceof UsernamePasswordAuthenticationToken) {
                 final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) event.getSource();
-                this.userService.userProvisionning(token.getName(), token.getName());
+                this.accountService.userProvisionning(token.getName(), token.getName());
             }
         }
     }

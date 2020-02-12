@@ -46,6 +46,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
 import timeboard.core.model.ValueHistory;
+import timeboard.core.security.AbacEntries;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.ParseException;
@@ -54,8 +55,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/projects/{project}/snapshots")
-public class ProjectSnapshotsController {
+@RequestMapping("/projects/{project}" + ProjectSnapshotsController.URL)
+public class ProjectSnapshotsController extends ProjectBaseController {
+
+    public static final String URL = "/snapshots";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectSnapshotsController.class);
@@ -68,13 +71,13 @@ public class ProjectSnapshotsController {
 
 
     @GetMapping
-    @PreAuthorize("hasPermission(#project,'PROJECT_SNAPSHOT')")
+    @PreAuthorize("hasPermission(#project, '"+ AbacEntries.PROJECT_SNAPSHOT+"')")
     public String display(final TimeboardAuthentication authentication,
                           @PathVariable("project") final Project project,
                           final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
-
+        this.initModel(model, authentication, project);
         return "project_snapshots";
     }
 

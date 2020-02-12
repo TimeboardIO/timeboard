@@ -31,10 +31,7 @@ import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.*;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 public interface TimesheetService {
@@ -42,16 +39,14 @@ public interface TimesheetService {
     /**
      * Submit user timesheet.
      *
-     * @param actor            user who trigger this function.
-     * @param accountTimesheet user which be used to build timehseet to submit
-     * @param year             timesheet year
-     * @param week             timesheet week
+     * @param timesheetOwner user which be used to build timehseet to submit
+     * @param year           timesheet year
+     * @param week           timesheet week
      * @return true if timesheet is submit else, false.
      */
     SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
-            final Account actor,
-            final Account accountTimesheet,
+            final Account timesheetOwner,
             final int year,
             final int week) throws BusinessException;
 
@@ -59,37 +54,39 @@ public interface TimesheetService {
     /**
      * Submit user timesheet.
      *
-     * @param actor            user who trigger this function.
-     * @param submittedTimesheet  submittedTimesheet to validate
+     * @param actor              user who trigger this function.
+     * @param submittedTimesheet submittedTimesheet to validate
      * @return true if timesheet is submit else, false.
      */
-    SubmittedTimesheet validateTimesheet(final Organization currentOrg, final Account actor,
-                                         final SubmittedTimesheet submittedTimesheet) throws BusinessException;
-    /**
+    SubmittedTimesheet validateTimesheet(
+            final Organization currentOrg,
+            final Account actor,
+            final SubmittedTimesheet submittedTimesheet) throws BusinessException;
 
+    /**
      * Reject user timesheet.
      *
-     * @param actor            user who trigger this function.
-     * @param submittedTimesheet  submittedTimesheet to reject
+     * @param actor              user who trigger this function.
+     * @param submittedTimesheet submittedTimesheet to reject
      * @return SubmittedTimesheet with status REJECTED
      */
     SubmittedTimesheet rejectTimesheet(final Organization currentOrg, final Account actor,
                                        final SubmittedTimesheet submittedTimesheet) throws BusinessException;
 
-    Optional<SubmittedTimesheet> getSubmittedTimesheet(Long orgID, Account actor, Account user, int year, int week);
+    Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization org, Account timesheetOwner, int year, int week);
 
 
     /**
      * Get timesheet validation status.
      *
-     * @param currentAccount user used to check timesheet sumbit state.
+     * @param timesheetOwner user used to check timesheet sumbit state.
      * @param year           timesheet year
      * @param week           timesheet week
      * @return ValidationStatus, null current account has no timesheet validation request for current week
      */
     Optional<ValidationStatus> getTimesheetValidationStatus(
-            final Long orgID,
-            final Account currentAccount,
+            final Organization org,
+            final Account timesheetOwner,
             final int year,
             final int week);
 
@@ -103,15 +100,27 @@ public interface TimesheetService {
      * @return the sum of all imputations of the week
      */
     Map<Integer, Double> getAllImputationsForAccountOnDateRange(
-            final Long orgID,
+            final Organization org,
             final Date firstDayOfWeek,
             final Date lastDayOfWeek,
             final Account account,
             final TimesheetFilter... filters);
 
+    UpdatedTaskResult updateTaskImputation(
+            final Organization org,
+            final Account actor,
+            final AbstractTask task,
+            final Date day,
+            final double val) throws BusinessException;
+
+    List<UpdatedTaskResult> updateTaskImputations(
+            final Organization org,
+            final Account actor,
+            final List<Imputation> imputationsList);
+
 
     Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(
-            final Long orgID,
+            final Organization org,
             final Account actor,
             final Project project);
 
@@ -129,9 +138,23 @@ public interface TimesheetService {
      * @param olderYear      year of older week in the "validation timesheet week" list
      * @param olderWeek      week of older week in the "validation timesheet week" list
      */
-    void forceValidationTimesheets(Long organizationID, Account actor, Account target,
-                                 int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
+    void forceValidationTimesheets(Organization organizationID, Account actor, Account target,
+                                   int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
 
+    @Deprecated
+    default long absoluteWeekNumber(SubmittedTimesheet t) {
+        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
+    }
+
+    @Deprecated
+    default long absoluteWeekNumber(int year, int week) {
+        return (long) (year * 53) + week;
+    }
+
+    @Deprecated
+    default long absoluteWeekNumber(java.util.Calendar c) {
+        return absoluteWeekNumber(c.get(java.util.Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+    }
 
     class TimesheetFilter<T> {
         private T target;
@@ -143,18 +166,6 @@ public interface TimesheetService {
         public T getTarget() {
             return target;
         }
-    }
-
-    default long absoluteWeekNumber(SubmittedTimesheet t) {
-        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
-    }
-
-    default long absoluteWeekNumber(int year, int week) {
-        return (long) (year * 53) + week;
-    }
-
-    default long absoluteWeekNumber(java.util.Calendar c) {
-        return absoluteWeekNumber(c.get(java.util.Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
     }
 
 }

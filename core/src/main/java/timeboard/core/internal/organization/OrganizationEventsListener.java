@@ -53,7 +53,7 @@ public class OrganizationEventsListener {
             try {
                 this.organizationService.createDefaultTask(
                         event.getActor(),
-                        event.getOrganization().getId(),
+                        event.getOrganization(),
                         this.defaultVacationTaskName);
 
             } catch (final BusinessException e) {

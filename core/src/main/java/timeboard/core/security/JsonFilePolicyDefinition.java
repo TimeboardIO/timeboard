@@ -48,12 +48,12 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JsonFilePolicyDefinition.class);
 
-    private static String DEFAULT_POLICY_FILE_NAME = "policy.json";
+    private static String DEFAULT_POLICY_FILE_NAME = "policy-set.json";
 
     @Value("${policy.json.filePath}")
     private String policyFilePath;
 
-    private List<PolicyRule> rules;
+    private List<PolicyRuleSet> rules;
 
     @PostConstruct
     private void init() {
@@ -62,15 +62,15 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
         module.addDeserializer(Expression.class, new SpelDeserializer());
         mapper.registerModule(module);
         try {
-            PolicyRule[] rulesArray = null;
+            PolicyRuleSet[] rulesArray = null;
             LOGGER.debug("[init] Checking policy file at: {}", policyFilePath);
             if (policyFilePath != null && !policyFilePath.isEmpty()
                     && Files.exists(Paths.get(policyFilePath))) {
                 LOGGER.info("[init] Loading policy from custom file: {}", policyFilePath);
-                rulesArray = mapper.readValue(new File(policyFilePath), PolicyRule[].class);
+                rulesArray = mapper.readValue(new File(policyFilePath), PolicyRuleSet[].class);
             } else {
                 LOGGER.info("[init] Custom policy file not found. Loading default policy");
-                rulesArray = mapper.readValue(getClass().getClassLoader().getResourceAsStream(DEFAULT_POLICY_FILE_NAME), PolicyRule[].class);
+                rulesArray = mapper.readValue(getClass().getClassLoader().getResourceAsStream(DEFAULT_POLICY_FILE_NAME), PolicyRuleSet[].class);
             }
             this.rules = rulesArray != null ? Arrays.asList(rulesArray) : null;
             LOGGER.info("[init] Policy loaded successfully.");
@@ -82,7 +82,7 @@ public class JsonFilePolicyDefinition implements PolicyDefinition {
     }
 
     @Override
-    public List<PolicyRule> getAllPolicyRules() {
+    public List<PolicyRuleSet> getAllPolicyRules() {
         return rules;
     }
 
