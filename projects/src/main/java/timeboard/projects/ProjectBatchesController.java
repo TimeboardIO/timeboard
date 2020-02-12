@@ -77,7 +77,6 @@ public class ProjectBatchesController extends ProjectBaseController {
                               @PathVariable final Project project, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-       // final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("project", project);
         model.addAttribute("batchTypes", BatchType.values());
@@ -117,10 +116,9 @@ public class ProjectBatchesController extends ProjectBaseController {
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
     protected ResponseEntity<List<BatchDecorator>> listBatches(final TimeboardAuthentication authentication,
-                                                               @PathVariable final Long projectID) throws BusinessException {
+                                                               @PathVariable final Project project) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         return ResponseEntity.ok(this.projectService.listProjectBatches(actor, project)
                 .stream().map(batch -> new BatchDecorator(batch))

@@ -34,6 +34,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.*;
 import timeboard.core.api.events.TaskEvent;
@@ -49,6 +50,7 @@ import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
 import timeboard.core.security.AbacEntries;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -311,7 +313,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#project, " + AbacEntries.PROJECT_TASKS_CREATE + ")")
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_CREATE + "')")
     public Task createTask(
             final Organization orgID,
             final Account actor,
@@ -365,7 +367,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#task.getProject(), " + AbacEntries.PROJECT_TASKS_EDIT + ")")
+    @PreAuthorize("hasPermission(#task.getProject(), '" + AbacEntries.PROJECT_TASKS_EDIT + "')")
     public Task updateTask(final Organization orgID, final Account actor, final Task task) {
         if (task.getProject().isMember(actor)) {
             task.setOrganizationID(orgID.getId());
@@ -610,7 +612,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_BATCHES_VIEW + "')")
     public Batch createBatch(final Account actor,
                              final String name, final Date date, final BatchType type,
                              final Map<String, String> attributes,
@@ -624,6 +626,7 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
 
+        final TimeboardAuthentication authentication = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
         final Batch newBatch = new Batch();
         newBatch.setName(name);
         newBatch.setType(type);
@@ -631,6 +634,7 @@ public class ProjectServiceImpl implements ProjectService {
         newBatch.setAttributes(attributes);
         newBatch.setTasks(tasks);
         newBatch.setProject(project);
+        newBatch.setOrganizationID(authentication.getCurrentOrganization().getId());
 
         em.persist(newBatch);
         LOGGER.info("Batch {} created by {} ", newBatch.getName(), actor.getScreenName());
