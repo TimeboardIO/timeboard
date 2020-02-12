@@ -199,8 +199,8 @@ public class OrganizationServiceImpl implements OrganizationService {
             this.em.detach(o.get());
             return o;
         } else {
-            if (organization.isPublicOrganisation()){
-                return Optional.of(new OrganizationMembership(organization, actor, MembershipRole.CONTRIBUTOR));
+            if (org.isPublicOrganisation()){
+                return Optional.of(new OrganizationMembership(org, actor, MembershipRole.CONTRIBUTOR));
             }
         }
 
