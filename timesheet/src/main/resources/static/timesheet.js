@@ -229,6 +229,7 @@ $(document).ready(function () {
                     }
                 });
             },
+
             validateWeek: function (event) {
                 $.ajax({
                     method: "POST",
@@ -363,7 +364,23 @@ $(document).ready(function () {
                     },
                     detachable: true, centered: true
                 }).modal('show');
-            }
+            },
+            cancelTask: function(event, task) {
+                event.preventDefault();
+                event.stopPropagation();
+                $.ajax({
+                    method: "DELETE",
+                    url: "timesheet/cancelTask/" + task.taskID,
+                    success: function (weekValidationStatus, textStatus, jqXHR) {
+                        app.displaySuccessMessage("Task successfully canceled. ");
+                        app.updateTimesheet();
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        app.displayErrorMessage("Error can not cancel task : " + textStatus);
+                    }
+                });
+            },
         },
         mounted: function () {
             this.updateTimesheet();

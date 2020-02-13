@@ -359,6 +359,17 @@ public class TimesheetController {
         }
     }
 
+    @DeleteMapping("/cancelTask/{taskID}")
+    public ResponseEntity cancelTask(final TimeboardAuthentication authentication,
+                                          @PathVariable final Long taskID) {
+        try {
+            this.projectService.deleteTaskByID(authentication.getDetails(), taskID);
+            return ResponseEntity.ok().build();
+        } catch (BusinessException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
+    }
 
     private List<TaskWrapper> getDefaultTasks(final Account currentAccount,
                                               final Organization org,
