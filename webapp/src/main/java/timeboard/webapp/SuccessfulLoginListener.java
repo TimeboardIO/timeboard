@@ -54,13 +54,13 @@ public class SuccessfulLoginListener {
         if (account == null) {
             if (event.getSource() instanceof OAuth2AuthenticationToken) {
                 final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) event.getSource();
-                this.accountService.userProvisionning((String) token.getPrincipal().getAttributes().get("sub"),
+                this.accountService.userProvisioning((String) token.getPrincipal().getAttributes().get("sub"),
                         (String) token.getPrincipal().getAttributes().get("email"));
             }
 
             if (event.getSource() instanceof UsernamePasswordAuthenticationToken) {
                 final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) event.getSource();
-                this.accountService.userProvisionning(token.getName(), token.getName());
+                this.accountService.userProvisioning(token.getName(), token.getName());
             }
         }
     }

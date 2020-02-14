@@ -57,7 +57,7 @@ public class HomeFeatureATest extends TimeboardTest {
     public void user_with_an_existing_account_and_project(final int arg1) throws Throwable {
 
         this.model = new ConcurrentModel();
-        this.account = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test");
+        this.account = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test");
 
         this.organisation = this.organizationService.createOrganization(this.account, "Integration", Collections.emptyMap());
 
