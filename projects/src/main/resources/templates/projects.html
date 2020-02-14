@@ -24,6 +24,12 @@
                 <a th:href="@{/projects/create}" data-cy="create-project" >here</a>
                 to create your first project !</p>
         </div>
+        <div class="content" sec:authorize="!hasPermission(null,'PROJECTS_CREATE')">
+            <div class="header">
+                No Projects.
+            </div>
+            <p>You have not enough rights to create projects on this organization, maybe you should create your own !</p>
+        </div>
     </div>
 
     <div th:if="${!projects.isEmpty()}">

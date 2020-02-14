@@ -100,7 +100,6 @@ public class TimeboardWebMVCConfig implements WebMvcConfigurer {
         registry
                 .addResourceHandler("/webjars/**")
                 .setCacheControl(CacheControl.maxAge(365, TimeUnit.DAYS))
-
                 .addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 

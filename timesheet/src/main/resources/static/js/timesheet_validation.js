@@ -79,6 +79,21 @@ $(document).ready(function () {
                     }
                 });
             },
+            sendReminder: function (event, target) {
+                event.stopPropagation();
+                let self = this;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "/timesheet/sendReminderMail/" + target.id,
+                    success: function (data, textStatus, jqXHR)  {
+                        event.target.classList.add('disabled');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        event.target.classList.add('red');
+                    }
+                });
+            }
         },
         mounted: function () {
             let self = this;
@@ -96,6 +111,5 @@ $(document).ready(function () {
         }
     });
 
-    $('.ui.accordion')
-        .accordion();
+    $('.ui.accordion').accordion();
 });
