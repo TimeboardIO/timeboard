@@ -26,29 +26,17 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.en.Given;
-import org.aspectj.weaver.World;
-import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
 import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
-
-import java.util.Collections;
-import java.util.UUID;
 
 
 @SpringBootTest(
@@ -61,35 +49,26 @@ import java.util.UUID;
 public class TimeboardTest {
 
     protected TimeboardWorld world;
+    @Autowired
+    protected MockMvc mvc;
+    @Autowired
+    protected HomeController controller;
+    @Autowired
+    protected ProjectService projectService;
+    @Autowired
+    protected AccountService accountService;
+    @Autowired
+    protected OrganizationService organizationService;
+    @Autowired
+    protected TimesheetService timesheetService;
 
     public TimeboardTest(TimeboardWorld world) {
         this.world = world;
     }
+
     public TimeboardTest() {
         this.world = new TimeboardWorld();
     }
-
-    @Autowired
-    protected MockMvc mvc;
-
-    @Autowired
-    protected HomeController controller;
-
-    @Autowired
-    protected ProjectService projectService;
-
-    @Autowired
-    protected AccountService accountService;
-
-    @Autowired
-    protected OrganizationService organizationService;
-
-    @Autowired
-    protected TimesheetService timesheetService;
-
-
-
-
 
 
 }

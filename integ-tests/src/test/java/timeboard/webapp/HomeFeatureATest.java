@@ -26,29 +26,18 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
-
-import java.util.Collections;
-import java.util.UUID;
 
 public class HomeFeatureATest extends TimeboardTest {
 
     @Autowired
-    private TimeboardWorld world;
-
-    @Autowired
     protected HomeController homeController;
+    @Autowired
+    private TimeboardWorld world;
 
     @When("^the user calls /home$")
     public void the_client_calls_home() throws Throwable {

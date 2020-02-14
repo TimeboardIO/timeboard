@@ -32,10 +32,7 @@ import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
-import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
 
 import java.util.Collections;
@@ -44,11 +41,9 @@ import java.util.UUID;
 public class HomeFeatureBTest extends TimeboardTest {
 
     @Autowired
-    private TimeboardWorld world;
-
-    @Autowired
     protected HomeController homeController;
-
+    @Autowired
+    private TimeboardWorld world;
     private Organization organisationA;
     private Organization organisationB;
 

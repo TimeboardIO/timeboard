@@ -54,7 +54,7 @@ public class GlobalStepDefinitions extends TimeboardTest {
         world.model = new ConcurrentModel();
         world.account = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test");
 
-        world.organization = this.organizationService.createOrganization(world.account, "Integration"+ new Random().nextInt(), Collections.emptyMap());
+        world.organization = this.organizationService.createOrganization(world.account, "Integration" + new Random().nextInt(), Collections.emptyMap());
 
         Assert.assertNotNull(world.account);
         world.auth = new TimeboardAuthentication(world.account);
@@ -62,7 +62,7 @@ public class GlobalStepDefinitions extends TimeboardTest {
         SecurityContextHolder.getContext().setAuthentication(world.auth);
 
         for (int i = 0; i < arg1; i++) {
-            world.lastProject = this.projectService.createProject(world.organization, world.account, "TestProject"+i);
+            world.lastProject = this.projectService.createProject(world.organization, world.account, "TestProject" + i);
         }
     }
 
@@ -77,11 +77,11 @@ public class GlobalStepDefinitions extends TimeboardTest {
         end.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         end.add(Calendar.DAY_OF_YEAR, arg1);
 
-        String remoteID = Math.random()+"/";
+        String remoteID = Math.random() + "/";
         for (int i = 0; i < arg1; i++) {
-            world.lastTask = projectService.createTask(world.organization, world.account, world.lastProject,"","",
+            world.lastTask = projectService.createTask(world.organization, world.account, world.lastProject, "", "",
                     start.getTime(), end.getTime(), Math.random(),
-                    null,  null,null, null, remoteID+i,
+                    null, null, null, null, remoteID + i,
                     TaskStatus.IN_PROGRESS, Collections.emptyList()
             );
         }

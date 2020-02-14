@@ -26,7 +26,6 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.ca.Cal;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
@@ -57,10 +56,10 @@ public class TimesheetFeatureTest extends TimeboardTest {
         start.setTime(task.getStartDate());
         end.setTime(task.getEndDate());
 
-        while(start.before(end)) {
+        while (start.before(end)) {
             Optional<Imputation> imputation = projectService.getImputation(world.account, task, start.getTime());
             Assert.assertTrue(imputation.isPresent());
-            localSum+= imputation.get().getValue();
+            localSum += imputation.get().getValue();
             start.add(Calendar.DAY_OF_YEAR, 1);
         }
 
@@ -76,7 +75,7 @@ public class TimesheetFeatureTest extends TimeboardTest {
         Calendar end = Calendar.getInstance();
         start.setTime(task.getStartDate());
         end.setTime(task.getEndDate());
-        while(start.before(end)) {
+        while (start.before(end)) {
             UpdatedTaskResult result = timesheetService.updateTaskImputation(world.organization, world.account, task, start.getTime(), 1.0);
             Assert.assertNotNull(result);
             start.add(Calendar.DAY_OF_YEAR, 1);
@@ -88,7 +87,7 @@ public class TimesheetFeatureTest extends TimeboardTest {
     public void theUserSubmitHisTimesheet() throws BusinessException {
 
         Calendar c = Calendar.getInstance();
-        timesheetService.submitTimesheet(world.organization, world.account, c.get(Calendar.YEAR),  c.get(Calendar.WEEK_OF_YEAR));
+        timesheetService.submitTimesheet(world.organization, world.account, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
     }
 
     @Then("^the timesheet is submitted$")

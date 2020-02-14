@@ -45,14 +45,12 @@ import java.util.Random;
 public class TaskFeatureATest extends TimeboardTest {
 
     @Autowired
-    private TimeboardWorld world;
-
-    @Autowired
     protected ProjectsController projectsController;
-
+    @Autowired
+    private TimeboardWorld world;
     private Project project;
 
-    private String remoteID = new Random().nextInt()+"";
+    private String remoteID = new Random().nextInt() + "";
 
     @When("^the user create a task$")
     public void theUserCreateATask() {
@@ -61,9 +59,9 @@ public class TaskFeatureATest extends TimeboardTest {
         Calendar end = Calendar.getInstance();
         end.add(Calendar.DAY_OF_YEAR, 5);
 
-        projectService.createTask(world.organization, world.account, world.lastProject,"","",
+        projectService.createTask(world.organization, world.account, world.lastProject, "", "",
                 start.getTime(), end.getTime(), Math.random(),
-                null,  null,null, null, remoteID,
+                null, null, null, null, remoteID,
                 TaskStatus.PENDING, Collections.emptyList());
 
     }
@@ -78,7 +76,7 @@ public class TaskFeatureATest extends TimeboardTest {
     @When("^the user update a task$")
     public void theUserUpdateATask() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2020, Calendar.JANUARY,1);
+        calendar.set(2020, Calendar.JANUARY, 1);
         Optional<Task> task = projectService.getTaskByRemoteID(world.account, remoteID);
         Assert.assertTrue(task.isPresent());
         Task t = task.get();

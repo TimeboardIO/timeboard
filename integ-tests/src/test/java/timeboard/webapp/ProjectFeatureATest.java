@@ -26,33 +26,19 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.PendingException;
-import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.projects.ProjectsController;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 public class ProjectFeatureATest extends TimeboardTest {
 
     @Autowired
-    private TimeboardWorld world;
-
-    @Autowired
     protected ProjectsController projectsController;
+    @Autowired
+    private TimeboardWorld world;
 
     @Then("^the user has (\\d+) projects$")
     public void the_user_has_projects(final int arg1) throws Throwable {
