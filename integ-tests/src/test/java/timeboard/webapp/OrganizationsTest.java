@@ -61,12 +61,12 @@ public class OrganizationsTest extends TimeboardTest {
     @Test
     public void testRemoveOrganizationMember() throws BusinessException {
 
-        final Account a1 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "testRemove1@test.fr");
+        final Account a1 = this.accountService.userProvisioning(UUID.randomUUID().toString(), "testRemove1@test.fr");
         final Organization org = this.organizationService.createOrganization(a1, "testRemoveOrg", Collections.emptyMap());
 
         SecurityUtils.signIn(org, a1);
 
-        final Account a2 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "testRemove2@test.fr");
+        final Account a2 = this.accountService.userProvisioning(UUID.randomUUID().toString(), "testRemove2@test.fr");
 
         this.organizationService.addMembership(a1, org, a2, MembershipRole.CONTRIBUTOR);
 
@@ -81,7 +81,7 @@ public class OrganizationsTest extends TimeboardTest {
     @Test
     public void testCreateDefaultTask() throws BusinessException {
 
-        final Account a1 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test3@test.fr");
+        final Account a1 = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test3@test.fr");
         final Organization org = this.organizationService.createOrganization(a1, "testOrg2", Collections.emptyMap());
 
         SecurityUtils.signIn(org, a1);

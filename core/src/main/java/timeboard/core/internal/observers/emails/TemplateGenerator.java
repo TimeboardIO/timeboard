@@ -26,19 +26,27 @@ package timeboard.core.internal.observers.emails;
  * #L%
  */
 
-import org.thymeleaf.TemplateEngine;
+import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 import java.util.Locale;
 import java.util.Map;
 
+@Component
 public class TemplateGenerator {
 
     private ClassLoaderTemplateResolver resolver = new ClassLoaderTemplateResolver();
 
     private boolean init = false;
+
+    @Autowired
+    private MessageSource messageSource;
 
     public void init() {
 
@@ -48,22 +56,23 @@ public class TemplateGenerator {
         resolver.setCacheTTLMs(50000L);
         resolver.setCharacterEncoding("utf-8");
 
-
         init = true;
     }
 
 
-    public String getTemplateString(final String templateName, final Map<String, Object> templateData) {
+    public String getTemplateString(final String templateName, final Map<String, Object> templateData, Locale locale) {
         if (!init) {
             init();
         }
 
-        final TemplateEngine engine = new TemplateEngine();
+        final SpringTemplateEngine engine = new SpringTemplateEngine();
         engine.setTemplateResolver(resolver);
-        final Context ctx = new Context(Locale.FRANCE);
+        engine.addDialect(new LayoutDialect());
+        engine.setTemplateEngineMessageSource(messageSource);
+
+        final Context ctx = new Context(locale);
 
         templateData.forEach(ctx::setVariable);
-
         return engine.process(templateName, ctx);
 
     }

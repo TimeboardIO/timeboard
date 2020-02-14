@@ -83,7 +83,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
 
     @Override
-    @PostAuthorize("#actor.isMemberOf(returnObject)")
+    @PostAuthorize("(returnObject.isPresent() && returnObject.get().isPublicOrganisation()) || #actor.isMemberOf(returnObject)")
     @Cacheable(value = "organizationsCache", key = "#id")
     public Optional<Organization> getOrganizationByID(final Account actor, final long id) {
         Organization data;
@@ -197,8 +197,14 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         if (o.isPresent()) {
             this.em.detach(o.get());
+            return o;
+        } else {
+            if (org.isPublicOrganisation()){
+                return Optional.of(new OrganizationMembership(org, actor, MembershipRole.CONTRIBUTOR));
+            }
         }
-        return o;
+
+        return Optional.empty();
     }
 
 

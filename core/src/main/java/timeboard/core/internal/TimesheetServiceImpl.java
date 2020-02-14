@@ -446,6 +446,19 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
+    public List<SubmittedTimesheet> getSubmittedTimesheets(Organization org, Account actor, Account targetUser) {
+        final TypedQuery<SubmittedTimesheet> q = em.createQuery("select st from SubmittedTimesheet st JOIN st.account a "
+                + "where st.account = :user and st.organizationID = :orgID", SubmittedTimesheet.class);
+
+        q.setParameter("orgID", org.getId());
+        q.setParameter("user", targetUser);
+
+        try {
+            return q.getResultList();
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
+    }
     public void forceValidationTimesheets(final Organization org,
                                           final Account actor,
                                           final Account target,
@@ -453,6 +466,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                                           final int selectedWeek,
                                           final int olderYear,
                                           final int olderWeek) throws TimesheetException {
+
 
         final long selectedAbsoluteWeekNumber = absoluteWeekNumber(selectedYear, selectedWeek);
 
