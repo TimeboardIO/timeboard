@@ -41,6 +41,7 @@ import org.springframework.ui.Model;
 import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
@@ -82,6 +83,9 @@ public class TimeboardTest {
 
     @Autowired
     protected OrganizationService organizationService;
+
+    @Autowired
+    protected TimesheetService timesheetService;
 
 
 

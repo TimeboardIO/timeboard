@@ -35,7 +35,6 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
-import timeboard.core.model.TaskType;
 import timeboard.projects.ProjectsController;
 
 import java.util.Calendar;
@@ -62,7 +61,7 @@ public class TaskFeatureATest extends TimeboardTest {
         Calendar end = Calendar.getInstance();
         end.add(Calendar.DAY_OF_YEAR, 5);
 
-        projectService.createTask(world.organization, world.account, world.project,"","",
+        projectService.createTask(world.organization, world.account, world.lastProject,"","",
                 start.getTime(), end.getTime(), Math.random(),
                 null,  null,null, null, remoteID,
                 TaskStatus.PENDING, Collections.emptyList());
@@ -71,7 +70,7 @@ public class TaskFeatureATest extends TimeboardTest {
 
     @Then("^the user has (\\d+) task on project$")
     public void theUserHasTaskOnProject(int arg0) throws BusinessException {
-        List<Task> tasks = projectService.listProjectTasks(world.account, world.project);
+        List<Task> tasks = projectService.listProjectTasks(world.account, world.lastProject);
         Assert.assertEquals(tasks.size(), 1);
 
     }
@@ -106,4 +105,6 @@ public class TaskFeatureATest extends TimeboardTest {
         Assert.assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
 
     }
+
+
 }

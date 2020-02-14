@@ -27,19 +27,15 @@ package timeboard.webapp;
  */
 
 import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import org.aspectj.weaver.World;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
+import timeboard.core.model.TaskStatus;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
 
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
@@ -66,10 +62,29 @@ public class GlobalStepDefinitions extends TimeboardTest {
         SecurityContextHolder.getContext().setAuthentication(world.auth);
 
         for (int i = 0; i < arg1; i++) {
-            world.project = this.projectService.createProject(world.organization, world.account, "TestProject"+i);
+            world.lastProject = this.projectService.createProject(world.organization, world.account, "TestProject"+i);
         }
     }
 
 
+    @Given("^user with an existing account and (\\d+) projects with (\\d+) tasks$")
+    public void userWithAnExistingAccountAndProjectsWithTasks(int arg0, int arg1) throws Throwable {
+        this.user_with_an_existing_account_and_projects(arg0);
 
+        Calendar start = Calendar.getInstance();
+        Calendar end = Calendar.getInstance();
+        start.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        end.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+        end.add(Calendar.DAY_OF_YEAR, arg1);
+
+        String remoteID = Math.random()+"/";
+        for (int i = 0; i < arg1; i++) {
+            world.lastTask = projectService.createTask(world.organization, world.account, world.lastProject,"","",
+                    start.getTime(), end.getTime(), Math.random(),
+                    null,  null,null, null, remoteID+i,
+                    TaskStatus.IN_PROGRESS, Collections.emptyList()
+            );
+        }
+
+    }
 }

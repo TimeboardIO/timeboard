@@ -32,12 +32,17 @@ import org.springframework.ui.Model;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
+import timeboard.core.model.Task;
 import timeboard.core.security.TimeboardAuthentication;
+
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 
 @Component
 public class TimeboardWorld {
 
-    Project project;
+    Project lastProject;
+    Task lastTask;
     Account account;
     Organization organization;
     TimeboardAuthentication auth;

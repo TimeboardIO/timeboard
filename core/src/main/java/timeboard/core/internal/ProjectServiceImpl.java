@@ -447,21 +447,15 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    public Optional<Imputation> getImputation(final Account user, final DefaultTask task, final Date day) {
-        final Imputation existingImputation = this.getImputationByDayByTask(em, day, task, user);
-        return Optional.ofNullable(existingImputation);
-    }
+    public Optional<Imputation> getImputation(final Account account, final AbstractTask task, final Date day) {
 
-    @Override
-    public Imputation getImputationByDayByTask(final EntityManager entityManager, final Date day, final AbstractTask task, final Account account) {
-        final TypedQuery<Imputation> q = entityManager.createQuery("select i from Imputation i  " +
+        final TypedQuery<Imputation> q = em.createQuery("select i from Imputation i  " +
                 "where i.task.id = :taskID and i.day = :day and i.account = :account", Imputation.class);
         q.setParameter("taskID", task.getId());
         q.setParameter("day", day);
         q.setParameter("account", account);
-        return q.getResultList().stream().findFirst().orElse(null);
+        return q.getResultList().stream().findFirst();
     }
-
 
     @Override
     public UpdatedTaskResult updateTaskEffortLeft(final Account actor, final Task task, final double effortLeft) throws BusinessException {

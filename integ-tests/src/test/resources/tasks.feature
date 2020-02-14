@@ -1,4 +1,4 @@
-Feature: User can CRUD tasks
+Feature: User can CRU tasks
 
   Scenario: A client can create a task
     Given user with an existing account and 1 projects
@@ -11,4 +11,8 @@ Feature: User can CRUD tasks
     When the user update a task
     Then the user has 1 task on project
     Then the task have been updated
+
+
+
+
 
