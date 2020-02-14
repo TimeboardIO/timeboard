@@ -114,6 +114,16 @@ const timesheetModel = {
             }),
             contentType: "application/json",
         });
+    },
+    getFirstDayOfWeekDateString : function () {
+        let d1 = new Date('' + this.year + '');
+        d1.setDate(d1.getDate() - d1.getDay() + 1 + (7 * (this.week - 1)));
+        return d1.toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' });
+    },
+    getLastDayOfWeekDateString : function () {
+        let d1 = new Date('' + this.year + '');
+        d1.setDate(d1.getDate() - d1.getDay() + 7 + (7 * (this.week - 1)));
+        return d1.toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' });
     }
 };
 

@@ -178,7 +178,9 @@
                :class="{ disabled : disablePrev }">
                 <i class="left arrow icon"></i><span th:text="#{timesheet.previousweek}">Previous Week</span> </a>
 
-            <span class="ui blue circular label"><span th:text="#{week}">Week</span> {{ week }}</span>
+            <span class="ui label" style="border-radius: 2rem 5px 5px 2rem;">{{ getFirstDayOfWeekDateString() }}</span>
+            <span class="ui blue label"><span th:text="#{week}">Week</span> {{ week }} </span>
+            <span class="ui label" style="border-radius:  5px 2rem 2rem 5px;">{{ getLastDayOfWeekDateString() }} </span>
 
             <a class="ui right labeled icon button"
                v-bind:href="userIsActor ? '/timesheet/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) : '/timesheet/'+userID+'/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) "
