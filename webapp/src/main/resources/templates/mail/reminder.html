@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/mail/global.html}"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div layout:fragment="content">
+    <tr>
+        <td class="innerpadding borderbottom">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td class="bodycopy" >
+                        <span th:text="#{reminder.hello}" >Hello</span>
+                        <span th:text="' ' + ${targetScreenName} + ', '" >Bob</span>
+                        <br/>
+                        <br/>
+                        <span th:text="#{reminder.missing1}" ></span>
+                        <div class="circle" th:text="${missingWeeksNumber}" style="display: inline-block;">
+                            5
+                        </div>
+                        <span th:text="#{reminder.missing2}" ></span>
+                        <br/>
+                        <span th:text="#{reminder.mail}" ></span>
+                        <a th:href="${link}" th:text="' ' + ${weekToValidate} + '/' + ${yearToValidate}"> </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</div>
+</body>
+</html>

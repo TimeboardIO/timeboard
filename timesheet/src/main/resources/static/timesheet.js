@@ -261,6 +261,21 @@ $(document).ready(function () {
                     }
                 });
             },
+            sendReminder: function (event) {
+                event.stopPropagation();
+                let self = this;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "timesheet/sendReminderMail/" + _USER_ID,
+                    success: function (data, textStatus, jqXHR)  {
+                        event.target.classList.add('disabled');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        event.target.classList.add('red');
+                    }
+                });
+            },
             triggerUpdateEffortLeft: function (event) {
                 $(event.target).parent().addClass('left icon loading').removeClass('error');
                 const taskID = $(event.target).attr('data-task-effortLeft');
