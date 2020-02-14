@@ -56,7 +56,7 @@ public class HomeFeatureBTest extends TimeboardTest {
     @Given("^user with an existing account and (\\d+) project in (\\d+) org \\(A\\) and (\\d+) in an other org \\(B\\)$")
     public void user_with_an_existing_account_and_project_in_org_A_and_in_an_other_org_B(final int arg1, final int arg2, final int arg3) throws Throwable {
         world.model = new ConcurrentModel();
-        world.account = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test2");
+        world.account = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test2");
 
         this.organisationA = this.organizationService.createOrganization(world.account, "Integration A", Collections.emptyMap());
         this.organisationB = this.organizationService.createOrganization(world.account, "Integration B", Collections.emptyMap());

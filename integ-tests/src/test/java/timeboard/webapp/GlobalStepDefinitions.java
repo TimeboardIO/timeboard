@@ -56,7 +56,7 @@ public class GlobalStepDefinitions extends TimeboardTest {
     public void user_with_an_existing_account_and_projects(final int arg1) throws Throwable {
 
         world.model = new ConcurrentModel();
-        world.account = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test");
+        world.account = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test");
 
         world.organization = this.organizationService.createOrganization(world.account, "Integration"+ new Random().nextInt(), Collections.emptyMap());
 

@@ -40,6 +40,7 @@ import timeboard.projects.ProjectsController;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class TaskFeatureATest extends TimeboardTest {
@@ -52,6 +53,8 @@ public class TaskFeatureATest extends TimeboardTest {
 
     private Project project;
 
+    private String remoteID = new Random().nextInt()+"";
+
     @When("^the user create a task$")
     public void theUserCreateATask() {
 
@@ -60,8 +63,8 @@ public class TaskFeatureATest extends TimeboardTest {
         end.add(Calendar.DAY_OF_YEAR, 5);
 
         projectService.createTask(world.organization, world.account, world.project,"","",
-                start.getTime(), end.getTime(), new Random().nextInt(),
-                null,  null,null, null, null,
+                start.getTime(), end.getTime(), Math.random(),
+                null,  null,null, null, remoteID,
                 TaskStatus.PENDING, Collections.emptyList());
 
     }
@@ -70,6 +73,37 @@ public class TaskFeatureATest extends TimeboardTest {
     public void theUserHasTaskOnProject(int arg0) throws BusinessException {
         List<Task> tasks = projectService.listProjectTasks(world.account, world.project);
         Assert.assertEquals(tasks.size(), 1);
+
+    }
+
+    @When("^the user update a task$")
+    public void theUserUpdateATask() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2020, Calendar.JANUARY,1);
+        Optional<Task> task = projectService.getTaskByRemoteID(world.account, remoteID);
+        Assert.assertTrue(task.isPresent());
+        Task t = task.get();
+        t.setTaskStatus(TaskStatus.IN_PROGRESS);
+        t.setStartDate(calendar.getTime());
+        t.setAssigned(world.account);
+        t.setOriginalEstimate(2.25);
+        projectService.updateTask(world.organization, world.account, task.get());
+    }
+
+    @Then("^the task have been updated$")
+    public void theTaskHaveBeenUpdated() {
+        Optional<Task> task = projectService.getTaskByRemoteID(world.account, remoteID);
+        Assert.assertTrue(task.isPresent());
+        Task t = task.get();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(t.getStartDate());
+        Assert.assertEquals(TaskStatus.IN_PROGRESS, t.getTaskStatus());
+        Assert.assertEquals(t.getAssigned().getId(), world.account.getId());
+        Assert.assertEquals(2.25, t.getOriginalEstimate(), 0);
+        Assert.assertEquals(Calendar.JANUARY, calendar.get(Calendar.MONTH));
+        Assert.assertEquals(2020, calendar.get(Calendar.YEAR));
+        Assert.assertEquals(1, calendar.get(Calendar.DAY_OF_MONTH));
 
     }
 }
