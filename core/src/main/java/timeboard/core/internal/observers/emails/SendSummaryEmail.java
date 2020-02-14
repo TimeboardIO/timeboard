@@ -55,7 +55,6 @@ public class SendSummaryEmail {
     @Value("${timeboard.mail.buffer.time}")
     private Long bufferTime;
 
-    private TemplateGenerator templateGenerator = new TemplateGenerator();
 
     @PostConstruct
     public void activate() {
@@ -113,11 +112,10 @@ public class SendSummaryEmail {
         data.put("vacationEventsDenied", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DENY)).toArray());
         data.put("vacationEventsDeleted", vacationEvents.stream().filter(e -> e.getEventType().equals(TimeboardEventType.DELETE)).toArray());
 
-        final String message = templateGenerator.getTemplateString("mail/summary.html", data);
         final ArrayList<String> list = new ArrayList<>();
         list.add(userNotificationStructure.getTargetAccount().getEmail());
-        final String subject = "[Timeboard] Daily summary";
-        return new EmailStructure(list, null, subject, message);
+        final String subject = "Summary";
+        return new EmailStructure(list, null, subject, data, "mail/summary.html");
     }
 
 

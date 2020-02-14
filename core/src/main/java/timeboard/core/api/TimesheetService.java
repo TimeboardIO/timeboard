@@ -124,6 +124,9 @@ public interface TimesheetService {
             final Account actor,
             final Project project);
 
+    List<SubmittedTimesheet> getSubmittedTimesheets(final Organization org, final Account actor, Account targetUser);
+
+
     /**
      * Force Validation of a list of weeks
      *

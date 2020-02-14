@@ -29,6 +29,7 @@ package timeboard.core.api;
 import timeboard.core.internal.observers.emails.EmailStructure;
 
 import javax.mail.MessagingException;
+import java.util.Locale;
 
 public interface EmailService {
 
@@ -39,4 +40,6 @@ public interface EmailService {
      * @throws MessagingException message not sent
      */
     void sendMessage(EmailStructure emailStructure) throws MessagingException;
+
+    void sendMessage(EmailStructure structure, Locale locale) throws MessagingException;
 }

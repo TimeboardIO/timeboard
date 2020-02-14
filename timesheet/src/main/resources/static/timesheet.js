@@ -114,6 +114,16 @@ const timesheetModel = {
             }),
             contentType: "application/json",
         });
+    },
+    getFirstDayOfWeekDateString : function () {
+        let d1 = new Date('' + this.year + '');
+        d1.setDate(d1.getDate() - d1.getDay() + 1 + (7 * (this.week - 1)));
+        return d1.toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' });
+    },
+    getLastDayOfWeekDateString : function () {
+        let d1 = new Date('' + this.year + '');
+        d1.setDate(d1.getDate() - d1.getDay() + 7 + (7 * (this.week - 1)));
+        return d1.toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' });
     }
 };
 
@@ -258,6 +268,21 @@ $(document).ready(function () {
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         app.displayErrorMessage("Error can not validate this timesheet. " + textStatus);
+                    }
+                });
+            },
+            sendReminder: function (event) {
+                event.stopPropagation();
+                let self = this;
+                $.ajax({
+                    type: "POST",
+                    contentType: "application/json",
+                    url: "timesheet/sendReminderMail/" + _USER_ID,
+                    success: function (data, textStatus, jqXHR)  {
+                        event.target.classList.add('disabled');
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        event.target.classList.add('red');
                     }
                 });
             },
