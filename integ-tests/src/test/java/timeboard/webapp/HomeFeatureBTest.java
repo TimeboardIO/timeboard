@@ -44,44 +44,43 @@ import java.util.UUID;
 public class HomeFeatureBTest extends TimeboardTest {
 
     @Autowired
+    private TimeboardWorld world;
+
+    @Autowired
     protected HomeController homeController;
 
-    private Account account;
     private Organization organisationA;
     private Organization organisationB;
-    private TimeboardAuthentication auth;
-    private Model model;
 
 
     @Given("^user with an existing account and (\\d+) project in (\\d+) org \\(A\\) and (\\d+) in an other org \\(B\\)$")
     public void user_with_an_existing_account_and_project_in_org_A_and_in_an_other_org_B(final int arg1, final int arg2, final int arg3) throws Throwable {
-        this.model = new ConcurrentModel();
-        this.account = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test2");
+        world.model = new ConcurrentModel();
+        world.account = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test2");
 
-        this.organisationA = this.organizationService.createOrganization(this.account, "Integration A", Collections.emptyMap());
-        this.organisationB = this.organizationService.createOrganization(this.account, "Integration B", Collections.emptyMap());
+        this.organisationA = this.organizationService.createOrganization(world.account, "Integration A", Collections.emptyMap());
+        this.organisationB = this.organizationService.createOrganization(world.account, "Integration B", Collections.emptyMap());
 
 
-        this.auth = SecurityUtils.signIn(organisationA, this.account);
-        this.projectService.createProject(this.organisationA, this.account, "TestProjectOrgA");
+        world.auth = SecurityUtils.signIn(organisationA, world.account);
+        this.projectService.createProject(this.organisationA, world.account, "TestProjectOrgA");
 
-        this.auth = SecurityUtils.signIn(organisationB, this.account);
-        this.projectService.createProject(this.organisationB, this.account, "TestProjectOrgB");
+        world.auth = SecurityUtils.signIn(organisationB, world.account);
+        this.projectService.createProject(this.organisationB, world.account, "TestProjectOrgB");
 
-        this.auth = SecurityUtils.signIn(organisationA, this.account);
+        world.auth = SecurityUtils.signIn(organisationA, world.account);
 
 
     }
 
     @When("^the user calls /home on org A$")
     public void the_user_calls_home_on_org_A() throws Throwable {
-        this.homeController.handleGet(this.auth, this.model);
+        this.homeController.handleGet(world.auth, world.model);
     }
 
     @Then("^the user receives (\\d+) project from org A$")
     public void the_user_receives_project_form_org_A(final int arg1) throws Throwable {
-        Assert.assertEquals(this.model.asMap().get(HomeController.NB_PROJECTS), arg1);
+        Assert.assertEquals(world.model.asMap().get(HomeController.NB_PROJECTS), arg1);
     }
-
 
 }

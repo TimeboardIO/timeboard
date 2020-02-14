@@ -71,7 +71,7 @@ public class ProjectsController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ProjectDecorator>> projectList(final TimeboardAuthentication authentication, final Model model) {
+    public ResponseEntity<List<ProjectDecorator>> projectList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
         final List<ProjectDecorator> projects = this.projectService.listProjects(actor, authentication.getCurrentOrganization())
                 .stream()
@@ -120,7 +120,7 @@ public class ProjectsController {
     }
 
 
-    private class ProjectDecorator {
+    public class ProjectDecorator {
 
         private final Project project;
 

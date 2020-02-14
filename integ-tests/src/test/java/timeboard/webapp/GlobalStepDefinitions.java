@@ -29,6 +29,7 @@ package timeboard.webapp;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+import org.aspectj.weaver.World;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,24 +41,35 @@ import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
 
 import java.util.Collections;
+import java.util.Random;
 import java.util.UUID;
 
-public class HomeFeatureATest extends TimeboardTest {
-
-    @Autowired
-    private TimeboardWorld world;
+public class GlobalStepDefinitions extends TimeboardTest {
 
     @Autowired
     protected HomeController homeController;
 
-    @When("^the user calls /home$")
-    public void the_client_calls_home() throws Throwable {
-        this.homeController.handleGet(world.auth, world.model);
+    @Autowired
+    private TimeboardWorld world;
+
+    @Given("^user with an existing account and (\\d+) projects$")
+    public void user_with_an_existing_account_and_projects(final int arg1) throws Throwable {
+
+        world.model = new ConcurrentModel();
+        world.account = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test");
+
+        world.organization = this.organizationService.createOrganization(world.account, "Integration"+ new Random().nextInt(), Collections.emptyMap());
+
+        Assert.assertNotNull(world.account);
+        world.auth = new TimeboardAuthentication(world.account);
+        world.auth.setCurrentOrganization(world.organization);
+        SecurityContextHolder.getContext().setAuthentication(world.auth);
+
+        for (int i = 0; i < arg1; i++) {
+            this.projectService.createProject(world.organization, world.account, "TestProject"+i);
+        }
     }
 
-    @Then("^the user receives (\\d+) project$")
-    public void the_user_receives_project(final int arg1) throws Throwable {
-        Assert.assertEquals(world.model.asMap().get(HomeController.NB_PROJECTS), arg1);
-    }
+
 
 }

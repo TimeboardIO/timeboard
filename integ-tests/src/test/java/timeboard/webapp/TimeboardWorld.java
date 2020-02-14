@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,38 +26,19 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import org.junit.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.ConcurrentModel;
+import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.ui.Model;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.home.HomeController;
 
-import java.util.Collections;
-import java.util.UUID;
+@Component
+public class TimeboardWorld {
 
-public class HomeFeatureATest extends TimeboardTest {
-
-    @Autowired
-    private TimeboardWorld world;
-
-    @Autowired
-    protected HomeController homeController;
-
-    @When("^the user calls /home$")
-    public void the_client_calls_home() throws Throwable {
-        this.homeController.handleGet(world.auth, world.model);
-    }
-
-    @Then("^the user receives (\\d+) project$")
-    public void the_user_receives_project(final int arg1) throws Throwable {
-        Assert.assertEquals(world.model.asMap().get(HomeController.NB_PROJECTS), arg1);
-    }
+    Account account;
+    Organization organization;
+    TimeboardAuthentication auth;
+    Model model;
 
 }
