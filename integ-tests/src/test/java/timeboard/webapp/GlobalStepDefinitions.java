@@ -66,7 +66,7 @@ public class GlobalStepDefinitions extends TimeboardTest {
         SecurityContextHolder.getContext().setAuthentication(world.auth);
 
         for (int i = 0; i < arg1; i++) {
-            this.projectService.createProject(world.organization, world.account, "TestProject"+i);
+            world.project = this.projectService.createProject(world.organization, world.account, "TestProject"+i);
         }
     }
 

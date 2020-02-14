@@ -109,11 +109,11 @@ public class ProjectServiceImpl implements ProjectService {
                 .put(Project.PROJECT_COLOR_ATTR, new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
         em.persist(newProject);
 
-        em.flush();
         final ProjectMembership ownerMembership = new ProjectMembership(newProject, ownerAccount, MembershipRole.OWNER);
 
+        newProject.getMembers().add(ownerMembership);
         em.persist(ownerMembership);
-
+        em.flush();
         LOGGER.info("Project " + projectName + " created by user " + owner.getId());
         return newProject;
     }
@@ -353,9 +353,9 @@ public class ProjectServiceImpl implements ProjectService {
             newTask.setBatches(new HashSet<>());
             newTask.getBatches().addAll(batches);
         }
-        em.persist(newTask);
         em.merge(project);
         newTask.setProject(project);
+        em.persist(newTask);
         em.flush();
 
         LOGGER.info("Task " + taskName + " created by " + actor.getScreenName() + " in project " + project.getName());

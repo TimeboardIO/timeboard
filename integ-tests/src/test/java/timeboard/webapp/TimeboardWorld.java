@@ -31,11 +31,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.ui.Model;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 
 @Component
 public class TimeboardWorld {
 
+    Project project;
     Account account;
     Organization organization;
     TimeboardAuthentication auth;
