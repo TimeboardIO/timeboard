@@ -212,7 +212,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public Account userProvisionning(final String sub, final String email) throws BusinessException {
+    public Account userProvisioning(final String sub, final String email) throws BusinessException {
 
         Account account = this.findUserBySubject(sub);
         if (account == null) {
