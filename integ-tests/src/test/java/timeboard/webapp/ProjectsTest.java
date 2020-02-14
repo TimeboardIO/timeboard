@@ -54,10 +54,6 @@ public class ProjectsTest extends TimeboardTest {
     @Autowired
     private ProjectService projectService;
 
-    public ProjectsTest(TimeboardWorld world) {
-        super(world);
-    }
-
     @Test
     public void testCreateProject() throws BusinessException {
         final Account a1 = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test1@test.fr");

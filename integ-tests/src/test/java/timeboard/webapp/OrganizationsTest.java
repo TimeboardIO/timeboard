@@ -53,11 +53,6 @@ public class OrganizationsTest extends TimeboardTest {
     @Autowired
     private OrganizationService organizationService;
 
-    public OrganizationsTest(TimeboardWorld world) {
-        super(world);
-    }
-
-
     @Test
     public void testRemoveOrganizationMember() throws BusinessException {
 

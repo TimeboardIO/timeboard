@@ -29,7 +29,6 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 
 public interface ProjectService {
