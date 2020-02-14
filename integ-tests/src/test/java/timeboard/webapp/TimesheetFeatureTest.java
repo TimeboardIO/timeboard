@@ -26,6 +26,7 @@ package timeboard.webapp;
  * #L%
  */
 
+import cucumber.api.java.ca.Cal;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
@@ -34,6 +35,7 @@ import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Imputation;
 import timeboard.core.model.Task;
+import timeboard.core.model.ValidationStatus;
 
 import java.util.Calendar;
 import java.util.Optional;
@@ -80,5 +82,21 @@ public class TimesheetFeatureTest extends TimeboardTest {
             start.add(Calendar.DAY_OF_YEAR, 1);
             imputationSum++;
         }
+    }
+
+    @When("^the user submit his timesheet$")
+    public void theUserSubmitHisTimesheet() throws BusinessException {
+
+        Calendar c = Calendar.getInstance();
+        timesheetService.submitTimesheet(world.organization, world.account, c.get(Calendar.YEAR),  c.get(Calendar.WEEK_OF_YEAR));
+    }
+
+    @Then("^the timesheet is submitted$")
+    public void theTimesheetIsSubmitted() {
+        Calendar c = Calendar.getInstance();
+        Optional<ValidationStatus> status = timesheetService.getTimesheetValidationStatus(
+                world.organization, world.account, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+
+        Assert.assertTrue(status.isPresent());
     }
 }
