@@ -214,6 +214,7 @@ public class TimesheetController {
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("userID", user.getId());
+        model.addAttribute("userScreenName", user.getScreenName());
         model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekSubmitted",
                 this.timesheetService.getTimesheetValidationStatus(
