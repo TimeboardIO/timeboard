@@ -80,7 +80,8 @@ public class HomeFeatureBTest extends TimeboardTest {
 
     @Then("^the user receives (\\d+) project from org A$")
     public void the_user_receives_project_form_org_A(final int arg1) throws Throwable {
-        Assert.assertEquals(this.model.asMap().get(HomeController.NB_PROJECTS), arg1);
+        double res = (double) this.model.asMap().get(HomeController.NB_PROJECTS);
+        Assert.assertTrue(res==arg1);
     }
 
 

@@ -76,7 +76,7 @@ public class HomeFeatureATest extends TimeboardTest {
 
     @Then("^the user receives (\\d+) project$")
     public void the_user_receives_project(final int arg1) throws Throwable {
-        Assert.assertEquals(this.model.asMap().get(HomeController.NB_PROJECTS), 1);
+        Assert.assertEquals(this.model.asMap().get(HomeController.NB_PROJECTS), 1.0d);
     }
 
 }
