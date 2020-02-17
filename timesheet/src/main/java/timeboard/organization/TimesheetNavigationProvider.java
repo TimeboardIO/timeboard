@@ -28,7 +28,7 @@ package timeboard.organization;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.NavigationExtPoint;
-import timeboard.core.api.TimesheetService;
+import timeboard.core.security.AbacEntries;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -57,7 +57,7 @@ public class TimesheetNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationAction() {
-        return TimesheetService.TIMESHEET_LIST;
+        return AbacEntries.TIMESHEET_VIEW;
     }
 
     @Override

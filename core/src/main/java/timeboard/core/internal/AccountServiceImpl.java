@@ -39,10 +39,11 @@ import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
+import timeboard.core.security.AbacEntries;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,13 +54,12 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
-    private static final String ACCOUNT_CREATE = "ACCOUNT_CREATE";
 
     @Autowired
     private EntityManager em;
 
     @Override
-    @PreAuthorize("hasPermission(null,'" + ACCOUNT_CREATE + "')")
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.ACCOUNT_CREATE + "')")
     public List<Account> createUsers(final List<Account> accounts) {
         accounts.forEach(user -> {
             em.persist(user);
@@ -212,12 +212,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public Account userProvisionning(final String sub, final String email) throws BusinessException {
+    public Account userProvisioning(final String sub, final String email) throws BusinessException {
 
         Account account = this.findUserBySubject(sub);
         if (account == null) {
             //Create user
-            account = new Account(null, null, email, new Date());
+            account = new Account(null, null, email, Calendar.getInstance());
             account.setRemoteSubject(sub);
             account = this.createUser(account);
         }

@@ -47,7 +47,7 @@ import static timeboard.reports.ProjectDashboardController.PATH;
  * Display project dashboard.
  */
 @Controller
-@RequestMapping("/projects/{projectID}" + PATH)
+@RequestMapping("/projects/{project}" + PATH)
 public class ProjectDashboardController extends ProjectBaseController {
 
     public static final String PATH = "/dashboard";

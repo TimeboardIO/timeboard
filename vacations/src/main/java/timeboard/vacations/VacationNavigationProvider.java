@@ -28,7 +28,7 @@ package timeboard.vacations;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.NavigationExtPoint;
-import timeboard.core.api.VacationService;
+import timeboard.core.security.AbacEntries;
 
 
 @Component
@@ -46,7 +46,7 @@ public class VacationNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationAction() {
-        return VacationService.VACATION_VIEW;
+        return AbacEntries.VACATION_VIEW;
     }
 
     @Override

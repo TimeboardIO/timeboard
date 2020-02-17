@@ -47,7 +47,7 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
     public boolean check(final Object subject, final Object resource, final Object action, final Object environment) {
         //Get all policy rules
         final List<PolicyRuleSet> allRules = policyDefinition.getAllPolicyRules()
-                .stream().filter(prs -> prs.getActions().contains(action))
+                .stream().filter(prs -> prs.getActions().contains(new String(action + "").replaceAll("\'", "")))
                 .collect(Collectors.toList());
 
         //Wrap the context
@@ -55,8 +55,8 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
 
         final boolean res = checkRules(allRules, cxt);
 
-        if (res == false) {
-            LOGGER.info("Account :" + subject + " has no policy for action : " + action + " on ressource : " + resource);
+        if (!res) {
+            LOGGER.debug("Account :" + subject + " has no policy for action : " + action + " on resource : " + resource);
         }
 
         return res;
@@ -67,8 +67,7 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
         for (final PolicyRuleSet rule : matchedRules) {
             try {
                 if (rule.getConditions().stream()
-                        .map(expression -> expression.getValue(cxt, Boolean.class))
-                        .allMatch(aBoolean -> aBoolean == true)) {
+                        .allMatch(expression -> expression.getValue(cxt, Boolean.class))) {
                     return true;
                 }
             } catch (final EvaluationException ex) {

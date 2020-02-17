@@ -48,6 +48,7 @@ import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
+import timeboard.core.security.AbacEntries;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -97,13 +98,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(null,'" + PROJECT_CREATE + "')")
-    public Project createProject(final Organization orgID, final Account owner, final String projectName) {
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.PROJECT_CREATE + "')")
+    public Project createProject(final Organization org, final Account owner, final String projectName) {
         final Account ownerAccount = this.em.find(Account.class, owner.getId());
         final Project newProject = new Project();
         newProject.setName(projectName);
         newProject.setStartDate(new Date());
-        newProject.setOrganizationID(orgID.getId());
+        newProject.setOrganizationID(org.getId());
         newProject.getAttributes()
                 .put(Project.PROJECT_COLOR_ATTR, new ProjectAttributValue(ProjectServiceImpl.generateRandomColor(Color.WHITE)));
         em.persist(newProject);
@@ -118,7 +119,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(null,'" + PROJECT_LIST + "')")
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.PROJECT_LIST + "')")
     @Cacheable(value = "accountProjectsCache", key = "#candidate.getId()")
     public List<Project> listProjects(final Account candidate, final Organization org) {
         final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
@@ -128,8 +129,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(null,'" + PROJECT_COUNT + "')")
-    public double countAccountProjectMemberships(final Organization org, final Account candidate) {
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.PROJECT_COUNT + "')")
+    public int countAccountProjectMemberships(final Organization org, final Account candidate) {
         final TypedQuery<Project> query = em.createNamedQuery(Project.PROJECT_LIST, Project.class);
         query.setParameter("user", candidate);
         query.setParameter("orgID", org.getId());
@@ -137,7 +138,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PostAuthorize("hasPermission(returnObject,'" + PROJECT_VIEW + "')")
+    @PostAuthorize("hasPermission(returnObject,'" + AbacEntries.PROJECT_VIEW + "')")
     public Project getProjectByID(final Account actor, final Organization org, final Long projectId) {
 
         Project data = null;
@@ -191,7 +192,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     @Override
-    @PreAuthorize("hasPermission(#project,'" + PROJECT_ARCHIVE + "')")
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.PROJECT_ARCHIVE + "')")
     @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project archiveProjectByID(final Account actor, final Project project) throws BusinessException {
         final RuleSet<Project> ruleSet = new RuleSet<>();
@@ -209,7 +210,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#project,'" + PROJECT_SETUP + "')")
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.PROJECT_SETUP + "')")
     @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project updateProject(final Account actor, final Project project) throws BusinessException {
         final RuleSet<Project> ruleSet = new RuleSet<>();
@@ -280,7 +281,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#project,'" + TASK_LIST + "')")
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.TASK_LIST + "')")
     public List<Task> listProjectTasks(final Account actor, final Project project) throws BusinessException {
 
         final RuleSet<Project> ruleSet = new RuleSet<>();
@@ -298,7 +299,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Cacheable(value = "accountTasksCache")
-    @PreAuthorize("hasPermission(#project,'" + TASK_LIST + "')")
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.TASK_LIST + "')")
     public List<Task> listUserTasks(Organization org, final Account account) {
         final TypedQuery<Task> q = em.createQuery("select t " +
                 "from Task t " +
@@ -311,9 +312,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    @PreAuthorize("hasPermission(#project,'TASKS_CREATE')")
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_TASKS_CREATE + "')")
     public Task createTask(
-            final Organization orgID,
+            final Organization org,
             final Account actor,
             final Project project,
             final String taskName,
@@ -347,8 +348,8 @@ public class ProjectServiceImpl implements ProjectService {
         newTask.setOriginalEstimate(originalEstimate);
         newTask.setTaskStatus(taskStatus);
         newTask.setAssigned(assignedAccount);
-        newTask.setOrganizationID(orgID.getId());
-        if (batches!= null && !batches.isEmpty() ) {
+        newTask.setOrganizationID(org.getId());
+        if (batches != null && !batches.isEmpty()) {
             newTask.setBatches(new HashSet<>());
             newTask.getBatches().addAll(batches);
         }
@@ -365,9 +366,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Task updateTask(final Organization orgID, final Account actor, final Task task) {
+    @PreAuthorize("hasPermission(#task.getProject(), '" + AbacEntries.PROJECT_TASKS_EDIT + "')")
+    public Task updateTask(final Organization org, final Account actor, final Task task) {
         if (task.getProject().isMember(actor)) {
-            task.setOrganizationID(orgID.getId());
+            task.setOrganizationID(org.getId());
             em.merge(task);
             em.flush();
         }
@@ -377,6 +379,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#task.getProject(), " + AbacEntries.PROJECT_TASKS_EDIT + ")")
     public void updateTasks(final Account actor, final List<Task> taskList) {
         for (final Task task : taskList) {
             em.merge(task);
@@ -602,7 +605,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PostAuthorize("returnObject.organizationID == authentication.currentOrganization")
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_BATCHES_VIEW + "')")
     public Batch createBatch(final Account actor,
                              final String name, final Date date, final BatchType type,
                              final Map<String, String> attributes,
@@ -614,7 +617,6 @@ public class ProjectServiceImpl implements ProjectService {
         if (!wrongRules.isEmpty()) {
             throw new BusinessException(wrongRules);
         }
-
 
         final Batch newBatch = new Batch();
         newBatch.setName(name);

@@ -47,8 +47,10 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}/setup")
+@RequestMapping("/projects/{projectID}" + ProjectSetupController.URL)
 public class ProjectSetupController extends ProjectBaseController {
+
+    public static final String URL = "/setup";
 
     @Autowired
     private ProjectService projectService;
@@ -58,7 +60,7 @@ public class ProjectSetupController extends ProjectBaseController {
 
 
     @GetMapping
-    protected String configProject(
+    protected String setupProject(
             final TimeboardAuthentication authentication,
             @PathVariable final long projectID,
             final Model model) throws BusinessException {
@@ -69,7 +71,7 @@ public class ProjectSetupController extends ProjectBaseController {
         this.prepareTemplateData(authentication.getCurrentOrganization(), project, map);
         model.addAllAttributes(map);
         this.initModel(model, authentication, project);
-        return "project_config.html";
+        return "project_setup.html";
     }
 
     @PostMapping("/memberships")
@@ -139,7 +141,7 @@ public class ProjectSetupController extends ProjectBaseController {
             attributes.addFlashAttribute("error", e.getMessage());
         }
 
-        return "redirect:/projects/" + projectID + "/setup";
+        return "redirect:/projects/" + projectID + URL;
     }
 
     private void prepareTemplateData(final Organization org, final Project project, final Map<String, Object> map) {

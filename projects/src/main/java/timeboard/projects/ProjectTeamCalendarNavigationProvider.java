@@ -1,8 +1,8 @@
-package timeboard.organization;
+package timeboard.projects;
 
 /*-
  * #%L
- * timesheet
+ * projects
  * %%
  * Copyright (C) 2019 - 2020 Timeboard
  * %%
@@ -31,20 +31,19 @@ import timeboard.core.security.AbacEntries;
 import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
-public class TimesheetProjectNavigationProvider implements ProjectNavigationProvider {
+public class ProjectTeamCalendarNavigationProvider implements ProjectNavigationProvider {
     @Override
     public String getNavigationLabel() {
-        return "timesheet.validation";
+        return "project.tab.calendar";
     }
-
 
     @Override
     public String getNavigationPath() {
-        return ProjectTimesheetValidationController.PATH;
+        return ProjectTeamCalendarController.URL;
     }
 
     @Override
     public String getNavigationAction() {
-        return AbacEntries.TIMESHEET_VALIDATION_VIEW;
+        return AbacEntries.VACATION_TEAM_LIST;
     }
 }

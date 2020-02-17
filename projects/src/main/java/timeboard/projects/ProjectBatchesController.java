@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 public class ProjectBatchesController extends ProjectBaseController {
 
     public static final String URL = "/batches";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ProjectBatchesController.class);
 
     @Autowired
@@ -73,13 +74,11 @@ public class ProjectBatchesController extends ProjectBaseController {
 
     @GetMapping
     protected String batchApp(final TimeboardAuthentication authentication,
-                              @PathVariable final Long projectID, final Model model) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+                              @PathVariable final Project project, final Model model) throws BusinessException {
 
         model.addAttribute("project", project);
         model.addAttribute("batchTypes", BatchType.values());
+
         this.initModel(model, authentication, project);
         return "project_batches.html";
     }
@@ -116,10 +115,9 @@ public class ProjectBatchesController extends ProjectBaseController {
 
     @GetMapping(value = "/list", produces = {MediaType.APPLICATION_JSON_VALUE})
     protected ResponseEntity<List<BatchDecorator>> listBatches(final TimeboardAuthentication authentication,
-                                                               @PathVariable final Long projectID) throws BusinessException {
+                                                               @PathVariable final Project project) throws BusinessException {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         return ResponseEntity.ok(this.projectService.listProjectBatches(actor, project)
                 .stream().map(batch -> new BatchDecorator(batch))
@@ -167,12 +165,12 @@ public class ProjectBatchesController extends ProjectBaseController {
 
 
     protected String createConfigLinks(final Account actor,
-                                       final Organization orgID,
+                                       final Organization org,
                                        final HttpServletRequest request,
                                        final Model model) throws BusinessException {
 
         final long projectID = Long.parseLong(request.getParameter("projectID"));
-        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+        final Project project = this.projectService.getProjectByID(actor, org, projectID);
         Batch currentBatch = null;
 
         try {

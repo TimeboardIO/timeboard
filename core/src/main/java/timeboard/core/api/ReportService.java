@@ -40,10 +40,6 @@ import java.util.stream.Collectors;
 
 public interface ReportService {
 
-
-    String REPORT_LIST = "REPORT_LIST";
-    String REPORT_PROJECT_VIEW = "REPORT_PROJECT_VIEW";
-
     /**
      * Create a new report configuration
      *
@@ -65,11 +61,11 @@ public interface ReportService {
     /**
      * List all report for owner
      *
-     * @param orgID primary key {@link Organization} where looking for reports
+     * @param org primary key {@link Organization} where looking for reports
      * @param owner an account that own reports
      * @return
      */
-    List<Report> listReports(final Organization orgID, final Account owner);
+    List<Report> listReports(final Organization org, final Account owner);
 
     Report updateReport(Account actor, Report report);
 
@@ -77,9 +73,9 @@ public interface ReportService {
 
     void deleteReportByID(Account actor, Long reportId) throws SchedulerException;
 
-    List<ProjectWrapper> findProjects(Account actor, Organization orgID, List<String> expressions);
+    List<ProjectWrapper> findProjects(Account actor, Organization org, List<String> expressions);
 
-    List<ProjectWrapper> findProjects(Account actor, Organization orgID, Report report);
+    List<ProjectWrapper> findProjects(Account actor, Organization org, Report report);
 
     Optional<ReportHandler> getReportHandler(Report report);
 

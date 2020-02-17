@@ -31,10 +31,7 @@ import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.*;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 public interface TimesheetService {
@@ -48,16 +45,14 @@ public interface TimesheetService {
     /**
      * Submit user timesheet.
      *
-     * @param actor            user who trigger this function.
-     * @param accountTimesheet user which be used to build timehseet to submit
-     * @param year             timesheet year
-     * @param week             timesheet week
+     * @param timesheetOwner user which be used to build timehseet to submit
+     * @param year           timesheet year
+     * @param week           timesheet week
      * @return true if timesheet is submit else, false.
      */
     SubmittedTimesheet submitTimesheet(
             final Organization currentOrg,
-            final Account actor,
-            final Account accountTimesheet,
+            final Account timesheetOwner,
             final int year,
             final int week) throws BusinessException;
 
@@ -84,20 +79,20 @@ public interface TimesheetService {
     SubmittedTimesheet rejectTimesheet(final Organization currentOrg, final Account actor,
                                        final SubmittedTimesheet submittedTimesheet) throws BusinessException;
 
-    Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization org, Account actor, Account user, int year, int week);
+    Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization org, Account timesheetOwner, int year, int week);
 
 
     /**
      * Get timesheet validation status.
      *
-     * @param currentAccount user used to check timesheet sumbit state.
+     * @param timesheetOwner user used to check timesheet sumbit state.
      * @param year           timesheet year
      * @param week           timesheet week
      * @return ValidationStatus, null current account has no timesheet validation request for current week
      */
     Optional<ValidationStatus> getTimesheetValidationStatus(
             final Organization org,
-            final Account currentAccount,
+            final Account timesheetOwner,
             final int year,
             final int week);
 
@@ -135,6 +130,9 @@ public interface TimesheetService {
             final Account actor,
             final Project project);
 
+    List<SubmittedTimesheet> getSubmittedTimesheets(final Organization org, final Account actor, Account targetUser);
+
+
     /**
      * Force Validation of a list of weeks
      *
@@ -147,19 +145,7 @@ public interface TimesheetService {
      * @param olderWeek      week of older week in the "validation timesheet week" list
      */
     void forceValidationTimesheets(Organization organizationID, Account actor, Account target,
-                                 int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
-
-    class TimesheetFilter<T> {
-        private T target;
-
-        public TimesheetFilter(T target) {
-            this.target = target;
-        }
-
-        public T getTarget() {
-            return target;
-        }
-    }
+                                   int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
 
     @Deprecated
     default long absoluteWeekNumber(SubmittedTimesheet t) {
@@ -174,6 +160,18 @@ public interface TimesheetService {
     @Deprecated
     default long absoluteWeekNumber(java.util.Calendar c) {
         return absoluteWeekNumber(c.get(java.util.Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+    }
+
+    class TimesheetFilter<T> {
+        private T target;
+
+        public TimesheetFilter(T target) {
+            this.target = target;
+        }
+
+        public T getTarget() {
+            return target;
+        }
     }
 
 }

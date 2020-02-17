@@ -92,7 +92,7 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public Report createReport(final Organization orgID, final Account owner, final String reportName,
+    public Report createReport(final Organization org, final Account owner, final String reportName,
                                final String handlerID, final String filterProject) throws SchedulerException {
 
 
@@ -130,11 +130,11 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<Report> listReports(final Organization orgID, final Account owner) {
+    public List<Report> listReports(final Organization org, final Account owner) {
         final TypedQuery<Report> query = em.createQuery(
                 "select r from Report r where r.organizationID = :orgID",
                 Report.class);
-        query.setParameter("orgID", orgID);
+        query.setParameter("orgID", org.getId());
 
         return query.getResultList();
     }
@@ -172,7 +172,7 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(final Account actor, final Organization orgID, final List<String> expressions) {
+    public List<ProjectWrapper> findProjects(final Account actor, final Organization org, final List<String> expressions) {
 
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
@@ -180,7 +180,7 @@ public class ReportServiceImpl implements ReportService {
                 .stream().map(filter -> expressionParser.parseExpression(filter))
                 .collect(Collectors.toList());
 
-        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor, orgID)
+        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor, org)
                 .stream()
                 .map(project -> wrapProjectTags(project))
                 .filter(projectWrapper -> {
@@ -198,8 +198,8 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public List<ProjectWrapper> findProjects(final Account actor, final Organization orgID, final Report report) {
-        return this.findProjects(actor, orgID, Arrays.asList(report.getFilterProject().split("\n")));
+    public List<ProjectWrapper> findProjects(final Account actor, final Organization org, final Report report) {
+        return this.findProjects(actor, org, Arrays.asList(report.getFilterProject().split("\n")));
     }
 
     @Override

@@ -56,7 +56,7 @@ public class ProjectsTest extends TimeboardTest {
 
     @Test
     public void testCreateProject() throws BusinessException {
-        final Account a1 = this.accountService.userProvisionning(UUID.randomUUID().toString(), "test1@test.fr");
+        final Account a1 = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test1@test.fr");
         final Organization org = this.organizationService.createOrganization(a1, "testOrg", Collections.emptyMap());
         SecurityUtils.signIn(org, a1);
 

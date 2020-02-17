@@ -80,7 +80,7 @@ public interface OrganizationService {
     == Default Tasks ==
     */
     List<DefaultTask> listDefaultTasks(
-            final Organization orgID,
+            final Organization org,
             final Date ds,
             final Date de);
 
@@ -91,7 +91,7 @@ public interface OrganizationService {
      */
     DefaultTask createDefaultTask(
             final Account actor,
-            final Organization orgID,
+            final Organization org,
             final String task) throws BusinessException;
 
 
@@ -104,7 +104,7 @@ public interface OrganizationService {
      */
     void disableDefaultTaskByID(
             final Account actor,
-            final Organization orgID, final
+            final Organization org, final
             long taskID) throws BusinessException;
 
 
@@ -123,7 +123,7 @@ public interface OrganizationService {
      * @return List all task types.
      */
     List<TaskType> listTaskType(
-            final Organization orgID);
+            final Organization org);
 
     TaskType findTaskTypeByID(
             final Long taskTypeID);
@@ -134,7 +134,7 @@ public interface OrganizationService {
 
     TaskType createTaskType(
             final Account actor,
-            final Organization orgID,
+            final Organization org,
             final String name);
 
     void disableTaskType(

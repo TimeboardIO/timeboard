@@ -1,10 +1,10 @@
-package timeboard.organization;
+package timeboard.projects;
 
 /*-
  * #%L
- * timesheet
+ * KanbanProjectPlugin
  * %%
- * Copyright (C) 2019 - 2020 Timeboard
+ * Copyright (C) 2019 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,21 +30,24 @@ import org.springframework.stereotype.Component;
 import timeboard.core.security.AbacEntries;
 import timeboard.projects.api.ProjectNavigationProvider;
 
+
 @Component
-public class TimesheetProjectNavigationProvider implements ProjectNavigationProvider {
+public class ProjectSnapshotsNavigationProvider implements ProjectNavigationProvider {
+
     @Override
     public String getNavigationLabel() {
-        return "timesheet.validation";
+        return "project.tab.snapshots";
     }
-
 
     @Override
     public String getNavigationPath() {
-        return ProjectTimesheetValidationController.PATH;
+        return ProjectSnapshotsController.URL;
     }
 
     @Override
     public String getNavigationAction() {
-        return AbacEntries.TIMESHEET_VALIDATION_VIEW;
+        return AbacEntries.PROJECT_SNAPSHOTS_VIEW;
     }
+
+
 }

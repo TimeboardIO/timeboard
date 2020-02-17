@@ -83,8 +83,8 @@ public class ProjectSnapshotServiceImpl implements ProjectSnapshotService {
     public List<TaskSnapshot> findAllTaskSnapshotByTaskID(final Account actor, final Long taskID) {
         final TypedQuery<TaskSnapshot> q = em
                 .createQuery("select t from TaskSnapshot t left join fetch t.task where "
-                        + "t.task.id = :taskID"
-                        + "group by t.task "
+                        + "t.task.id = :taskID "
+                        + "group by t.task  "
                         + "having max(t.snapshotDate)", TaskSnapshot.class);
         q.setParameter("taskID", taskID);
         return q.getResultList();

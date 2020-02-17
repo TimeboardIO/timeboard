@@ -40,9 +40,13 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.api.UpdatedTaskResult;
 import timeboard.core.api.exceptions.BusinessException;
+import timeboard.core.internal.observers.emails.EmailStructure;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
+import org.springframework.web.servlet.LocaleResolver;
 
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -65,6 +69,13 @@ public class TimesheetController {
 
     @Autowired
     private OrganizationService organizationService;
+
+
+    @Autowired
+    public EmailService emailService;
+
+    @Autowired
+    private LocaleResolver localeResolver;
 
     @GetMapping
     protected String currentWeekTimesheet(
@@ -150,16 +161,16 @@ public class TimesheetController {
                         && lastDayOfWeek.compareTo(creationDate) >= 0;
 
         final TimesheetWrapper ts = new TimesheetWrapper(
-                isFirstWeek ? ValidationStatus.PENDING_VALIDATION :
-                        this.timesheetService.getTimesheetValidationStatus(
-                                authentication.getCurrentOrganization(),
-                                currentAccount,
-                                findPreviousWeekYear(c, week, year),
-                                findPreviousWeek(c, week, year)).orElse(null),
+                isFirstWeek ? ValidationStatus.VALIDATED :
                 this.timesheetService.getTimesheetValidationStatus(
-                        authentication.getCurrentOrganization(),
-                        currentAccount,
-                        year, week).orElse(null),
+                    authentication.getCurrentOrganization(),
+                    currentAccount,
+                    findPreviousWeekYear(c, week, year),
+                    findPreviousWeek(c, week, year)).orElse(null),
+                this.timesheetService.getTimesheetValidationStatus(
+                    authentication.getCurrentOrganization(),
+                    currentAccount,
+                    year, week).orElse(null),
                 year, week,
                 beginWorkDate.get(Calendar.YEAR),
                 beginWorkDate.get(Calendar.WEEK_OF_YEAR),
@@ -206,6 +217,7 @@ public class TimesheetController {
         model.addAttribute("week", week);
         model.addAttribute("year", year);
         model.addAttribute("userID", user.getId());
+        model.addAttribute("userScreenName", user.getScreenName());
         model.addAttribute("actorID", authentication.getDetails().getId());
         model.addAttribute("lastWeekSubmitted",
                 this.timesheetService.getTimesheetValidationStatus(
@@ -276,7 +288,6 @@ public class TimesheetController {
                     this.timesheetService.submitTimesheet(
                             currentOrg,
                             actor,
-                            actor,
                             year,
                             week);
 
@@ -303,7 +314,6 @@ public class TimesheetController {
             final Optional<SubmittedTimesheet> submittedTimesheet =
                     this.timesheetService.getSubmittedTimesheet(
                             authentication.getCurrentOrganization(),
-                            actor,
                             user,
                             year,
                             week);
@@ -312,7 +322,7 @@ public class TimesheetController {
                 final SubmittedTimesheet result =
                         this.timesheetService.validateTimesheet(
                                 authentication.getCurrentOrganization(),
-                                actor,submittedTimesheet.get());
+                                actor, submittedTimesheet.get());
 
                 return ResponseEntity.ok(result.getTimesheetStatus());
 
@@ -344,7 +354,6 @@ public class TimesheetController {
             final Optional<SubmittedTimesheet> submittedTimesheet =
                     this.timesheetService.getSubmittedTimesheet(
                             authentication.getCurrentOrganization(),
-                            actor,
                             user,
                             year,
                             week);
@@ -360,6 +369,63 @@ public class TimesheetController {
             LOGGER.error(e.getMessage(), e);
             return ResponseEntity.badRequest().body("An error occurred when rejecting this week. ");
         }
+    }
+
+    @PostMapping(value = "/sendReminderMail/{targetUser}")
+    public ResponseEntity sendReminderMail(HttpServletRequest request,
+                                           final TimeboardAuthentication authentication,
+                                           @PathVariable Account targetUser)
+            throws MessagingException, BusinessException {
+
+        final Account actor = authentication.getDetails();
+
+        final HashMap<String, Object> data =  new HashMap<>();
+
+        final List<SubmittedTimesheet> list = this.timesheetService.getSubmittedTimesheets(
+                authentication.getCurrentOrganization(), authentication.getDetails(), targetUser);
+
+        final long todayAbsoluteWeekNumber = this.timesheetService.absoluteWeekNumber(Calendar.getInstance());
+
+        final Optional<SubmittedTimesheet> max = list.stream()
+                .filter(e -> !e.getTimesheetStatus().equals(ValidationStatus.REJECTED)) // ignore rejected
+                .max(Comparator.comparingLong(timesheetService::absoluteWeekNumber));
+
+        if (max.isPresent()) {
+            final SubmittedTimesheet lastSubmittedTimesheet = max.get();
+            final Calendar c = Calendar.getInstance();
+            c.set(Calendar.WEEK_OF_YEAR,lastSubmittedTimesheet.getWeek());
+            c.set(Calendar.YEAR,lastSubmittedTimesheet.getYear());
+            c.add(Calendar.WEEK_OF_YEAR, 1);
+
+            data.put("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(lastSubmittedTimesheet));
+            data.put("weekToValidate", c.get(Calendar.WEEK_OF_YEAR));
+            data.put("yearToValidate", c.get(Calendar.YEAR));
+            data.put("link", request.getLocalName() +"/timesheet/"+ targetUser.getId()
+                    +"/"+c.get(Calendar.YEAR)+"/"+c.get(Calendar.WEEK_OF_YEAR));
+
+        } else {
+            // never submitted a first week or it been rejected
+            final Calendar beginWorkDate = this.organizationService
+                    .findOrganizationMembership(actor, authentication.getCurrentOrganization()).get().getCreationDate();
+
+            data.put("missingWeeksNumber", todayAbsoluteWeekNumber - this.timesheetService.absoluteWeekNumber(beginWorkDate));
+            data.put("weekToValidate", beginWorkDate.get(Calendar.WEEK_OF_YEAR));
+            data.put("yearToValidate", beginWorkDate.get(Calendar.YEAR));
+            data.put("link", request.getLocalName() +"/timesheet/"+ targetUser.getId()+"/"
+                    +beginWorkDate.get(Calendar.YEAR)+"/"+beginWorkDate.get(Calendar.WEEK_OF_YEAR));
+
+        }
+
+        data.put("targetID", targetUser.getId());
+        data.put("targetScreenName", targetUser.getScreenName());
+        final EmailStructure structure = new EmailStructure(targetUser.getEmail(), actor.getEmail(), "Reminder", data, "mail/reminder.html");
+
+
+        this.emailService.sendMessage(structure, localeResolver.resolveLocale(request));
+
+
+        return ResponseEntity.ok().build();
+
     }
 
 
@@ -444,7 +510,7 @@ public class TimesheetController {
     private int findPreviousWeekYear(final Calendar c, final int week, final int year) {
         c.set(Calendar.YEAR, year);
         c.set(Calendar.WEEK_OF_YEAR, week);
-        c.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        c.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
         c.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
         return c.get(Calendar.YEAR);
     }

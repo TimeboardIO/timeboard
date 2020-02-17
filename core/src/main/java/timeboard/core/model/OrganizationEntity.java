@@ -27,6 +27,9 @@ package timeboard.core.model;
  */
 
 
+import org.springframework.security.core.context.SecurityContextHolder;
+import timeboard.core.security.TimeboardAuthentication;
+
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 
@@ -41,7 +44,11 @@ public abstract class OrganizationEntity {
     }
 
     public OrganizationEntity() {
-        this.organizationID = null;
+        try {
+            this.organizationID = ((TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication()).getCurrentOrganization().getId();
+        } catch (Exception e) {
+            this.organizationID = null;
+        }
     }
 
     public Long getOrganizationID() {

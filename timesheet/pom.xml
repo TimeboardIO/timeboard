@@ -40,6 +40,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>timeboard</groupId>
             <artifactId>projects</artifactId>
             <version>1.0-SNAPSHOT</version>

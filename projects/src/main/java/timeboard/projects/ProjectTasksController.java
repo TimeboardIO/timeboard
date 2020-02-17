@@ -234,9 +234,7 @@ public class ProjectTasksController extends ProjectBaseController {
                                             final Long taskID,
                                             final TaskStatus status) {
 
-        if (taskID == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing argument taskId.");
-        }
+
         if (taskID == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
         }

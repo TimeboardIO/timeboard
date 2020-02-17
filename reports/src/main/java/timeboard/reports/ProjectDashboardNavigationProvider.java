@@ -1,8 +1,8 @@
-package timeboard.organization;
+package timeboard.reports;
 
 /*-
  * #%L
- * timesheet
+ * reports
  * %%
  * Copyright (C) 2019 - 2020 Timeboard
  * %%
@@ -31,20 +31,22 @@ import timeboard.core.security.AbacEntries;
 import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
-public class TimesheetProjectNavigationProvider implements ProjectNavigationProvider {
+public class ProjectDashboardNavigationProvider implements ProjectNavigationProvider {
+
     @Override
     public String getNavigationLabel() {
-        return "timesheet.validation";
+        return "report.project.dashboard";
     }
-
 
     @Override
     public String getNavigationPath() {
-        return ProjectTimesheetValidationController.PATH;
+        return ProjectDashboardController.PATH;
     }
 
     @Override
     public String getNavigationAction() {
-        return AbacEntries.TIMESHEET_VALIDATION_VIEW;
+        return AbacEntries.REPORT_PROJECT_VIEW;
     }
+
+
 }

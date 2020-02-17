@@ -31,6 +31,7 @@
                 <th th:text="#{timesheet.last.submitted}"> Last Submitted Date</th>
                 <th th:text="#{status}"> Status</th>
                 <th th:text="#{timesheet.last.validated}"> Last Approved Date</th>
+                <th> </th>
             </tr>
             </thead>
             <tbody class="ui accordion">
@@ -52,12 +53,17 @@
                     <td>
                         {{ account.lastApprovedDate }}
                     </td>
+                    <td>
+                        <button @click="sendReminder($event, account)" class="ui positive icon button">
+                            Reminder mail <i class="envelope icon"></i>
+                        </button>
+                    </td>
                 </tr>
                 <tr class="ui content">
                     <td colspan="5">
                         <data-table v-bind:config="Object.assign({}, config)" v-bind:table="account.weeks">
                             <template v-slot:week="{row}">
-                                <a ::href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week" class="ui button"> {{
+                                <a  class="ui button" :href="baseURL+'/'+account.id+'/'+row.year+'/'+row.week" :target="account.id"   > {{
                                     row.week }} </a>
                             </template>
                             <template v-slot:period="{row}">
@@ -72,6 +78,12 @@
                             <template v-slot:submitted="{row}">
                                 <div :class="{red:  !row.submitted, green: row.submitted}"
                                      class="ui circular label large "></div>
+                            </template>
+                            <template v-slot:actions="{row}">
+                                <button @click="forceValidation($event, account, row)" class="ui positive icon button" :class="{ disabled : row.validated }">
+                                    Force Validation
+                                    <i class="check icon"></i>
+                                </button>
                             </template>
                         </data-table>
                     </td>

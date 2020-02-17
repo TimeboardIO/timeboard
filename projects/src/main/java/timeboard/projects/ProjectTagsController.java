@@ -45,8 +45,10 @@ import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/projects/{project}/tags")
+@RequestMapping("/projects/{project}" + ProjectTagsController.URL)
 public class ProjectTagsController extends ProjectBaseController {
+
+    public static final String URL = "/tags";
 
     @Autowired
     private ProjectService projectService;

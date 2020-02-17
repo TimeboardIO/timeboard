@@ -45,11 +45,11 @@ public interface VacationService {
 
     RecursiveVacationRequest createRecursiveVacationRequest(Account actor, RecursiveVacationRequest request);
 
-    List<VacationRequest> listVacationRequestsByUser(Account user, Organization orgID);
+    List<VacationRequest> listVacationRequestsByUser(Account applicant, Organization org);
 
-    List<VacationRequest> listVacationRequestsByUser(Account user, Organization orgID, int year);
+    List<VacationRequest> listVacationRequestsByUser(Account applicant, Organization org, int year);
 
-    List<VacationRequest> listVacationRequestsToValidateByUser(Account user, Organization orgID);
+    List<VacationRequest> listVacationRequestsToValidateByUser(Account assignee, Organization org);
 
     Map<Account, List<VacationRequest>> listProjectMembersVacationRequests(Account actor, Project project, int month, int year);
 
