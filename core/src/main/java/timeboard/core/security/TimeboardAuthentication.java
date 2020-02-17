@@ -94,7 +94,7 @@ public class TimeboardAuthentication implements Authentication {
 
     @Transient
     public boolean currentOrganizationRole(final MembershipRole... roles) {
-        if (account == null || account.getOrganizationMemberships() == null || this.currentOrganization == null) {
+        if (account == null || account.getOrganizationMemberships() == null || currentOrganization == null) {
             return false;
         }
         return account.getOrganizationMemberships()
