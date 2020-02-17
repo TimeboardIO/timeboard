@@ -312,7 +312,7 @@ $(document).ready(function () {
                 const currentSum = app.getImputationSum(date);
                 let newVal = parseFloat($(event.target).val());
                 let oldVal = app.imputations[date][taskID];
-                if (newval !== oldVal) {
+                if (newVal !== oldVal) {
 
                     if (newVal > 1) {
                         newVal = 1;
