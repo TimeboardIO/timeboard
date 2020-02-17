@@ -239,6 +239,7 @@ $(document).ready(function () {
                     }
                 });
             },
+
             validateWeek: function (event) {
                 $.ajax({
                     method: "POST",
@@ -288,7 +289,7 @@ $(document).ready(function () {
             },
             triggerUpdateEffortLeft: function (event) {
                 $(event.target).parent().addClass('left icon loading').removeClass('error');
-                const taskID = $(event.target).attr('data-task-effortLeft');
+                const taskID = $(event.target).attr('effortLeft');
                 const val = $(event.target).val();
                 const self = this;
                 this.updateTask(null, taskID, 'effortLeft', val)
@@ -306,13 +307,14 @@ $(document).ready(function () {
             },
             triggerUpdateTask: function (event) {
 
-                $(event.target).parent().addClass('left icon loading').removeClass('error');
-                const date = $(event.target).attr('data-date');
-                const taskID = $(event.target).attr('data-task');
+                const date = $(event.target).attr('date');
+                const taskID = $(event.target).attr('task');
+                const currentSum = app.getImputationSum(date);
 
                 const currentSum = app.getImputationSum(date);
                 let newVal = parseFloat($(event.target).val());
                 let oldVal = app.imputations[date][taskID];
+                if (newval !== oldVal) {
 
                 if (newVal > 1) {
                     newVal = 1;
@@ -341,6 +343,30 @@ $(document).ready(function () {
                     $(event.target).parent().removeClass('left icon loading').addClass('error');
                     this.displayErrorMessage("you cannot charge more than one day a day.");
 
+
+                    if (newval > 1) {
+                        newval = 1;
+                    }
+                    if (newval < 0) {
+                        newval = 0;
+                    }
+                    if (currentSum + (newval - oldVal) <= 1.0) {
+                        $(event.target).val(newval);
+                        this.updateTask(date, taskID, 'imputation', newval)
+                            .then(function (updateTask) {
+                                app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
+                                app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
+                                app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
+                                app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
+                                app.imputations[date][taskID] = newval;
+                                $(event.target).parent().removeClass('left icon loading');
+                            });
+                    } else {
+                        $(event.target).val(oldVal);
+                        $(event.target).parent().removeClass('left icon loading').addClass('error');
+                        this.displayErrorMessage("you cannot charge more than one day a day.");
+
+                    }
                 }
             },
             showCreateTaskModal: function (projectID, task, event) {
@@ -388,7 +414,23 @@ $(document).ready(function () {
                     },
                     detachable: true, centered: true
                 }).modal('show');
-            }
+            },
+            cancelTask: function(event, task) {
+                event.preventDefault();
+                event.stopPropagation();
+                $.ajax({
+                    method: "DELETE",
+                    url: "timesheet/cancelTask/" + task.taskID,
+                    success: function (weekValidationStatus, textStatus, jqXHR) {
+                        app.displaySuccessMessage("Task successfully canceled. ");
+                        app.updateTimesheet();
+
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        app.displayErrorMessage("Error can not cancel task : " + textStatus);
+                    }
+                });
+            },
         },
         mounted: function () {
             this.updateTimesheet();

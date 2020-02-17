@@ -77,17 +77,10 @@
                         </a>
                     </div>
                 </div>
-
-                <div class="ui card loading">
-                    <a class="content"  style="background-color: lightgrey" >
-                        <div class="ui active loader"></div>
-                    </a>
-                </div>
-                <div class="ui card" sec:authorize="hasPermission(null,'PROJECT_CREATE')">
-                    <a class="content"  style="background-color: lightgrey" data-cy="create-project"  th:href="@{/projects/create}">
-                        <div class="badge" style="font-size: 4.2rem; padding-top: 2rem;">
-                            <i class="plus icon"></i>
-
+                <div class="ui card" sec:authorize="hasPermission(null,'PROJECTS_CREATE')">
+                    <a class="content"  style="background-color: lightgrey; display: flex; flex-direction: column;justify-content: center;" data-cy="create-project"  th:href="@{/projects/create}">
+                        <div class="badge" >
+                            <i class="plus icon" style="font-size: 4.2rem;"></i>
                         </div>
                     </a>
                 </div>
