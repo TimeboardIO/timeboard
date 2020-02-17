@@ -26,21 +26,12 @@ package timeboard.core;
  * #L%
  */
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Organization;
-
-import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 @Configuration
 @ComponentScan(basePackages = "timeboard.core")
@@ -48,33 +39,5 @@ import java.util.Optional;
 @EnableJpaRepositories
 @EnableTransactionManagement
 public class CoreConfiguration {
-
-    @Autowired
-    private OrganizationService organizationService;
-
-    @Value("${timeboard.organizations.default}")
-    private String defaultOrganizationName;
-
-    @Value("${timeboard.tasks.default.vacation}")
-    private String defaultVacationTaskName;
-
-    @PostConstruct
-    private void verifyPublicOrganization() throws BusinessException {
-
-        final Optional<Organization> defaultOrganization = this.organizationService
-                .getOrganizationByName(this.defaultOrganizationName);
-
-        if (!defaultOrganization.isPresent()) {
-            final Map<String, String> props = new HashMap<>();
-            props.put(Organization.SETUP_PUBLIC, "true");
-
-            this.organizationService.createOrganization(null, this.defaultOrganizationName, props);
-        }
-
-        this.organizationService.checkOrganizationVacationTask(defaultVacationTaskName);
-
-
-    }
-
 
 }
