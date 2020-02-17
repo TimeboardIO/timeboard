@@ -6,6 +6,8 @@
 </head>
 <body>
 <div th:fragment="timesheet">
+
+
     <table align="left" border="0" cellpadding="0" cellspacing="0" class="col380" style="width: 100%; max-width: 800px;"
            th:if="${timesheetSubmitted.length > 0 || timesheetRejected.length > 0 || timesheetValidated.length > 0}">
         <tr th:if="${timesheetSubmitted.length > 0}">

@@ -1,4 +1,3 @@
-
 var copyToClipboard = function (textToCopy) {
     var el = document.createElement('input');
     el.value = textToCopy;
