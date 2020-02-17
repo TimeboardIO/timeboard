@@ -151,6 +151,8 @@
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf-spring5</artifactId>
         </dependency>
+
+
     </dependencies>
 
     <build>
@@ -177,6 +179,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

@@ -45,6 +45,9 @@ public class ProjectTag extends OrganizationEntity implements Serializable {
     @ManyToOne(targetEntity = Project.class, fetch = FetchType.LAZY)
     private Project project;
 
+    @Column
+    private String test;
+
     public ProjectTag() {
     }
 
