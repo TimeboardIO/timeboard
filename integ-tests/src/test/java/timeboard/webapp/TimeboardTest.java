@@ -35,6 +35,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import timeboard.core.api.AccountService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectService;
+import timeboard.core.api.TimesheetService;
 import timeboard.home.HomeController;
 
 
@@ -47,19 +48,27 @@ import timeboard.home.HomeController;
 @AutoConfigureMockMvc
 public class TimeboardTest {
 
+    protected TimeboardWorld world;
     @Autowired
     protected MockMvc mvc;
-
     @Autowired
     protected HomeController controller;
-
     @Autowired
     protected ProjectService projectService;
-
     @Autowired
     protected AccountService accountService;
-
     @Autowired
     protected OrganizationService organizationService;
+    @Autowired
+    protected TimesheetService timesheetService;
+
+    public TimeboardTest(TimeboardWorld world) {
+        this.world = world;
+    }
+
+    public TimeboardTest() {
+        this.world = new TimeboardWorld();
+    }
+
 
 }
