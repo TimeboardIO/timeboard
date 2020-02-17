@@ -26,27 +26,22 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
-import org.junit.Assert;
-import org.springframework.beans.factory.annotation.Autowired;
-import timeboard.home.HomeController;
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
+import timeboard.core.security.TimeboardAuthentication;
 
-public class HomeFeatureATest extends TimeboardTest {
+@Component
+public class TimeboardWorld {
 
-    @Autowired
-    protected HomeController homeController;
-    @Autowired
-    private TimeboardWorld world;
-
-    @When("^the user calls /home$")
-    public void the_client_calls_home() throws Throwable {
-        this.homeController.handleGet(world.auth, world.model);
-    }
-
-    @Then("^the user receives (\\d+) project$")
-    public void the_user_receives_project(final int arg1) throws Throwable {
-        Assert.assertEquals(world.model.asMap().get(HomeController.NB_PROJECTS), arg1);
-    }
+    Project lastProject;
+    Task lastTask;
+    Account account;
+    Organization organization;
+    TimeboardAuthentication auth;
+    Model model;
 
 }

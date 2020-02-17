@@ -30,23 +30,23 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import timeboard.home.HomeController;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.projects.ProjectsController;
 
-public class HomeFeatureATest extends TimeboardTest {
+public class ProjectFeatureATest extends TimeboardTest {
 
     @Autowired
-    protected HomeController homeController;
+    protected ProjectsController projectsController;
     @Autowired
     private TimeboardWorld world;
 
-    @When("^the user calls /home$")
-    public void the_client_calls_home() throws Throwable {
-        this.homeController.handleGet(world.auth, world.model);
+    @Then("^the user has (\\d+) projects$")
+    public void the_user_has_projects(final int arg1) throws Throwable {
+        Assert.assertEquals(projectService.listProjects(world.account, world.organization).size(), arg1);
     }
 
-    @Then("^the user receives (\\d+) project$")
-    public void the_user_receives_project(final int arg1) throws Throwable {
-        Assert.assertEquals(world.model.asMap().get(HomeController.NB_PROJECTS), arg1);
+    @When("^the user create a project$")
+    public void theUserCreateAProject() throws BusinessException {
+        projectService.createProject(world.organization, world.account, "BrandNewProject");
     }
-
 }

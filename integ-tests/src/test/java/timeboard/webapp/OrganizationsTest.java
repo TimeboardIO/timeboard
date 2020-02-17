@@ -53,7 +53,6 @@ public class OrganizationsTest extends TimeboardTest {
     @Autowired
     private OrganizationService organizationService;
 
-
     @Test
     public void testRemoveOrganizationMember() throws BusinessException {
 

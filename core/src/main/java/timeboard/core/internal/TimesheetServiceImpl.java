@@ -515,10 +515,10 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
         if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
-            final Imputation existingImputation = this.projectService.getImputationByDayByTask(em, calendar.getTime(), projectTask, actor);
-            final double oldValue = existingImputation != null ? existingImputation.getValue() : 0;
+            final Optional<Imputation> existingImputation = this.projectService.getImputation(actor, projectTask,  calendar.getTime() );
+            final double oldValue = existingImputation.isPresent() ? existingImputation.get().getValue() : 0;
 
-            this.actionOnImputation(existingImputation, projectTask, actor, val, calendar.getTime());
+            this.actionOnImputation(existingImputation.orElse(null), projectTask, actor, val, calendar.getTime());
             final Task updatedTask = em.find(Task.class, projectTask.getId());
             final double newEffortLeft = this.updateEffortLeftFromImputationValue(projectTask.getEffortLeft(), oldValue, val);
             updatedTask.setEffortLeft(newEffortLeft);
@@ -547,8 +547,8 @@ public class TimesheetServiceImpl implements TimesheetService {
         final DefaultTask defaultTask = (DefaultTask) this.projectService.getTaskByID(actor, task.getId());
 
         // No matching imputations AND new value is correct (0.0 < val <= 1.0) AND task is available for imputations
-        final Imputation existingImputation = this.projectService.getImputationByDayByTask(em, calendar.getTime(), defaultTask, actor);
-        this.actionOnImputation(existingImputation, defaultTask, actor, val, calendar.getTime());
+        final Optional<Imputation> existingImputation = this.projectService.getImputation(actor, defaultTask, calendar.getTime());
+        this.actionOnImputation(existingImputation.orElse(null), defaultTask, actor, val, calendar.getTime());
 
         em.flush();
         LOGGER.info("User " + actor.getScreenName() + " updated imputations for default task "

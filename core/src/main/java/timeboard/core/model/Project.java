@@ -105,6 +105,8 @@ public class Project extends OrganizationEntity implements Serializable {
         this.members = new HashSet<>();
         this.tasks = new HashSet<>();
         this.attributes = new HashMap<>();
+        this.snapshots = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
     public Long getId() {

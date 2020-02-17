@@ -135,7 +135,8 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
     }
 
     public void setOrigin(final String origin) {
-        this.origin = origin.toLowerCase();
+        this.origin = origin != null ?
+        origin.toLowerCase() : "";
     }
 
     public String getRemotePath() {

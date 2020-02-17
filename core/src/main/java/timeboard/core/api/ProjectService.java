@@ -29,33 +29,17 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 
 public interface ProjectService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
-    String PROJECT_CREATE = "PROJECT_CREATE";
-    String PROJECT_SETUP = "PROJECT_SETUP";
-    String PROJECT_ARCHIVE = "PROJECT_ARCHIVE";
-    String PROJECT_LIST = "PROJECT_LIST";
-    String PROJECT_COUNT = "PROJECT_COUNT";
-    String PROJECT_VIEW = "PROJECT_VIEW";
 
-    String TASK_LIST = "TASK_LIST";
-    String PROJECT_TAGS_VIEW = "PROJECT_TAGS_VIEW";
-    String PROJECT_TASKS_VIEW = "PROJECT_TASKS_VIEW";
-    String PROJECT_TASKS_APPROBATION = "PROJECT_TASKS_APPROBATION";
-    String PROJECT_TASKS_IMPORT = "PROJECT_TASKS_IMPORT";
-    String PROJECT_TASKS_EDIT = "PROJECT_TASKS_EDIT";
-    String PROJECT_BATCHES_VIEW = "PROJECT_BATCHES_VIEW";
-    String PROJECT_SETUP_VIEW = "PROJECT_BATCHES_VIEW";
     /*
     === Projects ===
     */
-
-    Project createProject(final Organization orgID, Account owner, String projectName) throws BusinessException;
+    Project createProject(final Organization org, Account owner, String projectName) throws BusinessException;
 
     List<Project> listProjects(Account owner, Organization orgID);
 
@@ -71,10 +55,10 @@ public interface ProjectService {
 
     void save(Account actor, ProjectMembership projectMembership) throws BusinessException;
 
+
     /*
      == Tasks ==
      */
-
     List<Task> listUserTasks(Organization org, Account account);
 
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
@@ -113,7 +97,7 @@ public interface ProjectService {
 
     void updateTasks(Account actor, List<Task> taskList);
 
-    Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task, Account account);
+    Optional<Imputation> getImputation(Account user, AbstractTask task, Date day);
 
     UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
@@ -206,8 +190,6 @@ public interface ProjectService {
     List<Batch> getBatchList(Account user, Project project, BatchType batchType) throws BusinessException;
 
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
-
-    Optional<Imputation> getImputation(Account user, DefaultTask task, Date day);
 
     List<Account> findOwnersOfAnyUserProject(Account user);
 

@@ -33,4 +33,7 @@ import org.junit.runner.RunWith;
 @RunWith(Cucumber.class)
 @CucumberOptions(features = "src/test/resources", strict = true, plugin = {"json:target/cucumber.json", "pretty", "html:target/site/cucumber"})
 public class CucumberTest extends TimeboardTest {
+    public CucumberTest(TimeboardWorld world) {
+        super(world);
+    }
 }
