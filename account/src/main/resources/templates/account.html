@@ -63,13 +63,14 @@
 
                 <form action="" class="ui form account" enctype="application/x-www-form-urlencoded" method="post">
                     <div class="field">
-                        <label>Name</label>
                         <div class="two fields">
                             <div class="field">
+                                <label>First Name</label>
                                 <input name="firstName" placeholder="First Name" th:value="${account.firstName}"
                                        type="text">
                             </div>
                             <div class="field">
+                                <label>Name</label>
                                 <input name="name" placeholder="Last Name" th:value="${account.name}" type="text">
                             </div>
                         </div>
