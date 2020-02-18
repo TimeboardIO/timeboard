@@ -81,6 +81,7 @@
   {
     "name": "Limits of project creation is respected",
     "actions": [
+      "PROJECT_CREATE",
       "PROJECT_CREATE_LIMIT"
     ],
     "conditions": [

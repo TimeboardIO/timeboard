@@ -64,16 +64,20 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
 
 
     private boolean checkRules(final List<PolicyRuleSet> matchedRules, final SecurityAccessContext cxt) {
+        boolean result = true;
         for (final PolicyRuleSet rule : matchedRules) {
             try {
                 if (rule.getConditions().stream()
                         .allMatch(expression -> expression.getValue(cxt, Boolean.class))) {
-                    return true;
+                    result = result;
+                }else{
+                    result = false;
                 }
             } catch (final EvaluationException ex) {
                 LOGGER.error("An error occurred while evaluating PolicyRule.", ex);
+                return false;
             }
         }
-        return false;
+        return result;
     }
 }
