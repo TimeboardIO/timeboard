@@ -94,7 +94,7 @@
       "PROJECT_TASKS_CREATE"
     ],
     "conditions": [
-      "environment.checkTaskByProjectLimit(subject)"
+      "environment.checkTaskByProjectLimit(subject, resource)"
     ]
   }
 ]
