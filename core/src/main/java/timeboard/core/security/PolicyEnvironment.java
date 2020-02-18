@@ -53,6 +53,10 @@ public class PolicyEnvironment {
         return new Date();
     }
 
+    public boolean checkEnabledProjectLimit(final TimeboardAuthentication authentication) throws CommercialException {
+        return businessPolicyEvaluator.checkProjectEnabledLimit(authentication.getDetails());
+    }
+
     public boolean checkProjectByUserLimit(final TimeboardAuthentication authentication) throws CommercialException {
         return businessPolicyEvaluator.checkProjectByUserLimit(authentication.getDetails());
     }

@@ -59,7 +59,7 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
         if (numberEnabledProjects >= limitEnabledProjectsInApp) {
             throw new CommercialException("Limit reached",
                     "Project's creation impossible for " + actor.getScreenName() + "!\n" +
-                            "Too many enabled projects in this applciation !");
+                            "Too many enabled projects in this application !");
         }
         return true;
     }
@@ -89,7 +89,7 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     @Override
     public int getNumberEnabledProjects(final Account account) {
         final TypedQuery<Object> query = this.entityManager.createQuery(
-                "select count(p) from Project p where p.enabled = true", Object.class);
+                "select count(p) from Project p where p.enable = true", Object.class);
         return Integer.parseInt(query.getSingleResult().toString());
     }
 

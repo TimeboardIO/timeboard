@@ -77,5 +77,23 @@
     "conditions": [
       "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"
     ]
+  },
+  {
+    "name": "Limits of project creation is respected",
+    "actions": [
+      "PROJECT_CREATE_LIMIT"
+    ],
+    "conditions": [
+      "environment.checkEnabledProjectLimit(subject) && environment.checkProjectByUserLimit(subject)"
+    ]
+  },
+  {
+    "name": "Limits of task creation is respected",
+    "actions": [
+      "PROJECT_TASKS_CREATE"
+    ],
+    "conditions": [
+      "environment.checkTaskByProjectLimit(subject)"
+    ]
   }
 ]
