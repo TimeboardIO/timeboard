@@ -201,7 +201,7 @@
                             {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{
                             new Date(day.date).getDate() }}
                         </th>
-                        <th class="wide one" style="background-color: white;" colspan="4"></th>
+                        <th class="wide one" style="background-color: white;" colspan="5"></th>
                     </tr>
 
                     <tr class="timesheet-head">
@@ -228,6 +228,8 @@
                             </div>
                         </th>
                         <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1"> ES
+                        </th>
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.esw}" rowspan="1"> ESW
                         </th>
                         <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1"> EL
                         </th>
@@ -276,9 +278,11 @@
                                 </div>
                             </td>
 
-                            <td colspan="4" v-if="projectID == 0"></td>
+                            <td colspan="5" v-if="projectID == 0"></td>
                             <template v-if="task.status!='PENDING'">
                                 <td v-if="projectID > 0" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
+                                </td>
+                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
                                 </td>
                                 <td v-if="projectID > 0">
                                     <div class="ui input">
