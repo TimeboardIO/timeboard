@@ -50,6 +50,20 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     @Value("${timeboard.quotas.project.tasks}")
     private int limitTasksByProject;
 
+    @Value("${timeboard.quotas.enabled.projects}")
+    private int limitEnabledProjectsInApp;
+
+    @Override
+    public boolean checkProjectEnabledLimit(final Account actor) throws CommercialException {
+        final int numberEnabledProjects = this.getNumberEnabledProjects(actor);
+        if (numberEnabledProjects >= limitEnabledProjectsInApp) {
+            throw new CommercialException("Limit reached",
+                    "Project's creation impossible for " + actor.getScreenName() + "!\n" +
+                            "Too many enabled projects in this applciation !");
+        }
+        return true;
+    }
+
     @Override
     public boolean checkProjectByUserLimit(final Account actor) throws CommercialException {
         final int numberProjectByUser = this.getNumberProjectsByUser(actor);
@@ -70,6 +84,13 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
                             "Too many task in project " + project.getName() + "in this account !");
         }
         return true;
+    }
+
+    @Override
+    public int getNumberEnabledProjects(final Account account) {
+        final TypedQuery<Object> query = this.entityManager.createQuery(
+                "select count(p) from Project p where p.enabled = true", Object.class);
+        return Integer.parseInt(query.getSingleResult().toString());
     }
 
     @Override
