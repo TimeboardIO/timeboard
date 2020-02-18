@@ -47,6 +47,7 @@ import timeboard.core.internal.rules.project.ActorIsProjectMember;
 import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
+import timeboard.core.internal.rules.task.TaskHasStatus;
 import timeboard.core.model.*;
 import timeboard.core.security.AbacEntries;
 
@@ -390,8 +391,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteTasks(final Account actor, final List<Task> taskList) {
+    public void archiveTasks(final Account actor, final List<Task> taskList) {
         for (final Task task : taskList) {
+            task.setTaskStatus(TaskStatus.ARCHIVED);
             em.merge(task);
         }
         LOGGER.info("User " + actor + " deleted " + taskList.size() + " tasks ");
@@ -435,12 +437,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Optional<Task> getTaskByRemoteID(final Account actor, final String id) {
-        Task task = null;
+        Task task;
         try {
             final TypedQuery<Task> query = this.em.createQuery("select t from Task t where t.remoteId = :remoteID", Task.class);
             query.setParameter("remoteID", id);
             task = query.getSingleResult();
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
+            task = null;
         }
         return Optional.ofNullable(task);
     }
@@ -512,11 +515,28 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteTaskByID(final Account actor, final long taskID) throws BusinessException {
+    public void archiveTaskByID(final Account actor, final long taskID) throws BusinessException {
+
+
+        final Task task = em.find(Task.class, taskID);
+
+        task.setTaskStatus(TaskStatus.ARCHIVED);
+        em.merge(task);
+        em.flush();
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
+
+
+        LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
+
+    }
+
+    @Override
+    public void deleteTaskByID(Account actor, Long taskID) throws BusinessException {
 
         final RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new TaskHasNoImputation());
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
+        ruleSet.addRule(new TaskHasStatus(TaskStatus.PENDING));
 
         final Task task = em.find(Task.class, taskID);
 
@@ -525,13 +545,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-        em.remove(task);
+        task.setTaskStatus(TaskStatus.ARCHIVED);
+        em.merge(task);
         em.flush();
         TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
 
 
         LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
-
     }
 
     @Override

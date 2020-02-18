@@ -156,7 +156,7 @@ public class CalendarServiceImpl implements CalendarService {
                 for (final List<Task> remainingEventList : existingEvents.values()) {
                     tasksToDelete.addAll(remainingEventList);
                 }
-                this.projectService.deleteTasks(actor, tasksToDelete);
+                this.projectService.archiveTasks(actor, tasksToDelete);
             }
 
             this.projectService.updateTasks(actor, tasksToUpdate);
