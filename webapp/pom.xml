@@ -44,6 +44,8 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>2.1.8.RELEASE</version>
             </plugin>
+
+
         </plugins>
     </build>
     <dependencies>
@@ -173,8 +175,12 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-core</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-maven-plugin</artifactId>
+            <version>3.4.1</version>
+        </dependency>
     </dependencies>
-
 
 
 </project>
