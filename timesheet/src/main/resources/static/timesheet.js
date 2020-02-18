@@ -115,12 +115,12 @@ const timesheetModel = {
             contentType: "application/json",
         });
     },
-    getFirstDayOfWeekDateString : function () {
+    getFirstDayOfWeekDateString: function () {
         let d1 = new Date('' + this.year + '');
         d1.setDate(d1.getDate() - d1.getDay() + 1 + (7 * (this.week - 1)));
         return d1.toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' });
     },
-    getLastDayOfWeekDateString : function () {
+    getLastDayOfWeekDateString: function () {
         let d1 = new Date('' + this.year + '');
         d1.setDate(d1.getDate() - d1.getDay() + 7 + (7 * (this.week - 1)));
         return d1.toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' });
@@ -134,24 +134,24 @@ $(document).ready(function () {
         fields: {
             projectID: {
                 identifier: 'projectID',
-                rules: [{type: 'empty', prompt: 'Please select project'}]
+                rules: [{ type: 'empty', prompt: 'Please select project' }]
             },
             taskName: {
                 identifier: 'taskName',
-                rules: [{type: 'empty', prompt: 'Please enter task name'}]
+                rules: [{ type: 'empty', prompt: 'Please enter task name' }]
             },
             taskStartDate: {
                 identifier: 'taskStartDate',
-                rules: [{type: "empty", prompt: 'Please enter task start date'}]
+                rules: [{ type: "empty", prompt: 'Please enter task start date' }]
             },
             taskEndDate: {
                 identifier: 'taskEndDate',
-                rules: [{type: "empty", prompt: 'Please enter task end date'}]
+                rules: [{ type: "empty", prompt: 'Please enter task end date' }]
             },
             taskOriginalEstimate: {
                 identifier: 'taskOriginalEstimate',
-                rules: [{type: 'empty', prompt: 'Please enter task original estimate in days'},
-                    {type: 'number', prompt: 'Please enter task a number original estimate in days'}]
+                rules: [{ type: 'empty', prompt: 'Please enter task original estimate in days' },
+                { type: 'number', prompt: 'Please enter task a number original estimate in days' }]
             },
         }
     };
@@ -201,27 +201,27 @@ $(document).ready(function () {
                         app.currentWeekValidationStatus = data.currentWeekValidationStatus;
                         app.previousWeekValidationStatus = data.previousWeekValidationStatus;
                     }).then(function () {
-                    $('.ui.dimmer').removeClass('active');
-                    $(' #timesheet').removeClass('hidden');
-                }).then(function () {
-                    let list = document.getElementsByClassName("day-badge");
-                    for (let i = 0; i < list.length; i++) {
-                        let badge = list[i];
-                        if (badge.innerText === "1.0") {
-                            badge.classList.add("green");
-                            badge.classList.remove("red");
+                        $('.ui.dimmer').removeClass('active');
+                        $(' #timesheet').removeClass('hidden');
+                    }).then(function () {
+                        let list = document.getElementsByClassName("day-badge");
+                        for (let i = 0; i < list.length; i++) {
+                            let badge = list[i];
+                            if (badge.innerText === "1.0") {
+                                badge.classList.add("green");
+                                badge.classList.remove("red");
+                            }
                         }
-                    }
-                })
+                    })
             },
             isTimesheetHasState: function (statesArray) {
                 return statesArray.includes(this.currentWeekValidationStatus);
             },
             displayErrorMessage: function (message) {
-                this.errorMessages.push({message: message, visible: true});
+                this.errorMessages.push({ message: message, visible: true });
             },
             displaySuccessMessage: function (message) {
-                this.successMessages.push({message: message, visible: true});
+                this.successMessages.push({ message: message, visible: true });
             },
             submitMyWeek: function (event) {
                 $.ajax({
@@ -279,7 +279,7 @@ $(document).ready(function () {
                     type: "POST",
                     contentType: "application/json",
                     url: "timesheet/sendReminderMail/" + _USER_ID,
-                    success: function (data, textStatus, jqXHR)  {
+                    success: function (data, textStatus, jqXHR) {
                         event.target.classList.add('disabled');
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
@@ -310,55 +310,30 @@ $(document).ready(function () {
                 const date = $(event.target).attr('date');
                 const taskID = $(event.target).attr('task');
                 const currentSum = app.getImputationSum(date);
-
-                const currentSum = app.getImputationSum(date);
                 let newVal = parseFloat($(event.target).val());
                 let oldVal = app.imputations[date][taskID];
-                if (newval !== oldVal) {
+                if (newVal !== oldVal) {
 
-                if (newVal > 1) {
-                    newVal = 1;
-                }
-                if (newVal < 0) {
-                    newVal = 0;
-                }
-                if (currentSum + (newVal - oldVal) <= 1.0) {
-                    $(event.target).val(newVal);
-                    const self = this;
-                    this.updateTask(date, taskID, 'imputation', newVal)
-                        .done(function (updateTask) {
-                            app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
-                            app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
-                            app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
-                            app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
-                            app.imputations[date][taskID] = newVal;
-                            $(event.target).parent().removeClass('left icon loading');
-                        })
-                        .fail(function (errorMessage) {
-                            self.displayErrorMessage(errorMessage.responseText);
-                            $(event.target).parent().removeClass('left icon loading');
-                        });
-                } else {
-                    $(event.target).val(oldVal);
-                    $(event.target).parent().removeClass('left icon loading').addClass('error');
-                    this.displayErrorMessage("you cannot charge more than one day a day.");
-
-
-                    if (newval > 1) {
-                        newval = 1;
+                    if (newVal > 1) {
+                        newVal = 1;
                     }
-                    if (newval < 0) {
-                        newval = 0;
+                    if (newVal < 0) {
+                        newVal = 0;
                     }
-                    if (currentSum + (newval - oldVal) <= 1.0) {
-                        $(event.target).val(newval);
-                        this.updateTask(date, taskID, 'imputation', newval)
-                            .then(function (updateTask) {
+                    if (currentSum + (newVal - oldVal) <= 1.0) {
+                        $(event.target).val(newVal);
+                        const self = this;
+                        this.updateTask(date, taskID, 'imputation', newVal)
+                            .done(function (updateTask) {
                                 app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
                                 app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
                                 app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
                                 app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
-                                app.imputations[date][taskID] = newval;
+                                app.imputations[date][taskID] = newVal;
+                                $(event.target).parent().removeClass('left icon loading');
+                            })
+                            .fail(function (errorMessage) {
+                                self.displayErrorMessage(errorMessage.responseText);
                                 $(event.target).parent().removeClass('left icon loading');
                             });
                     } else {
@@ -366,6 +341,30 @@ $(document).ready(function () {
                         $(event.target).parent().removeClass('left icon loading').addClass('error');
                         this.displayErrorMessage("you cannot charge more than one day a day.");
 
+
+                        if (newval > 1) {
+                            newval = 1;
+                        }
+                        if (newval < 0) {
+                            newval = 0;
+                        }
+                        if (currentSum + (newval - oldVal) <= 1.0) {
+                            $(event.target).val(newval);
+                            this.updateTask(date, taskID, 'imputation', newval)
+                                .then(function (updateTask) {
+                                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
+                                    app.projects[updateTask.projectID].tasks[updateTask.taskID].realEffort = updateTask.realEffort;
+                                    app.projects[updateTask.projectID].tasks[updateTask.taskID].originalEstimate = updateTask.originalEstimate;
+                                    app.projects[updateTask.projectID].tasks[updateTask.taskID].effortLeft = updateTask.effortLeft;
+                                    app.imputations[date][taskID] = newval;
+                                    $(event.target).parent().removeClass('left icon loading');
+                                });
+                        } else {
+                            $(event.target).val(oldVal);
+                            $(event.target).parent().removeClass('left icon loading').addClass('error');
+                            this.displayErrorMessage("you cannot charge more than one day a day.");
+
+                        }
                     }
                 }
             },
@@ -415,7 +414,7 @@ $(document).ready(function () {
                     detachable: true, centered: true
                 }).modal('show');
             },
-            cancelTask: function(event, task) {
+            cancelTask: function (event, task) {
                 event.preventDefault();
                 event.stopPropagation();
                 $.ajax({

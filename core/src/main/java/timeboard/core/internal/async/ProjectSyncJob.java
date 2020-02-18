@@ -185,6 +185,7 @@ public final class ProjectSyncJob implements Job {
     }
 
 
+
     private void createTasks(
             final Organization org, final Account actor, final Project project, final List<RemoteTask> newTasks, TaskStatus status) {
         newTasks.forEach(task -> {

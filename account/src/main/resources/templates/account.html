@@ -38,7 +38,7 @@
                         <div class="item">
                             <i class="clock outline icon"></i>
                             <div class="content">
-                                Member since <i th:text="${account.accountCreationTime}"></i>
+                                Member since <i th:text="${#dates.formatISO(account.accountCreationTime)}"></i>
                             </div>
                         </div>
                         <div class="item">
@@ -63,13 +63,14 @@
 
                 <form action="" class="ui form account" enctype="application/x-www-form-urlencoded" method="post">
                     <div class="field">
-                        <label>Name</label>
                         <div class="two fields">
                             <div class="field">
+                                <label>First Name</label>
                                 <input name="firstName" placeholder="First Name" th:value="${account.firstName}"
                                        type="text">
                             </div>
                             <div class="field">
+                                <label>Name</label>
                                 <input name="name" placeholder="Last Name" th:value="${account.name}" type="text">
                             </div>
                         </div>
@@ -140,7 +141,7 @@
                         <div class="two fields">
                             <div class="field">
                                 <label>Month</label>
-                                <select name="month">
+                                <select name="month" class="ui dropdown">
                                     <option th:each="month : ${monthsSinceHiring}" th:text="${month.value}"
                                             th:value="${month.key}">December
                                     </option>
@@ -149,7 +150,7 @@
                             </div>
                             <div class="field">
                                 <label>Year</label>
-                                <select name="year">
+                                <select name="year" class="ui dropdown">
                                     <option th:each="year : ${yearsSinceHiring}" th:text="${year}" th:value="${year}">
                                         2019
                                     </option>
@@ -158,7 +159,7 @@
                             </div>
                             <div class="field">
                                 <label>Month</label>
-                                <select name="projectID">
+                                <select name="projectID" class="ui dropdown">
                                     <option th:each="project : ${projects}" th:text="${project.name}"
                                             th:value="${project.id}"></option>
                                 </select>

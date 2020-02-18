@@ -67,7 +67,6 @@ public class TimesheetController {
     @Autowired
     private OrganizationService organizationService;
 
-
     @Autowired
     public EmailService emailService;
 
