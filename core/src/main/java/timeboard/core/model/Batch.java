@@ -97,7 +97,7 @@ public class Batch extends OrganizationEntity implements Serializable {
 
     public String getScreenName() {
         if (date != null) {
-            // TODO replace by i18n locale DIRTY
+            // replace by i18n locale DIRTY
             return this.name + " (" + DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).format(this.date) + ")";
         }
         return this.name;
