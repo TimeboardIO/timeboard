@@ -40,7 +40,6 @@ import timeboard.core.model.Project;
 import timeboard.core.model.TaskType;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.projects.ProjectBaseController;
-
 import java.util.Map;
 
 import static timeboard.reports.ProjectDashboardController.PATH;
@@ -68,11 +67,8 @@ public class ProjectDashboardController extends ProjectBaseController {
         final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
         model.addAttribute("project", project);
         model.addAttribute("dashboard", dashboard);
-
-        final TaskType type = new TaskType();
-        type.setTypeName("Global");
-        dashboardsByType.put(type, dashboard);
         model.addAttribute("dashboardsByType", dashboardsByType);
+
         this.initModel(model, authentication, project);
         return "project_dashboard.html";
     }
