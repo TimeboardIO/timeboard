@@ -13,7 +13,7 @@
 
 <div layout:fragment="placeholder">
 
-    <div class="ui two column grid">
+    <div class="ui one column grid">
         <div class="column">
             <div class="ui fluid card">
                 <div class="image">
@@ -21,19 +21,22 @@
                 </div>
             </div>
         </div>
-        <div class="column">
+        <div class="column" th:each="dashboard:${dashboardsByType}" >
             <div class="ui fluid card">
+                <div class="ui horizontal divider"><i class="bookmark icon"></i>
+                    <span th:text="${dashboard.key.typeName}"></span>
+                </div>
                 <div class="content">
                     <div class="ui mini statistic">
                         <div class="value"
-                             th:text="${#numbers.formatDecimal(dashboard.originalEstimate,1,1,'COMMA')}"></div>
+                             th:text="${#numbers.formatDecimal(dashboard.value.originalEstimate,1,1,'COMMA')}"></div>
                         <div class="label">
                             Original Estimate
                         </div>
                     </div>
 
                     <div class="ui mini statistic">
-                        <div class="value" th:text="${#numbers.formatDecimal(dashboard.effortSpent,1,1,'COMMA')}"></div>
+                        <div class="value" th:text="${#numbers.formatDecimal(dashboard.value.effortSpent,1,1,'COMMA')}"></div>
                         <div class="label">
                             Effort Spent
                         </div>
@@ -41,7 +44,7 @@
 
                     <div class="ui mini statistic">
                         <div class="value"
-                             th:text="${#numbers.formatDecimal(dashboard.effortLeft,1,1,'COMMA')}"></div>
+                             th:text="${#numbers.formatDecimal(dashboard.value.effortLeft,1,1,'COMMA')}"></div>
                         <div class="label">
                             Effort Left
                         </div>
@@ -50,7 +53,7 @@
 
                     <div class="ui mini statistic">
                         <div class="value"
-                             th:text="${#numbers.formatDecimal(dashboard.realEffort,1,1,'COMMA')}"></div>
+                             th:text="${#numbers.formatDecimal(dashboard.value.realEffort,1,1,'COMMA')}"></div>
                         <div class="label">
                             Real Effort
                         </div>
@@ -65,11 +68,11 @@
 
       /*<![CDATA[*/
 
-         var qt = /*[[${dashboard.quotation}]]*/ 'QT';
-         var oe = /*[[${dashboard.originalEstimate}]]*/ 'OE';
-         var re = /*[[${dashboard.realEffort}]]*/ 'RE';
-         var es = /*[[${dashboard.effortSpent}]]*/ 'ES';
-         var el = /*[[${dashboard.effortLeft}]]*/ 'EL';
+         let qt = /*[[${dashboard.quotation}]]*/ 'QT';
+         let oe = /*[[${dashboard.originalEstimate}]]*/ 'OE';
+         let re = /*[[${dashboard.realEffort}]]*/ 'RE';
+         let es = /*[[${dashboard.effortSpent}]]*/ 'ES';
+         let el = /*[[${dashboard.effortLeft}]]*/ 'EL';
 
 
         const data = {
@@ -124,7 +127,7 @@
         };
 
         const ctx = document.querySelector("#barchart");
-        var kpiChart = new Chart(ctx, {
+        let kpiChart = new Chart(ctx, {
             type: 'bar',
             data: data,
             options: options
