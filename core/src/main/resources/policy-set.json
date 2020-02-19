@@ -37,6 +37,7 @@
       "PROJECT_TAGS_VIEW",
       "PROJECT_TASKS_APPROBATION",
       "PROJECT_TASKS_EDIT",
+      "REPORT_PROJECT_VIEW",
       "TIMESHEET_VALIDATION_VIEW"
     ],
     "conditions": [
@@ -77,7 +78,6 @@
     "name": "This features are disabled for v1.0",
     "actions": [
       "PROJECT_TASKS_IMPORT",
-      "REPORT_PROJECT_VIEW",
       "REPORT_GENERATE_TAS",
       "ACCOUNT_CONFIG_EXTERNAL_TOOLS",
       "REPORT_LIST",
