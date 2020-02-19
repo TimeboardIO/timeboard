@@ -2,7 +2,7 @@
 
 <html layout:decorate="~{layouts/general.html(path='/account')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
     <title layout:fragment="title">Account</title>
@@ -93,7 +93,7 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card" sec:authorize="hasPermission(null,'ACCOUNT_CONFIG_EXTERNAL_TOOLS')">
             <div class="content">
                 <h4 class="ui dividing header">External tools</h4>
 
@@ -131,7 +131,7 @@
         </div>
 
 
-        <div class="card">
+        <div class="card" sec:authorize="hasPermission(null,'REPORT_GENERATE_TAS')" >
             <div class="content">
                 <h4 class="ui dividing header">Exports Reports</h4>
 

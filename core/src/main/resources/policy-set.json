@@ -33,14 +33,10 @@
     "name": "User is project owner",
     "actions": [
       "PROJECT_BATCHES_VIEW",
-      "PROJECT_SNAPSHOTS_VIEW",
-      "PROJECT_SNAPSHOT",
-      "REPORT_PROJECT_VIEW",
       "PROJECT_SETUP",
       "PROJECT_TAGS_VIEW",
       "PROJECT_TASKS_APPROBATION",
       "PROJECT_TASKS_EDIT",
-      "PROJECT_TASKS_IMPORT",
       "TIMESHEET_VALIDATION_VIEW"
     ],
     "conditions": [
@@ -52,7 +48,6 @@
     "actions": [
       "PROJECT_CREATE",
       "PROJECT_ARCHIVE",
-      "REPORT_LIST",
       "ORG_SETUP"
     ],
     "conditions": [
@@ -77,5 +72,22 @@
     "conditions": [
       "environment.isOwnerOfAnyUserProject(subject.getDetails(), resource)"
     ]
+  },
+  {
+    "name": "This features are disabled for v1.0",
+    "actions": [
+      "PROJECT_TASKS_IMPORT",
+      "REPORT_PROJECT_VIEW",
+      "REPORT_GENERATE_TAS",
+      "ACCOUNT_CONFIG_EXTERNAL_TOOLS",
+      "REPORT_LIST",
+      "PROJECT_TASKS_IMPORT",
+      "PROJECT_SNAPSHOTS_VIEW",
+      "PROJECT_SNAPSHOT"
+    ],
+    "conditions": [
+      "false"
+    ]
   }
+
 ]
