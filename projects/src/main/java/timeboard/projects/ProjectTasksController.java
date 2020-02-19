@@ -121,7 +121,7 @@ public class ProjectTasksController extends ProjectBaseController {
 
                 task.getBatches().forEach(b -> {
                     batchIDs.add(b.getId());
-                    batchNames.add(b.getName());
+                    batchNames.add(b.getScreenName());
                 });
                 result.add(new TasksRestAPI.TaskWrapper(
                         task.getId(),
@@ -313,7 +313,7 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
         final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
-        batchList.forEach(batch -> batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getName())));
+        batchList.forEach(batch -> batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName())));
 
         return ResponseEntity.status(HttpStatus.OK).body(batchWrapperList.toArray());
     }
