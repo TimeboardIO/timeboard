@@ -75,6 +75,10 @@ const formValidationRules = {
             identifier: 'taskOriginalEstimate',
             rules: [ { type   : 'empty', prompt : 'Please enter task original estimate in days'  },
             { type   : 'number', prompt : 'Please enter task a number original estimate in days'  } ]
+        },
+        taskComments: {
+            identifier: 'taskComments',
+            rules: [ { type   : 'maxLength[500]', prompt : 'Please enter a comment with less than 500 characters'  } ]
         }
     }
 };
