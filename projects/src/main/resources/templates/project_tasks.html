@@ -259,6 +259,21 @@
             <template v-slot:end="{row}">
                 {{row.endDate}}
             </template>
+            <template v-slot:re="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    <p>{{row.realEffort}}</p>
+                </div>
+            </template>
+            <template v-slot:el="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    <p>{{row.effortLeft}}</p>
+                </div>
+            </template>
+            <template v-slot:es="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    <p>{{row.effortSpent}}</p>
+                </div>
+            </template>
             <template v-slot:oe="{row}">
                 <div class="ui circular label large day-badge" style="margin-top: 5px;">
                     <p>{{row.originalEstimate}}</p>
@@ -300,7 +315,7 @@
                     <i class="plus icon"></i>
                     {{ batch.batchName }}
                 </div>
-                <div class="content">
+                <div class="content" style="overflow-y: scroll">
                     <!-- Datatable component -->
                     <data-table v-bind:config="taskListConfig" v-bind:table="tableByBatch[batch.batchID]">
                         <template v-slot:name="{row}">
@@ -312,6 +327,21 @@
                         </template>
                         <template v-slot:end="{row}">
                             {{row.endDate}}
+                        </template>
+                        <template v-slot:re="{row}">
+                            <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                                <p>{{row.realEffort}}</p>
+                            </div>
+                        </template>
+                        <template v-slot:el="{row}">
+                            <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                                <p>{{row.effortLeft}}</p>
+                            </div>
+                        </template>
+                        <template v-slot:es="{row}">
+                            <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                                <p>{{row.effortSpent}}</p>
+                            </div>
                         </template>
                         <template v-slot:oe="{row}">
                             <div class="ui circular label large day-badge" style="margin-top: 5px;">
@@ -358,6 +388,21 @@
                     </template>
                     <template v-slot:end="{row}">
                         {{row.endDate}}
+                    </template>
+                    <template v-slot:re="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.realEffort}}</p>
+                        </div>
+                    </template>
+                    <template v-slot:el="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.effortLeft}}</p>
+                        </div>
+                    </template>
+                    <template v-slot:es="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.effortSpent}}</p>
+                        </div>
                     </template>
                     <template v-slot:oe="{row}">
                         <div class="ui circular label large day-badge" style="margin-top: 5px;">

@@ -304,6 +304,9 @@ public class TasksRestAPI {
         public String taskComments;
 
         public double originalEstimate;
+        public double realEffort;
+        public double effortLeft;
+        public double effortSpent;
 
         public String startDate;
         public String endDate;
@@ -329,6 +332,9 @@ public class TasksRestAPI {
                            final String taskName,
                            final String taskComments,
                            final double originalEstimate,
+                           final double realEffort,
+                           final double effortLeft,
+                           final double effortSpent,
                            final Date startDate,
                            final Date endDate,
                            final String assignee,
@@ -346,6 +352,10 @@ public class TasksRestAPI {
             this.taskName = taskName;
             this.taskComments = taskComments;
             this.originalEstimate = originalEstimate;
+            this.effortLeft = effortLeft;
+            this.realEffort = realEffort;
+            this.effortSpent = effortSpent;
+
             this.startDate = DATE_FORMAT.format(startDate);
             if (endDate != null) {
                 this.endDate = DATE_FORMAT.format(endDate);
@@ -361,6 +371,7 @@ public class TasksRestAPI {
             this.statusName = statusName;
             this.typeName = typeName;
             this.canChangeAssignee = canChangeAssignee;
+
         }
 
 
@@ -458,6 +469,30 @@ public class TasksRestAPI {
 
         public String getEndDate() {
             return this.endDate;
+        }
+
+        public double getRealEffort() {
+            return realEffort;
+        }
+
+        public void setRealEffort(double realEffort) {
+            this.realEffort = realEffort;
+        }
+
+        public double getEffortLeft() {
+            return effortLeft;
+        }
+
+        public void setEffortLeft(double effortLeft) {
+            this.effortLeft = effortLeft;
+        }
+
+        public double getEffortSpent() {
+            return effortSpent;
+        }
+
+        public void setEffortSpent(double effortSpent) {
+            this.effortSpent = effortSpent;
         }
     }
 

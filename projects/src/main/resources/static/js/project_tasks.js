@@ -88,6 +88,9 @@ const emptyTask =  {
     startDate: "",
     endDate:"",
     originalEstimate: 0,
+    realEffort: 0,
+    effortLeft: 0,
+    effortSpent: 0,
     typeID: 0,
     typeName: '',
     assignee: "",
@@ -132,12 +135,6 @@ let app = new Vue({
 
                 },
                 {
-                    "slot": "oe",
-                    "label": "OE",
-                    "sortKey": "originalEstimate"
-
-                },
-                {
                     "slot": "assignee",
                     "label": "Assignee",
                     "sortKey": "assignee"
@@ -158,6 +155,30 @@ let app = new Vue({
                     "slot": "type",
                     "label": "Type",
                     "sortKey": "typeID"
+
+                },
+                {
+                    "slot": "es",
+                    "label": "ES",
+                    "sortKey": "effortSpent"
+
+                },
+                {
+                    "slot": "el",
+                    "label": "EL",
+                    "sortKey": "effortLeft"
+
+                },
+                {
+                    "slot": "re",
+                    "label": "RE",
+                    "sortKey": "realEffort"
+
+                },
+                {
+                    "slot": "oe",
+                    "label": "OE",
+                    "sortKey": "originalEstimate"
 
                 },
                 {
@@ -266,15 +287,18 @@ let app = new Vue({
             if(task){
                  this.modalTitle = "Edit task";
                 // load task data in modal
-                 this.newTask.projectID = currentProjectID;
-                 this.newTask.taskID = task.taskID;
-                 this.newTask.taskName = task.taskName;
-                 this.newTask.taskComments = task.taskComments;
-                 this.newTask.endDate = task.endDate;
-                 this.newTask.startDate = task.startDate;
-                 this.newTask.originalEstimate = task.originalEstimate;
-                 this.newTask.typeID = task.typeID;
-                 this.newTask.status = task.status;
+                this.newTask.projectID = currentProjectID;
+                this.newTask.taskID = task.taskID;
+                this.newTask.taskName = task.taskName;
+                this.newTask.taskComments = task.taskComments;
+                this.newTask.endDate = task.endDate;
+                this.newTask.startDate = task.startDate;
+                this.newTask.originalEstimate = task.originalEstimate;
+                this.newTask.effortLeft = task.effortLeft;
+                this.newTask.effortSpent = task.effortSpent;
+                this.newTask.realEffort = task.realEffort;
+                this.newTask.typeID = task.typeID;
+                this.newTask.status = task.status;
                 this.newTask.batchIDs = task.batchIDs;
                 this.newTask.batchNames = task.batchNames;
                 this.newTask.typeName = task.typeName;
