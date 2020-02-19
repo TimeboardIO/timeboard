@@ -156,10 +156,10 @@ public class ProjectSetupController extends ProjectBaseController {
         final ProjectConfigForm pcf = new ProjectConfigForm();
         pcf.setName(project.getName());
 
-        if(RequestContextUtils.getInputFlashMap(request) != null && RequestContextUtils.getInputFlashMap(request).containsKey("editedComments"))
+        if (RequestContextUtils.getInputFlashMap(request) != null && RequestContextUtils.getInputFlashMap(request).containsKey("editedComments")){
             // Keep last edited comment
             pcf.setComments((String) RequestContextUtils.getInputFlashMap(request).get("editedComments"));
-        else{
+        }else{
             pcf.setComments(project.getComments());
         }
         pcf.setQuotation(project.getQuotation());
