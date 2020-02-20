@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
@@ -316,8 +317,17 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
         final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
-        batchList.forEach(batch -> batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName())));
-
+        Project finalProject = project;
+        batchList.forEach(batch -> {
+            ProjectDashboard dashboardBatch = null;
+            try {
+                dashboardBatch = this.projectService.projectDashboardByBatch(actor, finalProject, batch);
+            } catch (BusinessException e) {
+                e.printStackTrace();
+            }
+            batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName(), dashboardBatch.getOriginalEstimate(),
+                    dashboardBatch.getEffortLeft(), dashboardBatch.getRealEffort(), dashboardBatch.getEffortSpent()));
+        });
         return ResponseEntity.status(HttpStatus.OK).body(batchWrapperList.toArray());
     }
 

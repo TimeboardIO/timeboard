@@ -272,9 +272,18 @@ public class TasksRestAPI {
         public Long batchID;
         public String batchName;
 
-        public BatchWrapper(final Long batchID, final String batchName) {
+        public double originalEstimate;
+        public double realEffort;
+        public double effortLeft;
+        public double effortSpent;
+
+        public BatchWrapper(final Long batchID, final String batchName, double originalEstimate, double realEffort, double effortLeft, double effortSpent) {
             this.batchID = batchID;
             this.batchName = batchName;
+            this.originalEstimate = originalEstimate;
+            this.effortLeft = effortLeft;
+            this.realEffort = realEffort;
+            this.effortSpent = effortSpent;
         }
 
         public Long getBatchID() {
@@ -291,6 +300,38 @@ public class TasksRestAPI {
 
         public void setBatchName(final String batchName) {
             this.batchName = batchName;
+        }
+
+        public double getOriginalEstimate() {
+            return originalEstimate;
+        }
+
+        public void setOriginalEstimate(final double originalEstimate) {
+            this.originalEstimate = originalEstimate;
+        }
+
+        public double getRealEffort() {
+            return realEffort;
+        }
+
+        public void setRealEffort(double realEffort) {
+            this.realEffort = realEffort;
+        }
+
+        public double getEffortLeft() {
+            return effortLeft;
+        }
+
+        public void setEffortLeft(double effortLeft) {
+            this.effortLeft = effortLeft;
+        }
+
+        public double getEffortSpent() {
+            return effortSpent;
+        }
+
+        public void setEffortSpent(double effortSpent) {
+            this.effortSpent = effortSpent;
         }
 
 
