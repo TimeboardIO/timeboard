@@ -1,10 +1,10 @@
-package timeboard.core;
+package timeboard.webapp;
 
 /*-
  * #%L
- * core
+ * integ-tests
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,18 +26,27 @@ package timeboard.core;
  * #L%
  */
 
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import org.junit.Assert;
+import org.springframework.beans.factory.annotation.Autowired;
+import timeboard.core.api.exceptions.BusinessException;
+import timeboard.projects.ProjectsController;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+public class ProjectFeatureATest extends TimeboardTest {
 
-@Configuration
-@ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.internal.async"})
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class CoreConfiguration {
+    @Autowired
+    protected ProjectsController projectsController;
+    @Autowired
+    private TimeboardWorld world;
 
+    @Then("^the user has (\\d+) projects$")
+    public void the_user_has_projects(final int arg1) throws Throwable {
+        Assert.assertEquals(projectService.listProjects(world.account, world.organization).size(), arg1);
+    }
+
+    @When("^the user create a project$")
+    public void theUserCreateAProject() throws BusinessException {
+        projectService.createProject(world.organization, world.account, "BrandNewProject");
+    }
 }

@@ -27,7 +27,6 @@ package timeboard.organization;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,9 +54,6 @@ public class OrganizationSelectController {
     @Autowired
     private OrganizationService organizationService;
 
-    @Value("${timeboard.organizations.default}")
-    private String defaultOrganisationName;
-
     @GetMapping
     public String selectOrganisation(final TimeboardAuthentication authentication,
                                      final HttpServletRequest req, final TimeboardAuthentication p, final Model model) {
@@ -65,12 +61,6 @@ public class OrganizationSelectController {
 
         final List<Organization> orgs = authentication.getDetails().getOrganizationMemberships()
                 .stream().map(organizationMembership -> organizationMembership.getOrganization()).collect(Collectors.toList());
-
-        final Optional<Organization> defaultOrganisation = this.organizationService.getOrganizationByName(this.defaultOrganisationName);
-
-        if (defaultOrganisation.isPresent()) {
-            orgs.add(defaultOrganisation.get());
-        }
 
         model.addAttribute("organizations", orgs);
 

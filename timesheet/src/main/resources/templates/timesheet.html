@@ -37,7 +37,7 @@
                     <div v-bind="formError" class="ui error message"></div>
                     <div class="field">
                         <label>Project</label>
-                        <select v-model="task.projectID" class="select dropdown" name="projectID">
+                        <select v-model="task.projectID" class="select ui dropdown" name="projectID">
                             <option th:each="project: ${projectList}"
                                     th:text="${project.name}" th:value="${project.id}"
                             ></option>
@@ -73,7 +73,7 @@
                         </div>
                         <div class="field">
                             <label>Task type</label>
-                            <select v-model="task.typeID" name="taskTypeID">
+                            <select v-model="task.typeID" class="ui dropdown" name="taskTypeID">
                                 <option th:each="type: ${taskTypes}"
                                         th:text="${type.typeName}" th:value="${type.id}"
                                 ></option>
@@ -100,7 +100,8 @@
     <div class="ui inverted dimmer">
         <div class="ui text loader" th:text="#{loading}">Loading</div>
     </div>
-    <div id="timesheet" class="hidden">
+    <div id="timesheet" class="hidden" style="overflow-x: scroll;" >
+
         <div v-for="error in errorMessages" v-if="error.visible" class="ui container negative timesheet message">
             <i class="close icon" @click="error.visible = false; "></i>
             <div class="header"> {{ error.message }}</div>
@@ -109,127 +110,126 @@
             <i class="close icon" @click="success.visible = false; "></i>
             <div class="header"> {{ success.message }}</div>
         </div>
-        <div class="ui segment controls timesheet-navigation-controls">
+        <div class="ui segment">
+            <div class="ui controls stackable grid timesheet-menu" >
+                <div class=" two column row">
+                    <div class="left floated column" style="text-align: center;">
+                        <!-- LABELS -->
+                        <template v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
+                            <div class="ui orange label" th:text="#{timesheet.status.pending.validation}">
+                                Pending validation
+                            </div>
+                        </template>
+                        <template v-if="isTimesheetHasState([null])  && !userIsActor">
+                            <div class="ui orange label" th:text="#{timesheet.status.pending.submission}">
+                                Pending submission
+                            </div>
+                        </template>
+                        <template v-if="isTimesheetHasState(['VALIDATED'])">
+                            <div class="ui green label" th:text="#{timesheet.status.validated}">
+                                Week validated
+                            </div>
+                        </template>
+                        <template v-if="isTimesheetHasState(['REJECTED'])">
+                            <div class="ui red label" th:text="#{timesheet.status.rejected}">
+                                Week rejected
+                            </div>
+                        </template>
 
-            <div class="actions">
 
-                <!-- LABELS -->
-                <div v-if="isTimesheetHasState(['PENDING_VALIDATION'])">
-                    <div class="ui orange label" th:text="#{timesheet.status.pending.validation}">
-                        Pending validation
+                        <!-- ACTION BUTTONS -->
+                        <div style="display: inline-block"
+                                v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
+                             v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
+                             data-position="right center">
+                            <button
+                                    v-bind:data-week="week" v-bind:data-year="year"
+                                    v-on:click="submitMyWeek"
+                                    v-bind:class="{'ui positive button icons':true, 'disabled':(!enableSubmitButton())}"
+                                    type="submit">
+                                <i class="paper plane icon"></i>
+                                <span th:text="#{timesheet.submit}">Submit My Week</span>
+                            </button>
+                        </div>
+                        <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
+                                v-on:click="validateWeek"
+                                class="ui icons positive create-task button">
+                            <i class="check icon"></i>
+                            <span th:text="#{timesheet.validate}">Validate this week</span>
+                        </button>
+                        <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
+                                v-on:click="rejectWeek"
+                                class="ui icons negative create-task button">
+                            <i class="close icon"></i>
+                            <span th:text="#{timesheet.reject}">Reject this week</span>
+                        </button>
+                        <button
+                                v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
+                                v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button icons"
+                                th:text="#{timesheet.newtask}">
+                            <i class="plus icon"></i>
+                            <span th:text="#{timesheet.newtask}">New Task</span>
+                        </button>
+
+                    </div>
+                    <div class="right floated column" style="text-align: center;">
+                        <a class="ui labeled icon button"
+                           v-bind:href="userIsActor ? '/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) : '/timesheet/'+userID+'/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) "
+                           :class="{ disabled : disablePrev }">
+                            <i class="left arrow icon"></i><span th:text="#{timesheet.previousweek}">Previous Week</span> </a>
+
+                        <span class="ui blue circular label"><span th:text="#{week}">Week</span> {{ week }}</span>
+
+                        <a class="ui right labeled icon button"
+                           v-bind:href="userIsActor ? '/timesheet/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) : '/timesheet/'+userID+'/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) "
+                           :class="{ disabled : disableNext }">
+                            <i class="right arrow icon"></i><span th:text="#{timesheet.nextweek}">Next Week</span></a>
                     </div>
                 </div>
-                <div v-if="isTimesheetHasState([null])  && !userIsActor">
-                    <div class="ui orange label" th:text="#{timesheet.status.pending.submission}">
-                        Pending submission
-                    </div>
-                </div>
-                <div v-if="isTimesheetHasState(['VALIDATED'])">
-                    <div class="ui green label" th:text="#{timesheet.status.validated}">
-                        Week validated
-                    </div>
-                </div>
-                <div v-if="isTimesheetHasState(['REJECTED'])">
-                    <div class="ui red label" th:text="#{timesheet.status.rejected}">
-                        Week rejected
-                    </div>
-                </div>
-
-
-                <!-- ACTION BUTTONS -->
-                <div v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
-                     v-bind:data-tooltip="!enableSubmitButton()?' Please submit previous week and make sure every working day imputation day total equals 1' : false"
-                     data-position="right center">
-                    <button
-                            v-bind:data-week="week" v-bind:data-year="year"
-                            v-on:click="submitMyWeek"
-                            v-bind:class="{'ui positive button icons':true, 'disabled':(!enableSubmitButton())}"
-                            type="submit">
-                        <i class="paper plane icon"></i>
-                        <span th:text="#{timesheet.submit}">Submit My Week</span>
-                    </button>
-                </div>
-                <div v-bind:data-tooltip="!enableValidationButtons()?' Please validate previous week before.' : false"
-                     data-position="right center">
-                    <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
-                            v-on:click="validateWeek" :class="{disabled : !enableValidationButtons()}"
-                            class="ui icons positive create-task button" >
-                        <i class="check icon"></i>
-                        <span th:text="#{timesheet.validate}">Validate this week</span>
-                    </button>
-                    <button v-if="canValidate && isTimesheetHasState(['PENDING_VALIDATION'])"
-                            v-on:click="rejectWeek" :class="{disabled : !enableValidationButtons()}"
-                            class="ui icons negative create-task button">
-                        <i class="close icon"></i>
-                        <span th:text="#{timesheet.reject}">Reject this week</span>
-                    </button>
-                </div>
-                <button
-                        v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
-                        v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button icons"
-                        th:text="#{timesheet.newtask}">
-                    <i class="plus icon"></i>
-                    <span th:text="#{timesheet.newtask}">New Task</span>
-                </button>
-
-
             </div>
-
-            <a class="ui labeled icon button"
-               v-bind:href="userIsActor ? '/timesheet/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) : '/timesheet/'+userID+'/'+lastWeekYear(year,week)+'/'+lastWeek(year,week) "
-               :class="{ disabled : disablePrev }">
-                <i class="left arrow icon"></i><span th:text="#{timesheet.previousweek}">Previous Week</span> </a>
-
-            <span class="ui label" style="border-radius: 2rem 5px 5px 2rem;">{{ getFirstDayOfWeekDateString() }}</span>
-            <span class="ui blue label"><span th:text="#{week}">Week</span> {{ week }} </span>
-            <span class="ui label" style="border-radius:  5px 2rem 2rem 5px;">{{ getLastDayOfWeekDateString() }} </span>
-
-            <a class="ui right labeled icon button"
-               v-bind:href="userIsActor ? '/timesheet/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) : '/timesheet/'+userID+'/'+nextWeekYear(year,week)+'/'+nextWeek(year,week) "
-               :class="{ disabled : disableNext }">
-                <i class="right arrow icon"></i><span th:text="#{timesheet.nextweek}">Next Week</span></a>
         </div>
 
         <fieldset v-bind:disabled="!userIsActor || isTimesheetHasState(['VALIDATED', 'PENDING_VALIDATION'])">
             <form class="ui form" read enctype="application/x-www-form-urlencoded" method="post">
-                <table class="ui celled table" style="text-align:center">
+                    <table class="ui celled table unstackable" style="text-align:center">
                     <thead>
                     <tr class="days">
-                        <th class="two wide" colspan="2">
+                        <th class="two wide" colspan="1">
                             <label th:text="${userScreenName}" v-if="!userIsActor"></label>
                         </th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
                             {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{
                             new Date(day.date).getDate() }}
                         </th>
-                        <th class="wide one" style="background-color: white;" colspan="4"></th>
+                        <th class="wide one" style="background-color: white;" colspan="5"></th>
                     </tr>
 
                     <tr class="timesheet-head">
                         <th class="two wide" th:text="#{tasks}">Tasks</th>
-                        <th class="two wide" >End Date</th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
                             <div v-if="(day.dayNum != 7) && (day.dayNum != 1)"
                                  v-bind:id="day.date"
                                  v-bind:class="{'ui circular label large day-badge':true,
-                                          'green':(getImputationSum(day.date).toFixed(1) == 1),
-                                          'yellow':(getImputationSum(day.date).toFixed(1) < 1),
-                                          'red':(getImputationSum(day.date).toFixed(1) > 1)}"
+                                          'green':(getImputationSum(day.date).toFixed(2) == 1),
+                                          'yellow':(getImputationSum(day.date).toFixed(2) < 1),
+                                          'red':(getImputationSum(day.date).toFixed(2) > 1)}"
                                  style="margin-top: 5px;"
                                  v-bind:day-badge="day.date">
-                                <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
+                                <p>{{ parseFloat(getImputationSum(day.date).toFixed(2)) }}</p>
                             </div>
                             <div v-if="(day.dayNum == 7) || (day.dayNum == 1)"
                                  v-bind:id="day.date"
                                  v-bind:class="{'ui circular label large day-badge':true,
-                                          'green':(getImputationSum(day.date).toFixed(1) == 1),
-                                          'red':(getImputationSum(day.date).toFixed(1) > 1)}"
+                                          'green':(getImputationSum(day.date).toFixed(2) == 1),
+                                          'red':(getImputationSum(day.date).toFixed(2) > 1)}"
                                  style="margin-top: 5px;"
                                  v-bind:day-badge="day.date">
-                                <p>{{ getImputationSum(day.date).toFixed(1) }}</p>
+                                <p>{{ parseFloat(getImputationSum(day.date).toFixed(2)) }}</p>
                             </div>
                         </th>
                         <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1"> ES
+                        </th>
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.esw}" rowspan="1"> ESW
                         </th>
                         <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1"> EL
                         </th>
@@ -250,10 +250,10 @@
                         </tr>
 
                         <tr v-for="(task, taskID) in project.tasks">
-                            <td>{{ task.taskName }}</td>
-                            <td>{{  task.endDate !== null ? (new Date(task.endDate)).toLocaleDateString(_LOCALE, { year: 'numeric', month: 'short', day: 'numeric' }) : '' }}</td>
+                            <td style="min-width: 7rem;">{{ task.taskName }}</td>
                             <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
-                                <i class="hourglass half icon"></i> Task pending manager validation
+                                <i class="hourglass half icon"></i> <span th:text="#{timesheet.pending}"> Task pending manager validation </span>
+                                <button @click="cancelTask($event, task)" class="ui mini icon button">Cancel<i class="ui icon cancel"></i></button>
                             </td>
                             <td v-else-if="task.status == 'REFUSED'" v-bind:colspan="days.length" class="negative">
                                 <i class="times icon"></i> Task have been rejected by a manager, please modify and
@@ -265,47 +265,42 @@
                             </td>
                             <td v-else v-for="day in days">
                                 <div class="ui input">
-                                    <input
-                                            max="1"
-                                            min="0"
-                                            step="0.05"
-                                            v-if="((day.date >= task.startDate || !task.startDate)) && ((day.date <= task.endDate) || (!task.endDate))"
-                                            v-on:focusout="triggerUpdateTask"
-                                            v-on:keyup.enter="triggerUpdateTask"
-                                            v-bind:data-date="day.date"
-                                            v-bind:data-task="taskID"
-                                            v-bind:name="'task['+taskID+']day['+day.date+']'"
-                                            v-bind:value="getImputation(day.date, taskID).toFixed(1)"
-                                            v-bind:data-cy="project.projectName+'/'+task.taskName+'/'+day.date"
-                                            type="number"/>
+                                    <number-input
+                                        :min="0" :max="1" :validation-step="0.05" :input-step="0.1" :trigger="triggerUpdateTask"
+                                        :value="parseFloat(getImputation(day.date, taskID).toFixed(2))"
+                                        v-if="((day.date >= task.startDate || !task.startDate)) && ((day.date <= task.endDate) || (!task.endDate))"
+                                        v-bind:attrs="{
+                                            date: day.date,
+                                            task: taskID,
+                                        }"
+                                    ></number-input>
                                     <i class="search icon hidden" style="color: transparent;"></i>
                                 </div>
                             </td>
 
-                            <td colspan="4" v-if="projectID == 0"></td>
+                            <td colspan="5" v-if="projectID == 0"></td>
                             <template v-if="task.status!='PENDING'">
-                                <td v-if="projectID > 0" v-bind:data-task-es="taskID">{{task.effortSpent.toFixed(1)}}
+                                <td v-if="projectID > 0" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
+                                </td>
+                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
                                 </td>
                                 <td v-if="projectID > 0">
                                     <div class="ui input">
-                                        <input
-                                                min="0"
-                                                step="0.1"
-                                                name="effortLeft"
-                                                v-on:focusout="triggerUpdateEffortLeft"
-                                                v-bind:value="task.effortLeft.toFixed(1)"
-                                                v-bind:data-task-effortLeft="taskID"
-                                                type="number"
-                                        />
+                                        <number-input
+                                                :min="0" :max="1" :validation-step="0.05" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
+                                                :value="parseFloat(task.effortLeft.toFixed(2))"
+                                                v-bind:attrs="{
+                                                    effortLeft: taskID
+                                                }"
+                                        ></number-input>
                                         <i class="search icon hidden" style="color: transparent;"></i>
-
                                     </div>
                                 </td>
                                 <td v-if="projectID > 0"
-                                    v-bind:data-task-rew="taskID">{{task.realEffort.toFixed(1)}}
+                                    v-bind:data-task-rew="taskID" style="font-weight: bold">{{task.realEffort.toFixed(2)}}
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID">
-                                    {{task.originalEstimate.toFixed(1)}}
+                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID" style="font-weight: bold">
+                                    {{task.originalEstimate.toFixed(2)}}
                                 </td>
                             </template>
                         </tr>

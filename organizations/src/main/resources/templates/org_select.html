@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 
-<html
-      xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 
 
 <body>
@@ -66,7 +65,7 @@
                         Select an organisation:
                     </a>
                     <div class="description">
-                        <form th:action="@{/select}" method="post">
+                        <form th:action="@{/select}" method="post" th:if="${organizations.size() > 0}">
                             <div class="ui">
                                 <select class="ui button selection dropdown organisations" name="organization">
                                     <option class="item" th:each="org : ${organizations}" th:value="${org.id}" th:text="${org.name}"></option>
@@ -79,6 +78,9 @@
                                 </script>
                             </div>
                         </form>
+                        <label th:if="${organizations.size() <= 0}">
+                            For now, you don't have any organization !
+                        </label>
                     </div>
 
                     <div class="ui horizontal divider" style="margin: 30px 0px;">

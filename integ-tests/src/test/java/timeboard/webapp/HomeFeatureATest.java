@@ -26,57 +26,27 @@ package timeboard.webapp;
  * #L%
  */
 
-import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.ui.ConcurrentModel;
-import org.springframework.ui.Model;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.HomeController;
-
-import java.util.Collections;
-import java.util.UUID;
 
 public class HomeFeatureATest extends TimeboardTest {
 
     @Autowired
     protected HomeController homeController;
-
-    private Account account;
-    private Organization organisation;
-    private TimeboardAuthentication auth;
-    private Model model;
-
-
-    @Given("^user with an existing account and (\\d+) project$")
-    public void user_with_an_existing_account_and_project(final int arg1) throws Throwable {
-
-        this.model = new ConcurrentModel();
-        this.account = this.accountService.userProvisioning(UUID.randomUUID().toString(), "test");
-
-        this.organisation = this.organizationService.createOrganization(this.account, "Integration", Collections.emptyMap());
-
-        Assert.assertNotNull(this.account);
-        this.auth = new TimeboardAuthentication(this.account);
-        this.auth.setCurrentOrganization(this.organisation);
-        SecurityContextHolder.getContext().setAuthentication(this.auth);
-
-        this.projectService.createProject(this.organisation, this.account, "TestProject");
-    }
+    @Autowired
+    private TimeboardWorld world;
 
     @When("^the user calls /home$")
     public void the_client_calls_home() throws Throwable {
-        this.homeController.handleGet(this.auth, this.model);
+        this.homeController.handleGet(world.auth, world.model);
     }
 
     @Then("^the user receives (\\d+) project$")
     public void the_user_receives_project(final int arg1) throws Throwable {
-        Assert.assertEquals(this.model.asMap().get(HomeController.NB_PROJECTS), 1);
+        Assert.assertEquals(world.model.asMap().get(HomeController.NB_PROJECTS), arg1);
     }
 
 }

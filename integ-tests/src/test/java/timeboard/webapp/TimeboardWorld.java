@@ -1,10 +1,10 @@
-package timeboard.core;
+package timeboard.webapp;
 
 /*-
  * #%L
- * core
+ * integ-tests
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,18 +26,22 @@ package timeboard.core;
  * #L%
  */
 
+import org.springframework.stereotype.Component;
+import org.springframework.ui.Model;
+import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
+import timeboard.core.security.TimeboardAuthentication;
 
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+@Component
+public class TimeboardWorld {
 
-@Configuration
-@ComponentScan(basePackages = "timeboard.core")
-@EntityScan(basePackages = {"timeboard.core.model", "timeboard.core.internal.async"})
-@EnableJpaRepositories
-@EnableTransactionManagement
-public class CoreConfiguration {
+    Project lastProject;
+    Task lastTask;
+    Account account;
+    Organization organization;
+    TimeboardAuthentication auth;
+    Model model;
 
 }

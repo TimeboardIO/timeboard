@@ -805,6 +805,14 @@ h2.ui.header,
   color: #00bfd8;
 }
 
+div.pointing:nth-child(1) > a:nth-child(1),
+div.pointing:nth-child(1) > a:nth-child(1):hover {
+  background-color: #00bfd8;
+  border-bottom-left-radius: 0 !important;
+  color: #FFFFFF;
+  cursor: default;
+}
+
 ui.input.error > input {
   background-color: #fff !important;
   border-color: #e0b4b4 !important;
@@ -829,6 +837,49 @@ table,
 }
 
 /** Timesheet **/
+
+#timesheet {
+  /** input number **/
+}
+
+#timesheet .ui.button,
+#timesheet .ui.buttons .button,
+#timesheet .ui.buttons .or {
+  font-size: 0.85714286rem !important;
+}
+
+#timesheet input {
+  -moz-appearance: textfield;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 100%;
+  min-height: 1.5rem;
+  min-width: 3rem;
+  padding: 0.4375rem 0.875rem;
+  -webkit-transition: border-color 0.15s;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+#timesheet input::-webkit-outer-spin-button,
+#timesheet input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+@media only screen and (max-width: 767px) {
+  #timesheet .ui.table:not(.unstackable) thead {
+    display: none !important;
+  }
+}
+
+#timesheet input:disabled,
+#timesheet input[readonly] {
+  color: lightgrey;
+}
 
 #timesheet table td {
   padding: 0.3rem 0.3rem;
@@ -868,8 +919,13 @@ table,
   background-color: rgba(128, 128, 200, 0.3);
 }
 
+#timesheet .timesheet-menu {
+  background-color: white !important;
+  border-radius: 0.5rem !important;
+}
+
 #timesheet .timesheet-navigation-controls {
-  margin-bottom: 1em;
+  margin-bottom: 0em;
   text-align: right;
 }
 
@@ -975,7 +1031,7 @@ table,
   padding: 0.5rem 1rem 0.5rem;
   text-transform: none;
   text-shadow: none;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1em;
   font-style: normal;
   text-align: center;

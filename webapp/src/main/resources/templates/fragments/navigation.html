@@ -19,7 +19,7 @@
         <div class="title" th:text="#{${nav.getNavigationLabel()}}"></div>
     </a>
 
-    <div class="right menu">
+    <div class="main right menu">
         <div class="ui dropdown item" tabindex="0">
             <i class="sitemap icon"></i>
             <div class="title" th:text="${currentOrg.name}"></div>
@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="ui dropdown item" tabindex="0">
-            <i class="user icon"></i>
+            <i class="user circle icon"></i>
             <div class="title" th:text="${account.screenName}"></div>
             <i class="dropdown icon"></i>
             <div class="menu transition hidden" tabindex="-1">

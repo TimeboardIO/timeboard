@@ -29,17 +29,16 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
-import javax.persistence.EntityManager;
 import java.util.*;
 
 public interface ProjectService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
+
     /*
     === Projects ===
     */
-
     Project createProject(final Organization org, Account owner, String projectName) throws BusinessException;
 
     List<Project> listProjects(Account owner, Organization org);
@@ -56,10 +55,10 @@ public interface ProjectService {
 
     void save(Account actor, ProjectMembership projectMembership) throws BusinessException;
 
+
     /*
      == Tasks ==
      */
-
     List<Task> listUserTasks(Organization org, Account account);
 
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
@@ -98,7 +97,7 @@ public interface ProjectService {
 
     void updateTasks(Account actor, List<Task> taskList);
 
-    Imputation getImputationByDayByTask(EntityManager entityManager, Date day, AbstractTask task, Account account);
+    Optional<Imputation> getImputation(Account user, AbstractTask task, Date day);
 
     UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
@@ -191,8 +190,6 @@ public interface ProjectService {
     List<Batch> getBatchList(Account user, Project project, BatchType batchType) throws BusinessException;
 
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
-
-    Optional<Imputation> getImputation(Account user, DefaultTask task, Date day);
 
     List<Account> findOwnersOfAnyUserProject(Account user);
 
