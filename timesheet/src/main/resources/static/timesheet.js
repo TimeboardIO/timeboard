@@ -326,6 +326,7 @@ $(document).ready(function () {
                     if (currentSum + (newVal - oldVal) <= 1.0) {
                         $(event.target).val(newVal);
                         const self = this;
+                        $(event.target).parent().addClass('left icon loading').removeClass('error');
                         this.updateTask(date, taskID, 'imputation', newVal)
                             .done(function (updateTask) {
                                 app.projects[updateTask.projectID].tasks[updateTask.taskID].effortSpent = updateTask.effortSpent;
