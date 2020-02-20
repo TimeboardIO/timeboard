@@ -36,7 +36,9 @@ Vue.component('calendar', {
                   <th class="calendar-cell" v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)"></th>        
                 </tr>
                 <tr>
-                  <td style="width: 10rem; white-space: nowrap;" rowspan="2" v-if="showColName === true" > {{ name }}</td>
+                  <td rowspan="2" v-if="showColName === true" style="width: 10rem; word-wrap: break-word" >
+                  {{ name }}
+                  </td>
                   <td class="calendar-cell" v-for="day in daysInMonth" v-bind:style="[
                    (day.morningEvent !== undefined && selectColor(day.morningEvent)) ? {'background-color' : selectColor(day.morningEvent) } : {},
                    (day.date.getDay() === 0 || day.date.getDay() === 6) ? { 'background-color' : 'lightgrey' } : {} 

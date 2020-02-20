@@ -26,7 +26,7 @@
 
 
     <!-- Task creation modal -->
-    <script type="text/x-template" id="task-modal-template">
+    <script type="text/x-template" id="task-modal-template" th:if="${projectList.size() > 0}">
         <div class="ui longer modal create-task ">
             <i class="close icon"></i>
             <div class="header">
@@ -163,7 +163,7 @@
                             <i class="close icon"></i>
                             <span th:text="#{timesheet.reject}">Reject this week</span>
                         </button>
-                        <button
+                        <button th:if="${projectList.size() > 0}"
                                 v-if="isTimesheetHasState([null,'REJECTED']) && userIsActor"
                                 v-on:click="showCreateTaskModal(null, null, $event)" class="ui primary create-task button icons"
                                 th:text="#{timesheet.newtask}">
@@ -287,7 +287,7 @@
                                 <td v-if="projectID > 0">
                                     <div class="ui input">
                                         <number-input
-                                                :min="0" :max="1" :validation-step="0.05" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
+                                                :min="0" :validation-step="0.1" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
                                                 :value="parseFloat(task.effortLeft.toFixed(2))"
                                                 v-bind:attrs="{
                                                     effortLeft: taskID
