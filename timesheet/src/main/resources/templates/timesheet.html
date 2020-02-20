@@ -287,7 +287,7 @@
                                 <td v-if="projectID > 0">
                                     <div class="ui input">
                                         <number-input
-                                                :min="0" :max="1" :validation-step="0.05" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
+                                                :min="0" :validation-step="0.1" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
                                                 :value="parseFloat(task.effortLeft.toFixed(2))"
                                                 v-bind:attrs="{
                                                     effortLeft: taskID
