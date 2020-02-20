@@ -259,9 +259,24 @@
             <template v-slot:end="{row}">
                 {{row.endDate}}
             </template>
+            <template v-slot:re="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    <p>{{row.realEffort.toFixed(2)}}</p>
+                </div>
+            </template>
+            <template v-slot:el="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    <p>{{row.effortLeft.toFixed(2)}}</p>
+                </div>
+            </template>
+            <template v-slot:es="{row}">
+                <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                    <p>{{row.effortSpent.toFixed(2)}}</p>
+                </div>
+            </template>
             <template v-slot:oe="{row}">
                 <div class="ui circular label large day-badge" style="margin-top: 5px;">
-                    <p>{{row.originalEstimate}}</p>
+                    <p>{{row.originalEstimate.toFixed(2)}}</p>
                 </div>
             </template>
             <template v-slot:assignee="{row}">
@@ -295,12 +310,12 @@
         </div>
 
         <div class="ui styled fluid accordion">
-            <div v-for="batch in batches">
+            <div v-for="batch in batches" style="overflow-y: scroll" >
                 <div class="title">
                     <i class="plus icon"></i>
                     {{ batch.batchName }}
                 </div>
-                <div class="content">
+                <div class="content" >
                     <!-- Datatable component -->
                     <data-table v-bind:config="taskListConfig" v-bind:table="tableByBatch[batch.batchID]">
                         <template v-slot:name="{row}">
@@ -313,9 +328,24 @@
                         <template v-slot:end="{row}">
                             {{row.endDate}}
                         </template>
+                        <template v-slot:re="{row}">
+                            <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                                <p>{{row.realEffort.toFixed(2)}}</p>
+                            </div>
+                        </template>
+                        <template v-slot:el="{row}">
+                            <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                                <p>{{row.effortLeft.toFixed(2)}}</p>
+                            </div>
+                        </template>
+                        <template v-slot:es="{row}">
+                            <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                                <p>{{row.effortSpent.toFixed(2)}}</p>
+                            </div>
+                        </template>
                         <template v-slot:oe="{row}">
                             <div class="ui circular label large day-badge" style="margin-top: 5px;">
-                                <p>{{row.originalEstimate}}</p>
+                                <p>{{row.originalEstimate.toFixed(2)}}</p>
                             </div>
                         </template>
                         <template v-slot:assignee="{row}">
@@ -347,7 +377,7 @@
                     </data-table>
                 </div>
             </div >
-            <div th:if="${batchType} == 'Default' ">
+            <div th:if="${batchType} == 'Default' " style="overflow-y: scroll" >
                 <data-table v-bind:config="taskListConfig" v-bind:table="taskList">
                     <template v-slot:name="{row}">
                         {{row.taskName}} <p class="ellipsis" style="color: grey;  font-size: 1em;">
@@ -359,9 +389,24 @@
                     <template v-slot:end="{row}">
                         {{row.endDate}}
                     </template>
+                    <template v-slot:re="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.realEffort.toFixed(2)}}</p>
+                        </div>
+                    </template>
+                    <template v-slot:el="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.effortLeft.toFixed(2)}}</p>
+                        </div>
+                    </template>
+                    <template v-slot:es="{row}">
+                        <div class="ui circular label large day-badge" style="margin-top: 5px;">
+                            <p>{{row.effortSpent.toFixed(2)}}</p>
+                        </div>
+                    </template>
                     <template v-slot:oe="{row}">
                         <div class="ui circular label large day-badge" style="margin-top: 5px;">
-                            <p>{{row.originalEstimate}}</p>
+                            <p>{{row.originalEstimate.toFixed(2)}}</p>
                         </div>
                     </template>
                     <template v-slot:assignee="{row}">

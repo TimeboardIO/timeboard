@@ -128,6 +128,9 @@ public class ProjectTasksController extends ProjectBaseController {
                         task.getName(),
                         task.getComments(),
                         task.getOriginalEstimate(),
+                        task.getRealEffort(),
+                        task.getEffortLeft(),
+                        task.getEffortSpent(),
                         task.getStartDate(),
                         task.getEndDate(),
                         assignee.getScreenName(), assignee.getId(),
@@ -275,7 +278,7 @@ public class ProjectTasksController extends ProjectBaseController {
 
     @GetMapping("/batches")
     public ResponseEntity getBatches(final TimeboardAuthentication authentication,
-                                     final HttpServletRequest request) throws JsonProcessingException {
+                                     final HttpServletRequest request) {
         final Account actor = authentication.getDetails();
         Project project = null;
 
