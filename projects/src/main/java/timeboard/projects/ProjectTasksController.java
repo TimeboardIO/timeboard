@@ -317,13 +317,13 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
         final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
-        Project finalProject = project;
+        final Project finalProject = project;
         batchList.forEach(batch -> {
             ProjectDashboard dashboardBatch = null;
             try {
                 dashboardBatch = this.projectService.projectDashboardByBatch(actor, finalProject, batch);
             } catch (BusinessException e) {
-                e.printStackTrace();
+                LOGGER.error(e.getMessage(), e);
             }
             batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName(), dashboardBatch.getOriginalEstimate(),
                     dashboardBatch.getEffortLeft(), dashboardBatch.getRealEffort(), dashboardBatch.getEffortSpent()));

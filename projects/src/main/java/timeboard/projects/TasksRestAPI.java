@@ -277,7 +277,8 @@ public class TasksRestAPI {
         public double effortLeft;
         public double effortSpent;
 
-        public BatchWrapper(final Long batchID, final String batchName, double originalEstimate, double realEffort, double effortLeft, double effortSpent) {
+        public BatchWrapper(final Long batchID, final String batchName, double originalEstimate, double realEffort,
+                            double effortLeft, double effortSpent) {
             this.batchID = batchID;
             this.batchName = batchName;
             this.originalEstimate = originalEstimate;
