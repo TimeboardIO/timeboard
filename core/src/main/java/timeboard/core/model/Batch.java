@@ -30,10 +30,8 @@ import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.text.DateFormat;
+import java.util.*;
 
 @Entity
 public class Batch extends OrganizationEntity implements Serializable {
@@ -95,6 +93,17 @@ public class Batch extends OrganizationEntity implements Serializable {
     public String getName() {
         return name;
     }
+
+
+    public String getScreenName() {
+        if (date != null) {
+            // replace by i18n locale DIRTY
+            return this.name + " (" + DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).format(this.date) + ")";
+        }
+        return this.name;
+    }
+
+
 
     public void setName(final String name) {
         this.name = name;

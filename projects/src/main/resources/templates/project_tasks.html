@@ -116,7 +116,7 @@
                             <select multiple="" class="ui batch dropdown" v-model="task.batchIDs" name="taskBatchId" data-cy="task-batch">
                                 <option
                                         th:each="batch: ${allProjectBatches}"
-                                        th:text="${batch.name}"
+                                        th:text="${batch.screenName}"
                                         th:value="${batch.id}"
                                 ></option>
                             </select>
