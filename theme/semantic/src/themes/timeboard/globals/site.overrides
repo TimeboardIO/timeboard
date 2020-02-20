@@ -87,6 +87,12 @@ table, .controls {
 
 #timesheet {
 
+  .hatchedBackground {
+    background: repeating-linear-gradient( 45deg, lightgray, lightgray 10px, white 10px, white 20px );
+    input {
+      color : rgba(40,40,40,.3);
+    }
+  }
   .ui.button, .ui.buttons .button, .ui.buttons .or {
 
     font-size: .85714286rem !important;
@@ -135,7 +141,6 @@ table, .controls {
       text-align: center;
       border: 0px solid #fff;
       background-color: rgba(1,0,1,0);
-      border: 1px solid lightgrey;
     }
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button {
