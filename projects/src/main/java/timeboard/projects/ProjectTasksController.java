@@ -103,7 +103,8 @@ public class ProjectTasksController extends ProjectBaseController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("Project does not exists or you don't have enough permissions to access it.");
             }
-            final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
+            List<Task> tasks = this.projectService.listProjectTasks(actor, project);
+            tasks = tasks.stream().filter(e -> e.getTaskStatus() != TaskStatus.ARCHIVED).collect(Collectors.toList());
 
             final List<TasksRestAPI.TaskWrapper> result = new ArrayList<>();
 
@@ -257,8 +258,8 @@ public class ProjectTasksController extends ProjectBaseController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{taskID}")
-    public ResponseEntity deleteTask(final TimeboardAuthentication authentication,
+    @DeleteMapping("/archive/{taskID}")
+    public ResponseEntity archiveTask(final TimeboardAuthentication authentication,
                                      @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
 

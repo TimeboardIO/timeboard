@@ -376,12 +376,16 @@ let app = new Vue({
             });
         },
         deleteTask: function(event, task) {
-            this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.taskName + "?",
+            let message = '';
+            if(task.effortSpent > 0) message = message + 'Assigned user(s) have already added imputations for this task for a total effort spent of ' + task.effortSpent + '.\n';
+            message = message + 'Archiving will block all imputations on task. Are you sure you want to archive task '+ task.taskName + '?';
+
+            this.$refs.confirmModal.confirm(message,
                 function() {
                     event.target.classList.toggle('loading');
                     $.ajax({
                         type: "DELETE",
-                        url: "/projects/"+currentProjectID+"/tasks/delete/"+task.taskID,
+                        url: "/projects/"+currentProjectID+"/tasks/archive/"+task.taskID,
                         success: function (data) {
                             event.target.classList.toggle('loading');
                             window.location.reload();
