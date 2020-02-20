@@ -9,7 +9,7 @@
 <div layout:fragment="content">
 
     <div class="ui attached pointing menu stackable container ">
-        <a class="item"><span class="primary bold text" th:text="${project.name}"></span></a>
+        <a class="item"><span class="bold text" th:text="${project.name}"></span></a>
         <a class="item"
            th:classappend="${tab == nav.getNavigationLabel()}  ? 'active':''"
            th:each="nav: ${projectNavProviders}"
