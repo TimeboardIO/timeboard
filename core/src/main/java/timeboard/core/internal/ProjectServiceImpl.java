@@ -634,7 +634,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("#batch.organizationID == authentication.currentOrganization")
+    @PreAuthorize("hasPermission(#batch.project, '" + AbacEntries.PROJECT_BATCHES_VIEW + "')")
     public Batch updateBatch(final Account actor, final Batch batch) throws BusinessException {
         final RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByBatch());
