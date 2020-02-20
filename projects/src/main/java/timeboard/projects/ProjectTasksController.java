@@ -121,13 +121,16 @@ public class ProjectTasksController extends ProjectBaseController {
 
                 task.getBatches().forEach(b -> {
                     batchIDs.add(b.getId());
-                    batchNames.add(b.getName());
+                    batchNames.add(b.getScreenName());
                 });
                 result.add(new TasksRestAPI.TaskWrapper(
                         task.getId(),
                         task.getName(),
                         task.getComments(),
                         task.getOriginalEstimate(),
+                        task.getRealEffort(),
+                        task.getEffortLeft(),
+                        task.getEffortSpent(),
                         task.getStartDate(),
                         task.getEndDate(),
                         assignee.getScreenName(), assignee.getId(),
@@ -275,7 +278,7 @@ public class ProjectTasksController extends ProjectBaseController {
 
     @GetMapping("/batches")
     public ResponseEntity getBatches(final TimeboardAuthentication authentication,
-                                     final HttpServletRequest request) throws JsonProcessingException {
+                                     final HttpServletRequest request) {
         final Account actor = authentication.getDetails();
         Project project = null;
 
@@ -313,7 +316,7 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
         final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
-        batchList.forEach(batch -> batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getName())));
+        batchList.forEach(batch -> batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName())));
 
         return ResponseEntity.status(HttpStatus.OK).body(batchWrapperList.toArray());
     }

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.support.RequestContextUtils;
 import timeboard.core.api.AccountService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
@@ -63,12 +64,13 @@ public class ProjectSetupController extends ProjectBaseController {
     protected String setupProject(
             final TimeboardAuthentication authentication,
             @PathVariable final long projectID,
-            final Model model) throws BusinessException {
+            final Model model,
+            HttpServletRequest request) throws BusinessException {
 
         final Account actor = authentication.getDetails();
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final Map<String, Object> map = new HashMap<>();
-        this.prepareTemplateData(authentication.getCurrentOrganization(), project, map);
+        this.prepareTemplateData(authentication.getCurrentOrganization(), project, map, request);
         model.addAllAttributes(map);
         this.initModel(model, authentication, project);
         return "project_setup.html";
@@ -127,28 +129,39 @@ public class ProjectSetupController extends ProjectBaseController {
                                                 @ModelAttribute final ProjectConfigForm projectConfigForm,
                                                 final RedirectAttributes attributes) throws Exception {
 
-        final Account actor = authentication.getDetails();
+        if(projectConfigForm.getComments().length() > 500){
+            attributes.addFlashAttribute("error", "Your comment is too long (500 characters max)");
+            attributes.addFlashAttribute("editedComments", projectConfigForm.getComments());
+        }else {
 
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-        project.setName(projectConfigForm.getName());
-        project.setComments(projectConfigForm.getComments());
-        project.setQuotation(projectConfigForm.getQuotation());
+            final Account actor = authentication.getDetails();
 
-        try {
-            this.projectService.updateProject(actor, project);
-            attributes.addFlashAttribute("success", "Project config updated successfully.");
-        } catch (final BusinessException e) {
-            attributes.addFlashAttribute("error", e.getMessage());
+            final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+            project.setName(projectConfigForm.getName());
+            project.setComments(projectConfigForm.getComments());
+            project.setQuotation(projectConfigForm.getQuotation());
+
+            try {
+                this.projectService.updateProject(actor, project);
+                attributes.addFlashAttribute("success", "Project config updated successfully.");
+            } catch (final BusinessException e) {
+                attributes.addFlashAttribute("error", e.getMessage());
+            }
         }
-
         return "redirect:/projects/" + projectID + URL;
     }
 
-    private void prepareTemplateData(final Organization org, final Project project, final Map<String, Object> map) {
+    private void prepareTemplateData(final Organization org, final Project project, final Map<String, Object> map, HttpServletRequest request) {
 
         final ProjectConfigForm pcf = new ProjectConfigForm();
         pcf.setName(project.getName());
-        pcf.setComments(project.getComments());
+
+        if (RequestContextUtils.getInputFlashMap(request) != null && RequestContextUtils.getInputFlashMap(request).containsKey("editedComments")){
+            // Keep last edited comment
+            pcf.setComments((String) RequestContextUtils.getInputFlashMap(request).get("editedComments"));
+        }else{
+            pcf.setComments(project.getComments());
+        }
         pcf.setQuotation(project.getQuotation());
 
         final ProjectMembersForm pmf = new ProjectMembersForm();
