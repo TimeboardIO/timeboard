@@ -731,6 +731,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(null,'"+AbacEntries.REPORT_GENERATE_TAS+"')")
     public TASData generateTasData(final Account user, final Project project, final int month, final int year) {
 
         final TASData data = new TASData();

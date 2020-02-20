@@ -55,6 +55,7 @@ public class AbacEntries {
     public static final String VACATION_VIEW = "VACATION_VIEW";
 
     public static final String ACCOUNT_CREATE = "ACCOUNT_CREATE";
+    public static final String ACCOUNT_CONFIG_EXTERNAL_TOOLS = "ACCOUNT_CONFIG_EXTERNAL_TOOLS";
 
     public static final String TIMESHEET_SUBMIT = "TIMESHEET_SUBMIT";
     public static final String TIMESHEET_VALIDATE = "TIMESHEET_VALIDATE";
@@ -66,6 +67,7 @@ public class AbacEntries {
 
     public static final String REPORT_LIST = "REPORT_LIST";
     public static final String REPORT_PROJECT_VIEW = "REPORT_PROJECT_VIEW";
+    public static final String REPORT_GENERATE_TAS = "REPORT_GENERATE_TAS";
 
     public static final String ORG_SETUP = "ORG_SETUP";
 
