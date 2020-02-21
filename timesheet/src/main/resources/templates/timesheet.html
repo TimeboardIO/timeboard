@@ -201,7 +201,7 @@
                             {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{
                             new Date(day.date).getDate() }}
                         </th>
-                        <th class="wide one" style="background-color: white;" colspan="5"><i class="cog icon" @click="showConfigModal()"></i></th>
+                        <th class="wide one" style="background-color: white;" :colspan="activeColumnsCount"><i class="cog icon" @click="showConfigModal()"></i></th>
                     </tr>
 
                     <tr class="timesheet-head">
@@ -227,15 +227,15 @@
                                 <p>{{ parseFloat(getImputationSum(day.date).toFixed(2)) }}</p>
                             </div>
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1"> ES
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1" v-if="columns.find(e => e.slot === 'es').visible"> ES
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.esw}" rowspan="1"> ESW
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.esw}" rowspan="1" v-if="columns.find(e => e.slot === 'esw').visible"> ESW
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1"> EL
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1" > EL
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.re}" rowspan="1"> RE
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.re}" rowspan="1" v-if="columns.find(e => e.slot === 're').visible"> RE
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.oe}" rowspan="1"> OE
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.oe}" rowspan="1" v-if="columns.find(e => e.slot === 'oe').visible"> OE
                         </th>
 
                     </tr>
@@ -281,13 +281,13 @@
                                 </div>
                             </td>
 
-                            <td colspan="5" v-if="projectID == 0"></td>
+                            <td :colspan="activeColumnsCount" v-if="projectID == 0"></td>
                             <template v-if="task.status!='PENDING'">
-                                <td v-if="projectID > 0" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'es').visible" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'esw').visible" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
                                 </td>
-                                <td v-if="projectID > 0">
+                                <td v-if="projectID > 0 ">
                                     <div class="ui input">
                                         <number-input
                                                 :min="0" :validation-step="0.1" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
@@ -299,10 +299,10 @@
                                         <i class="search icon hidden" style="color: transparent;"></i>
                                     </div>
                                 </td>
-                                <td v-if="projectID > 0"
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 're').visible"
                                     v-bind:data-task-rew="taskID" style="font-weight: bold">{{task.realEffort.toFixed(2)}}
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID" style="font-weight: bold">
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'oe').visible" v-bind:data-task-ew="taskID" style="font-weight: bold">
                                     {{task.originalEstimate.toFixed(2)}}
                                 </td>
                             </template>

@@ -62,11 +62,6 @@ const timesheetModel = {
 
         },
         {
-            "slot": "el",
-            "visible" : true
-
-        },
-        {
             "slot": "re",
             "visible" : true
 
@@ -493,8 +488,26 @@ $(document).ready(function () {
                 });
             },
         },
+        computed : {
+          activeColumnsCount : function () {
+              return this.columns.filter(col => col.visible).length + 1 ; //1 is for el (can not be disabled)
+          }
+        },
         mounted: function () {
             this.updateTimesheet();
+            let self = this;
+            // columns config loading
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "/api/datatable?tableID=timesheetConfigModal",
+                success: function (d) {
+                    self.columns
+                        .forEach(function (c) {
+                            c.visible = d.colNames.includes(c.slot);
+                        });
+                }
+            });
         }
     });
 
