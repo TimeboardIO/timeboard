@@ -8,36 +8,41 @@ let el = properties.attr('el');
 
 
 const data = {
-    labels: ['QT', 'OE', 'RE', 'ES'],
+    labels: ['QT', 'OE', 'RE', 'ES + EL'],
     datasets: [
         {
             label: 'Quotation',
-            data: [qt,0,0,0],
-            backgroundColor: 'royalblue',
+            data: [qt, 0, 0, 0],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
             borderWidth: 3
         },
         {
             label: 'Original Estimate',
-            data: [0, oe,0,0],
-            backgroundColor: '#ff6384',
+            data: [0, oe, 0, 0],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
             borderWidth: 3
         },
         {
             label: 'Real Effort',
-            data: [0, 0,re,0],
-            backgroundColor: '#36a2eb',
+            data: [0, 0, re, 0],
+            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+            borderColor: 'rgba(153, 102, 255, 1)',
             borderWidth: 3
         },
         {
             label: 'Effort Spent',
-            data: [0, 0, 0,es],
-            backgroundColor: '#cc65fe',
+            data: [0, 0, 0, es],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 3
         },
         {
             label: 'Effort Left',
             data: [0, 0, 0, el],
-            backgroundColor: '#ffce56',
+            backgroundColor: 'rgba(255, 206, 86, 0.2)',
+            borderColor: 'rgba(255, 206, 86, 1)',
             borderWidth: 3
         }
     ]
@@ -59,24 +64,9 @@ const options = {
 };
 
 
-const ctx = document.querySelector("#barchart");
+const ctx = document.querySelector("#dashboardBarChart");
 let kpiChart = new Chart(ctx, {
     type: 'bar',
     data: data,
     options: options
 });
-
-
-/*let myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-        labels: ["M", "T", "W", "R", "F", "S", "S"],
-        datasets: [{
-            label: 'apples',
-            data: [12, 19, 3, 17, 28, 24, 7]
-        }, {
-            label: 'oranges',
-            data: [30, 29, 5, 5, 20, 3, 10]
-        }]
-    }
-});*/
