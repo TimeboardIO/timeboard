@@ -46,4 +46,9 @@ public class ProjectTeamCalendarNavigationProvider implements ProjectNavigationP
     public String getNavigationAction() {
         return AbacEntries.VACATION_TEAM_LIST;
     }
+
+    @Override
+    public int getNavigationWeight() {
+        return 60;
+    }
 }
