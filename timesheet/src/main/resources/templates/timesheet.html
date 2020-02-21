@@ -3,7 +3,7 @@
 <html layout:decorate="~{layouts/general.html(path='/timesheet')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-bind="http://www.w3.org/1999/xhtml"
-      xmlns:v-on="http://www.w3.org/1999/xhtml">
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
     <meta property="timesheet"
@@ -201,7 +201,7 @@
                             {{ new Date(day.date).toLocaleDateString(_LOCALE, {weekday: 'long'}).substring(0,3) }} {{
                             new Date(day.date).getDate() }}
                         </th>
-                        <th class="wide one" style="background-color: white;" colspan="5"></th>
+                        <th class="wide one" style="background-color: white;" :colspan="activeColumnsCount"><i class="cog icon" @click="showConfigModal()"></i></th>
                     </tr>
 
                     <tr class="timesheet-head">
@@ -227,15 +227,15 @@
                                 <p>{{ parseFloat(getImputationSum(day.date).toFixed(2)) }}</p>
                             </div>
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1"> ES
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.es}" rowspan="1" v-if="columns.find(e => e.slot === 'es').visible"> ES
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.esw}" rowspan="1"> ESW
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.esw}" rowspan="1" v-if="columns.find(e => e.slot === 'esw').visible"> ESW
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1"> EL
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.el}" rowspan="1" > EL
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.re}" rowspan="1"> RE
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.re}" rowspan="1" v-if="columns.find(e => e.slot === 're').visible"> RE
                         </th>
-                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.oe}" rowspan="1"> OE
+                        <th class="wide one" th:data-tooltip="#{timesheet.tooltips.oe}" rowspan="1" v-if="columns.find(e => e.slot === 'oe').visible"> OE
                         </th>
 
                     </tr>
@@ -243,6 +243,7 @@
                     </thead>
                     <tbody>
                     <template v-for="(project, projectID) in projects">
+
                         <tr>
                             <td class="ui header left aligned project" v-bind:colspan="days.length + 6">
                                 <a v-bind:href="'/projects/'+project.projectID+'/setup'">{{ project.projectName }}</a>
@@ -250,7 +251,9 @@
                         </tr>
 
                         <tr v-for="(task, taskID) in project.tasks">
+                            <!--Name -->
                             <td style="min-width: 7rem;">{{ task.taskName }}</td>
+
                             <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
                                 <i class="hourglass half icon"></i> <span th:text="#{timesheet.pending}"> Task pending manager validation </span>
                                 <button @click="cancelTask($event, task)" class="ui mini icon button">Cancel<i class="ui icon cancel"></i></button>
@@ -278,13 +281,13 @@
                                 </div>
                             </td>
 
-                            <td colspan="5" v-if="projectID == 0"></td>
+                            <td :colspan="activeColumnsCount" v-if="projectID == 0"></td>
                             <template v-if="task.status!='PENDING'">
-                                <td v-if="projectID > 0" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'es').visible" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'esw').visible" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
                                 </td>
-                                <td v-if="projectID > 0">
+                                <td v-if="projectID > 0 ">
                                     <div class="ui input">
                                         <number-input
                                                 :min="0" :validation-step="0.1" :input-step="0.1" :trigger="triggerUpdateEffortLeft"
@@ -296,10 +299,10 @@
                                         <i class="search icon hidden" style="color: transparent;"></i>
                                     </div>
                                 </td>
-                                <td v-if="projectID > 0"
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 're').visible"
                                     v-bind:data-task-rew="taskID" style="font-weight: bold">{{task.realEffort.toFixed(2)}}
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-ew="taskID" style="font-weight: bold">
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'oe').visible" v-bind:data-task-ew="taskID" style="font-weight: bold">
                                     {{task.originalEstimate.toFixed(2)}}
                                 </td>
                             </template>
@@ -314,6 +317,34 @@
                 :form-error="formError"
                 :modal-title="modalTitle">
         </task-modal>
+        <tmodal
+                v-bind:title="'Column config'"
+                v-bind:id="'timesheetConfigModal'">
+            <template v-slot:content>
+                <table class="ui celled table">
+                    <thead>
+                    <tr>
+                        <th>Column</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(col, j) in columns" >
+                        <td>
+                            {{ col.slot }}
+                        </td>
+                        <td>
+                            <input type="checkbox" id="checkbox" v-model="col.visible" v-bind:name="col.slot" >
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div  @click="changeDataTableConfig($event)" class="ui positive submit right labeled icon button">
+                    Save
+                    <i class="checkmark icon"></i>
+                </div>
+            </template>
+        </tmodal>
     </div>
     <script src="timesheet.js"></script>
 </div>
