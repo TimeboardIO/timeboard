@@ -105,7 +105,7 @@ public class ProjectBatchesController extends ProjectBaseController {
         } else {
 
             final Batch dbBatch = this.projectService.getBatchById(actor, batch.getId());
-            batch.updpate(dbBatch);
+            batch.update(dbBatch);
             this.projectService.updateBatch(actor, dbBatch);
 
             return ResponseEntity.ok(new BatchDecorator(dbBatch));
@@ -256,7 +256,7 @@ public class ProjectBatchesController extends ProjectBaseController {
             this.date = date;
         }
 
-        public void updpate(final Batch dbBatch) {
+        public void update(final Batch dbBatch) {
             dbBatch.setName(this.getName());
             dbBatch.setType(this.getType());
             dbBatch.setDate(this.getDate());
