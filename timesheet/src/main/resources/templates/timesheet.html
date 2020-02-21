@@ -286,7 +286,7 @@
                             <template v-if="task.status!='PENDING'">
                                 <td v-if="projectID > 0" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
+                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID" style="font-weight: bold">{{ getTaskESW(task).toFixed(1) }}
                                 </td>
                                 <td v-if="projectID > 0">
                                     <div class="ui input">
