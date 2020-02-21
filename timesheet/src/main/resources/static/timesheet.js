@@ -502,10 +502,12 @@ $(document).ready(function () {
                 dataType: "json",
                 url: "/api/datatable?tableID=timesheetConfigModal",
                 success: function (d) {
-                    self.columns
-                        .forEach(function (c) {
-                            c.visible = d.colNames.includes(c.slot);
-                        });
+                    if (d.initialized) {
+                        self.columns
+                            .forEach(function (c) {
+                                c.visible = d.colNames.includes(c.slot);
+                            });
+                    }
                 }
             });
         }
