@@ -250,7 +250,11 @@
                         </tr>
 
                         <tr v-for="(task, taskID) in project.tasks">
-                            <td style="min-width: 7rem;">{{ task.taskName }}</td>
+                            <td style="min-width: 7rem;">{{ task.taskName }}
+                                <p class="ellipsis" style="color: grey; font-size: 1em;" v-if="projectID > 0" >
+                                    {{ new Date(task.endDate).toLocaleDateString(_LOCALE, { year: 'numeric', month: 'numeric', day: 'numeric' }) }}
+                                </p>
+                            </td>
                             <td v-if="task.status == 'PENDING'" v-bind:colspan="days.length + 4" class="primary">
                                 <i class="hourglass half icon"></i> <span th:text="#{timesheet.pending}"> Task pending manager validation </span>
                                 <button @click="cancelTask($event, task)" class="ui mini icon button">Cancel<i class="ui icon cancel"></i></button>
