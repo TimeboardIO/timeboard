@@ -247,7 +247,7 @@ let app = new Vue({
                     let effortSpentDataForChart = data.effortSpentData;
 
                     //chart config
-                    let chart = new Chart($("#lineChart"), {
+                    let chart = new Chart($("#taskLineChart"), {
                         type: 'line',
                         data: {
                             labels: listOfTaskDates,
