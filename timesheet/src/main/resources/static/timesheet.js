@@ -51,6 +51,32 @@ const timesheetModel = {
     previousWeekValidationStatus: {},
     userID: _USER_ID,
     userIsActor: _USER_ID === _ACTOR_ID,
+    columns: [
+        {
+            "slot": "es",
+            "visible" : true
+        },
+        {
+            "slot": "esw",
+            "visible" : true
+
+        },
+        {
+            "slot": "el",
+            "visible" : true
+
+        },
+        {
+            "slot": "re",
+            "visible" : true
+
+        },
+        {
+            "slot": "oe",
+            "visible" : true
+
+        }
+    ],
     getImputationSum: function (date) {
         let sum = 0;
         if (this.imputations[date]) {
@@ -371,6 +397,38 @@ $(document).ready(function () {
                         }
                     }
                 }
+            },
+            showConfigModal: function() {
+                $( '#timesheetConfigModal').modal({
+                    onApprove : function($element) {
+
+                    },
+                    detachable : true, centered: true
+                }).modal('show');
+            },
+            changeDataTableConfig: function(event) {
+                let self = this;
+                event.target.classList.toggle('loading');
+
+                let cols = [];
+                this.columns.forEach(function (col) {
+                    if(col.visible) cols.push(col.slot);
+                });
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        colNames : cols,
+                        tableID : "timesheetConfigModal",
+                        userID : 0
+                    }),
+                    url: "/api/datatable",
+                    success: function (d) {
+                        event.target.classList.toggle('loading');
+                        $('#timesheetConfigModal').modal('hide');
+                    }
+                });
             },
             showCreateTaskModal: function (projectID, task, event) {
                 event.preventDefault();
