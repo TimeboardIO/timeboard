@@ -228,21 +228,54 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public ProjectDashboard projectDashboard(final Account actor, final Project project) throws BusinessException {
-        final RuleSet<Project> ruleSet = new RuleSet<>();
-        ruleSet.addRule(new ActorIsProjectMember());
-        final Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
-        if (!wrongRules.isEmpty()) {
-            throw new BusinessException(wrongRules);
-        }
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.REPORT_PROJECT_VIEW + "')")
+    public Map<TaskType, ProjectDashboard> projectDashboardByTaskType(final Account actor, final Project project) throws BusinessException {
 
+        // Get effort spent from imputations
+        final TypedQuery<Object[]> q1 = em.createQuery(
+                "select t.taskType as type, COALESCE(sum(i.value),0) "
+                +  "from Task t left outer join t.imputations i "
+                +  "where t.project = :project "
+                +  "GROUP BY t.taskType", Object[].class);
+
+        q1.setParameter("project", project);
+        final Map<TaskType, Double> effortSpent = q1.getResultList().stream()
+                .collect(Collectors.toMap(e -> (TaskType) e[0], e -> (double) e[1] ));
+
+        // get oe et el from task
+        final TypedQuery<Object[]> q2 = em.createQuery("select "
+                + "t.taskType as type, "
+                + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
+                + "COALESCE(sum(t.effortLeft),0) as effortLeft "
+                + "from Task t where t.project = :project "
+                + "GROUP BY t.taskType", Object[].class);
+
+        q2.setParameter("project", project);
+
+        final List<Object[]>  originalEstimateAndEffortLeft = q2.getResultList();
+
+        return originalEstimateAndEffortLeft.stream()
+                .collect(Collectors.toMap(
+                        e -> (TaskType) e[0],
+                        e -> new ProjectDashboard(
+                                project.getQuotation(),
+                                (double) e[1],
+                                (double) e[2],
+                                effortSpent.get((TaskType) e[0]),
+                                new Date())));
+
+
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.REPORT_PROJECT_VIEW + "')")
+    public ProjectDashboard projectDashboard(final Account actor, final Project project) throws BusinessException {
 
         final TypedQuery<Object[]> q = em.createQuery("select "
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
                 + "from Task t "
                 + "where t.project = :project ", Object[].class);
-
         q.setParameter("project", project);
 
         final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
@@ -258,6 +291,7 @@ public class ProjectServiceImpl implements ProjectService {
         return new ProjectDashboard(project.getQuotation(),
                 (Double) originalEstimateAndEffortLeft[0],
                 (Double) originalEstimateAndEffortLeft[1], effortSpent, new Date());
+
 
     }
 

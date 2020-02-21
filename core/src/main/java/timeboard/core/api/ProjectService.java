@@ -51,6 +51,7 @@ public interface ProjectService {
 
     Project updateProject(Account actor, Project project) throws BusinessException;
 
+    Map<TaskType, ProjectDashboard> projectDashboardByTaskType(Account actor, Project project) throws BusinessException;
     ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException;
 
     void save(Account actor, ProjectMembership projectMembership) throws BusinessException;
