@@ -26,9 +26,10 @@
 
 <div layout:fragment="content">
     <div id="vacationApp">
-        <div class="ui negative hidden message " >
+
+        <div class="ui negative hidden message ">
             <i class="close icon"></i>
-            <div class="header" >
+            <div class="header">
                 {{ formError }}
             </div>
         </div>
@@ -39,17 +40,17 @@
             <a @click="activateTab('Calendar')" :class="{ active : activeTab === 'Calendar' }" class="item">
                 Calendar
             </a>
-            <a class="item blue "  v-on:click="openModal" >
+            <a class="item blue " v-on:click="openModal">
                 <i class="plus icon"></i>
                 New Vacation
             </a>
-            <a class="item blue"  v-on:click="openRecursiveModal" >
+            <a class="item blue" v-on:click="openRecursiveModal">
                 <i class="plus icon"></i>
                 New Recursive Vacation
             </a>
         </div>
 
-        <div class="ui bottom attached segment visible" v-if="activeTab === 'Calendar'" >
+        <div class="ui bottom attached segment visible" v-if="activeTab === 'Calendar'">
 
             <div class="ui three item menu">
                 <a @click="calendarYear--" class="active item">
@@ -63,99 +64,109 @@
                 </a>
             </div>
 
-            <year-calendar :year="calendarYear"  :events="calendarData"></year-calendar>
+            <year-calendar :year="calendarYear" :events="calendarData"></year-calendar>
         </div>
 
         <div class="ui bottom attached segment visible" v-if="activeTab === 'Requests'">
 
-        <div v-if="toValidateRequestsListData.length" class="ui horizontal divider"><i class="clock icon"></i>
-            Vacations requests to Validate
-        </div>
-        <data-table v-bind:table="toValidateRequestsListData" v-bind:config="toValidateRequestsListConfig">
-            <template v-slot:label="{row}">
-                {{ row.label }}
-            </template>
-            <template v-slot:start="{row}">
-                {{ new Date(row.start).toLocaleString().substring(0,10) }}
-                <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
-            </template>
-            <template v-slot:end="{row}">
-                {{ new Date(row.end).toLocaleString().substring(0,10) }}
-                <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
-            </template>
-            <template v-slot:applicant="{row}">
-                {{ row.applicantName }}
-            </template>
-            <template v-slot:recursive="{row}">
-                <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
-                <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
-                <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
-                <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
-                <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
-                <a v-else class="ui circular label">X</a>
-            </template>
-            <template v-slot:actions="{row}">
-                <button class="ui positive button icon" v-on:click="approveRequest(row)">
-                    <i class="check alternate icon"></i>
-                    Approve
-                </button>
-                <button class="ui negative button icon" v-on:click="rejectRequest(row)">
-                    <i class="remove alternate icon"></i>
-                    Deny
-                </button>
-            </template>
-        </data-table>
+            <div class="ui icon message" v-if="toValidateRequestsListData.length === 0">
+                <i class="calendar alternate outline icon"></i>
+                <div class="content">
+                    <div class="header">
+                        You haven't vacations requests.
+                    </div>
+                    <p>click <span class="ui button" v-on:click="openModal">here</span> to create a new request.</p>
+                </div>
+            </div>
+
+            <div v-if="toValidateRequestsListData.length" class="ui horizontal divider"><i class="clock icon"></i>
+                Vacations requests to Validate
+            </div>
+            <data-table v-bind:table="toValidateRequestsListData" v-bind:config="toValidateRequestsListConfig">
+                <template v-slot:label="{row}">
+                    {{ row.label }}
+                </template>
+                <template v-slot:start="{row}">
+                    {{ new Date(row.start).toLocaleString().substring(0,10) }}
+                    <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
+                </template>
+                <template v-slot:end="{row}">
+                    {{ new Date(row.end).toLocaleString().substring(0,10) }}
+                    <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
+                </template>
+                <template v-slot:applicant="{row}">
+                    {{ row.applicantName }}
+                </template>
+                <template v-slot:recursive="{row}">
+                    <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
+                    <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                    <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                    <a v-else class="ui circular label">X</a>
+                </template>
+                <template v-slot:actions="{row}">
+                    <button class="ui positive button icon" v-on:click="approveRequest(row)">
+                        <i class="check alternate icon"></i>
+                        Approve
+                    </button>
+                    <button class="ui negative button icon" v-on:click="rejectRequest(row)">
+                        <i class="remove alternate icon"></i>
+                        Deny
+                    </button>
+                </template>
+            </data-table>
 
 
-        <div v-if="myRequestsListData.length" class="ui horizontal divider"><i class="boxes icon"></i>
-            My vacation requests
-        </div>
-        <data-table v-bind:table="myRequestsListData" v-bind:config="myRequestsListConfig">
-            <template v-slot:label="{row}">
-                {{ row.label }}
-            </template>
-            <template v-slot:start="{row}">
-                {{ new Date(row.start).toLocaleString().substring(0,10) }}
-                <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
-            </template>
-            <template v-slot:end="{row}">
-                {{ new Date(row.end).toLocaleString().substring(0,10) }}
-                <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
-            </template>
-            <template v-slot:assignee="{row}">
-                {{ row.assigneeName }}
-            </template>
-            <template v-slot:recursive="{row}">
-                <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
-                <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
-                <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
-                <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
-                <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
-                <a v-else class="ui circular label">X</a>
-            </template>
-            <template v-slot:status="{row}">
-                <span v-if="row.status == 'ACCEPTED'"   class="ui green icon label">
+            <div v-if="myRequestsListData.length" class="ui horizontal divider"><i class="boxes icon"></i>
+                My vacation requests
+            </div>
+            <data-table v-bind:table="myRequestsListData" v-bind:config="myRequestsListConfig">
+                <template v-slot:label="{row}">
+                    {{ row.label }}
+                </template>
+                <template v-slot:start="{row}">
+                    {{ new Date(row.start).toLocaleString().substring(0,10) }}
+                    <div class="ui horizontal label">{{ (row.halfStart ? 'Afternoon' : 'Morning') }}</div>
+                </template>
+                <template v-slot:end="{row}">
+                    {{ new Date(row.end).toLocaleString().substring(0,10) }}
+                    <div class="ui horizontal label">{{ (row.halfEnd ? 'Morning' : 'Afternoon') }}</div>
+                </template>
+                <template v-slot:assignee="{row}">
+                    {{ row.assigneeName }}
+                </template>
+                <template v-slot:recursive="{row}">
+                    <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
+                    <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
+                    <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                    <a v-else class="ui circular label">X</a>
+                </template>
+                <template v-slot:status="{row}">
+                <span v-if="row.status == 'ACCEPTED'" class="ui green icon label">
                     <i class="check icon"></i>
                     Accepted
                 </span>
-                <span v-else-if="row.status == 'REJECTED'" class="ui negative icon label">
+                    <span v-else-if="row.status == 'REJECTED'" class="ui negative icon label">
                     <i class="close icon"></i>
                     Rejected
                 </span>
-                <span v-else class="ui yellow icon label">
+                    <span v-else class="ui yellow icon label">
                     <i class="clock outline icon"></i>
                     Pending
                 </span>
-            </template>
-            <template v-slot:actions="{row}">
-                <button :class="{ disabled : (row.status !== 'ACCEPTED') && (new Date(row.end).getTime() < new Date().getTime()) }"
-                        class="ui negative button icon" v-on:click="cancelRequest(row)">
-                    <i class="remove alternate icon"></i>
-                    Cancel
-                </button>
-            </template>
+                </template>
+                <template v-slot:actions="{row}">
+                    <button :class="{ disabled : (row.status !== 'ACCEPTED') && (new Date(row.end).getTime() < new Date().getTime()) }"
+                            class="ui negative button icon" v-on:click="cancelRequest(row)">
+                        <i class="remove alternate icon"></i>
+                        Cancel
+                    </button>
+                </template>
 
-        </data-table>
+            </data-table>
 
 
         </div>
@@ -175,24 +186,30 @@
                     <div class="two fields">
                         <div class="field">
                             <label>Departure Date</label>
-                            <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
+                            <input type="date" name="start-date" placeholder="Departure date"
+                                   v-model="vacationRequest.start">
                             <div class="inline fields" style="padding-top: 1rem;">
                                 <div class="field">
                                     <div class="ui buttons">
-                                        <a @click="vacationRequest.halfStart = false" :class="{ blue : !vacationRequest.halfStart }" class="ui button">Morning</a>
-                                        <a @click="vacationRequest.halfStart = true" :class="{ blue : vacationRequest.halfStart }" class="ui button">Afternoon</a>
+                                        <a @click="vacationRequest.halfStart = false"
+                                           :class="{ blue : !vacationRequest.halfStart }" class="ui button">Morning</a>
+                                        <a @click="vacationRequest.halfStart = true"
+                                           :class="{ blue : vacationRequest.halfStart }" class="ui button">Afternoon</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="field">
                             <label>Return Date</label>
-                            <input type="date" name="end-date" :min="vacationRequest.start" placeholder="Return date" v-model="vacationRequest.end">
+                            <input type="date" name="end-date" :min="vacationRequest.start" placeholder="Return date"
+                                   v-model="vacationRequest.end">
                             <div class="inline fields" style="padding-top: 1rem;">
                                 <div class="field">
                                     <div class="ui buttons">
-                                        <a @click="vacationRequest.halfEnd = true" :class="{ blue : vacationRequest.halfEnd }" class="ui button">Morning</a>
-                                        <a @click="vacationRequest.halfEnd = false" :class="{ blue : !vacationRequest.halfEnd }" class="ui button">Afternoon</a>
+                                        <a @click="vacationRequest.halfEnd = true"
+                                           :class="{ blue : vacationRequest.halfEnd }" class="ui button">Morning</a>
+                                        <a @click="vacationRequest.halfEnd = false"
+                                           :class="{ blue : !vacationRequest.halfEnd }" class="ui button">Afternoon</a>
                                     </div>
                                 </div>
                             </div>
@@ -205,7 +222,8 @@
                         </div>
                         <div class="field">
                             <label>User to notify</label>
-                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID" name="assignee" type="text">
+                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID"
+                                   name="assignee" type="text">
                             <div class="ui category search">
                                 <div class="ui icon input">
                                     <input class="prompt" name="assignee" placeholder="Search account..." type="text">
@@ -216,7 +234,7 @@
                         </div>
                     </div>
                 </form>
-                <button class="ui positive button"  @click="addVacationRequest">Request new vacation</button>
+                <button class="ui positive button" @click="addVacationRequest">Request new vacation</button>
 
             </template>
         </tmodal>
@@ -230,12 +248,14 @@
                     <div class="two fields">
                         <div class="field">
                             <label>Start of recurrence</label>
-                            <input type="date" name="start-date" placeholder="Departure date" v-model="vacationRequest.start">
+                            <input type="date" name="start-date" placeholder="Departure date"
+                                   v-model="vacationRequest.start">
 
                         </div>
                         <div class="field">
                             <label>End of recurrence</label>
-                            <input type="date" name="end-date" :min="vacationRequest.start" placeholder="Return date" v-model="vacationRequest.end">
+                            <input type="date" name="end-date" :min="vacationRequest.start" placeholder="Return date"
+                                   v-model="vacationRequest.end">
 
                         </div>
 
@@ -245,20 +265,31 @@
 
                             <div class="field">
                                 <div class="ui buttons">
-                                    <a @click="vacationRequest.recurrenceType = 'MORNING'" :class="{ blue : vacationRequest.recurrenceType === 'MORNING', active : vacationRequest.recurrenceType === 'FULL'}" class="ui button">Morning</a>
-                                    <a @click="vacationRequest.recurrenceType = 'FULL'" :class="{ blue : vacationRequest.recurrenceType === 'FULL' }" class="ui button">Full day</a>
-                                    <a @click="vacationRequest.recurrenceType = 'AFTERNOON'" :class="{ blue : vacationRequest.recurrenceType === 'AFTERNOON', active : vacationRequest.recurrenceType === 'FULL'}" class="ui button">Afternoon</a>
+                                    <a @click="vacationRequest.recurrenceType = 'MORNING'"
+                                       :class="{ blue : vacationRequest.recurrenceType === 'MORNING', active : vacationRequest.recurrenceType === 'FULL'}"
+                                       class="ui button">Morning</a>
+                                    <a @click="vacationRequest.recurrenceType = 'FULL'"
+                                       :class="{ blue : vacationRequest.recurrenceType === 'FULL' }" class="ui button">Full
+                                        day</a>
+                                    <a @click="vacationRequest.recurrenceType = 'AFTERNOON'"
+                                       :class="{ blue : vacationRequest.recurrenceType === 'AFTERNOON', active : vacationRequest.recurrenceType === 'FULL'}"
+                                       class="ui button">Afternoon</a>
                                 </div>
                             </div>
 
                         </div>
                         <div class="field">
                             <label>Repeat every week on</label>
-                            <a @click="vacationRequest.recurrenceDay = 1" :class="{ blue : (vacationRequest.recurrenceDay === 1) }" class="ui circular label">M</a>
-                            <a @click="vacationRequest.recurrenceDay = 2" :class="{ blue : (vacationRequest.recurrenceDay === 2) }" class="ui circular label">T</a>
-                            <a @click="vacationRequest.recurrenceDay = 3" :class="{ blue : (vacationRequest.recurrenceDay === 3) }" class="ui circular label">W</a>
-                            <a @click="vacationRequest.recurrenceDay = 4" :class="{ blue : (vacationRequest.recurrenceDay === 4) }" class="ui circular label">T</a>
-                            <a @click="vacationRequest.recurrenceDay = 5" :class="{ blue : (vacationRequest.recurrenceDay === 5) }" class="ui circular label">F</a>
+                            <a @click="vacationRequest.recurrenceDay = 1"
+                               :class="{ blue : (vacationRequest.recurrenceDay === 1) }" class="ui circular label">M</a>
+                            <a @click="vacationRequest.recurrenceDay = 2"
+                               :class="{ blue : (vacationRequest.recurrenceDay === 2) }" class="ui circular label">T</a>
+                            <a @click="vacationRequest.recurrenceDay = 3"
+                               :class="{ blue : (vacationRequest.recurrenceDay === 3) }" class="ui circular label">W</a>
+                            <a @click="vacationRequest.recurrenceDay = 4"
+                               :class="{ blue : (vacationRequest.recurrenceDay === 4) }" class="ui circular label">T</a>
+                            <a @click="vacationRequest.recurrenceDay = 5"
+                               :class="{ blue : (vacationRequest.recurrenceDay === 5) }" class="ui circular label">F</a>
                         </div>
                     </div>
                     <div class="two fields">
@@ -268,7 +299,8 @@
                         </div>
                         <div class="field">
                             <label>User to notify</label>
-                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID" name="assignee" type="text">
+                            <input class="hidden" style="display: none" v-model="vacationRequest.assigneeID"
+                                   name="assignee" type="text">
                             <div class="ui category search">
                                 <div class="ui icon input">
                                     <input class="prompt" name="assignee" placeholder="Search account..." type="text">
@@ -280,7 +312,7 @@
                     </div>
 
                 </form>
-                <button class="ui positive button"  @click="addVacationRequest">Request new vacation</button>
+                <button class="ui positive button" @click="addVacationRequest">Request new vacation</button>
 
             </template>
         </tmodal>
