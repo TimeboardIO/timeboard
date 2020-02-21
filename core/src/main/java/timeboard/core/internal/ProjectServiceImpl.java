@@ -691,10 +691,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
         final TypedQuery<Batch> q = em.createQuery(
-                "select distinct b from Batch b join b.tasks t where t.project = :project and b.type = :type",
+                "select distinct b from Batch b where b.project = :project",
                 Batch.class);
         q.setParameter("project", project);
-        q.setParameter("type", batchType);
+
+        if(batchType != null) {
+            return q.getResultList().stream().filter(batch -> batch.getType().equals(batchType)).collect(Collectors.toList());
+        }
         return q.getResultList();
     }
 

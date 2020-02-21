@@ -31,11 +31,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class CalendarEvent implements Serializable {
 
     private String name;
+    private String label;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
     private double value;
@@ -67,6 +69,7 @@ public class CalendarEvent implements Serializable {
             final CalendarEvent wrapper = new CalendarEvent();
 
             wrapper.setName(request.getApplicant().getScreenName());
+            wrapper.setLabel(request.getLabel());
             wrapper.setDate(start.getTime());
             if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
                 wrapper.setValue(1);
@@ -94,12 +97,51 @@ public class CalendarEvent implements Serializable {
         return results;
     }
 
+    public static List<CalendarEvent> batchListToWrapperList(List<Batch> batches) {
+
+        final List<CalendarEvent> wrapperList = new ArrayList<>();
+
+        final Set<Batch> copy = new HashSet<>(batches);
+
+        for (Batch batch : batches) {
+
+            if(copy.contains(batch)) {
+                copy.remove(batch);
+                String label = batch.getName();
+                final List<Batch> sameDayBatches = copy.stream().filter(other -> other.getDate().compareTo(batch.getDate()) == 0).collect(Collectors.toList());
+                final CalendarEvent wrapper = new CalendarEvent();
+                if(!sameDayBatches.isEmpty()) {
+                    label += sameDayBatches.stream().map(Batch::getName).reduce("", (b, currentStr) -> b += " - " + currentStr);
+                    copy.removeAll(sameDayBatches);
+                }
+                wrapper.setName("project");
+                wrapper.setType(1); // FULL DAY
+                wrapper.setValue(2); // BATCH
+                wrapper.setLabel(label);
+                wrapper.setDate(batch.getDate());
+
+                wrapperList.add(wrapper);
+            }
+        }
+
+        return wrapperList;
+    }
+
+
     public String getName() {
         return name;
     }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public Date getDate() {

@@ -31,9 +31,16 @@
 
         <div style="overflow-x: scroll;" >
             <calendar v-for="(calendar, i) in teamCalendars"
+                      :name="'Project'"
+                      :show-header="true"
+                      :events="projectCalendar"
+                      :year="year"
+                      :month="month">
+            </calendar>
+            <calendar v-for="(calendar, i) in teamCalendars"
                       :name="calendar.name"
                       :events="calendar.events"
-                      :show-header="i == 0"
+                      :show-header="false"
                       :year="year"
                       :month="month">
             </calendar>
@@ -41,8 +48,9 @@
         <div class="ui segment">
             <div class="ui two column very relaxed grid">
                 <div class="column">
-                    <div><a class="ui green empty circular label" style="background-color: #5BCA7E"></a>  Occasional vacation (Scheduled)</div>
-                    <div><a class="ui yellow empty circular label" style="background-color: #FBBD08"></a>  Saved vacation Occasional/Recursive (awaiting planning)</div>
+                    <div><a class="ui green empty circular label" style="background-color: #00BFD8"></a> Project batch(es) </div>
+                    <div><a class="ui green empty circular label" style="background-color: #5BCA7E"></a> Occasional vacation (Scheduled)</div>
+                    <div><a class="ui yellow empty circular label" style="background-color: #FBBD08"></a> Saved vacation Occasional/Recursive (awaiting planning)</div>
                 </div>
                 <div class="column">
                     <div><a class="ui white empty circular label " style="background-color:  white; border: 1px solid rgba(34,36,38,.1);"></a>  Available</div>
