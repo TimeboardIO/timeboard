@@ -250,7 +250,7 @@
                             </td>
                         </tr>
 
-                        <tr v-for="(task, taskID) in project.tasks">
+                        <tr v-for="(task, taskID) in project.tasks" :class="{disabled : task.status == 'ARCHIVED', hatchedBackground : task.status == 'ARCHIVED'}" >
                             <td style="min-width: 7rem;">{{ task.taskName }}
                                 <p class="ellipsis" style="color: grey; font-size: 1em;" v-if="projectID > 0" >
                                     {{ new Date(task.endDate).toLocaleDateString(_LOCALE, { year: 'numeric', month: 'numeric', day: 'numeric' }) }}
@@ -268,7 +268,7 @@
                                     <i class="right arrow icon"></i> Edit
                                 </button>
                             </td>
-                            <td v-else v-for="day in days">
+                            <td v-else v-for="day in days"  >
                                 <div class="ui input">
                                     <number-input
                                         :min="0" :max="1" :validation-step="0.05" :input-step="0.1" :trigger="triggerUpdateTask"
@@ -285,9 +285,9 @@
 
                             <td :colspan="activeColumnsCount" v-if="projectID == 0"></td>
                             <template v-if="task.status!='PENDING'">
-                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'es').visible" v-bind:data-task-es="taskID" style="font-weight: bold">{{task.effortSpent.toFixed(1)}}
+                                <td v-if="projectID > 0  && columns.find(e => e.slot === 'es').visible" v-bind:data-task-es="taskID" style="font-weight: bold" > {{task.effortSpent.toFixed(1)}}
                                 </td>
-                                <td v-if="projectID > 0" v-bind:data-task-esw="taskID">{{ getTaskESW(task).toFixed(1) }}
+                                <td v-if="projectID > 0 && columns.find(e => e.slot === 'esw').visible" v-bind:data-task-esw="taskID" style="font-weight: bold" > {{ getTaskESW(task).toFixed(1) }}
                                 </td>
                                 <td v-if="projectID > 0 ">
                                     <div class="ui input">

@@ -363,7 +363,7 @@
 
                         <template v-slot:actions="{row}">
                             <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
-                                <i class="close icon"></i>
+                                <i class="archive icon"></i>
                             </button>
                             <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
                                     class="ui tiny primary icon button">
@@ -424,7 +424,7 @@
 
                     <template v-slot:actions="{row}">
                         <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_APPROBATION')}" >
-                            <i class="close icon"></i>
+                            <i class="archive icon"></i>
                         </button>
                         <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_EDIT')}"
                                 class="ui tiny primary icon button">
@@ -455,7 +455,7 @@
 
         <tmodal-confirm
                 ref="confirmModal"
-                title="Delete task ?"
+                title="Archive task ?"
                 icon="close"
         ></tmodal-confirm>
 

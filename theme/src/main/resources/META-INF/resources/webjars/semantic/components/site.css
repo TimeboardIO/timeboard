@@ -149,6 +149,10 @@ input::-moz-selection {
   background-color: rgba(100, 100, 100, 0.4);
   color: #393939;
 }
+textarea::-moz-selection, input::-moz-selection {
+  background-color: rgba(100, 100, 100, 0.4);
+  color: #393939;
+}
 textarea::selection,
 input::selection {
   background-color: rgba(100, 100, 100, 0.4);
@@ -267,6 +271,13 @@ table,
 #timesheet {
   /** input number **/
 }
+#timesheet .hatchedBackground {
+  background: -webkit-repeating-linear-gradient(45deg, lightgray, lightgray 10px, white 10px, white 20px);
+  background: repeating-linear-gradient(45deg, lightgray, lightgray 10px, white 10px, white 20px);
+}
+#timesheet .hatchedBackground input {
+  color: rgba(40, 40, 40, 0.3);
+}
 #timesheet .ui.button,
 #timesheet .ui.buttons .button,
 #timesheet .ui.buttons .or {
@@ -308,7 +319,6 @@ table,
   text-align: center;
   border: 0px solid #fff;
   background-color: rgba(1, 0, 1, 0);
-  border: 1px solid lightgrey;
 }
 #timesheet input[type=number]::-webkit-inner-spin-button,
 #timesheet input[type=number]::-webkit-outer-spin-button {
