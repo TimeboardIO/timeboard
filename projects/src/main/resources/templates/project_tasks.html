@@ -316,6 +316,48 @@
                     {{ batch.batchName }}
                 </div>
                 <div class="content" >
+
+                    <!-- Charge Information -->
+                    <div class="ui fluid card" style="width: 50%; margin-left: 25%;">
+                        <div class="content">
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.originalEstimate.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Original Estimate
+                                </div>
+                            </div>
+
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.effortSpent.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Effort Spent
+                                </div>
+                            </div>
+
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.effortLeft.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Effort Left
+                                </div>
+                            </div>
+
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.realEffort.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Real Effort
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Datatable component -->
                     <data-table v-bind:config="taskListConfig" v-bind:table="tableByBatch[batch.batchID]">
                         <template v-slot:name="{row}">

@@ -54,6 +54,8 @@ public interface ProjectService {
     Map<TaskType, ProjectDashboard> projectDashboardByTaskType(Account actor, Project project) throws BusinessException;
     ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException;
 
+    ProjectDashboard projectDashboardByBatch(Account actor, Project project, Batch batch) throws BusinessException;
+
     void save(Account actor, ProjectMembership projectMembership) throws BusinessException;
 
 

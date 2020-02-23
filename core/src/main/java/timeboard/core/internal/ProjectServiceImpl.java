@@ -296,6 +296,42 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+    @Override
+    public ProjectDashboard projectDashboardByBatch(final Account actor, final Project project, final Batch batch) throws BusinessException {
+        final RuleSet<Project> ruleSet = new RuleSet<>();
+        ruleSet.addRule(new ActorIsProjectMember());
+        final Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
+        if (!wrongRules.isEmpty()) {
+            throw new BusinessException(wrongRules);
+        }
+
+
+        final TypedQuery<Object[]> q = em.createQuery("select "
+                + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
+                + "COALESCE(sum(t.effortLeft),0) as effortLeft "
+                + "from Task t join t.batches bList "
+                + "where t.project = :project and :batch IN bList ", Object[].class);
+
+        q.setParameter("project", project);
+        q.setParameter("batch", batch);
+
+        final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
+
+        final TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
+                + "from Task t left outer join t.imputations i join t.batches bList "
+                + "where t.project = :project and :batch IN bList ", Double.class);
+
+        effortSpentQuery.setParameter("project", project);
+        effortSpentQuery.setParameter("batch", batch);
+
+        final Double effortSpent = effortSpentQuery.getSingleResult();
+
+        return new ProjectDashboard(project.getQuotation(),
+                (Double) originalEstimateAndEffortLeft[0],
+                (Double) originalEstimateAndEffortLeft[1], effortSpent, new Date());
+
+    }
+
 
     /* -- TASKS -- */
 
