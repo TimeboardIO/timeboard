@@ -56,7 +56,6 @@ public class DataTableConfigRestController {
         final Account actor = authentication.getDetails();
 
         final String tableID = request.getParameter("tableID");
-
         DataTableConfig dataTable = null;
         try {
             dataTable = this.dataTableService.findTableConfigByUserAndTable(tableID, actor);
@@ -64,12 +63,18 @@ public class DataTableConfigRestController {
             // nothing to do except handle exception
         }
         if (dataTable == null) {
-            dataTable = new DataTableConfig();
-            dataTable.setUser(actor);
-            dataTable.setTableInstanceId(tableID);
-            dataTable.setColumns(new ArrayList<>());
+
+            final DataTableConfigWrapper wrapper = new DataTableConfigWrapper();
+            wrapper.setUserID(actor.getId());
+            wrapper.setColNames(new ArrayList<>());
+            wrapper.setTableID(tableID);
+            wrapper.setInitialized(false);
+            return ResponseEntity.ok(wrapper);
+
+        } else {
+            return ResponseEntity.ok(new DataTableConfigWrapper(dataTable));
+
         }
-        return ResponseEntity.ok(new DataTableConfigWrapper(dataTable));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -82,9 +87,10 @@ public class DataTableConfigRestController {
 
     public static class DataTableConfigWrapper implements Serializable {
 
-        public List<String> colNames = new ArrayList<String>();
+        public List<String> colNames;
         public String tableID;
         public Long userID;
+        public boolean initialized = true;
 
         public DataTableConfigWrapper() {
             colNames = new ArrayList<String>();
@@ -119,6 +125,14 @@ public class DataTableConfigRestController {
 
         public void setUserID(final Long userID) {
             this.userID = userID;
+        }
+
+        public boolean isInitialized() {
+            return initialized;
+        }
+
+        public void setInitialized(boolean b) {
+            this.initialized = b;
         }
     }
 

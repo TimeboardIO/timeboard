@@ -37,8 +37,10 @@ import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Project;
+import timeboard.core.model.TaskType;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.projects.ProjectBaseController;
+import java.util.Map;
 
 import static timeboard.reports.ProjectDashboardController.PATH;
 
@@ -61,10 +63,12 @@ public class ProjectDashboardController extends ProjectBaseController {
                                @PathVariable final Project project, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
+        final Map<TaskType, ProjectDashboard> dashboardsByType = this.projectService.projectDashboardByTaskType(actor, project);
         final ProjectDashboard dashboard = this.projectService.projectDashboard(actor, project);
-
         model.addAttribute("project", project);
         model.addAttribute("dashboard", dashboard);
+        model.addAttribute("dashboardsByType", dashboardsByType);
+
         this.initModel(model, authentication, project);
         return "project_dashboard.html";
     }
