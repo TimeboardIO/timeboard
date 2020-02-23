@@ -48,5 +48,10 @@ public class ProjectDashboardNavigationProvider implements ProjectNavigationProv
         return AbacEntries.REPORT_PROJECT_VIEW;
     }
 
+    @Override
+    public int getNavigationWeight() {
+        return 20;
+    }
+
 
 }
