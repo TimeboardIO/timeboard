@@ -47,4 +47,9 @@ public class TimesheetProjectNavigationProvider implements ProjectNavigationProv
     public String getNavigationAction() {
         return AbacEntries.TIMESHEET_VALIDATION_VIEW;
     }
+
+    @Override
+    public int getNavigationWeight() {
+        return 30;
+    }
 }
