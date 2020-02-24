@@ -15,7 +15,7 @@ deploy:
   - provider: elasticbeanstalk
     access_key_id: "$AWS_ACCESS_KEY"
     secret_access_key: "$AWS_SECRET_KEY"
-    region: "eu-west-1"
+    region: "eu-west-3"
     app: "TimeboardApp"
     env: "TimeboardEnvironment"
     zip_file: "build/timeboard.$TRAVIS_COMMIT.zip"
