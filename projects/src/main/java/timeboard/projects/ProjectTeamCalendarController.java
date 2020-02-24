@@ -26,7 +26,6 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,9 +40,7 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 import timeboard.core.security.TimeboardAuthentication;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -75,7 +72,7 @@ public class ProjectTeamCalendarController extends ProjectBaseController {
     }
 
     @GetMapping(value = "/list/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, List<CalendarEvent>>> listTags(final TimeboardAuthentication authentication,
+    public ResponseEntity<Map<String, List<CalendarEvent>>> listTeam(final TimeboardAuthentication authentication,
                                                                      @PathVariable final Project project,
                                                                      @PathVariable final Integer yearNum,
                                                                      @PathVariable final Integer monthNum) throws BusinessException {
@@ -99,56 +96,20 @@ public class ProjectTeamCalendarController extends ProjectBaseController {
     }
 
 
-    public static class CalendarEventWrapper implements Serializable {
+    @GetMapping(value = "/list_batches/{yearNum}/{monthNum}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CalendarEvent>> listBatches(final TimeboardAuthentication authentication,
+                                                           @PathVariable final Project project,
+                                                           @PathVariable final Integer yearNum,
+                                                           @PathVariable final Integer monthNum) throws BusinessException {
+        final Account actor = authentication.getDetails();
 
-        private String name;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        private Date date;
-        private double value;
-        private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
+        final List<Batch> batchList = this.projectService.getBatchList(actor, project, null);
+        final List<Batch> filteredBatchList = batchList.stream()
+                .filter(batch -> batch.getDate() != null)
+                .collect(Collectors.toList());
+        final List<CalendarEvent> calendarEvents = CalendarEvent.batchListToWrapperList(filteredBatchList);
 
-        public CalendarEventWrapper() {
-        }
-
-        public CalendarEventWrapper(final Imputation imputation) {
-            this.date = imputation.getDay();
-            this.value = imputation.getValue();
-            this.type = 1;
-            this.name = imputation.getAccount().getScreenName();
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(final String name) {
-            this.name = name;
-        }
-
-
-        public Date getDate() {
-            return date;
-        }
-
-        public void setDate(Date date) {
-            this.date = date;
-        }
-
-        public int getType() {
-            return type;
-        }
-
-        public void setType(int type) {
-            this.type = type;
-        }
-
-        public double getValue() {
-            return value;
-        }
-
-        public void setValue(double value) {
-            this.value = value;
-        }
+        return ResponseEntity.ok(calendarEvents);
     }
 
 }

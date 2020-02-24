@@ -6,11 +6,15 @@ const CustomCalendar = BaseCalendar.extend({
     methods : {
         selectColor: function(event) {
             let color = "";
+
             if (event.value > 0) {
                 color = "#FBBD08";
             }
             if (event.value >= 1) {
                 color = "#5BCA7E";
+            }
+            if (event.value === 2) {
+                color = "#00BFD8";
             }
             return color;
         }
@@ -25,6 +29,7 @@ let app = new Vue({
         year : new Date().getFullYear(),
         month : new Date().getMonth(),
         teamCalendars : [],
+        projectCalendar : [],
         monthNames : ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ]
@@ -60,6 +65,14 @@ let app = new Vue({
                             events : value
                         });
                     }
+                }
+            });
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "projects/" + projectID + "/calendar/list_batches/" + this.year + "/" + this.month,
+                success: function (d) {
+                    self.projectCalendar = d;
                 }
             });
         }

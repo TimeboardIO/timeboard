@@ -40,6 +40,7 @@ import timeboard.core.model.Project;
 import timeboard.core.model.TaskType;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.projects.ProjectBaseController;
+
 import java.util.Map;
 
 import static timeboard.reports.ProjectDashboardController.PATH;

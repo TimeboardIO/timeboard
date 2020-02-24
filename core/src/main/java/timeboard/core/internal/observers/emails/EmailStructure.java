@@ -72,7 +72,7 @@ public class EmailStructure {
     public EmailStructure(final String targetUser, final String targetCCUser, final String subject, final String message) {
         this(subject);
         this.targetUserList.add(targetUser);
-        if (targetCCUser !=null) {
+        if (targetCCUser != null) {
             this.targetCCUserList.add(targetCCUser);
         }
         this.model.put("message", message);
@@ -83,13 +83,12 @@ public class EmailStructure {
                           final String subject, Map<String, Object> model, final String template) {
         this(subject);
         this.targetUserList.add(targetUser);
-        if (targetCCUser !=null) {
+        if (targetCCUser != null) {
             this.targetCCUserList.add(targetCCUser);
         }
         this.template = template;
         this.model = model;
     }
-
 
 
     public List<String> getTargetUserList() {
