@@ -163,7 +163,7 @@ public class OrganizationMembersController {
 
     }
 
-    @GetMapping("/remove/{member}")
+    @DeleteMapping("/{member}")
     public ResponseEntity removeMember(final TimeboardAuthentication authentication,
                                        @PathVariable final Account member) throws BusinessException {
 

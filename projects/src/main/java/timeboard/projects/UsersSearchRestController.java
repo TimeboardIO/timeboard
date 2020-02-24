@@ -96,6 +96,30 @@ public class UsersSearchRestController {
         return ResponseEntity.ok(searchResults);
     }
 
+
+    @GetMapping("/all")
+    protected ResponseEntity<SearchResults> doGetSearchAllApp(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest req,
+            final HttpServletResponse resp) throws BusinessException {
+
+        final String query = req.getParameter("q");
+        final Account actor = authentication.getDetails();
+
+        if (query.isBlank() || query.isEmpty()) {
+            throw new BusinessException("Query is empty");
+        }
+
+        final Set<Account> accounts = new HashSet<>();
+
+        accounts.addAll(this.accountService.searchUserByEmail(actor, query));
+
+
+        final SearchResults searchResults = new SearchResults(accounts.size(), accounts);
+
+        return ResponseEntity.ok(searchResults);
+    }
+
     @GetMapping("/byRole")
     protected ResponseEntity<SearchResults> doGetMembersProjects(
             final TimeboardAuthentication authentication,
