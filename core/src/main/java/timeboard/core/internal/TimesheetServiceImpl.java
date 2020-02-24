@@ -133,7 +133,8 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Double result = q.getSingleResult();
 
         if (!result.equals(expectedSum)) {
-            throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to " + expectedSum + " Having : " + result);
+            throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to "
+                    + expectedSum + " Having : " + result);
         }
 
         return processSubmission(timesheetOwner, year, week, currentOrg);
