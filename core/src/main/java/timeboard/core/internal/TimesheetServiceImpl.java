@@ -77,21 +77,13 @@ public class TimesheetServiceImpl implements TimesheetService {
                 .findOrganizationMembership(timesheetOwner, currentOrg).get().getCreationDate();
 
         final int dayInFirstWeek = beginWorkDate.get(Calendar.DAY_OF_WEEK);
-        final boolean firstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR)
+        final boolean isFirstWeek = beginWorkDate.get(Calendar.WEEK_OF_YEAR)
                 == week && beginWorkDate.get(Calendar.YEAR) == year;
 
-        final Calendar previousWeek = Calendar.getInstance();
-        previousWeek.set(Calendar.WEEK_OF_YEAR, week);
-        previousWeek.set(Calendar.YEAR, year);
-        previousWeek.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-        previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
-        previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+        final boolean isPreviousWeekValidated = this.checkPreviousWeekTimesheetValidation(
+                currentOrg, timesheetOwner, year, week, isFirstWeek);
 
-        final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
-                currentOrg, timesheetOwner, previousWeek.get(Calendar.YEAR),
-                previousWeek.get(Calendar.WEEK_OF_YEAR));
-
-        if (!firstWeek && lastWeekValidatedOpt.isEmpty()) {
+        if(isPreviousWeekValidated){
             throw new TimesheetException("Can not submit week " + week + ", previous week is not submitted");
         }
 
@@ -107,7 +99,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Calendar lastDayOfWeek = (Calendar) firstDayOfWeek.clone();
         lastDayOfWeek.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
 
-        if (firstWeek) {
+        if (isFirstWeek) {
             firstDayOfWeek.set(Calendar.DAY_OF_WEEK, dayInFirstWeek);
             firstDayOfWeek.setFirstDayOfWeek(dayInFirstWeek);
         }
@@ -138,6 +130,27 @@ public class TimesheetServiceImpl implements TimesheetService {
         }
 
         return processSubmission(timesheetOwner, year, week, currentOrg);
+    }
+
+    private boolean checkPreviousWeekTimesheetValidation(
+            final Organization currentOrg,
+            final Account timesheetOwner,
+            final int year,
+            final int week,
+            final boolean firstWeek) throws TimesheetException {
+
+        final Calendar previousWeek = Calendar.getInstance();
+        previousWeek.set(Calendar.WEEK_OF_YEAR, week);
+        previousWeek.set(Calendar.YEAR, year);
+        previousWeek.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        previousWeek.setFirstDayOfWeek(Calendar.MONDAY);
+        previousWeek.add(Calendar.WEEK_OF_YEAR, -1); // remove 1 week
+
+        final Optional<ValidationStatus> lastWeekValidatedOpt = this.getTimesheetValidationStatus(
+                currentOrg, timesheetOwner, previousWeek.get(Calendar.YEAR),
+                previousWeek.get(Calendar.WEEK_OF_YEAR));
+
+        return !firstWeek && lastWeekValidatedOpt.isEmpty();
     }
 
     private SubmittedTimesheet processSubmission(Account accountTimesheet, int year, int week, Organization currentOrg) {
