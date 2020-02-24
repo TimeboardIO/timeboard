@@ -51,7 +51,8 @@
       "PROJECT_ARCHIVE",
       "ORG_IMPERSONATE",
       "ORG_SETUP",
-      "REPORT_LIST"
+      "REPORT_LIST",
+      "REPORT_PROJECT_VIEW"
     ],
     "conditions": [
       "subject.currentOrganizationRole('OWNER')"
