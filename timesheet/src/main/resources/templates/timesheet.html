@@ -252,7 +252,9 @@
 
                         <tr v-for="(task, taskID) in project.tasks" :class="{disabled : task.status == 'ARCHIVED', hatchedBackground : task.status == 'ARCHIVED'}" >
                             <td style="min-width: 7rem;">{{ task.taskName }}
-                                <p class="ellipsis" style="color: grey; font-size: 1em;" v-if="projectID > 0" >
+                                <p class="ellipsis" style="color: grey; font-size: 0.9em;" v-if="projectID > 0" >
+                                    {{ new Date(task.startDate).toLocaleDateString(_LOCALE, { year: 'numeric', month: 'numeric', day: 'numeric' }) }}
+                                    <i class="ui icon angle right"></i>
                                     {{ new Date(task.endDate).toLocaleDateString(_LOCALE, { year: 'numeric', month: 'numeric', day: 'numeric' }) }}
                                 </p>
                             </td>
