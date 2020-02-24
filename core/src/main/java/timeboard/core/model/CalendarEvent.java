@@ -105,12 +105,14 @@ public class CalendarEvent implements Serializable {
 
         for (Batch batch : batches) {
 
-            if(copy.contains(batch)) {
+            if (copy.contains(batch)) {
                 copy.remove(batch);
                 String label = batch.getName();
-                final List<Batch> sameDayBatches = copy.stream().filter(other -> other.getDate().compareTo(batch.getDate()) == 0).collect(Collectors.toList());
+                final List<Batch> sameDayBatches = copy.stream().filter(
+                        other -> other.getDate().compareTo(batch.getDate()) == 0
+                ).collect(Collectors.toList());
                 final CalendarEvent wrapper = new CalendarEvent();
-                if(!sameDayBatches.isEmpty()) {
+                if (!sameDayBatches.isEmpty()) {
                     label += sameDayBatches.stream().map(Batch::getName).reduce("", (b, currentStr) -> b += " - " + currentStr);
                     copy.removeAll(sameDayBatches);
                 }

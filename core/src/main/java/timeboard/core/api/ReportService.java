@@ -61,7 +61,7 @@ public interface ReportService {
     /**
      * List all report for owner
      *
-     * @param org primary key {@link Organization} where looking for reports
+     * @param org   primary key {@link Organization} where looking for reports
      * @param owner an account that own reports
      * @return
      */

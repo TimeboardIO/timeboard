@@ -202,7 +202,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 currentOrg, submittedTimesheet.getAccount(), previousWeek.get(Calendar.YEAR),
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
-        if (!firstWeek && (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED)) ){
+        if (!firstWeek && (lastWeekValidatedOpt.isEmpty() || !lastWeekValidatedOpt.get().equals(ValidationStatus.VALIDATED))) {
             throw new TimesheetException("Can not validate this week, previous week is not validated");
         }
 
@@ -459,6 +459,7 @@ public class TimesheetServiceImpl implements TimesheetService {
             return new ArrayList<>();
         }
     }
+
     public void forceValidationTimesheets(final Organization org,
                                           final Account actor,
                                           final Account target,
@@ -534,7 +535,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
         if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
-            final Optional<Imputation> existingImputation = this.projectService.getImputation(actor, projectTask,  calendar.getTime() );
+            final Optional<Imputation> existingImputation = this.projectService.getImputation(actor, projectTask, calendar.getTime());
             final double oldValue = existingImputation.isPresent() ? existingImputation.get().getValue() : 0;
 
             this.actionOnImputation(existingImputation.orElse(null), projectTask, actor, val, calendar.getTime());
