@@ -33,15 +33,12 @@
     "name": "User is project owner",
     "actions": [
       "PROJECT_BATCHES_VIEW",
-      "PROJECT_SNAPSHOTS_VIEW",
-      "PROJECT_SNAPSHOT",
-      "REPORT_PROJECT_VIEW",
       "PROJECT_SETUP",
       "PROJECT_TAGS_VIEW",
       "PROJECT_TASKS_APPROBATION",
       "PROJECT_TASKS_EDIT",
-      "PROJECT_TASKS_IMPORT",
-      "TIMESHEET_VALIDATION_VIEW"
+      "TIMESHEET_VALIDATION_VIEW",
+      "TIMESHEET_REJECT"
     ],
     "conditions": [
       "subject.currentProjectRole(resource, 'OWNER')"
@@ -52,7 +49,6 @@
     "actions": [
       "PROJECT_CREATE",
       "PROJECT_ARCHIVE",
-      "REPORT_LIST",
       "ORG_IMPERSONATE",
       "ORG_SETUP"
     ],
@@ -98,4 +94,5 @@
       "environment.checkTaskByProjectLimit(subject, resource)"
     ]
   }
+
 ]

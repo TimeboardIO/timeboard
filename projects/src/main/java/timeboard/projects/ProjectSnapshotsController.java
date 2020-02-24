@@ -38,6 +38,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import timeboard.core.api.AbacEntries;
 import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.ProjectSnapshotService;
@@ -46,7 +47,6 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
 import timeboard.core.model.ValueHistory;
-import timeboard.core.security.AbacEntries;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.ParseException;

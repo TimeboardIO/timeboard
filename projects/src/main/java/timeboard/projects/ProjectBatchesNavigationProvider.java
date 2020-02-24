@@ -27,7 +27,7 @@ package timeboard.projects;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.security.AbacEntries;
+import timeboard.core.api.AbacEntries;
 import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component

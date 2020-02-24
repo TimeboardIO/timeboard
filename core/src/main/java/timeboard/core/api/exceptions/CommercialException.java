@@ -26,29 +26,9 @@ package timeboard.core.api.exceptions;
  * #L%
  */
 
-public class CommercialException extends Exception {
+public class CommercialException extends BusinessException {
 
-    private String errCause;
-    private String errMsg;
-
-    public CommercialException(final String errCause, final String errMsg) {
-        this.errCause = errCause;
-        this.errMsg = errMsg;
-    }
-
-    public String getErrCode() {
-        return errCause;
-    }
-
-    public void setErrCode(final String errCode) {
-        this.errCause = errCode;
-    }
-
-    public String getErrMsg() {
-        return errMsg;
-    }
-
-    public void setErrMsg(final String errMsg) {
-        this.errMsg = errMsg;
+    public CommercialException(final String errMsg) {
+        super(errMsg);
     }
 }

@@ -2,13 +2,9 @@ AWSTemplateFormatVersion: 2010-09-09
 Parameters:
   ElasticBeansTalkApp:
     Type: 'String'
-  Route53HostedZone:
-    Type: 'AWS::Route53::HostedZone::Id'
   TimeboardVPC:
     Type: 'AWS::EC2::VPC::Id'
   TimeboardDNSName:
-    Type: 'String'
-  DatabaseDNSName:
     Type: 'String'
   TimeboardSSLArn:
     Type: 'String'
@@ -26,6 +22,8 @@ Parameters:
     Type: 'String'
   DBPassword:
     Type: 'String'
+  DBDNS:
+    Type: 'String'
 Resources:
   WebAppEnvBT:
     Type: AWS::ElasticBeanstalk::Environment
@@ -34,8 +32,11 @@ Resources:
         Ref: ElasticBeansTalkApp
       Description: 'AWS Elastic Beanstalk Environment running Timeboard Application on Java 11'
       EnvironmentName: TimeboardEnvironment
-      SolutionStackName: '64bit Amazon Linux 2018.03 v2.10.1 running Java 8'
+      SolutionStackName: '64bit Amazon Linux 2018.03 v2.10.2 running Java 8'
       OptionSettings:
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'SPRING_DATASOURCE_DOMAIN'
+          Value: !Ref DBDNS
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SERVER_PORT'
           Value: '5000'
@@ -44,13 +45,16 @@ Resources:
           Value: !Ref OAuthClientID
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'OAUTH_SECRETID'
-          Value: !Ref OAuthSecretID 
+          Value: !Ref OAuthSecretID
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'APP_DOMAIN'
+          Value: !Ref TimeboardDNSName
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'APP_URL'
           Value: !Join [ '', [ 'https://', !Ref 'TimeboardDNSName' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_URL'
-          Value: !Join [ '', [ 'jdbc:mysql://', !Ref 'DatabaseDNSName', '/timeboard?createDatabaseIfNotExist=true' ] ]
+          Value: !Join [ '', [ 'jdbc:mysql://', !Ref 'DBDNS', '/timeboard?createDatabaseIfNotExist=true' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_USERNAME'
           Value: !Ref 'DBUser'
@@ -108,18 +112,8 @@ Resources:
         - Namespace: 'aws:elasticbeanstalk:command'
           OptionName: 'DeploymentPolicy'
           Value: 'Rolling'
-  WebAppDNSRecord:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      HostedZoneId: !Ref 'Route53HostedZone'
-      Comment: DNS name for timeboard web app
-      Name: !Ref 'TimeboardDNSName'
-      Type: CNAME
-      TTL: '900'
-      ResourceRecords:
-        - !GetAtt WebAppEnvBT.EndpointURL
 
 Outputs:
-  AppID:
-    Description: Test
-    Value: !Ref EC2Subnet
+  AppDNS:
+    Description: Stack front load balancer DNS
+    Value: !GetAtt WebAppEnvBT.EndpointURL

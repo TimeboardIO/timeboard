@@ -103,9 +103,19 @@
                     {{row.name}}
                 </template>
                 <template v-slot:actions="{row}">
-                    <a class="ui right labeled primary icon button" v-bind:href="'/projects/'+row.id+'/tasks'" data-cy="tasks">
+                    <a v-bind:href="'/projects/'+row.id+'/setup'" class="ui right labeled positive icon button" data-cy="setup"
+                       sec:authorize="hasPermission(null,'PROJECT_ARCHIVE')">
+                        <i class="cog icon"></i>
+                        Set up
+                    </a>
+                    <a v-bind:href="'/projects/'+row.id+'/tasks'" class="ui right labeled primary icon button" data-cy="tasks">
                         <i class="tasks icon"></i>
-                        Task
+                        Tasks
+                    </a>
+                    <a @click="archive(row)" class="ui right labeled negative icon button" data-cy="archive"
+                       sec:authorize="hasPermission(null,'PROJECT_ARCHIVE')">
+                        <i class="archive icon"></i>
+                        Archive
                     </a>
                 </template>
             </data-table>

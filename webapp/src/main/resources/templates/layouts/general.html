@@ -7,10 +7,15 @@
     <base th:href="@{/}">
     <title>[[${appName}]]</title>
     <link rel="manifest" href="/manifest.json">
-    <link rel="icon" href="/onboarding/images/ico.png" />
-    <link href="https://fonts.googleapis.com/css?family=Raleway:400,400i,600,700,700i&amp;subset=latin-ext" rel="stylesheet">
+    <link rel="icon" href="/onboarding/images/ico.png"/>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway:400,400i,600,700,700i&amp;subset=latin-ext">
     <link rel="stylesheet" href="/webjars/semantic/semantic.min.css">
-    <link href="/webjars/timeboard/style.css" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="/webjars/timeboard/style.css">
+
+
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0" name="viewport">
 
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
@@ -50,10 +55,12 @@
     #versionBox:hover > * {
         display: block;
     }
+
 </style>
 
 <div th:if="${impersonated}" class="ui fixed menu main" style="margin-top: 2rem;background-color: #00bfd8;">
-    <a th:href="@{/org/impersonate/cancel}" style="color: white;text-align: center;width: 100%;position: absolute;bottom: 0;font-weight: bold;">
+    <a th:href="@{/org/impersonate/cancel}"
+       style="color: white;text-align: center;width: 100%;position: absolute;bottom: 0;font-weight: bold;">
         You are using timeboard as <span th:text="${account.screenName}"></span> (click here to cancel)
     </a>
 </div>
@@ -64,17 +71,17 @@
 <div class="ui left vertical menu sidebar side"
      th:include="fragments/navigation.html :: nav(${path})"></div>
 
-<div class="ui main container pusher"  style="padding-top:6em">
+<div class="ui main container pusher" style="padding-top:6em">
     <div class="ui container negative message" th:if="${error !=  null && error != ''}">
         <i class="close icon"></i>
-        <div th:text="#{${error}}" class="header">  </div>
+        <div th:text="#{${error}}" class="header"></div>
 
     </div>
     <div class="ui container positive message" th:if="${success !=  null && success != ''}">
         <i class="close icon"></i>
-        <div th:text="#{${success}}" class="header">  </div>
+        <div th:text="#{${success}}" class="header"></div>
     </div>
-    <div layout:fragment="content" ></div>
+    <div layout:fragment="content"></div>
 </div>
 <script>
     $('.message .close')
@@ -83,12 +90,12 @@
                 .closest('.message')
                 .transition('fade');
         });
+
 </script>
 
 <a id="versionBox" th:onclick="copyToClipboard([[${appVersion}]])">
     <div id="versionText" th:text="${appVersion}"></div>
 </a>
-
 
 
 </body>

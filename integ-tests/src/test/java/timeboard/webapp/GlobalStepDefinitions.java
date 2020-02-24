@@ -73,9 +73,10 @@ public class GlobalStepDefinitions extends TimeboardTest {
 
         Calendar start = Calendar.getInstance();
         Calendar end = Calendar.getInstance();
+        start.setFirstDayOfWeek(Calendar.MONDAY);
         start.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        end.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        end.add(Calendar.DAY_OF_YEAR, arg1);
+        end.setFirstDayOfWeek(Calendar.MONDAY);
+        end.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
         String remoteID = Math.random() + "/";
         for (int i = 0; i < arg1; i++) {
