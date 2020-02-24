@@ -33,6 +33,7 @@ const emptyTask = {
 };
 
 const timesheetModel = {
+    windowWidth: window.innerWidth,
     week: 0,
     year: 0,
     sum: 0,
@@ -487,13 +488,17 @@ $(document).ready(function () {
                     }
                 });
             },
+            getWindowWidth(event) {
+                this.windowWidth = document.documentElement.clientWidth;
+            },
         },
         computed : {
-          activeColumnsCount : function () {
-              return this.columns.filter(col => col.visible).length + 1 ; //1 is for el (can not be disabled)
-          }
+            activeColumnsCount : function () {
+                return this.columns.filter(col => col.visible).length + 1 ; //1 is for el (can not be disabled)
+            }
         },
         mounted: function () {
+            window.addEventListener('resize', this.getWindowWidth);
             this.updateTimesheet();
             let self = this;
             // columns config loading
