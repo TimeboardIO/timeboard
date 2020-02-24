@@ -6,8 +6,6 @@ Parameters:
     Type: 'AWS::EC2::VPC::Id'
   TimeboardDNSName:
     Type: 'String'
-  DatabaseDNSName:
-    Type: 'String'
   TimeboardSSLArn:
     Type: 'String'
   OAuthClientID:
@@ -34,7 +32,7 @@ Resources:
         Ref: ElasticBeansTalkApp
       Description: 'AWS Elastic Beanstalk Environment running Timeboard Application on Java 11'
       EnvironmentName: TimeboardEnvironment
-      SolutionStackName: '64bit Amazon Linux 2018.03 v2.10.1 running Java 8'
+      SolutionStackName: '64bit Amazon Linux 2018.03 v2.10.2 running Java 8'
       OptionSettings:
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_DOMAIN'
@@ -56,7 +54,7 @@ Resources:
           Value: !Join [ '', [ 'https://', !Ref 'TimeboardDNSName' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_URL'
-          Value: !Join [ '', [ 'jdbc:mysql://', !Ref 'DatabaseDNSName', '/timeboard?createDatabaseIfNotExist=true' ] ]
+          Value: !Join [ '', [ 'jdbc:mysql://', !Ref 'DBDNS', '/timeboard?createDatabaseIfNotExist=true' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_USERNAME'
           Value: !Ref 'DBUser'
@@ -116,6 +114,6 @@ Resources:
           Value: 'Rolling'
 
 Outputs:
-  AppID:
-    Description: Test
-    Value: !Ref EC2Subnet
+  AppDNS:
+    Description: Stack front load balancer DNS
+    Value: !GetAtt WebAppEnvBT.EndpointURL

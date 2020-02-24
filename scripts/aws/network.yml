@@ -1,7 +1,4 @@
 AWSTemplateFormatVersion: 2010-09-09
-Parameters:
-  Route53HostedZone:
-    Type: 'AWS::Route53::HostedZone::Id'
 Resources:
   InternetGW:
     Type: 'AWS::EC2::InternetGateway'
@@ -37,7 +34,7 @@ Resources:
       VpcId:
         Ref: TimeboardVPC
       CidrBlock: 10.0.40.0/24
-      AvailabilityZone: 'eu-west-1a'
+      AvailabilityZone: 'eu-west-3a'
       MapPublicIpOnLaunch: true
   EC2SubnetRouteTable:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -50,7 +47,7 @@ Resources:
       VpcId:
         Ref: TimeboardVPC
       CidrBlock: 10.0.70.0/24
-      AvailabilityZone: 'eu-west-1a'
+      AvailabilityZone: 'eu-west-3a'
   PublicSubnetRouteTable:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -78,14 +75,14 @@ Resources:
       VpcId:
         Ref: TimeboardVPC
       CidrBlock: 10.0.20.0/24
-      AvailabilityZone: 'eu-west-1a'
+      AvailabilityZone: 'eu-west-3a'
   DBSubnetB:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId:
         Ref: TimeboardVPC
       CidrBlock: 10.0.30.0/24
-      AvailabilityZone: 'eu-west-1b'
+      AvailabilityZone: 'eu-west-3b'
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -93,10 +90,6 @@ Resources:
       VpcId:
         Ref: TimeboardVPC
       SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
@@ -106,10 +99,6 @@ Resources:
           ToPort: 80
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
