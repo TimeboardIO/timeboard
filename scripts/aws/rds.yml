@@ -4,8 +4,6 @@ Parameters:
     Type: 'String'
   DBPassword:
     Type: 'String'
-  DatabaseDNSName:
-    Type: 'String'
   DBSubnetA:
     Type: 'AWS::EC2::Subnet::Id'
   DBSubnetB:
