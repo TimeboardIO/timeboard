@@ -64,6 +64,9 @@ public class BasicPolicyEnforcement implements PolicyEnforcement {
 
 
     private boolean checkRules(final List<PolicyRuleSet> matchedRules, final SecurityAccessContext cxt) {
+        if (matchedRules.isEmpty()){
+            return false;
+        }
         for (final PolicyRuleSet rule : matchedRules) {
             try {
                 if (!rule.getConditions().stream()
