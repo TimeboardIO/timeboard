@@ -42,6 +42,8 @@ public class TimeboardAuthentication implements Authentication {
 
     private Principal p;
     private Account account;
+
+    private Account overriddenAccount;
     private Organization currentOrganization;
 
     public TimeboardAuthentication(final Account a) {
@@ -61,6 +63,9 @@ public class TimeboardAuthentication implements Authentication {
 
     @Override
     public Account getDetails() {
+        if (overriddenAccount != null) {
+            return overriddenAccount;
+        }
         return account;
     }
 
@@ -69,7 +74,11 @@ public class TimeboardAuthentication implements Authentication {
         return this.p;
     }
 
-    @Override
+    public boolean isImpersonalised() {
+        return this.overriddenAccount != null;
+    }
+
+     @Override
     public boolean isAuthenticated() {
         return this.p != null;
     }
@@ -78,6 +87,11 @@ public class TimeboardAuthentication implements Authentication {
     public void setAuthenticated(final boolean b) throws IllegalArgumentException {
 
     }
+
+    public void setOverriddenAccount(Account overriddenAccount) {
+        this.overriddenAccount = overriddenAccount;
+    }
+    
 
     public Organization getCurrentOrganization() {
         return currentOrganization;
