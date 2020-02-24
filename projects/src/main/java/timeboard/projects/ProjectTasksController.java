@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
@@ -103,7 +104,8 @@ public class ProjectTasksController extends ProjectBaseController {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN)
                         .body("Project does not exists or you don't have enough permissions to access it.");
             }
-            final List<Task> tasks = this.projectService.listProjectTasks(actor, project);
+            List<Task> tasks = this.projectService.listProjectTasks(actor, project);
+            tasks = tasks.stream().filter(e -> e.getTaskStatus() != TaskStatus.ARCHIVED).collect(Collectors.toList());
 
             final List<TasksRestAPI.TaskWrapper> result = new ArrayList<>();
 
@@ -257,8 +259,8 @@ public class ProjectTasksController extends ProjectBaseController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/delete/{taskID}")
-    public ResponseEntity deleteTask(final TimeboardAuthentication authentication,
+    @DeleteMapping("/archive/{taskID}")
+    public ResponseEntity archiveTask(final TimeboardAuthentication authentication,
                                      @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
 
@@ -267,7 +269,7 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
         try {
-            projectService.deleteTaskByID(actor, taskID);
+            projectService.archiveTaskByID(actor, taskID);
         } catch (final Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -316,8 +318,17 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
         final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
-        batchList.forEach(batch -> batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName())));
-
+        final Project finalProject = project;
+        batchList.forEach(batch -> {
+            ProjectDashboard dashboardBatch = null;
+            try {
+                dashboardBatch = this.projectService.projectDashboardByBatch(actor, finalProject, batch);
+            } catch (BusinessException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName(), dashboardBatch.getOriginalEstimate(),
+                    dashboardBatch.getEffortLeft(), dashboardBatch.getRealEffort(), dashboardBatch.getEffortSpent()));
+        });
         return ResponseEntity.status(HttpStatus.OK).body(batchWrapperList.toArray());
     }
 

@@ -75,18 +75,22 @@
     ]
   },
   {
-    "name": "This features are disabled for v1.0",
+    "name": "Limits of project creation is respected",
     "actions": [
-      "PROJECT_TASKS_IMPORT",
-      "REPORT_GENERATE_TAS",
-      "ACCOUNT_CONFIG_EXTERNAL_TOOLS",
-      "REPORT_LIST",
-      "PROJECT_TASKS_IMPORT",
-      "PROJECT_SNAPSHOTS_VIEW",
-      "PROJECT_SNAPSHOT"
+      "PROJECT_CREATE",
+      "PROJECT_CREATE_LIMIT"
     ],
     "conditions": [
-      "false"
+      "environment.checkEnabledProjectLimit(subject) && environment.checkProjectByUserLimit(subject)"
+    ]
+  },
+  {
+    "name": "Limits of task creation is respected",
+    "actions": [
+      "PROJECT_TASKS_CREATE"
+    ],
+    "conditions": [
+      "environment.checkTaskByProjectLimit(subject, resource)"
     ]
   }
 

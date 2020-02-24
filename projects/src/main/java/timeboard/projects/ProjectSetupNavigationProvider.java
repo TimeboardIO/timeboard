@@ -46,4 +46,9 @@ public class ProjectSetupNavigationProvider implements ProjectNavigationProvider
     public String getNavigationAction() {
         return AbacEntries.PROJECT_SETUP_VIEW;
     }
+
+    @Override
+    public int getNavigationWeight() {
+        return 1;
+    }
 }

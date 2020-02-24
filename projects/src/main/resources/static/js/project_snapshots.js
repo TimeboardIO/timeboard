@@ -89,7 +89,7 @@ $(document).ready(function () {
                         }
 
                         //chart config
-                        let chart = new Chart($("#lineChart"), {
+                        let chart = new Chart($("#snapshotLineChart"), {
                             type: 'line',
                             data: {
                                 labels: d.listOfProjectSnapshotDates,

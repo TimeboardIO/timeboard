@@ -46,4 +46,9 @@ public class ProjectTagsNavigationProvider implements ProjectNavigationProvider 
     public String getNavigationAction() {
         return AbacEntries.PROJECT_TAGS_VIEW;
     }
+
+    @Override
+    public int getNavigationWeight() {
+        return 50;
+    }
 }

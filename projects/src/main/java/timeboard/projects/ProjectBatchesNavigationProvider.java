@@ -46,4 +46,11 @@ public class ProjectBatchesNavigationProvider implements ProjectNavigationProvid
     public String getNavigationAction() {
         return AbacEntries.PROJECT_BATCHES_VIEW;
     }
+
+    @Override
+    public int getNavigationWeight() {
+        return 40;
+    }
+
+
 }

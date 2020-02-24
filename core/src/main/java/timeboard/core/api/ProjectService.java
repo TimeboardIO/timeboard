@@ -54,6 +54,8 @@ public interface ProjectService {
     Map<TaskType, ProjectDashboard> projectDashboardByTaskType(Account actor, Project project) throws BusinessException;
     ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException;
 
+    ProjectDashboard projectDashboardByBatch(Account actor, Project project, Batch batch) throws BusinessException;
+
     void save(Account actor, ProjectMembership projectMembership) throws BusinessException;
 
 
@@ -102,34 +104,27 @@ public interface ProjectService {
 
     UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
-    void deleteTaskByID(Account actor, long taskID) throws BusinessException;
+    void archiveTaskByID(Account actor, long taskID) throws BusinessException;
 
-    void deleteTasks(Account actor, List<Task> taskList);
+    void deleteTaskByID(Account actor, Long taskID) throws BusinessException;
+
+    void archiveTasks(Account actor, List<Task> taskList);
 
 
     Optional<Task> getTaskByRemoteID(Account actor, String id);
 
-    /*
-     == Imputations ==
-     */
+    /* == Imputations == */
 
     /**
      * Return effort spent for a task.
      *
      * @return List all effort spent for a task.
      */
-    List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor,
-                                                     Task task,
-                                                     Date startTaskDate,
+    List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor, Task task, Date startTaskDate,
                                                      Date endTaskDate) throws BusinessException;
 
 
-
-
-
-    /*
-     == Batches ==
-     */
+    /* == Batches == */
 
     /**
      * Return all batches for a project.
@@ -146,6 +141,7 @@ public interface ProjectService {
      * @return Batch
      */
     Batch getBatchById(Account actor, long id) throws BusinessException;
+
 
     /**
      * Create a batch.

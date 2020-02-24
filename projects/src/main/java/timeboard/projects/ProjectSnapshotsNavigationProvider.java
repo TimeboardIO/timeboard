@@ -49,5 +49,8 @@ public class ProjectSnapshotsNavigationProvider implements ProjectNavigationProv
         return AbacEntries.PROJECT_SNAPSHOTS_VIEW;
     }
 
-
+    @Override
+    public int getNavigationWeight() {
+        return 25;
+    }
 }
