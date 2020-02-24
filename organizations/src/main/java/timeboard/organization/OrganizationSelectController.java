@@ -81,7 +81,6 @@ public class OrganizationSelectController {
         if (selectedOrg.isPresent()) {
             final Cookie orgCookie = new Cookie(COOKIE_NAME, String.valueOf(selectedOrg.get().getId()));
             orgCookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-            orgCookie.setSecure(true);
             orgCookie.setDomain(this.appDomain);
             res.addCookie(orgCookie);
         }
