@@ -10,7 +10,7 @@ import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 
 import timeboard.core.model.Account;
-import timeboard.core.security.AbacEntries;
+import timeboard.core.api.AbacEntries;
 import timeboard.core.security.TimeboardAuthentication;
 
 
