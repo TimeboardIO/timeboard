@@ -86,7 +86,7 @@ public class OrganizationMembersController {
         for (OrganizationMembership member : members) {
 
             result.add(new MemberWrapper(
-                    member.getId(),
+                    member.getMember().getId(),
                     member.getMember().getScreenName(),
                     member.getRole() != null ? member.getRole().name() : "",
                     member.getCreationDate()
@@ -97,16 +97,16 @@ public class OrganizationMembersController {
 
     }
 
-    @PatchMapping(value = "/{membershipID}",
+    @PatchMapping(value = "/{member}",
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity updateMemberRole(
             final TimeboardAuthentication authentication,
-            final @PathVariable Long membershipID,
+            final @PathVariable Account member,
             final @RequestBody MemberWrapper membershipWrapper) throws BusinessException {
 
 
         final Optional<OrganizationMembership> membershipOpt = this.organizationService
-                .findOrganizationMembership(authentication.getDetails(), authentication.getCurrentOrganization());
+                .findOrganizationMembership(member, authentication.getCurrentOrganization());
 
         if (membershipOpt.isPresent()) {
 
@@ -163,19 +163,16 @@ public class OrganizationMembersController {
 
     }
 
-    @GetMapping("/remove/{orgMemberID}")
+    @GetMapping("/remove/{member}")
     public ResponseEntity removeMember(final TimeboardAuthentication authentication,
-                                       @PathVariable final Long orgMemberID) throws BusinessException {
+                                       @PathVariable final Account member) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
 
-        if (orgMemberID == null) {
+        if (member == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect org member argument");
         }
-        final OrganizationMembership organizationMembership =
-                this.organizationService.findOrganizationMembership(actor, authentication.getCurrentOrganization()).get();
-        final Account member = organizationMembership.getMember();
 
         try {
             organizationService.removeMembership(actor, authentication.getCurrentOrganization(), member);

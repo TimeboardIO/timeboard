@@ -89,9 +89,12 @@ public class TimeboardAuthentication implements Authentication {
     }
 
     public void setOverriddenAccount(Account overriddenAccount) {
-        this.overriddenAccount = overriddenAccount;
+        this.overriddenAccount = null;
+        if(overriddenAccount != null && this.account.getId() != overriddenAccount.getId()) {
+            this.overriddenAccount = overriddenAccount;
+        }
     }
-    
+
 
     public Organization getCurrentOrganization() {
         return currentOrganization;
@@ -108,10 +111,10 @@ public class TimeboardAuthentication implements Authentication {
 
     @Transient
     public boolean currentOrganizationRole(final MembershipRole... roles) {
-        if (account == null || account.getOrganizationMemberships() == null || currentOrganization == null) {
+        if (this.getDetails() == null || this.getDetails().getOrganizationMemberships() == null || currentOrganization == null) {
             return false;
         }
-        return account.getOrganizationMemberships()
+        return this.getDetails().getOrganizationMemberships()
                 .stream()
                 .filter(o -> o.getOrganization() != null)
                 .filter(o -> o.getOrganization().getId() == currentOrganization.getId())
@@ -126,14 +129,14 @@ public class TimeboardAuthentication implements Authentication {
         }
         return project.getMembers()
                 .stream()
-                .filter(projectMembership -> projectMembership.getMember().getId() == account.getId())
+                .filter(projectMembership -> projectMembership.getMember().getId() == this.getDetails().getId())
                 .filter(projectMembership -> Arrays.asList(roles).contains(projectMembership.getRole()))
                 .count() > 0;
     }
 
     @Transient
     public boolean isPublicCurrentOrganization() {
-        return account.getOrganizationMemberships().stream()
+        return this.getDetails().getOrganizationMemberships().stream()
                 .map(o -> o.getOrganization())
                 .filter(o -> o.getId() == this.currentOrganization.getId())
                 .allMatch(o -> o.isPublicOrganisation());
