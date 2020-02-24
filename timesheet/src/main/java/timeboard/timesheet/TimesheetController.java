@@ -93,14 +93,7 @@ public class TimesheetController {
 
         final Account currentAccount = authentication.getDetails();
 
-        final Optional<OrganizationMembership> currentOrgMembership = this.organizationService
-                .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization());
-
-        if (!currentOrgMembership.isPresent()) {
-            throw new BusinessException("No membership for user " + authentication.getDetails() + " and org = " + authentication.getCurrentOrganization());
-        }
-
-        final Calendar beginWorkDate = currentOrgMembership.get().getCreationDate();
+        final Calendar beginWorkDate = findCurrentUserBeginWorkDate(authentication, currentAccount);
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
@@ -172,6 +165,21 @@ public class TimesheetController {
                 days, projects, imputations, canValidate);
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ts);
+    }
+
+    private Calendar findCurrentUserBeginWorkDate(
+            final TimeboardAuthentication authentication,
+            final Account currentAccount) throws BusinessException {
+
+        final Optional<OrganizationMembership> currentOrgMembership = this.organizationService
+                .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization());
+
+        if (!currentOrgMembership.isPresent()) {
+            throw new BusinessException("No membership for user " + authentication.getDetails() + " " +
+                    "and org = " + authentication.getCurrentOrganization());
+        }
+
+        return currentOrgMembership.get().getCreationDate();
     }
 
 

@@ -132,7 +132,13 @@ public class TimesheetServiceImpl implements TimesheetService {
         return processSubmission(timesheetOwner, year, week, currentOrg);
     }
 
-    private boolean checkPreviousWeekTimesheetValidation(final Organization currentOrg, final Account timesheetOwner, final int year, final int week, final boolean firstWeek) throws TimesheetException {
+    private boolean checkPreviousWeekTimesheetValidation(
+            final Organization currentOrg,
+            final Account timesheetOwner,
+            final int year,
+            final int week,
+            final boolean firstWeek) throws TimesheetException {
+
         final Calendar previousWeek = Calendar.getInstance();
         previousWeek.set(Calendar.WEEK_OF_YEAR, week);
         previousWeek.set(Calendar.YEAR, year);
