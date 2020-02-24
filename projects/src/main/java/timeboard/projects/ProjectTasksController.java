@@ -195,7 +195,7 @@ public class ProjectTasksController extends ProjectBaseController {
     }
 
     @GetMapping("/{task}")
-    protected String editTasks(
+    protected String getTask(
             final TimeboardAuthentication authentication,
             @PathVariable final Project project,
             @PathVariable final Long taskID, final Model model) throws BusinessException {
