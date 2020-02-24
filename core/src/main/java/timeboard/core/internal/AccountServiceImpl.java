@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.AbacEntries;
 import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.internal.rules.Rule;
@@ -39,7 +40,6 @@ import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
-import timeboard.core.api.AbacEntries;
 
 import javax.persistence.*;
 import javax.transaction.Transactional;

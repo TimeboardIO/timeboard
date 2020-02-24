@@ -61,10 +61,10 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     public boolean checkProjectEnabledLimit(final Account actor) throws CommercialException {
         final int numberEnabledProjects = this.getNumberEnabledProjects(actor);
         if (numberEnabledProjects >= limitEnabledProjectsInApp) {
-            final String message = "Limit reached "+numberEnabledProjects+"/"+limitEnabledProjectsInApp+
+            final String message = "Limit reached " + numberEnabledProjects + "/" + limitEnabledProjectsInApp +
                     " Project's creation impossible for " + actor.getScreenName() + "!";
             LOGGER.warn(message);
-            throw  new CommercialException(message);
+            throw new CommercialException(message);
         }
         return true;
     }
@@ -73,10 +73,10 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     public boolean checkProjectByUserLimit(final Account actor) throws CommercialException {
         final int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
-            final String message = "Limit reached "+numberProjectByUser+"/"+limitProjectsByUser+
+            final String message = "Limit reached " + numberProjectByUser + "/" + limitProjectsByUser +
                     " Project's creation impossible for " + actor.getScreenName() + "!";
             LOGGER.warn(message);
-            throw  new CommercialException(message);
+            throw new CommercialException(message);
         }
         return true;
     }
@@ -85,11 +85,11 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     public boolean checkTaskByProjectLimit(final Account actor, final Project project) throws CommercialException {
         final int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
-            final String message = "Limit reached "+numberTasksByProject+"/"+limitTasksByProject+
+            final String message = "Limit reached " + numberTasksByProject + "/" + limitTasksByProject +
                     " Project's creation impossible for " + actor.getScreenName() + "!";
 
             LOGGER.warn(message);
-            throw  new CommercialException(message);
+            throw new CommercialException(message);
         }
         return true;
     }

@@ -36,7 +36,6 @@ import timeboard.core.api.events.TimesheetEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
 import timeboard.core.model.*;
-import timeboard.core.api.AbacEntries;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -93,7 +92,7 @@ public class TimesheetServiceImpl implements TimesheetService {
                 previousWeek.get(Calendar.WEEK_OF_YEAR));
 
         if (!firstWeek && lastWeekValidatedOpt.isEmpty()) {
-            throw new TimesheetException("Can not submit week "+week+", previous week is not submitted");
+            throw new TimesheetException("Can not submit week " + week + ", previous week is not submitted");
         }
 
         final Calendar firstDayOfWeek = Calendar.getInstance();
@@ -116,7 +115,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Calendar currentDay = (Calendar) firstDayOfWeek.clone();
 
         final long nbDays = ChronoUnit.DAYS.between(firstDayOfWeek.toInstant(), lastDayOfWeek.toInstant());
-        final Double expectedSum = nbDays+1.0d; //nbDays is exclusive, add 1 to add inclusive days
+        final Double expectedSum = nbDays + 1.0d; //nbDays is exclusive, add 1 to add inclusive days
 
         final List<Date> days = new ArrayList<>();
 
@@ -134,7 +133,7 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Double result = q.getSingleResult();
 
         if (!result.equals(expectedSum)) {
-            throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to "+expectedSum+" Having : "+result);
+            throw new TimesheetException("Can not submit this week, all daily imputations totals are not equals to " + expectedSum + " Having : " + result);
         }
 
         return processSubmission(timesheetOwner, year, week, currentOrg);

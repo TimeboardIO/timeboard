@@ -49,7 +49,6 @@ import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.internal.rules.task.TaskHasStatus;
 import timeboard.core.model.*;
-import timeboard.core.api.AbacEntries;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -824,7 +823,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(null,'"+AbacEntries.REPORT_GENERATE_TAS+"')")
+    @PreAuthorize("hasPermission(null,'" + AbacEntries.REPORT_GENERATE_TAS + "')")
     public TASData generateTasData(final Account user, final Project project, final int month, final int year) {
 
         final TASData data = new TASData();

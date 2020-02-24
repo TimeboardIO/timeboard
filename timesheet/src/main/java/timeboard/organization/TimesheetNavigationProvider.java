@@ -27,8 +27,8 @@ package timeboard.organization;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.api.NavigationExtPoint;
 import timeboard.core.api.AbacEntries;
+import timeboard.core.api.NavigationExtPoint;
 
 import java.util.Calendar;
 import java.util.Date;

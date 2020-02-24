@@ -35,7 +35,6 @@ import timeboard.core.api.events.TimeboardEventType;
 import timeboard.core.api.events.VacationEvent;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
-import timeboard.core.api.AbacEntries;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
