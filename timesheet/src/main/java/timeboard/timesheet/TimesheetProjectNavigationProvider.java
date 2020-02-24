@@ -1,10 +1,10 @@
-package timeboard.organization;
+package timeboard.timesheet;
 
 /*-
  * #%L
  * timesheet
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,45 +28,28 @@ package timeboard.organization;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.AbacEntries;
-import timeboard.core.api.NavigationExtPoint;
-
-import java.util.Calendar;
-import java.util.Date;
-
+import timeboard.projects.api.ProjectNavigationProvider;
 
 @Component
-public class TimesheetNavigationProvider implements NavigationExtPoint {
-
+public class TimesheetProjectNavigationProvider implements ProjectNavigationProvider {
     @Override
     public String getNavigationLabel() {
-        return "nav.timesheet";
+        return "timesheet.validation";
     }
 
-    @Override
-    public String getNavigationParams() {
-        final Calendar c = Calendar.getInstance();
-        c.setTime(new Date());
-
-        return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));
-    }
 
     @Override
     public String getNavigationPath() {
-        return "/timesheet";
+        return ProjectTimesheetValidationController.PATH;
     }
 
     @Override
     public String getNavigationAction() {
-        return AbacEntries.TIMESHEET_VIEW;
+        return AbacEntries.TIMESHEET_VALIDATION_VIEW;
     }
 
     @Override
     public int getNavigationWeight() {
-        return 100;
-    }
-
-    @Override
-    public String getNavigationLogo() {
-        return "calendar alternate outline";
+        return 30;
     }
 }

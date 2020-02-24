@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.model.Organization;
 import timeboard.core.security.TimeboardAuthentication;
-import timeboard.organization.OrganizationSelectController;
+import timeboard.timesheet.OrganizationSelectController;
 
 import javax.servlet.*;
 import javax.servlet.http.Cookie;

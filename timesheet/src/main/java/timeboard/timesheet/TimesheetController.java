@@ -1,4 +1,4 @@
-package timeboard.organization;
+package timeboard.timesheet;
 
 /*-
  * #%L
@@ -85,18 +85,22 @@ public class TimesheetController {
         return this.fillAndDisplayTimesheetPage(authentication, user, c.get(Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR), model);
     }
 
-    @GetMapping(value = "/data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/data/{year}/{week}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<TimesheetWrapper> getTimesheetData(
             final TimeboardAuthentication authentication,
-            final @RequestParam("user") Account user,
-            final @RequestParam("week") int week,
-            final @RequestParam("year") int year) throws BusinessException {
+            final @PathVariable("week") int week,
+            final @PathVariable("year") int year) throws BusinessException {
 
-        final Account currentAccount = user;
+        final Account currentAccount = authentication.getDetails();
 
-        final Calendar beginWorkDate = this.organizationService
-                .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization())
-                .get().getCreationDate();
+        final Optional<OrganizationMembership> currentOrgMembership = this.organizationService
+                .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization());
+
+        if (!currentOrgMembership.isPresent()) {
+            throw new BusinessException("No membership for user " + authentication.getDetails() + " and org = " + authentication.getCurrentOrganization());
+        }
+
+        final Calendar beginWorkDate = currentOrgMembership.get().getCreationDate();
 
         final List<ProjectWrapper> projects = new ArrayList<>();
         final List<ImputationWrapper> imputations = new ArrayList<>();
@@ -110,38 +114,37 @@ public class TimesheetController {
                 firstDayOfWeek.getTime());
 
         //Get tasks for current week
-        if (this.projectService != null) {
-            this.projectService.listTasksByProject(
-                    authentication.getCurrentOrganization(),
-                    currentAccount,
-                    firstDayOfWeek.getTime(),
-                    lastDayOfWeek.getTime()).stream().forEach(projectTasks -> {
+        this.projectService.listTasksByProject(
+                authentication.getCurrentOrganization(),
+                currentAccount,
+                firstDayOfWeek.getTime(),
+                lastDayOfWeek.getTime()).stream().forEach(projectTasks -> {
 
-                final List<TaskWrapper> tasks = new ArrayList<>();
-                projectTasks.getTasks().forEach(task -> {
-                    tasks.add(new TaskWrapper(task.getId(), task.getName(),
-                            task.getComments(), task.getEffortSpent(),
-                            task.getEffortLeft(), task.getOriginalEstimate(),
-                            task.getRealEffort(), task.getStartDate(),
-                            task.getEndDate(), task.getTaskStatus().name(),
-                            task.getTaskType() != null ? task.getTaskType().getId() : 0)
-                    );
-                    days.forEach(dateWrapper -> {
-                        final double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
-                        imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
-                    });
+            final List<TaskWrapper> tasks = new ArrayList<>();
+            projectTasks.getTasks().forEach(task -> {
+                tasks.add(new TaskWrapper(task.getId(), task.getName(),
+                        task.getComments(), task.getEffortSpent(),
+                        task.getEffortLeft(), task.getOriginalEstimate(),
+                        task.getRealEffort(), task.getStartDate(),
+                        task.getEndDate(), task.getTaskStatus().name(),
+                        task.getTaskType() != null ? task.getTaskType().getId() : 0)
+                );
+                days.forEach(dateWrapper -> {
+                    final double i = task.findTaskImputationValueByDate(dateWrapper.date, currentAccount);
+                    imputations.add(new ImputationWrapper(task.getId(), i, dateWrapper.date));
                 });
-                projects.add(new ProjectWrapper(
-                        projectTasks.getProject().getId(),
-                        projectTasks.getProject().getName(),
-                        tasks));
             });
+            projects.add(new ProjectWrapper(
+                    projectTasks.getProject().getId(),
+                    projectTasks.getProject().getName(),
+                    tasks));
+        });
 
-            //Default tasks
-            final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, authentication.getCurrentOrganization(),
-                    imputations, firstDayOfWeek.getTime(), lastDayOfWeek.getTime(), days);
-            projects.add(new ProjectWrapper(0L, "Default Tasks", tasks));
-        }
+        //Default tasks
+        final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, authentication.getCurrentOrganization(),
+                imputations, firstDayOfWeek.getTime(), lastDayOfWeek.getTime(), days);
+        projects.add(new ProjectWrapper(0L, "Default Tasks", tasks));
+
         final boolean canValidate = this.projectService.isOwnerOfAnyUserProject(authentication.getDetails(), currentAccount);
         final Calendar creationDate = this.organizationService
                 .findOrganizationMembership(currentAccount, authentication.getCurrentOrganization())
@@ -499,6 +502,7 @@ public class TimesheetController {
     private Calendar findStartDate(final Calendar c) {
         final Calendar result = Calendar.getInstance();
         result.setTime(c.getTime());
+        result.setFirstDayOfWeek(Calendar.MONDAY);
         result.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         return result;
     }
@@ -506,6 +510,7 @@ public class TimesheetController {
     private Calendar findEndDate(final Calendar c) {
         final Calendar result = Calendar.getInstance();
         result.setTime(c.getTime());
+        result.setFirstDayOfWeek(Calendar.MONDAY);
         result.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         return result;
     }

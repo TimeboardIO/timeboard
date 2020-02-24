@@ -67,7 +67,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            timeboard.organization
+                            timeboard.timesheet
                         </Export-Package>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
