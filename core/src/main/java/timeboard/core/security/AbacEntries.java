@@ -69,4 +69,6 @@ public class AbacEntries {
 
     public static final String ORG_SETUP = "ORG_SETUP";
 
+    public static final String ORG_IMPERSONATE = "ORG_IMPERSONATE";
+
 }

@@ -52,6 +52,11 @@
     }
 </style>
 
+<div th:if="${impersonated}" class="ui fixed menu main" style="margin-top: 2rem;background-color: #00bfd8;">
+    <a th:href="@{/org/impersonate/cancel}" style="color: white;text-align: center;width: 100%;position: absolute;bottom: 0;font-weight: bold;">
+        You are using timeboard as <span th:text="${account.screenName}"></span> (click here to cancel)
+    </a>
+</div>
 
 <div class="ui fixed menu main"
      th:include="fragments/navigation.html :: nav(${path})"></div>

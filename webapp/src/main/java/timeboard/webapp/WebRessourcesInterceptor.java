@@ -100,6 +100,7 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     private void fillModelWithOrganization(final TimeboardAuthentication auth, final ModelMap modelMap) {
         modelMap.put("orgID", auth.getCurrentOrganization().getId());
         modelMap.put("currentOrg", auth.getCurrentOrganization());
+        modelMap.put("impersonated", auth.isImpersonalised());
     }
 
     @Override

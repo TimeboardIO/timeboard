@@ -53,6 +53,7 @@
       "PROJECT_CREATE",
       "PROJECT_ARCHIVE",
       "REPORT_LIST",
+      "ORG_IMPERSONATE",
       "ORG_SETUP"
     ],
     "conditions": [

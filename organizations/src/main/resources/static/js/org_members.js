@@ -35,7 +35,6 @@ let app = new Vue({
             });
         },
         updateRole: function(e, member){
-
             $.ajax({
                 type: "patch",
                 url: "/org/members/"+member.id,
@@ -43,8 +42,16 @@ let app = new Vue({
                 dataType: "json",
                 contentType: 'application/json; charset=utf-8'
             }).then(function(role){
-                              member.role = role;
-                          });
+                  member.role = role;
+            });
+        },
+        impersonateMember: function(e, member){
+            $.ajax({
+                type: "POST",
+                url: "/org/impersonate/"+member.id,
+            }).then(function(role){
+                window.location.href = '../../'; //two level up
+            });
         }
     }
 });
