@@ -28,6 +28,7 @@ package timeboard.core.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Calendar;
 
 
 @Entity
@@ -44,32 +45,52 @@ public class Report extends OrganizationEntity implements Serializable {
     private String filterProject;
 
     @Column
-    private ReportType type;
+    private String handlerID;
+
+    @Column
+    private String asyncTriggerKeyName;
+
+    @Column
+    @Temporal(TemporalType.TIMESTAMP)
+    private java.util.Calendar lastAsyncJobTrigger;
+
+    @Lob
+    @Column
+    private Serializable data;
 
 
     public Report() {
-        this.type = ReportType.PROJECT_KPI;
     }
 
-    public Report(String name, ReportType type, String filterProject) {
-        this.name = name;
-        this.type = type;
-        this.filterProject = filterProject;
+    public Serializable getData() {
+        return data;
+    }
+
+    public void setData(final Serializable data) {
+        this.data = data;
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
+    }
+
+    public String getHandlerID() {
+        return handlerID;
+    }
+
+    public void setHandlerID(final String handlerID) {
+        this.handlerID = handlerID;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -77,15 +98,23 @@ public class Report extends OrganizationEntity implements Serializable {
         return filterProject;
     }
 
-    public void setFilterProject(String filterProject) {
+    public void setFilterProject(final String filterProject) {
         this.filterProject = filterProject;
     }
 
-    public ReportType getType() {
-        return type;
+    public Calendar getLastAsyncJobTrigger() {
+        return lastAsyncJobTrigger;
     }
 
-    public void setType(ReportType type) {
-        this.type = type;
+    public void setLastAsyncJobTrigger(final Calendar lastAsyncJobTrigger) {
+        this.lastAsyncJobTrigger = lastAsyncJobTrigger;
+    }
+
+    public String getAsyncTriggerKeyName() {
+        return asyncTriggerKeyName;
+    }
+
+    public void setAsyncTriggerKeyName(final String asyncTriggerKeyName) {
+        this.asyncTriggerKeyName = asyncTriggerKeyName;
     }
 }

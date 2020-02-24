@@ -21,6 +21,34 @@ Vue.component('graph-modal', {
     }
 });
 
+// SYnc in progress or not
+const interval = 5000;  // 5000 = 5 seconds
+function showStateSync() {
+    $.ajax({
+        method: "GET",
+        url: "/projects/"+currentProjectID+"/tasks/sync/inProgress",
+        contentType: "application/json",
+        dataType: "json",
+        success: function (data) {
+            if(data == "IN_PROGRESS" && $('#jobInProgress').is(':hidden')){
+                $("#jobInProgress").show();
+            }
+            if(data == "NO_JOB" && $('#jobInProgress').is(':visible')){
+                $("#jobInProgress").hide();
+                document.location.reload(true);
+            }
+        },
+        error: function(data) {
+            console.log(data);
+        },
+        complete: function () {
+            // Schedule the next
+            setTimeout(showStateSync, interval);
+        }
+    });
+}
+showStateSync();
+
 
 // Form validations rules
 const formValidationRules = {
@@ -47,6 +75,10 @@ const formValidationRules = {
             identifier: 'taskOriginalEstimate',
             rules: [ { type   : 'empty', prompt : 'Please enter task original estimate in days'  },
             { type   : 'number', prompt : 'Please enter task a number original estimate in days'  } ]
+        },
+        taskComments: {
+            identifier: 'taskComments',
+            rules: [ { type   : 'maxLength[500]', prompt : 'Please enter a comment with less than 500 characters'  } ]
         }
     }
 };
@@ -60,6 +92,9 @@ const emptyTask =  {
     startDate: "",
     endDate:"",
     originalEstimate: 0,
+    realEffort: 0,
+    effortLeft: 0,
+    effortSpent: 0,
     typeID: 0,
     typeName: '',
     assignee: "",
@@ -68,6 +103,7 @@ const emptyTask =  {
     statusName: '',
     batchNames: [],
     batchIDs: [],
+    canChangeAssignee: true,
 };
 
 const projectID = $("meta[name='projectID']").attr('value');
@@ -77,11 +113,12 @@ const projectID = $("meta[name='projectID']").attr('value');
 let app = new Vue({
     el: '#tasksList',
     data: {
+        taskList : [],
         newTask: Object.assign({}, emptyTask),
         formError: "",
         batches: [],
         modalTitle: "Create task",
-        table: {
+        taskListConfig: {
             cols: [
                 {
                     "slot": "name",
@@ -99,12 +136,6 @@ let app = new Vue({
                     "slot": "end",
                     "label": "End date",
                     "sortKey": "taskEndDate"
-
-                },
-                {
-                    "slot": "oe",
-                    "label": "OE",
-                    "sortKey": "originalEstimate"
 
                 },
                 {
@@ -128,6 +159,30 @@ let app = new Vue({
                     "slot": "type",
                     "label": "Type",
                     "sortKey": "typeID"
+
+                },
+                {
+                    "slot": "es",
+                    "label": "ES",
+                    "sortKey": "effortSpent"
+
+                },
+                {
+                    "slot": "el",
+                    "label": "EL",
+                    "sortKey": "effortLeft"
+
+                },
+                {
+                    "slot": "re",
+                    "label": "RE",
+                    "sortKey": "realEffort"
+
+                },
+                {
+                    "slot": "oe",
+                    "label": "OE",
+                    "sortKey": "originalEstimate"
 
                 },
                 {
@@ -156,31 +211,43 @@ let app = new Vue({
                 type:      { filterKey: 'typeID', filterValue: [],
                                 filterFunction: (filters, row) => filters.length === 0 || filters.some(filter => parseInt(row) === parseInt(filter)) },
             },
-            data: [],
             name: 'tasks',
             configurable : true
         },
-        tablePending : {
+        pendingTaskListConfig : {
             cols: [], //will copy table columns
-            data: [],
             name: 'pending tasks',
             configurable : true
         },
-        tableByBatch : {}
+    },
+    computed : {
+        pendingTaskList : function () {
+            return this.taskList.filter(r => r.status === 'PENDING');
+        },
+        tableByBatch: function () {
+            let self = this;
+            let res = {};
+            this.batches.forEach(function(batch) {
+                res[batch.batchID] = self.taskList.filter(row => {
+                    return row.batchIDs.some(b => b === batch.batchID);
+                });
+            });
+            return res;
+        }
     },
     methods: {
         showGraphModal: function(projectID, task, event){
             $('.graph.modal').modal({ detachable : true, centered: true }).modal('show');
             $.ajax({
                 method: "GET",
-                url: "/api/tasks/chart?task="+task.taskID,
+                url: "/projects/"+currentProjectID+"/tasks/chart?task="+task.taskID,
                 success : function(data, textStatus, jqXHR) {
 
                     let listOfTaskDates = data.listOfTaskDates;
                     let effortSpentDataForChart = data.effortSpentData;
 
                     //chart config
-                    let chart = new Chart($("#lineChart"), {
+                    let chart = new Chart($("#taskLineChart"), {
                         type: 'line',
                         data: {
                             labels: listOfTaskDates,
@@ -214,26 +281,35 @@ let app = new Vue({
                 }
             });
         },
+        showImportModal: function (event) {
+            if (event) {
+                $('#'+event.target.getAttribute('modal-id')).modal('show')
+            }
+        },
         showCreateTaskModal: function(projectID, task, event){
             event.preventDefault();
             if(task){
                  this.modalTitle = "Edit task";
                 // load task data in modal
-                 this.newTask.projectID = currentProjectID;
-                 this.newTask.taskID = task.taskID;
-                 this.newTask.taskName = task.taskName;
-                 this.newTask.taskComments = task.taskComments;
-                 this.newTask.endDate = task.endDate;
-                 this.newTask.startDate = task.startDate;
-                 this.newTask.originalEstimate = task.originalEstimate;
-                 this.newTask.typeID = task.typeID;
-                 this.newTask.status = task.status;
+                this.newTask.projectID = currentProjectID;
+                this.newTask.taskID = task.taskID;
+                this.newTask.taskName = task.taskName;
+                this.newTask.taskComments = task.taskComments;
+                this.newTask.endDate = task.endDate;
+                this.newTask.startDate = task.startDate;
+                this.newTask.originalEstimate = task.originalEstimate;
+                this.newTask.effortLeft = task.effortLeft;
+                this.newTask.effortSpent = task.effortSpent;
+                this.newTask.realEffort = task.realEffort;
+                this.newTask.typeID = task.typeID;
+                this.newTask.status = task.status;
                 this.newTask.batchIDs = task.batchIDs;
                 this.newTask.batchNames = task.batchNames;
                 this.newTask.typeName = task.typeName;
                 this.newTask.statusName = task.statusName;
                 this.newTask.assignee = task.assignee;
                 this.newTask.assigneeID = task.assigneeID;
+                this.newTask.canChangeAssignee = task.canChangeAssignee;
 
             }else{
                  this.modalTitle = "Create task";
@@ -242,8 +318,8 @@ let app = new Vue({
             let self = this;
             $('.create-task.modal').modal({
                 onApprove : function($element) {
-                    var validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
-                    var object = {};
+                    let validated = $('.create-task .ui.form').form(formValidationRules).form('validate form');
+                    let object = {};
                     if(validated) {
                         $('.ui.error.message').hide();
                         $.ajax({
@@ -269,34 +345,57 @@ let app = new Vue({
             }).modal('show');
         },
         approveTask: function(event, task) {
+            let self = this;
             event.target.classList.toggle('loading');
-            $.get("/api/tasks/approve?task="+task.taskID)
-                .then(function(data) {
+            $.ajax({
+                type: "PATCH",
+                url: "/projects/" + currentProjectID + "/tasks/approve/" + task.taskID,
+                success: function (data) {
                     task.status = 'IN_PROGRESS';
+                    self.taskList.find(e => e.taskID === task.taskID).status = 'IN_PROGRESS';
                     event.target.classList.toggle('loading');
-                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
-                });
-        },
-        deleteTask: function(event, task) {
-            this.$refs.confirmModal.confirm("Are you sure you want to delete task "+ task.taskName + "?",
-                function() {
-                    event.target.classList.toggle('loading');
-                    $.get("/api/tasks/delete?task="+task.taskID)
-                        .then(function(data) {
-                            event.target.classList.toggle('loading');
-                            window.location.reload();
-                        });
-                });
-
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            });
         },
         denyTask: function(event, task) {
             event.target.classList.toggle('loading');
-            $.get("/api/tasks/deny?task="+task.taskID)
-                .then(function(data){
+            $.ajax({
+                type: "PATCH",
+                url: "/projects/"+currentProjectID+"/tasks/deny/"+task.taskID,
+                success: function (data) {
                     task.status = 'REFUSED';
+                    self.taskList.find(e => e.taskID === task.taskID).status = 'REFUSED';
                     event.target.classList.toggle('loading');
-                    app.tablePending.data = app.table.data.filter(r => r.status === 'PENDING');
+                },
+                error: function (data){
+                    console.log(data);
+                }
+            });
+        },
+        deleteTask: function(event, task) {
+            let message = '';
+            if(task.effortSpent > 0) message = message + 'Assigned user(s) have already added imputations for this task for a total effort spent of ' + task.effortSpent + '.\n';
+            message = message + 'Archiving will block all imputations on task. Are you sure you want to archive task '+ task.taskName + '?';
+
+            this.$refs.confirmModal.confirm(message,
+                function() {
+                    event.target.classList.toggle('loading');
+                    $.ajax({
+                        type: "DELETE",
+                        url: "/projects/"+currentProjectID+"/tasks/archive/"+task.taskID,
+                        success: function (data) {
+                            event.target.classList.toggle('loading');
+                            window.location.reload();
+                        },
+                        error: function (data){
+                            console.log(data);
+                        }
+                    });
                 });
+
         },
         toggleFilters : function() {
             $('.filters').toggle();
@@ -304,43 +403,35 @@ let app = new Vue({
     },
     created: function () {
         // copying table config to pending task table config
-        this.tablePending.cols = this.table.cols;
+        this.pendingTaskListConfig.cols = this.taskListConfig.cols;
 
         let self = this;
         if (currentBatchType !== 'Default') {
             $.ajax({
                 type: "GET",
                 dataType: "json",
-                url: "/api/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
+                url: "/projects/"+currentProjectID+"/tasks/batches?project=" + currentProjectID + "&batchType=" + currentBatchType,
                 success: function (d) {
                     self.batches = d;
-                    d.forEach(function(batch) {
-                        self.tableByBatch[batch.batchID] = Object.assign({}, self.table );
-                    });
                 }
             });
         }
 
-    },
-    updated: function () {
-        // ! \\ create a infinite loop
-       // this.tablePending.data = this.table.data.filter(r => r.status === 'PENDING');
     },
     mounted: function () {
         let self = this;
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "/api/tasks?project=" + currentProjectID,
+            url: "/projects/"+currentProjectID+"/tasks/list",
             success: function (d) {
-                self.table.data = d;
-                if(currentBatchType !== 'Default') {
+                self.taskList = d;
+                /*if(currentBatchType !== 'Default') {
                     // Spliting data by batch
                     self.batches.forEach(function(batch) {
                         self.tableByBatch[batch.batchID].data = d.filter(row => { return row.batchIDs.some(b => b === batch.batchID) });
                     });
-                }
-                self.tablePending.data = d.filter(r => r.status === 'PENDING');
+                }*/
                 $('.ui.dimmer').removeClass('active');
             }
         });

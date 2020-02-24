@@ -29,26 +29,27 @@ package timeboard.core.api;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.*;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
 public interface CalendarService {
+
+    String CALENDAR_VIEW = "CALENDAR_VIEW";
 
     boolean importCalendarAsTasksFromIcs(
             Account actor,
             String name,
             String ics,
             Project project,
-            boolean deleteOrphan) throws BusinessException, ParseException, IOException;
+            boolean deleteOrphan) throws BusinessException;
 
     boolean importCalendarAsImputationsFromIcs(
-            Account actor,
-            String ics,
-            AbstractTask task,
-            List<Account> accountList,
-            double value) throws BusinessException, ParseException, IOException;
+            final Organization org,
+            final Account actor,
+            final String ics,
+            final AbstractTask task,
+            final List<Account> accountList,
+            double value) throws BusinessException;
 
     Calendar createOrUpdateCalendar(String name, String remoteId);
 

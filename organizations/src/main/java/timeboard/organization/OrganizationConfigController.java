@@ -26,29 +26,29 @@ package timeboard.organization;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.TimeboardAuthentication;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.DefaultTask;
 import timeboard.core.model.Organization;
 import timeboard.core.model.TaskType;
+import timeboard.core.security.TimeboardAuthentication;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 /**
@@ -60,69 +60,186 @@ import java.util.Optional;
 @RequestMapping("/org/setup")
 public class OrganizationConfigController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     @Autowired
     public OrganizationService organizationService;
-
-    @Autowired
-    public ProjectService projectService;
-
     @Autowired
     public EncryptionService encryptionService;
+    @Value("${timeboard.tasks.default.vacation}")
+    private String defaultVacationTaskName;
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication,
-                               HttpServletRequest request, Model model) throws ServletException, IOException, BusinessException {
+    protected String handleGet(final TimeboardAuthentication authentication,
+                               final Model model) throws BusinessException {
 
-        final Account actor = authentication.getDetails();
-
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
-
-        final List<DefaultTask> defaultTasks = this.projectService.listDefaultTasks(new Date(), new Date());
-        final List<TaskType> taskTypes = this.projectService.listTaskType();
+        final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
+                new Date(), new Date());
+        final List<TaskType> taskTypes = this.organizationService.listTaskType(authentication.getCurrentOrganization());
 
         model.addAttribute("taskTypes", taskTypes);
         model.addAttribute("defaultTasks", defaultTasks);
-        if (organization.isPresent()) {
-            model.addAttribute("organization", organization.get());
-        }
-        return "details_org_config.html";
+        model.addAttribute("organization", authentication.getCurrentOrganization());
+
+        return "org_config.html";
 
     }
 
-    @PostMapping
-    protected String handlePost(TimeboardAuthentication authentication,
-                                HttpServletRequest request, Model model) throws Exception {
+    @GetMapping(value = "/default-task/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TaskWrapper>> listDefaultTasks(final TimeboardAuthentication authentication) throws BusinessException {
+        final List<DefaultTask> defaultTasks = this.organizationService.listDefaultTasks(authentication.getCurrentOrganization(),
+                new Date(), new Date());
+        return ResponseEntity.ok(defaultTasks.stream().filter(
+                t -> !t.getName().matches(defaultVacationTaskName)).map(TaskWrapper::new).collect(Collectors.toList()));
+    }
+
+    @GetMapping(value = "/task-type/list", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<TypeWrapper>> listTaskTypes(final TimeboardAuthentication authentication) throws BusinessException {
+        final List<TaskType> taskTypes = this.organizationService.listTaskType(authentication.getCurrentOrganization());
+        return ResponseEntity.ok(taskTypes.stream().map(TypeWrapper::new).collect(Collectors.toList()));
+    }
+
+    @PostMapping(value = "/default-task", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity addDefaultTask(final TimeboardAuthentication authentication,
+                                         @ModelAttribute final TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
+        final Account actor = authentication.getDetails();
+
+        this.organizationService.createDefaultTask(actor, authentication.getCurrentOrganization(), taskWrapper.getName());
+
+        return this.listDefaultTasks(authentication);
+    }
+
+    @PatchMapping(value = "/default-task/{taskID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateDefaultTask(final TimeboardAuthentication authentication, @PathVariable final Long taskID,
+                                            @ModelAttribute final TaskWrapper taskWrapper) throws JsonProcessingException, BusinessException {
 
         final Account actor = authentication.getDetails();
 
-        String action = request.getParameter("action");
-        Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, authentication.getCurrentOrganization());
+        final DefaultTask task = (DefaultTask) this.organizationService.getDefaultTaskByID(actor, taskWrapper.getId());
 
-        switch (action) {
-            case "CONFIG":
-                organization.get().setName(request.getParameter("organizationName"));
-                this.organizationService.updateOrganization(actor, organization.get());
-                break;
-            case "NEW_TASK":
-                this.projectService.createDefaultTask(actor, request.getParameter("newDefaultTask"));
-                break;
-            case "NEW_TYPE":
-                this.projectService.createTaskType(actor, request.getParameter("newTaskType"));
-                break;
-            case "DELETE_TYPE":
-                long typeID = Long.parseLong(request.getParameter("typeID"));
-                TaskType first = this.projectService.listTaskType()
-                        .stream().filter(taskType -> taskType.getId() == typeID).findFirst().get();
-                this.projectService.disableTaskType(actor, first);
-                break;
-            case "DELETE_TASK":
-                long taskID = Long.parseLong(request.getParameter("taskID"));
-                this.projectService.disableDefaultTaskByID(actor, taskID);
-                break;
+        task.setName(taskWrapper.getName());
+        this.organizationService.updateDefaultTask(actor, task);
+
+        return this.listDefaultTasks(authentication);
+    }
+
+    @DeleteMapping(value = "/default-task/{taskID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteDefaultTask(final TimeboardAuthentication authentication, @PathVariable final Long taskID) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+
+        this.organizationService.disableDefaultTaskByID(actor, authentication.getCurrentOrganization(), taskID);
+
+        return this.listDefaultTasks(authentication);
+    }
+
+
+    @PostMapping(value = "/task-type", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity addTaskType(final TimeboardAuthentication authentication,
+                                      @ModelAttribute final TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
+        final Account actor = authentication.getDetails();
+
+        this.organizationService.createTaskType(actor, authentication.getCurrentOrganization(), typeWrapper.getName());
+
+        return this.listTaskTypes(authentication);
+    }
+
+    @PatchMapping(value = "/task-type/{typeID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity updateTaskType(final TimeboardAuthentication authentication, @PathVariable final Long typeID,
+                                         @ModelAttribute final TypeWrapper typeWrapper) throws JsonProcessingException, BusinessException {
+
+        final Account actor = authentication.getDetails();
+
+        final TaskType type = this.organizationService.findTaskTypeByID(typeWrapper.getId());
+
+        type.setTypeName(typeWrapper.getName());
+        this.organizationService.updateTaskType(actor, type);
+
+        return this.listTaskTypes(authentication);
+    }
+
+    @DeleteMapping(value = "/task-type/{typeID}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteTaskType(final TimeboardAuthentication authentication, @PathVariable final Long typeID) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+        final TaskType type = organizationService.findTaskTypeByID(typeID);
+        this.organizationService.disableTaskType(actor, type);
+
+        return this.listTaskTypes(authentication);
+    }
+
+
+    @PostMapping
+    protected String handlePost(
+            final TimeboardAuthentication authentication,
+            final RedirectAttributes redirectAttributes,
+            final @ModelAttribute Organization model) throws Exception {
+
+        final Account actor = authentication.getDetails();
+        final Optional<Organization> updatedOrg = this.organizationService.updateOrganization(actor, model);
+        if (updatedOrg.isPresent()) {
+            redirectAttributes.addFlashAttribute("success", "Successfully updated..");
+        }
+        return "redirect:/org/setup";
+    }
+
+
+    public static class TaskWrapper implements Serializable {
+        public String name;
+        public long id;
+
+        public TaskWrapper() {
         }
 
-        //Extract organization
-        return this.handleGet(authentication, request, model);
+        public TaskWrapper(final DefaultTask task) {
+            this.name = task.getName();
+            this.id = task.getId();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(final String name) {
+            this.name = name;
+        }
+
+        public long getId() {
+            return this.id;
+        }
+
+        public void setId(final long id) {
+            this.id = id;
+        }
+
+
+    }
+
+    public static class TypeWrapper {
+        public String name;
+        public long id;
+
+        public TypeWrapper() {
+        }
+
+
+        public TypeWrapper(final TaskType type) {
+            this.name = type.getTypeName();
+            this.id = type.getId();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(final String name) {
+            this.name = name;
+        }
+
+        public long getId() {
+            return this.id;
+        }
+
+        public void setId(final long id) {
+            this.id = id;
+        }
     }
 }

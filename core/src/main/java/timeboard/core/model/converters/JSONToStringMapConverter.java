@@ -29,6 +29,8 @@ package timeboard.core.model.converters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -40,28 +42,29 @@ import java.util.Map;
 public class JSONToStringMapConverter implements AttributeConverter<Map<String, String>, String> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONToStringMapConverter.class);
 
     @Override
-    public String convertToDatabaseColumn(Map<String, String> stringStringMap) {
+    public String convertToDatabaseColumn(final Map<String, String> stringStringMap) {
         String res = "{}";
         try {
             res = OBJECT_MAPPER.writeValueAsString(stringStringMap);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        } catch (final JsonProcessingException e) {
+            LOGGER.error(e.getMessage());
         }
         return res;
     }
 
     @Override
-    public Map<String, String> convertToEntityAttribute(String s) {
+    public Map<String, String> convertToEntityAttribute(final String s) {
         Map<String, String> attrs = new HashMap<>();
 
-        TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+        final TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
         };
         try {
             attrs = OBJECT_MAPPER.readValue(s, typeRef);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (final IOException e) {
+            LOGGER.error(e.getMessage());
         }
         return attrs;
     }

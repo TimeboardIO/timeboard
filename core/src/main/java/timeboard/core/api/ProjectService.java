@@ -35,133 +35,97 @@ public interface ProjectService {
 
     String ORIGIN_TIMEBOARD = "timeboard";
 
+
     /*
     === Projects ===
     */
+    Project createProject(final Organization org, Account owner, String projectName) throws BusinessException;
 
-    Project createProject(Account owner, String projectName) throws BusinessException;
+    List<Project> listProjects(Account owner, Organization org);
 
-    List<Project> listProjects(Account owner,  Long orgID);
+    int countAccountProjectMemberships(Organization org, Account candidate);
 
-    Project getProjectByID(Account actor, Long orgID, Long projectID) throws BusinessException;
-
-    Project getProjectByIdWithAllMembers(Account actor, Long projectId) throws BusinessException;
-
-    Project getProjectByName(Account account, String projectArg) throws BusinessException;
+    Project getProjectByID(Account actor, Organization org, Long projectID) throws BusinessException;
 
     Project archiveProjectByID(Account actor, Project project) throws BusinessException;
 
     Project updateProject(Account actor, Project project) throws BusinessException;
 
-    /**
-     * Update a project.
-     *
-     * @param project
-     * @param memberships Key : userID, Value : user role for project param
-     */
-    Project updateProject(Account actor, Project project, Map<Long, MembershipRole> memberships) throws BusinessException;
+    Map<TaskType, ProjectDashboard> projectDashboardByTaskType(Account actor, Project project) throws BusinessException;
 
     ProjectDashboard projectDashboard(Account actor, Project project) throws BusinessException;
 
+    ProjectDashboard projectDashboardByBatch(Account actor, Project project, Batch batch) throws BusinessException;
+
     void save(Account actor, ProjectMembership projectMembership) throws BusinessException;
+
 
     /*
      == Tasks ==
      */
-
-    List<Task> listUserTasks(Account account);
+    List<Task> listUserTasks(Organization org, Account account);
 
     List<Task> listProjectTasks(Account account, Project project) throws BusinessException;
 
     AbstractTask getTaskByID(Account account, long id) throws BusinessException;
 
-    List<AbstractTask> getTasksByName(Account actor, String name);
+    List<ProjectTasks> listTasksByProject(Organization org, Account actor, Date ds, Date de);
 
-    List<ProjectTasks> listTasksByProject(Account actor, Date ds, Date de);
+    Task createTask(final Organization org,
+                    final Account actor,
+                    final Project project,
+                    final String taskName,
+                    final String taskComment,
+                    final Date startDate,
+                    final Date endDate,
+                    final double originalEstimate,
+                    final TaskType taskType,
+                    final Account assignedAccount,
+                    final String origin,
+                    final String remotePath,
+                    final String remoteId,
+                    final TaskStatus taskStatus,
+                    final Collection<Batch> batches);
 
-    Task createTask(Account actor, Project project, String taskName, String taskComment,
-                    Date startDate, Date endDate, double originalEstimate,
-                    Long taskTypeID, Account assignedAccountID, String origin,
-                    String remotePath, String remoteId,
-                    TaskStatus taskStatus, Batch batch);
-
-    void createTasks(Account actor, List<Task> taskList);
-
-    Task updateTask(Account actor, Task task);
+    /**
+     * Update task in database
+     *
+     * @param org   relevant {@link Organization} ID
+     * @param actor issuer {@link Account}
+     * @param task  {@link Task} to update in database
+     * @return updated {@link Task}
+     */
+    Task updateTask(final Organization org,
+                    final Account actor,
+                    final Task task);
 
     void updateTasks(Account actor, List<Task> taskList);
 
+    Optional<Imputation> getImputation(Account user, AbstractTask task, Date day);
+
     UpdatedTaskResult updateTaskEffortLeft(Account actor, Task task, double effortLeft) throws BusinessException;
 
-    void deleteTaskByID(Account actor, long taskID) throws BusinessException;
+    void archiveTaskByID(Account actor, long taskID) throws BusinessException;
 
-    void deleteTasks(Account actor, List<Task> taskList);
+    void deleteTaskByID(Account actor, Long taskID) throws BusinessException;
 
-    /**
-     * Search existing task from specific origin.
-     *
-     * @param project    target project
-     * @param origin     source (Github, GitLab, Jira, ...)
-     * @param remotePath string key of source characteristics (owner, repository, ...)
-     * @return list of task corresponding to the origin
-     */
-    Map<String, Task> searchExistingTasksFromOrigin(Account actor,
-                                                    Project project,
-                                                    String origin,
-                                                    String remotePath) throws BusinessException;
-
+    void archiveTasks(Account actor, List<Task> taskList);
 
 
     Optional<Task> getTaskByRemoteID(Account actor, String id);
 
-    /*
-     == Imputations ==
-     */
+    /* == Imputations == */
 
     /**
      * Return effort spent for a task.
      *
      * @return List all effort spent for a task.
      */
-    List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor,
-                                                     Task task,
-                                                     Date startTaskDate,
+    List<ValueHistory> getEffortSpentByTaskAndPeriod(Account actor, Task task, Date startTaskDate,
                                                      Date endTaskDate) throws BusinessException;
 
-    List<ValueHistory> getTaskEffortLeftHistory(Account actor, Task task) throws BusinessException;
 
-    UpdatedTaskResult updateTaskImputation(Account actor,
-                                           AbstractTask task,
-                                           Date day, double imputation) throws BusinessException;
-
-    List<UpdatedTaskResult> updateTaskImputations(Account actor, List<Imputation> imputationsList);
-
-
-    /*
-     == Default Tasks ==
-     */
-    List<DefaultTask> listDefaultTasks(Date ds, Date de);
-
-    /**
-     * Create a default task.
-     *
-     * @return DefaultTask
-     */
-    DefaultTask createDefaultTask(Account actor, String task) throws BusinessException;
-
-    /**
-     * default tasks can not be deleted, so they are set disabled and hidden from UI
-     *
-     * @param actor
-     * @param taskID
-     * @throws BusinessException
-     */
-    void disableDefaultTaskByID(Account actor, long taskID) throws BusinessException;
-
-
-    /*
-     == Batches ==
-     */
+    /* == Batches == */
 
     /**
      * Return all batches for a project.
@@ -178,6 +142,7 @@ public interface ProjectService {
      * @return Batch
      */
     Batch getBatchById(Account actor, long id) throws BusinessException;
+
 
     /**
      * Create a batch.
@@ -211,20 +176,9 @@ public interface ProjectService {
                           Batch currentBatch,
                           List<Task> newTasks, List<Task> oldTasks) throws BusinessException;
 
-    TaskType createTaskType(Account actor, String name);
-
-    void disableTaskType(Account actor, TaskType type);
-
-    /**
-     * Return task types.
-     *
-     * @return List all task types.
-     */
-    List<TaskType> listTaskType();
-
-    TaskType findTaskTypeByID(Long taskTypeID);
 
     TASData generateTasData(Account user, Project project, int month, int year);
+
     /*
      == Rule ==
      */
@@ -234,4 +188,8 @@ public interface ProjectService {
     List<Batch> getBatchList(Account user, Project project, BatchType batchType) throws BusinessException;
 
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
+
+    List<Account> findOwnersOfAnyUserProject(Account user);
+
+    boolean isOwnerOfAnyUserProject(Account owner, Account user);
 }

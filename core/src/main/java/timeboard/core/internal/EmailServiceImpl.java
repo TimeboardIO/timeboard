@@ -27,10 +27,12 @@ package timeboard.core.internal;
  */
 
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.EmailService;
-import timeboard.core.observers.emails.EmailStructure;
+import timeboard.core.internal.observers.emails.EmailStructure;
+import timeboard.core.internal.observers.emails.TemplateGenerator;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -39,6 +41,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.util.List;
+import java.util.Locale;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -53,32 +56,48 @@ public class EmailServiceImpl implements EmailService {
     private String host;
     @Value("${timeboard.mail.port}")
     private String port;
+    @Value("${timeboard.smtp.username}")
+    private String username;
+    @Value("${timeboard.smtp.password}")
+    private String password;
 
+
+    @Autowired
+    private TemplateGenerator templateGenerator;
 
     @Override
-    public void sendMessage(EmailStructure emailStructure) throws MessagingException {
-        Properties props = new Properties();
+    public void sendMessage(final EmailStructure emailStructure, Locale locale) throws MessagingException {
+        final Properties props = new Properties();
         props.setProperty("mail.host", host);
         props.setProperty("mail.smtp.port", port);
+        props.setProperty("mail.smtp.username", username);
+        props.setProperty("mail.smtp.password", password);
 
-        Session session = Session.getInstance(props, null);
+        final Session session = Session.getInstance(props, null);
 
-        MimeMessage msg = new MimeMessage(session);
-        msg.setSubject(emailStructure.getSubject());
+        final String message = templateGenerator.getTemplateString(emailStructure.getTemplate(), emailStructure.getModel(), locale);
+
+        final MimeMessage msg = new MimeMessage(session);
+        msg.setSubject("[Timeboard] " + emailStructure.getSubject());
         msg.setFrom(new InternetAddress(fromEmail));
-        msg.setContent(emailStructure.getMessage(), "text/html; charset=utf-8");
+        msg.setContent(message, "text/html; charset=utf-8");
 
-        List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList()
+        final List<String> listToEmailsWithoutDuplicate = emailStructure.getTargetUserList()
                 .stream().distinct().collect(Collectors.toList());
-        String targetToEmails = StringUtils.join(listToEmailsWithoutDuplicate, ',');
+        final String targetToEmails = StringUtils.join(listToEmailsWithoutDuplicate, ',');
         msg.addRecipients(Message.RecipientType.TO, InternetAddress.parse(targetToEmails));
 
         if (emailStructure.getTargetCCUserList() != null) {
-            List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList()
+            final List<String> listCCEmailsWithoutDuplicate = emailStructure.getTargetCCUserList()
                     .stream().distinct().collect(Collectors.toList());
-            String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
+            final String targetCCEmails = StringUtils.join(listCCEmailsWithoutDuplicate, ',');
             msg.addRecipients(Message.RecipientType.CC, InternetAddress.parse(targetCCEmails));
         }
         Transport.send(msg);
+    }
+
+
+    public void sendMessage(final EmailStructure emailStructure) throws MessagingException {
+        this.sendMessage(emailStructure, Locale.FRANCE);
     }
 }

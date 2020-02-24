@@ -37,7 +37,7 @@ public enum BatchType {
 
     public final String label;
 
-    private BatchType(String label) {
+    private BatchType(final String label) {
         this.label = label;
     }
 

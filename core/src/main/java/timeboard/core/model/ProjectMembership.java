@@ -49,17 +49,18 @@ public class ProjectMembership extends OrganizationEntity {
     }
 
 
-    public ProjectMembership(Project project, Account owner, MembershipRole role) {
+    public ProjectMembership(final Project project, final Account owner, final MembershipRole role) {
         this.member = owner;
         this.role = role;
         this.project = project;
+
     }
 
     public Long getMembershipID() {
         return membershipID;
     }
 
-    public void setMembershipID(Long membershipID) {
+    public void setMembershipID(final Long membershipID) {
         this.membershipID = membershipID;
     }
 
@@ -67,7 +68,7 @@ public class ProjectMembership extends OrganizationEntity {
         return member;
     }
 
-    public void setMember(Account member) {
+    public void setMember(final Account member) {
         this.member = member;
     }
 
@@ -75,7 +76,7 @@ public class ProjectMembership extends OrganizationEntity {
         return project;
     }
 
-    public void setProject(Project project) {
+    public void setProject(final Project project) {
         this.project = project;
     }
 
@@ -83,7 +84,7 @@ public class ProjectMembership extends OrganizationEntity {
         return role;
     }
 
-    public void setRole(MembershipRole role) {
+    public void setRole(final MembershipRole role) {
         this.role = role;
     }
 }

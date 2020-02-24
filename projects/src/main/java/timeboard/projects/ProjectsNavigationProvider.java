@@ -27,7 +27,8 @@ package timeboard.projects;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.api.AbacEntries;
+import timeboard.core.api.NavigationExtPoint;
 
 
 @Component
@@ -35,12 +36,17 @@ public class ProjectsNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Projects";
+        return "nav.projects";
     }
 
     @Override
     public String getNavigationPath() {
         return "/projects";
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return AbacEntries.PROJECT_LIST;
     }
 
     @Override

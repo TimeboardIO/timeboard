@@ -32,16 +32,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
-import timeboard.home.model.Week;
+import timeboard.core.model.ValidationStatus;
+import timeboard.core.security.TimeboardAuthentication;
+import timeboard.home.model.WeekWrapper;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 @Controller
@@ -49,6 +47,10 @@ import java.util.List;
 public class HomeController {
 
     public static final String URI = "/home";
+    public static final String NB_PROJECTS = "nb_projects";
+    public static final String NB_TASKS = "nb_tasks";
+    public static final String WEEKS = "weeks";
+    public static final String HOME_VIEW = "HOME_VIEW";
 
     @Autowired
     private ProjectService projectService;
@@ -62,37 +64,54 @@ public class HomeController {
     }
 
     @GetMapping
-    protected String handleGet(TimeboardAuthentication authentication, Model model) {
+    public String handleGet(final TimeboardAuthentication authentication, final Model model) {
 
 
         //load previous weeks data
-        Date d = new Date();
-        Calendar calendar = Calendar.getInstance();
+        final Date d = new Date();
+        final Calendar calendar = Calendar.getInstance();
         calendar.setTime(d);
-        List<Week> weeks = new ArrayList<>();
+        calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        final List<WeekWrapper> weeks = new ArrayList<>();
         final Account account = authentication.getDetails();
-        int weeksToDisplay = 3; // actual week and the two previous ones
+        final int weeksToDisplay = 3; // actual week and the two previous ones
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
-                boolean weekIsValidated = timesheetService.isTimesheetValidated(
+                final Optional<ValidationStatus> timesheetStatusOpt = timesheetService.getTimesheetValidationStatus(
+                        authentication.getCurrentOrganization(),
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
 
-                calendar.set(Calendar.DAY_OF_WEEK, 2); // Monday
-                Date firstDayOfWeek = calendar.getTime();
-                calendar.set(Calendar.DAY_OF_WEEK, 1); // Sunday
-                Date lastDayOfWeek = calendar.getTime();
-                Double weekSum = this.timesheetService.getSumImputationForWeek(firstDayOfWeek, lastDayOfWeek, account);
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                final Date firstDayOfWeek = calendar.getTime();
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+                final Date lastDayOfWeek = calendar.getTime();
 
-                Week week = new Week(calendar.get(Calendar.WEEK_OF_YEAR), calendar.get(Calendar.YEAR), weekSum, weekIsValidated);
+                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(
+                        authentication.getCurrentOrganization(),
+                        firstDayOfWeek, lastDayOfWeek,
+                        account).values().stream().reduce(Double::sum).orElse(0.0);
+
+                final WeekWrapper week = new WeekWrapper(
+                        calendar.get(Calendar.WEEK_OF_YEAR),
+                        calendar.get(Calendar.YEAR),
+                        weekSum,
+                        timesheetStatusOpt.orElse(null),
+                        firstDayOfWeek,
+                        lastDayOfWeek);
+
                 weeks.add(week);
                 calendar.roll(Calendar.WEEK_OF_YEAR, -1);
             }
         }
 
-        model.addAttribute("nb_projects", this.projectService.listProjects(account, authentication.getCurrentOrganization()).size());
-        model.addAttribute("nb_tasks", this.projectService.listUserTasks(account).size());
-        model.addAttribute("weeks", weeks);
+        model.addAttribute(NB_PROJECTS, this.projectService
+                .countAccountProjectMemberships(authentication.getCurrentOrganization(), account));
+
+        model.addAttribute(NB_TASKS, this.projectService
+                .listUserTasks(authentication.getCurrentOrganization(), account).size());
+
+        model.addAttribute(WEEKS, weeks);
 
         return "home.html";
     }

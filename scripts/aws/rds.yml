@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  DBUser:
+    Type: 'String'
+  DBPassword:
+    Type: 'String'
+  DBSubnetA:
+    Type: 'AWS::EC2::Subnet::Id'
+  DBSubnetB:
+    Type: 'AWS::EC2::Subnet::Id'
+  DBSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup::Id'
+Resources:
+
+  MySQLDatabase:
+    Type: 'AWS::RDS::DBInstance'
+    Properties:
+      AllocatedStorage: '30'
+      StorageType: 'gp2'
+      PubliclyAccessible: 'false'
+      DBInstanceClass: 'db.t2.micro'
+      DBName: 'Timeboard'
+      Engine: MySQL
+      BackupRetentionPeriod: 0
+      EngineVersion: '8.0.16'
+      VPCSecurityGroups:
+        - !Ref DBSecurityGroup
+      DBSubnetGroupName:
+        Ref: DBSubnetGroup
+      MasterUserPassword:
+        Ref: DBPassword
+      MasterUsername:
+        Ref: DBUser
+
+  DBSubnetGroup:
+    Type: 'AWS::RDS::DBSubnetGroup'
+    Properties:
+      DBSubnetGroupDescription: 'Timeboard DBSubnet'
+      SubnetIds:
+        - Ref: DBSubnetA
+        - Ref: DBSubnetB
+
+Outputs:
+  MySQLDNS:
+    Description: Databse DNS Name
+    Value: !GetAtt MySQLDatabase.Endpoint.Address
+  MySQLPort:
+    Description: Databse Prot
+    Value: !GetAtt MySQLDatabase.Endpoint.Port

@@ -1,0 +1,14 @@
+AWSTemplateFormatVersion: 2010-09-09
+Parameters:
+  TimeboardApplicationName:
+    Type: 'String'
+Resources:
+  WebAppBT:
+    Type: AWS::ElasticBeanstalk::Application
+    Properties: 
+      ApplicationName: !Ref TimeboardApplicationName
+      Description: 'AWS Elastic Beanstalk Timeboard Application'
+Outputs:
+  AppID:
+    Description: Timeboard ElasticBeansTalk App ID
+    Value: !Ref WebAppBT

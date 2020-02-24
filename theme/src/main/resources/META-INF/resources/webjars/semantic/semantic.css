@@ -785,7 +785,7 @@ td {
   text-align: center;
 }
 
-.ui.segment {
+.ui.segment:not(.visible) {
   -webkit-box-shadow: none !important;
   box-shadow: none !important;
   border: none !important;
@@ -811,6 +811,14 @@ h2.ui.header,
   color: #00bfd8;
 }
 
+div.pointing:nth-child(1) > a:nth-child(1),
+div.pointing:nth-child(1) > a:nth-child(1):hover {
+  background-color: #00bfd8;
+  border-bottom-left-radius: 0 !important;
+  color: #FFFFFF;
+  cursor: default;
+}
+
 ui.input.error > input {
   background-color: #fff !important;
   border-color: #e0b4b4 !important;
@@ -818,7 +826,7 @@ ui.input.error > input {
 }
 
 .day-badge {
-  width: 2.5rem;
+  min-width: 2.5rem !important;
   height: 2.5rem;
 }
 
@@ -835,6 +843,58 @@ table,
 }
 
 /** Timesheet **/
+
+#timesheet {
+  /** input number **/
+}
+
+#timesheet .hatchedBackground {
+  background: -webkit-repeating-linear-gradient(45deg, lightgray, lightgray 10px, white 10px, white 20px);
+  background: repeating-linear-gradient(45deg, lightgray, lightgray 10px, white 10px, white 20px);
+}
+
+#timesheet .hatchedBackground input {
+  color: rgba(40, 40, 40, 0.3);
+}
+
+#timesheet .ui.button,
+#timesheet .ui.buttons .button,
+#timesheet .ui.buttons .or {
+  font-size: 0.85714286rem !important;
+}
+
+#timesheet input {
+  -moz-appearance: textfield;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 100%;
+  min-height: 1.5rem;
+  min-width: 3rem;
+  padding: 0.4375rem 0.875rem;
+  -webkit-transition: border-color 0.15s;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+
+#timesheet input::-webkit-outer-spin-button,
+#timesheet input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+
+@media only screen and (max-width: 767px) {
+  #timesheet .ui.table:not(.unstackable) thead {
+    display: none !important;
+  }
+}
+
+#timesheet input:disabled,
+#timesheet input[readonly] {
+  color: lightgrey;
+}
 
 #timesheet table td {
   padding: 0.3rem 0.3rem;
@@ -873,8 +933,13 @@ table,
   background-color: rgba(128, 128, 200, 0.3);
 }
 
+#timesheet .timesheet-menu {
+  background-color: white !important;
+  border-radius: 0.5rem !important;
+}
+
 #timesheet .timesheet-navigation-controls {
-  margin-bottom: 1em;
+  margin-bottom: 0em;
   text-align: right;
 }
 
@@ -901,6 +966,15 @@ table,
 #timesheet th.project {
   font-size: 1em !important;
   font-weight: normal;
+}
+
+.calendar.ui.celled.table tr td,
+.calendar.ui.celled.table tr th {
+  border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
+}
+
+.calendar-cell {
+  width: 25px;
 }
 
 /** PROJECT **/
@@ -971,7 +1045,7 @@ table,
   padding: 0.5rem 1rem 0.5rem;
   text-transform: none;
   text-shadow: none;
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1em;
   font-style: normal;
   text-align: center;
@@ -32945,13 +33019,13 @@ select.ui.dropdown {
 
 .ui.modal > .header {
   display: block;
-  font-family: 'Lato', 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-family: 'Raleway', 'Verdana', Geneva, sans-serif;
   background: #FFFFFF;
   margin: 0em;
   padding: 1.25rem 1.5rem;
   -webkit-box-shadow: none;
   box-shadow: none;
-  color: rgba(0, 0, 0, 0.85);
+  color: #393939;
   border-bottom: 1px solid rgba(34, 36, 38, 0.15);
 }
 
@@ -33109,7 +33183,7 @@ select.ui.dropdown {
   .ui.modal > .close {
     top: 1.0535rem;
     right: 1rem;
-    color: rgba(0, 0, 0, 0.87);
+    color: #393939;
   }
 }
 
@@ -33214,11 +33288,11 @@ select.ui.dropdown {
 }
 
 .ui.inverted.dimmer > .basic.modal {
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 .ui.inverted.dimmer > .ui.basic.modal > .header {
-  color: rgba(0, 0, 0, 0.85);
+  color: #393939;
 }
 
 /* Resort to margin positioning if legacy */
@@ -33359,7 +33433,7 @@ select.ui.dropdown {
 .ui.fullscreen.modal > .close {
   top: 1.0535rem;
   right: 1rem;
-  color: rgba(0, 0, 0, 0.87);
+  color: #393939;
 }
 
 /*--------------
@@ -33543,6 +33617,12 @@ select.ui.dropdown {
 /*******************************
          Theme Overrides
 *******************************/
+
+.ui.modal > .close {
+  top: 0rem;
+  right: 0rem;
+  color: black;
+}
 
 /*******************************
          Site Overrides

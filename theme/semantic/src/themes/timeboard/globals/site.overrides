@@ -25,7 +25,7 @@ th, td {
 }
 
 
-.ui.segment {
+.ui.segment:not(.visible) {
   box-shadow: none !important;
   border: none !important;
   background: transparent !important;
@@ -49,6 +49,17 @@ h2.ui.header, .ui.large.header {
 
 }
 
+div.pointing:nth-child(1) > a:nth-child(1),
+div.pointing:nth-child(1) > a:nth-child(1):hover {
+
+  background-color: @primaryColor;
+  border-bottom-left-radius: 0 !important;
+  color: @white;
+  cursor: default;
+
+}
+
+
 ui.input.error > input {
     background-color: @veryLightRed !important;
     border-color: @inputBorderColor !important;
@@ -56,8 +67,9 @@ ui.input.error > input {
 
 }
 
+
 .day-badge {
-  width: 2.5rem;
+  min-width: 2.5rem !important;
   height: 2.5rem;
 }
 
@@ -74,6 +86,52 @@ table, .controls {
 /** Timesheet **/
 
 #timesheet {
+
+  .hatchedBackground {
+    background: repeating-linear-gradient( 45deg, lightgray, lightgray 10px, white 10px, white 20px );
+    input {
+      color : rgba(40,40,40,.3);
+    }
+  }
+  .ui.button, .ui.buttons .button, .ui.buttons .or {
+
+    font-size: .85714286rem !important;
+
+  }
+
+
+  /** input number **/
+
+  input {
+    -moz-appearance: textfield;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    display: block;
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 100%;
+    min-height: 1.5rem;
+    min-width: 3rem;
+    padding: 0.4375rem 0.875rem;
+    transition: border-color 0.15s;
+    width: 100%;
+
+  }
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  @media only screen and (max-width:767px) {
+    .ui.table:not(.unstackable) thead {
+      display: none !important;
+    }
+  }
+  input:disabled,
+  input[readonly] {
+    color: lightgrey;
+  }
 
   table td{
     padding: 0.3rem 0.3rem;
@@ -106,12 +164,16 @@ table, .controls {
   td:focus {
       background-color: rgba(128,128,200,0.3);
   }
-  .timesheet-navigation-controls{
-      margin-bottom: 1em;
+  .timesheet-menu {
+    background-color: white !important;
+    border-radius: 0.5rem !important;
+  }
+  .timesheet-navigation-controls {
+      margin-bottom: 0em;
       text-align: right;
   }
 
-  .timesheet-validation-controls{
+  .timesheet-validation-controls {
       margin-top: 1em;
   }
 
@@ -139,6 +201,14 @@ table, .controls {
 }
 
 
+.calendar.ui.celled.table tr td, .calendar.ui.celled.table tr th {
+
+  border-left: 1px solid rgba(34,36,38,.1) !important;
+}
+
+.calendar-cell {
+  width: 25px;
+}
 
 
 /** PROJECT **/
@@ -179,3 +249,4 @@ table, .controls {
   padding: 1.1em 1em !important;
 
 }
+

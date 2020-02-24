@@ -26,16 +26,20 @@ package timeboard.core.api.sync;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import timeboard.core.model.Account;
 
 import java.util.List;
 
 public interface ProjectSyncPlugin {
 
+    static final Logger LOGGER = LoggerFactory.getLogger(ProjectSyncPlugin.class);
+
     String getServiceName();
 
-    default String getServiceID(){
-        return this.getServiceName().toLowerCase().replace(" ","");
+    default String getServiceID() {
+        return this.getServiceName().toLowerCase().replace(" ", "");
     }
 
     List<ProjectSyncCredentialField> getSyncCredentialFields();

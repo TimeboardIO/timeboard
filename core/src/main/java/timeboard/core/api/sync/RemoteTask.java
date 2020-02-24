@@ -12,10 +12,10 @@ package timeboard.core.api.sync;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,11 +26,12 @@ package timeboard.core.api.sync;
  * #L%
  */
 
+import timeboard.core.model.Account;
 import timeboard.core.model.Task;
 
 import java.util.Date;
 
-public class RemoteTask {
+public class RemoteTask implements Cloneable {
 
     private String id;
     private String title;
@@ -39,7 +40,7 @@ public class RemoteTask {
     private String origin;
     private Date startDate;
     private Date stopDate;
-    private Long localUserID;
+    private Account localUser;
 
     public Task toTask() {
         return null;
@@ -49,7 +50,7 @@ public class RemoteTask {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -57,7 +58,7 @@ public class RemoteTask {
         return title;
     }
 
-    public void setTitle(String summary) {
+    public void setTitle(final String summary) {
         this.title = summary;
     }
 
@@ -65,7 +66,7 @@ public class RemoteTask {
         return userName;
     }
 
-    public void setUserName(String userName) {
+    public void setUserName(final String userName) {
         this.userName = userName;
     }
 
@@ -73,7 +74,7 @@ public class RemoteTask {
         return origin;
     }
 
-    public void setOrigin(String o) {
+    public void setOrigin(final String o) {
         this.origin = o;
     }
 
@@ -81,23 +82,23 @@ public class RemoteTask {
         return startDate;
     }
 
-    public void setStartDate(Date date) {
+    public void setStartDate(final Date date) {
         this.startDate = date;
     }
 
-    public Long getLocalUserID() {
-        return localUserID;
+    public Account getLocalUser() {
+        return localUser;
     }
 
-    public void setLocalUserID(Long localUserID) {
-        this.localUserID = localUserID;
+    public void setLocalUser(final Account localUser) {
+        this.localUser = localUser;
     }
 
     public String getComments() {
         return comments;
     }
 
-    public void setComments(String comments) {
+    public void setComments(final String comments) {
         this.comments = comments;
     }
 
@@ -105,7 +106,22 @@ public class RemoteTask {
         return stopDate;
     }
 
-    public void setStopDate(Date stopDate) {
+    public void setStopDate(final Date stopDate) {
         this.stopDate = stopDate;
     }
+
+    @Override
+    public Object clone() {
+        final RemoteTask clone = new RemoteTask();
+        clone.id = this.title;
+        clone.title = this.title;
+        clone.userName = this.userName;
+        clone.comments = this.comments;
+        clone.origin = this.origin;
+        clone.startDate = this.startDate;
+        clone.stopDate = this.stopDate;
+        clone.localUser = this.localUser;
+        return clone;
+    }
+
 }

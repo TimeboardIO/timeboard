@@ -12,10 +12,10 @@ package timeboard.plugin.project.export.xls;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,20 +31,25 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ProjectExportService;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
 
 
 @Component
 public class XlsExportPlugin implements ProjectExportService {
 
+    @Autowired
+    private OrganizationService organizationService;
 
     @Autowired
     private ProjectService projectService;
@@ -60,31 +65,33 @@ public class XlsExportPlugin implements ProjectExportService {
     }
 
     @Override
-    public void export(Account actor, long orgID, long projectID, OutputStream output) throws IOException, BusinessException {
+    public void export(final Account actor, final long orgID, final long projectID, final OutputStream output) throws IOException, BusinessException {
 
-        final Project project = this.projectService.getProjectByID(actor, orgID, projectID);
+        final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, orgID);
 
-        String sheetName = project.getName();
+        final Project project = this.projectService.getProjectByID(actor, org.get(), projectID);
 
-       try(HSSFWorkbook wb = new HSSFWorkbook()) {
-           HSSFSheet sheet = wb.createSheet(sheetName);
+        final String sheetName = project.getName();
 
-           HSSFRow headerRow = sheet.createRow(0);
-           headerRow.createCell(0).setCellValue("Task name");
-           headerRow.createCell(1).setCellValue("Task Original Estimate");
+        try (final HSSFWorkbook wb = new HSSFWorkbook()) {
+            final HSSFSheet sheet = wb.createSheet(sheetName);
 
-           int rowNum = 1;
-           for (Task task : this.projectService.listProjectTasks(actor, project)) {
+            final HSSFRow headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Task name");
+            headerRow.createCell(1).setCellValue("Task Original Estimate");
 
-               HSSFRow taskRow = sheet.createRow(rowNum);
+            int rowNum = 1;
+            for (final Task task : this.projectService.listProjectTasks(actor, project)) {
 
-               taskRow.createCell(0).setCellValue(task.getName());
-               taskRow.createCell(1).setCellValue(task.getOriginalEstimate());
-               rowNum++;
-           }
+                final HSSFRow taskRow = sheet.createRow(rowNum);
 
-           wb.write(output);
-       }
+                taskRow.createCell(0).setCellValue(task.getName());
+                taskRow.createCell(1).setCellValue(task.getOriginalEstimate());
+                rowNum++;
+            }
+
+            wb.write(output);
+        }
 
     }
 

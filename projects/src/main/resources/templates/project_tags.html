@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{project_layout.html(tab='five')}"
+<html layout:decorate="~{project_layout.html(tab='project.tab.tags')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
@@ -14,7 +14,7 @@
 
 
 <div layout:fragment="placeholder">
-    <div id="components-demo">
+    <div id="projectTags">
 
         <div class="ui menu">
             <a class="item"
@@ -24,7 +24,7 @@
             </a>
         </div>
 
-        <data-table v-bind:config="table">
+        <data-table v-bind:table="tagsListData" v-bind:config="tagsListConfig">
             <template v-slot:tagkey="{row}">
                 <div class="ui input">
                     <input type="text" v-model="row.tagKey"/>

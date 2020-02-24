@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{layouts/general.html(path='/reports')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title layout:fragment="title">View Report Page</title>
+    <meta name="reportID" th:content="${report.id}"/>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <div class="ui segment">
+        <h4 class="ui dividing header">
+
+            <a class="ui button" th:href="@{/reports}">
+                <i class="left arrow icon"></i>
+                Back
+            </a>
+
+            Report <span th:text="${report.getName()}"></span></h4>
+
+        <h3 style="text-align: center" th:text="#{${reportController.handlerLabel()}}"></h3>
+
+        <div class="ui segment"
+             th:include="fragments/__${fragment}__ :: report"></div>
+
+        <br>
+    </div>
+</div>
+</body>
+</html>

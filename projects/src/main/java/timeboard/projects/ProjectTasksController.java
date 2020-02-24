@@ -27,112 +27,178 @@ package timeboard.projects;
  */
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.DataTableService;
+import timeboard.core.api.OrganizationService;
+import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
-import timeboard.core.api.sync.ProjectSyncService;
-import timeboard.core.async.AsyncJobService;
 import timeboard.core.model.*;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}")
-public class ProjectTasksController {
+@RequestMapping("/projects/{project}" + ProjectTasksController.URL)
+public class ProjectTasksController extends ProjectBaseController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    public static final String URL = "/tasks";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProjectTasksController.class);
 
     @Autowired
     public ProjectService projectService;
 
     @Autowired
+    public OrganizationService organizationService;
+
+    @Autowired
     public DataTableService dataTableService;
-
-    @Autowired
-    public AsyncJobService asyncJobService;
-
-    @Autowired
-    public ProjectSyncService projectSyncService;
 
     @Autowired(required = false)
     public List<ProjectSyncPlugin> projectImportServiceList;
 
-    @GetMapping("/tasks")
-    protected String listTasks(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID, Model model) throws BusinessException {
-
-        final Account actor = authentication.getDetails();
+    @GetMapping
+    protected String handleGet(
+            final TimeboardAuthentication authentication,
+            @PathVariable final Project project, final Model model) throws BusinessException {
 
         final Task task = new Task();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("task", new TaskForm(task));
-        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
         model.addAttribute("batchType", "Default");
+        this.initModel(model, authentication, project);
         return "project_tasks.html";
     }
 
+    @GetMapping("/list")
+    public ResponseEntity getTasks(final TimeboardAuthentication authentication,
+                                   final HttpServletRequest request,
+                                   @PathVariable final Project project) throws JsonProcessingException {
 
-    @GetMapping("/tasks/group/{batchType}")
+        final Account actor = authentication.getDetails();
+
+        try {
+            if (project == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body("Project does not exists or you don't have enough permissions to access it.");
+            }
+            List<Task> tasks = this.projectService.listProjectTasks(actor, project);
+            tasks = tasks.stream().filter(e -> e.getTaskStatus() != TaskStatus.ARCHIVED).collect(Collectors.toList());
+
+            final List<TasksRestAPI.TaskWrapper> result = new ArrayList<>();
+
+            for (final Task task : tasks) {
+                Account assignee = task.getAssigned();
+                if (assignee == null) {
+                    assignee = new Account();
+                    assignee.setId(0);
+                    assignee.setName("");
+                    assignee.setFirstName("");
+                }
+
+                final List<Long> batchIDs = new ArrayList<>();
+                final List<String> batchNames = new ArrayList<>();
+
+                task.getBatches().forEach(b -> {
+                    batchIDs.add(b.getId());
+                    batchNames.add(b.getScreenName());
+                });
+                result.add(new TasksRestAPI.TaskWrapper(
+                        task.getId(),
+                        task.getName(),
+                        task.getComments(),
+                        task.getOriginalEstimate(),
+                        task.getRealEffort(),
+                        task.getEffortLeft(),
+                        task.getEffortSpent(),
+                        task.getStartDate(),
+                        task.getEndDate(),
+                        assignee.getId() == 0 ? "" : assignee.getScreenName(),
+                        assignee.getId(),
+                        task.getTaskStatus().name(),
+                        task.getTaskType() != null ? task.getTaskType().getId() : 0L,
+                        batchIDs, batchNames,
+                        task.getTaskStatus().name(),
+                        task.getTaskType() != null ? task.getTaskType().getTypeName() : "",
+                        task.getEffortSpent() == 0
+                ));
+
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(result.toArray());
+        } catch (final BusinessException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+
+    }
+
+    @GetMapping("/group/{batchType}")
     protected String listTasksGroupByBatchType(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID, @PathVariable String batchType, Model model) throws BusinessException {
+            final TimeboardAuthentication authentication,
+            @PathVariable final Project project,
+            @PathVariable final String batchType,
+            final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
         final Task task = new Task();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
+        final BatchType javaBatchType = BatchType.valueOf(batchType.toUpperCase());
         model.addAttribute("batchType", batchType);
         model.addAttribute("batchList", this.projectService.getBatchList(actor, project, javaBatchType));
 
         model.addAttribute("task", new TaskForm(task));
-        model.addAttribute("import", this.asyncJobService.getAccountJobs(actor).size());
+        model.addAttribute("import", 0);
         model.addAttribute("sync_plugins", this.projectImportServiceList);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
         return "project_tasks.html";
     }
 
-    private void fillModel(Model model, Account actor, Project project) throws BusinessException {
+    private void fillModel(final Model model,
+                           final Organization org,
+                           final TimeboardAuthentication auth,
+                           final Project project) throws BusinessException {
+
         model.addAttribute("project", project);
-        model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
-        model.addAttribute("taskTypes", this.projectService.listTaskType());
+        model.addAttribute("tasks", this.projectService.listProjectTasks(auth.getDetails(), project));
+        model.addAttribute("taskTypes", this.organizationService.listTaskType(org));
         model.addAttribute("allTaskStatus", TaskStatus.values());
-        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(actor, project));
-        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(actor, project));
-        model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(actor, project));
+        model.addAttribute("allProjectBatches", this.projectService.listProjectBatches(auth.getDetails(), project));
+        model.addAttribute("allProjectBatchTypes", this.projectService.listProjectUsedBatchType(auth.getDetails(), project));
+        model.addAttribute("isProjectOwner", this.projectService.isProjectOwner(auth.getDetails(), project));
         model.addAttribute("dataTableService", this.dataTableService);
         model.addAttribute("projectMembers", project.getMembers());
+        this.initModel(model, auth, project);
     }
 
-    @GetMapping("/tasks/{taskID}")
+    @GetMapping("/{task}")
     protected String editTasks(
-                    TimeboardAuthentication authentication,
-                    @PathVariable Long projectID,
-                    @PathVariable Long taskID, Model model) throws BusinessException {
+            final TimeboardAuthentication authentication,
+            @PathVariable final Project project,
+            @PathVariable final Long taskID, final Model model) throws BusinessException {
 
         final Account actor = authentication.getDetails();
 
@@ -140,46 +206,207 @@ public class ProjectTasksController {
 
         model.addAttribute("task", new TaskForm(task));
 
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        fillModel(model, actor, project);
+        fillModel(model, authentication.getCurrentOrganization(), authentication, project);
 
 
         return "project_tasks.html";
     }
 
-    @PostMapping(value = "/tasks/sync/{serviceName}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    protected String importFromJIRA(
-            TimeboardAuthentication authentication,
-            @PathVariable Long projectID,
-            @PathVariable String serviceName,
-            @RequestBody MultiValueMap<String, String> formBody) throws BusinessException, JsonProcessingException {
-
+    @PatchMapping("/approve/{taskID}")
+    public ResponseEntity approveTask(final TimeboardAuthentication authentication,
+                                      @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
-
-        final List<ProjectSyncCredentialField> creds = this.projectSyncService.getServiceFields(serviceName);
-
-        creds.forEach(field -> {
-            if(formBody.containsKey(field.getFieldKey())){
-                field.setValue(formBody.get(field.getFieldKey()).get(0));
-            }
-        });
-
-        this.projectSyncService.syncProjectTasks(actor, actor, project, serviceName, creds);
-
-
-        return "redirect:/projects/"+projectID+"/tasks";
+        return this.changeTaskStatus(
+                authentication.getCurrentOrganization(),
+                actor,
+                taskID,
+                TaskStatus.IN_PROGRESS);
     }
 
-    @PostMapping("/tasks")
+    @PatchMapping("/deny/{taskID}")
+    public ResponseEntity denyTask(final TimeboardAuthentication authentication,
+                                   @PathVariable final Long taskID) {
+        final Account actor = authentication.getDetails();
+        return this.changeTaskStatus(
+                authentication.getCurrentOrganization(),
+                actor,
+                taskID,
+                TaskStatus.REFUSED);
+    }
+
+    private ResponseEntity changeTaskStatus(final Organization org,
+                                            final Account actor,
+                                            final Long taskID,
+                                            final TaskStatus status) {
+
+
+        if (taskID == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
+        }
+
+        final Task task;
+        try {
+            task = (Task) this.projectService.getTaskByID(actor, taskID);
+            task.setTaskStatus(status);
+            this.projectService.updateTask(org, actor, task);
+
+        } catch (final ClassCastException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task is not a project task.");
+        } catch (final Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Task id not found.");
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/archive/{taskID}")
+    public ResponseEntity archiveTask(final TimeboardAuthentication authentication,
+                                      @PathVariable final Long taskID) {
+        final Account actor = authentication.getDetails();
+
+        if (taskID == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
+        }
+
+        try {
+            projectService.archiveTaskByID(actor, taskID);
+        } catch (final Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+
+    @GetMapping("/batches")
+    public ResponseEntity getBatches(final TimeboardAuthentication authentication,
+                                     final HttpServletRequest request) {
+        final Account actor = authentication.getDetails();
+        Project project = null;
+
+        final String strProjectID = request.getParameter("project");
+        final String strBatchType = request.getParameter("batchType");
+
+        Long projectID = null;
+        if (strProjectID != null) {
+            projectID = Long.parseLong(strProjectID);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect project argument");
+        }
+
+        BatchType batchType = null;
+        if (strBatchType != null) {
+            batchType = BatchType.valueOf(strBatchType.toUpperCase());
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect batchType argument");
+        }
+
+        try {
+            project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+        } catch (final BusinessException e) {
+            // just handling exception
+        }
+        if (project == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+        }
+
+        List<Batch> batchList = null;
+        try {
+            batchList = projectService.getBatchList(actor, project, batchType);
+        } catch (final BusinessException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Project does not exists or you don't have enough permissions to access it.");
+        }
+
+        final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
+        final Project finalProject = project;
+        batchList.forEach(batch -> {
+            ProjectDashboard dashboardBatch = null;
+            try {
+                dashboardBatch = this.projectService.projectDashboardByBatch(actor, finalProject, batch);
+            } catch (BusinessException e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+            batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName(), dashboardBatch.getOriginalEstimate(),
+                    dashboardBatch.getEffortLeft(), dashboardBatch.getRealEffort(), dashboardBatch.getEffortSpent()));
+        });
+        return ResponseEntity.status(HttpStatus.OK).body(batchWrapperList.toArray());
+    }
+
+    @GetMapping("/chart")
+    public ResponseEntity getDatasForCharts(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest request) throws BusinessException, JsonProcessingException {
+
+        final TasksRestAPI.TaskGraphWrapper wrapper = new TasksRestAPI.TaskGraphWrapper();
+        final Account actor = authentication.getDetails();
+
+        final String taskIdStr = request.getParameter("task");
+        Long taskID = null;
+        if (taskIdStr != null) {
+            taskID = Long.parseLong(taskIdStr);
+        }
+        if (taskID == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid argument taskId.");
+        }
+
+        final Task task = (Task) this.projectService.getTaskByID(actor, taskID);
+
+        // Datas for dates (Axis X)
+        final String formatLocalDate = "yyyy-MM-dd";
+        final String formatDateToDisplay = "dd/MM/yyyy";
+        final LocalDate start = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getStartDate()));
+        final LocalDate end = LocalDate.parse(new SimpleDateFormat(formatLocalDate).format(task.getEndDate()));
+        final List<String> listOfTaskDates = start.datesUntil(end.plusDays(1))
+                .map(localDate -> localDate.format(DateTimeFormatter.ofPattern(formatDateToDisplay)))
+                .collect(Collectors.toList());
+        wrapper.setListOfTaskDates(listOfTaskDates);
+
+        // Datas for effort spent (Axis Y)
+        final List<ValueHistory> effortSpentDB = this.projectService.getEffortSpentByTaskAndPeriod(actor,
+                task, task.getStartDate(), task.getEndDate());
+        final ValueHistory[] lastEffortSpentSum = {new ValueHistory(task.getStartDate(), 0.0)};
+        final Map<Date, Double> effortSpentMap = listOfTaskDates
+                .stream()
+                .map(dateString -> {
+                    return formatDate(formatDateToDisplay, dateString);
+                })
+                .map(date -> effortSpentDB.stream()
+                        .filter(es -> new SimpleDateFormat(formatDateToDisplay)
+                                .format(es.getDate()).equals(new SimpleDateFormat(formatDateToDisplay).format(date)))
+                        .map(effort -> {
+                            lastEffortSpentSum[0] = new ValueHistory(date, effort.getValue());
+                            return lastEffortSpentSum[0];
+                        })
+                        .findFirst().orElse(new ValueHistory(date, lastEffortSpentSum[0].getValue())))
+                .collect(Collectors.toMap(
+                        e -> e.getDate(),
+                        e -> e.getValue(),
+                        (x, y) -> y, LinkedHashMap::new
+                ));
+        wrapper.setEffortSpentData(effortSpentMap.values());
+
+        return ResponseEntity.status(HttpStatus.OK).body(wrapper);
+
+    }
+
+    private Date formatDate(final String formatDateToDisplay, final String dateString) {
+        try {
+            return new SimpleDateFormat(formatDateToDisplay).parse(dateString);
+        } catch (final ParseException e) {
+            LOGGER.error(e.getMessage());
+        }
+        return null;
+    }
+
+    @PostMapping
     protected String handlePost(
-            TimeboardAuthentication authentication,
-            HttpServletRequest request, Model model,  RedirectAttributes attributes) throws BusinessException {
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest request, final Model model, final RedirectAttributes attributes) throws BusinessException {
 
-        Account actor = authentication.getDetails();
+        final Account actor = authentication.getDetails();
 
-        long projectID = Long.parseLong(request.getParameter("projectID"));
+        final long projectID = Long.parseLong(request.getParameter("projectID"));
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
         model.addAttribute("tasks", this.projectService.listProjectTasks(actor, project));
@@ -203,10 +430,10 @@ public class ProjectTasksController {
         private TaskStatus taskStatus;
         private List<Long> batchesID;
 
-        public TaskForm(Task task) {
+        public TaskForm(final Task task) {
             this.taskID = task.getId();
             this.taskType = task.getTaskType();
-            if( task.getBatches() != null){
+            if (task.getBatches() != null) {
                 this.batchesID = new ArrayList<>();
                 task.getBatches().forEach(batch -> batchesID.add(batch.getId()));
             }
@@ -225,7 +452,7 @@ public class ProjectTasksController {
             return taskID;
         }
 
-        public void setTaskID(Long taskID) {
+        public void setTaskID(final Long taskID) {
             this.taskID = taskID;
         }
 
@@ -253,7 +480,7 @@ public class ProjectTasksController {
             return assignedUserID;
         }
 
-        public void setAssignedUserID(Long assignedUserID) {
+        public void setAssignedUserID(final Long assignedUserID) {
             this.assignedUserID = assignedUserID;
         }
 
@@ -261,7 +488,7 @@ public class ProjectTasksController {
             return taskTypeID;
         }
 
-        public void setTaskTypeID(Long taskTypeID) {
+        public void setTaskTypeID(final Long taskTypeID) {
             this.taskTypeID = taskTypeID;
         }
 
@@ -269,7 +496,7 @@ public class ProjectTasksController {
             return taskType;
         }
 
-        public void setTaskType(TaskType taskType) {
+        public void setTaskType(final TaskType taskType) {
             this.taskType = taskType;
         }
 
@@ -277,7 +504,7 @@ public class ProjectTasksController {
             return assignedAccount;
         }
 
-        public void setAssignedAccount(Account assignedAccount) {
+        public void setAssignedAccount(final Account assignedAccount) {
             this.assignedAccount = assignedAccount;
         }
 
@@ -285,7 +512,7 @@ public class ProjectTasksController {
             return taskStatus;
         }
 
-        public void setTaskStatus(TaskStatus taskStatus) {
+        public void setTaskStatus(final TaskStatus taskStatus) {
             this.taskStatus = taskStatus;
         }
 
@@ -293,7 +520,7 @@ public class ProjectTasksController {
             return batchesID;
         }
 
-        public void setBatchesID(List<Long> batchesID) {
+        public void setBatchesID(final List<Long> batchesID) {
             this.batchesID = batchesID;
         }
     }

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html layout:decorate="~{project_layout.html(tab='third')}"
+<html layout:decorate="~{project_layout.html(tab='project.tab.batches')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
@@ -22,7 +22,7 @@
             </a>
         </div>
 
-        <data-table v-bind:config="table">
+        <data-table v-bind:table="batchesListData" v-bind:config="batchesListConfig">
             <template v-slot:name="{row}">
                 {{row.name}}
             </template>
@@ -73,7 +73,6 @@
 
             </template>
         </tmodal>
-
     </div>
 </div>
 

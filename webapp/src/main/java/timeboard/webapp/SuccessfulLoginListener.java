@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,7 +33,7 @@ import org.springframework.security.authentication.event.InteractiveAuthenticati
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Component;
-import timeboard.core.api.UserService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 
@@ -42,25 +42,25 @@ import timeboard.core.model.Account;
 public class SuccessfulLoginListener {
 
     @Autowired
-    private UserService userService;
+    private AccountService accountService;
 
 
     @EventListener
-    public void doSomething(InteractiveAuthenticationSuccessEvent event) throws BusinessException {
+    public void doSomething(final InteractiveAuthenticationSuccessEvent event) throws BusinessException {
 
 
         final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();
 
-        if(account == null){
-            if(event.getSource() instanceof OAuth2AuthenticationToken) {
+        if (account == null) {
+            if (event.getSource() instanceof OAuth2AuthenticationToken) {
                 final OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) event.getSource();
-                this.userService.userProvisionning((String) token.getPrincipal().getAttributes().get("sub"),
+                this.accountService.userProvisioning((String) token.getPrincipal().getAttributes().get("sub"),
                         (String) token.getPrincipal().getAttributes().get("email"));
             }
 
-            if(event.getSource() instanceof UsernamePasswordAuthenticationToken) {
+            if (event.getSource() instanceof UsernamePasswordAuthenticationToken) {
                 final UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) event.getSource();
-                this.userService.userProvisionning(token.getName(), token.getName());
+                this.accountService.userProvisioning(token.getName(), token.getName());
             }
         }
     }

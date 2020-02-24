@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html layout:decorate="mail/global.html"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div layout:fragment="content">
+        <tr>
+            <td class="innerpadding borderbottom">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <tr>
+                        <td class="bodycopy">
+                            Hello, here is your daily Timeboard report.
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td class="innerpadding borderbottom">
+                <!--[if (gte mso 9)|(IE)]>
+                <table width="380" align="left" cellpadding="0" cellspacing="0" border="0">
+                    <tr>
+                        <td>
+                <![endif]-->
+
+                <div th:include="mail/tasks.html :: tasks"></div>
+                <div th:include="mail/timesheet.html :: timesheet"></div>
+                <div th:include="mail/vacation.html :: vacation"></div>
+
+                <!--[if (gte mso 9)|(IE)]>
+                </td>
+                </tr>
+                </table>
+                <![endif]-->
+            </td>
+        </tr>
+    </div>
+</body>
+</html>

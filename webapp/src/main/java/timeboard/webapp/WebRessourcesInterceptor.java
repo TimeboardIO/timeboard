@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -37,17 +37,10 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.WebRequestInterceptor;
 import timeboard.core.api.DataTableService;
-import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.ui.CssService;
-import timeboard.core.ui.JavascriptService;
-import timeboard.core.ui.NavigationEntryRegistryService;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
-import java.util.Optional;
 
 @Component
 public class WebRessourcesInterceptor implements WebRequestInterceptor {
@@ -58,27 +51,19 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     private String appName;
 
     @Autowired
-    private JavascriptService javascriptService;
-
-    @Autowired
-    private CssService cssService;
-
-    @Autowired
     private NavigationEntryRegistryService navRegistry;
 
     @Autowired
     private DataTableService dataTableService;
 
-    @Autowired
-    private OrganizationService organizationService;
 
     private String version = "";
 
     @PostConstruct
-    private void init() throws Exception{
-        try(final InputStream versionStream = this.getClass().getClassLoader().getResourceAsStream("version")) {
+    private void init() throws Exception {
+        try (final InputStream versionStream = this.getClass().getClassLoader().getResourceAsStream("version")) {
             if (versionStream != null) {
-                byte[] array = IOUtils.toByteArray(versionStream);
+                final byte[] array = IOUtils.toByteArray(versionStream);
                 version = new String(array, "UTF-8");
                 LOGGER.info("Timeboard version is {}", version);
             }
@@ -86,47 +71,40 @@ public class WebRessourcesInterceptor implements WebRequestInterceptor {
     }
 
     @Override
-    public void preHandle(WebRequest webRequest) throws Exception {
+    public void preHandle(final WebRequest webRequest) throws Exception {
 
     }
 
     @Override
-    public void postHandle(WebRequest webRequest, ModelMap modelMap) throws Exception {
+    public void postHandle(final WebRequest webRequest, final ModelMap modelMap) throws Exception {
 
 
-        if(modelMap != null && webRequest.getUserPrincipal() != null) {
-            final Account account = (Account) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        if (modelMap != null && webRequest.getUserPrincipal() != null) {
+            final TimeboardAuthentication authentication = (TimeboardAuthentication) SecurityContextHolder.getContext().getAuthentication();
 
-            modelMap.put("account", account);
-            modelMap.put("navs", navRegistry.getEntries());
-            modelMap.put("javascripts", javascriptService.listJavascriptUrls());
-            modelMap.put("CSSs", cssService.listCSSUrls());
+            modelMap.put("account", authentication.getDetails());
+            modelMap.put("navs", navRegistry.getEntries(authentication));
             modelMap.put("dataTableService", dataTableService);
-            Long orgaID = ThreadLocalStorage.getCurrentOrganizationID();
-            if(orgaID != null) {
-                fillModelWithOrganization(account, modelMap, orgaID);
+            if (authentication.getCurrentOrganization() != null) {
+                fillModelWithOrganization(authentication, modelMap);
             }
 
         }
 
-        if(modelMap != null){
+        if (modelMap != null) {
             modelMap.put("appName", appName);
             modelMap.put("appVersion", version);
         }
     }
 
-    private void fillModelWithOrganization(Account account, ModelMap modelMap, Long orgaID) {
-        modelMap.put("orgID", orgaID);
-        Optional<Organization> organisation = organizationService.getOrganizationByID(account, orgaID);
-        if(organisation.isPresent()){
-            modelMap.put("currentOrg", organisation.get());
-        }else{
-            LOGGER.warn("User : {} try to access missing org : {}", account, orgaID);
-        }
+    private void fillModelWithOrganization(final TimeboardAuthentication auth, final ModelMap modelMap) {
+        modelMap.put("orgID", auth.getCurrentOrganization().getId());
+        modelMap.put("currentOrg", auth.getCurrentOrganization());
+        modelMap.put("impersonated", auth.isImpersonalised());
     }
 
     @Override
-    public void afterCompletion(WebRequest webRequest, Exception e) throws Exception {
+    public void afterCompletion(final WebRequest webRequest, final Exception e) throws Exception {
 
     }
 }

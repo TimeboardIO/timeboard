@@ -29,7 +29,7 @@ package timeboard.core.model;
 import javax.persistence.*;
 
 @Entity
-public class TaskType {
+public class TaskType extends OrganizationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -48,7 +48,7 @@ public class TaskType {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -56,7 +56,7 @@ public class TaskType {
         return typeName;
     }
 
-    public void setTypeName(String typeName) {
+    public void setTypeName(final String typeName) {
         this.typeName = typeName;
     }
 
@@ -64,7 +64,7 @@ public class TaskType {
         return enable;
     }
 
-    public void setEnable(boolean active) {
+    public void setEnable(final boolean active) {
         this.enable = active;
     }
 }

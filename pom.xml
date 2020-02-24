@@ -9,20 +9,21 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-            <module>core</module>
-            <module>theme</module>
-            <module>core-ui</module>
-            <module>home</module>
-            <module>projects</module>
-            <module>organizations</module>
-            <module>timesheet</module>
-            <module>sample-data</module>
-            <module>account</module>
-            <module>reports</module>
-            <module>webapp</module>
-            <module>plugins/project-jira-import-plugin</module>
-            <module>plugins/project-github-import-plugin</module>
-            <module>plugins/project-xls-export-plugin</module>
+        <module>build-tools</module>
+        <module>core</module>
+        <module>theme</module>
+        <module>home</module>
+        <module>projects</module>
+        <module>organizations</module>
+        <module>timesheet</module>
+        <module>account</module>
+        <module>reports</module>
+        <module>vacations</module>
+        <module>webapp</module>
+        <module>plugins/project-jira-import-plugin</module>
+        <module>plugins/project-github-import-plugin</module>
+        <module>plugins/project-xls-export-plugin</module>
+        <module>integ-tests</module>
     </modules>
     <dependencies>
         <dependency>
@@ -46,6 +47,12 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit</artifactId>
+                <version>0.13.0</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
@@ -118,10 +125,19 @@
                 <artifactId>rxjava</artifactId>
                 <version>2.2.0</version>
             </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>4.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.2</version>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
-
 
 
     <build>
@@ -183,6 +199,32 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.12.0</version>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <rulesets>
+                        <ruleset>timeboard_pmd.xml</ruleset>
+                    </rulesets>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>build-tools</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.1.0</version>
                 <dependencies>
@@ -191,9 +233,14 @@
                         <artifactId>checkstyle</artifactId>
                         <version>8.24</version>
                     </dependency>
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>build-tools</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
                 </dependencies>
                 <configuration>
-                    <configLocation>timeboard_checkstyle.xml</configLocation>
+                    <configLocation>build-tools/src/main/resources/timeboard_checkstyle.xml</configLocation>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>

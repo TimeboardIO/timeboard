@@ -45,7 +45,7 @@ import java.util.List;
 @Transactional
 public class DataTableServiceImpl implements DataTableService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
 
     @Autowired
     private EntityManager em;
@@ -54,13 +54,13 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public boolean checkColumnDisplayed(String tableId, Account actor, String colName) {
+    public boolean checkColumnDisplayed(final String tableId, final Account actor, final String colName) {
         return checkColumnDisplayedFromDB(tableId, actor, colName);
     }
 
     @Override
-    public boolean checkColumnDisplayedFromDB(String tableId, Account actor, String colName) {
-        DataTableConfig tableConfig = findTableConfigByUserAndTable(tableId, actor);
+    public boolean checkColumnDisplayedFromDB(final String tableId, final Account actor, final String colName) {
+        final DataTableConfig tableConfig = findTableConfigByUserAndTable(tableId, actor);
         if (tableConfig == null) {
             return false;
         }
@@ -68,21 +68,21 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public DataTableConfig findTableConfigByUserAndTable(String tableId, Account actor) {
-        TypedQuery<DataTableConfig> q = this.em
+    public DataTableConfig findTableConfigByUserAndTable(final String tableId, final Account actor) {
+        final TypedQuery<DataTableConfig> q = this.em
                 .createQuery("select d from DataTableConfig d " +
                         "where d.user=:user and d.tableInstanceId=:tableId", DataTableConfig.class);
         q.setParameter("user", actor);
         q.setParameter("tableId", tableId);
         try {
             return q.getSingleResult();
-        } catch (NoResultException e) {
+        } catch (final NoResultException e) {
             return null;
         }
     }
 
     @Override
-    public DataTableConfig addOrUpdateTableConfig(String tableId, Account actor, List<String> columnsNamesList) {
+    public DataTableConfig addOrUpdateTableConfig(final String tableId, final Account actor, final List<String> columnsNamesList) {
         DataTableConfig datatableConfig = this.findTableConfigByUserAndTable(tableId, actor);
         if (datatableConfig != null) {
             datatableConfig.setUser(actor);

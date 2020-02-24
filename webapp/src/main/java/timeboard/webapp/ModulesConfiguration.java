@@ -12,10 +12,10 @@ package timeboard.webapp;
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,21 +33,20 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import timeboard.account.AccountConfiguration;
 import timeboard.core.CoreConfiguration;
-import timeboard.core.ui.CoreUIConfiguration;
 import timeboard.home.HomeConfiguration;
+import timeboard.organization.OrganizationsConfiguration;
+import timeboard.organization.TimesheetConfiguration;
 import timeboard.plugin.project.imp.jira.JiraPluginConfiguration;
 import timeboard.plugin.project.sync.github.GithubPluginConfiguration;
 import timeboard.projects.ProjectsConfiguration;
 import timeboard.reports.ReportsConfiguration;
 import timeboard.theme.ThemeConfiguration;
-import timeboard.organization.OrganizationsConfiguration;
-import timeboard.organization.TimesheetConfiguration;
+import timeboard.vacations.VacationsConfiguration;
 
 @Configuration
 @Import({
         ThemeConfiguration.class,
         CoreConfiguration.class,
-        CoreUIConfiguration.class,
         HomeConfiguration.class,
         AccountConfiguration.class,
         ReportsConfiguration.class,
@@ -55,7 +54,8 @@ import timeboard.organization.TimesheetConfiguration;
         ProjectsConfiguration.class,
         JiraPluginConfiguration.class,
         GithubPluginConfiguration.class,
-        OrganizationsConfiguration.class
+        OrganizationsConfiguration.class,
+        VacationsConfiguration.class
 })
 public class ModulesConfiguration {
 
@@ -63,12 +63,13 @@ public class ModulesConfiguration {
     private OrganizationFilter organizationFilter;
 
     @Bean
-    public FilterRegistrationBean<OrganizationFilter> loggingFilter(){
-        FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
+    public FilterRegistrationBean<OrganizationFilter> loggingFilter() {
+        final FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
 
         registrationBean.setFilter(this.organizationFilter);
         registrationBean.addUrlPatterns("/*");
 
         return registrationBean;
     }
+
 }

@@ -28,20 +28,12 @@ package timeboard.core.model;
 
 
 public enum TaskStatus {
-    PENDING("En attente"),
-    IN_PROGRESS("En cours"),
-    DONE("Réalisée"),
-    REFUSED("Refusée");
+    PENDING,
+    IN_PROGRESS,
+    DONE,
+    REFUSED,
+    ARCHIVED;
 
-    public final String label;
-
-    private TaskStatus(String label) {
-        this.label = label;
-    }
-
-    public String getLabel() {
-        return this.label;
-    }
 
 }
 

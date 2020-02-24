@@ -31,21 +31,27 @@ import timeboard.core.model.converters.JSONToProjectAttributsConverter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Entity
 @NamedQueries(
-    {
-            @NamedQuery(name = Project.PROJECT_LIST, query =
-                    "select p from Project p join fetch p.members m " +
-                    "where (p.enable = true or p.enable is null) and m.member = :user and p.organizationID = :orgID"),
+        {
+                @NamedQuery(name = Project.PROJECT_LIST, query =
+                        "select p from Project p join p.members m " +
+                                "where (p.enable = true or p.enable is null) and :user in m.member and p.organizationID = :orgID"),
 
-            @NamedQuery(name = Project.PROJECT_GET_BY_ID, query =
-                    "select p from Project p join fetch p.members m " +
-                    "where p.id = :projectID and m.member = :user and p.organizationID = :orgID"),
+                @NamedQuery(name = Project.PROJECT_GET_BY_ID, query =
+                        "select p from Project p join p.members m " +
+                                "where p.id = :projectID and m.member = :user and p.organizationID = :orgID"),
 
-    }
+        }
 )
+@Table(name = "Project", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {
+                "name", "organizationID"
+        })
+})
 public class Project extends OrganizationEntity implements Serializable {
 
     public static final String PROJECT_COLOR_ATTR = "project.color";
@@ -87,7 +93,6 @@ public class Project extends OrganizationEntity implements Serializable {
     @OneToMany(targetEntity = Task.class, mappedBy = "project", cascade = CascadeType.ALL)
     private Set<Task> tasks;
 
-
     @OneToMany(targetEntity = ProjectTag.class, mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectTag> tags;
 
@@ -100,13 +105,15 @@ public class Project extends OrganizationEntity implements Serializable {
         this.members = new HashSet<>();
         this.tasks = new HashSet<>();
         this.attributes = new HashMap<>();
+        this.snapshots = new ArrayList<>();
+        this.tags = new ArrayList<>();
     }
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -117,7 +124,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return quotation;
     }
 
-    public void setQuotation(Double quotation) {
+    public void setQuotation(final Double quotation) {
         this.quotation = quotation;
     }
 
@@ -125,7 +132,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -133,7 +140,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -141,7 +148,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return comments;
     }
 
-    public void setComments(String comments) {
+    public void setComments(final String comments) {
         this.comments = comments;
     }
 
@@ -149,7 +156,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return members;
     }
 
-    public void setMembers(Set<ProjectMembership> members) {
+    public void setMembers(final Set<ProjectMembership> members) {
         this.members = members;
     }
 
@@ -157,7 +164,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return tasks;
     }
 
-    public void setTasks(Set<Task> tasks) {
+    public void setTasks(final Set<Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -165,7 +172,7 @@ public class Project extends OrganizationEntity implements Serializable {
         return attributes;
     }
 
-    public void setAttributes(Map<String, ProjectAttributValue> attributes) {
+    public void setAttributes(final Map<String, ProjectAttributValue> attributes) {
         this.attributes = attributes;
     }
 
@@ -174,28 +181,55 @@ public class Project extends OrganizationEntity implements Serializable {
         return tags;
     }
 
-    public void setTags(List<ProjectTag> tags) {
+    public void setTags(final List<ProjectTag> tags) {
         this.tags = tags;
     }
 
-    public List<ProjectSnapshot> getSnapshots() { return snapshots; }
+    public List<ProjectSnapshot> getSnapshots() {
+        return snapshots;
+    }
 
-    public void setSnapshots(List<ProjectSnapshot> snapshots) { this.snapshots = snapshots; }
+    public void setSnapshots(final List<ProjectSnapshot> snapshots) {
+        this.snapshots = snapshots;
+    }
 
     public boolean isEnable() {
         return enable;
     }
 
-    public void setEnable(boolean enable) {
+    public void setEnable(final boolean enable) {
         this.enable = enable;
     }
 
-    public boolean isMember(Account actor) {
+
+    @Transient
+    public Set<ProjectMembership> getMemberShipsByRole(final MembershipRole role) {
+        if (role != null) {
+            return this.getMembers()
+                    .stream()
+                    .filter(projectMembership -> projectMembership.getRole() == role)
+                    .collect(Collectors.toSet());
+        }
+        return this.getMembers();
+    }
+
+    @Transient
+    public boolean isMember(final Account actor) {
         return this.getMembers()
                 .stream()
                 .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
                 .count() == 1;
     }
+
+    @Transient
+    public boolean isMember(final Account actor, final MembershipRole role) {
+        return this.getMembers()
+                .stream()
+                .filter(projectMembership -> projectMembership.getMember().getId() == actor.getId())
+                .filter(pm -> pm.getRole() == role)
+                .count() == 1;
+    }
+
 
     @Transient
     public String getColor() {
@@ -204,5 +238,10 @@ public class Project extends OrganizationEntity implements Serializable {
         } else {
             return "#957DAD";
         }
+    }
+
+    @Override
+    public String toString() {
+        return "project(" + this.getId() + ") - " + this.getName();
     }
 }

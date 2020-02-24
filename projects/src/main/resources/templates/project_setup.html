@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='project.tab.setup')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <title layout:fragment="title">Project</title>
+    <meta name="projectID" th:content="${project.id}"/>
+    <meta name="orgID" th:content="${orgID}"/>
+</head>
+<body>
+
+
+<div layout:fragment="placeholder">
+
+    <div class="ui stackable two column grid">
+        <div class="column">
+            <form class="ui form"
+                  enctype="application/x-www-form-urlencoded" method="post"
+                  name="projectConfig"
+                  th:action="@{projects/{projectID}/setup/informations(projectID=${projectID})}" th:object="${projectConfigForm}">
+
+                <h4 class="ui dividing header">Project Informations</h4>
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
+                    <label>Project Name</label>
+                    <input name="projectName" placeholder="Project Name" required th:field="*{name}"
+                           class="ui input"
+                           type="text" data-cy="project-name">
+                </div>
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
+                    <label>Project Quotation</label>
+                    <input name="projectQuotation" required th:field="*{quotation}"
+                           type="number" data-cy="project-quotation">
+                </div>
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
+                    <label>Project Description</label>
+                    <textarea name="projectDescription" placeholder="Project Description"
+                              th:field="*{comments}" data-cy="project-description">
+                    </textarea>
+                </div>
+
+
+                <button class="ui positive button" style="margin-top:1em" type="submit" data-cy="submit"
+                        sec:authorize="${hasPermission(#vars.project,'PROJECT_SETUP')}">Save</button>
+            </form>
+        </div>
+        <div class="column">
+            <div class="ui form" name="projectMembers">
+
+                <h4 class="ui dividing header">Members</h4>
+                <div class="field"
+                     th:classappend="${#authorization.expression('hasPermission(#vars.project,''PROJECT_SETUP'')') ? '' : 'disabled'}">
+                    <div class="ui category search">
+                        <div class="ui icon input">
+                            <input class="prompt" placeholder="Search account..." type="text">
+                            <i class="search icon"></i>
+                        </div>
+                        <div class="results"></div>
+                    </div>
+                    <table class="ui celled table" id="members">
+                        <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="membership, status : ${projectMembersForm.memberships}"
+                            th:id="${membership.membershipID}">
+                            <td th:text="${membership.member.screenName}"></td>
+                            <td>
+                                <select th:field="${projectMembersForm.memberships[__${status.index}__].role}"
+                                        th:onchange="'updateUser('+${membership.membershipID}+', this.value)'"
+                                        th:classappend="${membership.member.id == account.id} ? 'ui dropdown disabled' : ''">
+                                <option th:each="role : ${roles}" th:selected="${role == membership.role}"
+                                            th:text="${role}"
+                                            th:value="${role}"></option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="ui negative basic button" th:if="${membership.member.id != account.id}"
+                                        th:onclick="'removeUser('+${membership.membershipID}+')'">
+                                    <i class="remove alternate icon"></i>
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script src="/js/project_setup.js"></script>
+    </div>
+</div>
+
+</body>
+</html>

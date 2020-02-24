@@ -26,38 +26,75 @@ package timeboard.core.api;
  * #L%
  */
 
+import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.exceptions.TimesheetException;
-import timeboard.core.model.AbstractTask;
-import timeboard.core.model.Account;
-import timeboard.core.model.Organization;
-import timeboard.core.model.Project;
+import timeboard.core.model.*;
 
-import java.util.Date;
-import java.util.Map;
+import java.util.Calendar;
+import java.util.*;
 
 
 public interface TimesheetService {
 
-    /**
-     * Validate user timesheet.
-     *
-     * @param actor            user who trigger this function.
-     * @param accountTimesheet user which be used to build timehseet to validate
-     * @param year             timesheet year
-     * @param week             timesheet week
-     * @return true if timesheet is validate else, false.
-     */
-    void validateTimesheet(Account actor, Account accountTimesheet, Organization currentOrg, int year, int week) throws TimesheetException;
+    String TIMESHEET_SUBMIT = "TIMESHEET_SUBMIT";
+    String TIMESHEET_VALIDATE = "TIMESHEET_VALIDATE";
+    String TIMESHEET_REJECT = "TIMESHEET_REJECT";
+    String TIMESHEET_IMPUTATION = "TIMESHEET_IMPUTATION";
+    String TIMESHEET_LIST = "TIMESHEET_LIST";
 
     /**
-     * Is timesheet validated.
+     * Submit user timesheet.
      *
-     * @param accountTimesheet user used to check timesheet validation state.
-     * @param week             timesheet week
-     * @param year             timesheet year
-     * @return true if timesheet is already validated
+     * @param timesheetOwner user which be used to build timehseet to submit
+     * @param year           timesheet year
+     * @param week           timesheet week
+     * @return true if timesheet is submit else, false.
      */
-    boolean isTimesheetValidated(Account accountTimesheet, int year, int week);
+    SubmittedTimesheet submitTimesheet(
+            final Organization currentOrg,
+            final Account timesheetOwner,
+            final int year,
+            final int week) throws BusinessException;
+
+
+    /**
+     * Submit user timesheet.
+     *
+     * @param actor              user who trigger this function.
+     * @param submittedTimesheet submittedTimesheet to validate
+     * @return true if timesheet is submit else, false.
+     */
+    SubmittedTimesheet validateTimesheet(
+            final Organization currentOrg,
+            final Account actor,
+            final SubmittedTimesheet submittedTimesheet) throws BusinessException;
+
+    /**
+     * Reject user timesheet.
+     *
+     * @param actor              user who trigger this function.
+     * @param submittedTimesheet submittedTimesheet to reject
+     * @return SubmittedTimesheet with status REJECTED
+     */
+    SubmittedTimesheet rejectTimesheet(final Organization currentOrg, final Account actor,
+                                       final SubmittedTimesheet submittedTimesheet) throws BusinessException;
+
+    Optional<SubmittedTimesheet> getSubmittedTimesheet(Organization org, Account timesheetOwner, int year, int week);
+
+
+    /**
+     * Get timesheet validation status.
+     *
+     * @param timesheetOwner user used to check timesheet sumbit state.
+     * @param year           timesheet year
+     * @param week           timesheet week
+     * @return ValidationStatus, null current account has no timesheet validation request for current week
+     */
+    Optional<ValidationStatus> getTimesheetValidationStatus(
+            final Organization org,
+            final Account timesheetOwner,
+            final int year,
+            final int week);
 
 
     /**
@@ -65,12 +102,76 @@ public interface TimesheetService {
      *
      * @param firstDayOfWeek first day of week
      * @param lastDayOfWeek  last day of week
-     * @param account        user used to check timesheet validation state.
+     * @param filters        user used to check timesheet validation state.
      * @return the sum of all imputations of the week
      */
-    double getSumImputationForWeek(Date firstDayOfWeek, Date lastDayOfWeek, Account account);
+    Map<Integer, Double> getAllImputationsForAccountOnDateRange(
+            final Organization org,
+            final Date firstDayOfWeek,
+            final Date lastDayOfWeek,
+            final Account account,
+            final TimesheetFilter... filters);
 
-    Map<Integer, Double> getProjectImputationSumForDate(Date startDate, Date endDate, Account user, Project project);
+    UpdatedTaskResult updateTaskImputation(
+            final Organization org,
+            final Account actor,
+            final AbstractTask task,
+            final Date day,
+            final double val) throws BusinessException;
 
-    Map<Integer, Double> getTaskImputationForDate(Date startDate, Date endDate, Account user, AbstractTask task);
+    List<UpdatedTaskResult> updateTaskImputations(
+            final Organization org,
+            final Account actor,
+            final List<Imputation> imputationsList);
+
+
+    Map<Account, List<SubmittedTimesheet>> getProjectTimesheetByAccounts(
+            final Organization org,
+            final Account actor,
+            final Project project);
+
+    List<SubmittedTimesheet> getSubmittedTimesheets(final Organization org, final Account actor, Account targetUser);
+
+
+    /**
+     * Force Validation of a list of weeks
+     *
+     * @param organizationID id of current organization
+     * @param actor          project owner
+     * @param target         timesheet owner (target of timesheet validation)
+     * @param selectedYear   year of week selected in the "validation timesheet week" list
+     * @param selectedWeek   week of week selected in the "validation timesheet week" list
+     * @param olderYear      year of older week in the "validation timesheet week" list
+     * @param olderWeek      week of older week in the "validation timesheet week" list
+     */
+    void forceValidationTimesheets(Organization organizationID, Account actor, Account target,
+                                   int selectedYear, int selectedWeek, int olderYear, int olderWeek) throws TimesheetException;
+
+    @Deprecated
+    default long absoluteWeekNumber(SubmittedTimesheet t) {
+        return absoluteWeekNumber((int) t.getYear(), (int) t.getWeek());
+    }
+
+    @Deprecated
+    default long absoluteWeekNumber(int year, int week) {
+        return (long) (year * 53) + week;
+    }
+
+    @Deprecated
+    default long absoluteWeekNumber(java.util.Calendar c) {
+        return absoluteWeekNumber(c.get(java.util.Calendar.YEAR), c.get(Calendar.WEEK_OF_YEAR));
+    }
+
+    class TimesheetFilter<T> {
+        private T target;
+
+        public TimesheetFilter(T target) {
+            this.target = target;
+        }
+
+        public T getTarget() {
+            return target;
+        }
+    }
+
 }

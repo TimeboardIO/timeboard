@@ -27,19 +27,25 @@ package timeboard.reports;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.api.AbacEntries;
+import timeboard.core.api.NavigationExtPoint;
 
 @Component
 public class ReportsNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Reports";
+        return "nav.reports";
     }
 
     @Override
     public String getNavigationPath() {
         return "/reports";
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return AbacEntries.REPORT_LIST;
     }
 
     @Override

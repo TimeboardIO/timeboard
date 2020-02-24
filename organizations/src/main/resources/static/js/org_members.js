@@ -1,16 +1,24 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
+
 let app = new Vue({
 
     el: '#members',
     data: {
         members: [],
     },
+    filters:{
+        formatDate: function(value) {
+            if (value) {
+                return new Date(value).toDateString();
+            }
+        }
+    },
     methods: {
         removeMember: function(e, member){
-            $.get("/api/org/members/remove?orgID="+currentOrgID+"&memberID="+member.id)
-            .done(function(data){
+            $.get("/org/members/remove/"+currentOrgID+"/"+member.id)
+            .then(function(data){
                 let copy = [];
                 for (let i = 0; i < app.members.length; i++) {
                     if(app.members[i].id !== member.id){
@@ -21,35 +29,41 @@ let app = new Vue({
             });
         },
         addMember: function(memberID){
-            $.get("/api/org/members/add?orgID="+currentOrgID+"&memberID="+memberID)
-            .done(function(data){
-                app.members.push(new MemberWrapper(data));
+            $.get("/org/members/add?orgID="+currentOrgID+"&memberID="+memberID)
+            .then(function(data){
+                app.members.push(data);
             });
         },
         updateRole: function(e, member){
-            $.get("/api/org/members/updateRole?orgID="+currentOrgID+"&memberID="+member.id+"&role="+member.role)
-            .done(function(data){
-                member.role = data.role;
+            $.ajax({
+                type: "patch",
+                url: "/org/members/"+member.id,
+                data: JSON.stringify(member),
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8'
+            }).then(function(role){
+                  member.role = role;
+            });
+        },
+        impersonateMember: function(e, member){
+            $.ajax({
+                type: "POST",
+                url: "/org/impersonate/"+member.id,
+            }).then(function(role){
+                window.location.href = '../../'; //two level up
             });
         }
     }
 });
 
-class MemberWrapper {
-    constructor(data) {
-        this.id = data.orgID;
-        this.screenName = data.screenName;
-        this.isOrganization = data.isOrganization;
-        this.role = data.role;
-    }
-}
+
 //Initialization
 $(document).ready(function(){
     //initial data loading
-        $.get("/api/org/members?orgID="+currentOrgID)
+        $.get("/org/members/list")
         .then(function(data){
-            for (var item in data) {
-                app.members.push(new MemberWrapper(data[item]));
+            for (let i = 0; i < data.length; i++) {
+                app.members.push(data[i]);
             }
             $('.ui.dimmer').removeClass('active');
         });

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='project.tab.calendar')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+>
+
+<head>
+    <title>Project Calendar</title>
+    <meta name="projectID" th:content="${project.id}"/>
+
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+    <!-- MAIN COMPONENT-->
+    <div id="teamCalendar">
+
+
+        <div class="ui three item menu">
+            <a @click="lastMonth" class="active item">
+                <i class="icon big arrow circle left"></i>
+            </a>
+            <a class="item">
+                {{ monthNames[month] + ' ' + year }}
+            </a>
+            <a @click="nextMonth" class="item">
+                <i class="icon big arrow circle right"></i>
+            </a>
+        </div>
+
+        <div style="overflow-x: scroll;" >
+            <calendar v-for="(calendar, i) in teamCalendars"
+                      :name="'Project'"
+                      :show-header="true"
+                      :events="projectCalendar"
+                      :year="year"
+                      :month="month">
+            </calendar>
+            <calendar v-for="(calendar, i) in teamCalendars"
+                      :name="calendar.name"
+                      :events="calendar.events"
+                      :show-header="false"
+                      :year="year"
+                      :month="month">
+            </calendar>
+        </div>
+        <div class="ui segment">
+            <div class="ui two column very relaxed grid">
+                <div class="column">
+                    <div><a class="ui green empty circular label" style="background-color: #00BFD8"></a> Project batch(es) </div>
+                    <div><a class="ui green empty circular label" style="background-color: #5BCA7E"></a> Occasional vacation (Scheduled)</div>
+                    <div><a class="ui yellow empty circular label" style="background-color: #FBBD08"></a> Saved vacation Occasional/Recursive (awaiting planning)</div>
+                </div>
+                <div class="column">
+                    <div><a class="ui white empty circular label " style="background-color:  white; border: 1px solid rgba(34,36,38,.1);"></a>  Available</div>
+                    <div><a class="ui lightgrey empty circular label" style="background-color:  lightgrey;" ></a>  Week-ends / Recurrent vacation(Scheduled)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/project_calendar.js"></script>
+
+</div>
+
+</body>
+</html>

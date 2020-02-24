@@ -74,7 +74,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         this.imputations = new HashSet<>();
     }
 
-    public AbstractTask(String taskName, String taskComment, Date startDate, Date endDate) {
+    public AbstractTask(final String taskName, final String taskComment, final Date startDate, final Date endDate) {
         this.setName(taskName);
         this.setComments(taskComment);
         this.setStartDate(startDate);
@@ -85,7 +85,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -93,7 +93,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -101,7 +101,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return comments;
     }
 
-    public void setComments(String comments) {
+    public void setComments(final String comments) {
         this.comments = comments;
     }
 
@@ -109,7 +109,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(final Date startDate) {
         this.startDate = startDate;
     }
 
@@ -117,7 +117,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(final Date endDate) {
         this.endDate = endDate;
     }
 
@@ -125,7 +125,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return imputations;
     }
 
-    public void setImputations(Set<Imputation> imputations) {
+    public void setImputations(final Set<Imputation> imputations) {
         this.imputations = imputations;
     }
 
@@ -134,15 +134,16 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return origin;
     }
 
-    public void setOrigin(String origin) {
-        this.origin = origin.toLowerCase();
+    public void setOrigin(final String origin) {
+        this.origin = origin != null ?
+                origin.toLowerCase() : "";
     }
 
     public String getRemotePath() {
         return remotePath;
     }
 
-    public void setRemotePath(String remotePath) {
+    public void setRemotePath(final String remotePath) {
         this.remotePath = remotePath;
     }
 
@@ -150,15 +151,15 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         return remoteId;
     }
 
-    public void setRemoteId(String remoteId) {
+    public void setRemoteId(final String remoteId) {
         this.remoteId = remoteId;
     }
 
     @Transient
-    public double findTaskImputationValueByDate(Date date, Account account) {
+    public double findTaskImputationValueByDate(final Date date, final Account account) {
         final Optional<Imputation> imputationOptional = this.getImputations().stream()
                 .filter(imputation -> areDateSameDay(date, imputation.getDay()))
-                .filter(imputation -> (imputation.getAccount().getId() == account.getId()))
+                .filter(imputation -> imputation.getAccount().getId() == account.getId())
                 .findFirst();
         if (imputationOptional.isPresent()) {
             return imputationOptional.get().getValue();
@@ -167,7 +168,7 @@ public abstract class AbstractTask extends OrganizationEntity implements Seriali
         }
     }
 
-    private boolean areDateSameDay(Date date1, Date date2) {
+    private boolean areDateSameDay(final Date date1, final Date date2) {
         return new SimpleDateFormat("yyyy-MM-dd")
                 .format(date1)
                 .equals(new SimpleDateFormat("yyyy-MM-dd").format(date2));

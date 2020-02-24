@@ -25,13 +25,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>core-ui</artifactId>
+            <artifactId>core</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>core</artifactId>
+            <artifactId>projects</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>

@@ -5,18 +5,23 @@ $(document).ready(function () {
     var appListReports = new Vue({
         el: '#app-create-report',
         data: {
-            table: {
+            reportListConfig: {
                 cols: [
                     {
                         "slot": "name",
                         "label": "Report Name"
                     },
                     {
+                        "slot": "async",
+                        "label": "Is Async Report"
+                    },
+                    {
                         "slot": "actions",
                         "label": "Actions"
                     }],
-                data: []
-            }
+                name: "tableReports"
+            },
+            reportListData: []
         },
         methods: {
         },
@@ -27,7 +32,7 @@ $(document).ready(function () {
                 dataType: "json",
                 url: "reports/list",
                 success: function (d) {
-                    self.table.data = d;
+                    self.reportListData = d;
                 }
             });
         }

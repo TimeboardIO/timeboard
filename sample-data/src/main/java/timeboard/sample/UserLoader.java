@@ -39,26 +39,25 @@ public class UserLoader {
 
     UserService userService;
 
-    UserLoader(UserService userService){
+    UserLoader(final UserService userService) {
         this.userService = userService;
     }
 
-    public List<Account> load(int nbUsers) throws BusinessException {
+    public List<Account> load(final int nbUsers) throws BusinessException {
         List<Account> accountSaved = new ArrayList<>();
 
-        List<Account> usersToSave = new ArrayList<>();
+        final List<Account> usersToSave = new ArrayList<>();
         // On créé "nbUsers" utilisateurs
         for (int i = 0; i < nbUsers; i++) {
-            Account u = new Account();
+            final Account u = new Account();
             u.setName("timeboard" + i);
             u.setEmail("user" + i + "@timeboard.com");
-            u.setBeginWorkDate(new Date());
             u.setFirstName("User" + i);
             u.setAccountCreationTime(new Date());
             usersToSave.add(u);
-         }
+        }
 
-            accountSaved = this.userService.createUsers(usersToSave);
+        accountSaved = this.userService.createUsers(usersToSave);
 
 
         return accountSaved;

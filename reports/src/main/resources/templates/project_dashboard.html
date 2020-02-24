@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<html layout:decorate="~{project_layout.html(tab='report.project.dashboard')}"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Project Dashboard</title>
+    <script src="/webjars/chartjs/2.8.0/Chart.js"></script>
+    <link href="/webjars/chartjs/2.8.0/Chart.min.css" rel="stylesheet">
+    <meta property="dashboard"
+          th:qt="${dashboard.quotation}"
+          th:oe="${dashboard.originalEstimate}"
+          th:re="${dashboard.realEffort}"
+          th:es="${dashboard.effortSpent}"
+          th:el="${dashboard.effortLeft}"
+    />
+</head>
+<body>
+
+<div layout:fragment="placeholder">
+
+    <div class="ui two column grid">
+
+        <div class="column ">
+            <div class="ui fluid card">
+                <div class="ui horizontal divider"><i class="boxes icon"></i>
+                    Global
+                </div>
+                <div class="content">
+
+                    <div class="ui mini statistic">
+                        <div class="value"
+                             th:text="${#numbers.formatDecimal(dashboard.originalEstimate,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Original Estimate
+                        </div>
+                    </div>
+
+                    <div class="ui mini statistic">
+                        <div class="value" th:text="${#numbers.formatDecimal(dashboard.effortSpent,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Effort Spent
+                        </div>
+                    </div>
+
+                    <div class="ui mini statistic">
+                        <div class="value"
+                             th:text="${#numbers.formatDecimal(dashboard.effortLeft,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Effort Left
+                        </div>
+                    </div>
+
+                    <div class="ui mini statistic">
+                        <div class="value"
+                             th:text="${#numbers.formatDecimal(dashboard.realEffort,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Real Effort
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div class="ui fluid card">
+                <canvas id="dashboardBarChart"></canvas>
+            </div>
+        </div>
+        <div class="column" th:each="item:${dashboardsByType}" >
+            <div class="ui fluid card">
+                <div class="ui horizontal divider"><i class="box icon"></i>
+                    <span th:text="${item.key.typeName}"></span>
+                </div>
+                <div class="content">
+                    <div class="ui mini statistic">
+                        <div class="value"
+                             th:text="${#numbers.formatDecimal(item.value.originalEstimate,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Original Estimate
+                        </div>
+                    </div>
+
+                    <div class="ui mini statistic">
+                        <div class="value" th:text="${#numbers.formatDecimal(item.value.effortSpent,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Effort Spent
+                        </div>
+                    </div>
+
+                    <div class="ui mini statistic">
+                        <div class="value"
+                             th:text="${#numbers.formatDecimal(item.value.effortLeft,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Effort Left
+                        </div>
+                    </div>
+
+
+                    <div class="ui mini statistic">
+                        <div class="value"
+                             th:text="${#numbers.formatDecimal(item.value.realEffort,1,1,'COMMA')}"></div>
+                        <div class="label">
+                            Real Effort
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/project_dashboard.js" type="text/javascript"></script>
+
+</div>
+
+</body>
+</html>

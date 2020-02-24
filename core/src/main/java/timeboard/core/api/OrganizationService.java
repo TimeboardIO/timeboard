@@ -27,10 +27,10 @@ package timeboard.core.api;
  */
 
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Organization;
+import timeboard.core.model.*;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -40,31 +40,108 @@ import java.util.Optional;
 public interface OrganizationService {
 
 
-    Organization createOrganization(String organizationName, Map<String, String> properties);
+    Organization createOrganization(
+            final Account actor,
+            final String organizationName,
+            final Map<String, String> properties) throws BusinessException;
 
-    Organization createOrganization(Account actor,
-                                    String organizationName, Map<String, String> properties) throws BusinessException;
+    Optional<Organization> getOrganizationByID(
+            final Account actor,
+            final long id);
 
-    Optional<Organization> getOrganizationByID(final Account actor,
-                                               long id);
+    Optional<Organization> getOrganizationByName(
+            final String organisationName);
 
-    Optional<Organization> getOrganizationByName(String organisationName);
+    Optional<Organization> updateOrganization(
+            final Account actor,
+            final Organization organization);
 
-    Organization updateOrganization(final Account actor,
-                                    Organization organization);
+    Optional<Organization> removeMembership(
+            final Account actor,
+            final Organization organization,
+            final Account member) throws BusinessException;
 
-    Optional<Organization> removeMember(Account actor,
-                                        Organization organization,
-                                        Account member) throws BusinessException;
+    Optional<Organization> addMembership(
+            final Account actor,
+            final Organization organization,
+            final Account member,
+            final MembershipRole role) throws BusinessException;
 
-    Optional<Organization> addMember(Account actor,
-                                     Organization organization,
-                                     Account member,
-                                     MembershipRole role) throws BusinessException;
+    Optional<Organization> updateMembership(
+            final Account actor,
+            final OrganizationMembership membership) throws BusinessException;
 
-    Optional<Organization> updateMemberRole(Account actor,
-                                            Organization organization,
-                                            Account member,
-                                            MembershipRole role) throws BusinessException;
+    Optional<OrganizationMembership> findOrganizationMembership(
+            final Account actor,
+            final Organization organization) throws BusinessException;
+
+
+    /*
+    == Default Tasks ==
+    */
+    List<DefaultTask> listDefaultTasks(
+            final Organization org,
+            final Date ds,
+            final Date de);
+
+    /**
+     * Create a default task.
+     *
+     * @return DefaultTask
+     */
+    DefaultTask createDefaultTask(
+            final Account actor,
+            final Organization org,
+            final String task) throws BusinessException;
+
+
+    /**
+     * default tasks can not be deleted, so they are set disabled and hidden from UI
+     *
+     * @param actor
+     * @param taskID
+     * @throws BusinessException
+     */
+    void disableDefaultTaskByID(
+            final Account actor,
+            final Organization org, final
+            long taskID) throws BusinessException;
+
+
+    DefaultTask updateDefaultTask(
+            final Account actor,
+            final DefaultTask task);
+
+    DefaultTask getDefaultTaskByID(
+            final Account actor,
+            final long id);
+
+
+    /**
+     * Return task types.
+     *
+     * @return List all task types.
+     */
+    List<TaskType> listTaskType(
+            final Organization org);
+
+    TaskType findTaskTypeByID(
+            final Long taskTypeID);
+
+    TaskType updateTaskType(
+            final Account actor,
+            final TaskType type);
+
+    TaskType createTaskType(
+            final Account actor,
+            final Organization org,
+            final String name);
+
+    void disableTaskType(
+            final Account actor,
+            final TaskType type);
+
+    boolean checkOrganizationVacationTask(
+            final String taskName);
 
 }

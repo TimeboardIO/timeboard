@@ -35,13 +35,13 @@ public class RuleSet<T> {
 
     private final Set<Rule> rules = new HashSet<>();
 
-    public void addRule(Rule r) {
+    public void addRule(final Rule r) {
         this.rules.add(r);
     }
 
-    public Set<Rule> evaluate(Account actor, T o) {
-        Set<Rule> noSatisfiedRules = new HashSet<>();
-        for (Rule r : this.rules) {
+    public Set<Rule> evaluate(final Account actor, final T o) {
+        final Set<Rule> noSatisfiedRules = new HashSet<>();
+        for (final Rule r : this.rules) {
             if (!r.isSatisfied(actor, o)) {
                 noSatisfiedRules.add(r);
             }

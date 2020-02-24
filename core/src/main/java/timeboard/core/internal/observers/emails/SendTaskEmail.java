@@ -1,0 +1,89 @@
+package timeboard.core.internal.observers.emails;
+
+/*-
+ * #%L
+ * core
+ * %%
+ * Copyright (C) 2019 Timeboard
+ * %%
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ * #L%
+ */
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.EmailService;
+import timeboard.core.model.Account;
+import timeboard.core.model.MembershipRole;
+import timeboard.core.model.Project;
+import timeboard.core.model.Task;
+
+import javax.annotation.PostConstruct;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+
+@Component
+public class SendTaskEmail {
+
+    @Autowired
+    EmailService emailService;
+
+    @PostConstruct
+    public void activate() {
+
+       /* TimeboardSubjects.CREATE_TASK
+                .map(newTask -> sendEmailCreatingTask(new User(), newTask) )
+                .observeOn(Schedulers.from(Executors.newFixedThreadPool(10)))
+                .subscribe(emailStructure ->this.emailService.sendMessage(emailStructure));*/
+    }
+
+    public EmailStructure sendEmailCreatingTask(final Account creator, final Task newTaskDB) {
+        final List<String> to = new ArrayList<>();
+        final Project project = newTaskDB.getProject();
+        final Account assignedAccount = newTaskDB.getAssigned();
+
+        project.getMembers()
+                .stream()
+                .filter(member -> member.getRole() == MembershipRole.OWNER)
+                .forEach(member -> to.add(member.getMember().getEmail()));
+
+        final List<String> cc = Arrays.asList(assignedAccount.getEmail(), creator.getEmail());
+
+        final String subject = "Mail de création d'une tâche";
+        final String message = "Bonjour,\n"
+                + creator.getFirstName() + " " + creator.getName() + " a ajouté une tâche au " + this.getDisplayFormatDate(new Date()) + "\n"
+                + "Nom de la tâche : " + newTaskDB.getName() + "\n"
+                + "Date de début : " + this.getDisplayFormatDate(newTaskDB.getStartDate()) + "\n"
+                + "Date de fin : " + this.getDisplayFormatDate(newTaskDB.getEndDate()) + "\n"
+                + "Estimation initiale : " + newTaskDB.getOriginalEstimate() + "\n"
+                + "Projet : " + project.getName() + "\n";
+
+        return new EmailStructure(to, cc, subject, message);
+    }
+
+    private String getDisplayFormatDate(final Date date) {
+        return new SimpleDateFormat("dd/MM/yyyy").format(date);
+    }
+
+}
+

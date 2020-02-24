@@ -1,16 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
 Parameters:
-  SSHKey:
-    Type: 'AWS::EC2::KeyPair::KeyName'
-  DBUser:
+  ElasticBeansTalkApp:
     Type: 'String'
-  DBPassword:
-    Type: 'String'
-  Route53HostedZone:
-    Type: 'String'
+  TimeboardVPC:
+    Type: 'AWS::EC2::VPC::Id'
   TimeboardDNSName:
-    Type: 'String'
-  DatabaseDNSName:
     Type: 'String'
   TimeboardSSLArn:
     Type: 'String'
@@ -18,233 +12,31 @@ Parameters:
     Type: 'String'
   OAuthSecretID:
     Type: 'String'
-Resources:
-  InternetGW:
-    Type: 'AWS::EC2::InternetGateway'
-    Properties: {}
-  RouteTable:
-    Type: AWS::EC2::RouteTable
-    Properties:
-      VpcId:
-        Ref: TimeboardVPC
-  InternetRoute:
-    Type: AWS::EC2::Route
-    DependsOn: InternetGW
-    Properties:
-      RouteTableId:
-        Ref: RouteTable
-      DestinationCidrBlock: 0.0.0.0/0
-      GatewayId:
-        Ref: InternetGW
-  GWAttachment:
-    Type: 'AWS::EC2::VPCGatewayAttachment'
-    Properties:
-      VpcId: !Ref TimeboardVPC
-      InternetGatewayId: !Ref InternetGW
-  TimeboardVPC:
-    Type: AWS::EC2::VPC
-    Properties:
-      CidrBlock: 10.0.0.0/16
-      EnableDnsSupport: 'true'
-      EnableDnsHostnames: 'true'
-  DBSubnetA:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: TimeboardVPC
-      CidrBlock: 10.0.20.0/24
-      AvailabilityZone: 'eu-west-1a'
-  DBSubnetB:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: TimeboardVPC
-      CidrBlock: 10.0.30.0/24
-      AvailabilityZone: 'eu-west-1b'
   EC2Subnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: TimeboardVPC
-      CidrBlock: 10.0.40.0/24
-      AvailabilityZone: 'eu-west-1a'
-      MapPublicIpOnLaunch: true
-  Ec2SubnetRouteTable:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties: 
-      RouteTableId: !Ref RouteTable
-      SubnetId: !Ref EC2Subnet
-  PublicSubnet:
-    Type: AWS::EC2::Subnet
-    Properties:
-      VpcId:
-        Ref: TimeboardVPC
-      CidrBlock: 10.0.10.0/24
-      AvailabilityZone: 'eu-west-1a'
-  PublicSubnetRouteTable:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties: 
-      RouteTableId: !Ref RouteTable
-      SubnetId: !Ref PublicSubnet    
-  RootRole:
-    Type: 'AWS::IAM::Role'
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: 'Allow'
-            Principal:
-              Service:
-                - 'ec2.amazonaws.com'
-            Action:
-              - 'sts:AssumeRole'
-      Path: '/'
-      Policies:
-        - PolicyName: 'root'
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: 'Allow'
-                Action: '*'
-                Resource: '*'
-  EC2WebAppInstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      InstanceProfileName: 'EC2WebAppInstanceProfile'
-      Path: '/'
-      Roles:
-        - Ref: RootRole
-  WebAppSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow http to client host
-      VpcId:
-        Ref: TimeboardVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 5000
-          ToPort: 5000
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
+    Type: 'AWS::EC2::Subnet::Id'
   EC2SecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow http to client host
-      VpcId:
-        Ref: TimeboardVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-        - IpProtocol: tcp
-          FromPort: 3306
-          ToPort: 3306
-          CidrIp: 0.0.0.0/0
-  DBSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Allow ZC2 to connect RDS
-      VpcId:
-        Ref: TimeboardVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 3306
-          ToPort: 3306
-          SourceSecurityGroupId: !Ref EC2SecurityGroup
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 3306
-          ToPort: 3306
-          CidrIp: 0.0.0.0/0
-  MySQLDatabase:
-    Type: 'AWS::RDS::DBInstance'
-    Properties:
-      AllocatedStorage: '30'
-      StorageType: 'gp2'
-      PubliclyAccessible: 'false'
-      DBInstanceClass: 'db.t2.micro'
-      DBName: 'Timeboard'
-      Engine: MySQL
-      BackupRetentionPeriod: 0
-      EngineVersion: '8.0.16'
-      VPCSecurityGroups:
-        - !Ref DBSecurityGroup
-      DBSubnetGroupName:
-        Ref: DBSubnetGroup
-      MasterUserPassword:
-        Ref: DBPassword
-      MasterUsername:
-        Ref: DBUser
-
-  DBSubnetGroup:
-    Type: 'AWS::RDS::DBSubnetGroup'
-    Properties:
-      DBSubnetGroupDescription: 'Timeboard DBSubnet'
-      SubnetIds:
-        - Ref: DBSubnetA
-        - Ref: DBSubnetB
-  DBDNSRecord:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      HostedZoneId: !Ref 'Route53HostedZone'
-      Comment: DNS name for timeboard
-      Name: !Ref 'DatabaseDNSName'
-      Type: CNAME
-      TTL: '900'
-      ResourceRecords:
-        - !GetAtt MySQLDatabase.Endpoint.Address
-  WebAppBT:
-    Type: AWS::ElasticBeanstalk::Application
-    Properties: 
-      ApplicationName: 'TimeboardApplication'
-      Description: 'AWS Elastic Beanstalk Timeboard Application'
+    Type: 'AWS::EC2::SecurityGroup::Id'
+  ELBSubnet:
+    Type: 'AWS::EC2::Subnet::Id'
+  DBUser:
+    Type: 'String'
+  DBPassword:
+    Type: 'String'
+  DBDNS:
+    Type: 'String'
+Resources:
   WebAppEnvBT:
     Type: AWS::ElasticBeanstalk::Environment
     Properties: 
       ApplicationName: 
-        Ref: WebAppBT
+        Ref: ElasticBeansTalkApp
       Description: 'AWS Elastic Beanstalk Environment running Timeboard Application on Java 11'
       EnvironmentName: TimeboardEnvironment
-      SolutionStackName: '64bit Amazon Linux 2018.03 v2.10.1 running Java 8'
+      SolutionStackName: '64bit Amazon Linux 2018.03 v2.10.2 running Java 8'
       OptionSettings:
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'SPRING_DATASOURCE_DOMAIN'
+          Value: !Ref DBDNS
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SERVER_PORT'
           Value: '5000'
@@ -253,13 +45,16 @@ Resources:
           Value: !Ref OAuthClientID
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'OAUTH_SECRETID'
-          Value: !Ref OAuthSecretID 
+          Value: !Ref OAuthSecretID
+        - Namespace: 'aws:elasticbeanstalk:application:environment'
+          OptionName: 'APP_DOMAIN'
+          Value: !Ref TimeboardDNSName
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'APP_URL'
           Value: !Join [ '', [ 'https://', !Ref 'TimeboardDNSName' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_URL'
-          Value: !Join [ '', [ 'jdbc:mysql://', !Ref 'DatabaseDNSName', '/timeboard?createDatabaseIfNotExist=true' ] ]
+          Value: !Join [ '', [ 'jdbc:mysql://', !Ref 'DBDNS', '/timeboard?createDatabaseIfNotExist=true' ] ]
         - Namespace: 'aws:elasticbeanstalk:application:environment'
           OptionName: 'SPRING_DATASOURCE_USERNAME'
           Value: !Ref 'DBUser'
@@ -277,16 +72,16 @@ Resources:
           Value: !Ref EC2Subnet
         - Namespace: 'aws:ec2:vpc'
           OptionName: 'ELBSubnets'
-          Value: !Ref 'PublicSubnet'
+          Value: !Ref 'ELBSubnet'
         - Namespace: 'aws:ec2:vpc'
           OptionName: 'AssociatePublicIpAddress'
           Value: true
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: 'IamInstanceProfile'
-          Value: !Ref 'EC2WebAppInstanceProfile'
+          Value: 'aws-elasticbeanstalk-ec2-role'
         - Namespace: 'aws:autoscaling:launchconfiguration'
           OptionName: 'SecurityGroups'
-          Value: !Ref 'EC2SecurityGroup'  
+          Value: !Ref 'EC2SecurityGroup'
         - Namespace: 'aws:elb:listener:443'
           OptionName: 'InstanceProtocol'
           Value: 'HTTP'
@@ -299,24 +94,26 @@ Resources:
         - Namespace: 'aws:elb:listener:443'
           OptionName: 'InstancePort'
           Value: '80'
-          
-
-
-  WebAppDNSRecord:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      HostedZoneId: !Ref 'Route53HostedZone'
-      Comment: DNS name for timeboard web app
-      Name: !Ref 'TimeboardDNSName'
-      Type: CNAME
-      TTL: '900'
-      ResourceRecords:
-        - !GetAtt WebAppEnvBT.EndpointURL
+        - Namespace: 'aws:ec2:instances'
+          OptionName: 'EnableSpot'
+          Value: 'true'
+        - Namespace: 'aws:ec2:instances'
+          OptionName: 'SpotFleetOnDemandBase'
+          Value: '1'
+        - Namespace: 'aws:ec2:instances'
+          OptionName: 'SpotMaxPrice'
+          Value: '0.0050'
+        - Namespace: 'aws:autoscaling:asg'
+          OptionName: 'MaxSize'
+          Value: '3'
+        - Namespace: 'aws:elasticbeanstalk:environment'
+          OptionName: 'EnvironmentType'
+          Value: 'LoadBalanced'
+        - Namespace: 'aws:elasticbeanstalk:command'
+          OptionName: 'DeploymentPolicy'
+          Value: 'Rolling'
 
 Outputs:
-  MySQLDNS:
-    Description: Databse DNS Name
-    Value: !GetAtt MySQLDatabase.Endpoint.Address
-  MySQLPort:
-    Description: Databse Prot
-    Value: !GetAtt MySQLDatabase.Endpoint.Port
+  AppDNS:
+    Description: Stack front load balancer DNS
+    Value: !GetAtt WebAppEnvBT.EndpointURL

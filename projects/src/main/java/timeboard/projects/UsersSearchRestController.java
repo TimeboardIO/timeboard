@@ -26,23 +26,21 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import timeboard.core.TimeboardAuthentication;
-import timeboard.core.api.OrganizationService;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
@@ -56,22 +54,20 @@ import java.util.*;
 @RequestMapping("/api/search")
 public class UsersSearchRestController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     @Autowired
-    private UserService userService;
-
-    @Autowired
-    private OrganizationService organizationService;
+    private AccountService accountService;
 
     @Autowired
     private ProjectService projectService;
 
     @GetMapping
-    protected void doGet(TimeboardAuthentication authentication,
-                         HttpServletRequest req, HttpServletResponse resp) throws IOException, BusinessException {
+    protected ResponseEntity<SearchResults> doGet(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest req,
+            final HttpServletResponse resp) throws BusinessException {
 
-        String query = req.getParameter("q");
-        Account actor = authentication.getDetails();
+        final String query = req.getParameter("q");
+        final Account actor = authentication.getDetails();
 
         if (query.isBlank() || query.isEmpty()) {
             throw new BusinessException("Query is empty");
@@ -82,32 +78,58 @@ public class UsersSearchRestController {
             projectID = Long.parseLong(req.getParameter("projectID"));
         }
 
-        Long orgID = null;
-        if (req.getParameter("orgID") != null) {
-            orgID = Long.parseLong(req.getParameter("orgID"));
-        }
+        final Organization org = authentication.getCurrentOrganization();
 
-        Set<Account> accounts = new HashSet<>();
+        final Set<Account> accounts = new HashSet<>();
 
         if (projectID != null) {
-            Project project = projectService.getProjectByIdWithAllMembers(actor, projectID);
-            accounts.addAll(this.userService.searchUserByEmail(actor, query, project));
-        } else if (orgID != null) {
-            Optional<Organization> org = organizationService.getOrganizationByID(actor, orgID);
-            accounts.addAll(this.userService.searchUserByEmail(actor, query, org.get()));
+            final Project project = projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query, project));
+        } else if (org != null) {
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query, org));
         } else {
-            accounts.addAll(this.userService.searchUserByEmail(actor,  query));
+            accounts.addAll(this.accountService.searchUserByEmail(actor, query));
         }
-        SearchResults searchResults = new SearchResults(accounts.size(), accounts);
 
-        MAPPER.writeValue(resp.getWriter(), searchResults);
+        final SearchResults searchResults = new SearchResults(accounts.size(), accounts);
+
+        return ResponseEntity.ok(searchResults);
+    }
+
+    @GetMapping("/byRole")
+    protected ResponseEntity<SearchResults> doGetMembersProjects(
+            final TimeboardAuthentication authentication,
+            final HttpServletRequest req, final HttpServletResponse resp) throws BusinessException {
+
+        final Account actor = authentication.getDetails();
+
+        final String query = req.getParameter("q");
+        if (query.isBlank() || query.isEmpty()) {
+            throw new BusinessException("Query is empty");
+        }
+
+        final Organization org = authentication.getCurrentOrganization();
+
+
+        final List<Account> accounts = new ArrayList<>();
+        if (org != null) {
+            final List<Account> ownersOfAnyUserProject = this.projectService.findOwnersOfAnyUserProject(actor);
+            accounts.addAll(ownersOfAnyUserProject);
+
+        } else {
+            throw new BusinessException("OrganizationID is null");
+        }
+
+        final SearchResults searchResults = new SearchResults(accounts.size(), accounts);
+
+        return ResponseEntity.ok(searchResults);
     }
 
     public static class SearchResult implements Serializable {
         private Long id;
         private String screenName;
 
-        public SearchResult(Account a) {
+        public SearchResult(final Account a) {
             this.id = a.getId();
             this.screenName = a.getScreenName();
         }
@@ -116,7 +138,7 @@ public class UsersSearchRestController {
             return id;
         }
 
-        public void setId(Long id) {
+        public void setId(final Long id) {
             this.id = id;
         }
 
@@ -124,7 +146,7 @@ public class UsersSearchRestController {
             return screenName;
         }
 
-        public void setScreenName(String screenName) {
+        public void setScreenName(final String screenName) {
             this.screenName = screenName;
         }
 
@@ -135,11 +157,11 @@ public class UsersSearchRestController {
         private Integer count;
         private Collection<SearchResult> items;
 
-        public SearchResults(Integer count, Collection<Account> items) {
+        public SearchResults(final Integer count, final Collection<Account> items) {
             this.count = count;
             this.items = new ArrayList<>();
 
-            for (Account a : items) {
+            for (final Account a : items) {
                 this.items.add(new SearchResult(a));
             }
         }
@@ -148,7 +170,7 @@ public class UsersSearchRestController {
             return count;
         }
 
-        public void setCount(Integer count) {
+        public void setCount(final Integer count) {
 
             this.count = count;
         }
@@ -157,7 +179,7 @@ public class UsersSearchRestController {
             return items;
         }
 
-        public void setItems(List<SearchResult> items) {
+        public void setItems(final List<SearchResult> items) {
             this.items = items;
         }
     }

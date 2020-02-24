@@ -27,7 +27,8 @@ package timeboard.organization;
  */
 
 import org.springframework.stereotype.Component;
-import timeboard.core.ui.NavigationExtPoint;
+import timeboard.core.api.AbacEntries;
+import timeboard.core.api.NavigationExtPoint;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -38,12 +39,12 @@ public class TimesheetNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "Timesheet";
+        return "nav.timesheet";
     }
 
     @Override
     public String getNavigationParams() {
-        Calendar c = Calendar.getInstance();
+        final Calendar c = Calendar.getInstance();
         c.setTime(new Date());
 
         return String.format("week=%s&year=%s", c.get(Calendar.WEEK_OF_YEAR), c.get(Calendar.YEAR));
@@ -52,6 +53,11 @@ public class TimesheetNavigationProvider implements NavigationExtPoint {
     @Override
     public String getNavigationPath() {
         return "/timesheet";
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return AbacEntries.TIMESHEET_VIEW;
     }
 
     @Override

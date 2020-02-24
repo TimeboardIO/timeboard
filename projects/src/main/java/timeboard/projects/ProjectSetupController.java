@@ -26,7 +26,6 @@ package timeboard.projects;
  * #L%
  */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,17 +33,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.TimeboardAuthentication;
-import timeboard.core.api.ProjectExportService;
+import org.springframework.web.servlet.support.RequestContextUtils;
+import timeboard.core.api.AccountService;
 import timeboard.core.api.ProjectService;
-import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.UserService;
 import timeboard.core.api.exceptions.BusinessException;
-import timeboard.core.api.sync.ProjectSyncPlugin;
-import timeboard.core.model.Account;
-import timeboard.core.model.MembershipRole;
-import timeboard.core.model.Project;
-import timeboard.core.model.ProjectMembership;
+import timeboard.core.model.*;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -54,49 +48,43 @@ import java.util.Map;
 
 
 @Controller
-@RequestMapping("/projects/{projectID}/setup")
-public class ProjectSetupController {
+@RequestMapping("/projects/{projectID}" + ProjectSetupController.URL)
+public class ProjectSetupController extends ProjectBaseController {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-    @Autowired(
-            required = false
-    )
-    private List<ProjectExportService> projectExportServices;
-
-    @Autowired(
-            required = false
-    )
-    private List<ProjectSyncPlugin> projectImportServices;
+    public static final String URL = "/setup";
 
     @Autowired
     private ProjectService projectService;
 
     @Autowired
-    private UserService userService;
-
+    private AccountService accountService;
 
 
     @GetMapping
-    protected String configProject(TimeboardAuthentication authentication,
-                                   @PathVariable long projectID, Model model) throws BusinessException {
+    protected String setupProject(
+            final TimeboardAuthentication authentication,
+            @PathVariable final long projectID,
+            final Model model,
+            HttpServletRequest request) throws BusinessException {
+
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         final Map<String, Object> map = new HashMap<>();
-        this.prepareTemplateData(project, map);
+        this.prepareTemplateData(authentication.getCurrentOrganization(), project, map, request);
         model.addAllAttributes(map);
-        return "project_config.html";
+        this.initModel(model, authentication, project);
+        return "project_setup.html";
     }
 
     @PostMapping("/memberships")
     @ResponseBody
-    protected ResponseEntity updateProjectMembers(TimeboardAuthentication authentication,
-                                                  @PathVariable long projectID, HttpServletRequest request) throws Exception {
+    protected ResponseEntity updateProjectMembers(final TimeboardAuthentication authentication,
+                                                  @PathVariable final long projectID, final HttpServletRequest request) throws Exception {
         final Account actor = authentication.getDetails();
-        final Account targetMember = this.userService.findUserByID(Long.parseLong(request.getParameter("memberID")));
+        final Account targetMember = this.accountService.findUserByID(Long.parseLong(request.getParameter("memberID")));
         final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
 
-        if(project.isMember(targetMember)){
+        if (project.isMember(targetMember)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This user is already member of this project");
         }
 
@@ -106,27 +94,27 @@ public class ProjectSetupController {
     }
 
     @PatchMapping("/memberships/{membershipID}/{role}")
-    protected ResponseEntity updateProjectMembers(TimeboardAuthentication authentication,
-                                                  @PathVariable Long projectID,
-                                                  @PathVariable Long membershipID,
-                                                  @PathVariable MembershipRole role) throws Exception {
+    protected ResponseEntity updateProjectMembers(final TimeboardAuthentication authentication,
+                                                  @PathVariable final Long projectID,
+                                                  @PathVariable final Long membershipID,
+                                                  @PathVariable final MembershipRole role) throws Exception {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getMembers().stream()
-                .filter(projectMembership -> projectMembership.getMembershipID() == membershipID)
+                .filter(projectMembership -> projectMembership.getMembershipID().equals(membershipID))
                 .forEach(projectMembership -> projectMembership.setRole(role));
         this.projectService.updateProject(actor, project);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @DeleteMapping("/memberships/{membershipID}")
-    protected ResponseEntity deleteProjectMembers(TimeboardAuthentication authentication,
-                                                  @PathVariable Long projectID,
-                                                  @PathVariable Long membershipID) throws Exception {
+    protected ResponseEntity deleteProjectMembers(final TimeboardAuthentication authentication,
+                                                  @PathVariable final Long projectID,
+                                                  @PathVariable final Long membershipID) throws Exception {
 
         final Account actor = authentication.getDetails();
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
+        final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
         project.getMembers().removeIf(projectMembership -> {
             return projectMembership.getMembershipID() == membershipID && projectMembership.getMember().getId() != actor.getId();
         });
@@ -136,40 +124,51 @@ public class ProjectSetupController {
     }
 
     @PostMapping("/informations")
-    protected String updateProjectConfiguration(TimeboardAuthentication authentication,
-                                                @PathVariable long projectID,
-                                                @ModelAttribute ProjectConfigForm projectConfigForm,
-                                                RedirectAttributes attributes) throws Exception {
+    protected String updateProjectConfiguration(final TimeboardAuthentication authentication,
+                                                @PathVariable final long projectID,
+                                                @ModelAttribute final ProjectConfigForm projectConfigForm,
+                                                final RedirectAttributes attributes) throws Exception {
 
-        final Account actor = authentication.getDetails();
+        if (projectConfigForm.getComments().length() > 500) {
+            attributes.addFlashAttribute("error", "Your comment is too long (500 characters max)");
+            attributes.addFlashAttribute("editedComments", projectConfigForm.getComments());
+        } else {
 
-        final Project project = this.projectService.getProjectByIdWithAllMembers(actor, projectID);
-        project.setName(projectConfigForm.getName());
-        project.setComments(projectConfigForm.getComments());
-        project.setQuotation(projectConfigForm.getQuotation());
+            final Account actor = authentication.getDetails();
 
-        try {
-            this.projectService.updateProject(actor, project);
-            attributes.addFlashAttribute("success", "Project config updated successfully.");
-        } catch(BusinessException e) {
-            attributes.addFlashAttribute("error", e.getMessage());
+            final Project project = this.projectService.getProjectByID(actor, authentication.getCurrentOrganization(), projectID);
+            project.setName(projectConfigForm.getName());
+            project.setComments(projectConfigForm.getComments());
+            project.setQuotation(projectConfigForm.getQuotation());
+
+            try {
+                this.projectService.updateProject(actor, project);
+                attributes.addFlashAttribute("success", "Project config updated successfully.");
+            } catch (final BusinessException e) {
+                attributes.addFlashAttribute("error", e.getMessage());
+            }
         }
-
-        return "redirect:/projects/" + projectID + "/setup";
+        return "redirect:/projects/" + projectID + URL;
     }
 
-    private void prepareTemplateData(final Project project, final Map<String, Object> map) {
+    private void prepareTemplateData(final Organization org, final Project project, final Map<String, Object> map, HttpServletRequest request) {
 
         final ProjectConfigForm pcf = new ProjectConfigForm();
         pcf.setName(project.getName());
-        pcf.setComments(project.getComments());
+
+        if (RequestContextUtils.getInputFlashMap(request) != null && RequestContextUtils.getInputFlashMap(request).containsKey("editedComments")) {
+            // Keep last edited comment
+            pcf.setComments((String) RequestContextUtils.getInputFlashMap(request).get("editedComments"));
+        } else {
+            pcf.setComments(project.getComments());
+        }
         pcf.setQuotation(project.getQuotation());
 
         final ProjectMembersForm pmf = new ProjectMembersForm();
         pmf.setMemberships(new ArrayList<>(project.getMembers()));
 
         map.put("project", project);
-        map.put("orgID", ThreadLocalStorage.getCurrentOrganizationID());
+        map.put("orgID", org.getId());
         map.put("projectConfigForm", pcf);
         map.put("projectMembersForm", pmf);
         map.put("roles", MembershipRole.values());
@@ -188,7 +187,7 @@ public class ProjectSetupController {
             return memberships;
         }
 
-        public void setMemberships(List<ProjectMembership> memberships) {
+        public void setMemberships(final List<ProjectMembership> memberships) {
             this.memberships = memberships;
         }
     }
@@ -203,7 +202,7 @@ public class ProjectSetupController {
             return name;
         }
 
-        public void setName(String name) {
+        public void setName(final String name) {
             this.name = name;
         }
 
@@ -211,7 +210,7 @@ public class ProjectSetupController {
             return quotation;
         }
 
-        public void setQuotation(double quotation) {
+        public void setQuotation(final double quotation) {
             this.quotation = quotation;
         }
 
@@ -219,7 +218,7 @@ public class ProjectSetupController {
             return comments;
         }
 
-        public void setComments(String comments) {
+        public void setComments(final String comments) {
             this.comments = comments;
         }
 

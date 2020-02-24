@@ -219,7 +219,7 @@ th,
 td {
   text-align: center;
 }
-.ui.segment {
+.ui.segment:not(.visible) {
   -webkit-box-shadow: none !important;
           box-shadow: none !important;
   border: none !important;
@@ -241,13 +241,20 @@ h2.ui.header,
   font-weight: normal;
   color: #00bfd8;
 }
+div.pointing:nth-child(1) > a:nth-child(1),
+div.pointing:nth-child(1) > a:nth-child(1):hover {
+  background-color: #00bfd8;
+  border-bottom-left-radius: 0 !important;
+  color: #FFFFFF;
+  cursor: default;
+}
 ui.input.error > input {
   background-color: #fff !important;
   border-color: #e0b4b4 !important;
   color: #e55151 !important;
 }
 .day-badge {
-  width: 2.5rem;
+  min-width: 2.5rem !important;
   height: 2.5rem;
 }
 .ui.statistic .value {
@@ -261,6 +268,50 @@ table,
           box-shadow: 0 1px 2px 0 rgba(34, 36, 38, 0.15) !important;
 }
 /** Timesheet **/
+#timesheet {
+  /** input number **/
+}
+#timesheet .hatchedBackground {
+  background: -webkit-repeating-linear-gradient(45deg, lightgray, lightgray 10px, white 10px, white 20px);
+  background: repeating-linear-gradient(45deg, lightgray, lightgray 10px, white 10px, white 20px);
+}
+#timesheet .hatchedBackground input {
+  color: rgba(40, 40, 40, 0.3);
+}
+#timesheet .ui.button,
+#timesheet .ui.buttons .button,
+#timesheet .ui.buttons .or {
+  font-size: 0.85714286rem !important;
+}
+#timesheet input {
+  -moz-appearance: textfield;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.25rem;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  max-width: 100%;
+  min-height: 1.5rem;
+  min-width: 3rem;
+  padding: 0.4375rem 0.875rem;
+  -webkit-transition: border-color 0.15s;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+#timesheet input::-webkit-outer-spin-button,
+#timesheet input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+}
+@media only screen and (max-width: 767px) {
+  #timesheet .ui.table:not(.unstackable) thead {
+    display: none !important;
+  }
+}
+#timesheet input:disabled,
+#timesheet input[readonly] {
+  color: lightgrey;
+}
 #timesheet table td {
   padding: 0.3rem 0.3rem;
 }
@@ -291,8 +342,12 @@ table,
 #timesheet td:focus {
   background-color: rgba(128, 128, 200, 0.3);
 }
+#timesheet .timesheet-menu {
+  background-color: white !important;
+  border-radius: 0.5rem !important;
+}
 #timesheet .timesheet-navigation-controls {
-  margin-bottom: 1em;
+  margin-bottom: 0em;
   text-align: right;
 }
 #timesheet .timesheet-validation-controls {
@@ -314,6 +369,13 @@ table,
 #timesheet th.project {
   font-size: 1em !important;
   font-weight: normal;
+}
+.calendar.ui.celled.table tr td,
+.calendar.ui.celled.table tr th {
+  border-left: 1px solid rgba(34, 36, 38, 0.1) !important;
+}
+.calendar-cell {
+  width: 25px;
 }
 /** PROJECT **/
 .badge {

@@ -26,8 +26,7 @@ package timeboard.reports;
  * #L%
  */
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,20 +35,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.TimeboardAuthentication;
-import timeboard.core.api.ProjectService;
 import timeboard.core.api.ReportService;
-import timeboard.core.api.ThreadLocalStorage;
-import timeboard.core.api.UserService;
+import timeboard.core.internal.reports.ReportHandler;
 import timeboard.core.model.Account;
 import timeboard.core.model.Report;
-import timeboard.core.model.ReportType;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.ServletException;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -57,36 +57,35 @@ import java.util.stream.Collectors;
 @RequestMapping("/reports")
 public class ReportsController {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     @Autowired
     private ReportService reportService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ProjectService projectService;
-
-
     @GetMapping
-    protected String handleGet()  {
+    protected String handleGet() {
         return "reports.html";
     }
 
+
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    protected ResponseEntity<List<ReportDecorator>> reportList(TimeboardAuthentication authentication,  Model model) {
+    protected ResponseEntity<List<ReportDecorator>> reportList(final TimeboardAuthentication authentication, final Model model) {
         final Account actor = authentication.getDetails();
-        final List<ReportDecorator> reports = this.reportService.listReports(actor)
+        final List<ReportDecorator> reports = this.reportService.listReports(authentication.getCurrentOrganization(), actor)
                 .stream()
-                .map(report -> new ReportDecorator(report))
+                .map(report -> {
+                    final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
+                    if (reportController.isPresent()) {
+                        return new ReportDecorator(report, reportController.get());
+                    }
+                    return null;
+                })
+                .filter(r -> r != null)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(reports);
     }
 
     @GetMapping("/create")
-    protected String createReport(Model model) throws ServletException, IOException {
-        model.addAttribute("allReportTypes", ReportType.values());
+    protected String createReport(final Model model) throws ServletException, IOException {
+        model.addAttribute("allReportTypes", this.reportService.listReportHandlers());
         model.addAttribute("report", new Report());
         model.addAttribute("action", "create");
 
@@ -95,20 +94,18 @@ public class ReportsController {
     }
 
     @PostMapping("/create")
-    protected String handlePost(TimeboardAuthentication authentication,
-                                @ModelAttribute Report report,  RedirectAttributes attributes) {
+    protected String handlePost(final TimeboardAuthentication authentication,
+                                @ModelAttribute final Report report, final RedirectAttributes attributes) throws SchedulerException {
 
         final Account actor = authentication.getDetails();
-        Long organizationID = ThreadLocalStorage.getCurrentOrganizationID();
-        Account organization = userService.findUserByID(organizationID);
 
-        String projectFilter = report.getFilterProject();
+        final String projectFilter = report.getFilterProject();
 
         this.reportService.createReport(
+                authentication.getCurrentOrganization(),
                 actor,
                 report.getName(),
-                organization,
-                report.getType(),
+                report.getHandlerID(),
                 projectFilter
         );
         attributes.addFlashAttribute("success", "Report created successfully.");
@@ -116,40 +113,38 @@ public class ReportsController {
         return "redirect:/reports";
     }
 
-    @GetMapping("/delete/{reportID}")
+    @GetMapping("/delete/{report}")
     protected String deleteReport(final TimeboardAuthentication authentication,
-                                  @PathVariable long reportID,
-                                  RedirectAttributes attributes) {
+                                  @PathVariable final Report report,
+                                  final RedirectAttributes attributes) throws SchedulerException {
 
-        this.reportService.deleteReportByID(authentication.getDetails(), reportID);
+        this.reportService.deleteReportByID(authentication.getDetails(), report.getId());
 
         attributes.addFlashAttribute("success", "Report deleted successfully.");
 
         return "redirect:/reports";
     }
 
-    @GetMapping("/edit/{reportID}")
+    @GetMapping("/edit/{report}")
     protected String editReport(final TimeboardAuthentication authentication,
-                                @PathVariable long reportID, Model model) {
-        model.addAttribute("allReportTypes", ReportType.values());
-        model.addAttribute("reportID", reportID);
+                                @PathVariable final Report report, final Model model) {
+        model.addAttribute("allReportTypes", this.reportService.listReportHandlers());
+        model.addAttribute("reportID", report.getId());
         model.addAttribute("action", "edit");
-        model.addAttribute("report", this.reportService.getReportByID(authentication.getDetails(), reportID));
+        model.addAttribute("report", report);
         return "create_report.html";
     }
 
     @PostMapping("/edit/{reportID}")
     protected String handlePost(final TimeboardAuthentication authentication,
-                                @PathVariable long reportID,
-                                @ModelAttribute Report report,  RedirectAttributes attributes) {
+                                @PathVariable final long reportID,
+                                @ModelAttribute final Report report, final RedirectAttributes attributes) {
 
         final Account actor = authentication.getDetails();
-        Long organizationID = ThreadLocalStorage.getCurrentOrganizationID();
-        Account organization = userService.findUserByID(organizationID);
 
-        Report updatedReport = this.reportService.getReportByID(organization, reportID);
+        final Report updatedReport = this.reportService.getReportByID(authentication.getDetails(), reportID);
         updatedReport.setName(report.getName());
-        updatedReport.setType(ReportType.PROJECT_KPI);
+        updatedReport.setHandlerID(report.getHandlerID());
         updatedReport.setFilterProject(report.getFilterProject());
 
         this.reportService.updateReport(actor, updatedReport);
@@ -158,16 +153,19 @@ public class ReportsController {
         return "redirect:/reports";
     }
 
-    @PostMapping(value = "/refreshProjectSelection", produces = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public ResponseEntity refreshProjectSelection(final TimeboardAuthentication authentication,
-                                                  @RequestBody MultiValueMap<String, String> filterProjectsMap)
-            throws JsonProcessingException {
+    @PostMapping(value = "/refreshProjectSelection",
+            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity refreshProjectSelection(
+            final TimeboardAuthentication authentication,
+            @RequestBody final MultiValueMap<String, String> filterProjectsMap) {
+
         final Account actor = authentication.getDetails();
 
-        String filterProjects = filterProjectsMap.getFirst("filter");
+        final String filterProjects = filterProjectsMap.getFirst("filter");
 
         // If there is no filter, don't display all the projects
-        if(filterProjects == null || filterProjects.isEmpty()) {
+        if (filterProjects == null || filterProjects.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible to display the projects. Give a filter.");
         }
 
@@ -175,32 +173,81 @@ public class ReportsController {
         final List<ReportService.ProjectWrapper> projects = this.reportService
                 .findProjects(actor, authentication.getCurrentOrganization(), Arrays.asList(filters));
 
-        return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(projects));
+        return ResponseEntity.ok(projects);
     }
 
-    @GetMapping("/view/{reportID}")
-    protected String viewReport(final TimeboardAuthentication authentication,
-                                @PathVariable long reportID, Model model) {
-        model.addAttribute("reportID", reportID);
-        ReportType type = this.reportService.getReportByID(authentication.getDetails(), reportID).getType();
-        model.addAttribute("reportType", type);
-        model.addAttribute("report", this.reportService.getReportByID(authentication.getDetails(), reportID));
+    @GetMapping("/async/{report}")
+    public String requestAsyncReport(
+            final TimeboardAuthentication authentication,
+            @PathVariable final Report report,
+            final RedirectAttributes attributes) throws SchedulerException {
 
-        switch (type) {
-            case PROJECT_KPI:
-                return "view_report_kpi.html";
-            default:
-                return "";
+        this.reportService.executeAsyncReport(authentication.getDetails(), report);
+        attributes.addFlashAttribute("success", "report.async.request");
+
+        return "redirect:/reports";
+    }
+
+    @GetMapping("/view/{report}")
+    public ModelAndView viewReport(
+            final TimeboardAuthentication authentication,
+            @PathVariable final Report report) {
+
+        final ModelAndView mav = new ModelAndView();
+
+        final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
+
+        if (reportController.isPresent()) {
+            mav.getModel().put("fragment", reportController.get().handlerView());
         }
+
+        mav.getModel().put("report", report);
+        mav.getModel().put("reportController", reportController.get());
+        mav.setViewName("report_layout.html");
+
+        return mav;
     }
 
 
-    private class ReportDecorator {
+    @GetMapping(
+            value = "/view/{reportID}/data",
+            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_XML_VALUE})
+    @ResponseBody
+    public ResponseEntity<Object> viewReportData(
+            final TimeboardAuthentication authentication,
+            @PathVariable final Report report) {
+
+        final Optional<ReportHandler> reportController = this.reportService.getReportHandler(report);
+
+        if (reportController.isPresent()) {
+            final Serializable model = reportController.get().getReportModel(authentication, report);
+            return ResponseEntity.ok(model);
+        }
+
+        return ResponseEntity.badRequest().build();
+    }
+
+
+    private static class ReportDecorator {
 
         private final Report report;
+        private final ReportHandler controller;
 
-        public ReportDecorator(Report report) {
+        public ReportDecorator(final Report report, ReportHandler controller) {
             this.report = report;
+            this.controller = controller;
+        }
+
+        public Report getReport() {
+            return report;
+        }
+
+        public ReportHandler getController() {
+            return controller;
+        }
+
+        public Calendar getLastAsyncJobTrigger() {
+            return this.report.getLastAsyncJobTrigger();
         }
 
         public long getID() {
@@ -210,6 +257,12 @@ public class ReportsController {
         public String getName() {
             return this.report.getName();
         }
+
+
+        public boolean isAsync() {
+            return this.controller.isAsyncHandler();
+        }
+
 
     }
 

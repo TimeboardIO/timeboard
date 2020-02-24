@@ -33,10 +33,9 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import timeboard.core.TimeboardAuthentication;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ThreadLocalStorage;
 import timeboard.core.model.Organization;
+import timeboard.core.security.TimeboardAuthentication;
 import timeboard.organization.OrganizationSelectController;
 
 import javax.servlet.*;
@@ -55,10 +54,6 @@ import java.util.stream.Collectors;
 public class OrganizationFilter implements Filter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganizationFilter.class);
-
-    @Autowired
-    private OrganizationService organizationService;
-
     private static final List<String> whitelist = new ArrayList<>();
 
     static {
@@ -66,13 +61,17 @@ public class OrganizationFilter implements Filter {
         whitelist.add(OnboardingController.URI);
         whitelist.add("/org/create");
         whitelist.add("/login/oauth2/code/cognito");
+        whitelist.add("/manifest.json");
         whitelist.add(".*(.)(js|css|jpg|png|ttf|woff|woff2|svg)");
     }
 
+    @Autowired
+    private OrganizationService organizationService;
+
     @Override
-    public void doFilter(ServletRequest servletRequest,
-                         ServletResponse servletResponse,
-                         FilterChain filterChain) throws IOException, ServletException {
+    public void doFilter(final ServletRequest servletRequest,
+                         final ServletResponse servletResponse,
+                         final FilterChain filterChain) throws IOException, ServletException {
 
         if (isWhiteListed((HttpServletRequest) servletRequest)) {
             filterChain.doFilter(servletRequest, servletResponse);
@@ -88,40 +87,40 @@ public class OrganizationFilter implements Filter {
         }
     }
 
-    private boolean processCookieExtraction(TimeboardAuthentication authentication,
-                                            HttpServletRequest servletRequest,
-                                            HttpServletResponse servletResponse) throws IOException {
+    private boolean processCookieExtraction(final TimeboardAuthentication authentication,
+                                            final HttpServletRequest servletRequest,
+                                            final HttpServletResponse servletResponse) throws IOException {
 
-        Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
-        if (orgCookie.isPresent()) {
+        final Optional<Cookie> orgCookie = this.extractOrgCookie(servletRequest);
+        if (orgCookie.isPresent() && authentication != null) {
             try {
                 final Long organizationID = Long.parseLong(orgCookie.get().getValue());
 
-                Optional<Organization> organization = this.organizationService
+                final Optional<Organization> organization = this.organizationService
                         .getOrganizationByID(authentication.getDetails(), organizationID);
 
                 if (organization.isPresent()) {
-                    ThreadLocalStorage.setCurrentOrganizationID(organization.get().getId());
+                    authentication.setCurrentOrganization(organization.get());
                 } else {
                     servletResponse.sendRedirect(OrganizationSelectController.URI);
-                    LOGGER.debug("Wrong or missing org cookie, redirect to login");
+                    LOGGER.info("Wrong or missing org cookie, redirect to login");
                     return true;
                 }
-            } catch (AccessDeniedException ex) {
+            } catch (final AccessDeniedException ex) {
                 servletResponse.sendRedirect(OrganizationSelectController.URI);
-                LOGGER.debug("Wrong or missing org cookie, redirect to login");
+                LOGGER.info("Wrong or missing org cookie, redirect to login");
                 return true;
             }
 
         } else {
             servletResponse.sendRedirect(OrganizationSelectController.URI);
-            LOGGER.debug("Wrong or missing org cookie, redirect to login");
+            LOGGER.info("Wrong or missing org cookie, redirect to login");
             return true;
         }
         return false;
     }
 
-    private boolean isWhiteListed(HttpServletRequest servletRequest) {
+    private boolean isWhiteListed(final HttpServletRequest servletRequest) {
 
         final Long nbRulesMatched = whitelist.stream()
                 .filter(s -> servletRequest.getRequestURI().matches(s)).collect(Collectors.counting());
@@ -129,7 +128,7 @@ public class OrganizationFilter implements Filter {
         return nbRulesMatched != null && nbRulesMatched > 0;
     }
 
-    private Optional<Cookie> extractOrgCookie(HttpServletRequest servletRequest) {
+    private Optional<Cookie> extractOrgCookie(final HttpServletRequest servletRequest) {
         return Arrays.asList(servletRequest.getCookies())
                 .stream()
                 .filter(cookie -> cookie.getName().equals(OrganizationSelectController.COOKIE_NAME))

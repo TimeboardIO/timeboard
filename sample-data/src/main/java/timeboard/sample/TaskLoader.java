@@ -43,19 +43,24 @@ public class TaskLoader {
     UserService userService;
     ProjectService projectService;
 
-    TaskLoader(ProjectService projectService, UserService userService){
+    TaskLoader(final ProjectService projectService, final UserService userService) {
         this.projectService = projectService;
         this.userService = userService;
     }
 
-    public List<Task> load(List<Account> usersSaved, List<Project> projectsSaved, int nbProjectsByUsers, int nbTasksByProjects) {
-        List<Task> tasksSaved = new ArrayList<>();
+    public List<Task> load(
+            final List<Account> usersSaved,
+            final List<Project> projectsSaved,
+            final int nbProjectsByUsers,
+            final int nbTasksByProjects) {
+
+        final List<Task> tasksSaved = new ArrayList<>();
         for (int i = 0; i < projectsSaved.size(); i++) {
 
-            Account owner = usersSaved.get(i/nbProjectsByUsers); // car 1 user possède "nbProjectsByUsers" projects
-            Project project = projectsSaved.get(i);
+            final Account owner = usersSaved.get(i / nbProjectsByUsers); // car 1 user possède "nbProjectsByUsers" projects
+            final Project project = projectsSaved.get(i);
 
-            if(owner != null && project != null) {
+            if (owner != null && project != null) {
                 // On créé "nbTasksByProjects" tâches par projet
                 for (int j = 0; j < nbTasksByProjects; j++) {
                     try {
@@ -74,15 +79,15 @@ public class TaskLoader {
                                 null));
 
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (final Exception e) {
+                        LOGGER.error(e.getMessage());
                     }
                 }
             }
 
         }
 
-         return tasksSaved;
+        return tasksSaved;
 
     }
 
