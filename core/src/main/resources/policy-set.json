@@ -49,6 +49,7 @@
     "actions": [
       "PROJECT_CREATE",
       "PROJECT_ARCHIVE",
+      "ORG_IMPERSONATE",
       "ORG_SETUP"
     ],
     "conditions": [
