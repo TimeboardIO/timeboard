@@ -62,9 +62,6 @@ public class ModulesConfiguration {
     @Autowired
     private OrganizationFilter organizationFilter;
 
-    @Autowired
-    private RequestDurationFilter requestDurationFilter;
-
     @Bean
     public FilterRegistrationBean<OrganizationFilter> loggingFilter() {
         final FilterRegistrationBean<OrganizationFilter> registrationBean = new FilterRegistrationBean<>();
@@ -75,13 +72,4 @@ public class ModulesConfiguration {
         return registrationBean;
     }
 
-    @Bean
-    public FilterRegistrationBean<RequestDurationFilter> loggingRequestDurationFilter() {
-        final FilterRegistrationBean<RequestDurationFilter> registrationBean = new FilterRegistrationBean<>();
-
-        registrationBean.setFilter(this.requestDurationFilter);
-        registrationBean.addUrlPatterns("/*");
-
-        return registrationBean;
-    }
 }

@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
+import timeboard.core.api.AbacEntries;
 import timeboard.core.api.sync.ProjectSyncCredentialField;
 import timeboard.core.api.sync.ProjectSyncPlugin;
 import timeboard.core.api.sync.ProjectSyncService;
@@ -39,7 +40,6 @@ import timeboard.core.internal.async.ProjectSyncJob;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
-import timeboard.core.security.AbacEntries;
 
 import java.util.Date;
 import java.util.List;

@@ -78,7 +78,7 @@ public class TimeboardAuthentication implements Authentication {
         return this.overriddenAccount != null;
     }
 
-     @Override
+    @Override
     public boolean isAuthenticated() {
         return this.p != null;
     }
@@ -90,7 +90,7 @@ public class TimeboardAuthentication implements Authentication {
 
     public void setOverriddenAccount(Account overriddenAccount) {
         this.overriddenAccount = null;
-        if(overriddenAccount != null && this.account.getId() != overriddenAccount.getId()) {
+        if (overriddenAccount != null && this.account.getId() != overriddenAccount.getId()) {
             this.overriddenAccount = overriddenAccount;
         }
     }
