@@ -46,4 +46,9 @@ public class ProjectTasksNavigationProvider implements ProjectNavigationProvider
     public String getNavigationAction() {
         return AbacEntries.PROJECT_TASKS_VIEW;
     }
+
+    @Override
+    public int getNavigationWeight() {
+        return 0;
+    }
 }

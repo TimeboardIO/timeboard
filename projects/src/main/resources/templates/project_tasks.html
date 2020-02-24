@@ -33,7 +33,7 @@
             <i class="close icon"></i>
             <div class="content">
                 <div class="ui fluid card">
-                    <canvas id="lineChart" width="800" height="450"></canvas>
+                    <canvas id="taskLineChart" width="800" height="450"></canvas>
                 </div>
             </div>
 
@@ -316,6 +316,48 @@
                     {{ batch.batchName }}
                 </div>
                 <div class="content" >
+
+                    <!-- Charge Information -->
+                    <div class="ui fluid card" style="width: 50%; margin-left: 25%;">
+                        <div class="content">
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.originalEstimate.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Original Estimate
+                                </div>
+                            </div>
+
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.effortSpent.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Effort Spent
+                                </div>
+                            </div>
+
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.effortLeft.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Effort Left
+                                </div>
+                            </div>
+
+                            <div class="ui mini statistic">
+                                <div class="value">
+                                    {{batch.realEffort.toFixed(2)}}
+                                </div>
+                                <div class="label">
+                                    Real Effort
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Datatable component -->
                     <data-table v-bind:config="taskListConfig" v-bind:table="tableByBatch[batch.batchID]">
                         <template v-slot:name="{row}">
@@ -363,7 +405,7 @@
 
                         <template v-slot:actions="{row}">
                             <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task">
-                                <i class="close icon"></i>
+                                <i class="archive icon"></i>
                             </button>
                             <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task"
                                     class="ui tiny primary icon button">
@@ -424,7 +466,7 @@
 
                     <template v-slot:actions="{row}">
                         <button @click="deleteTask($event, row)" class="ui tiny negative icon button" data-cy="delete-task" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_APPROBATION')}" >
-                            <i class="close icon"></i>
+                            <i class="archive icon"></i>
                         </button>
                         <button v-on:click="showCreateTaskModal(null, row, $event)" data-cy="edit-task" sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_EDIT')}"
                                 class="ui tiny primary icon button">
@@ -455,7 +497,7 @@
 
         <tmodal-confirm
                 ref="confirmModal"
-                title="Delete task ?"
+                title="Archive task ?"
                 icon="close"
         ></tmodal-confirm>
 

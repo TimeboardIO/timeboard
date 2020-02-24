@@ -47,6 +47,7 @@ import timeboard.core.internal.rules.project.ActorIsProjectMember;
 import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
+import timeboard.core.internal.rules.task.TaskHasStatus;
 import timeboard.core.model.*;
 import timeboard.core.security.AbacEntries;
 
@@ -228,7 +229,75 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.REPORT_PROJECT_VIEW + "')")
+    public Map<TaskType, ProjectDashboard> projectDashboardByTaskType(final Account actor, final Project project) throws BusinessException {
+
+        // Get effort spent from imputations
+        final TypedQuery<Object[]> q1 = em.createQuery(
+                "select t.taskType as type, COALESCE(sum(i.value),0) "
+                +  "from Task t left outer join t.imputations i "
+                +  "where t.project = :project "
+                +  "GROUP BY t.taskType", Object[].class);
+
+        q1.setParameter("project", project);
+        final Map<TaskType, Double> effortSpent = q1.getResultList().stream()
+                .collect(Collectors.toMap(e -> (TaskType) e[0], e -> (double) e[1] ));
+
+        // get oe et el from task
+        final TypedQuery<Object[]> q2 = em.createQuery("select "
+                + "t.taskType as type, "
+                + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
+                + "COALESCE(sum(t.effortLeft),0) as effortLeft "
+                + "from Task t where t.project = :project "
+                + "GROUP BY t.taskType", Object[].class);
+
+        q2.setParameter("project", project);
+
+        final List<Object[]>  originalEstimateAndEffortLeft = q2.getResultList();
+
+        return originalEstimateAndEffortLeft.stream()
+                .collect(Collectors.toMap(
+                        e -> (TaskType) e[0],
+                        e -> new ProjectDashboard(
+                                project.getQuotation(),
+                                (double) e[1],
+                                (double) e[2],
+                                effortSpent.get((TaskType) e[0]),
+                                new Date())));
+
+
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#project,'" + AbacEntries.REPORT_PROJECT_VIEW + "')")
     public ProjectDashboard projectDashboard(final Account actor, final Project project) throws BusinessException {
+
+        final TypedQuery<Object[]> q = em.createQuery("select "
+                + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
+                + "COALESCE(sum(t.effortLeft),0) as effortLeft "
+                + "from Task t "
+                + "where t.project = :project ", Object[].class);
+        q.setParameter("project", project);
+
+        final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
+
+        final TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
+                + "from Task t left outer join t.imputations i "
+                + "where t.project = :project ", Double.class);
+
+        effortSpentQuery.setParameter("project", project);
+
+        final Double effortSpent = effortSpentQuery.getSingleResult();
+
+        return new ProjectDashboard(project.getQuotation(),
+                (Double) originalEstimateAndEffortLeft[0],
+                (Double) originalEstimateAndEffortLeft[1], effortSpent, new Date());
+
+
+    }
+
+    @Override
+    public ProjectDashboard projectDashboardByBatch(final Account actor, final Project project, final Batch batch) throws BusinessException {
         final RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMember());
         final Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -240,18 +309,20 @@ public class ProjectServiceImpl implements ProjectService {
         final TypedQuery<Object[]> q = em.createQuery("select "
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
-                + "from Task t "
-                + "where t.project = :project ", Object[].class);
+                + "from Task t join t.batches bList "
+                + "where t.project = :project and :batch IN bList ", Object[].class);
 
         q.setParameter("project", project);
+        q.setParameter("batch", batch);
 
         final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
 
         final TypedQuery<Double> effortSpentQuery = em.createQuery("select COALESCE(sum(i.value),0) "
-                + "from Task t left outer join t.imputations i "
-                + "where t.project = :project ", Double.class);
+                + "from Task t left outer join t.imputations i join t.batches bList "
+                + "where t.project = :project and :batch IN bList ", Double.class);
 
         effortSpentQuery.setParameter("project", project);
+        effortSpentQuery.setParameter("batch", batch);
 
         final Double effortSpent = effortSpentQuery.getSingleResult();
 
@@ -390,8 +461,9 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteTasks(final Account actor, final List<Task> taskList) {
+    public void archiveTasks(final Account actor, final List<Task> taskList) {
         for (final Task task : taskList) {
+            task.setTaskStatus(TaskStatus.ARCHIVED);
             em.merge(task);
         }
         LOGGER.info("User " + actor + " deleted " + taskList.size() + " tasks ");
@@ -435,12 +507,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Optional<Task> getTaskByRemoteID(final Account actor, final String id) {
-        Task task = null;
+        Task task;
         try {
             final TypedQuery<Task> query = this.em.createQuery("select t from Task t where t.remoteId = :remoteID", Task.class);
             query.setParameter("remoteID", id);
             task = query.getSingleResult();
-        } catch (final Exception e) {
+        } catch (final Exception ignored) {
+            task = null;
         }
         return Optional.ofNullable(task);
     }
@@ -512,11 +585,28 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void deleteTaskByID(final Account actor, final long taskID) throws BusinessException {
+    public void archiveTaskByID(final Account actor, final long taskID) throws BusinessException {
+
+
+        final Task task = em.find(Task.class, taskID);
+
+        task.setTaskStatus(TaskStatus.ARCHIVED);
+        em.merge(task);
+        em.flush();
+        TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
+
+
+        LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
+
+    }
+
+    @Override
+    public void deleteTaskByID(Account actor, Long taskID) throws BusinessException {
 
         final RuleSet<Task> ruleSet = new RuleSet<>();
         ruleSet.addRule(new TaskHasNoImputation());
         ruleSet.addRule(new ActorIsProjectMemberbyTask());
+        ruleSet.addRule(new TaskHasStatus(TaskStatus.PENDING));
 
         final Task task = em.find(Task.class, taskID);
 
@@ -525,13 +615,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
 
-        em.remove(task);
+        task.setTaskStatus(TaskStatus.ARCHIVED);
+        em.merge(task);
         em.flush();
         TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
 
 
         LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
-
     }
 
     @Override
@@ -634,7 +724,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    @PreAuthorize("#batch.organizationID == authentication.currentOrganization")
+    @PreAuthorize("hasPermission(#batch.project, '" + AbacEntries.PROJECT_BATCHES_VIEW + "')")
     public Batch updateBatch(final Account actor, final Batch batch) throws BusinessException {
         final RuleSet<Batch> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectMemberByBatch());

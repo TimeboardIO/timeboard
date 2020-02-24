@@ -34,6 +34,7 @@ import timeboard.core.model.Project;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.projects.api.ProjectNavigationProvider;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,8 @@ public abstract class ProjectBaseController {
     private List<ProjectNavigationProvider> navigationProviderList;
 
     public List<ProjectNavigationProvider> getNavigationProviderList(TimeboardAuthentication authentication, Project project) {
+        this.navigationProviderList.sort(Comparator.comparing(o -> (Integer) o.getNavigationWeight()));
+
         return navigationProviderList.stream()
                 .filter(projectNavigationProvider ->
                         permissionEvaluator
