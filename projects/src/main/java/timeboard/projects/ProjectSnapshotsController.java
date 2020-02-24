@@ -71,7 +71,7 @@ public class ProjectSnapshotsController extends ProjectBaseController {
 
 
     @GetMapping
-    @PreAuthorize("hasPermission(#project, '"+ AbacEntries.PROJECT_SNAPSHOT+"')")
+    @PreAuthorize("hasPermission(#project, '" + AbacEntries.PROJECT_SNAPSHOT + "')")
     public String display(final TimeboardAuthentication authentication,
                           @PathVariable("project") final Project project,
                           final Model model) throws BusinessException {

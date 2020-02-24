@@ -94,6 +94,9 @@ public class Batch extends OrganizationEntity implements Serializable {
         return name;
     }
 
+    public void setName(final String name) {
+        this.name = name;
+    }
 
     public String getScreenName() {
         if (date != null) {
@@ -101,12 +104,6 @@ public class Batch extends OrganizationEntity implements Serializable {
             return this.name + " (" + DateFormat.getDateInstance(DateFormat.SHORT, Locale.FRANCE).format(this.date) + ")";
         }
         return this.name;
-    }
-
-
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     public Date getDate() {

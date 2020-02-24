@@ -235,13 +235,13 @@ public class ProjectServiceImpl implements ProjectService {
         // Get effort spent from imputations
         final TypedQuery<Object[]> q1 = em.createQuery(
                 "select t.taskType as type, COALESCE(sum(i.value),0) "
-                +  "from Task t left outer join t.imputations i "
-                +  "where t.project = :project "
-                +  "GROUP BY t.taskType", Object[].class);
+                        + "from Task t left outer join t.imputations i "
+                        + "where t.project = :project "
+                        + "GROUP BY t.taskType", Object[].class);
 
         q1.setParameter("project", project);
         final Map<TaskType, Double> effortSpent = q1.getResultList().stream()
-                .collect(Collectors.toMap(e -> (TaskType) e[0], e -> (double) e[1] ));
+                .collect(Collectors.toMap(e -> (TaskType) e[0], e -> (double) e[1]));
 
         // get oe et el from task
         final TypedQuery<Object[]> q2 = em.createQuery("select "
@@ -253,7 +253,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         q2.setParameter("project", project);
 
-        final List<Object[]>  originalEstimateAndEffortLeft = q2.getResultList();
+        final List<Object[]> originalEstimateAndEffortLeft = q2.getResultList();
 
         return originalEstimateAndEffortLeft.stream()
                 .collect(Collectors.toMap(
@@ -781,10 +781,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new BusinessException(wrongRules);
         }
         final TypedQuery<Batch> q = em.createQuery(
-                "select distinct b from Batch b join b.tasks t where t.project = :project and b.type = :type",
+                "select distinct b from Batch b where b.project = :project",
                 Batch.class);
         q.setParameter("project", project);
-        q.setParameter("type", batchType);
+
+        if (batchType != null) {
+            return q.getResultList().stream().filter(batch -> batch.getType().equals(batchType)).collect(Collectors.toList());
+        }
         return q.getResultList();
     }
 

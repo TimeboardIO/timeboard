@@ -108,7 +108,6 @@ public class TimeboardWebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
 
-
     public class RedirectFilter extends GenericFilterBean {
 
         @Override

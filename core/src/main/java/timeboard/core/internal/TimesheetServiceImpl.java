@@ -535,7 +535,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
 
         if (projectTask.getTaskStatus() != TaskStatus.PENDING) {
-            final Optional<Imputation> existingImputation = this.projectService.getImputation(actor, projectTask,  calendar.getTime() );
+            final Optional<Imputation> existingImputation = this.projectService.getImputation(actor, projectTask, calendar.getTime());
             final double oldValue = existingImputation.isPresent() ? existingImputation.get().getValue() : 0;
 
             this.actionOnImputation(existingImputation.orElse(null), projectTask, actor, val, calendar.getTime());

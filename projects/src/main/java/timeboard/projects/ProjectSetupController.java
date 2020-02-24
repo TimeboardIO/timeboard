@@ -129,10 +129,10 @@ public class ProjectSetupController extends ProjectBaseController {
                                                 @ModelAttribute final ProjectConfigForm projectConfigForm,
                                                 final RedirectAttributes attributes) throws Exception {
 
-        if(projectConfigForm.getComments().length() > 500){
+        if (projectConfigForm.getComments().length() > 500) {
             attributes.addFlashAttribute("error", "Your comment is too long (500 characters max)");
             attributes.addFlashAttribute("editedComments", projectConfigForm.getComments());
-        }else {
+        } else {
 
             final Account actor = authentication.getDetails();
 
@@ -156,10 +156,10 @@ public class ProjectSetupController extends ProjectBaseController {
         final ProjectConfigForm pcf = new ProjectConfigForm();
         pcf.setName(project.getName());
 
-        if (RequestContextUtils.getInputFlashMap(request) != null && RequestContextUtils.getInputFlashMap(request).containsKey("editedComments")){
+        if (RequestContextUtils.getInputFlashMap(request) != null && RequestContextUtils.getInputFlashMap(request).containsKey("editedComments")) {
             // Keep last edited comment
             pcf.setComments((String) RequestContextUtils.getInputFlashMap(request).get("editedComments"));
-        }else{
+        } else {
             pcf.setComments(project.getComments());
         }
         pcf.setQuotation(project.getQuotation());

@@ -46,7 +46,7 @@ public class WeekWrapper {
                        final Date firstDay, final Date lastDay) {
         this.number = number;
         this.year = year;
-        this.imputationSum = Math.round(imputationSum *100d) / 100d;
+        this.imputationSum = Math.round(imputationSum * 100d) / 100d;
         this.validationStatus = vs;
         this.firstDay = firstDay;
         this.lastDay = lastDay;

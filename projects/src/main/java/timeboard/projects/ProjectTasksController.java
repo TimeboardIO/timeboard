@@ -261,7 +261,7 @@ public class ProjectTasksController extends ProjectBaseController {
 
     @DeleteMapping("/archive/{taskID}")
     public ResponseEntity archiveTask(final TimeboardAuthentication authentication,
-                                     @PathVariable final Long taskID) {
+                                      @PathVariable final Long taskID) {
         final Account actor = authentication.getDetails();
 
         if (taskID == null) {
