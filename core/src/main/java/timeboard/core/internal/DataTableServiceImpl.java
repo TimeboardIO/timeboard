@@ -54,20 +54,6 @@ public class DataTableServiceImpl implements DataTableService {
     }
 
     @Override
-    public boolean checkColumnDisplayed(final String tableId, final Account actor, final String colName) {
-        return checkColumnDisplayedFromDB(tableId, actor, colName);
-    }
-
-    @Override
-    public boolean checkColumnDisplayedFromDB(final String tableId, final Account actor, final String colName) {
-        final DataTableConfig tableConfig = findTableConfigByUserAndTable(tableId, actor);
-        if (tableConfig == null) {
-            return false;
-        }
-        return tableConfig.getColumns().contains(colName);
-    }
-
-    @Override
     public DataTableConfig findTableConfigByUserAndTable(final String tableId, final Account actor) {
         final TypedQuery<DataTableConfig> q = this.em
                 .createQuery("select d from DataTableConfig d " +

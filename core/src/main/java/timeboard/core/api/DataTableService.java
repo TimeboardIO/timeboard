@@ -36,12 +36,23 @@ import java.util.List;
  */
 public interface DataTableService {
 
-    boolean checkColumnDisplayed(String tableId, Account actor, String colName);
 
-    boolean checkColumnDisplayedFromDB(String tableId, Account actor, String colName);
-
+    /**
+     * Get a {@link DataTableConfig} object that represent a specific confication for a table instance and relevant to
+     * actor
+     * @param tableId
+     * @param actor
+     * @return an instance of {@link DataTableConfig}, else return null
+     */
     DataTableConfig findTableConfigByUserAndTable(String tableId, Account actor);
 
+    /**
+     * Create a {@link DataTableConfig} object
+     * @param tableId a unique identifier that represent user
+     * @param actor account associated to new datatable config
+     * @param columnsNamesList list of displayed columns
+     * @return a instance of {@link DataTableConfig}
+     */
     DataTableConfig addOrUpdateTableConfig(String tableId, Account actor, List<String> columnsNamesList);
 
 }
