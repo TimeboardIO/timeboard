@@ -100,7 +100,7 @@
     <div class="ui inverted dimmer">
         <div class="ui text loader" th:text="#{loading}">Loading</div>
     </div>
-    <div id="timesheet" class="hidden" style="overflow-x: scroll;" >
+    <div id="timesheet" class="hidden" :style="{ overflowX: (windowWidth < 700) ? 'scroll' : '' }" >
 
         <div v-for="error in errorMessages" v-if="error.visible" class="ui container negative timesheet message">
             <i class="close icon" @click="error.visible = false; "></i>
