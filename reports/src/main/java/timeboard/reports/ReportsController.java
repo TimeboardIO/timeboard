@@ -210,8 +210,7 @@ public class ReportsController {
 
 
     @GetMapping(
-            value = "/view/{reportID}/data",
-            produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_XML_VALUE})
+            value = "/view/{report}/data")
     @ResponseBody
     public ResponseEntity<Object> viewReportData(
             final TimeboardAuthentication authentication,
