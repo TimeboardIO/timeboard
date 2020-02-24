@@ -48,7 +48,7 @@ import timeboard.core.internal.rules.project.ActorIsProjectOwner;
 import timeboard.core.internal.rules.task.ActorIsProjectMemberbyTask;
 import timeboard.core.internal.rules.task.TaskHasNoImputation;
 import timeboard.core.model.*;
-import timeboard.core.security.AbacEntries;
+import timeboard.core.api.AbacEntries;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;

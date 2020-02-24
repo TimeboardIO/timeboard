@@ -43,7 +43,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.MembershipRole;
 import timeboard.core.model.Organization;
 import timeboard.core.model.OrganizationMembership;
-import timeboard.core.security.AbacEntries;
+import timeboard.core.api.AbacEntries;
 import timeboard.core.security.TimeboardAuthentication;
 
 import javax.servlet.http.HttpServletRequest;

@@ -46,7 +46,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Project;
 import timeboard.core.model.ProjectSnapshot;
 import timeboard.core.model.ValueHistory;
-import timeboard.core.security.AbacEntries;
+import timeboard.core.api.AbacEntries;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.text.ParseException;

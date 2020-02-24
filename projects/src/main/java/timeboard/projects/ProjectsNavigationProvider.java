@@ -28,7 +28,7 @@ package timeboard.projects;
 
 import org.springframework.stereotype.Component;
 import timeboard.core.api.NavigationExtPoint;
-import timeboard.core.security.AbacEntries;
+import timeboard.core.api.AbacEntries;
 
 
 @Component

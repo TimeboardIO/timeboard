@@ -39,7 +39,7 @@ import timeboard.core.internal.async.ProjectSyncJob;
 import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
-import timeboard.core.security.AbacEntries;
+import timeboard.core.api.AbacEntries;
 
 import java.util.Date;
 import java.util.List;

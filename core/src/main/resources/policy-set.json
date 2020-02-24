@@ -37,8 +37,8 @@
       "PROJECT_TAGS_VIEW",
       "PROJECT_TASKS_APPROBATION",
       "PROJECT_TASKS_EDIT",
-      "REPORT_PROJECT_VIEW",
-      "TIMESHEET_VALIDATION_VIEW"
+      "TIMESHEET_VALIDATION_VIEW",
+      "TIMESHEET_REJECT"
     ],
     "conditions": [
       "subject.currentProjectRole(resource, 'OWNER')"
