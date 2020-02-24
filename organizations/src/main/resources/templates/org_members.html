@@ -23,23 +23,6 @@
                 <div class="results"></div>
             </div>
         </div>
-        <!-- h4 class="ui dividing header">Organization Members</h4>
-
-        <div class="ui center aligned segment">
-            <div th:each="parent : ${parents}" class="ui button" tabindex="0">
-                <a th:text="${parent.screenName}" th:href="@{${'/org/'+tab}(orgID=${parent.id})}" class="ui basic label"> </a>
-            </div>
-
-            <a th:text="${organization.name}" class="ui horizontal divider" >Name</a>
-            <div v-for="member  in members " v-if="member.isOrganization == true" class="ui left labeled primary button" tabindex="0">
-                <a  v-bind:href="baseURL+'?orgID='+member.id" class="ui basic label">
-                    {{member.screenName}}
-                </a>
-                <a @click="removeMember($event, member)" class="ui icon button">
-                    <i class="close icon"></i>
-                </a>
-            </div>
-        </div-->
         <h4 class="ui dividing header">User Members</h4>
 
         <table class="ui tablet unstackable table">
@@ -77,7 +60,13 @@
             </tr>
             </tbody>
         </table>
+        <tmodal-confirm
+                ref="confirmModal"
+                title="Remove member ?"
+                icon="close"
+        ></tmodal-confirm>
     </div>
+
     <script src="/js/org_members.js"></script>
 
 </div>

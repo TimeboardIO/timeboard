@@ -17,16 +17,22 @@ let app = new Vue({
     },
     methods: {
         removeMember: function(e, member){
-            $.get("/org/members/remove/"+currentOrgID+"/"+member.id)
-            .then(function(data){
-                let copy = [];
-                for (let i = 0; i < app.members.length; i++) {
-                    if(app.members[i].id !== member.id){
-                        copy.push(app.members[i]);
+            let self = this;
+            this.$refs.confirmModal.confirm("Are you sure you want to remove "+ member.screenName + "?", function() {
+                $.ajax({
+                    type: "DELETE",
+                    url: "/org/members/"+member.id,
+                }).then(function(role){
+                    let copy = [];
+                    for (let i = 0; i < self.members.length; i++) {
+                        if(self.members[i].id !== member.id){
+                            copy.push(self.members[i]);
+                        }
                     }
-                }
-                app.members = copy;
+                    self.members = copy;
+                });
             });
+
         },
         addMember: function(memberID){
             $.get("/org/members/add?orgID="+currentOrgID+"&memberID="+memberID)
@@ -71,7 +77,7 @@ $(document).ready(function(){
     $('.ui.search')
     .search({
         apiSettings: {
-            url: '/api/search?q={query}'
+            url: '/api/search/all?q={query}'
         },
         fields: {
             results : 'items',
