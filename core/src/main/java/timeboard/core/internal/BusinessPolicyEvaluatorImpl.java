@@ -26,6 +26,8 @@ package timeboard.core.internal;
  * #L%
  */
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -40,6 +42,8 @@ import javax.transaction.Transactional;
 @Component(value = "bpe")
 @Transactional
 public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessPolicyEvaluator {
+
+    private static Logger LOGGER = LoggerFactory.getLogger(BusinessPolicyEvaluatorImpl.class);
 
     @Autowired
     private EntityManager entityManager;
@@ -57,9 +61,10 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     public boolean checkProjectEnabledLimit(final Account actor) throws CommercialException {
         final int numberEnabledProjects = this.getNumberEnabledProjects(actor);
         if (numberEnabledProjects >= limitEnabledProjectsInApp) {
-            throw new CommercialException("Limit reached",
-                    "Project's creation impossible for " + actor.getScreenName() + "!\n" +
-                            "Too many enabled projects in this application !");
+            String message = "Limit reached "+numberEnabledProjects+"/"+limitEnabledProjectsInApp+
+                    " Project's creation impossible for " + actor.getScreenName() + "!";
+            LOGGER.warn(message);
+            throw  new CommercialException(message);
         }
         return true;
     }
@@ -68,9 +73,10 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     public boolean checkProjectByUserLimit(final Account actor) throws CommercialException {
         final int numberProjectByUser = this.getNumberProjectsByUser(actor);
         if (numberProjectByUser >= limitProjectsByUser) {
-            throw new CommercialException("Limit reached",
-                    "Project's creation impossible for " + actor.getScreenName() + "!\n" +
-                            "Too many projects in this account !");
+            String message = "Limit reached "+numberProjectByUser+"/"+limitProjectsByUser+
+                    " Project's creation impossible for " + actor.getScreenName() + "!";
+            LOGGER.warn(message);
+            throw  new CommercialException(message);
         }
         return true;
     }
@@ -79,9 +85,11 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     public boolean checkTaskByProjectLimit(final Account actor, final Project project) throws CommercialException {
         final int numberTasksByProject = this.getNumberTasksByProject(actor, project);
         if (numberTasksByProject >= limitTasksByProject) {
-            throw new CommercialException("Limit reached",
-                    "Task's creation impossible for " + actor.getScreenName() + "!\n" +
-                            "Too many task in project " + project.getName() + "in this account !");
+            String message = "Limit reached "+numberTasksByProject+"/"+limitTasksByProject+
+                    " Project's creation impossible for " + actor.getScreenName() + "!";
+
+            LOGGER.warn(message);
+            throw  new CommercialException(message);
         }
         return true;
     }
