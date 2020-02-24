@@ -1,0 +1,11 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet author="pierremellet (generated)" id="1582214639733-35">
+        <dropUniqueConstraint constraintName="UKsc0a68hjsx40d6xt9yep80o7l"
+                              tableName="Imputation" />
+
+        <addUniqueConstraint columnNames="day, task_id, account_id"
+                             constraintName="UK_One_Imputation_Per_User_And_Day"
+                             tableName="Imputation"/>
+    </changeSet>
+</databaseChangeLog>
