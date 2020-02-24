@@ -35,7 +35,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import timeboard.core.api.EncryptionService;
 import timeboard.core.api.OrganizationService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Account;
@@ -62,8 +61,7 @@ public class OrganizationConfigController {
 
     @Autowired
     public OrganizationService organizationService;
-    @Autowired
-    public EncryptionService encryptionService;
+
     @Value("${timeboard.tasks.default.vacation}")
     private String defaultVacationTaskName;
 
