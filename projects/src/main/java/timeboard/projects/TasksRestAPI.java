@@ -178,7 +178,10 @@ public class TasksRestAPI {
     private double oeValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
         final double oe = taskWrapper.originalEstimate;
         if (oe <= 0.0) {
-            throw new TaskCreationException("Original original estimate must be positive ");
+            throw new TaskCreationException("Original estimate must be positive ");
+        }
+        if((oe * 100) % 5 != 0){ // Modulo with int and not double
+            throw new TaskCreationException("Original estimate is not valid. The step must be 0.05.");
         }
         return oe;
     }
