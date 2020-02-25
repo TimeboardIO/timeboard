@@ -235,10 +235,12 @@ public class ProjectServiceImpl implements ProjectService {
         final TypedQuery<Object[]> q1 = em.createQuery(
                 "select t.taskType as type, COALESCE(sum(i.value),0) "
                         + "from Task t left outer join t.imputations i "
-                        + "where t.project = :project "
+                        + "where t.project = :project and t.taskStatus <> :status "
                         + "GROUP BY t.taskType", Object[].class);
 
         q1.setParameter("project", project);
+        q1.setParameter("status", TaskStatus.PENDING);
+
         final Map<TaskType, Double> effortSpent = q1.getResultList().stream()
                 .collect(Collectors.toMap(e -> (TaskType) e[0], e -> (double) e[1]));
 
@@ -247,10 +249,12 @@ public class ProjectServiceImpl implements ProjectService {
                 + "t.taskType as type, "
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
-                + "from Task t where t.project = :project "
+                + "from Task t where t.project = :project and t.taskStatus <> :status "
                 + "GROUP BY t.taskType", Object[].class);
 
         q2.setParameter("project", project);
+        q2.setParameter("status", TaskStatus.PENDING);
+
 
         final List<Object[]> originalEstimateAndEffortLeft = q2.getResultList();
 
@@ -275,8 +279,9 @@ public class ProjectServiceImpl implements ProjectService {
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
                 + "from Task t "
-                + "where t.project = :project ", Object[].class);
+                + "where t.project = :project and t.taskStatus <> :status", Object[].class);
         q.setParameter("project", project);
+        q.setParameter("status", TaskStatus.PENDING);
 
         final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
 
@@ -309,10 +314,11 @@ public class ProjectServiceImpl implements ProjectService {
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
                 + "from Task t join t.batches bList "
-                + "where t.project = :project and :batch IN bList ", Object[].class);
+                + "where t.project = :project and :batch IN bList and t.taskStatus <> :status ", Object[].class);
 
         q.setParameter("project", project);
         q.setParameter("batch", batch);
+        q.setParameter("status", TaskStatus.PENDING);
 
         final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
 
