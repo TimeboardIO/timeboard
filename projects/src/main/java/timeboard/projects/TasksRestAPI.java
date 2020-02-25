@@ -104,13 +104,25 @@ public class TasksRestAPI {
         Task task = null;
         try {
             if (taskID != null && taskID != 0) {
+
                 final Task oldTask = (Task) projectService.getTaskByID(actor, taskID);
-                if (oldTask.getEffortSpent() > 0 && oldTask.getAssigned() != t.getAssigned()) {
-                    throw new TaskCreationException("You can not modify assignee because he already add imputation on this task");
+
+                checkUpdateRules(oldTask, t);
+
+                oldTask.setStartDate(t.getStartDate());
+                oldTask.setEndDate(t.getEndDate());
+                oldTask.setName(t.getName());
+                oldTask.setComments(t.getComments());
+                if (t.getOriginalEstimate() != oldTask.getOriginalEstimate()) {
+                    oldTask.setEffortLeft(t.getOriginalEstimate());
                 }
-                t.setOrigin(oldTask.getOrigin());
-                t.setId(oldTask.getId());
-                task = processUpdateTask(org, actor, t);
+                oldTask.setTaskType(t.getTaskType());
+                oldTask.setOriginalEstimate(t.getOriginalEstimate());
+                oldTask.setAssigned(t.getAssigned());
+                oldTask.setBatches(t.getBatches());
+                oldTask.setTaskStatus(t.getTaskStatus());
+
+                task = processUpdateTask(org, actor, oldTask);
 
             } else {
                 task = processCreateTask(org, actor, t);
@@ -120,6 +132,27 @@ public class TasksRestAPI {
         } catch (final Exception e) {
             throw new TaskCreationException("Error in task creation/update please verify your inputs and retry. (" + e.getMessage() + ")");
         }
+    }
+
+    private void checkUpdateRules(Task oldTask, Task newTask) throws TaskCreationException {
+
+        if (oldTask.getEffortSpent() > 0) {
+            if ( oldTask.getAssigned().getId() != newTask.getAssigned().getId()) {
+                throw new TaskCreationException("You can not modify assignee because he already add imputation on this task");
+            }
+            if (oldTask.getOriginalEstimate() != newTask.getOriginalEstimate()) {
+                throw new TaskCreationException("You can not modify OE because this task is started.");
+            }
+
+            if (oldTask.getStartDate().before(newTask.getStartDate())) {
+                throw new TaskCreationException("You cannot reduce the task interval because it has started.");
+            }
+
+            if (oldTask.getEndDate().after(newTask.getEndDate())) {
+                throw new TaskCreationException("You cannot reduce the task interval because it has started.");
+            }
+        }
+
     }
 
     private TaskStatus taskStatusValidator(@RequestBody final TaskWrapper taskWrapper) {
