@@ -392,7 +392,11 @@ public class TimesheetServiceImpl implements TimesheetService {
         final Map<String, Object> parameters = new HashMap<>();
         final StringBuilder sb = new StringBuilder();
         sb.append("SELECT DAY(day), COALESCE(SUM(i.value),0) ");
-        sb.append("FROM Imputation i JOIN Task t ON i.task_id = t.id ");
+        if (List .of(filters).stream().anyMatch(f -> f.getTarget().getClass() == Project.class)) {
+            sb.append("FROM Imputation i JOIN Task t ON i.task_id = t.id ");
+        } else {
+            sb.append("FROM Imputation i ");
+        }
         sb.append("WHERE  i.account_id = :user ");
         sb.append("AND i.organizationID = :orgID ");
         sb.append("AND i.day >= :startDate ");
@@ -409,7 +413,6 @@ public class TimesheetServiceImpl implements TimesheetService {
                 sb.append("i.task_id = :task ");
                 final AbstractTask task = (AbstractTask) filter.getTarget();
                 parameters.put("task", task.getId());
-
             }
         }
 
