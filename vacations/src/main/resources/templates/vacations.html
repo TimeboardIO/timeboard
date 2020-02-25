@@ -69,7 +69,7 @@
 
         <div class="ui bottom attached segment visible" v-if="activeTab === 'Requests'">
 
-            <div class="ui icon message" v-if="toValidateRequestsListData.length === 0">
+            <div class="ui icon message" v-if="!myRequestsListData.length">
                 <i class="calendar alternate outline icon"></i>
                 <div class="content">
                     <div class="header">
