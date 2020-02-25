@@ -304,13 +304,25 @@
             </template>
         </data-table>
 
-        <div class="ui horizontal divider">
-            <i class="boxes icon"></i>
-            All tasks <span th:if="${batchType} != 'Default' " th:text="'group by ' + ${batchType}"></span>
+        <div th:if="${project.getTasks().isEmpty()}" class="ui icon message"><i class="tasks icon"></i>
+            <div class="content">
+                <div class="header">
+                    There is no task in this project.
+                </div>
+                <p sec:authorize="${hasPermission(#vars.project,'PROJECT_TASKS_CREATE')}" >
+                    click
+                    <span v-on:click="showCreateTaskModal(null, null, $event)" class="ui button">here</span>
+                    to create a new task.</p>
+            </div>
         </div>
 
-        <div class="ui styled fluid accordion">
-            <div v-for="batch in batches" style="overflow-y: scroll" >
+        <div th:if="${project.getTasks().size() > 0}" class="ui horizontal divider">
+            <i class="boxes icon"></i>
+            All tasks <span th:if="${batchType} != 'Default' " th:text="' by ' + ${batchType}"></span>
+        </div>
+
+        <div class="ui styled fluid accordion" th:if="${project.getTasks().size() > 0}">
+            <div v-for="batch in batches" style="overflow-y: scroll"  th:if="${batchType != 'Default'}" >
                 <div class="title">
                     <i class="plus icon"></i>
                     {{ batch.batchName }}
