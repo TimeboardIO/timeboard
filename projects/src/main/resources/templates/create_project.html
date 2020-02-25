@@ -5,13 +5,13 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title layout:fragment="title">Home Page</title>
+    <title th:text="#{project.create}"></title>
 </head>
 <body>
 
 <div layout:fragment="content">
     <div class="ui segment">
-        <h4 class="ui dividing header">Create project</h4>
+        <h4 th:text="#{project.create}" class="ui dividing header"></h4>
 
         <div class="ui negative message" th:if="${errorCreateProject}">
             <i class="close icon"></i>

@@ -6,7 +6,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title layout:fragment="title">Project</title>
+    <title th:text="#{project.tab.setup}"></title>
     <meta name="projectID" th:content="${project.id}"/>
     <meta name="orgID" th:content="${orgID}"/>
 </head>
