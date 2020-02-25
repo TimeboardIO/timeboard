@@ -174,7 +174,7 @@ public class OrganizationConfigController {
         final Account actor = authentication.getDetails();
         final Optional<Organization> updatedOrg = this.organizationService.updateOrganization(actor, model);
         if (updatedOrg.isPresent()) {
-            redirectAttributes.addFlashAttribute("success", "Successfully updated..");
+            redirectAttributes.addFlashAttribute("success", "Successfully updated.");
         }
         return "redirect:/org/setup";
     }

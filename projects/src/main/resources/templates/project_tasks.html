@@ -318,7 +318,7 @@
 
         <div th:if="${project.getTasks().size() > 0}" class="ui horizontal divider">
             <i class="boxes icon"></i>
-            All tasks <span th:if="${batchType} != 'Default' " th:text="'group by ' + ${batchType}"></span>
+            All tasks <span th:if="${batchType} != 'Default' " th:text="' by ' + ${batchType}"></span>
         </div>
 
         <div class="ui styled fluid accordion" th:if="${project.getTasks().size() > 0}">
