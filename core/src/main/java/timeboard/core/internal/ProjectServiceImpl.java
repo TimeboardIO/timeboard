@@ -195,6 +195,10 @@ public class ProjectServiceImpl implements ProjectService {
     @PreAuthorize("hasPermission(#project,'" + AbacEntries.PROJECT_ARCHIVE + "')")
     @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project archiveProjectByID(final Account actor, final Project project) throws BusinessException {
+        //Archive project tasks
+        this.archiveTasks(actor, new ArrayList<>(project.getTasks()));
+
+        //Archive project
         final RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
         final Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -465,7 +469,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setTaskStatus(TaskStatus.ARCHIVED);
             em.merge(task);
         }
-        LOGGER.info("User " + actor + " deleted " + taskList.size() + " tasks ");
+        LOGGER.info("User " + actor + " archived " + taskList.size() + " tasks ");
         em.flush();
 
     }
@@ -595,7 +599,7 @@ public class ProjectServiceImpl implements ProjectService {
         TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
 
 
-        LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
+        LOGGER.info("Task " + taskID + " archived by " + actor.getName());
 
     }
 
