@@ -36,14 +36,13 @@
                 {{row.tasks}}
             </template>
             <template v-slot:actions="{row}">
-                <button class="ui positive basic button" @click="editBatch(row)">
+                <button class="ui negative icon button" v-on:click="deleteURL(row)">
+                    <i class="trash alternate icon"></i>
+                </button>
+                <button class="ui blue button" v-on:click="editBatch(row)">
                     <i class="edit alternate icon"></i>
                     Edit
                 </button>
-                <a class="ui negative basic button" v-bind:href="deleteURL(row)">
-                    <i class="remove alternate icon"></i>
-                    Remove
-                </a>
             </template>
         </data-table>
 
@@ -68,7 +67,10 @@
                         <label>Date</label>
                         <input v-model="batch.date"  type="date" name="batch-date">
                     </div>
-                    <button v-on:click="saveBatch" class="ui button">Submit</button>
+                    <button class="ui positive icon button" v-on:click="saveBatch">
+                        <i class="save alternate icon"></i>
+                        Save
+                    </button>
                 </div>
 
             </template>
