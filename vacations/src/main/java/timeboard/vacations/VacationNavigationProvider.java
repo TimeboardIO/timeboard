@@ -36,7 +36,7 @@ public class VacationNavigationProvider implements NavigationExtPoint {
 
     @Override
     public String getNavigationLabel() {
-        return "nav.vacation";
+        return "nav.vacations";
     }
 
     @Override
