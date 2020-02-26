@@ -19,7 +19,7 @@
                     <div class="ui label">
                         Add member <i class="plus icon"></i>
                     </div>
-                    <input class="prompt" placeholder="Search account..." type="text">
+                    <input class="prompt" placeholder="Existing account email..." type="text">
                 </div>
                 <div class="results"></div>
             </div>
@@ -51,11 +51,11 @@
                     </select>
                 </td>
                 <td>
-                    <button @click="removeMember($event, member)" class="ui tiny negative icon button">
+                    <button @click="removeMember($event, member)" class="ui negative icon button right labeled">
                         Remove <i class="close icon"></i>
                     </button>
-                    <button @click="impersonateMember($event, member)" class="ui tiny teal button">
-                        Impersonate
+                    <button @click="impersonateMember($event, member)" class="ui blue icon button right labeled">
+                        Browse as <i class="user secret icon"></i>
                     </button>
                 </td>
             </tr>
