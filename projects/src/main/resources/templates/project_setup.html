@@ -85,7 +85,7 @@
                                 </select>
                             </td>
                             <td>
-                                <button class="ui negative basic button" th:if="${membership.member.id != account.id}"
+                                <button class="ui negative button" th:if="${membership.member.id != account.id}"
                                         th:onclick="'removeUser('+${membership.membershipID}+')'">
                                     <i class="remove alternate icon"></i>
                                     Remove
