@@ -213,7 +213,8 @@ public class VacationServiceImpl implements VacationService {
             this.updateImputations(org, actor, request, 0);
         }
 
-        em.remove(request);
+        VacationRequest myRequestToDelete = em.find(VacationRequest.class, request.getId());
+        em.remove(myRequestToDelete);
         em.flush();
 
         TimeboardSubjects.VACATION_EVENTS.onNext(new VacationEvent(TimeboardEventType.DELETE, request));
