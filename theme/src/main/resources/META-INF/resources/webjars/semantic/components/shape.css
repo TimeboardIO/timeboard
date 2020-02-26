@@ -62,7 +62,10 @@
   height: 100%;
   display: table;
   text-align: center;
-  account-select: text;
+  -webkit-user-select: text;
+     -moz-user-select: text;
+      -ms-user-select: text;
+          user-select: text;
 }
 .ui.cube.shape .side > .content > div {
   display: table-cell;

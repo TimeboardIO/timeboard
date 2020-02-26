@@ -550,7 +550,10 @@ ul.ui.list li,
 ul.ui.list li:before,
 .ui.bulleted.list .list > .item:before,
 .ui.bulleted.list > .item:before {
-  account-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   pointer-events: none;
   position: absolute;
   top: auto;
@@ -618,7 +621,10 @@ ol.ui.list li:before,
   position: absolute;
   top: auto;
   left: auto;
-  account-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   pointer-events: none;
   margin-left: -1.25rem;
   counter-increment: ordered;

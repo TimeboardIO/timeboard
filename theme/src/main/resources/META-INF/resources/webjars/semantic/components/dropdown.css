@@ -661,7 +661,10 @@ select.ui.dropdown {
 
 /* Selection Label */
 .ui.multiple.dropdown > .label {
-  account-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   display: inline-block;
   vertical-align: top;
   white-space: normal;
