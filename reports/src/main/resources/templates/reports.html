@@ -37,14 +37,16 @@
                         <i class="right arrow icon"></i>
                         Request report
                     </a>
-                    <a class="ui right labeled success icon button" v-bind:href="'/reports/edit/'+row.id">
-                        <i class="right arrow icon"></i>
+                    <a class="ui right labeled blue icon button" v-bind:href="'/reports/edit/'+row.id">
+                        <i class="edit alternate icon"></i>
                         Edit
                     </a>
-                    <a class="ui right labeled success icon button" v-bind:href="'/reports/delete/'+row.id">
-                        <i class="right arrow icon"></i>
+                    <a class="ui right labeled negative icon button" v-bind:href="'/reports/delete/'+row.id">
+                        <i class="trash alternate icon"></i>
                         Delete
                     </a>
+
+
                 </template>
             </data-table>
         </div>
