@@ -114,9 +114,6 @@ public class OrganizationMembersController {
             membership.setRole(MembershipRole.valueOf(membershipWrapper.role));
             membership.setCreationDate(membershipWrapper.creationDate);
 
-            final Optional<Organization> updatedOrgMembership = organizationService
-                    .updateMembership(authentication.getDetails(), membership);
-
             return ResponseEntity.ok(membershipWrapper);
         }
 
