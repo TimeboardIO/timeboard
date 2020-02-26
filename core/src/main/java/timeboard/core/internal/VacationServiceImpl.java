@@ -284,7 +284,7 @@ public class VacationServiceImpl implements VacationService {
                                    final VacationRequest request,
                                    final double sign) throws BusinessException {
 
-        final DefaultTask vacationTask = this.getVacationTask(actor, request);
+        final DefaultTask vacationTask = this.getVacationTask(actor, request.getOrganizationID());
 
         final java.util.Calendar currentCalendar = java.util.Calendar.getInstance();
         currentCalendar.setTime(request.getStartDate());
@@ -318,8 +318,9 @@ public class VacationServiceImpl implements VacationService {
 
     }
 
-    private DefaultTask getVacationTask(final Account actor, final VacationRequest request) {
-        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, request.getOrganizationID());
+    @Override
+    public DefaultTask getVacationTask(final Account actor, final Long orgId) {
+        final Optional<Organization> organization = this.organizationService.getOrganizationByID(actor, orgId);
 
         if (organization.isPresent()) {
             final Optional<DefaultTask> vacationTask = organization.get().getDefaultTasks().stream()
