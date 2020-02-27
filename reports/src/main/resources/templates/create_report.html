@@ -52,10 +52,11 @@
                               th:field="*{filterProject}" type="text">
                         </textarea>
                     <br/>
-                    <a class="ui primary button" id="refreshSelectedProjects">
-                        Refresh selection
-                    </a>
+
                 </div>
+                <a class="ui primary button icon" id="refreshSelectedProjects">
+                <i class="sync alternate icon"></i> Refresh selection
+            </a>
             </div>
 
             <div class="eight wide column">
@@ -70,7 +71,8 @@
                     </div>
                 </div>
             </div>
-            <button class="ui positive button" type="submit">Submit</button>
+            <button class="ui positive icon button" type="submit"><i class="save alternate icon"></i>
+                Save</button>
             <a class="ui button" th:href="@{/reports}">Cancel</a>
         </form>
     </div>

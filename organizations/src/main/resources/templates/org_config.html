@@ -31,8 +31,9 @@
                            th:field="*{createdDate}"
                            type="date">
                 </div>
-                <button class="ui primary  right align icon button" type="submit">
-                    <span th:text="#{save}">Save</span> <i class="save icon"></i>
+                <button class="ui positive icon button" type="submit">
+                    <span th:text="#{save}">Save</span>
+                    <i class="save icon"></i>
                 </button>
             </form>
         </div>
@@ -53,21 +54,22 @@
                     </template>
                     <template v-slot:actions="{row}">
                         <button class="ui negative icon button" v-on:click="removeType(row)">
+                            Remove
                             <i class="trash alternate icon"></i>
                         </button>
-                        <button v-if="row.edition" class="ui positive icon button" v-on:click="updateType(row)">
-                            <i class="save alternate icon"></i>
+                        <button v-if="row.edition" class="ui positive icon button " v-on:click="updateType(row)">
                             Save
+                            <i class="save alternate icon"></i>
                         </button>
-                        <button v-else class="ui blue button" v-on:click="row.edition = true">
-                            <i class="edit alternate icon"></i>
+                        <button v-else class="ui blue icon button " v-on:click="row.edition = true">
                             Edit
+                            <i class="edit alternate icon"></i>
                         </button>
                     </template>
                 </data-table>
-                <button class="ui positive button" v-on:click="addType()">
-                    <i class="plus icon"></i>
+                <button class="ui positive icon button " v-on:click="addType()">
                     Add task type
+                    <i class="plus icon"></i>
                 </button>
             </div>
 
@@ -85,22 +87,23 @@
                         <span v-else>{{ row.name }}</span>
                     </template>
                     <template v-slot:actions="{row}">
-                        <button class="ui negative icon button" v-on:click="removeTask(row)">
+                        <button class="ui negative icon button " v-on:click="removeTask(row)">
+                            Remove
                             <i class="trash alternate icon"></i>
                         </button>
-                        <button v-if="row.edition" class="ui positive button" v-on:click="updateTask(row)">
-                            <i class="save alternate icon"></i>
+                        <button v-if="row.edition" class="ui positive icon button  " v-on:click="updateTask(row)">
                             Save
+                            <i class="save alternate icon"></i>
                         </button>
-                        <button v-else class="ui blue button" v-on:click="row.edition = true">
-                            <i class="edit alternate icon"></i>
+                        <button v-else class="ui blue icon button  " v-on:click="row.edition = true">
                             Edit
+                            <i class="edit alternate icon"></i>
                         </button>
                     </template>
                 </data-table>
-                <button class="ui positive button" v-on:click="addTask()">
-                    <i class="plus icon"></i>
+                <button class="ui positive icon button " v-on:click="addTask()">
                     Add default task
+                    <i class="plus icon"></i>
                 </button>
             </div>
 
