@@ -45,8 +45,11 @@
                 </div>
 
 
-                <button class="ui positive button" style="margin-top:1em" type="submit" data-cy="submit"
-                        sec:authorize="${hasPermission(#vars.project,'PROJECT_SETUP')}"><i class="save alternate icon"></i>Save</button>
+                <button class="ui positive icon button" style="margin-top:1em" type="submit" data-cy="submit"
+                        sec:authorize="${hasPermission(#vars.project,'PROJECT_SETUP')}">
+                    Save
+                    <i class="save alternate icon"></i>
+                </button>
 
             </form>
         </div>
@@ -85,10 +88,10 @@
                                 </select>
                             </td>
                             <td>
-                                <button class="ui negative button" th:if="${membership.member.id != account.id}"
+                                <button class="ui negative icon button " th:if="${membership.member.id != account.id}"
                                         th:onclick="'removeUser('+${membership.membershipID}+')'">
-                                    <i class="remove alternate icon"></i>
                                     Remove
+                                    <i class="remove alternate icon"></i>
                                 </button>
                             </td>
                         </tr>
