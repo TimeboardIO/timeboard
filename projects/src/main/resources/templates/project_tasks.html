@@ -88,9 +88,9 @@
                         </div>
                     </div>
                     <div class="four fields">
-                        <div class="field">
+                        <div class="field" :class="{ disabled : !task.canChangeAssignee }">
                             <label>Task Original Estimate</label>
-                            <input v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" data-cy="task-oe"
+                            <input  v-model="task.originalEstimate" name="taskOriginalEstimate" placeholder="Task OE" data-cy="task-oe"
                                    required type="number">
                         </div>
                         <div class="field">
