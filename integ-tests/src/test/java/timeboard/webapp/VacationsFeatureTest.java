@@ -61,7 +61,38 @@ public class VacationsFeatureTest extends TimeboardTest {
     private String remoteID = new Random().nextInt() + "";
     private Calendar myStartDate = Calendar.getInstance();
     private Calendar myEndDate = Calendar.getInstance();
-    private boolean alreadyChangeEndDate = false;
+    private Calendar dateDuringVacation = Calendar.getInstance();
+
+
+
+    private VacationsController.VacationRequestWrapper getExampleVacationRequestWrapper(String label) {
+
+        VacationsController.VacationRequestWrapper vacationRequestWrapper = new VacationsController.VacationRequestWrapper();
+        vacationRequestWrapper.setRecursive(false); // non recursive
+        vacationRequestWrapper.setStart(myStartDate.getTime());
+        vacationRequestWrapper.setEnd(myEndDate.getTime());
+        vacationRequestWrapper.setHalfStart(false); //morning and afternoon of start day
+        vacationRequestWrapper.setHalfEnd(true); //only morning of end day
+        vacationRequestWrapper.setLabel(label);
+        vacationRequestWrapper.setAssigneeID(world.account.getId());
+        vacationRequestWrapper.setAssigneeName(world.account.getScreenName());
+        return vacationRequestWrapper;
+    }
+
+    @Given("^start and end date of vacations$")
+    public void startAndEndDateOfVacations() {
+        myStartDate = Calendar.getInstance();
+        myStartDate.add(Calendar.WEEK_OF_YEAR, 1);
+        myStartDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        dateDuringVacation = Calendar.getInstance();
+        dateDuringVacation.add(Calendar.WEEK_OF_YEAR, 1);
+        dateDuringVacation.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+
+        myEndDate = Calendar.getInstance();
+        myEndDate.add(Calendar.WEEK_OF_YEAR, 1);
+        myEndDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+    }
 
     @Given("^user with an existing account and (\\d+) projects and (\\d+) vacations$")
     public void userWithAnExistingAccountAndProjectsAndVacations(final int arg0, final int arg1) throws Throwable {
@@ -148,14 +179,15 @@ public class VacationsFeatureTest extends TimeboardTest {
         DefaultTask vacationTask = this.vacationService.getVacationTask(world.account, world.organization.getId());
         //first day
         Imputation firstImputation = this.projectService.getImputation(world.account, vacationTask, myStartDate.getTime()).orElse(null);
+        Assert.assertNotNull(firstImputation);
         Assert.assertEquals(firstImputation.getValue(), 1, 0);
         //all day
-        Calendar dateDuringVacation = Calendar.getInstance();
-        dateDuringVacation.add(Calendar.DAY_OF_YEAR, 1);
         Imputation imputation = this.projectService.getImputation(world.account, vacationTask, dateDuringVacation.getTime()).orElse(null);
+        Assert.assertNotNull(imputation);
         Assert.assertEquals(imputation.getValue(), 1, 0);
         //last day
         Imputation lastImputation = this.projectService.getImputation(world.account, vacationTask, myEndDate.getTime()).orElse(null);
+        Assert.assertNotNull(lastImputation);
         Assert.assertEquals(lastImputation.getValue(), 0.5, 0);
     }
 
@@ -166,8 +198,6 @@ public class VacationsFeatureTest extends TimeboardTest {
         Imputation firstImputation = this.projectService.getImputation(world.account, vacationTask, myStartDate.getTime()).orElse(null);
         Assert.assertNull(firstImputation);
         //all day
-        Calendar dateDuringVacation = Calendar.getInstance();
-        dateDuringVacation.add(Calendar.DAY_OF_YEAR, 1);
         Imputation imputation = this.projectService.getImputation(world.account, vacationTask, dateDuringVacation.getTime()).orElse(null);
         Assert.assertNull(imputation);
         //last day
@@ -177,28 +207,4 @@ public class VacationsFeatureTest extends TimeboardTest {
 
 
 
-
-
-
-
-
-
-    private VacationsController.VacationRequestWrapper getExampleVacationRequestWrapper(String label) {
-
-        if(!this.alreadyChangeEndDate){
-            myEndDate.add(Calendar.DAY_OF_YEAR,3);
-            this.alreadyChangeEndDate = true;
-        }
-
-        VacationsController.VacationRequestWrapper vacationRequestWrapper = new VacationsController.VacationRequestWrapper();
-        vacationRequestWrapper.setRecursive(false); // non recursive
-        vacationRequestWrapper.setStart(myStartDate.getTime());
-        vacationRequestWrapper.setEnd(myEndDate.getTime());
-        vacationRequestWrapper.setHalfStart(false); //morning and afternoon of start day
-        vacationRequestWrapper.setHalfEnd(true); //only morning of end day
-        vacationRequestWrapper.setLabel(label);
-        vacationRequestWrapper.setAssigneeID(world.account.getId());
-        vacationRequestWrapper.setAssigneeName(world.account.getScreenName());
-        return vacationRequestWrapper;
-    }
 }
