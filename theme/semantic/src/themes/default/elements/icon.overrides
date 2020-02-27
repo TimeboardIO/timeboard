@@ -803,13 +803,13 @@ i.icon.unlock.alternate:before { content: "\f13e"; }
 i.icon.untappd:before { content: "\f405"; }
 i.icon.upload:before { content: "\f093"; }
 i.icon.usb:before { content: "\f287"; }
-i.icon.account:before { content: "\f007"; }
-i.icon.account.circle:before { content: "\f2bd"; }
-i.icon.account.md:before { content: "\f0f0"; }
-i.icon.account.plus:before { content: "\f234"; }
-i.icon.account.secret:before { content: "\f21b"; }
-i.icon.account.times:before { content: "\f235"; }
-i.icon.accounts:before { content: "\f0c0"; }
+i.icon.user:before { content: "\f007"; }
+i.icon.user.circle:before { content: "\f2bd"; }
+i.icon.user.md:before { content: "\f0f0"; }
+i.icon.user.plus:before { content: "\f234"; }
+i.icon.user.secret:before { content: "\f21b"; }
+i.icon.user.times:before { content: "\f235"; }
+i.icon.users:before { content: "\f0c0"; }
 i.icon.ussunnah:before { content: "\f407"; }
 i.icon.utensil.spoon:before { content: "\f2e5"; }
 i.icon.utensils:before { content: "\f2e7"; }
@@ -872,7 +872,7 @@ i.icon.youtube.square:before { content: "\f431"; }
 i.icon.chess.rock:before { content: "\f447"; }
 i.icon.ordered.list:before { content: "\f0cb"; }
 i.icon.unordered.list:before { content: "\f0ca"; }
-i.icon.account.doctor:before { content: "\f0f0"; }
+i.icon.user.doctor:before { content: "\f0f0"; }
 i.icon.shield:before { content: "\f3ed"; }
 i.icon.puzzle:before { content: "\f12e"; }
 i.icon.credit.card.amazon.pay:before { content: "\f42d"; }
@@ -888,7 +888,7 @@ i.icon.add.circle:before { content: "\f055"; }
 i.icon.add.square:before { content: "\f0fe"; }
 i.icon.add.to.calendar:before { content: "\f271"; }
 i.icon.add.to.cart:before { content: "\f217"; }
-i.icon.add.account:before { content: "\f234"; }
+i.icon.add.user:before { content: "\f234"; }
 i.icon.add:before { content: "\f067"; }
 i.icon.alarm.mute:before { content: "\f1f6"; }
 i.icon.alarm:before { content: "\f0f3"; }
@@ -1069,7 +1069,7 @@ i.icon.record:before { content: "\f03d"; }
 i.icon.refresh:before { content: "\f021"; }
 i.icon.remove.circle:before { content: "\f057"; }
 i.icon.remove.from.calendar:before { content: "\f272"; }
-i.icon.remove.account:before { content: "\f235"; }
+i.icon.remove.user:before { content: "\f235"; }
 i.icon.remove:before { content: "\f00d"; }
 i.icon.repeat:before { content: "\f01e"; }
 i.icon.rmb:before { content: "\f157"; }
@@ -1133,10 +1133,10 @@ i.icon.unhide:before { content: "\f06e"; }
 i.icon.unlinkify:before { content: "\f127"; }
 i.icon.unmute:before { content: "\f130"; }
 i.icon.usd:before { content: "\f155"; }
-i.icon.account.cancel:before { content: "\f235"; }
-i.icon.account.close:before { content: "\f235"; }
-i.icon.account.delete:before { content: "\f235"; }
-i.icon.account.x:before { content: "\f235"; }
+i.icon.user.cancel:before { content: "\f235"; }
+i.icon.user.close:before { content: "\f235"; }
+i.icon.user.delete:before { content: "\f235"; }
+i.icon.user.x:before { content: "\f235"; }
 i.icon.vcard:before { content: "\f2bb"; }
 i.icon.video.camera:before { content: "\f03d"; }
 i.icon.video.play:before { content: "\f144"; }
@@ -1340,8 +1340,8 @@ i.icon.youtube.play:before { content: "\f167"; }
   i.icon.thumbs.up.outline:before { content: "\f164"; }
   i.icon.times.circle.outline:before { content: "\f057"; }
   i.icon.trash.alternate.outline:before { content: "\f2ed"; }
-  i.icon.account.outline:before { content: "\f007"; }
-  i.icon.account.circle.outline:before { content: "\f2bd"; }
+  i.icon.user.outline:before { content: "\f007"; }
+  i.icon.user.circle.outline:before { content: "\f2bd"; }
   i.icon.window.close.outline:before { content: "\f410"; }
   i.icon.window.maximize.outline:before { content: "\f2d0"; }
   i.icon.window.minimize.outline:before { content: "\f2d1"; }

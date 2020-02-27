@@ -6,7 +6,7 @@
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
-    <title th:text="#{project.tab.snapshots}"></title>
+    <title th:text="#{nav.projects}  + ' - ' + #{project.tab.snapshots}"></title>
     <meta name="projectID" th:content="${project.id}"/>
     <script src="/webjars/chartjs/2.8.0/Chart.js"></script>
     <link href="/webjars/chartjs/2.8.0/Chart.min.css" rel="stylesheet">

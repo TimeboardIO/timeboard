@@ -6,7 +6,7 @@
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
-    <title th:text="#{project.tab.tags}"></title>
+    <title th:text="#{nav.projects}  + ' - ' + #{project.tab.tags}"></title>
     <meta name="projectID" th:value="${project.id}"/>
     <script src="/js/project_tags.js" type="text/javascript"></script>
 </head>

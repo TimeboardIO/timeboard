@@ -21,7 +21,6 @@
             text-shadow: -1px -1px 3px #333, 1px -1px 3px #333, -1px 1px 3px #333, 1px 1px 3px #333;
         }
 
-
         .box{
             position: fixed;
             top: 0px;
@@ -29,7 +28,6 @@
             left: 0px;
             right: 0px;
          }
-
 
         .background{
             background-image: url('/onboarding/bg-light.jpg');
@@ -45,24 +43,20 @@
             bottom: 0px;
         }
 
-
-
-
-
     </style>
 </head>
 
         <div class="ui three column stackable grid box">
         <div class="column"></div>
         <div class="column top aligned">
-            <div class="ui card segment centered">
-                <div class="image" style="background:none">
-                    <img style="margin: 0 auto; width:8rem" src="/onboarding/teamwork.png">
+            <div class="ui card segment centered" style="margin-top: 2rem;text-align: center;background-color: white !important; box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;">
+                <div class="image" style="background: none; padding: 1rem;">
+                    <img style="margin: 0 auto;" src="/onboarding/images/logo.png">
                 </div>
                 <div class="content">
 
                     <a class="header">
-                        Select an organisation:
+                        Select an organisation
                     </a>
                     <div class="description">
                         <form th:action="@{/select}" method="post" th:if="${organizations.size() > 0}">
@@ -70,7 +64,7 @@
                                 <select class="ui button selection dropdown organisations" name="organization">
                                     <option class="item" th:each="org : ${organizations}" th:value="${org.id}" th:text="${org.name}"></option>
                                 </select>
-                                <button class="ui item icon positive button" data-cy="select-org-submit">
+                                <button class="ui item icon blue button" data-cy="select-org-submit">
                                     <i class="icon arrow alternate circle right"></i>
                                 </button>
                                 <script type="text/javascript">
@@ -88,17 +82,24 @@
                     </div>
 
                     <a class="header">
-                        Create an organisation:
+                        Create an organisation
                     </a>
                     <div class="description">
                         <form class="ui form" th:action="@{/org/create}" method="post">
                             <div class="field">
-                                <label>Organization Name</label>
-                                <input name="organizationName" required type="text">
+                                <input placeholder="Organization Name" name="organizationName" required type="text">
                             </div>
-                            <button class="ui button" type="submit">Create</button>
+                            <button class="ui button positive" type="submit">Create</button>
                         </form>
                     </div>
+
+                </div>
+                <div class="content" style="text-align: center;">
+                    <h5>Logged as <span th:text="${account.screenName}" ></span></h5>
+                    <a href="/logout" class="ui button">
+                        <i class="sign out alternate icon"></i>
+                        Logout
+                    </a>
 
                 </div>
             </div>

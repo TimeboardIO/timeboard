@@ -19,7 +19,7 @@
                     <div class="ui label">
                         Add member <i class="plus icon"></i>
                     </div>
-                    <input class="prompt" placeholder="Search account..." type="text">
+                    <input class="prompt" placeholder="Existing account email..." type="text">
                 </div>
                 <div class="results"></div>
             </div>
@@ -55,11 +55,11 @@
                     <span v-else>{{ member.role }}</span>
                 </td>
                 <td>
-                    <button v-if="!member.edition"  @click="removeMember($event, member)" class="ui negative icon button">
+                    <button v-if="!member.edition" @click="removeMember($event, member)" class="ui negative icon button right labeled">
                         Remove <i class="close icon"></i>
                     </button>
-                    <button v-if="!member.edition"  @click="impersonateMember($event, member)" class="ui yellow button">
-                        Impersonate
+                    <button v-if="!member.edition"  @click="impersonateMember($event, member)" class="ui yellow icon button right labeled">
+                        Act on behalf <i class="user secret icon"></i>
                     </button>
 
                     <button v-if="member.edition" class="ui positive icon button" @click="updateRole($event, member)">
