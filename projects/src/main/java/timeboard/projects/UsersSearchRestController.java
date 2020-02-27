@@ -137,7 +137,7 @@ public class UsersSearchRestController {
 
         final List<Account> accounts = new ArrayList<>();
         if (org != null) {
-            final List<Account> ownersOfAnyUserProject = this.projectService.findOwnersOfAnyUserProject(actor);
+            final List<Account> ownersOfAnyUserProject = this.projectService.searchOwnersOfAnyUserProjectByEmail(actor, query);
             accounts.addAll(ownersOfAnyUserProject);
 
         } else {

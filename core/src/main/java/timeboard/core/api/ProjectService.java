@@ -189,7 +189,7 @@ public interface ProjectService {
 
     List<BatchType> listProjectUsedBatchType(Account actor, Project project) throws BusinessException;
 
-    List<Account> findOwnersOfAnyUserProject(Account user);
+    List<Account> searchOwnersOfAnyUserProjectByEmail(Account user, String query);
 
     boolean isOwnerOfAnyUserProject(Account owner, Account user);
 }
