@@ -125,6 +125,11 @@ public class VacationsController {
             return ResponseEntity.badRequest().body("Start date must be before end date. ");
         }
 
+        if (startDate.getTime() == endDate.getTime()
+                && requestWrapper.halfStart == true && requestWrapper.halfEnd == true) {
+            return ResponseEntity.badRequest().body("Start session Date must be before the End session Date.");
+        }
+
         if (startDate.before(new Date(new Date().getTime() - (1000 * 60 * 60 * 24)))) { //- 1 Day
             return ResponseEntity.badRequest().body("You can not submit vacation request in the past.");
         }
