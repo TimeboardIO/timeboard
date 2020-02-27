@@ -194,7 +194,7 @@
                     <table class="ui celled table unstackable" style="text-align:center">
                     <thead>
                     <tr class="days">
-                        <th class="two wide" colspan="1">
+                        <th class="two wide">
                             <label th:text="${userScreenName}" v-if="!userIsActor"></label>
                         </th>
                         <th class="wide one" style="text-align:center" v-for="day in days">
@@ -246,7 +246,8 @@
 
                         <tr>
                             <td class="ui header left aligned project" v-bind:colspan="days.length + 6">
-                                <a v-bind:href="'/projects/'+project.projectID+'/setup'">{{ project.projectName }}</a>
+                                <a v-if="project.enable == true" v-bind:href="'/projects/'+project.projectID+'/setup'">{{ project.projectName }}</a>
+                                <a v-else>{{ project.projectName }}</a>
                             </td>
                         </tr>
 
@@ -350,7 +351,7 @@
             </template>
         </tmodal>
     </div>
-    <script src="timesheet.js" async></script>
+    <script src="/js/timesheet.js" async></script>
 </div>
 
 </body>

@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.TimesheetService;
 import timeboard.core.model.Account;
+import timeboard.core.model.OrganizationMembership;
 import timeboard.core.model.ValidationStatus;
 import timeboard.core.security.TimeboardAuthentication;
 import timeboard.home.model.WeekWrapper;
@@ -68,39 +69,50 @@ public class HomeController {
 
 
         //load previous weeks data
-        final Date d = new Date();
+        final Calendar now = Calendar.getInstance();
         final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(d);
+        calendar.setTimeInMillis(0);
         calendar.setFirstDayOfWeek(Calendar.MONDAY);
+        calendar.set(Calendar.YEAR, now.get(Calendar.YEAR));
+        calendar.set(Calendar.DAY_OF_YEAR, now.get(Calendar.DAY_OF_YEAR));
         final List<WeekWrapper> weeks = new ArrayList<>();
         final Account account = authentication.getDetails();
         final int weeksToDisplay = 3; // actual week and the two previous ones
+
+        final OrganizationMembership first = authentication.getDetails()
+                .getOrganizationMemberships()
+                .stream()
+                .filter(m -> m.getOrganization().getId() == authentication.getCurrentOrganization().getId())
+                .findFirst().get();
+        final Calendar creationDate = first.getCreationDate();
+
         if (this.timesheetService != null) {
             for (int i = 0; i < weeksToDisplay; i++) {
                 final Optional<ValidationStatus> timesheetStatusOpt = timesheetService.getTimesheetValidationStatus(
                         authentication.getCurrentOrganization(),
                         account,
                         calendar.get(Calendar.YEAR), calendar.get(Calendar.WEEK_OF_YEAR));
-
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 final Date firstDayOfWeek = calendar.getTime();
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
                 final Date lastDayOfWeek = calendar.getTime();
 
-                final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(
-                        authentication.getCurrentOrganization(),
-                        firstDayOfWeek, lastDayOfWeek,
-                        account).values().stream().reduce(Double::sum).orElse(0.0);
+                if(creationDate.before(calendar)) {
+                    final Double weekSum = this.timesheetService.getAllImputationsForAccountOnDateRange(
+                            authentication.getCurrentOrganization(),
+                            firstDayOfWeek, lastDayOfWeek,
+                            account).values().stream().reduce(Double::sum).orElse(0.0);
 
-                final WeekWrapper week = new WeekWrapper(
-                        calendar.get(Calendar.WEEK_OF_YEAR),
-                        calendar.get(Calendar.YEAR),
-                        weekSum,
-                        timesheetStatusOpt.orElse(null),
-                        firstDayOfWeek,
-                        lastDayOfWeek);
+                    final WeekWrapper week = new WeekWrapper(
+                            calendar.get(Calendar.WEEK_OF_YEAR),
+                            calendar.get(Calendar.YEAR),
+                            weekSum,
+                            timesheetStatusOpt.orElse(null),
+                            firstDayOfWeek,
+                            lastDayOfWeek);
 
-                weeks.add(week);
+                    weeks.add(week);
+                }
                 calendar.roll(Calendar.WEEK_OF_YEAR, -1);
             }
         }

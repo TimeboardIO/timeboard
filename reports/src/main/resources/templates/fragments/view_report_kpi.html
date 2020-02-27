@@ -6,12 +6,96 @@
 <body>
 
 <div th:fragment="report">
-    <script src="/js/reportsChartKPI.js" type="text/javascript"></script>
-    <script src="/webjars/chartjs/2.8.0/Chart.js"></script>
-    <link href="/webjars/chartjs/2.8.0/Chart.min.css" rel="stylesheet">
-    <div id="app-view-report">
-        <canvas id="chartKPI"></canvas>
-    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/apexcharts/3.15.6/apexcharts.min.js"></script>
+
+    <div id="chart"></div>
+
+    <script>
+        const reportID = $("meta[name='reportID']").attr('content');
+
+        $.get("/reports/view/" + reportID + "/data", function(d){
+
+             var options = {
+              series: [{
+              name: 'Inflation',
+              data: [d.quotation, d.effortSpent, d.realEffort, d.originalEstimate, d.effortLeft]
+            }],
+              chart: {
+              height: 350,
+              type: 'bar',
+            },
+            plotOptions: {
+              bar: {
+                dataLabels: {
+                  position: 'top', // top, center, bottom
+                },
+              }
+            },
+
+            xaxis: {
+              categories: ["quotation", "effortSpent", "realEffort", "originalEstimate", "effortLeft"],
+              position: 'top',
+              labels: {
+                offsetY: -18,
+
+              },
+              axisBorder: {
+                show: false
+              },
+              axisTicks: {
+                show: false
+              },
+              crosshairs: {
+                fill: {
+                  type: 'gradient',
+                  gradient: {
+                    colorFrom: '#D8E3F0',
+                    colorTo: '#BED1E6',
+                    stops: [0, 100],
+                    opacityFrom: 0.4,
+                    opacityTo: 0.5,
+                  }
+                }
+              },
+              tooltip: {
+                enabled: true,
+                offsetY: -35,
+
+              }
+            },
+            fill: {
+              gradient: {
+                shade: 'light',
+                type: "horizontal",
+                shadeIntensity: 0.25,
+                gradientToColors: undefined,
+                inverseColors: true,
+                opacityFrom: 1,
+                opacityTo: 1,
+                stops: [50, 0, 100, 100]
+              },
+            },
+            yaxis: {
+              axisBorder: {
+                show: false
+              },
+              axisTicks: {
+                show: false,
+              },
+              labels: {
+                show: true,
+                formatter: function (val) {
+                  return val + " days";
+                }
+              }
+
+            }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options);
+            chart.render();
+        });
+    </script>
 </div>
 </body>
 </html>

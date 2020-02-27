@@ -195,6 +195,10 @@ public class ProjectServiceImpl implements ProjectService {
     @PreAuthorize("hasPermission(#project,'" + AbacEntries.PROJECT_ARCHIVE + "')")
     @CacheEvict(value = "accountProjectsCache", key = "#actor.getId()")
     public Project archiveProjectByID(final Account actor, final Project project) throws BusinessException {
+        //Archive project tasks
+        this.archiveTasks(actor, new ArrayList<>(project.getTasks()));
+
+        //Archive project
         final RuleSet<Project> ruleSet = new RuleSet<>();
         ruleSet.addRule(new ActorIsProjectOwner());
         final Set<Rule> wrongRules = ruleSet.evaluate(actor, project);
@@ -235,10 +239,12 @@ public class ProjectServiceImpl implements ProjectService {
         final TypedQuery<Object[]> q1 = em.createQuery(
                 "select t.taskType as type, COALESCE(sum(i.value),0) "
                         + "from Task t left outer join t.imputations i "
-                        + "where t.project = :project "
+                        + "where t.project = :project and t.taskStatus not in :status "
                         + "GROUP BY t.taskType", Object[].class);
 
         q1.setParameter("project", project);
+        q1.setParameter("status", List.of(TaskStatus.PENDING, TaskStatus.REFUSED));
+
         final Map<TaskType, Double> effortSpent = q1.getResultList().stream()
                 .collect(Collectors.toMap(e -> (TaskType) e[0], e -> (double) e[1]));
 
@@ -247,10 +253,12 @@ public class ProjectServiceImpl implements ProjectService {
                 + "t.taskType as type, "
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
-                + "from Task t where t.project = :project "
+                + "from Task t where t.project = :project and t.taskStatus not in :status "
                 + "GROUP BY t.taskType", Object[].class);
 
         q2.setParameter("project", project);
+        q2.setParameter("status", List.of(TaskStatus.PENDING, TaskStatus.REFUSED));
+
 
         final List<Object[]> originalEstimateAndEffortLeft = q2.getResultList();
 
@@ -275,8 +283,9 @@ public class ProjectServiceImpl implements ProjectService {
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
                 + "from Task t "
-                + "where t.project = :project ", Object[].class);
+                + "where t.project = :project and t.taskStatus not in :status", Object[].class);
         q.setParameter("project", project);
+        q.setParameter("status", List.of(TaskStatus.PENDING, TaskStatus.REFUSED));
 
         final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
 
@@ -309,10 +318,11 @@ public class ProjectServiceImpl implements ProjectService {
                 + "COALESCE(sum(t.originalEstimate),0) as originalEstimate, "
                 + "COALESCE(sum(t.effortLeft),0) as effortLeft "
                 + "from Task t join t.batches bList "
-                + "where t.project = :project and :batch IN bList ", Object[].class);
+                + "where t.project = :project and :batch IN bList and t.taskStatus NOT IN :status ", Object[].class);
 
         q.setParameter("project", project);
         q.setParameter("batch", batch);
+        q.setParameter("status", List.of(TaskStatus.PENDING, TaskStatus.REFUSED));
 
         final Object[] originalEstimateAndEffortLeft = q.getSingleResult();
 
@@ -465,7 +475,7 @@ public class ProjectServiceImpl implements ProjectService {
             task.setTaskStatus(TaskStatus.ARCHIVED);
             em.merge(task);
         }
-        LOGGER.info("User " + actor + " deleted " + taskList.size() + " tasks ");
+        LOGGER.info("User " + actor + " archived " + taskList.size() + " tasks ");
         em.flush();
 
     }
@@ -595,7 +605,7 @@ public class ProjectServiceImpl implements ProjectService {
         TimeboardSubjects.TASK_EVENTS.onNext(new TaskEvent(TimeboardEventType.DELETE, task, actor));
 
 
-        LOGGER.info("Task " + taskID + " deleted by " + actor.getName());
+        LOGGER.info("Task " + taskID + " archived by " + actor.getName());
 
     }
 

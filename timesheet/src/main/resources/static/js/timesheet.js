@@ -213,7 +213,7 @@ $(document).ready(function () {
             },
             updateTimesheet: function () {
                 $('.ui.dimmer').addClass('active');
-                $.get("/timesheet/data?user=" + _USER_ID + "&week=" + _WEEK + "&year=" + _YEAR)
+                $.get("/timesheet/data/" + _YEAR + "/" + _WEEK)
                     .then(function (data) {
                         app.canValidate = data.canValidate;
                         app.week = data.week;

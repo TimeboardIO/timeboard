@@ -1,4 +1,4 @@
-package timeboard.organization;
+package timeboard.timesheet;
 
 /*-
  * #%L

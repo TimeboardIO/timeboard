@@ -5,6 +5,7 @@
       xmlns:th="http://www.thymeleaf.org"
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-on="http://www.w3.org/1999/xhtml">
 <head>
+    <title th:text="#{org.setup}"></title>
     <meta property="organization" th:baseURL="@{${'/org/'+tab}}" th:orgID="${organization.id}"/>
 </head>
 <body>

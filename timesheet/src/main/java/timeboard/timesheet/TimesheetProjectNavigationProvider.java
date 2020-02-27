@@ -1,10 +1,10 @@
-package timeboard.core.api;
+package timeboard.timesheet;
 
 /*-
  * #%L
- * core
+ * timesheet
  * %%
- * Copyright (C) 2019 Timeboard
+ * Copyright (C) 2019 - 2020 Timeboard
  * %%
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,30 @@ package timeboard.core.api;
  * #L%
  */
 
-import timeboard.core.model.Project;
+import org.springframework.stereotype.Component;
+import timeboard.core.api.AbacEntries;
+import timeboard.projects.api.ProjectNavigationProvider;
 
-public interface EncryptionService {
+@Component
+public class TimesheetProjectNavigationProvider implements ProjectNavigationProvider {
+    @Override
+    public String getNavigationLabel() {
+        return "timesheet.validation";
+    }
 
-    String getProjectAttribute(Project targetProject, String attributeKey);
 
-    String encryptAttribute(String newAttrValue);
+    @Override
+    public String getNavigationPath() {
+        return ProjectTimesheetValidationController.PATH;
+    }
+
+    @Override
+    public String getNavigationAction() {
+        return AbacEntries.TIMESHEET_VALIDATION_VIEW;
+    }
+
+    @Override
+    public int getNavigationWeight() {
+        return 30;
+    }
 }

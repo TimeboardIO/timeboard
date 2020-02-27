@@ -6,7 +6,7 @@
       xmlns:v-slot="http://www.w3.org/1999/XSL/Transform" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title layout:fragment="title">Project Batches</title>
+    <title th:text="#{nav.projects}  + ' - ' + #{project.tab.batches}"></title>
     <meta name="projectID" th:content="${project.id}"/>
     <script src="/js/project_batches.js" type="text/javascript"></script>
 </head>

@@ -8,8 +8,7 @@
 >
 
 <head>
-    <title th:text="#{project.tab.timesheets}"
-    ></title>
+    <title th:text="#{nav.projects}  + ' - ' + #{timesheet.validation}"></title>
     <meta name="projectID" th:value="${project.id}"/>
     <meta name="baseURL" th:value="@{/timesheet}"/>
     <style>
