@@ -213,7 +213,7 @@ public class VacationServiceImpl implements VacationService {
             this.updateImputations(org, actor, request, 0);
         }
 
-        VacationRequest myRequestToDelete = em.find(VacationRequest.class, request.getId());
+        final VacationRequest myRequestToDelete = em.find(VacationRequest.class, request.getId());
         em.remove(myRequestToDelete);
         em.flush();
 
@@ -235,7 +235,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         if (removeIt) {
-            VacationRequest myRequestToDelete = em.find(VacationRequest.class, request.getId());
+            final VacationRequest myRequestToDelete = em.find(VacationRequest.class, request.getId());
             em.remove(myRequestToDelete);
         }
         em.flush();
