@@ -130,13 +130,14 @@ public class TimesheetController {
             projects.add(new ProjectWrapper(
                     projectTasks.getProject().getId(),
                     projectTasks.getProject().getName(),
-                    tasks));
+                    tasks,
+                    projectTasks.getProject().isEnable()));
         });
 
         //Default tasks
         final List<TaskWrapper> tasks = getDefaultTasks(currentAccount, authentication.getCurrentOrganization(),
                 imputations, firstDayOfWeek.getTime(), lastDayOfWeek.getTime(), days);
-        projects.add(new ProjectWrapper(0L, "Default Tasks", tasks));
+        projects.add(new ProjectWrapper(0L, "Default Tasks", tasks, false));
 
         final boolean canValidate = this.projectService.isOwnerOfAnyUserProject(authentication.getDetails(), currentAccount);
         final Calendar creationDate = this.organizationService
@@ -673,16 +674,22 @@ public class TimesheetController {
 
         private final Long projectID;
         private final String projectName;
+        private final boolean enable;
         private final List<TaskWrapper> tasks;
 
-        public ProjectWrapper(final Long projectID, final String projectName, final List<TaskWrapper> tasks) {
+        public ProjectWrapper(final Long projectID, final String projectName, final List<TaskWrapper> tasks, final boolean enable) {
             this.projectID = projectID;
             this.projectName = projectName;
             this.tasks = tasks;
+            this.enable = enable;
         }
 
         public Long getProjectID() {
             return projectID;
+        }
+
+        public boolean isEnable() {
+            return enable;
         }
 
         public String getProjectName() {
