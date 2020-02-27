@@ -2849,25 +2849,25 @@ i.icon.upload:before {
 i.icon.usb:before {
   content: "\f287";
 }
-i.icon.account:before {
+i.icon.user:before {
   content: "\f007";
 }
-i.icon.account.circle:before {
+i.icon.user.circle:before {
   content: "\f2bd";
 }
-i.icon.account.md:before {
+i.icon.user.md:before {
   content: "\f0f0";
 }
-i.icon.account.plus:before {
+i.icon.user.plus:before {
   content: "\f234";
 }
-i.icon.account.secret:before {
+i.icon.user.secret:before {
   content: "\f21b";
 }
-i.icon.account.times:before {
+i.icon.user.times:before {
   content: "\f235";
 }
-i.icon.accounts:before {
+i.icon.users:before {
   content: "\f0c0";
 }
 i.icon.ussunnah:before {
@@ -3052,7 +3052,7 @@ i.icon.ordered.list:before {
 i.icon.unordered.list:before {
   content: "\f0ca";
 }
-i.icon.account.doctor:before {
+i.icon.user.doctor:before {
   content: "\f0f0";
 }
 i.icon.shield:before {
@@ -3100,7 +3100,7 @@ i.icon.add.to.calendar:before {
 i.icon.add.to.cart:before {
   content: "\f217";
 }
-i.icon.add.account:before {
+i.icon.add.user:before {
   content: "\f234";
 }
 i.icon.add:before {
@@ -3643,7 +3643,7 @@ i.icon.remove.circle:before {
 i.icon.remove.from.calendar:before {
   content: "\f272";
 }
-i.icon.remove.account:before {
+i.icon.remove.user:before {
   content: "\f235";
 }
 i.icon.remove:before {
@@ -3835,16 +3835,16 @@ i.icon.unmute:before {
 i.icon.usd:before {
   content: "\f155";
 }
-i.icon.account.cancel:before {
+i.icon.user.cancel:before {
   content: "\f235";
 }
-i.icon.account.close:before {
+i.icon.user.close:before {
   content: "\f235";
 }
-i.icon.account.delete:before {
+i.icon.user.delete:before {
   content: "\f235";
 }
-i.icon.account.x:before {
+i.icon.user.x:before {
   content: "\f235";
 }
 i.icon.vcard:before {
@@ -4409,10 +4409,10 @@ i.icon.times.circle.outline:before {
 i.icon.trash.alternate.outline:before {
   content: "\f2ed";
 }
-i.icon.account.outline:before {
+i.icon.user.outline:before {
   content: "\f007";
 }
-i.icon.account.circle.outline:before {
+i.icon.user.circle.outline:before {
   content: "\f2bd";
 }
 i.icon.window.close.outline:before {

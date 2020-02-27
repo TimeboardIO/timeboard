@@ -21,7 +21,10 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #393939;
-  account-select: none;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
