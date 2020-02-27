@@ -1,5 +1,9 @@
 # Datatable component
-Datatable is a Timeboard VueJS componenent depoyable on view on app to render table. 
+Datatable is a Timeboard VueJS component deployable on view on a Vue app to render table. 
+
+![Capture du 2020-02-27 12-09-49](https://user-images.githubusercontent.com/15018911/75439511-39362580-595a-11ea-9a77-121e891f16e9.png)
+![Capture du 2020-02-27 12-08-23](https://user-images.githubusercontent.com/15018911/75439513-39cebc00-595a-11ea-80f6-51014ebaf794.png)
+
 ## Basic 
 Here is a simple example of datatable implementation for a table with 3 columns : 2 data columns and an action column.
 ### Template 
