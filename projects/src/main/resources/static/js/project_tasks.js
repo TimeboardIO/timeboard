@@ -231,6 +231,14 @@ let app = new Vue({
                 res[batch.batchID] = self.taskList.filter(row => {
                     return row.batchIDs.some(b => b === batch.batchID);
                 });
+                batch.originalEstimate = res[batch.batchID].filter(t => t.status !== 'PENDING' && t.status !== 'REJECTED')
+                    .reduce((accumulator, currentValue) => accumulator + currentValue.originalEstimate, 0);
+                batch.realEffort = res[batch.batchID].filter(t => t.status !== 'PENDING' && t.status !== 'REJECTED')
+                    .reduce((accumulator, currentValue) => accumulator + currentValue.realEffort, 0);
+                batch.effortLeft = res[batch.batchID].filter(t => t.status !== 'PENDING' && t.status !== 'REJECTED')
+                    .reduce((accumulator, currentValue) => accumulator + currentValue.effortLeft, 0);
+                batch.effortSpent = res[batch.batchID].filter(t => t.status !== 'PENDING' && t.status !== 'REJECTED')
+                    .reduce((accumulator, currentValue) => accumulator + currentValue.effortSpent, 0);
             });
             return res;
         }
