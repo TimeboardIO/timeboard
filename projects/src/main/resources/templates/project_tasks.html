@@ -9,7 +9,7 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head>
-    <title th:text="#{project.tab.tasks}"></title>
+    <title th:text="#{nav.projects}  + ' - ' + #{project.tab.tasks}"></title>
     <meta property="tasks" th:baseurl="@{/projects/tasks/config(projectID=${project.id})}" th:project="${project.id}"  th:batchtype="${batchType}"/>
     <style>
         .ellipsis {
