@@ -62,6 +62,7 @@ public class VacationsFeatureTest extends TimeboardTest {
     private Calendar myStartDate = Calendar.getInstance();
     private Calendar myEndDate = Calendar.getInstance();
     private Calendar dateDuringVacation = Calendar.getInstance();
+    private Calendar next3Week = Calendar.getInstance();
 
 
 
@@ -79,19 +80,55 @@ public class VacationsFeatureTest extends TimeboardTest {
         return vacationRequestWrapper;
     }
 
+    private VacationsController.VacationRequestWrapper getExampleRecursiveVacationRequestWrapper(String label) {
+
+        VacationsController.VacationRequestWrapper vacationRequestWrapper = new VacationsController.VacationRequestWrapper();
+        vacationRequestWrapper.setRecursive(true); // recursive
+        vacationRequestWrapper.setRecurrenceDay(1); // all mondays (monday = 1)
+        vacationRequestWrapper.setRecurrenceType("MORNING"); // only morning
+        vacationRequestWrapper.setStart(myStartDate.getTime());
+        vacationRequestWrapper.setEnd(myEndDate.getTime());
+        vacationRequestWrapper.setLabel(label);
+        vacationRequestWrapper.setAssigneeID(world.account.getId());
+        vacationRequestWrapper.setAssigneeName(world.account.getScreenName());
+        return vacationRequestWrapper;
+    }
+
     @Given("^start and end date of vacations$")
     public void startAndEndDateOfVacations() {
+
         myStartDate = Calendar.getInstance();
+        myStartDate.setFirstDayOfWeek(Calendar.MONDAY);
         myStartDate.add(Calendar.WEEK_OF_YEAR, 1);
         myStartDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
         dateDuringVacation = Calendar.getInstance();
+        dateDuringVacation.setFirstDayOfWeek(Calendar.MONDAY);
         dateDuringVacation.add(Calendar.WEEK_OF_YEAR, 1);
         dateDuringVacation.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
 
         myEndDate = Calendar.getInstance();
+        myEndDate.setFirstDayOfWeek(Calendar.MONDAY);
         myEndDate.add(Calendar.WEEK_OF_YEAR, 1);
         myEndDate.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+    }
+
+    @Given("^start and end date of recursive vacations$")
+    public void startAndEndDateOfRecursiveVacations() {
+        myStartDate = Calendar.getInstance();
+        myStartDate.setFirstDayOfWeek(Calendar.MONDAY);
+        myStartDate.add(Calendar.WEEK_OF_YEAR, 1);
+        myStartDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        myEndDate = Calendar.getInstance();
+        myEndDate.setFirstDayOfWeek(Calendar.MONDAY);
+        myEndDate.add(Calendar.WEEK_OF_YEAR, 2);
+        myEndDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+
+        next3Week = Calendar.getInstance();
+        next3Week.setFirstDayOfWeek(Calendar.MONDAY);
+        next3Week.add(Calendar.WEEK_OF_YEAR, 3);
+        next3Week.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
     }
 
     @Given("^user with an existing account and (\\d+) projects and (\\d+) vacations$")
@@ -106,6 +143,19 @@ public class VacationsFeatureTest extends TimeboardTest {
         }
     }
 
+    @Given("^user with an existing account and (\\d+) projects and (\\d+) recursive vacations$")
+    public void userWithAnExistingAccountAndProjectsAndRecursiveVacations(int arg0, int arg1) throws Throwable {
+        globalStepDefinitions.user_with_an_existing_account_and_projects(arg0);
+
+        for (int i = 0; i < arg1; i++) {
+            String label = "My best Recursive vacations " + (i+1);
+
+            VacationsController.VacationRequestWrapper vacationRequestWrapper = this.getExampleRecursiveVacationRequestWrapper(label);
+            vacationsController.createRequest(world.auth, vacationRequestWrapper);
+        }
+
+    }
+
 
 
     @When("^the user create a vacation$")
@@ -117,6 +167,14 @@ public class VacationsFeatureTest extends TimeboardTest {
 
     }
 
+    @When("^the user create a recursive vacation$")
+    public void theUserCreateARecursiveVacation() {
+        String label = "My monday morning recursive vacations";
+
+        VacationsController.VacationRequestWrapper vacationRequestWrapper = this.getExampleRecursiveVacationRequestWrapper(label);
+        vacationsController.createRequest(world.auth, vacationRequestWrapper);
+    }
+
     @When("^the user delete a pending vacation$")
     public void theUserDeleteAPendingVacation() throws BusinessException {
         List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization)
@@ -126,8 +184,18 @@ public class VacationsFeatureTest extends TimeboardTest {
         vacationsController.deleteRequest(world.auth, vacations.stream().findFirst().get());
     }
 
-    @When("^the user approve a pending vacation$")
-    public void theUserApproveAPendingVacation() throws BusinessException {
+
+    @When("^the user delete a accepted vacation$")
+    public void theUserDeleteAAcceptedVacation() throws BusinessException {
+        List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization)
+                .stream()
+                .filter(v -> v.getStatus() == VacationRequestStatus.ACCEPTED)
+                .collect(Collectors.toList());
+        vacationsController.deleteRequest(world.auth, vacations.stream().findFirst().get());
+    }
+
+    @When("^the user accept a pending vacation$")
+    public void theUserAcceptAPendingVacation() throws BusinessException {
         List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization)
                 .stream()
                 .filter(v -> v.getStatus() == VacationRequestStatus.PENDING)
@@ -135,8 +203,8 @@ public class VacationsFeatureTest extends TimeboardTest {
         vacationsController.approveRequest(world.auth, vacations.stream().findFirst().get());
     }
 
-    @When("^the user deny a pending vacation$")
-    public void theUserDenyAPendingVacation() throws BusinessException {
+    @When("^the user reject a pending vacation$")
+    public void theUserRejectAPendingVacation() throws BusinessException {
         List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization)
                 .stream()
                 .filter(v -> v.getStatus() == VacationRequestStatus.PENDING)
@@ -147,31 +215,45 @@ public class VacationsFeatureTest extends TimeboardTest {
 
 
 
-    @Then("^the user has (\\d+) vacations$")
-    public void theUserHasVacations(int arg0) throws BusinessException {
-        List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization);
-        Assert.assertEquals(vacations.size(), arg0);
 
-    }
 
     @Then("^the user has (\\d+) pending vacations$")
     public void theUserHasPendingVacations(int arg0) throws BusinessException {
         List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization);
         Assert.assertEquals(vacations.stream().filter(v -> v.getStatus() == VacationRequestStatus.PENDING).count(), arg0);
-
     }
 
     @Then("^the user has (\\d+) accepted vacations$")
     public void theUserHasAcceptedVacations(int arg0) throws BusinessException {
         List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization);
         Assert.assertEquals(vacations.stream().filter(v -> v.getStatus() == VacationRequestStatus.ACCEPTED).count(), arg0);
-
     }
 
     @Then("^the user has (\\d+) rejected vacations$")
     public void theUserHasRejectedVacations(int arg0) throws BusinessException {
         List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization);
         Assert.assertEquals(vacations.stream().filter(v -> v.getStatus() == VacationRequestStatus.REJECTED).count(), arg0);
+    }
+
+    @Then("^the user has (\\d+) pending recursive vacations$")
+    public void theUserHasRecursiveVacations(int arg0) {
+        List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization);
+        Assert.assertEquals(vacations.stream().filter(v -> v instanceof RecursiveVacationRequest
+                && v.getStatus() == VacationRequestStatus.PENDING).count(), arg0); // pending recursive vacation
+    }
+
+    @Then("^the user has (\\d+) accepted recursive vacations$")
+    public void theUserHasAcceptedRecursiveVacations(int arg0) {
+        List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization);
+        Assert.assertEquals(vacations.stream().filter(v -> v instanceof RecursiveVacationRequest
+                && v.getStatus() == VacationRequestStatus.ACCEPTED).count(), arg0);
+    }
+
+    @Then("^the user has (\\d+) rejected recursive vacations$")
+    public void theUserHasRejectedRecursiveVacations(int arg0) {
+            List<VacationRequest> vacations = vacationService.listVacationRequestsByUser(world.account, world.organization);
+            Assert.assertEquals(vacations.stream().filter(v -> v instanceof RecursiveVacationRequest
+                    && v.getStatus() == VacationRequestStatus.REJECTED).count(), arg0);
     }
 
     @Then("^the user has imputations on his vacations$")
@@ -205,6 +287,33 @@ public class VacationsFeatureTest extends TimeboardTest {
         Assert.assertNull(lastImputation);
     }
 
+    @Then("^the user has imputations on his recursive vacations$")
+    public void theUserHasImputationsOnHisRecursiveVacations() {
+        DefaultTask vacationTask = this.vacationService.getVacationTask(world.account, world.organization.getId());
+        // monday in 1 week
+        Imputation firstImputation = this.projectService.getImputation(world.account, vacationTask, myStartDate.getTime()).orElse(null);
+        Assert.assertNotNull(firstImputation);
+        Assert.assertEquals(firstImputation.getValue(), 0.5, 0);
+        // monday in 2 week
+        Imputation lastImputation = this.projectService.getImputation(world.account, vacationTask, myEndDate.getTime()).orElse(null);
+        Assert.assertNotNull(lastImputation);
+        Assert.assertEquals(lastImputation.getValue(), 0.5, 0);
+        // monday in 3 week
+        Imputation noImputation = this.projectService.getImputation(world.account, vacationTask, next3Week.getTime()).orElse(null);
+        Assert.assertNull(noImputation);
+    }
 
-
+    @Then("^the user has no imputations on his recursive vacations$")
+    public void theUserHasNoImputationsOnHisRecursiveVacations() {
+        DefaultTask vacationTask = this.vacationService.getVacationTask(world.account, world.organization.getId());
+        // monday in 1 week
+        Imputation firstImputation = this.projectService.getImputation(world.account, vacationTask, myStartDate.getTime()).orElse(null);
+        Assert.assertNull(firstImputation);
+        // monday in 2 week
+        Imputation lastImputation = this.projectService.getImputation(world.account, vacationTask, myEndDate.getTime()).orElse(null);
+        Assert.assertNull(lastImputation);
+        // monday in 3 week
+        Imputation noImputation = this.projectService.getImputation(world.account, vacationTask, next3Week.getTime()).orElse(null);
+        Assert.assertNull(noImputation);
+    }
 }

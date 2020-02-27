@@ -235,7 +235,8 @@ public class VacationServiceImpl implements VacationService {
         }
 
         if (removeIt) {
-            em.remove(request);
+            VacationRequest myRequestToDelete = em.find(VacationRequest.class, request.getId());
+            em.remove(myRequestToDelete);
         }
         em.flush();
 
