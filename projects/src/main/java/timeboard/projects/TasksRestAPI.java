@@ -88,7 +88,7 @@ public class TasksRestAPI {
             t.setTaskType(taskTypeValidator(taskWrapper));
             t.setAssigned(assigneeValidator(taskWrapper));
             t.setBatches(batchesValidator(taskWrapper, actor));
-            t.setTaskStatus(taskStatusValidator(taskWrapper));
+            t.setTaskStatus(TaskStatus.valueOf(taskWrapper.getStatus()));
 
             Task task = null;
             try {
@@ -111,10 +111,14 @@ public class TasksRestAPI {
                     oldTask.setBatches(t.getBatches());
                     oldTask.setTaskStatus(t.getTaskStatus());
 
-                    task = processUpdateTask(org, actor, oldTask);
+                    task = projectService.updateTask(org, actor, oldTask);
 
                 } else {
-                    task = processCreateTask(org, actor, t);
+                    task = projectService.createTask(org, actor, t.getProject(),
+                            t.getName(), t.getComments(), t.getStartDate(),
+                            t.getEndDate(), t.getOriginalEstimate(), t.getTaskType(), t.getAssigned(),
+                            ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,
+                            t.getBatches());
                 }
 
             } catch (final Exception e) {
@@ -148,10 +152,6 @@ public class TasksRestAPI {
             }
         }
 
-    }
-
-    private TaskStatus taskStatusValidator(@RequestBody final TaskWrapper taskWrapper) {
-        return TaskStatus.valueOf(taskWrapper.getStatus());
     }
 
     private Set<Batch> batchesValidator(@RequestBody final TaskWrapper taskWrapper, final Account actor) {
@@ -263,17 +263,8 @@ public class TasksRestAPI {
     }
 
 
-    private Task processCreateTask(final Organization org, final Account actor, final Task task) {
-        return projectService.createTask(org, actor, task.getProject(),
-                task.getName(), task.getComments(), task.getStartDate(),
-                task.getEndDate(), task.getOriginalEstimate(), task.getTaskType(), task.getAssigned(),
-                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,
-                task.getBatches());
-    }
 
-    private Task processUpdateTask(final Organization org, final Account actor, final Task task) {
-        return projectService.updateTask(org, actor, task);
-    }
+
 
 
     public static class TaskGraphWrapper implements Serializable {
