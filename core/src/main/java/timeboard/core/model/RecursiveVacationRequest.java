@@ -72,9 +72,10 @@ public class RecursiveVacationRequest extends VacationRequest {
         final java.util.Calendar end = java.util.Calendar.getInstance();
         end.setTime(this.getEndDate());
 
-        while (start.before(end)) {
+        while (start.compareTo(end) <= 0) {
             start.set(java.util.Calendar.DAY_OF_WEEK, (this.getRecurrenceDay() + 1) % 7); //Calendar first day of week is sunday
-            if (start.getTime().after(this.getStartDate()) && start.getTime().before(this.getEndDate())) {
+            // start.getTime() afterOrEquals this.getStartDate() AND start.getTime() beforeOrEquals this.getEndDate()
+            if (start.getTime().compareTo(this.getStartDate()) >= 0 && start.getTime().compareTo(this.getEndDate()) <= 0) {
                 final VacationRequest child = new VacationRequest(this);
                 child.setParent(this);
                 child.setStartDate(start.getTime());
