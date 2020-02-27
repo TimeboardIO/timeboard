@@ -84,7 +84,7 @@ public class VacationsFeatureTest extends TimeboardTest {
 
         VacationsController.VacationRequestWrapper vacationRequestWrapper = new VacationsController.VacationRequestWrapper();
         vacationRequestWrapper.setRecursive(true); // recursive
-        vacationRequestWrapper.setRecurrenceDay(1); // all mondays (monday = 1)
+        vacationRequestWrapper.setRecurrenceDay(Calendar.MONDAY); // all mondays
         vacationRequestWrapper.setRecurrenceType("MORNING"); // only morning
         vacationRequestWrapper.setStart(myStartDate.getTime());
         vacationRequestWrapper.setEnd(myEndDate.getTime());
