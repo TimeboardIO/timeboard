@@ -1,3 +1,7 @@
+/* Doc for this component available at
+{@link https://github.com/TimeboardIO/timeboard/blob/master/docs/vue-component/calendar.md  } */
+
+
 Vue.component('calendar', {
     props: {
         year : Number,
@@ -24,22 +28,29 @@ Vue.component('calendar', {
         }
     },
     methods : {
+        // To be override
         selectColor : function(event) {
             return "lightblue";
         }
     },
     template: `
             <table style="margin: 0; table-layout:fixed;" class="ui celled table unstackable calendar">
+                <!-- Header with day num  (hidden if showHeader is false) -->
                 <tr v-if="showHeader === true">
+                  <!-- Empty lef top cells  -->
                   <th style="width: 10rem; white-space: nowrap;"  v-if="showColName === true" ></th>
-                  <th class="calendar-cell" v-for="day in daysInMonth" v-bind:data-label="day.date.toDateString()" >{{ day.date.getDate() }}</th>    
-                  
+                  <!-- Day num in month  -->
+                  <th class="calendar-cell" v-for="day in daysInMonth" v-bind:data-label="day.date.toDateString()" >{{ day.date.getDate() }}</th>               
+                  <!-- Non existing days cells to fix line cells number to 31 days -->
                   <th class="calendar-cell" v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)"></th>        
                 </tr>
+                <!-- Morning event -->
                 <tr>
+                    <!-- Line name (hidden if showColName is false) -->
                     <td rowspan="2" v-if="showColName === true" style="width: 10rem; word-wrap: break-word" >
                     {{ name }}
                     </td>
+                    <!-- Morning cell (deduce cell color from selectColor function) -->
                     <td 
                         v-for="day in daysInMonth"             
                         v-bind:style="[
@@ -51,10 +62,12 @@ Vue.component('calendar', {
                         data-position="left center" 
                         :data-tooltip="day.morningEvent !== undefined ? day.morningEvent.label : false" 
                     ></td>  
-                  
+                   <!-- Non existing days cells to fix line cells number to 31 days -->
                    <td class="calendar-cell" v-for="index in (31 - daysInMonth.length)" :key="index" style="background-color: rgba(0,0,0,.05)" rowspan="2"></td>        
                 </tr>
+                <!-- Afternoon event -->
                 <tr>
+                    <!-- Afternoon cell (deduce cell color from selectColor function) -->
                     <td
                         v-for="day in daysInMonth" 
                         v-bind:style="[
@@ -70,7 +83,9 @@ Vue.component('calendar', {
             </table>
        `,
     computed: {
+        // Generate day in mouth
         daysInMonth : function() {
+            // First day of month
             let date = new Date(this.year, this.month, 1);
             let days = [];
             while (date.getMonth() === this.month) {
@@ -97,6 +112,7 @@ Vue.component('calendar', {
     }
 });
 
+// Year calendar is composed by 12 month calendar
 Vue.component('year-calendar', {
     props: {
         year : Number,
@@ -111,6 +127,7 @@ Vue.component('year-calendar', {
             ])
         }
     },
+    //overflow-x : scroll is user to enhance mobile experience
     template: `
         <div style="overflow-x: scroll;">
             <calendar v-for="month in monthsInYear" :name="monthNames[month]" :show-header="month === 0" :year="year" :month="month" :events="events"></calendar>
@@ -128,6 +145,7 @@ Vue.component('year-calendar', {
         },
     },
     data : function () {
+        // Currently static array of month name, must find a way to enhance i18n
         return {
             monthNames : ["January", "February", "March", "April", "May", "June",
                 "July", "August", "September", "October", "November", "December"

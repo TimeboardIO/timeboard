@@ -1,25 +1,34 @@
+/* Doc for this component available at
+{@link https://github.com/TimeboardIO/timeboard/blob/master/docs/vue-component/data-table.md  } */
+
 Vue.component('data-table', {
     props: ['config', 'table'],
     template: `
             <table class="ui celled table" v-if="table.length > 0">
+                <!-- Table header -->
                 <thead>
                     <tr>
                         <th v-for="col in finalCols"  v-if="col.visible" @click="sortBy(col.slot)"  v-bind:class="col.class"> 
                             {{col.label}} 
+                            <!-- Sort caret -->
                             <i v-if="col.visible && col.sortKey" class="icon caret" :class="sortOrders[col.slot] > 0 ? 'up' : 'down'"></i> 
                         </th>
+                         <!-- Cogwheel icon use to show config modal -->
                         <th v-if="config.configurable === true" class="collapsing" style="border-left: none;" ><i class="cog icon" @click="showConfigModal()"></i></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(row, i) in finalData">
+                    <!-- Data cells (override by slots in template). Can add custom class to columns  -->
                       <td v-for="(col, j) in finalCols" v-if="col.visible" v-bind:class="col.class"  >
                           <slot :name="col.slot" v-bind:row="finalData[i]">
                           </slot>
                       </td>
+                      <!-- Last empty column for cogwheel in header -->
                       <td v-if="config.configurable === true" style="border-left: none;" ></td>
                     </tr>
                 </tbody>
+                <!-- Config modal -->
                 <tmodal 
                     v-bind:title="'Column config '+config.name"
                     v-bind:id=" 'configModal' + config.name.replace(/ /g,'') ">
@@ -32,6 +41,7 @@ Vue.component('data-table', {
                                 </tr>
                             </thead>
                             <tbody>
+                                <!-- Column config toggle  (primary cols are not configurable) -->
                                 <tr v-for="(col, j) in finalCols" v-if="col.primary !== true" >
                                   <td>
                                      {{ col.slot }}
@@ -53,6 +63,7 @@ Vue.component('data-table', {
 `,
     data: function () {
 
+        // check data-table configuration
         if(!this.table) {
             Logger.error("[DATA-TABLE] you have to specify 'table' props.");
         }
@@ -63,13 +74,17 @@ Vue.component('data-table', {
         let sortOrders = {};
         let finalCols = [];
 
+        // Data-table does not affect the data directly
+        // here we make a copy of data to finalcol
         this.config.cols.forEach(function (key) {
             sortOrders[key.slot] = 1;
             key.visible = true;
             let col = Object.assign({}, key);
             finalCols.push(col);
         });
+
         let self = this;
+        // if data-table is configurable, load column configuration from db
         if (this.config.configurable === true) {
             if(!this.config.name) {
                 Logger.error("[DATA-TABLE] No name have been set for configuration saving")
@@ -82,6 +97,7 @@ Vue.component('data-table', {
                         self.finalCols
                             .forEach(function (c) {
                                 let visible = d.colNames.includes(c.slot);
+                                // primary columns are always visible
                                 c.visible = (c.primary === true || visible);
                             });
                     }
@@ -137,12 +153,12 @@ Vue.component('data-table', {
         showConfigModal: function() {
             $( '#configModal' + this.config.name.replace(/ /g, '' )).modal({
                 onApprove : function($element) {
-
                 },
                 detachable : true, centered: true
             }).modal('show');
         },
         changeDataTableConfig: function(event) {
+
             let self = this;
             event.target.classList.toggle('loading');
 
@@ -150,6 +166,7 @@ Vue.component('data-table', {
             this.finalCols.forEach(function (col) {
                if(col.visible) cols.push(col.slot);
             });
+            // config name is currently used as key in db for saving config for this table
             $.ajax({
                 type: "POST",
                 dataType: "json",

@@ -27,7 +27,7 @@ $(document).ready(function () {
                         "primary" : true
                     }],
                 name: 'tableTag',
-                configurable : true
+                configurable : false
             },
             tagsListData: []
         },
@@ -43,6 +43,7 @@ $(document).ready(function () {
                         "tagValue": "New Value"
                     },
                     success: function (d) {
+                        d.forEach(r => r.edition = false);
                         self.tagsListData = d;
                     }
                 });
@@ -55,6 +56,7 @@ $(document).ready(function () {
                     data: row,
                     url: "projects/" + projectID + "/tags/" + row.id,
                     success: function (d) {
+                        d.forEach(r => r.edition = false);
                         self.tagsListData = d;
                     }
                 });
@@ -67,6 +69,7 @@ $(document).ready(function () {
                         dataType: "json",
                         url: "projects/" + projectID + "/tags/" + row.id,
                         success: function (d) {
+                            d.forEach(r => r.edition = false);
                             self.tagsListData = d;
                         }
                     });
@@ -81,6 +84,7 @@ $(document).ready(function () {
                 dataType: "json",
                 url: "projects/" + projectID + "/tags/list",
                 success: function (d) {
+                    d.forEach(r => r.edition = false);
                     self.tagsListData = d;
                 }
             });
