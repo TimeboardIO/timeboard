@@ -5,7 +5,7 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Project Dashboard</title>
+    <title th:text="#{nav.projects}  + ' - ' + #{project.tab.dashboard}"></title>
     <script src="/webjars/chartjs/2.8.0/Chart.js"></script>
     <link href="/webjars/chartjs/2.8.0/Chart.min.css" rel="stylesheet">
     <meta property="dashboard"
@@ -22,14 +22,16 @@
 
     <div class="ui two column grid">
 
-        <div class="column ">
-            <div class="ui fluid card">
-                <div class="ui horizontal divider"><i class="boxes icon"></i>
-                    Global
-                </div>
-                <div class="content">
+        <div class="ui horizontal divider"><i class="boxes icon"></i>
+            Global Dashboard
+        </div>
 
-                    <div class="ui mini statistic">
+        <div class="column">
+            <div class="ui fluid card" style="height: 100%;">
+
+                <div class="content ui grid">
+
+                    <div class="ui small statistic eight wide column" style="margin: 0px;">
                         <div class="value"
                              th:text="${#numbers.formatDecimal(dashboard.originalEstimate,1,1,'COMMA')}"></div>
                         <div class="label">
@@ -37,14 +39,14 @@
                         </div>
                     </div>
 
-                    <div class="ui mini statistic">
+                    <div class="ui small statistic eight wide column" style="margin: 0px;">
                         <div class="value" th:text="${#numbers.formatDecimal(dashboard.effortSpent,1,1,'COMMA')}"></div>
                         <div class="label">
                             Effort Spent
                         </div>
                     </div>
 
-                    <div class="ui mini statistic">
+                    <div class="ui small statistic eight wide column" style="margin: 0px;">
                         <div class="value"
                              th:text="${#numbers.formatDecimal(dashboard.effortLeft,1,1,'COMMA')}"></div>
                         <div class="label">
@@ -52,7 +54,7 @@
                         </div>
                     </div>
 
-                    <div class="ui mini statistic">
+                    <div class="ui small statistic eight wide column" style="margin: 0px;">
                         <div class="value"
                              th:text="${#numbers.formatDecimal(dashboard.realEffort,1,1,'COMMA')}"></div>
                         <div class="label">
@@ -67,6 +69,10 @@
             <div class="ui fluid card">
                 <canvas id="dashboardBarChart"></canvas>
             </div>
+        </div>
+
+        <div v-if="dashboardsByType.length" class="ui horizontal divider"><i class="boxes icon"></i>
+            Dashboard by Tasks Type
         </div>
         <div class="column" th:each="item:${dashboardsByType}" >
             <div class="ui fluid card">

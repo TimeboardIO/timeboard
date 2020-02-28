@@ -35,9 +35,11 @@ let app = new Vue({
 
         },
         addMember: function(memberID){
+            let self = this;
             $.get("/org/members/add?orgID="+currentOrgID+"&memberID="+memberID)
             .then(function(data){
-                app.members.push(data);
+                data.edition = false;
+                self.members.push(data);
             });
         },
         updateRole: function(e, member){
@@ -46,9 +48,10 @@ let app = new Vue({
                 url: "/org/members/"+member.id,
                 data: JSON.stringify(member),
                 dataType: "json",
-                contentType: 'application/json; charset=utf-8'
-            }).then(function(role){
-                  member.role = role;
+                contentType: 'application/json; charset=utf-8',
+                success: function (d) {
+                    member.edition = false;
+                }
             });
         },
         impersonateMember: function(e, member){
@@ -69,6 +72,7 @@ $(document).ready(function(){
         $.get("/org/members/list")
         .then(function(data){
             for (let i = 0; i < data.length; i++) {
+                data[i].edition = false;
                 app.members.push(data[i]);
             }
             $('.ui.dimmer').removeClass('active');
@@ -86,6 +90,16 @@ $(document).ready(function(){
         },
         onSelect: function(result, response) {
             app.addMember(result.id);
+        },
+        error : {
+            source      : 'Cannot search. No source used, and Semantic API module was not included',
+            noResultsHeader : 'No Results',
+            noResults   : 'Please enter the exact email of an existing account',
+            logging     : 'Error in debug logging, exiting.',
+            noTemplate  : 'A valid template name was not specified.',
+            serverError : 'There was an issue with querying the server.',
+            maxResults  : 'Results must be an array to use maxResults setting',
+            method      : 'The method you called is not defined.'
         },
         minCharacters : 3
     });

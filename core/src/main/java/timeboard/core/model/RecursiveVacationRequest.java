@@ -68,20 +68,27 @@ public class RecursiveVacationRequest extends VacationRequest {
     public void generateChildren() {
         final java.util.Calendar start = java.util.Calendar.getInstance();
         start.setTime(this.getStartDate());
+        start.set(Calendar.HOUR, 0);
+
+        final java.util.Calendar currentDate = java.util.Calendar.getInstance();
+        currentDate.setTime(this.getStartDate());
+        currentDate.set(Calendar.HOUR, 0);
 
         final java.util.Calendar end = java.util.Calendar.getInstance();
         end.setTime(this.getEndDate());
+        end.set(Calendar.HOUR, 0);
 
-        while (start.before(end)) {
-            start.set(java.util.Calendar.DAY_OF_WEEK, (this.getRecurrenceDay() + 1) % 7); //Calendar first day of week is sunday
-            if (start.getTime().after(this.getStartDate()) && start.getTime().before(this.getEndDate())) {
+        while (currentDate.compareTo(end) <= 0) {
+            currentDate.set(java.util.Calendar.DAY_OF_WEEK, this.getRecurrenceDay() % 7); //Calendar first day of week is sunday
+            // >= means afterOrEquals //  <= means beforeOrEquals
+            if (currentDate.compareTo(start) >= 0 && currentDate.compareTo(end) <= 0) {
                 final VacationRequest child = new VacationRequest(this);
                 child.setParent(this);
-                child.setStartDate(start.getTime());
-                child.setEndDate(start.getTime());
+                child.setStartDate(currentDate.getTime());
+                child.setEndDate(currentDate.getTime());
                 this.getChildren().add(child);
             }
-            start.add(Calendar.WEEK_OF_YEAR, 1);
+            currentDate.add(Calendar.WEEK_OF_YEAR, 1);
         }
 
     }

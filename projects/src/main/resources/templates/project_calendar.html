@@ -6,7 +6,7 @@
 >
 
 <head>
-    <title>Project Calendar</title>
+    <title th:text="#{nav.projects}  + ' - ' + #{project.tab.calendar}"></title>
     <meta name="projectID" th:content="${project.id}"/>
 
 </head>
@@ -47,13 +47,13 @@
         <div class="ui segment">
             <div class="ui two column very relaxed grid">
                 <div class="column">
-                    <div><a class="ui green empty circular label" style="background-color: #00BFD8"></a> Project batch(es) </div>
-                    <div><a class="ui green empty circular label" style="background-color: #5BCA7E"></a> Occasional vacation (Scheduled)</div>
-                    <div><a class="ui yellow empty circular label" style="background-color: #FBBD08"></a> Saved vacation Occasional/Recursive (awaiting planning)</div>
+                    <div><a class="ui blue empty circular label" ></a> Project batch(es) </div>
+                    <div><a class="ui green empty circular label"></a> Occasional vacation (Scheduled)</div>
+                    <div><a class="ui yellow empty circular label" ></a> Saved vacation Occasional/Recursive (awaiting planning)</div>
                 </div>
                 <div class="column">
-                    <div><a class="ui white empty circular label " style="background-color:  white; border: 1px solid rgba(34,36,38,.1);"></a>  Available</div>
-                    <div><a class="ui lightgrey empty circular label" style="background-color:  lightgrey;" ></a>  Week-ends / Recurrent vacation(Scheduled)</div>
+                    <div><a class="ui empty circular label " style="background-color:  white; border: 1px solid rgba(34,36,38,.1);"></a>  Available</div>
+                    <div><a class="ui empty circular label"  ></a>  Week-ends / Recurrent vacation(Scheduled)</div>
                 </div>
             </div>
         </div>

@@ -1053,7 +1053,10 @@ table,
   border-radius: 1rem;
   -webkit-box-shadow: 0px 0px 0px 1px transparent inset, 0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
   box-shadow: 0px 0px 0px 1px transparent inset, 0px 0em 0px 0px rgba(34, 36, 38, 0.15) inset;
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   -webkit-transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, background 0.1s ease, -webkit-box-shadow 0.1s ease;
   transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, background 0.1s ease, -webkit-box-shadow 0.1s ease;
   transition: opacity 0.1s ease, background-color 0.1s ease, color 0.1s ease, box-shadow 0.1s ease, background 0.1s ease;
@@ -5623,7 +5626,10 @@ ui.button.negative{
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #393939;
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
@@ -10401,31 +10407,31 @@ i.icon.usb:before {
   content: "\f287";
 }
 
-i.icon.account:before {
+i.icon.user:before {
   content: "\f007";
 }
 
-i.icon.account.circle:before {
+i.icon.user.circle:before {
   content: "\f2bd";
 }
 
-i.icon.account.md:before {
+i.icon.user.md:before {
   content: "\f0f0";
 }
 
-i.icon.account.plus:before {
+i.icon.user.plus:before {
   content: "\f234";
 }
 
-i.icon.account.secret:before {
+i.icon.user.secret:before {
   content: "\f21b";
 }
 
-i.icon.account.times:before {
+i.icon.user.times:before {
   content: "\f235";
 }
 
-i.icon.accounts:before {
+i.icon.users:before {
   content: "\f0c0";
 }
 
@@ -10671,7 +10677,7 @@ i.icon.unordered.list:before {
   content: "\f0ca";
 }
 
-i.icon.account.doctor:before {
+i.icon.user.doctor:before {
   content: "\f0f0";
 }
 
@@ -10735,7 +10741,7 @@ i.icon.add.to.cart:before {
   content: "\f217";
 }
 
-i.icon.add.account:before {
+i.icon.add.user:before {
   content: "\f234";
 }
 
@@ -11459,7 +11465,7 @@ i.icon.remove.from.calendar:before {
   content: "\f272";
 }
 
-i.icon.remove.account:before {
+i.icon.remove.user:before {
   content: "\f235";
 }
 
@@ -11715,19 +11721,19 @@ i.icon.usd:before {
   content: "\f155";
 }
 
-i.icon.account.cancel:before {
+i.icon.user.cancel:before {
   content: "\f235";
 }
 
-i.icon.account.close:before {
+i.icon.user.close:before {
   content: "\f235";
 }
 
-i.icon.account.delete:before {
+i.icon.user.delete:before {
   content: "\f235";
 }
 
-i.icon.account.x:before {
+i.icon.user.x:before {
   content: "\f235";
 }
 
@@ -12472,11 +12478,11 @@ i.icon.trash.alternate.outline:before {
   content: "\f2ed";
 }
 
-i.icon.account.outline:before {
+i.icon.user.outline:before {
   content: "\f007";
 }
 
-i.icon.account.circle.outline:before {
+i.icon.user.circle.outline:before {
   content: "\f2bd";
 }
 
@@ -15802,7 +15808,10 @@ ul.ui.list li,
 ul.ui.list li:before,
 .ui.bulleted.list .list > .item:before,
 .ui.bulleted.list > .item:before {
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   pointer-events: none;
   position: absolute;
   top: auto;
@@ -15879,7 +15888,10 @@ ol.ui.list li:before,
   position: absolute;
   top: auto;
   left: auto;
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   pointer-events: none;
   margin-left: -1.25rem;
   counter-increment: ordered;
@@ -22713,7 +22725,10 @@ ol.ui.horizontal.list li:before,
   -webkit-box-flex: 0;
   -ms-flex: 0 0 auto;
   flex: 0 0 auto;
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   background: none;
   padding: 1.14285714em 1.14285714em;
   text-transform: none;
@@ -22748,7 +22763,10 @@ ol.ui.horizontal.list li:before,
 .ui.menu .text.item > *,
 .ui.menu .item > a:not(.ui),
 .ui.menu .item > p:only-child {
-  account-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
   line-height: 1.3;
 }
 
@@ -26513,7 +26531,10 @@ Floated Menu / Item
 
 .ui.sortable.table thead th.sorted,
 .ui.sortable.table thead th.sorted:hover {
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .ui.sortable.table thead th:after {
@@ -28624,14 +28645,14 @@ a.ui.card:hover,
       User
 ---------------*/
 
-.ui.feed > .event > .content .account {
+.ui.feed > .event > .content .user {
   display: inline-block;
   font-weight: bold;
   margin-right: 0em;
   vertical-align: baseline;
 }
 
-.ui.feed > .event > .content .account img {
+.ui.feed > .event > .content .user img {
   margin: -0.25em 0.25em 0em 0em;
   width: auto;
   height: 10em;
@@ -30455,7 +30476,10 @@ a.ui.card:hover,
 
 .ui.checkbox input.hidden + label {
   cursor: pointer;
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 /*******************************
@@ -30911,7 +30935,10 @@ a.ui.card:hover,
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   will-change: opacity;
   z-index: 1000;
 }
@@ -30919,7 +30946,10 @@ a.ui.card:hover,
 /* Dimmer Content */
 
 .ui.dimmer > .content {
-  account-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
   color: #FFFFFF;
 }
 
@@ -31838,7 +31868,10 @@ select.ui.dropdown {
 /* Selection Label */
 
 .ui.multiple.dropdown > .label {
-  account-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
   display: inline-block;
   vertical-align: top;
   white-space: normal;
@@ -32972,7 +33005,10 @@ select.ui.dropdown {
   -ms-flex: 0 0 auto;
   flex: 0 0 auto;
   border-radius: 0.28571429rem;
-  account-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
   will-change: top, left, margin, transform, opacity;
 }
 
@@ -36001,7 +36037,10 @@ a.ui.nag {
   height: 100%;
   display: table;
   text-align: center;
-  account-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+  user-select: text;
 }
 
 .ui.cube.shape .side > .content > div {

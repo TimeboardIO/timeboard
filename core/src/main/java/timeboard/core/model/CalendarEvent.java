@@ -36,12 +36,12 @@ import java.util.stream.Collectors;
 
 public class CalendarEvent implements Serializable {
 
-    private String name;
     private String label;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
-    private double value;
     private int type; // 0 MORNING - 1 FULL DAY - 2 AFTERNOON
+
+    private double value;
 
     public CalendarEvent() {
     }
@@ -68,7 +68,6 @@ public class CalendarEvent implements Serializable {
         while (last) {
             final CalendarEvent wrapper = new CalendarEvent();
 
-            wrapper.setName(request.getApplicant().getScreenName());
             wrapper.setLabel(request.getLabel());
             wrapper.setDate(start.getTime());
             if (request.getStatus() == VacationRequestStatus.ACCEPTED) {
@@ -116,7 +115,6 @@ public class CalendarEvent implements Serializable {
                     label += sameDayBatches.stream().map(Batch::getName).reduce("", (b, currentStr) -> b += " - " + currentStr);
                     copy.removeAll(sameDayBatches);
                 }
-                wrapper.setName("project");
                 wrapper.setType(1); // FULL DAY
                 wrapper.setValue(2); // BATCH
                 wrapper.setLabel(label);
@@ -127,15 +125,6 @@ public class CalendarEvent implements Serializable {
         }
 
         return wrapperList;
-    }
-
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getLabel() {

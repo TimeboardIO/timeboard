@@ -88,10 +88,42 @@ public class TasksRestAPI {
             t.setTaskType(taskTypeValidator(taskWrapper));
             t.setAssigned(assigneeValidator(taskWrapper));
             t.setBatches(batchesValidator(taskWrapper, actor));
-            t.setTaskStatus(taskStatusValidator(taskWrapper));
+            t.setTaskStatus(TaskStatus.valueOf(taskWrapper.getStatus()));
 
-            final Task newTask = processCreateOrUpdate(actor, org, taskID, t);
-            taskWrapper.setTaskID(newTask.getId());
+            Task task = null;
+            try {
+                if (taskID != null && taskID != 0) {
+
+                    final Task oldTask = (Task) projectService.getTaskByID(actor, taskID);
+
+                    checkUpdateRules(oldTask, t);
+
+                    oldTask.setStartDate(t.getStartDate());
+                    oldTask.setEndDate(t.getEndDate());
+                    oldTask.setName(t.getName());
+                    oldTask.setComments(t.getComments());
+                    if (t.getOriginalEstimate() != oldTask.getOriginalEstimate()) {
+                        oldTask.setEffortLeft(t.getOriginalEstimate());
+                    }
+                    oldTask.setTaskType(t.getTaskType());
+                    oldTask.setOriginalEstimate(t.getOriginalEstimate());
+                    oldTask.setAssigned(t.getAssigned());
+                    oldTask.setBatches(t.getBatches());
+                    oldTask.setTaskStatus(t.getTaskStatus());
+
+                    task = projectService.updateTask(org, actor, oldTask);
+
+                } else {
+                    task = projectService.createTask(org, actor, t.getProject(),
+                            t.getName(), t.getComments(), t.getStartDate(),
+                            t.getEndDate(), t.getOriginalEstimate(), t.getTaskType(), t.getAssigned(),
+                            ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,
+                            t.getBatches());
+                }
+
+            } catch (final Exception e) {
+                throw new TaskCreationException("Error in task creation/update please verify your inputs and retry. (" + e.getMessage() + ")");
+            }            taskWrapper.setTaskID(task.getId());
             return ResponseEntity.status(HttpStatus.OK).body(MAPPER.writeValueAsString(taskWrapper));
 
         } catch (TaskCreationException | JsonProcessingException e) {
@@ -100,30 +132,26 @@ public class TasksRestAPI {
 
     }
 
-    private Task processCreateOrUpdate(Account actor, Organization org, Long taskID, Task t) throws TaskCreationException {
-        Task task = null;
-        try {
-            if (taskID != null && taskID != 0) {
-                final Task oldTask = (Task) projectService.getTaskByID(actor, taskID);
-                if (oldTask.getEffortSpent() > 0 && oldTask.getAssigned() != t.getAssigned()) {
-                    throw new TaskCreationException("You can not modify assignee because he already add imputation on this task");
-                }
-                t.setOrigin(oldTask.getOrigin());
-                t.setId(oldTask.getId());
-                task = processUpdateTask(org, actor, t);
 
-            } else {
-                task = processCreateTask(org, actor, t);
+    private void checkUpdateRules(Task oldTask, Task newTask) throws TaskCreationException {
+
+        if (oldTask.getEffortSpent() > 0) {
+            if ( oldTask.getAssigned().getId() != newTask.getAssigned().getId()) {
+                throw new TaskCreationException("You can not modify assignee because he already add imputation on this task");
+            }
+            if (oldTask.getOriginalEstimate() != newTask.getOriginalEstimate()) {
+                throw new TaskCreationException("You can not modify OE because this task is started.");
             }
 
-            return task;
-        } catch (final Exception e) {
-            throw new TaskCreationException("Error in task creation/update please verify your inputs and retry. (" + e.getMessage() + ")");
-        }
-    }
+            if (oldTask.getStartDate().before(newTask.getStartDate())) {
+                throw new TaskCreationException("You cannot reduce the task interval because it has started.");
+            }
 
-    private TaskStatus taskStatusValidator(@RequestBody final TaskWrapper taskWrapper) {
-        return TaskStatus.valueOf(taskWrapper.getStatus());
+            if (oldTask.getEndDate().after(newTask.getEndDate())) {
+                throw new TaskCreationException("You cannot reduce the task interval because it has started.");
+            }
+        }
+
     }
 
     private Set<Batch> batchesValidator(@RequestBody final TaskWrapper taskWrapper, final Account actor) {
@@ -178,7 +206,10 @@ public class TasksRestAPI {
     private double oeValidator(@RequestBody final TaskWrapper taskWrapper) throws TaskCreationException {
         final double oe = taskWrapper.originalEstimate;
         if (oe <= 0.0) {
-            throw new TaskCreationException("Original original estimate must be positive ");
+            throw new TaskCreationException("Original estimate must be positive ");
+        }
+        if((oe * 100) % 5 != 0){ // Modulo with int and not double
+            throw new TaskCreationException("Original estimate is not valid. The step must be 0.05.");
         }
         return oe;
     }
@@ -232,17 +263,8 @@ public class TasksRestAPI {
     }
 
 
-    private Task processCreateTask(final Organization org, final Account actor, final Task task) {
-        return projectService.createTask(org, actor, task.getProject(),
-                task.getName(), task.getComments(), task.getStartDate(),
-                task.getEndDate(), task.getOriginalEstimate(), task.getTaskType(), task.getAssigned(),
-                ProjectService.ORIGIN_TIMEBOARD, null, null, TaskStatus.PENDING,
-                task.getBatches());
-    }
 
-    private Task processUpdateTask(final Organization org, final Account actor, final Task task) {
-        return projectService.updateTask(org, actor, task);
-    }
+
 
 
     public static class TaskGraphWrapper implements Serializable {
@@ -272,19 +294,9 @@ public class TasksRestAPI {
         public Long batchID;
         public String batchName;
 
-        public double originalEstimate;
-        public double realEffort;
-        public double effortLeft;
-        public double effortSpent;
-
-        public BatchWrapper(final Long batchID, final String batchName, double originalEstimate, double realEffort,
-                            double effortLeft, double effortSpent) {
+        public BatchWrapper(final Long batchID, final String batchName) {
             this.batchID = batchID;
             this.batchName = batchName;
-            this.originalEstimate = originalEstimate;
-            this.effortLeft = effortLeft;
-            this.realEffort = realEffort;
-            this.effortSpent = effortSpent;
         }
 
         public Long getBatchID() {
@@ -303,37 +315,6 @@ public class TasksRestAPI {
             this.batchName = batchName;
         }
 
-        public double getOriginalEstimate() {
-            return originalEstimate;
-        }
-
-        public void setOriginalEstimate(final double originalEstimate) {
-            this.originalEstimate = originalEstimate;
-        }
-
-        public double getRealEffort() {
-            return realEffort;
-        }
-
-        public void setRealEffort(double realEffort) {
-            this.realEffort = realEffort;
-        }
-
-        public double getEffortLeft() {
-            return effortLeft;
-        }
-
-        public void setEffortLeft(double effortLeft) {
-            this.effortLeft = effortLeft;
-        }
-
-        public double getEffortSpent() {
-            return effortSpent;
-        }
-
-        public void setEffortSpent(double effortSpent) {
-            this.effortSpent = effortSpent;
-        }
 
 
     }

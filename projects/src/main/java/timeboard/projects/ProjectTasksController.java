@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import timeboard.core.api.DataTableService;
 import timeboard.core.api.OrganizationService;
-import timeboard.core.api.ProjectDashboard;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.api.sync.ProjectSyncPlugin;
@@ -195,7 +194,7 @@ public class ProjectTasksController extends ProjectBaseController {
     }
 
     @GetMapping("/{task}")
-    protected String editTasks(
+    protected String getTask(
             final TimeboardAuthentication authentication,
             @PathVariable final Project project,
             @PathVariable final Long taskID, final Model model) throws BusinessException {
@@ -319,16 +318,8 @@ public class ProjectTasksController extends ProjectBaseController {
         }
 
         final List<TasksRestAPI.BatchWrapper> batchWrapperList = new ArrayList<>();
-        final Project finalProject = project;
         batchList.forEach(batch -> {
-            ProjectDashboard dashboardBatch = null;
-            try {
-                dashboardBatch = this.projectService.projectDashboardByBatch(actor, finalProject, batch);
-            } catch (BusinessException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-            batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName(), dashboardBatch.getOriginalEstimate(),
-                    dashboardBatch.getEffortLeft(), dashboardBatch.getRealEffort(), dashboardBatch.getEffortSpent()));
+            batchWrapperList.add(new TasksRestAPI.BatchWrapper(batch.getId(), batch.getScreenName()));
         });
         return ResponseEntity.status(HttpStatus.OK).body(batchWrapperList.toArray());
     }

@@ -6,7 +6,7 @@
       xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 
 <head>
-    <title layout:fragment="title">Vacation</title>
+    <title th:text="#{nav.vacations}"></title>
     <meta property="vacations" th:actorID="${actor.id}"/>
 </head>
 
@@ -69,7 +69,7 @@
 
         <div class="ui bottom attached segment visible" v-if="activeTab === 'Requests'">
 
-            <div class="ui icon message" v-if="toValidateRequestsListData.length === 0">
+            <div class="ui icon message" v-if="!myRequestsListData.length">
                 <i class="calendar alternate outline icon"></i>
                 <div class="content">
                     <div class="header">
@@ -98,11 +98,12 @@
                     {{ row.applicantName }}
                 </template>
                 <template v-slot:recursive="{row}">
-                    <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
-                    <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
-                    <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
-                    <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
-                    <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                    <!-- Java Calendar: Monday = 2, Tuesday = 3 .. -->
+                    <a v-if="row.recurrenceDay === 2" class="ui blue circular label">M</a>
+                    <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">W</a>
+                    <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 6" class="ui blue circular label">F</a>
                     <a v-else class="ui circular label">X</a>
                 </template>
                 <template v-slot:actions="{row}">
@@ -137,11 +138,12 @@
                     {{ row.assigneeName }}
                 </template>
                 <template v-slot:recursive="{row}">
-                    <a v-if="row.recurrenceDay === 1" class="ui blue circular label">M</a>
-                    <a v-else-if="row.recurrenceDay === 2" class="ui blue circular label">T</a>
-                    <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">W</a>
-                    <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">T</a>
-                    <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">F</a>
+                    <!-- Java Calendar: Monday = 2, Tuesday = 3 .. -->
+                    <a v-if="row.recurrenceDay === 2" class="ui blue circular label">M</a>
+                    <a v-else-if="row.recurrenceDay === 3" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 4" class="ui blue circular label">W</a>
+                    <a v-else-if="row.recurrenceDay === 5" class="ui blue circular label">T</a>
+                    <a v-else-if="row.recurrenceDay === 6" class="ui blue circular label">F</a>
                     <a v-else class="ui circular label">X</a>
                 </template>
                 <template v-slot:status="{row}">
@@ -280,16 +282,17 @@
                         </div>
                         <div class="field">
                             <label>Repeat every week on</label>
-                            <a @click="vacationRequest.recurrenceDay = 1"
-                               :class="{ blue : (vacationRequest.recurrenceDay === 1) }" class="ui circular label">M</a>
+                            <!-- Java Calendar: Monday = 2, Tuesday = 3 .. -->
                             <a @click="vacationRequest.recurrenceDay = 2"
-                               :class="{ blue : (vacationRequest.recurrenceDay === 2) }" class="ui circular label">T</a>
+                               :class="{ blue : (vacationRequest.recurrenceDay === 2) }" class="ui circular label">M</a>
                             <a @click="vacationRequest.recurrenceDay = 3"
-                               :class="{ blue : (vacationRequest.recurrenceDay === 3) }" class="ui circular label">W</a>
+                               :class="{ blue : (vacationRequest.recurrenceDay === 3) }" class="ui circular label">T</a>
                             <a @click="vacationRequest.recurrenceDay = 4"
-                               :class="{ blue : (vacationRequest.recurrenceDay === 4) }" class="ui circular label">T</a>
+                               :class="{ blue : (vacationRequest.recurrenceDay === 4) }" class="ui circular label">W</a>
                             <a @click="vacationRequest.recurrenceDay = 5"
-                               :class="{ blue : (vacationRequest.recurrenceDay === 5) }" class="ui circular label">F</a>
+                               :class="{ blue : (vacationRequest.recurrenceDay === 5) }" class="ui circular label">T</a>
+                            <a @click="vacationRequest.recurrenceDay = 6"
+                               :class="{ blue : (vacationRequest.recurrenceDay === 6) }" class="ui circular label">F</a>
                         </div>
                     </div>
                     <div class="two fields">

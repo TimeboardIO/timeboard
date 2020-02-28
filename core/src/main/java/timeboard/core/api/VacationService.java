@@ -61,6 +61,8 @@ public interface VacationService {
 
     RecursiveVacationRequest approveVacationRequest(Organization org, Account actor, RecursiveVacationRequest request) throws BusinessException;
 
+    DefaultTask getVacationTask(Account actor, Long orgId);
+
     VacationRequest rejectVacationRequest(Account actor, VacationRequest request);
 
     RecursiveVacationRequest rejectVacationRequest(Account actor, RecursiveVacationRequest request);

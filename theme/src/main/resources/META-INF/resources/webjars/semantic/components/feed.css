@@ -146,13 +146,13 @@
       User
 ---------------*/
 
-.ui.feed > .event > .content .account {
+.ui.feed > .event > .content .user {
   display: inline-block;
   font-weight: bold;
   margin-right: 0em;
   vertical-align: baseline;
 }
-.ui.feed > .event > .content .account img {
+.ui.feed > .event > .content .user img {
   margin: -0.25em 0.25em 0em 0em;
   width: auto;
   height: 10em;

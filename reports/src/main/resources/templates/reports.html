@@ -6,7 +6,7 @@
       xmlns:v-bind="http://www.w3.org/1999/xhtml" xmlns:v-slot="http://www.w3.org/1999/XSL/Transform">
 
 <head>
-    <title layout:fragment="title">Reports</title>
+    <title th:text="#{nav.reports}"></title>
     <script src="/js/reports.js" type="text/javascript"></script>
 </head>
 <body>
@@ -37,14 +37,16 @@
                         <i class="right arrow icon"></i>
                         Request report
                     </a>
-                    <a class="ui right labeled success icon button" v-bind:href="'/reports/edit/'+row.id">
-                        <i class="right arrow icon"></i>
+                    <a class="ui blue icon button" v-bind:href="'/reports/edit/'+row.id">
                         Edit
+                        <i class="edit alternate icon"></i>
                     </a>
-                    <a class="ui right labeled success icon button" v-bind:href="'/reports/delete/'+row.id">
-                        <i class="right arrow icon"></i>
+                    <a class="ui negative icon button" v-bind:href="'/reports/delete/'+row.id">
                         Delete
+                        <i class="trash alternate icon"></i>
                     </a>
+
+
                 </template>
             </data-table>
         </div>
