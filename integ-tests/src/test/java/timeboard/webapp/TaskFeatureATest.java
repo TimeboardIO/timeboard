@@ -69,7 +69,7 @@ public class TaskFeatureATest extends TimeboardTest {
     @Then("^the user has (\\d+) task on project$")
     public void theUserHasTaskOnProject(int arg0) throws BusinessException {
         List<Task> tasks = projectService.listProjectTasks(world.account, world.lastProject);
-        Assert.assertEquals(tasks.size(), 1);
+        Assert.assertEquals(tasks.size(), arg0);
 
     }
 

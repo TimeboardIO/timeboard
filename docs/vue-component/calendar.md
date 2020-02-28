@@ -1,4 +1,4 @@
-# Datatable component
+# Calendar component
 Calendar is a Timeboard VueJS component deployable on view on a Vue app to render calendar view. 
 
 ## Month calendar  
