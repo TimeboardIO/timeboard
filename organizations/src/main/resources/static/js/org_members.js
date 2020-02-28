@@ -1,4 +1,5 @@
 const currentOrgID = $("meta[property='organization']").attr('orgID');
+const accountID = $("meta[property='organization']").attr('accountID');
 const baseURL = $("meta[property='organization']").attr('baseURL');
 
 
@@ -7,6 +8,7 @@ let app = new Vue({
     el: '#members',
     data: {
         members: [],
+        accountID: accountID,
     },
     filters:{
         formatDate: function(value) {
