@@ -98,8 +98,8 @@ public class TaskFeatureTest extends TimeboardTest {
         this.projectTasksController.archiveTask(world.auth, world.lastTask.getId());
     }
 
-    @Then("^the task have been updated$")
-    public void theTaskHaveBeenUpdated() {
+    @Then("^the task has been updated$")
+    public void theTaskHasBeenUpdated() {
         Optional<Task> task = projectService.getTaskByRemoteID(world.account, remoteID);
         Assert.assertTrue(task.isPresent());
         Task t = task.get();

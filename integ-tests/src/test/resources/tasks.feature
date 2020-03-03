@@ -11,7 +11,7 @@ Feature: User can CRU tasks
     When the user update a task
     Then the user has 0 pending task on project
     Then the user has 1 in progress task on project
-    Then the task have been updated
+    Then the task has been updated
 
   Scenario: A client can accept a task
     Given user with an existing account and 1 projects with 1 tasks
