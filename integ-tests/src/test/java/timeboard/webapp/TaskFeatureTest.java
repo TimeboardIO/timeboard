@@ -35,17 +35,18 @@ import timeboard.core.api.exceptions.BusinessException;
 import timeboard.core.model.Project;
 import timeboard.core.model.Task;
 import timeboard.core.model.TaskStatus;
-import timeboard.projects.ProjectsController;
+import timeboard.projects.ProjectTasksController;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
-public class TaskFeatureATest extends TimeboardTest {
+public class TaskFeatureTest extends TimeboardTest {
 
     @Autowired
-    protected ProjectsController projectsController;
+    protected ProjectTasksController projectTasksController;
     @Autowired
     private TimeboardWorld world;
     private Project project;
@@ -66,13 +67,6 @@ public class TaskFeatureATest extends TimeboardTest {
 
     }
 
-    @Then("^the user has (\\d+) task on project$")
-    public void theUserHasTaskOnProject(int arg0) throws BusinessException {
-        List<Task> tasks = projectService.listProjectTasks(world.account, world.lastProject);
-        Assert.assertEquals(tasks.size(), arg0);
-
-    }
-
     @When("^the user update a task$")
     public void theUserUpdateATask() {
         Calendar calendar = Calendar.getInstance();
@@ -87,8 +81,25 @@ public class TaskFeatureATest extends TimeboardTest {
         projectService.updateTask(world.organization, world.account, task.get());
     }
 
-    @Then("^the task have been updated$")
-    public void theTaskHaveBeenUpdated() {
+
+    @When("^the user accept a task$")
+    public void theUserAcceptATask() {
+        this.projectTasksController.approveTask(world.auth, world.lastTask.getId());
+    }
+
+    @When("^the user deny a task$")
+    public void theUserDenyATask() {
+        this.projectTasksController.denyTask(world.auth, world.lastTask.getId());
+
+    }
+
+    @When("^the user archive a task$")
+    public void theUserArchiveATask() {
+        this.projectTasksController.archiveTask(world.auth, world.lastTask.getId());
+    }
+
+    @Then("^the task has been updated$")
+    public void theTaskHasBeenUpdated() {
         Optional<Task> task = projectService.getTaskByRemoteID(world.account, remoteID);
         Assert.assertTrue(task.isPresent());
         Task t = task.get();
@@ -104,5 +115,41 @@ public class TaskFeatureATest extends TimeboardTest {
 
     }
 
+    @Then("^the user has (\\d+) pending task on project$")
+    public void theUserHasPendingTaskOnProject(int arg0) throws BusinessException {
+        Assert.assertEquals(listProjectTasksByTaskType(TaskStatus.PENDING).size(), arg0);
 
+    }
+
+    @Then("^the user has (\\d+) refused task on project$")
+    public void theUserHasRefusedTaskOnProject(int arg0) throws BusinessException {
+        Assert.assertEquals(listProjectTasksByTaskType(TaskStatus.REFUSED).size(), arg0);
+
+    }
+
+    @Then("^the user has (\\d+) in progress task on project$")
+    public void theUserHasInProgressTaskOnProject(int arg0) throws BusinessException {
+        Assert.assertEquals(listProjectTasksByTaskType(TaskStatus.IN_PROGRESS).size(), arg0);
+
+    }
+
+    @Then("^the user has (\\d+) done task on project$")
+    public void theUserHasDoneTaskOnProject(int arg0) throws BusinessException {
+        Assert.assertEquals(listProjectTasksByTaskType(TaskStatus.DONE).size(), arg0);
+
+    }
+
+    @Then("^the user has (\\d+) archived task on project$")
+    public void theUserHasArchivedTaskOnProject(int arg0) throws BusinessException {
+        Assert.assertEquals(listProjectTasksByTaskType(TaskStatus.ARCHIVED).size(), arg0);
+    }
+
+
+
+    List<Task> listProjectTasksByTaskType(TaskStatus taskStatus) throws BusinessException {
+        return projectService.listProjectTasks(world.account, world.lastProject)
+                .stream()
+                .filter(task -> task.getTaskStatus() == taskStatus)
+                .collect(Collectors.toList());
+    }
 }

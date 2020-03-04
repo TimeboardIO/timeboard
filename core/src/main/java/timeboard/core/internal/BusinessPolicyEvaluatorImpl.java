@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.exceptions.CommercialException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import javax.persistence.EntityManager;
@@ -54,15 +55,33 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     @Value("${timeboard.quotas.project.tasks}")
     private int limitTasksByProject;
 
-    @Value("${timeboard.quotas.enabled.projects}")
-    private int limitEnabledProjectsInApp;
+    @Value("${timeboard.quotas.organization}")
+    private int limitOrganizationsInApp;
+
+    @Value("${timeboard.quotas.organization.projects}")
+    private int limitProjectsByOrganization;
+
+    public BusinessPolicyEvaluatorImpl() {
+    }
 
     @Override
-    public boolean checkProjectEnabledLimit(final Account actor) throws CommercialException {
-        final int numberEnabledProjects = this.getNumberEnabledProjects(actor);
-        if (numberEnabledProjects >= limitEnabledProjectsInApp) {
-            final String message = "Limit reached " + numberEnabledProjects + "/" + limitEnabledProjectsInApp +
-                    " Project's creation impossible for " + actor.getScreenName() + "!";
+    public boolean checkOrganizationLimit(final Account actor) throws CommercialException {
+        final int numberOrganizationInApp = this.getNumberOrganizationInApp(actor);
+        if (numberOrganizationInApp >= limitOrganizationsInApp) {
+            final String message = "Limit reached " + numberOrganizationInApp + "/" + limitOrganizationsInApp +
+                    " Organization's creation impossible for " + actor.getScreenName() + "!";
+            LOGGER.warn(message);
+            throw new CommercialException(message);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean checkProjectsByOrganizationLimit(final Account actor, final Organization organization) throws CommercialException {
+        final int numberProjectsByOrganization = this.getNumberProjectsByOrganization(organization);
+        if (numberProjectsByOrganization >= limitProjectsByOrganization) {
+            final String message = "Limit reached " + numberProjectsByOrganization + "/" + limitProjectsByOrganization +
+                    " Project's creation in this organization impossible for " + actor.getScreenName() + "!";
             LOGGER.warn(message);
             throw new CommercialException(message);
         }
@@ -95,13 +114,6 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
     }
 
     @Override
-    public int getNumberEnabledProjects(final Account account) {
-        final TypedQuery<Object> query = this.entityManager.createQuery(
-                "select count(p) from Project p where p.enable = true", Object.class);
-        return Integer.parseInt(query.getSingleResult().toString());
-    }
-
-    @Override
     public int getNumberProjectsByUser(final Account account) {
         final TypedQuery<Object> query = this.entityManager.createQuery(
                 "select count(p) from " +
@@ -116,6 +128,26 @@ public class BusinessPolicyEvaluatorImpl implements timeboard.core.api.BusinessP
         final TypedQuery<Object> q = this.entityManager.createQuery(
                 "select count(t) from Task t where t.project = :project", Object.class);
         q.setParameter("project", project);
+        return Integer.parseInt(q.getSingleResult().toString());
+    }
+
+    @Override
+    public int getNumberOrganizationInApp(final Account actor) {
+        final TypedQuery<Object> q = this.entityManager.createQuery(
+                "select count(o) " +
+                        "from Organization o join o.members members " +
+                        "where members.member = :actor", Object.class);
+        q.setParameter("actor", actor);
+        return Integer.parseInt(q.getSingleResult().toString());
+    }
+
+    @Override
+    public int getNumberProjectsByOrganization(final Organization organization) {
+        final TypedQuery<Object> q = this.entityManager.createQuery(
+                "select count(p) " +
+                        "from Project p " +
+                        "where p.organizationID = :organizationID", Object.class);
+        q.setParameter("organizationID", organization.getId());
         return Integer.parseInt(q.getSingleResult().toString());
     }
 }
