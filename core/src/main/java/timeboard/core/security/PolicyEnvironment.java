@@ -58,7 +58,8 @@ public class PolicyEnvironment {
         return businessPolicyEvaluator.checkOrganizationLimit(authentication.getDetails());
     }
 
-    public boolean checkProjectsByOrganizationLimit(final TimeboardAuthentication authentication, final Organization organization) throws CommercialException {
+    public boolean checkProjectsByOrganizationLimit(final TimeboardAuthentication authentication,
+                                                    final Organization organization) throws CommercialException {
         return businessPolicyEvaluator.checkProjectsByOrganizationLimit(authentication.getDetails(), organization);
     }
 
