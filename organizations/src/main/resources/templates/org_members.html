@@ -3,11 +3,12 @@
 <html layout:decorate="~{org_layout.html(tab='members')}"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml"
 >
 
 <head>
     <title th:text="#{org.members}"></title>
-    <meta property="organization" th:baseURL="@{${'/org/'+tab}}" th:orgID="${organization.id}"/>
+    <meta property="organization" th:baseURL="@{${'/org/'+tab}}" th:orgID="${organization.id}" th:accountID="${account.id}"/>
 </head>
 <body>
 
@@ -47,7 +48,8 @@
                     <span v-else>{{ member.creationDate }}</span>
                 </td>
                 <td>
-                    <select v-if="member.edition" class="ui dropdown" v-model="member.role">
+                    <select v-if="member.edition" class="ui dropdown" v-model="member.role"
+                            v-bind:class="(member.id == accountID) ? 'ui dropdown disabled' : ''">
                         <option th:each="role : ${roles}"
                                 th:text="${role}"
                                 th:value="${role}"></option>
@@ -55,11 +57,11 @@
                     <span v-else>{{ member.role }}</span>
                 </td>
                 <td>
-                    <button v-if="!member.edition" @click="removeMember($event, member)" class="ui negative icon button ">
+                    <button v-if="!member.edition && member.id != accountID" @click="removeMember($event, member)" class="ui negative icon button ">
                         Remove
                         <i class="close icon"></i>
                     </button>
-                    <button v-if="!member.edition"  @click="impersonateMember($event, member)" class="ui yellow icon button ">
+                    <button v-if="!member.edition && member.id != accountID"  @click="impersonateMember($event, member)" class="ui yellow icon button ">
                         Act on behalf
                         <i class="user secret icon"></i>
                     </button>

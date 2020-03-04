@@ -124,10 +124,10 @@ public class ProjectSetupController extends ProjectBaseController {
     }
 
     @PostMapping("/informations")
-    protected String updateProjectConfiguration(final TimeboardAuthentication authentication,
-                                                @PathVariable final long projectID,
-                                                @ModelAttribute final ProjectConfigForm projectConfigForm,
-                                                final RedirectAttributes attributes) throws Exception {
+    public String updateProjectConfiguration(final TimeboardAuthentication authentication,
+                                             @PathVariable final long projectID,
+                                             @ModelAttribute final ProjectConfigForm projectConfigForm,
+                                             final RedirectAttributes attributes) throws Exception {
 
         if (projectConfigForm.getComments().length() > 500) {
             attributes.addFlashAttribute("error", "Your comment is too long (500 characters max)");

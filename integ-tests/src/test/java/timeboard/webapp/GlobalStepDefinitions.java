@@ -80,7 +80,7 @@ public class GlobalStepDefinitions extends TimeboardTest {
 
         String remoteID = Math.random() + "/";
         for (int i = 0; i < arg1; i++) {
-            world.lastTask = projectService.createTask(world.organization, world.account, world.lastProject, "", "",
+            world.lastTask = projectService.createTask(world.organization, world.account, world.lastProject, "task "+i, "",
                     start.getTime(), end.getTime(), Math.random(),
                     null, null, null, null, remoteID + i,
                     TaskStatus.IN_PROGRESS, Collections.emptyList()

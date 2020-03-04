@@ -72,6 +72,7 @@ public class OrganizationMembersController {
         viewModel.addAttribute("members", authentication.getCurrentOrganization().getMembers());
         viewModel.addAttribute("roles", MembershipRole.values());
         viewModel.addAttribute("organization", authentication.getCurrentOrganization());
+        viewModel.addAttribute("account", authentication.getDetails());
 
         return "org_members";
     }
