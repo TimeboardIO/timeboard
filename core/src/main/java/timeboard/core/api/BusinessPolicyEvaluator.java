@@ -28,19 +28,24 @@ package timeboard.core.api;
 
 import timeboard.core.api.exceptions.CommercialException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 public interface BusinessPolicyEvaluator {
 
-    boolean checkProjectEnabledLimit(Account actor) throws CommercialException;
+    boolean checkOrganizationLimit(Account actor) throws CommercialException;
+
+    boolean checkProjectsByOrganizationLimit(Account actor, Organization organization) throws CommercialException;
 
     boolean checkProjectByUserLimit(Account actor) throws CommercialException;
 
     boolean checkTaskByProjectLimit(Account actor, Project project) throws CommercialException;
 
-    int getNumberEnabledProjects(Account account);
-
     int getNumberProjectsByUser(Account account);
 
     int getNumberTasksByProject(Account account, Project project);
+
+    int getNumberOrganizationInApp(Account actor);
+
+    int getNumberProjectsByOrganization(Organization organization);
 }

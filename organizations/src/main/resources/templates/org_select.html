@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 
 <body>
@@ -85,12 +86,19 @@
                         Create an organisation
                     </a>
                     <div class="description">
-                        <form class="ui form" th:action="@{/org/create}" method="post">
-                            <div class="field">
-                                <input placeholder="Organization Name" name="organizationName" required type="text">
-                            </div>
-                            <button class="ui button positive" type="submit">Create</button>
-                        </form>
+                        <div class="content" sec:authorize="hasPermission(null,'ORG_CREATE_LIMIT')">
+                            <form class="ui form" th:action="@{/org/create}" method="post">
+                                <div class="field">
+                                    <input placeholder="Organization Name" name="organizationName" required type="text">
+                                </div>
+                                <button class="ui button positive" type="submit">Create</button>
+                            </form>
+                        </div>
+                        <div class="content" sec:authorize="!hasPermission(null,'ORG_CREATE_LIMIT')">
+                            <p>There are too many organizations in this application !</p>
+                        </div>
+
+
                     </div>
 
                 </div>

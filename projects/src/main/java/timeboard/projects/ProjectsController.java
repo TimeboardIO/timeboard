@@ -66,6 +66,7 @@ public class ProjectsController {
             allActorProjects = allActorProjects.subList(0, 4);
         }
         model.addAttribute("projects", allActorProjects);
+        model.addAttribute("currentOrg", authentication.getCurrentOrganization());
 
         return "projects.html";
     }
