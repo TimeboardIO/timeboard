@@ -80,11 +80,10 @@
   {
     "name": "Limits of project creation is respected",
     "actions": [
-      "PROJECT_CREATE",
       "PROJECT_CREATE_LIMIT"
     ],
     "conditions": [
-      "environment.checkEnabledProjectLimit(subject) && environment.checkProjectByUserLimit(subject)"
+      "environment.checkProjectByUserLimit(subject) && environment.checkProjectsByOrganizationLimit(subject, resource)"
     ]
   },
   {
@@ -94,6 +93,15 @@
     ],
     "conditions": [
       "environment.checkTaskByProjectLimit(subject, resource)"
+    ]
+  },
+  {
+    "name": "Limits of organization creation is respected",
+    "actions": [
+      "ORG_CREATE_LIMIT"
+    ],
+    "conditions": [
+      "environment.checkOrganizationLimit(subject)"
     ]
   }
 

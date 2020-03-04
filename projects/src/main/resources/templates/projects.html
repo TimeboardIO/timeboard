@@ -17,7 +17,7 @@
 
     <div class="ui icon message" th:if="${projects.isEmpty()}">
         <i class="inbox icon"></i>
-        <div class="content" sec:authorize="hasPermission(null,'PROJECT_CREATE')">
+        <div class="content" sec:authorize="hasPermission(null,'PROJECT_CREATE') and hasPermission(#vars.currentOrg,'PROJECT_CREATE_LIMIT')">
             <div class="header">
                 No Projects ?
             </div>
@@ -29,11 +29,11 @@
             <div class="header">
                 No Projects.
             </div>
-            <p sec:authorize="hasPermission(null,'PROJECT_CREATE_LIMIT')">
+            <p sec:authorize="hasPermission(#vars.currentOrg,'PROJECT_CREATE_LIMIT')">
                 You have not enough rights to create projects on this organization, maybe you should create your own !
             </p>
-            <p sec:authorize="!hasPermission(null,'PROJECT_CREATE_LIMIT')">
-                There is too much enabled projects in this application, maybe you can archive some !
+            <p sec:authorize="!hasPermission(#vars.currentOrg,'PROJECT_CREATE_LIMIT')">
+                There are too many projects in this organization or you have exceeded your project creation limit in the application !
             </p>
         </div>
     </div>
@@ -83,7 +83,7 @@
                         </a>
                     </div>
                 </div>
-                <div class="ui card" sec:authorize="hasPermission(null,'PROJECT_CREATE')">
+                <div class="ui card" sec:authorize="hasPermission(null,'PROJECT_CREATE') and hasPermission(#vars.currentOrg,'PROJECT_CREATE_LIMIT')">
                     <a class="content"  style="background-color: lightgrey; display: flex; flex-direction: column;justify-content: center;" data-cy="create-project"  th:href="@{/projects/create}">
                         <div class="badge" >
                             <i class="plus icon" style="font-size: 4.2rem;"></i>

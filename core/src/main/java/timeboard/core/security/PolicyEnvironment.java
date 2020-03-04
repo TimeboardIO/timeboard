@@ -33,6 +33,7 @@ import timeboard.core.api.BusinessPolicyEvaluator;
 import timeboard.core.api.ProjectService;
 import timeboard.core.api.exceptions.CommercialException;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 
 import java.util.Date;
@@ -53,8 +54,12 @@ public class PolicyEnvironment {
         return new Date();
     }
 
-    public boolean checkEnabledProjectLimit(final TimeboardAuthentication authentication) throws CommercialException {
-        return businessPolicyEvaluator.checkProjectEnabledLimit(authentication.getDetails());
+    public boolean checkOrganizationLimit(final TimeboardAuthentication authentication) throws CommercialException {
+        return businessPolicyEvaluator.checkOrganizationLimit(authentication.getDetails());
+    }
+
+    public boolean checkProjectsByOrganizationLimit(final TimeboardAuthentication authentication, final Organization organization) throws CommercialException {
+        return businessPolicyEvaluator.checkProjectsByOrganizationLimit(authentication.getDetails(), organization);
     }
 
     public boolean checkProjectByUserLimit(final TimeboardAuthentication authentication) throws CommercialException {
