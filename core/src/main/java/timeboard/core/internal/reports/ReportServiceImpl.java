@@ -177,24 +177,14 @@ public class ReportServiceImpl implements ReportService {
         final ExpressionParser expressionParser = new SpelExpressionParser();
 
         final List<Expression> spelExp = expressions
-                .stream().map(filter -> expressionParser.parseExpression(filter))
+                .stream().map(expressionParser::parseExpression)
                 .collect(Collectors.toList());
 
-        final List<ProjectWrapper> listProjectsConcerned = this.projectService.listProjects(actor, org)
+        return this.projectService.listProjects(actor, org)
                 .stream()
-                .map(project -> wrapProjectTags(project))
-                .filter(projectWrapper -> {
-
-                    final Boolean match = spelExp.stream()
-                            .map(exp -> applyFilterOnProject(exp, projectWrapper))
-                            .allMatch(aBoolean -> aBoolean == true);
-
-                    return match;
-
-                }).collect(Collectors.toList());
-
-        return listProjectsConcerned;
-
+                .map(this::wrapProjectTags)
+                .filter(projectWrapper -> spelExp.stream()
+                        .allMatch(exp -> applyFilterOnProject(exp, projectWrapper))).collect(Collectors.toList());
     }
 
     @Override
