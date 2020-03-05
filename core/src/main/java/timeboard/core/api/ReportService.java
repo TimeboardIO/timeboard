@@ -32,6 +32,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
+import timeboard.core.security.TimeboardAuthentication;
 
 import java.beans.Transient;
 import java.util.List;
@@ -81,7 +82,7 @@ public interface ReportService {
 
     List<ReportHandler> listReportHandlers();
 
-    void executeAsyncReport(Account actor, Report report) throws SchedulerException;
+    void executeAsyncReport(TimeboardAuthentication auth, Report report) throws SchedulerException;
 
 
     class ProjectWrapper {

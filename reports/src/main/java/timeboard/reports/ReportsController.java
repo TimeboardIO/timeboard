@@ -182,7 +182,7 @@ public class ReportsController {
             @PathVariable final Report report,
             final RedirectAttributes attributes) throws SchedulerException {
 
-        this.reportService.executeAsyncReport(authentication.getDetails(), report);
+        this.reportService.executeAsyncReport(authentication, report);
         attributes.addFlashAttribute("success", "report.async.request");
 
         return "redirect:/reports";

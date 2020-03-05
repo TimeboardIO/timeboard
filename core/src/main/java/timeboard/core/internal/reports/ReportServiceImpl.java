@@ -41,6 +41,7 @@ import timeboard.core.model.Account;
 import timeboard.core.model.Organization;
 import timeboard.core.model.Project;
 import timeboard.core.model.Report;
+import timeboard.core.security.TimeboardAuthentication;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
@@ -111,8 +112,11 @@ public class ReportServiceImpl implements ReportService {
                 final JobDataMap jobDataMap = new JobDataMap();
                 jobDataMap.put("reportID", newReport.getId());
                 jobDataMap.put("actorID", owner.getId());
+                jobDataMap.put("orgID", org.getId());
+
 
                 final Trigger trigger = TriggerBuilder.newTrigger()
+                        .withIdentity("myTrigger")
                         .forJob(reportHandler.get().handlerJobJey())
                         .withSchedule(CronScheduleBuilder.cronSchedule("0 0/5 * 1/1 * ? *"))
                         .usingJobData(jobDataMap)
@@ -207,13 +211,14 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void executeAsyncReport(final Account actor, final Report report) throws SchedulerException {
+    public void executeAsyncReport(final TimeboardAuthentication auth, final Report report) throws SchedulerException {
 
         final Optional<ReportHandler> handler = this.getReportHandler(report);
         if (handler.isPresent()) {
             final JobDataMap jobDataMap = new JobDataMap();
             jobDataMap.put("reportID", report.getId());
-            jobDataMap.put("actorID", actor.getId());
+            jobDataMap.put("actorID", auth.getDetails().getId());
+            jobDataMap.put("orgID", auth.getCurrentOrganization().getId());
 
             this.scheduler.triggerJob(handler.get().handlerJobJey(), jobDataMap);
 
