@@ -5,7 +5,19 @@ $(document).ready(function () {
     var appListReports = new Vue({
         el: '#app-create-report',
         data: {
-            reportListConfig: {
+            syncReportListConfig: {
+                cols: [
+                    {
+                        "slot": "name",
+                        "label": "Report Name"
+                    },
+                    {
+                        "slot": "actions",
+                        "label": "Actions"
+                    }],
+                name: "syncTableReports"
+            },
+            asyncReportListConfig: {
                 cols: [
                     {
                         "slot": "name",
@@ -13,15 +25,16 @@ $(document).ready(function () {
                     },
                     {
                         "slot": "async",
-                        "label": "Is Async Report"
+                        "label": "last Async Report"
                     },
                     {
                         "slot": "actions",
                         "label": "Actions"
                     }],
-                name: "tableReports"
+                name: "asyncTableReports"
             },
-            reportListData: []
+            syncReportListData: [],
+            asyncReportListData: []
         },
         methods: {
         },
@@ -32,7 +45,8 @@ $(document).ready(function () {
                 dataType: "json",
                 url: "reports/list",
                 success: function (d) {
-                    self.reportListData = d;
+                    self.syncReportListData = d.filter(r => r.async == false);
+                    self.asyncReportListData = d.filter(r => r.async == true);
                 }
             });
         }
