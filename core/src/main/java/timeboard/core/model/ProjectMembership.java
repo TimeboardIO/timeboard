@@ -26,10 +26,11 @@ package timeboard.core.model;
  * #L%
  */
 
+import java.io.Serializable;
 import javax.persistence.*;
 
 @Entity
-public class ProjectMembership extends OrganizationEntity {
+public class ProjectMembership extends OrganizationEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -30,6 +30,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import timeboard.core.model.converters.JSONToStringMapConverter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ import java.util.stream.Collectors;
                         query = "select o from Organization o where o.name = :name and o.enabled = true")
         }
 )
-public class Organization {
+public class Organization implements Serializable {
 
     public static final String FIND_BY_NAME = "org_find_by_name";
     public static final String SETUP_PUBLIC = "org_public";

@@ -35,6 +35,7 @@ import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
 
 import java.beans.Transient;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -85,7 +86,7 @@ public interface ReportService {
     void executeAsyncReport(TimeboardAuthentication auth, Report report) throws SchedulerException;
 
 
-    class ProjectWrapper {
+    class ProjectWrapper implements Serializable {
 
         private final List<TagWrapper> projectTags;
         private final Project project;
@@ -120,7 +121,7 @@ public interface ReportService {
         }
     }
 
-    class TagWrapper {
+    class TagWrapper implements Serializable {
 
         private final String tagKey;
         private final String tagValue;
