@@ -30,7 +30,6 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -72,7 +71,7 @@ public final class ReportJob implements Job {
         final Account actor = this.accountService.findUserByID(actorID);
 
         final TimeboardAuthentication authentication = new TimeboardAuthentication(actor);
-        SecurityContext securityContext = new LocalSecurityContext(authentication);
+        final SecurityContext securityContext = new LocalSecurityContext(authentication);
         SecurityContextHolder.setContext(securityContext);
 
         final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, orgID);
