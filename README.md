@@ -1,5 +1,12 @@
 [![Build Status](https://travis-ci.com/timeboardio/timeboard.svg?branch=develop)](https://travis-ci.com/timeboardio/timeboard)
 
+# Presentation
+
+Our solution is a project management platform allowing to answer the following issues:
+- Finely manage the resources participating in a project
+- Estimate precisely the cost of an employee
+- Suggest a timesheets workflow validation
+
 # Documentations
 
 - [Software design](docs/design.md)
