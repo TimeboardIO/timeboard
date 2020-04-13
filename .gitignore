@@ -12,3 +12,8 @@ ui-tests/cypress/fixtures/projects.json
 webapp/src/main/resources/version
 **/.project
 **/.settings
+timeboard.lck
+timeboard.lobs
+timeboard.log
+timeboard.script
+timeboard.properties
