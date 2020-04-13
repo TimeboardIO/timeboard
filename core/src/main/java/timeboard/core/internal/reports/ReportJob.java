@@ -30,10 +30,14 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import timeboard.core.api.AccountService;
+import timeboard.core.api.OrganizationService;
 import timeboard.core.api.ReportService;
 import timeboard.core.model.Account;
+import timeboard.core.model.Organization;
 import timeboard.core.model.Report;
 import timeboard.core.security.TimeboardAuthentication;
 
@@ -54,14 +58,25 @@ public final class ReportJob implements Job {
     @Autowired
     private AccountService accountService;
 
+    @Autowired
+    private OrganizationService organizationService;
+
     @Override
     public void execute(final JobExecutionContext context) throws JobExecutionException {
 
         final Long reportID = context.getMergedJobDataMap().getLong("reportID");
         final Long actorID = context.getMergedJobDataMap().getLong("actorID");
+        final long orgID = context.getMergedJobDataMap().getLong("orgID");
 
         final Account actor = this.accountService.findUserByID(actorID);
+
         final TimeboardAuthentication authentication = new TimeboardAuthentication(actor);
+        final SecurityContext securityContext = new LocalSecurityContext(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        final Optional<Organization> org = this.organizationService.getOrganizationByID(actor, orgID);
+        authentication.setCurrentOrganization(org.get());
+
         final Report report = this.reportService.getReportByID(actor, reportID);
         final Optional<ReportHandler> reportHandler = this.reportService.getReportHandler(report);
 
@@ -77,4 +92,5 @@ public final class ReportJob implements Job {
 
 
     }
+
 }

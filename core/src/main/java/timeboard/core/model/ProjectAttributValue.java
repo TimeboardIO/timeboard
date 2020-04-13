@@ -26,7 +26,9 @@ package timeboard.core.model;
  * #L%
  */
 
-public class ProjectAttributValue {
+import java.io.Serializable;
+
+public class ProjectAttributValue implements Serializable {
 
 
     private boolean isPrivate;

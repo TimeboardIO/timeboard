@@ -21,7 +21,36 @@
         </div>
 
         <div id="app-create-report">
-            <data-table v-bind:table="reportListData" v-bind:config="reportListConfig">
+
+            <div class="ui horizontal divider" v-if="syncReportListData.length > 0">
+                <i class="box icon"></i>
+                Sync reports
+            </div>
+            <data-table v-bind:table="syncReportListData" v-bind:config="syncReportListConfig">
+                <template v-slot:name="{row}">
+                    {{row.name}}
+                </template>
+                <template v-slot:actions="{row}">
+                    <a class="ui right labeled success icon button" v-bind:href="'/reports/view/'+row.id">
+                        <i class="right arrow icon"></i>
+                        View
+                    </a>
+                    <a class="ui blue icon button" v-bind:href="'/reports/edit/'+row.id">
+                        Edit
+                        <i class="edit alternate icon"></i>
+                    </a>
+                    <a class="ui negative icon button" v-bind:href="'/reports/delete/'+row.id">
+                        Delete
+                        <i class="trash alternate icon"></i>
+                    </a>
+                </template>
+            </data-table>
+
+            <div class="ui horizontal divider" v-if="asyncReportListData.length > 0">
+                <i class="box icon"></i>
+                Async reports
+            </div>
+            <data-table v-bind:table="asyncReportListData" v-bind:config="asyncReportListConfig">
                 <template v-slot:name="{row}">
                     {{row.name}}
                 </template>
@@ -29,11 +58,7 @@
                     {{row.lastAsyncJobTrigger}}
                 </template>
                 <template v-slot:actions="{row}">
-                    <a v-if="row.async==false" class="ui right labeled success icon button" v-bind:href="'/reports/view/'+row.id">
-                        <i class="right arrow icon"></i>
-                        View
-                    </a>
-                    <a v-if="row.async==true" class="ui right labeled success icon button disable" v-bind:href="'/reports/async/'+row.id">
+                    <a class="ui right labeled success icon button disable" v-bind:href="'/reports/async/'+row.id">
                         <i class="right arrow icon"></i>
                         Request report
                     </a>
@@ -45,8 +70,6 @@
                         Delete
                         <i class="trash alternate icon"></i>
                     </a>
-
-
                 </template>
             </data-table>
         </div>
